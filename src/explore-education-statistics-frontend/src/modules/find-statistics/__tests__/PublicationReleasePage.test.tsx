@@ -45,6 +45,7 @@ describe('PublicationReleasePage', () => {
         '.govuk-accordion__section-header h3 button',
       ),
     ] as Element[];
+
     expect(
       elements.find(
         ele =>

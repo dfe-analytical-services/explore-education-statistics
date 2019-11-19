@@ -1,8 +1,8 @@
 import useMounted from '@common/hooks/useMounted';
-import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
   cloneElement,
+  ComponentType,
   ReactComponentElement,
   ReactNode,
   useEffect,
@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { useImmer } from 'use-immer';
 import styles from './Accordion.module.scss';
-import AccordionSection, {
+import {
   accordionSectionClasses,
   AccordionSectionProps,
 } from './AccordionSection';
@@ -31,9 +31,9 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
 
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
 
-  const sections = React.Children.toArray(children).filter(child =>
-    isComponentType(child, AccordionSection),
-  ) as ReactComponentElement<typeof AccordionSection>[];
+  const sections = React.Children.toArray(children) as ReactComponentElement<
+    ComponentType<AccordionSectionProps>
+  >[];
 
   const getSectionIds = (
     sectionProps: AccordionSectionProps,

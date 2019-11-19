@@ -52,7 +52,7 @@ const CreateReleasePage = ({
         publication,
       });
     });
-  }, []);
+  }, [publicationId]);
 
   const submitHandler = async (values: FormValues) => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(

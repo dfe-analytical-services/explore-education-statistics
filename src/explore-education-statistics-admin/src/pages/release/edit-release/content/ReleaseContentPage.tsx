@@ -1,16 +1,21 @@
-import BasicReleaseSummary from '@admin/pages/release/edit-release/content/components/BasicReleaseSummary';
+// eslint-disable-next-line import/no-named-as-default
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import commonService from '@admin/services/common/service';
+import { IdTitlePair } from '@admin/services/common/types';
 import { Comment } from '@admin/services/dashboard/types';
-import releaseService from '@admin/services/release/edit-release/summary/service';
+import releaseContentService from '@admin/services/release/edit-release/content/service';
+import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
+import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
+import { EditableContentBlock } from '@admin/services/publicationService';
 
 type PageMode = 'edit' | 'preview';
 
@@ -18,6 +23,8 @@ interface Model {
   unresolvedComments: Comment[];
   pageMode: PageMode;
   releaseSummary: ReleaseSummaryDetails;
+  theme: IdTitlePair;
+  release: AbstractRelease<EditableContentBlock>;
 }
 
 const ReleaseContentPage = () => {
@@ -28,7 +35,14 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseService.getReleaseSummaryDetails(releaseId).then(releaseSummary => {
+    Promise.all([
+      releaseSummaryService.getReleaseSummaryDetails(releaseId),
+      commonService.getBasicThemeDetails(publication.themeId),
+      releaseContentService.getRelease(releaseId),
+      releaseContentService.getContent(releaseId),
+    ]).then(([releaseSummary, theme, releaseData, releaseContent]) => {
+      // <editor-fold desc="TODO - content population">
+
       const unresolvedComments: Comment[] = [
         {
           message: 'Please resolve this.\nThank you.',
@@ -42,13 +56,89 @@ const ReleaseContentPage = () => {
         },
       ];
 
+      const contentBlock = {
+        order: 0,
+        heading: 'test',
+        caption: 'test',
+        content: [
+          {
+            type: 'HtmlBlock',
+            body: 'This is a test',
+            comments: [
+              {
+                name: 'A user',
+                time: new Date(),
+                comment: 'A comment',
+                state: 'open',
+              },
+            ],
+          },
+        ],
+      };
+
+      const contentBlocks = [contentBlock, { ...contentBlock, order: 1 }];
+
+      const releaseDataAsEditable = {
+        ...releaseData,
+        keyStatistics: releaseData.keyStatistics as EditableContentBlock,
+        content:
+          (releaseData.content &&
+            releaseData.content.map(section => ({
+              ...section,
+              content: section.content.map<EditableContentBlock>(
+                (block, index) => ({
+                  ...block,
+                  id: `${index}`,
+                  comments: [],
+                }),
+              ),
+            }))) ||
+          contentBlocks,
+      };
+
+      const release: AbstractRelease<EditableContentBlock> = {
+        ...releaseDataAsEditable,
+        summary: 'This is the summary ..... ',
+        updates: [
+          {
+            id: '',
+            on: '',
+            reason: '',
+            releaseId: '',
+          },
+        ],
+        publication: {
+          ...publication,
+          slug: '',
+          description: '',
+          dataSource: '',
+          summary: '',
+          releases: [],
+          legacyReleases: [],
+          topic: {
+            theme,
+          },
+          nextUpdate: '',
+          contact: {
+            contactName: '',
+            contactTelNo: '',
+            teamEmail: '',
+            teamName: '',
+          },
+        },
+      };
+
+      // </editor-fold>
+
       setModel({
         unresolvedComments,
         pageMode: 'edit',
         releaseSummary,
+        theme,
+        release,
       });
     });
-  }, [releaseId]);
+  }, [releaseId, publication.themeId, publication]);
 
   return (
     <>
@@ -99,23 +189,13 @@ const ReleaseContentPage = () => {
             })}
           >
             <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
-              <h1 className="govuk-heading-l">
-                <span className="govuk-caption-l">
-                  {model.releaseSummary.timePeriodCoverage.label}{' '}
-                  {getTimePeriodCoverageDateRangeStringShort(
-                    model.releaseSummary.releaseName,
-                    '/',
-                  )}
-                </span>
-                {publication.title}
-              </h1>
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                  <div className="govuk-grid-row">
-                    <BasicReleaseSummary release={model.releaseSummary} />
-                  </div>
-                </div>
-              </div>
+              <PublicationReleaseContent
+                editing={model.pageMode === 'edit'}
+                basicPublication={publication}
+                release={model.release}
+                releaseSummary={model.releaseSummary}
+                styles={{}}
+              />
             </div>
           </div>
         </>

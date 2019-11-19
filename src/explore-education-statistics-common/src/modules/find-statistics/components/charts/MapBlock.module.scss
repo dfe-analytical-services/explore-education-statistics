@@ -31,7 +31,7 @@
 .mapContainer {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 0.5%;
+  margin-bottom: 1rem;
 }
 
 .mapControls {
@@ -50,6 +50,7 @@
 }
 
 .mapKey {
+  padding: 0 1rem;
   @include govuk-media-query($until: tablet) {
     display: none;
   }
@@ -65,5 +66,35 @@
   }
   @include govuk-media-query($until: tablet) {
     display: none;
+  }
+}
+
+.mapIndicator {
+  flex: 1 0 64.6%;
+  margin-right: 1%;
+
+  @include govuk-media-query($until: tablet) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    margin: 0 1.5% 0 0.5%;
+  }
+}
+
+.mapLocation {
+  flex: 0 0 32.3%;
+  max-width: 32.3%;
+  padding: 0 0.5rem;
+
+  @include govuk-media-query($until: tablet) {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    margin: 0;
   }
 }

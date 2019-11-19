@@ -7,7 +7,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -82,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Stop();
-            
+
             return new TableBuilderResultSubjectMetaViewModel
             {
                 Filters = filters,
@@ -98,13 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private IEnumerable<ObservationalUnitMetaViewModel> GetObservationalUnits(IQueryable<Observation> observations)
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
-            return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit =>
+
+            var viewModels = observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit =>
                 new ObservationalUnitMetaViewModel
                 {
                     Label = observationalUnit.Name,
-                    Level = pair.Key.ToString().CamelCase(),
+                    Level = pair.Key,
                     Value = observationalUnit.Code
                 }));
+
+            return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels);
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)

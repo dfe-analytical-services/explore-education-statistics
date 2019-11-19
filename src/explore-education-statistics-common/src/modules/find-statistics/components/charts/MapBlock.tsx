@@ -1,8 +1,9 @@
-import { FormSelect } from '@common/components/form';
+import { FormSelect, FormGroup, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDataB,
   ChartDefinition,
+  ChartMetaData,
   ChartProps,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
@@ -11,7 +12,6 @@ import {
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
-  DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
@@ -70,13 +70,13 @@ interface MapClickEvent extends LeafletMouseEvent {
 // <editor-fold desc=" Static functions">
 function getLocationsForDataSet(
   data: DataBlockData,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   chartData: ChartDataB[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
 
   return [
-    { label: 'select...', value: '' },
+    { label: 'Select...', value: '' },
     ...allLocationIds.reduce(
       (locations: { label: string; value: string }[], next: string) => {
         const { label, value } = (meta.locations || {})[next];
@@ -96,7 +96,7 @@ function getLocationsForDataSet(
 }
 
 function getGeometryForOptions(
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   selectedDataSet: DataSetConfiguration,
   sourceData: ChartDataB[],
   min: number,
@@ -144,7 +144,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
 }
 
 function generateGeometryAndLegendForSelectedOptions(
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   chartData: ChartDataB[],
   selectedDataSet: string,
@@ -226,11 +226,13 @@ function getFeatureElementById(
     if (selectedFeature) {
       const selectedLayer: Path = selectedFeature.properties.layer as Path;
 
-      return {
-        element: selectedLayer.getElement(),
-        layer: selectedLayer,
-        feature: selectedFeature,
-      };
+      if (selectedLayer) {
+        return {
+          element: selectedLayer.getElement(),
+          layer: selectedLayer,
+          feature: selectedFeature,
+        };
+      }
     }
   }
 
@@ -292,6 +294,7 @@ const MapBlock = ({
   height,
   labels,
   axes,
+  children,
 }: MapProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
@@ -527,6 +530,16 @@ const MapBlock = ({
     }
   };
 
+  const findLocationBySelectedLocation = () => {
+    const chosenLocation = majorOptions.find(location => {
+      return location.value === selectedLocation;
+    });
+    if (chosenLocation) {
+      return chosenLocation.label;
+    }
+    return '';
+  };
+
   // reset the GeoJson layer if the geometry is changed, updating the component doesn't do it once it's rendered
   React.useEffect(() => {
     if (geoJsonRef.current) {
@@ -545,68 +558,45 @@ const MapBlock = ({
     axisMajor === undefined ||
     axisMajor.dataSets === undefined
   )
-    return <div>An error occurred</div>;
+    return <div>Unable to render map, map incorrectly configured</div>;
 
   return (
     <>
-      <div className={styles.mapContainer} ref={container}>
-        <div className={styles.mapControls} aria-live="assertive">
-          <form>
-            <div className="govuk-form-group govuk-!-margin-bottom-6">
+      <form>
+        <FormFieldset
+          id="data-and-location"
+          legend="Select data and location to view indicators"
+          legendHidden
+        >
+          <div className={styles.mapContainer}>
+            <FormGroup className={styles.mapIndicator}>
               <FormSelect
                 name="selectedIndicator"
                 id="selectedIndicator"
-                label="Select data to view"
+                label="1. Select data to view"
                 value={selectedDataSetKey}
                 onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
                 options={dataSetOptions}
                 order={[]}
+                className="govuk-!-width-full"
               />
-            </div>
+            </FormGroup>
 
-            <div className="govuk-form-group govuk-!-margin-bottom-6">
+            <FormGroup className={styles.mapLocation}>
               <FormSelect
                 name="selectedLocation"
                 id="selectedLocation"
-                label="Select a location"
+                label="2. Select a location"
                 value={selectedLocation}
                 onChange={e => updateSelectedLocation(e.currentTarget.value)}
                 options={majorOptions}
                 order={[]}
               />
-            </div>
-          </form>
-
-          {selectedDataSetKey && labels && labels[selectedDataSetKey] && (
-            <div className={styles.mapKey}>
-              <h3 className="govuk-heading-s">
-                Key to {labels[selectedDataSetKey].label}
-              </h3>
-              <dl className="govuk-list">
-                {legend &&
-                  legend.map(({ min, max, idx, minValue }) => (
-                    <dd className={styles.legend} key={idx}>
-                      <span
-                        className={styles[`rate${idx}`]}
-                        style={{
-                          backgroundColor: calculateColour({
-                            scaledData: minValue,
-                            color: labels[selectedDataSetKey].colour,
-                          }),
-                        }}
-                      >
-                        &nbsp;
-                      </span>{' '}
-                      {min}
-                      {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                      {labels[selectedDataSetKey].unit}{' '}
-                    </dd>
-                  ))}
-              </dl>
-            </div>
-          )}
-        </div>
-
+            </FormGroup>
+          </div>
+        </FormFieldset>
+      </form>
+      <div className={styles.mapContainer} ref={container}>
         <div className={styles.mapView}>
           {geometry && ukGeometry && (
             <Map
@@ -643,17 +633,48 @@ const MapBlock = ({
             </Map>
           )}
         </div>
+        <div className={styles.mapControls} aria-live="assertive">
+          {selectedDataSetKey && labels && labels[selectedDataSetKey] && (
+            <div className={styles.mapKey}>
+              <h3 className="govuk-heading-s">
+                Key to {labels[selectedDataSetKey].label}
+              </h3>
+              <dl className="govuk-list">
+                {legend &&
+                  legend.map(({ min, max, idx, minValue }) => (
+                    <dd className={styles.legend} key={idx}>
+                      <span
+                        className={styles[`rate${idx}`]}
+                        style={{
+                          backgroundColor: calculateColour({
+                            scaledData: minValue,
+                            color: labels[selectedDataSetKey].colour,
+                          }),
+                        }}
+                      >
+                        &nbsp;
+                      </span>{' '}
+                      {min}
+                      {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                      {labels[selectedDataSetKey].unit}{' '}
+                    </dd>
+                  ))}
+              </dl>
+            </div>
+          )}
+        </div>
       </div>
 
       {results.length > 0 && (
         <>
-          <hr />
-          {selectedLocation}
+          <h3 className="govuk-heading-m govuk-!-margin-left-1 govuk-!-margin-bottom-0">
+            {findLocationBySelectedLocation()}
+          </h3>
           <div className={classNames(stylesIndicators.keyStatsContainer)}>
             {results.map(result => (
               <div key={result.id} className={stylesIndicators.keyStatTile}>
                 <div className={stylesIndicators.keyStat}>
-                  <h3 className="govuk-heading-s">{labels[result.id].label}</h3>
+                  <h4 className="govuk-heading-s">{labels[result.id].label}</h4>
                   <p
                     className="govuk-heading-xl govuk-!-margin-bottom-2"
                     aria-label={labels[result.id].label}
@@ -671,6 +692,7 @@ const MapBlock = ({
           </div>
         </>
       )}
+      {children}
     </>
   );
 };
