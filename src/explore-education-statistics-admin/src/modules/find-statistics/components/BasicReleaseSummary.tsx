@@ -77,11 +77,11 @@ const BasicReleaseSummary = ({ release }: Props) => {
             </dl>
           </div>
 
-          {releaseTypeIdsToIcons[release.typeId] && (
+          {releaseTypeIdsToIcons[release.type.id] && (
             <div className="govuk-grid-column-one-quarter">
               <img
-                src={releaseTypeIdsToIcons[release.typeId].url}
-                alt={releaseTypeIdsToIcons[release.typeId].altText}
+                src={releaseTypeIdsToIcons[release.type.id].url}
+                alt={releaseTypeIdsToIcons[release.type.id].altText}
                 height="120"
                 width="120"
               />

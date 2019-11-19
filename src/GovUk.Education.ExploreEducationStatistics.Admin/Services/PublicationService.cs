@@ -93,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return values.Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.Type)
-                .Include(p => p.Methodology);
+                .Include(p => p.Methodology)
+                .Include(p => p.Topic);
         }
     }
 }

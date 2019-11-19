@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using UserId = System.Guid;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -16,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public List<Theme> GetUserThemes(UserId userId)
+        public List<Theme> GetUserThemes(Guid userId)
         {
             // TODO This method simply returns all Themes as we currently do not have a concept of how a user
             // TODO is connected to Themes for the purpose of administration. Once this has been modelled then
@@ -27,6 +31,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Title = th.Title,
                 Topics = th.Topics.Select(to => new Topic {Id = to.Id, Title = to.Title}).ToList()
             }).ToList();
+        }
+        
+        public Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id)
+        { 
+            return _context
+                .Themes
+                .Where(th => th.Id == id)
+                .Select(th => new ThemeSummaryViewModel()
+            {
+                Id = th.Id,
+                Title = th.Title
+            })
+                .FirstOrDefaultAsync();
         }
     }
 }

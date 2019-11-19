@@ -27,6 +27,11 @@ const PageFooter = ({ wide }: Props) => (
                 BAU Tools
               </a>
             </li>
+            <li className="govuk-footer__inline-list-item">
+              <a href="/docs" className="govuk-footer__link">
+                API Documentation
+              </a>
+            </li>
           </ul>
 
           <svg

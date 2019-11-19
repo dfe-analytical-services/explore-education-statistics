@@ -32,12 +32,14 @@ export interface Publication {
       title: string;
     };
   };
-  contact: {
-    teamName: string;
-    teamEmail: string;
-    contactName: string;
-    contactTelNo: string;
-  };
+  contact: PublicationContact;
+}
+
+export interface PublicationContact {
+  teamName: string;
+  teamEmail: string;
+  contactName: string;
+  contactTelNo: string;
 }
 
 export interface DataQuery {
@@ -187,7 +189,10 @@ export enum ReleaseType {
   OfficialStatistics = 'Official Statistics',
 }
 
-export interface AbstractRelease<ContentBlockType> {
+export interface AbstractRelease<
+  ContentBlockType,
+  PublicationType = Publication
+> {
   id: string;
   title: string;
   yearTitle: string;
@@ -197,7 +202,7 @@ export interface AbstractRelease<ContentBlockType> {
   slug: string;
   summary: string;
   publicationId: string;
-  publication: Publication;
+  publication: PublicationType;
   latestRelease: boolean;
   type: {
     id: string;
