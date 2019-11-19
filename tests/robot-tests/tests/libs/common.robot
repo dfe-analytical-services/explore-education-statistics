@@ -30,9 +30,8 @@ user signs in
   environment variable should be set   ADMIN_PASSWORD
   user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
 
-  sleep 5
   user checks url contains  %{ADMIN_URL}
-  user waits until page contains heading   User1 EESADMIN
+  user waits until page contains heading   User1
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
