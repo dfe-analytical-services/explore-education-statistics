@@ -35,5 +35,6 @@
   </Target>
   <Target Name="PostPublish" BeforeTargets="Publish">
     <Exec Command="copy $(PublishDir)$(ProjectName).deps.json $(PublishDir)bin\function.deps.json" />
+    <Exec Command="move $(PublishDir)\runtimes $(PublishDir)\bin" />
   </Target>
 </Project>
