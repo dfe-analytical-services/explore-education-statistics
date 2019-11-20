@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 }
 
                 return await contentSectionFn.Invoke(new Tuple<Release, ContentSection>(release, section));
-            });
+            }, HydrateContentSectionsAndBlocks);
         }
     }
 }
