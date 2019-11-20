@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e68fd875-2528-4f18-8a8a-6ea85b1c6200",
+		"_postman_id": "1d659858-24d8-4789-9d48-2d1dd704030e",
 		"name": "DfE Data API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -243,11 +243,7 @@
 													"    pm.expect(respJson.locations.country.options.length).to.equal(1);",
 													"    pm.expect(respJson.locations.region.options.length).to.equal(10);",
 													"    ",
-													"    /*",
-													"    $ csvgrep -p geographic_level/local\\ authority/ absence_by_geographic_level.csv | csvcut -k la_name | sed 1d | sort | uniq | wc -l",
-													"    154",
-													"    */",
-													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(154);",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(156);",
 													"});",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
@@ -1034,7 +1030,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1,\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"Local_Authority\"\n}"
+											"raw": "{\n\tsubjectId: 1,\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"LocalAuthority\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1488,7 +1484,7 @@
 													"    pm.expect(respJson.subjectMeta.timePeriodRange.length).to.equal(1); ",
 													"});",
 													"",
-													"pm.test(\"results should contain Country, Local_Authority, and Local_Authority_District geographicLevels\", function () {",
+													"pm.test(\"results should contain Country, LocalAuthority, and LocalAuthorityDistrict geographicLevels\", function () {",
 													"    var countryFound = false;",
 													"    var localAuthorityFound = false;",
 													"    var localAuthorityDistrictFound = false;",
@@ -1496,16 +1492,16 @@
 													"        if(respJson.results[i].geographicLevel == \"Country\") {",
 													"            countryFound = true;",
 													"        }",
-													"        if(respJson.results[i].geographicLevel == \"Local_Authority\") {",
+													"        if(respJson.results[i].geographicLevel == \"LocalAuthority\") {",
 													"            localAuthorityFound = true;",
 													"        }",
-													"        if(respJson.results[i].geographicLevel == \"Local_Authority_District\") {",
+													"        if(respJson.results[i].geographicLevel == \"LocalAuthorityDistrict\") {",
 													"            localAuthorityDistrictFound = true;",
 													"        }",
 													"    }",
-													"    pm.expect(countryFound).to.equal(true);",
-													"    pm.expect(localAuthorityFound).to.equal(true);",
-													"    pm.expect(localAuthorityDistrictFound).to.equal(true);",
+													"    pm.expect(countryFound).to.equal(true, 'No countries found!');",
+													"    pm.expect(localAuthorityFound).to.equal(true, 'No local authorities found!');",
+													"    pm.expect(localAuthorityDistrictFound).to.equal(true, 'No local authority districts found!');",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
@@ -1935,7 +1931,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});"
 												],
@@ -1955,7 +1951,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__GenderMale}}, {{1F_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__GenderMale}}, {{1F_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2068,7 +2064,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});"
 												],
@@ -2132,7 +2128,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});"
 												],
@@ -2152,7 +2148,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2200,7 +2196,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});"
 												],
@@ -2220,7 +2216,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2464,7 +2460,7 @@
 													"",
 													"pm.test(\"Results geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});"
 												],
@@ -2484,7 +2480,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{2F_SchoolType__StateFundedPrimary}}, \n    \t{{2F_SchoolType__StateFundedSecondary}}, \n    \t{{2F_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{2I_AbsenceFields__OverallAbsenceRate}},\n\t\t{{2I_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{2I_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{2F_SchoolType__StateFundedPrimary}}, \n    \t{{2F_SchoolType__StateFundedSecondary}}, \n    \t{{2F_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{2I_AbsenceFields__OverallAbsenceRate}},\n\t\t{{2I_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{2I_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3560,7 +3556,7 @@
 													"",
 													"pm.test(\"geographicLevel and indicators/measures should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.${pm.globals.get(\"5I_AbsenceFields__UnauthorisedAbsenceRate\")}`));",
 													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.${pm.globals.get(\"5I_AbsenceFields__AuthorisedAbsenceRate\")}`));",
 													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.${pm.globals.get(\"5I_AbsenceFields__OverallAbsenceRate\")}`));",
@@ -3660,7 +3656,7 @@
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.satisfy(function (geoLevel) {",
-													"            return geoLevel === \"Region\" || geoLevel === \"Local_Authority\";",
+													"            return geoLevel === \"Region\" || geoLevel === \"LocalAuthority\";",
 													"        });",
 													"    }",
 													"});"
@@ -3749,7 +3745,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});"
 												],
@@ -3769,7 +3765,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{6F_StateFundedPrimary}}, \n        {{6F_StateFundedSecondary}}, \n        {{6F_Special}}\n    ],\n    \"indicators\": [\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}},\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}},\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{6F_StateFundedPrimary}}, \n        {{6F_StateFundedSecondary}}, \n        {{6F_Special}}\n    ],\n    \"indicators\": [\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}},\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}},\n    \t{{6I_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4191,7 +4187,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});",
 													"",
@@ -4287,7 +4283,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
 													"    }",
 													"});"
 												],
@@ -4348,7 +4344,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});",
 													"",
@@ -4441,7 +4437,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});",
 													"",
@@ -4520,7 +4516,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});",
 													"",
@@ -4598,7 +4594,7 @@
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
 													"    }",
 													"});",
 													"",
@@ -4774,7 +4770,7 @@
 													"pm.test(\"All results should have correction geographicLevel\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 													"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-													"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
+													"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
 													"        });",
 													"    }",
 													"});"
@@ -5162,7 +5158,7 @@
 									"",
 									"pm.test(\"geographicLevel should be same as request\", function () {",
 									"    for(var i = 0; i < respJson.fullTable.results.length; i++) {",
-									"        pm.expect(respJson.fullTable.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+									"        pm.expect(respJson.fullTable.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
 									"    }",
 									"});",
 									"",
