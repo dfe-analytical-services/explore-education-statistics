@@ -20,10 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class BatchService : IBatchService
     {
-        private readonly ILogger<IBatchService> _logger;
-        private readonly CloudTable _table;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
+        private readonly ILogger<IBatchService> _logger;
+        private readonly CloudTable _table;
 
         public BatchService(
             ITableStorageService tblStorageService,
@@ -87,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
+
             return true;
         }
 
@@ -134,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId,
                 dataFileName,
-                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string> {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
 
             return (DatafileImport) result.Result;
         }
@@ -145,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             // TODO Improve error handling & max retries 
             while (leaseId == null)
-            {
                 try
                 {
                     leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
@@ -153,17 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 catch (StorageException se)
                 {
                     if (se.RequestInformation.HttpStatusCode == (int) HttpStatusCode.Conflict)
-                    {
                         // A Conflict has been found, lease is being used by another process
                         // wait and try again.
                         Thread.Sleep(TimeSpan.FromSeconds(2));
-                    }
                     else
-                    {
                         throw se;
-                    }
                 }
-            }
 
             return leaseId;
         }

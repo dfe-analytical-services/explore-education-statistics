@@ -16,35 +16,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         [EnumLabelValue("Meta header contains quotes")]
         MetaHeaderContainsQuotes,
-        
+
         [EnumLabelValue("Metafile has unexpected columns")]
         MetaFileHasUnexpectedColumns,
-        
+
         [EnumLabelValue("Metafile contains quotes")]
         MetaFileContainsQuotes,
-        
+
         [EnumLabelValue("Metafile has invalid number of columns")]
         MetaFileHasInvalidNumberOfColumns,
-        
+
         [EnumLabelValue("Metafile has invalid values")]
         MetaFileHasInvalidValues,
-        
+
         [EnumLabelValue("Datafile contains quotes")]
         DataFileContainsQuotes,
-        
+
         [EnumLabelValue("Datafile has invalid number of columns")]
         DataFileHasInvalidNumberOfColumns,
-        
+
         [EnumLabelValue("Datafile has invalid geographic level")]
         DataFileHasInvalidGeographicLevel,
-        
+
         [EnumLabelValue("Datafile has invalid time identifier")]
         DataFileHasInvalidTimeIdentifier,
-        
+
         [EnumLabelValue("Datafile has invalid time period")]
         DataFileHasInvalidTimePeriod
     }
-    
+
     public class ValidatorService : IValidatorService
     {
         public List<string> Validate(ImportMessage message, SubjectData subjectData)
@@ -65,59 +65,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static void ValidateMetaHeader(string header, List<string> errors)
         {
             if (RowContainsQuotes(header))
-            {
                 // No further checks if quotes exist
                 errors.Add(ValidationErrorMessages.MetaHeaderContainsQuotes.GetEnumLabel());
-            }
             else
-            {
                 // Check for unexpected column names
-                Array.ForEach<string>( Enum.GetNames(typeof(MetaColumns)), (string col) => {
+                Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
+                {
                     if (!header.Contains(col))
-                    { 
                         errors.Add(ValidationErrorMessages.MetaFileHasUnexpectedColumns.GetEnumLabel());
-                    }
-                } );
-            }
+                });
         }
-        
+
         private static void ValidateMetaRows(IEnumerable<string> lines, List<string> errors)
         {
             var idx = 2;
             var headers = lines.First().Split(',').ToList();
-            
-            foreach (var line in lines.Skip(1))
-            {
-                ValidateMetaRow(line, idx++, headers, errors);  
-            }
+
+            foreach (var line in lines.Skip(1)) ValidateMetaRow(line, idx++, headers, errors);
         }
-        
+
         private static void ValidateObservations(IEnumerable<string> lines, List<string> errors)
         {
             var idx = 2;
             var headers = lines.First().Split(',').ToList();
 
-            foreach (var line in lines.Skip(1))
-            {
-                ValidateObservationRow(line, idx++, headers, errors);
-            }
+            foreach (var line in lines.Skip(1)) ValidateObservationRow(line, idx++, headers, errors);
         }
 
         private static void ValidateMetaRow(string row, int rowNumber, List<string> headers, List<string> errors)
         {
-            int numExpectedColumns = headers.Count;
-            
+            var numExpectedColumns = headers.Count;
+
             if (RowContainsQuotes(row))
             {
                 // No further checks if quotes exist
-                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileContainsQuotes.GetEnumLabel());
+                errors.Add(
+                    $"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileContainsQuotes.GetEnumLabel());
             }
             else
             {
                 if (HasUnexpectedNumberOfColumns(row, numExpectedColumns))
-                {
-                    errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
-                }
+                    errors.Add($"error at row {rowNumber}: " +
+                               ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
 
                 try
                 {
@@ -125,24 +114,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message);
+                    errors.Add($"error at row {rowNumber}: " +
+                               ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message);
                 }
             }
         }
-        
+
         private static void ValidateObservationRow(string row, int rowNumber, List<string> headers, List<string> errors)
         {
             if (RowContainsQuotes(row))
             {
                 // No further checks if quotes exist
-                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.DataFileContainsQuotes.GetEnumLabel());
+                errors.Add(
+                    $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileContainsQuotes.GetEnumLabel());
             }
             else
             {
                 if (HasUnexpectedNumberOfColumns(row, headers.Count))
-                {
-                    errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel());
-                }
+                    errors.Add($"error at row {rowNumber}: " +
+                               ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel());
 
                 try
                 {
@@ -165,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.DataFileHasInvalidTimePeriod.GetEnumLabel());
-                } 
+                }
             }
         }
 

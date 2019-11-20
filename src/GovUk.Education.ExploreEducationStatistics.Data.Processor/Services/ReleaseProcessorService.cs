@@ -27,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _mapper = mapper;
         }
 
-        public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message, StatisticsDbContext context)
+        public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
+            StatisticsDbContext context)
         {
             var release = CreateOrUpdateRelease(message, context);
             return RemoveAndCreateSubject(subjectData.Name, release, context);
@@ -37,19 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subject = context.Subject
                 .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
-            
+
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
 
-            if (subject != null)
-            {
-                context.Subject.Remove(subject);
-            }
+            if (subject != null) context.Subject.Remove(subject);
 
             subject = context.Subject.Add(new Subject(name, release)).Entity;
 
             return subject;
         }
-        
+
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)
         {
             var release = context.Release
@@ -97,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             publication = _mapper.Map(message.Release.Publication, publication);
             return context.Publication.Update(publication).Entity;
         }
-        
+
         private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
         {
             var topic = context.Topic
