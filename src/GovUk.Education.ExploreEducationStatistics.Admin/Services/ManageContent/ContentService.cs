@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ContentService : IContentService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public ContentService(ApplicationDbContext context)
+        public ContentService(ContentDbContext context)
         {
             _context = context;
             _releaseHelper = new PersistenceHelper<Release, Guid>(

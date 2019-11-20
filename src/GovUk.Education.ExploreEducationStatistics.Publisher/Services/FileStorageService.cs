@@ -15,6 +15,7 @@ using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -51,6 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publicContainer, message);
         }
 
+        public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
+        {
+            return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicContainerName, publication,
+                release);
+        }
+
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
             PublishReleaseDataMessage message)
@@ -72,9 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
             context.ShouldTransferCallbackAsync += ShouldTransferCallbackAsync;
-
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
-
+            
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, CopyMethod.ServiceSideAsyncCopy, options, context);
+            
             ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
         }
 
@@ -95,7 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger.LogInformation("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
         }
 
+#pragma warning disable 1998
         private static async Task SetAttributesCallbackAsync(object destination, DateTime releasePublished)
+#pragma warning restore 1998
         {
             var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
             (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);

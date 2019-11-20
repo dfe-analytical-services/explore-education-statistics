@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class PreReleaseService : IPreReleaseService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IReleaseService _releaseService;
         private readonly ILogger<PreReleaseService> _logger;
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             },
         };
             
-        public PreReleaseService(ApplicationDbContext context, IMapper mapper, IReleaseService releaseService, ILogger<PreReleaseService> logger)
+        public PreReleaseService(ContentDbContext context, IMapper mapper, IReleaseService releaseService, ILogger<PreReleaseService> logger)
         {
             _context = context;
             _mapper = mapper;

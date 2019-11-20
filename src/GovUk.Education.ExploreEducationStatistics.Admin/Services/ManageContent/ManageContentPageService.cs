@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public ManageContentPageService(ApplicationDbContext context, IMapper mapper)
+        public ManageContentPageService(ContentDbContext context, IMapper mapper)
         {
             _mapper = mapper;
             _releaseHelper = new PersistenceHelper<Release, Guid>(

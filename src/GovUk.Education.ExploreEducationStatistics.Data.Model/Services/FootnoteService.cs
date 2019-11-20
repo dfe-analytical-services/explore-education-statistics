@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             {
                 f => f.Filters, f => f.FilterGroups, f => f.FilterItems, f => f.Indicators, f => f.Subjects
             });
-            
+
             DeleteEntities(footnote.Subjects);
             DeleteEntities(footnote.Filters);
             DeleteEntities(footnote.FilterGroups);
@@ -124,31 +124,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
 
-            return _context.Footnote.AsNoTracking().FromSql(
-                "EXEC dbo.FilteredFootnotes " +
-                "@subjectId," +
-                "@indicatorList," +
-                "@filterItemList",
-                subjectIdParam,
-                indicatorListParam,
-                filterItemListParam);
+            return _context
+                .Footnote
+                .FromSqlRaw(
+                    "EXEC dbo.FilteredFootnotes " +
+                    "@subjectId," +
+                    "@indicatorList," +
+                    "@filterItemList",
+                    subjectIdParam,
+                    indicatorListParam,
+                    filterItemListParam)
+                .AsNoTracking();
         }
-        
+
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId)
         {
-            return _context.SubjectFootnote
-                .Where(footnote => footnote.Subject.ReleaseId == releaseId)
-                .Select(footnote => footnote.Footnote)
-                .Distinct()
+            return DbSet().Where(footnote =>
+                    (!footnote.Subjects.Any() ||
+                     footnote.Subjects.Any(subjectFootnote => subjectFootnote.Subject.ReleaseId == releaseId))
+                    && (!footnote.Filters.Any() || footnote.Filters.Any(filterFootnote =>
+                            filterFootnote.Filter.Subject.ReleaseId == releaseId))
+                    && (!footnote.FilterGroups.Any() || footnote.FilterGroups.Any(filterGroupFootnote =>
+                            filterGroupFootnote.FilterGroup.Filter.Subject.ReleaseId == releaseId))
+                    && (!footnote.FilterItems.Any() || footnote.FilterItems.Any(filterItemFootnote =>
+                            filterItemFootnote.FilterItem.FilterGroup.Filter.Subject.ReleaseId == releaseId))
+                    && (!footnote.Indicators.Any() || footnote.Indicators.Any(indicatorFootnote =>
+                            indicatorFootnote.Indicator.IndicatorGroup.Subject.ReleaseId == releaseId)))
                 .Include(footnote => footnote.Filters)
                 .ThenInclude(footnote => footnote.Filter)
                 .Include(footnote => footnote.FilterGroups)
                 .Include(footnote => footnote.FilterItems)
                 .Include(footnote => footnote.Indicators)
-                .Include(footnote => footnote.Subjects)
-                .ToList();
+                .Include(footnote => footnote.Subjects);
         }
-        
+
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
         {
             var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id));
@@ -176,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var filterGroups = _filterGroupService.FindMany(filterGroup => filterGroupIds.Contains(filterGroup.Id),
                 new List<Expression<Func<FilterGroup, object>>>
                 {
-                    filterGroup => filterGroup.Filter 
+                    filterGroup => filterGroup.Filter
                 });
 
             var links = footnote.FilterGroups;
@@ -191,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var filterItems = _filterItemService.FindMany(filterItem => filterItemIds.Contains(filterItem.Id),
                 new List<Expression<Func<FilterItem, object>>>
                 {
-                    filterItem => filterItem.FilterGroup.Filter  
+                    filterItem => filterItem.FilterGroup.Filter
                 });
 
             var links = footnote.FilterItems;

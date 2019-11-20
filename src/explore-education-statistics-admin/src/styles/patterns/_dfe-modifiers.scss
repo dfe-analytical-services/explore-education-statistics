@@ -97,8 +97,10 @@ h1.govuk-panel__title {
 }
 
 .dfe-filter-overflow {
+  margin-left: -1rem;
   max-height: 600px;
   overflow-x: auto;
+  padding-left: 1rem;
 }
 
 .dfe-summary-list__key--small {

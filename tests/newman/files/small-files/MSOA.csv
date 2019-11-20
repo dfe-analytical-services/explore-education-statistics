@@ -1,4 +1,4 @@
-time_period,time_identifier,geographic_level,country_code,country_name,output_area_code,output_area_name,admission_numbers
+time_period,time_identifier,geographic_level,country_code,country_name,opportunity_area_code,opportunity_area_name,admission_numbers
 2018,Calendar year,Opportunity area,E92000001,England,E02000984,Bolton 001,16659
 2018,Calendar year,Opportunity area,E92000001,England,E02000985,Bolton 002,3017
 2018,Calendar year,Opportunity area,E92000001,England,E02000986,Bolton 003,14020

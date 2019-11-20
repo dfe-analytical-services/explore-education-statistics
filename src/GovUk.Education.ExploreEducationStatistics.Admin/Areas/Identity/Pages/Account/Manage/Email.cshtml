@@ -1,0 +1,43 @@
+@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Manage Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<h4 class="govuk-heading-m">@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="govuk-form-group">
+                <label asp-for="Email" class="govuk-label"></label>
+                @if (Model.IsEmailConfirmed)
+                {
+                    <div class="input-group">
+                        <input asp-for="Email" class="govuk-input" disabled />
+                        <div class="input-group-append">
+                            <span class="input-group-text text-success font-weight-bold">✓</span>
+                        </div>
+                    </div>
+                }
+                 else
+                {
+                    <input asp-for="Email" class="govuk-input" disabled />
+                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="govuk-button govuk-button--secondary">Send verification email</button>
+                }
+            </div>
+            <div class="govuk-form-group">
+                <label asp-for="Input.NewEmail" class="govuk-label" ></label>
+                <input asp-for="Input.NewEmail" class="govuk-input" />
+                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+            </div>
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="govuk-button">Change email</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
