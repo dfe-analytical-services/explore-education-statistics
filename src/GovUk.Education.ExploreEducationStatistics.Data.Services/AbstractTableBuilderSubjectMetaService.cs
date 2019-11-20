@@ -39,27 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
         }
-        
-        protected Dictionary<string, FilterMetaViewModel> GetFilters2(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItemsIncludingFilters(observations)
-                .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
-                .ToDictionary(
-                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new FilterMetaViewModel
-                    {
-                        Hint = itemsGroupedByFilter.Key.Hint,
-                        Legend = itemsGroupedByFilter.Key.Label,
-                        Options = itemsGroupedByFilter
-                            .GroupBy(item => item.FilterGroup, item => item, FilterGroupComparer)
-                            .ToDictionary(
-                                itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
-                                    itemsGroupedByFilterGroup)
-                            ),
-                        TotalValue = GetTotalValue(itemsGroupedByFilter)
-                    });
-        }
 
         protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
