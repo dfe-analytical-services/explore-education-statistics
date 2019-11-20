@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public static string Value(IReadOnlyList<string> line, List<string> headers, string column)
         {
-            return headers.Contains(column) ? line[headers.FindIndex(h => h.Equals(column))].NullIfWhiteSpace() : null;
+            return headers.Contains(column) ? line[headers.FindIndex(h => h.Equals(column))].Trim().NullIfWhiteSpace() : null;
         }
     }
 }
