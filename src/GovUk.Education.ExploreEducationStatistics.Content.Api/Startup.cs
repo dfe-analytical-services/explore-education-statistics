@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +9,12 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -36,21 +34,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddJsonOptions(options =>
+            services.AddMvc(options =>
                 {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-                    options.SerializerSettings.Converters.Add(new ContentBlockConverter());
-                });
-
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
-            );
+                    options.EnableEndpointRouting = false;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+                        options.SerializerSettings.Converters.Add(new ContentBlockConverter());
+                    });
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -59,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddSwaggerGen(swag =>
             {
                 swag.SwaggerDoc("v1",
-                    new Info {Title = "Explore education statistics - Content API", Version = "v1"});
+                    new OpenApiInfo {Title = "Explore education statistics - Content API", Version = "v1"});
             });
 
             services.AddCors();
@@ -71,10 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            UpdateDatabase(app);
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -106,19 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.UseRewriter(option);
         }
 
-        private static void UpdateDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
-                {
-                    context.Database.Migrate();
-                }
-            }
-        }
-
         // TODO: this should only be used in development, adds the required message to the content-cache queue
         private void GenerateContentCache()
         {
@@ -129,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
                 cloudStorageClient = cloudStorageAccount.CreateCloudQueueClient();
             }
-            catch (Exception ex)
+            catch 
             {
                 _logger.LogError("Unable to create content-cache queue client");
                 throw;
@@ -146,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 _logger.LogInformation("Message added to content-cache queue.");
                 _logger.LogInformation("Please ensure the publisher function is running");
             }
-            catch (Exception ex)
+            catch
             {
                 _logger.LogError("Unable add message to content-cache queue");
                 throw;

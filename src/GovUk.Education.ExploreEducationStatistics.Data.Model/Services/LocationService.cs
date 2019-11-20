@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -123,8 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private Dictionary<long, Location> GetLocations(long[] locationIds)
         {
             var locations = Find(locationIds).ToList();
-            // Nullify all of the Observational Unit fields which are empty (might not be needed)
-            locations.ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
             return locations.ToDictionary(location => location.Id);
         }
     }

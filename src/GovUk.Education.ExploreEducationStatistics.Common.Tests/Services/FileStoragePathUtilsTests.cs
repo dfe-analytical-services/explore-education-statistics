@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     public class FileStoragePathUtilsTests
@@ -46,9 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal(publicationSlug + "/" + releaseSlug + "/ancillary/file.png", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary, "file.png"));
             Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/data/file.csv", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Data, "file.csv"));
             Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/chart/file.doc", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart, "file.doc"));
-        } 
-        
-        
+        }
     }
-    
 }

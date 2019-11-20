@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage.Blob;
@@ -42,12 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             try
             {
                 var trees = await UpdateTrees();
-
                 var publications = await UpdatePublicationsAndReleases();
-
                 var methodologies = await UpdateMethodologies();
 
-                return trees && methodologies && publications;
+                return trees && publications && methodologies;
             }
             catch (Exception ex)
             {

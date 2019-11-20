@@ -9,9 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class TopicService : ITopicService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public TopicService(ApplicationDbContext context)
+        public TopicService(ContentDbContext context)
         {
             _context = context;
         }

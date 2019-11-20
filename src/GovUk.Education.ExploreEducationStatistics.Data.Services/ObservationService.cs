@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -13,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -58,8 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", query.Ward);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
-            var inner = _context.Query<IdWrapper>().AsNoTracking()
-                .FromSql("EXEC dbo.FilteredObservations " +
+            var inner = _context
+                .Set<IdWrapper>()
+                .FromSqlRaw("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
                          "@geographicLevel," +
                          "@timePeriodList," +
@@ -119,18 +119,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),
                 stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            // Nullify all of the Observational Unit fields which are empty
-            // Do this here on the set of distinct Locations rather than when building each ObservationViewModel
-            // (since a Location may be referenced by more than one Observation) 
-            result.Select(observation => observation.Location)
-                .Distinct()
-                .ToList()
-                .ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
-
-            _logger.LogTrace("Nullified all of the empty Observational Unit fields in {Time} ms",
-                stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Stop();
 
             return result;
@@ -138,7 +126,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
         {
-            return DbSet().AsNoTracking().Where(ObservationPredicateBuilder.Build(query));
+            return DbSet()
+                .AsNoTracking()
+                .Include(observation => observation.FilterItems)
+                .ThenInclude(filterItem => filterItem.FilterItem)
+                .ThenInclude(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
+                .Where(ObservationPredicateBuilder.Build(query));
         }
 
         private static SqlParameter CreateTimePeriodListType(string parameterName,

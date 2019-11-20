@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f5a1d0cf-2dbb-43ff-a121-43b4c931f219",
+		"_postman_id": "993c2b46-d8bc-4064-ab79-bea934abaec5",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -256,11 +256,8 @@
 													"    pm.expect(respJson.locations.country.options.length).to.equal(1);",
 													"    pm.expect(respJson.locations.region.options.length).to.equal(10);",
 													"    ",
-													"    /*",
-													"    $ csvgrep -p geographic_level/local\\ authority/ absence_by_geographic_level.csv | csvcut -k la_name | sed 1d | sort | uniq | wc -l",
-													"    154",
-													"    */",
-													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(154);",
+													"    // EES-635",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(156);",
 													"});",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",

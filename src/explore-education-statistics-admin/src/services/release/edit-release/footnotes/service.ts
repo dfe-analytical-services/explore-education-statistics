@@ -1,5 +1,6 @@
 import client from '@admin/services/util/service';
 import { FootnoteProps, Footnote, FootnoteMeta } from './types';
+import { footnoteToFlatFootnote } from './util';
 
 const service = {
   async getReleaseFootnoteData(
@@ -8,15 +9,18 @@ const service = {
     return client.get(`/data/footnote/release/${releaseId}`);
   },
   async createFootnote(footnote: FootnoteProps): Promise<Footnote> {
-    return client.post(`/data/footnote`, footnote);
+    return client.post(`/data/footnote`, footnoteToFlatFootnote(footnote));
   },
-  async getFootnote(id: number) {
+  async getFootnote(id: string) {
     return client.get(`/data/footnote/${id}`);
   },
-  async updateFootnote(id: number, footnote: FootnoteProps | Footnote) {
-    return client.put(`/data/footnote/${id}`, footnote);
+  async updateFootnote(
+    id: string,
+    footnote: FootnoteProps | Footnote,
+  ): Promise<Footnote> {
+    return client.put(`/data/footnote/${id}`, footnoteToFlatFootnote(footnote));
   },
-  async deleteFootnote(id: number): Promise<void> {
+  async deleteFootnote(id: string): Promise<void> {
     return client.delete(`/data/footnote/${id}`);
   },
 };

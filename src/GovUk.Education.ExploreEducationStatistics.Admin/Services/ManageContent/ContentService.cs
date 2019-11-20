@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ContentService : IContentService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public ContentService(ApplicationDbContext context)
+        public ContentService(ContentDbContext context)
         {
             _context = context;
         }

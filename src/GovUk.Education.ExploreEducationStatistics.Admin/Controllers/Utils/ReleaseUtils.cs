@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
     public static class ReleaseUtils
     {
         public static Task<Either<ValidationResult, T>> CheckReleaseExists<T>(
-            ApplicationDbContext context,
+            ContentDbContext context,
             Guid releaseId, 
             Func<Release, Task<Either<ValidationResult, T>>> successAction,
             Func<IQueryable<Release>, IQueryable<Release>> hydrateReleaseFn = null)
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
         } 
         
         public static Task<Either<ValidationResult, T>> CheckReleaseExists<T>(
-            ApplicationDbContext context,
+            ContentDbContext context,
             Guid releaseId, 
             Func<Release, T> successAction,
             Func<IQueryable<Release>, IQueryable<Release>> hydrateReleaseFn = null)
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
         } 
         
         public static Task<Either<ValidationResult, T>> CheckReleaseExists<T>(
-            ApplicationDbContext context,
+            ContentDbContext context,
             Guid releaseId, 
             Func<Release, Task<T>> successAction,
             Func<IQueryable<Release>, IQueryable<Release>> hydrateReleaseFn = null)

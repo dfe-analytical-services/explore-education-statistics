@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         [FunctionName("RebuildContentCache")]
         public void RebuildContentCacheTrees(
-            [QueueTrigger("content-cache", Connection = "")]
+            [QueueTrigger("content-cache")]
             string message,
             ILogger logger)
         {
