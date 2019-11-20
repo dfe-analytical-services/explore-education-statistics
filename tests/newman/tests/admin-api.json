@@ -2387,13 +2387,6 @@
 							],
 							"request": {
 								"method": "POST",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
@@ -2453,13 +2446,6 @@
 							},
 							"request": {
 								"method": "GET",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
@@ -2746,13 +2732,6 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
@@ -2814,13 +2793,6 @@
 							},
 							"request": {
 								"method": "GET",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
