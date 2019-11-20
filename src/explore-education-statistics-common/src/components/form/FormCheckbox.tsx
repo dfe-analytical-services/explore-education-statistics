@@ -15,7 +15,8 @@ export interface FormCheckboxProps {
   conditional?: ReactNode;
   id: string;
   hint?: string;
-  label: string | ReactNode;
+  label: string;
+  boldLabel?: boolean;
   name: string;
   onChange?: CheckboxChangeEventHandler;
   value: string;
@@ -30,6 +31,7 @@ const FormCheckbox = ({
   id,
   hint,
   label,
+  boldLabel = false,
   name,
   onChange,
   value,
@@ -55,7 +57,7 @@ const FormCheckbox = ({
           disabled={disabled}
         />
         <label className="govuk-label govuk-checkboxes__label" htmlFor={id}>
-          {label}
+          {boldLabel ? <strong>{label}</strong> : label}
         </label>
         {hint && (
           <span

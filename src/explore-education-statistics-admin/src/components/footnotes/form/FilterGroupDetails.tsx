@@ -44,7 +44,8 @@ const FilterGroupDetails = ({
           id={`select-all-${groupId}`}
           name={`${groupPath}.selected`}
           disabled={parentSelected}
-          label="Select all groups"
+          label="Select all"
+          boldLabel
         />
       )}
       <div className="dfe-filter-overflow">
@@ -67,12 +68,8 @@ const FilterGroupDetails = ({
                   className="govuk-checkboxes--small"
                   id={`filterGroup-${filterGroupId}`}
                   name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
-                  label={
-                    <>
-                      <strong>{filterGroup.label}</strong>{' '}
-                      {groupValue && '(All)'}
-                    </>
-                  }
+                  label={`${filterGroup.label} ${groupValue ? '(All)' : ''}`}
+                  boldLabel
                   disabled={groupIsSelected}
                 />
               )}
