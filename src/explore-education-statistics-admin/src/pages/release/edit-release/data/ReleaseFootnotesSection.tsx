@@ -10,8 +10,10 @@ import Link from '@admin/components/Link';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
-import FootnotesList from './FootnotesList';
-import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
+import FootnotesList from '@admin/components/footnotes/FootnotesList';
+import FootnoteForm, {
+  FootnoteFormConfig,
+} from '@admin/components/footnotes/form/FootnoteForm';
 
 interface Props {
   publicationId: string;
@@ -45,7 +47,6 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
         setLoading(false);
       });
   }
-
   useEffect(() => {
     getFootnoteData();
   }, [publicationId, releaseId]);
@@ -57,23 +58,25 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-    save: (footnote: FootnoteProps, footnoteId?: number) => {
+    save: (footnote: FootnoteProps, footnoteId?: string) => {
       if (footnoteId) {
         setLoading(true);
-        footnotesService.updateFootnote(footnoteId, footnote).then(() => {
-          const index = footnotes.findIndex((searchElement: Footnote) => {
-            return footnoteId === searchElement.id;
+        footnotesService
+          .updateFootnote(footnoteId, footnote)
+          .then(updatedFootnote => {
+            const index = footnotes.findIndex((searchElement: Footnote) => {
+              return footnoteId === searchElement.id;
+            });
+            if (index > -1) {
+              const updatedFootnotes = [...footnotes];
+              updatedFootnotes[index] = {
+                ...updatedFootnote,
+                id: footnoteId,
+              };
+              setFootnotes(updatedFootnotes);
+              setLoading(false);
+            }
           });
-          if (index > -1) {
-            const updatedFootnotes = [...footnotes];
-            updatedFootnotes[index] = {
-              ...footnote,
-              id: footnoteId,
-            };
-            setFootnotes(updatedFootnotes);
-            setLoading(false);
-          }
-        });
       } else {
         setLoading(true);
         footnotesService
