@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "42cebec7-4835-4df8-8bde-72029b0ffcdf",
+		"_postman_id": "12115576-7694-4505-a41a-540189aa6281",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2227,11 +2227,6 @@
 											"",
 											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
 											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
-											"});",
-											"",
-											"pm.test(\"Unset variables\", function () {",
-											"    pm.environment.unset(\"latest_related_information_id\");",
-											"    pm.environment.unset(\"number_of_related_information_items\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2260,6 +2255,62 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Verify Related Information entry deleted",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"Unset variables\", function () {",
+											"    pm.environment.unset(\"latest_related_information_id\");",
+											"    pm.environment.unset(\"number_of_related_information_items\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -2269,595 +2320,784 @@
 					"name": "Content",
 					"item": [
 						{
-							"name": "Get Content Sections",
-							"event": [
+							"name": "Content Sections",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Content Sections should contain the correct information\", function () { ",
-											"",
-											"    var respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.length).to.equal(9);",
-											"",
-											"    // assert that all of our content sections are coming back with details ",
-											"    respJson.forEach(section => {",
-											"        pm.expect(section.id).to.not.be.null;",
-											"        pm.expect(section.heading).to.not.be.null;",
-											"        pm.expect(section.caption).to.not.be.null;",
-											"        pm.expect(section.content.length).to.be.above(0);",
-											"    });",
-											"    ",
-											"    // assert that all of our sections are coming back in correct order",
-											"    respJson.forEach((section, index) => {",
-											"        pm.expect(section.order).to.equal(index + 1);",
-											"    });",
-											"    ",
-											"    // assert that the content sections' content blocks are coming back with details",
-											"    respJson.forEach(section => {",
-											"        section.content.forEach(contentBlock => {",
-											"            pm.expect(contentBlock.id).to.not.be.null;",
-											"            pm.expect(contentBlock.type).to.not.be.null;",
-											"        }); ",
-											"    });",
-											"    ",
-											"    // assert that the deliberately blanked out fields are undefined",
-											"    respJson.forEach(section => {",
-											"        section.content.forEach(contentBlock => {",
-											"            pm.expect(contentBlock.contentSection).to.be.undefined;",
-											"            pm.expect(contentBlock.contentSectionId).to.be.undefined;",
-											"       }); ",
-											"    });",
-											"    ",
-											"    // test a specific content section's content",
-											"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
-											"    pm.expect(respJson[0].order).to.equal(1);",
-											"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
-											"    pm.expect(respJson[0].caption).to.equal(\"\");",
-											"    ",
-											"    // test a MarkDownBlock's content",
-											"    pm.expect(respJson[0].content.length).to.equal(1);",
-											"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
-											"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
-											"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
-											"",
-											"    // test a DataBlock's content",
-											"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
-											"    pm.expect(respJson[1].content[2].type).to.equal(\"DataBlock\");",
-											"    pm.expect(respJson[1].content[2].heading).to.equal(\"Chart showing permanent exclusions in England\");",
-											"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
-											"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
-											"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
-											"});"
+									"name": "Get Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Sections should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(9);",
+													"",
+													"    // assert that all of our content sections are coming back with details ",
+													"    respJson.forEach(section => {",
+													"        pm.expect(section.id).to.not.be.null;",
+													"        pm.expect(section.heading).to.not.be.null;",
+													"        pm.expect(section.caption).to.not.be.null;",
+													"        pm.expect(section.content.length).to.be.above(0);",
+													"    });",
+													"    ",
+													"    // assert that all of our sections are coming back in correct order",
+													"    respJson.forEach((section, index) => {",
+													"        pm.expect(section.order).to.equal(index + 1);",
+													"    });",
+													"    ",
+													"    // assert that the content sections' content blocks are coming back with details",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.id).to.not.be.null;",
+													"            pm.expect(contentBlock.type).to.not.be.null;",
+													"        }); ",
+													"    });",
+													"    ",
+													"    // assert that the deliberately blanked out fields are undefined",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.contentSection).to.be.undefined;",
+													"            pm.expect(contentBlock.contentSectionId).to.be.undefined;",
+													"       }); ",
+													"    });",
+													"    ",
+													"    // test a specific content section's content",
+													"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson[0].caption).to.equal(\"\");",
+													"    ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson[0].content.length).to.equal(1);",
+													"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"",
+													"    // test a DataBlock's content",
+													"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
+													"    pm.expect(respJson[1].content[2].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[1].content[2].heading).to.equal(\"Chart showing permanent exclusions in England\");",
+													"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(10);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify new Content Section added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"        'New section'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"",
+													"    pm.environment.set(\"added_content_section_id\", respJson[respJson.length - 1].id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section Order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"        'New section',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Content Section heading",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should have an updated heading\", function () { ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.heading).to.equal('Updated heading');",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\theading: 'Updated heading'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"heading"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 4,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 1,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 2,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 3,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 7,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 5,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 6,\n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n    '{{added_content_section_id}}': 8,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Sections Order updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Restore Content Sections order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 1,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 2,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 3,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 4,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 5,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 6,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 7,\n    '{{added_content_section_id}}': 8, \n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section removed",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
+													"});",
+													"",
+													"pm.test(\"Unset variables\", function () {",
+													"    pm.environment.unset(\"added_content_section_id\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Add Content Section",
-							"event": [
+							"name": "Content Blocks",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be present\", function () { ",
-											"",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.id).to.not.be.null;",
-											"    pm.expect(respJson.heading).to.equal('New section');",
-											"    pm.expect(respJson.order).to.equal(10);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
+									"name": "Get Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson.caption).to.equal(\"\");",
+													"    ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New HTMLBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.environment.set(\"added_html_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify HTML Block added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should contain the newly added HtmlBlock\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson.content.length).to.equal(2);",
+													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "POST",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"add"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify new Content Section added",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"        'New section'",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"",
-											"    pm.environment.set(\"added_content_section_id\", respJson[respJson.length - 1].id);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Section Order",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"        'New section',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Content Section heading",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Section should have an updated heading\", function () { ",
-											"    const respJson = pm.response.json();",
-											"    pm.expect(respJson.heading).to.equal('Updated heading');",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\theading: 'Updated heading'\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"section",
-										"{{added_content_section_id}}",
-										"heading"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Reorder Content Sections",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'About this release',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Reasons for exclusions',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 4,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 1,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 2,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 3,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 7,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 5,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 6,\n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n    '{{added_content_section_id}}': 8,\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"order"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Sections Order updated",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'About this release',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Reasons for exclusions',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Restore Content Sections order",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 1,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 2,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 3,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 4,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 5,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 6,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 7,\n    '{{added_content_section_id}}': 8, \n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"order"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Remove Content Section",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be removed\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"section",
-										"{{added_content_section_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Section removed",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
-											"});",
-											"",
-											"pm.test(\"Unset variables\", function () {",
-											"    pm.environment.unset(\"added_content_section_id\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"protocolProfileBehavior": {},

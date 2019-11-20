@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 Ok);
         }
 
-        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/add")]
+        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/add")]
         public Task<ActionResult<IContentBlock>> AddContentBlock(Guid releaseId, Guid contentSectionId)
         {
             return this.HandlingValidationErrorsAsync(
