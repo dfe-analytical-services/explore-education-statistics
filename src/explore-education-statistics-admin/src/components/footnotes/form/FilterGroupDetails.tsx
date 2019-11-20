@@ -83,8 +83,13 @@ const FilterGroupDetails = ({
                     : ''
                 }
               >
-                {Object.entries(filterGroup.options).map(
-                  ([filterItemId, filterItem]) => {
+                {Object.entries(filterGroup.options)
+                  .sort(function(a, b) {
+                    const textA = a[1].label.toUpperCase();
+                    const textB = b[1].label.toUpperCase();
+                    return textA < textB ? -1 : 1;
+                  })
+                  .map(([filterItemId, filterItem]) => {
                     const checked =
                       (filterItems && filterItems.includes(filterItem.value)) ||
                       false;
@@ -121,8 +126,7 @@ const FilterGroupDetails = ({
                         }}
                       />
                     );
-                  },
-                )}
+                  })}
               </div>
             </div>
           );

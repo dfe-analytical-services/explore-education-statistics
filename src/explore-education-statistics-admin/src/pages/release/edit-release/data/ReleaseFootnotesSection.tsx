@@ -61,20 +61,22 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
     save: (footnote: FootnoteProps, footnoteId?: string) => {
       if (footnoteId) {
         setLoading(true);
-        footnotesService.updateFootnote(footnoteId, footnote).then(() => {
-          const index = footnotes.findIndex((searchElement: Footnote) => {
-            return footnoteId === searchElement.id;
+        footnotesService
+          .updateFootnote(footnoteId, footnote)
+          .then(updatedFootnote => {
+            const index = footnotes.findIndex((searchElement: Footnote) => {
+              return footnoteId === searchElement.id;
+            });
+            if (index > -1) {
+              const updatedFootnotes = [...footnotes];
+              updatedFootnotes[index] = {
+                ...updatedFootnote,
+                id: footnoteId,
+              };
+              setFootnotes(updatedFootnotes);
+              setLoading(false);
+            }
           });
-          if (index > -1) {
-            const updatedFootnotes = [...footnotes];
-            updatedFootnotes[index] = {
-              ...footnote,
-              id: footnoteId,
-            };
-            setFootnotes(updatedFootnotes);
-            setLoading(false);
-          }
-        });
       } else {
         setLoading(true);
         footnotesService

@@ -69,8 +69,13 @@ const IndicatorDetails = ({
                     : ''
                 }
               >
-                {Object.entries(indicatorGroup.options).map(
-                  ([indicatorItemId, indicatorItem]) => {
+                {Object.entries(indicatorGroup.options)
+                  .sort(function(a, b) {
+                    const textA = a[1].label.toUpperCase();
+                    const textB = b[1].label.toUpperCase();
+                    return textA < textB ? -1 : 1;
+                  })
+                  .map(([indicatorItemId, indicatorItem]) => {
                     const checked =
                       (indicators &&
                         indicators.includes(indicatorItem.value)) ||
@@ -108,8 +113,7 @@ const IndicatorDetails = ({
                         }}
                       />
                     );
-                  },
-                )}
+                  })}
               </div>
             </div>
           );
