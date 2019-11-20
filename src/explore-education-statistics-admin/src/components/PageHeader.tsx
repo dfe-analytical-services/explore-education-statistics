@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import { LoginContext } from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
 import { Authentication } from '@admin/services/sign-in/types';
@@ -87,14 +88,14 @@ const PageHeader = ({ wide }: Props) => {
 const LoggedInLinks = ({ user }: Authentication) => (
   <>
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="#">
+      <a className="govuk-header__link" href="/identity/account/manage">
         {user ? user.name : ''}
       </a>
     </li>
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href={loginService.getSignOutLink()}>
+      <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out
-      </a>
+      </Link>
     </li>
   </>
 );

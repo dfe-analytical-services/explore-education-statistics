@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
@@ -11,8 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task<SubjectData> GetSubjectData(ImportMessage importMessage);
 
-        Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
-            string name);
+        Task<Boolean> UploadDataFileAsync(
+            Guid releaseId,
+            MemoryStream stream,
+            string metaFileName,
+            string name,
+            string fileName,
+            string contentType);
 
         void Delete(string releaseId, string dataFileName);
         

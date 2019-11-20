@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
@@ -13,10 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class NotificationsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly INotificationsService _notificationsService;
 
-        public NotificationsController(ApplicationDbContext context,
+        public NotificationsController(ContentDbContext context,
             INotificationsService notificationsService)
         {
             _context = context;
@@ -25,8 +26,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
 
         public ActionResult NotifySubscribers()
         {
-            ViewData["PublicationId"] = new SelectList(_context.Releases.GroupBy(release => release.Publication)
-                .Select(releases => releases.Key).OrderBy(r => r.Title), "Id", "Title");
+            var publications = _context.Releases.Select(release => release.Publication).Distinct()
+                .OrderBy(publication => publication.Title);
+
+            ViewData["PublicationId"] = new SelectList(publications, "Id", "Title");
 
             return View();
         }
@@ -42,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             return new BadRequestResult();
         }
 
-        [Route("{controller}/notify/sent")]
+        [Route("[controller]/notify/sent")]
         public IActionResult NotificationsSent(Guid publicationId)
         {
             var publication = _context.Publications.FirstOrDefault(p => p.Id.Equals(publicationId));

@@ -21,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var schoolService = new Mock<ISchoolService>();
             var subjectService = new Mock<ISubjectService>();
 
-            filterService.Setup(g => g.Count()).Returns(Task.FromResult(100));
-            indicatorService.Setup(g => g.Count()).Returns(Task.FromResult(200));
-            locationService.Setup(g => g.Count()).Returns(Task.FromResult(300));
-            observationService.Setup(g => g.Count()).Returns(Task.FromResult(400));
-            releaseService.Setup(g => g.Count()).Returns(Task.FromResult(500));
-            schoolService.Setup(g => g.Count()).Returns(Task.FromResult(600));
-            subjectService.Setup(g => g.Count()).Returns(Task.FromResult(700));
+            filterService.Setup(g => g.CountAsync()).Returns(Task.FromResult(100));
+            indicatorService.Setup(g => g.CountAsync()).Returns(Task.FromResult(200));
+            locationService.Setup(g => g.CountAsync()).Returns(Task.FromResult(300));
+            observationService.Setup(g => g.CountAsync()).Returns(Task.FromResult(400));
+            releaseService.Setup(g => g.CountAsync()).Returns(Task.FromResult(500));
+            schoolService.Setup(g => g.CountAsync()).Returns(Task.FromResult(600));
+            subjectService.Setup(g => g.CountAsync()).Returns(Task.FromResult(700));
 
             _controller = new DebugController(
                 filterService.Object,

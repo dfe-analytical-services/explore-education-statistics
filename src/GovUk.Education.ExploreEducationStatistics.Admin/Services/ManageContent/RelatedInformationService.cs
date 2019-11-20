@@ -15,10 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class RelatedInformationService : IRelatedInformationService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public RelatedInformationService(ApplicationDbContext context)
+        public RelatedInformationService(ContentDbContext context)
         {
             _context = context;
             _releaseHelper = new PersistenceHelper<Release, Guid>(

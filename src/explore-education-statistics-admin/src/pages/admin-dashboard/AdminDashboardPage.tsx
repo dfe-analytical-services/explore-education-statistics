@@ -11,13 +11,12 @@ import loginService from '@admin/services/sign-in/service';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
+import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import SummaryList from '@common/components/SummaryList';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -27,14 +26,9 @@ interface Model {
   preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
-interface MatchProps {
-  themeId: string;
-  topicId: string;
-}
-
-const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const AdminDashboardPage = () => {
   const { user } = useContext(LoginContext);
-  const { themeId, topicId } = match.params;
+
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -83,12 +77,14 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 {user ? user.name : ''}{' '}
                 <span className="govuk-body-s">
                   Not you?{' '}
-                  <a
-                    className="govuk-link"
-                    href={loginService.getSignOutLink()}
-                  >
-                    Sign out
-                  </a>
+                  <li className="govuk-header__navigation-item">
+                    <Link
+                      className="govuk-link"
+                      to={loginService.getSignOutLink()}
+                    >
+                      Sign out
+                    </Link>
+                  </li>
                 </span>
               </h1>
             </div>
@@ -117,7 +113,7 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab themePropId={themeId} topicPropId={topicId} />
+              <MyPublicationsTab />
             </TabsSection>
             <TabsSection
               id="draft-releases"

@@ -94,12 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             {
                 contentBlock.ContentSection = null;
                 contentBlock.ContentSectionId = null;
-
-                if (contentBlock.GetType() == typeof(DataBlock))
-                {
-                    ((DataBlock) contentBlock).Release = null;
-                    ((DataBlock) contentBlock).ReleaseId = null;
-                }
             });
         }
 

@@ -1,10 +1,14 @@
 import '@common/polyfill';
+import axiosConfigurer from '@admin/services/util/axios-configurer';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 
 process.env.APP_ROOT_ID = 'root';
+
+// @ts-ignore
+window.axiosConfigurer = axiosConfigurer;
 
 import('./App').then(({ default: App }) => {
   ReactDOM.render(<App />, document.getElementById('root'));

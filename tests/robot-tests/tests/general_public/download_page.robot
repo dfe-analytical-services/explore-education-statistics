@@ -12,9 +12,9 @@ Navigate to /download-data page
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}
     user waits until page contains heading   Choose how to explore our statistics and data
-    user clicks link   Download data files
-    user waits until page contains heading   Download data files
-    user checks url contains   %{PUBLIC_URL}/download-data
+    user clicks link   Download latest data files
+    user waits until page contains heading   Download latest data files
+    user checks url contains   %{PUBLIC_URL}/download-latest-data
 
 Validate Pupils and schools contains correct details components
     [Tags]  HappyPath

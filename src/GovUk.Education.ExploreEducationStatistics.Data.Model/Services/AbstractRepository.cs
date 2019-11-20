@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _context.Set<TEntity>();
         }
 
-        public Task<int> Count()
+        public Task<int> CountAsync()
         {
             return DbSet().CountAsync();
         }
@@ -68,7 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IQueryable<TEntity> Find(TKey[] ids)
         {
-            return DbSet().FindAll(_context, ids.Cast<object>().ToArray());
+            // TODO EES-711 - this code needs improving following upgrade to EF for Core 3
+            var idField = typeof(TEntity).GetProperty("Id");
+            
+            var list = ids.ToList();
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var methodInfo = typeof(List<TKey>).GetMethod("Contains");
+            var body = Expression.Call(Expression.Constant(list, typeof(List<TKey>)), methodInfo, Expression.MakeMemberAccess(parameter, idField));
+            var predicateExpression = Expression.Lambda<Func<TEntity, bool>>(body, parameter);
+
+            return DbSet().Where(predicateExpression);
         }
 
         public IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
