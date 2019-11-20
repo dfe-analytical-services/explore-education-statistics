@@ -2542,11 +2542,6 @@
 								"method": "PUT",
 								"header": [
 									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
-									{
 										"key": "Content-Type",
 										"value": "application/json",
 										"type": "text"
