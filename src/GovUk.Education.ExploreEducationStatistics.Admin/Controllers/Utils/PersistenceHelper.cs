@@ -45,10 +45,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                         .FirstOrDefaultAsync();
 
                     return entity == null
-                        ? ValidationResult(ValidationErrorMessages.EntityNotFound)
+                        ? ValidationResult(_notFoundErrorMessage)
                         : new Either<ValidationResult, TEntity>(entity);
                 },
                 successAction.Invoke);
+        } 
+        
+        public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
+            TEntityId id, 
+            Func<TEntity, Either<ValidationResult, T>> successAction,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+        {
+            Task<Either<ValidationResult, T>> Success(TEntity entity)
+            {
+                return Task.FromResult(successAction.Invoke(entity));
+            }
+            
+            return CheckEntityExists(
+                id,
+                Success,
+                hydrateEntityFn);
         } 
         
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(

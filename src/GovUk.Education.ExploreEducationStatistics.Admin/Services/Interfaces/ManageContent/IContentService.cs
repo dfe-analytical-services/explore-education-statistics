@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
 {
@@ -20,5 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(Guid releaseId,
             Guid contentSectionId);
+
+        Task<Either<ValidationResult, ContentSectionViewModel>> GetContentSectionAsync(Guid releaseId, Guid contentSectionId);
+        
+        Task<Either<ValidationResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid,int> newBlocksOrder);
+        
+        Task<Either<ValidationResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId);
+        
+        Task<Either<ValidationResult, List<IContentBlock>>> RemoveContentBlockAsync(Guid releaseId, Guid contentSectionId, Guid contentBlockId);
     }
 }
