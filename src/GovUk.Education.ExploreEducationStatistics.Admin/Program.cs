@@ -12,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseApplicationInsights()
                 .UseKestrel(options => options.AddServerHeader = false)
                 .UseStartup<Startup>();
     }

@@ -204,6 +204,15 @@
       "metadata": {
         "description": "The size of the new Azure Cache for Redis instance. "
       }
+    },
+    "adminUri" : {
+      "type": "string"
+    },
+    "openIdConnectClientId": {
+      "type": "string"
+    },
+    "openIdConnectClientSecret": {
+      "type": "string"
     }
   },
   "variables": {
@@ -626,6 +635,33 @@
               "name": "WEBSITE_RUN_FROM_PACKAGE",
               "value": "1"
             },
+            {
+              "name": "WEBSITE_LOAD_CERTIFICATES",
+              "value": "*"
+            },
+            {
+              "name": "ASPNETCORE_DETAILEDERRORS",
+              "value": "true"
+            },
+
+            {
+              "name": "IdentityServer:IssuerUri",
+              "value": "[concat('urn=', parameters('adminUri'))]"
+            },
+            {
+              "name": "IdentityServer:Key:Name",
+              "value": "[concat('CN=', parameters('adminUri'))]"
+            },
+
+            {
+              "name": "OpenIdConnect:ClientId",
+              "value": "[parameters('openIdConnectClientId')]"
+            },
+            {
+              "name": "OpenIdConnect:ClientSecret",
+              "value": "[parameters('openIdConnectClientSecret')]"
+            },
+
             {
               "name": "RedisCacheConnection",
               "value": "[concat(variables('redisCacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheName')), '2015-08-01').primaryKey)]"
@@ -1260,7 +1296,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -1416,7 +1452,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -1553,7 +1589,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -124,14 +124,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
 
-            return _context.Footnote.AsNoTracking().FromSql(
-                "EXEC dbo.FilteredFootnotes " +
-                "@subjectId," +
-                "@indicatorList," +
-                "@filterItemList",
-                subjectIdParam,
-                indicatorListParam,
-                filterItemListParam);
+            return _context
+                .Footnote
+                .FromSqlRaw(
+                    "EXEC dbo.FilteredFootnotes " +
+                    "@subjectId," +
+                    "@indicatorList," +
+                    "@filterItemList",
+                    subjectIdParam,
+                    indicatorListParam,
+                    filterItemListParam)
+                .AsNoTracking();
         }
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId)

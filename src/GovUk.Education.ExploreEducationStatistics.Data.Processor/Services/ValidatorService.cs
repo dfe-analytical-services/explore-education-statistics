@@ -151,17 +151,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetTimeIdentifier(line, headers);
                     ImporterService.GetYear(line, headers);
                 }
-                catch (InvalidGeographicLevelException e)
+                catch (InvalidGeographicLevelException)
                 {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.DataFileHasInvalidGeographicLevel.GetEnumLabel());
                 }
-                catch (InvalidTimeIdentifierException e)
+                catch (InvalidTimeIdentifierException)
                 {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.DataFileHasInvalidTimeIdentifier.GetEnumLabel());
                 }
-                catch (InvalidTimePeriod e)
+                catch (InvalidTimePeriod)
                 {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.DataFileHasInvalidTimePeriod.GetEnumLabel());

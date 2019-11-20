@@ -29,7 +29,7 @@ Validate homepage
     [Tags]  HappyPath
     user checks page contains element  link:Find statistics and data
     user checks page contains element  link:Create your own tables online
-    user checks page contains element  link:Download data files
+    user checks page contains element  link:Download latest data files
 
     user checks page contains element  xpath://h3[text()="Supporting information"]
     user checks page contains element  link:Education statistics: methodology

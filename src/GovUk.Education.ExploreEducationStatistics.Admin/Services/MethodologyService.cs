@@ -12,10 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class MethodologyService : IMethodologyService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public MethodologyService(ApplicationDbContext context, IMapper mapper)
+        public MethodologyService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IImportStatusService _importStatusService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
-        private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IImportStatusService importStatusService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
-            IUserService userService
+            UserManager<ApplicationUser> userManager
             )
         {
             _importService = importService;
@@ -55,8 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _importStatusService = importStatusService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
-            _userService = userService;
-            
+            _userManager = userManager;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -164,12 +163,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
-            return await CheckReleaseExistsAsync(releaseId, () =>
+            return await CheckReleaseExistsAsync(releaseId, async () =>
             {
-                var email = _userService.GetLoggedInUserEmail(HttpContext);    
+                var user = await _userManager.GetUserAsync(User);
                 
                 // upload the files
-                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, email)
+                return await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
                     // add message to queue to process these files
                     .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });
@@ -289,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             if (result.IsLeft)
             {
                 ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem();
+                return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
             return Ok(result.Right);
@@ -308,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             if (result.IsLeft)
             {
                 ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem();
+                return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
             return result.Right;
@@ -328,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             if (result.IsLeft)
             {
                 ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem();
+                return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
             return Ok(result.Right);

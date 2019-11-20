@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             return email;
         }
 
-        private TokenValidationParameters GetValidationParameters(string secretKey)
+        private static TokenValidationParameters GetValidationParameters(string secretKey)
         {
             return new TokenValidationParameters()
             {

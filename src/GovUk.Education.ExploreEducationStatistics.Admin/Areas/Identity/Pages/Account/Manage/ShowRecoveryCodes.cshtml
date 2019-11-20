@@ -1,0 +1,35 @@
+﻿@page
+@model ShowRecoveryCodesModel
+@{
+    ViewData["Title"] = "Recovery codes";
+    ViewData["ActivePage"] = "TwoFactorAuthentication";
+}
+
+<partial name="_StatusMessage" for="StatusMessage"/>
+
+<h4 class="govuk-heading-m">@ViewData["Title"]</h4>
+
+
+<div class="govuk-warning-text">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        Put these codes in a safe place.
+    </strong>
+</div>
+
+<p class="govuk-body">
+    If you lose your device and don't have the recovery codes you will lose access to your account.
+</p>
+
+<div class="row">
+    <div class="col-md-12">
+        @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
+        {
+            <code class="recovery-code">@Model.RecoveryCodes[row]</code>
+            <text>&nbsp;</text>
+            <code class="recovery-code">@Model.RecoveryCodes[row + 1]</code>
+            <br/>
+        }
+    </div>
+</div>

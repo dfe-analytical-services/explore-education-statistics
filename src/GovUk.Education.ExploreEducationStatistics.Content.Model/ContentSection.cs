@@ -80,10 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Table> Tables { get; set; }
 
-        public Release Release { get; set; }
-
-        public Guid ReleaseId { get; set; }
-
         public override string Type { get; set; } = "DataBlock";
     }
 

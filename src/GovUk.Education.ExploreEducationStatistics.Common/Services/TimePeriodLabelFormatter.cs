@@ -7,11 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static System.Int32;
 using static System.String;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public class TimePeriodLabelFormatter
     {
-        
         private static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
         private YearFormatOption YearFormat { get; }
         private TimeIdentifierFormatOption TimeIdentifierFormat { get; }

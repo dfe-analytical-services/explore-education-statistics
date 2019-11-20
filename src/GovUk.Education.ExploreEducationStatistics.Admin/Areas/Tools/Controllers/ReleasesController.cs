@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class ReleasesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public ReleasesController(ApplicationDbContext context)
+        public ReleasesController(ContentDbContext context)
         {
             _context = context;
         }
@@ -25,8 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
         // GET: Releases
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Releases.Include(r => r.Publication).OrderBy(r => r.Title);
-            return View(await applicationDbContext.ToListAsync());
+            var releases = await _context.Releases.Include(r => r.Publication).ToListAsync();
+            return View(releases.OrderBy(release => release.Title));
         }
 
         // GET: Releases/Details/5
