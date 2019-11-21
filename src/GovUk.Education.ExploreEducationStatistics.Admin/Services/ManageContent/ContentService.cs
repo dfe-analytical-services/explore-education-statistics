@@ -60,27 +60,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ValidationResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, AddContentSectionRequest request)
+            Guid releaseId, AddContentSectionRequest? request)
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
+                var orderForNewSection = request?.Order ?? 
+                                         release.Content.Max(contentSection => contentSection.Order) + 1;
+                
                 release.Content.ForEach(contentSection =>
                 {
-                    if (contentSection.Order >= request.Order)
+                    if (contentSection.Order >= orderForNewSection)
                     {
                         contentSection.Order++;
                     }
                 });
-                    
-                release.Content.Add(new ContentSection
+
+                var newContentSection = new ContentSection
                 {
                     Heading = "New section",
-                    Order = request.Order
-                });
+                    Order = orderForNewSection
+                };
+                
+                release.Content.Add(newContentSection);
                 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return OrderedContentSections(release).Last();
+                return ContentSectionViewModel.ToViewModel(newContentSection);
             }, HydrateContentSectionsAndBlocks);
         }
 
@@ -95,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return OrderedContentSections(release).Last();
+                return ContentSectionViewModel.ToViewModel(sectionToUpdate);
             });
         }
         
@@ -155,26 +160,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
                 var (_, section) = tuple;
+                
+                var orderForNewBlock = request.Order ?? section.Content.Max(contentBlock => contentBlock.Order) + 1;
 
                 section.Content.ForEach(contentBlock =>
                 {
-                    if (contentBlock.Order >= request.Order)
+                    if (contentBlock.Order >= orderForNewBlock)
                     {
                         contentBlock.Order++;
                     }
                 });
                     
-                IContentBlock newContentBlock = new HtmlBlock
-                {
-                    Order = request.Order
-                };
-                
+                IContentBlock newContentBlock = CreateContentBlockForType(request.Type);
+                newContentBlock.Order = orderForNewBlock;
                 section.Content.Add(newContentBlock);
                 
                 _context.ContentSections.Update(section);
                 await _context.SaveChangesAsync();
                 return newContentBlock;
             });
+        }
+
+        private static IContentBlock CreateContentBlockForType(ContentBlockType type)
+        {
+            return type switch
+            {
+                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
+                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
+                ContentBlockType.HtmlBlock => new HtmlBlock(),
+                ContentBlockType.DataBlock => new DataBlock(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
         }
 
         public Task<Either<ValidationResult, List<IContentBlock>>> RemoveContentBlockAsync(

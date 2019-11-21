@@ -40,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPost("release/{releaseId}/content/sections/add")]
-        public Task<ActionResult<ContentSectionViewModel>> AddContentSection(Guid releaseId, AddContentSectionRequest request)
+        public Task<ActionResult<ContentSectionViewModel>> AddContentSection(
+            Guid releaseId, AddContentSectionRequest? request = null)
         {
             return this.HandlingValidationErrorsAsync(
                 () => _contentService.AddContentSectionAsync(releaseId, request),
@@ -83,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/add")]
-        public Task<ActionResult<IContentBlock>> AddContentBlock(Guid releaseId, Guid contentSectionId, AddContentBlockRequest request)
+        public Task<ActionResult<IContentBlock>> AddContentBlock(
+            Guid releaseId, Guid contentSectionId, AddContentBlockRequest request)
         {
             return this.HandlingValidationErrorsAsync(
                 () => _contentService.AddContentBlockAsync(releaseId, contentSectionId, request),

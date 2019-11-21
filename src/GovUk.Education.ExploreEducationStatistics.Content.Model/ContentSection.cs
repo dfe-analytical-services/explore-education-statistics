@@ -23,6 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid ReleaseId { get; set; }
     }
 
+    public enum ContentBlockType
+    {
+        MarkDownBlock,
+        HtmlBlock,
+        InsetTextBlock,
+        DataBlock,
+    }
+
     [JsonConverter(typeof(ContentBlockConverter))]
     [KnownType(typeof(MarkDownBlock))]
     [KnownType(typeof(InsetTextBlock))]
@@ -45,29 +53,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class MarkDownBlock : IContentBlock
     {
+        public MarkDownBlock()
+        {
+            
+        }
+        
         public string Body { get; set; }
 
-        public override string Type { get; set; } = "MarkDownBlock";
+        public override string Type { get; set; } = ContentBlockType.MarkDownBlock.ToString();
     }
 
     public class HtmlBlock : IContentBlock
     {
+        public HtmlBlock()
+        {
+            
+        }
+        
         public string Body { get; set; }
 
-        public override string Type { get; set; } = "HtmlBlock";
+        public override string Type { get; set; } = ContentBlockType.HtmlBlock.ToString();
     }
 
     public class InsetTextBlock : IContentBlock
     {
+        public InsetTextBlock()
+        {
+            
+        }
+        
         public string Heading { get; set; }
 
         public string Body { get; set; }
 
-        public override string Type { get; set; } = "InsetTextBlock";
+        public override string Type { get; set; } = ContentBlockType.InsetTextBlock.ToString();
     }
 
     public class DataBlock : IContentBlock
     {
+        public DataBlock()
+        {
+            
+        }
+        
         public string Heading { get; set; }
         
         public string CustomFootnotes { get; set; }
@@ -84,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Table> Tables { get; set; }
 
-        public override string Type { get; set; } = "DataBlock";
+        public override string Type { get; set; } = ContentBlockType.DataBlock.ToString();
     }
 
     public class Summary
