@@ -39,10 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             else
             {
                 message.RowsPerBatch = batchSettings.RowsPerBatch;
-                collector.Add(message); 
+                collector.Add(message);
             }
         }
-        
+
         private async Task<List<ImportMessage>> SplitFiles(
             ImportMessage message,
             IEnumerable<string> csvLines,
@@ -65,10 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var mStream = new MemoryStream();
                 var writer = new StreamWriter(mStream);
                 writer.Flush();
-                
+
                 // Insert the header at the beginning of each file/batch
                 writer.WriteLine(header);
-                
+
                 foreach (var line in lines)
                 {
                     writer.WriteLine(line);
@@ -81,8 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BlobUtils.GetName(subjectData.DataBlob),
                     fileName,
                     "text/csv"
-                    );
-                
+                );
+
                 var iMessage = new ImportMessage
                 {
                     DataFileName = fileName,
@@ -98,8 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return messages;
         }
-        public static int GetNumBatches(int rows, int rowsPerBatch) {
-            return (int)Math.Ceiling(rows / (double)rowsPerBatch);
+
+        public static int GetNumBatches(int rows, int rowsPerBatch)
+        {
+            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
         {
             return blob.Metadata["metafile"];
         }
-        
+
         public static string GetName(CloudBlob blob)
         {
             return blob.Metadata["name"];

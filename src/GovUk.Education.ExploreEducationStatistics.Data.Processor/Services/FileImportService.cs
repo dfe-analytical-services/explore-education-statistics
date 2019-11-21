@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileImportService : IFileImportService
     {
+        private readonly IBatchService _batchService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
-        private readonly IBatchService _batchService;
         private readonly ILogger<IFileImportService> _logger;
 
         public FileImportService(
@@ -46,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             // Potentially status could already be failed so don't continue
-            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_2))
+            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_3))
             {
                 try
                 {
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     await _batchService.LogErrors(
                         message.Release.Id.ToString(),
                         message.OrigDataFileName,
-                        new List<String> {e.Message}
+                        new List<string> {e.Message}
                     );
 
                     _logger.LogError(
@@ -87,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             }
         }
-        
+
         public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
             var subject = GetSubject(message, subjectData.Name, context);
-            
+
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
                 _importerService.GetMeta(metaLines, subject, context),
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context);
         }
 
-        private Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)
+        private static Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)
         {
             return context.Subject
                 .Include(s => s.Release)
