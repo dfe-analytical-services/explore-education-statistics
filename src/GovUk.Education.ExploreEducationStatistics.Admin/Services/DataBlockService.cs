@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = await _releaseService.GetAsync(releaseId);
             
-            var dataBlocks = await _context.DataBlocks.Where(block => 
+            var dataBlocks = await _context.DataBlocks.Where(block =>
                 block.ContentSection.ReleaseId.Equals(releaseId) || 
                 block.Id.Equals(release.KeyStatisticsId)).ToListAsync();
             

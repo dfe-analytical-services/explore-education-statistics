@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
-            return _filterItemService.GetFilterItemsIncludingFilters(observations)
+            return _filterItemService.GetFilterItems(observations)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
