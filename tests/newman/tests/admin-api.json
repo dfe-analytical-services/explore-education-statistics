@@ -2522,6 +2522,53 @@
 							"response": []
 						},
 						{
+							"name": "Update Content Section heading",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"Content Section should have an updated heading\", function () { ",
+											"    const respJson = pm.response.json();",
+											"    pm.expect(respJson.heading).to.equal('Updated heading');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\theading: 'Updated heading'\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"section",
+										"{{added_content_section_id}}",
+										"heading"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Reorder Content Sections",
 							"event": [
 								{
@@ -2539,7 +2586,7 @@
 											"        'Exclusions by pupil characteristics',",
 											"        'Independent exclusion reviews',",
 											"        'Reasons for exclusions',",
-											"        'New section',",
+											"        'Updated heading',",
 											"        'Pupil referral units exclusions',",
 											"        'Regional and local authority (LA) breakdown',",
 											"    ];",
@@ -2600,7 +2647,7 @@
 											"        'Exclusions by pupil characteristics',",
 											"        'Independent exclusion reviews',",
 											"        'Reasons for exclusions',",
-											"        'New section',",
+											"        'Updated heading',",
 											"        'Pupil referral units exclusions',",
 											"        'Regional and local authority (LA) breakdown',",
 											"    ];",
@@ -2656,7 +2703,7 @@
 											"        'Reasons for exclusions',",
 											"        'Exclusions by pupil characteristics',",
 											"        'Independent exclusion reviews',",
-											"        'New section',",
+											"        'Updated heading',",
 											"        'Pupil referral units exclusions',",
 											"        'Regional and local authority (LA) breakdown',",
 											"    ];",
