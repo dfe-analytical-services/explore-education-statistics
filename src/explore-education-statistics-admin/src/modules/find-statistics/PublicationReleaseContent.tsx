@@ -44,17 +44,19 @@ interface ReleaseContentAccordionProps {
   release: AbstractRelease<EditableContentBlock>,
   content: AbstractRelease<EditableContentBlock>['content'],
   strings: string[],
+  sectionName: string;
 }
 
 
 const ReleaseContentAccordion = ({
   release,
   content,
-  strings
+  strings,
+  sectionName
 }: ReleaseContentAccordionProps) => (
   <>
     {content.length > 0 && (
-      <Accordion id={strings[0]} canReorder>
+      <Accordion id={strings[0]} canReorder sectionName={sectionName}>
         {content.map(({heading, caption, order, content: contentdata}, index) => (
           <AccordionSection
             index={index}
@@ -267,7 +269,7 @@ const PublicationReleaseContent = ({
 
       {/* <editor-fold desc="Content blocks"> */}
 
-      <ReleaseContentAccordion release={release} content={release.content} strings={accId} />
+      <ReleaseContentAccordion release={release} content={release.content} strings={accId} sectionName="Contents" />
 
       {/* </editor-fold> */}
 

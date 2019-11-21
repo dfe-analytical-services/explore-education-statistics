@@ -3,13 +3,15 @@ import isComponentType from '@common/lib/type-guards/components/isComponentType'
 import React, {cloneElement, ComponentClass, createRef, ReactElement, ReactNode} from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
-import EditableAccordionSection, {EditableAccordionSectionProps,} from './EditableAccordionSection';
+import classnames from 'classnames';
+import {EditableAccordionSectionProps} from './EditableAccordionSection';
 
 import styles from './EditableAccordion.module.scss';
 
 export interface EditableAccordionProps extends AccordionProps {
   index?: number;
   canReorder?: boolean;
+  sectionName?: string;
 }
 
 interface State {
@@ -103,7 +105,8 @@ const EditableAccordion = ({
   children,
   id,
   index,
-  canReorder
+  canReorder,
+  sectionName
 }: EditableAccordionProps) => {
   const ref = createRef<HTMLDivElement>();
   const [openAll, setOpenAll] = React.useState(false);
@@ -123,7 +126,7 @@ const EditableAccordion = ({
         // ignoring any errors
       }
     }
-  }, [ref])
+  }, [ref]);
 
   React.useEffect(() => {
     window.addEventListener('hashchange', goToHash);
@@ -139,7 +142,10 @@ const EditableAccordion = ({
   };
 
   const reorder = () => {
-    setIsReordering(!isReordering);
+    setIsReordering(true);
+  };
+  const saveOrder = () => {
+    setIsReordering(false);
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -148,19 +154,31 @@ const EditableAccordion = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <h2 className="govuk-heading-l reorderable-relative">
+        {canReorder && (
+          isReordering ? (
+            <button
+              className="govuk-button reorderable"
+              onClick={() => saveOrder()}
+              type="button"
+            >
+              Save Reordering
+            </button>
+          ) : (
+            <button
+              className="govuk-button govuk-button--secondary reorderable"
+              onClick={() => reorder()}
+              type="button"
+            >
+              Reorder <span className="govuk-visually-hidden"> sections </span>
+            </button>
+          )
+        )}
+        {sectionName}
+      </h2>
       <DroppableAccordion id={id} isReordering={isReordering}>
         <div className="govuk-accordion" ref={ref} id={id}>
-          <div className="govuk-accordion__controls">
-            {canReorder && (
-              <button
-                type="button"
-                aria-expanded="false"
-                onClick={() => reorder()}
-              >
-                Reorder<span className="govuk-visually-hidden"> sections</span>
-              </button>
-
-            )}
+          <div className={classnames("govuk-accordion__controls")}>
             <button
               type="button"
               className="govuk-accordion__open-all"

@@ -96,6 +96,8 @@ const ReleaseContentPage = () => {
           contentBlocks,
       };
 
+      console.log(releaseDataAsEditable.content);
+
       const release: AbstractRelease<EditableContentBlock> = {
         ...releaseDataAsEditable,
         summary: 'This is the summary ..... ',
