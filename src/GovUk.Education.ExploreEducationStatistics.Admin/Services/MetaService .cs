@@ -12,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class MetaService : IMetaService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public MetaService(ApplicationDbContext context)
+        public MetaService(ContentDbContext context)
         {
             _context = context;
         }

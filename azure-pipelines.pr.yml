@@ -8,8 +8,21 @@ pr: [ 'master' ]
 jobs:
   - job: 'Backend'
     pool:
-      vmImage: 'ubuntu-16.04'
+      name: Hosted Windows 2019 with VS2019
+      demands:
+      - npm
+      - azureps
     steps:
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core 2.1.x SDK'
+        inputs:
+          packageType: sdk
+          version: 2.1.x
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core 3.0.x SDK'
+        inputs:
+          version: 3.0.x
+          performMultiLevelLookup: true
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'
         inputs:
@@ -20,7 +33,7 @@ jobs:
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.*/*csproj'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
@@ -30,18 +43,70 @@ jobs:
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish'
+        displayName: 'Publish Data API'
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.*/*.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Content API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
+
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Public APIs Artifacts'
+        inputs:
+          artifactName: 'public-api'
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Notifier Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Notifier Artifacts'
         inputs:
-          artifactName: 'backend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'notifier'
+          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Publisher Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Publisher Artifacts'
+        inputs:
+          artifactName: 'publisher'
+          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Processor Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Processor Artifacts'
+        inputs:
+          artifactName: 'processor'
+          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
+
   - job: 'Admin'
     pool:
       name: Hosted Windows 2019 with VS2019
@@ -49,6 +114,11 @@ jobs:
       - npm
       - azureps
     steps:
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core SDK'
+        inputs:
+          version: 3.0.x
+          performMultiLevelLookup: true
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'
         inputs:
@@ -66,7 +136,7 @@ jobs:
         inputs:
           command: 'test'
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-          arguments: '--configuration $(BuildConfiguration)'
+          arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
       - task: Npm@1
         displayName: 'npm run ci'
@@ -106,9 +176,9 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
       - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Admin Artifact'
         inputs:
           artifactName: 'Admin'
           targetPath: '$(Build.ArtifactStagingDirectory)'
@@ -179,3 +249,27 @@ jobs:
           testResultsFiles: '**/junit.xml'
           searchFolder: './src'
           testRunTitle: 'Frontend Jest tests'
+  - job: 'MiscellaneousArtifacts'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Robot tests'
+        inputs:
+          artifactName: 'robot-tests'
+          targetPath: 'tests/robot-tests'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Newman tests'
+        inputs:
+          artifactName: 'newman-tests'
+          targetPath: 'tests/newman'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Auth Token script'
+        inputs:
+          artifactName: 'auth-token-script'
+          targetPath: 'useful-scripts/auth-tokens'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish ARM templates'
+        inputs:
+          artifactName: 'arm-templates'
+          targetPath: 'armTemplates'

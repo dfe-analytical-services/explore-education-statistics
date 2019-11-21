@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Convert
             var jObject = JObject.Parse(testString);
             var result = jObject.ToObject<MarkDownBlock>(serializer);
             
-            Assert.Equal(result.Body, "Markdown text");
+            Assert.Equal("Markdown text", result.Body);
         }
         
         [Fact]

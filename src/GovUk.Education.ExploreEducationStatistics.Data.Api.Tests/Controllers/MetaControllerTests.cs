@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
@@ -14,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     {
         private readonly MetaController _controller;
 
-        private readonly PublicationId _publicationId = PublicationId.NewGuid();
+        private readonly Guid _publicationId = Guid.NewGuid();
 
         public MetaControllerTests()
         {

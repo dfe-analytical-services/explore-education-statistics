@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IRepository<TEntity, in TKey> where TEntity : class
     {
-        Task<int> Count();
+        Task<int> CountAsync();
 
         int Count(Expression<Func<TEntity, bool>> expression);
 

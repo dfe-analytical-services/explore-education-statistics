@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {

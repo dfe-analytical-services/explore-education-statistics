@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -48,27 +47,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             switch (geographicLevel)
             {
-                case GeographicLevel.Local_Authority:
+                case GeographicLevel.LocalAuthority:
                     return location.LocalAuthority;
-                case GeographicLevel.Local_Authority_District:
+                case GeographicLevel.LocalAuthorityDistrict:
                     return location.LocalAuthorityDistrict;
-                case GeographicLevel.Local_Enterprise_Partnership:
+                case GeographicLevel.LocalEnterprisePartnership:
                     return location.LocalEnterprisePartnership;
                 case GeographicLevel.Institution:
                     return location.Institution;
-                case GeographicLevel.Mayoral_Combined_Authority:
+                case GeographicLevel.MayoralCombinedAuthority:
                     return location.MayoralCombinedAuthority;
-                case GeographicLevel.Multi_Academy_Trust:
+                case GeographicLevel.MultiAcademyTrust:
                     return location.MultiAcademyTrust;
                 case GeographicLevel.Country:
                     return location.Country;
-                case GeographicLevel.Opportunity_Area:
+                case GeographicLevel.OpportunityArea:
                     return location.OpportunityArea;
-                case GeographicLevel.Parliamentary_Constituency:
+                case GeographicLevel.ParliamentaryConstituency:
                     return location.ParliamentaryConstituency;
                 case GeographicLevel.Region:
                     return location.Region;
-                case GeographicLevel.RSC_Region:
+                case GeographicLevel.RscRegion:
                     return location.RscRegion;
                 case GeographicLevel.Sponsor:
                     return location.Sponsor;
@@ -123,8 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private Dictionary<long, Location> GetLocations(long[] locationIds)
         {
             var locations = Find(locationIds).ToList();
-            // Nullify all of the Observational Unit fields which are empty (might not be needed)
-            locations.ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
             return locations.ToDictionary(location => location.Id);
         }
     }

@@ -4,7 +4,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -104,8 +103,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifierRange(
             int startYear, int endYear, TimeIdentifier startCode, TimeIdentifier endCode, TimeIdentifier[] range)
         {
-            var indexOfStart = range.IndexOf(startCode);
-            var indexOfEnd = range.IndexOf(endCode);
+            var indexOfStart = Array.IndexOf(range, startCode);
+            var indexOfEnd = Array.IndexOf(range, endCode);
 
             var result = new List<(int Year, TimeIdentifier TimeIdentifier)>();
 

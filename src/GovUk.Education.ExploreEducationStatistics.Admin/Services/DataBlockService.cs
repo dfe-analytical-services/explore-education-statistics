@@ -15,13 +15,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataBlockService : IDataBlockService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
+        private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
-        public DataBlockService(ApplicationDbContext context,
+        public DataBlockService(
+            ContentDbContext context,
+            IReleaseService releaseService,
             IMapper mapper)
         {
             _context = context;
+            _releaseService = releaseService;
             _mapper = mapper;
         }
 
@@ -29,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
             dataBlock.Id = DataBlockId.NewGuid();
-            dataBlock.ReleaseId = releaseId;
 
             await _context.DataBlocks.AddAsync(dataBlock);
             await _context.SaveChangesAsync();
@@ -55,8 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
         {
-            var releases = await _context.DataBlocks.Where(block => block.ReleaseId.Equals(releaseId)).ToListAsync();
-            return _mapper.Map<List<DataBlockViewModel>>(releases);
+            var release = await _releaseService.GetAsync(releaseId);
+            
+            var dataBlocks = await _context.DataBlocks.Where(block => 
+                block.ContentSection.ReleaseId.Equals(releaseId) || 
+                block.Id.Equals(release.KeyStatisticsId)).ToListAsync();
+            
+            return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }
 
         public async Task<DataBlockViewModel> UpdateAsync(DataBlockId id, UpdateDataBlockViewModel updateDataBlock)

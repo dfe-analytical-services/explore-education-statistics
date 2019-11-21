@@ -8,14 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterLocationService : BaseImporterService
     {
-        private readonly StatisticsDbContext _context;
-
-        public ImporterLocationService(ImporterMemoryCache cache, StatisticsDbContext context) : base(cache)
+        public ImporterLocationService(ImporterMemoryCache cache) : base(cache)
         {
-            _context = context;
         }
 
-        public Location Find(Country country,
+        public Location Find(
+            StatisticsDbContext context,
+            Country country,
             Institution institution = null,
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
@@ -38,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return location;
             }
 
-            location = LookupOrCreate(country, institution, localAuthority, localAuthorityDistrict,
+            location = LookupOrCreate(context, country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
                 parliamentaryConstituency, region, rscRegion, sponsor, ward);
             GetCache().Set(cacheKey, location);
@@ -76,7 +75,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .Select(unit => unit.Code));
         }
 
-        private Location LookupOrCreate(Country country,
+        private Location LookupOrCreate(
+            StatisticsDbContext context,
+            Country country,
             Institution institution = null,
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
@@ -91,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Ward ward = null)
         {
             var location = Lookup(
+                context,
                 country,
                 institution,
                 localAuthority,
@@ -107,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             if (location == null)
             {
-                var entityEntry = _context.Location.Add(new Location
+                var entityEntry = context.Location.Add(new Location
                 {
                     Country = country ?? Country.Empty(),
                     Institution = institution ?? Institution.Empty(),
@@ -130,7 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return location;
         }
 
-        private Location Lookup(Country country,
+        private Location Lookup(
+            StatisticsDbContext context,
+            Country country,
             Institution institution = null,
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
@@ -195,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 location.Ward.Code ==
                 (ward != null ? ward.Code : null));
 
-            return _context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
+            return context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
         }
     }
 }

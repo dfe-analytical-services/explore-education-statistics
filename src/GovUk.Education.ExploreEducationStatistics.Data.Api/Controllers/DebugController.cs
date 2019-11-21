@@ -38,32 +38,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("report")]
         public async Task<ActionResult<DebugReport>> GetReport()
         {
-            var filterCount = _filterService.Count();
-            var indicatorCount = _indicatorService.Count();
-            var locationCount = _locationService.Count();
-            var observationCount = _observationService.Count();
-            var releaseCount = _releaseService.Count();
-            var schoolCount = _schoolService.Count();
-            var subjectCount = _subjectService.Count();
-
-            var counts = await Task.WhenAll(
-                filterCount,
-                indicatorCount,
-                locationCount,
-                observationCount,
-                releaseCount,
-                schoolCount,
-                subjectCount);
-
             return new DebugReport
             {
-                FilterCount = counts[0],
-                IndicatorCount = counts[1],
-                LocationCount = counts[2],
-                ObservationCount = counts[3],
-                ReleaseCount = counts[4],
-                SchoolCount = counts[5],
-                SubjectCount = counts[6]
+                FilterCount = await _filterService.CountAsync(),
+                IndicatorCount = await _indicatorService.CountAsync(),
+                LocationCount = await _locationService.CountAsync(),
+                ObservationCount = await _observationService.CountAsync(),
+                ReleaseCount = await _releaseService.CountAsync(),
+                SchoolCount = await _schoolService.CountAsync(),
+                SubjectCount = await _subjectService.CountAsync()
             };
         }
     }

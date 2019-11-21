@@ -13,10 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class PublishingController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IPublishingService _publishingService;
 
-        public PublishingController(ApplicationDbContext context, IPublishingService publishingService)
+        public PublishingController(ContentDbContext context, IPublishingService publishingService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -24,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
 
         public ActionResult PublishReleaseData()
         {
-            ViewData["ReleaseId"] = new SelectList(_context.Releases.OrderBy(r => r.Title), "Id", "Title");
+            var releases = _context.Releases.ToList().OrderBy(release => release.Title);
+            ViewData["ReleaseId"] = new SelectList(releases, "Id", "Title");
             return View();
         }
 
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             return RedirectToAction("ReleaseDataPublished", "Publishing", new {releaseId});
         }
 
-        [Route("{controller}/publish/complete")]
+        [Route("[controller]/publish/complete")]
         public IActionResult ReleaseDataPublished(Guid releaseId)
         {
             var release = _context.Releases.FirstOrDefault(r => r.Id.Equals(releaseId));
