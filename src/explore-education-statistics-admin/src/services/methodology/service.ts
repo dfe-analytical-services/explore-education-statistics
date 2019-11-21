@@ -1,13 +1,13 @@
 import client from '@admin/services/util/service';
-import { IdTitlePair } from '@admin/services/common/types';
+import { MethodologyStatus } from '@admin/services/methodology/types';
 
 export interface MethodologyService {
-  getMethodologies(): Promise<IdTitlePair[]>;
+  getMethodologies(): Promise<MethodologyStatus[]>;
 }
 
 const service: MethodologyService = {
-  getMethodologies(): Promise<IdTitlePair[]> {
-    return client.get<IdTitlePair[]>('/bau/methodology');
+  getMethodologies(): Promise<MethodologyStatus[]> {
+    return client.get<MethodologyStatus[]>('/bau/methodology');
   },
 };
 

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import methodologyService from '@admin/services/methodology/service';
 import Page from '@admin/components/Page';
-import { IdTitlePair } from '@admin/services/common/types';
+import { MethodologyStatus } from '@admin/services/methodology/types';
 
 interface Model {
-  methodologies: IdTitlePair[];
+  methodologies: MethodologyStatus[];
 }
 
 const BauMethodologyPage = () => {
@@ -19,12 +19,20 @@ const BauMethodologyPage = () => {
   }, []);
 
   return (
-    <Page>
-      <h1>BAU Methodology</h1>
+    <Page
+      wide
+      breadcrumbs={[
+        { name: 'Platform administration', link: '/administration' },
+        { name: 'Methodology' },
+      ]}
+    >
+      <h1>Methodology status</h1>
 
       {model && (
         <table className="govuk-table">
-          <caption className="govuk-table__caption">Methodologies list</caption>
+          <caption className="govuk-table__caption">
+            Current methodologies
+          </caption>
           <thead className="govuk-table__head">
             <tr className="govuk-table__row">
               <th scope="col" className="govuk-table__header">
@@ -41,16 +49,15 @@ const BauMethodologyPage = () => {
           <tbody className="govuk-table__body">
             {model.methodologies.map(methodology => (
               <tr className="govuk-table__row" key={methodology.id}>
-                <th scope="row" className="govuk-table__header">
-                  {methodology.title}
-                </th>
+                <td className="govuk-table__header">{methodology.title}</td>
                 <td className="govuk-table__cell">
-                  <strong className="govuk-tag">Draft</strong>
+                  <strong className="govuk-tag">{methodology.status}</strong>
                 </td>
                 <td className="govuk-table__cell">
                   <ul className="govuk-list">
-                    <li>Pupil absence in schools in England</li>
-                    <li>Pupil absence in schools in England (Spring)</li>
+                    {methodology.publications.map(publication => (
+                      <li key={publication.id}>{publication.title}</li>
+                    ))}
                   </ul>
                 </td>
               </tr>

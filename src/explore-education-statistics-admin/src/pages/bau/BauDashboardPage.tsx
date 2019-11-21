@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
+import Link from '@admin/components/Link';
 
 function BauDashboardPage() {
   return (
-    <Page>
-      <h1>BAU</h1>
+    <Page wide>
+      <h1 className="govuk-heading-xl">Platform administration</h1>
 
+      <Link to="/administration/methodology">View methodology status</Link>
     </Page>
   );
 }

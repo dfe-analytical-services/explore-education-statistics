@@ -84,13 +84,13 @@ function App() {
 
           <ProtectedRoute
             exact
-            path="/bau"
+            path="/administration"
             component={BauDashboardPage}
           />
 
           <ProtectedRoute
             exact
-            path="/bau/methodology"
+            path="/administration/methodology"
             component={BauMethodologyPage}
           />
 

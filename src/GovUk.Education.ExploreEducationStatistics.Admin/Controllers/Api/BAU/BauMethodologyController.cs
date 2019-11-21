@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -24,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         }
         
         [HttpGet("bau/methodology")]
-        public async Task<ActionResult<List<Methodology>>> GetMethodologyList()
+        public async Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyList()
         {
-            var methodologies = await _methodologyService.ListAsync();
+            var methodologies = await _methodologyService.ListStatusAsync();
 
             if (methodologies.Any())
             {

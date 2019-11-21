@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using TopicId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -27,7 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MethodologyViewModel>>(result);
             
         }
-        
+
+        public async Task<List<MethodologyStatusViewModel>> ListStatusAsync()
+        {
+            var result = await _context.Methodologies.Include(m => m.Publications).ToListAsync();
+
+            return _mapper.Map<List<MethodologyStatusViewModel>>(result);
+        }
         public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId)
         {
             var methodologies = await _context.Publications

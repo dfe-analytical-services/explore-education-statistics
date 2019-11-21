@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<List<MethodologyViewModel>> ListAsync();
         
+        Task<List<MethodologyStatusViewModel>> ListStatusAsync();
+        
         Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId);
     }
 }
