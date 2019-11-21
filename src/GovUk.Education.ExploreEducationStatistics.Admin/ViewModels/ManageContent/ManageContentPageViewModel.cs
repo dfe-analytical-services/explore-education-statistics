@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -65,6 +66,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
     public class ContentSectionViewModel
     {
+        public ContentSectionViewModel()
+        {
+            
+        }
+
+        public static ContentSectionViewModel ToViewModel(ContentSection section)
+        {
+            var model = new ContentSectionViewModel
+            {
+                Id = section.Id,
+                Caption = section.Caption,
+                Content = section.Content,
+                Heading = section.Heading,
+                Order = section.Order
+            };
+            
+            UnsetUnwantedFields(model);
+
+            return model;
+        }
+
+        // remove unwanted fields from the ContentBlock JSON structure
+        private static void UnsetUnwantedFields(ContentSectionViewModel model)
+        {
+            model.Content.ForEach(contentBlock =>
+            {
+                contentBlock.ContentSection = null;
+                contentBlock.ContentSectionId = null;
+            });
+        }
+
         public Guid Id { get; set; }
         
         public int Order { get; set; }

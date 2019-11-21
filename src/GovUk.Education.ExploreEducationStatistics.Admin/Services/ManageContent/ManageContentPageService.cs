@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ReleaseUtils;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ReleaseUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId)
         {
-            return CheckReleaseExists(_context, releaseId, release => 
-                new ManageContentPageViewModel()
+            return CheckReleaseExists(_context, releaseId, release =>
+                new ManageContentPageViewModel
                 {
                     Release = _mapper.Map<ReleaseViewModel>(release),
                     ReleaseNotes = new List<ReleaseNoteViewModel>()
@@ -53,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             Id = new Guid("faabaf92-2a47-4f53-a7ce-15b2d0afba82"),
                             Title = "2017 to 2018",
                             Url = "http://example.com/1"
-                        }, new BasicLink()
+                        },
+                        new BasicLink()
                         {
                             Id = new Guid("10daf47e-2b8a-4bcb-882c-c8780bea9568"),
                             Title = "2016 to 2017",
@@ -89,57 +90,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 Type = "HtmlBlock",
                                 Body = "<p>Read national statistical summaries and definitions, view charts and " +
                                        "tables and download data files across a range of pupil absence subject " +
-                                       "areas.</p>" + 
+                                       "areas.</p>" +
                                        "<p>You can also view a regional breakdown of statistics and data within the " +
                                        "<a href=\"#\">local authorities section</a></p>    ",
                             }
                         }
                     },
-                    ContentSections = new List<ContentSectionViewModel>()
-                    {
-                        new ContentSectionViewModel()
-                        {
-                            Id = new Guid("4675309a-97f3-4072-b79a-b54c59ff6686"),
-                            Order = 0,
-                            Caption = "About this release caption",
-                            Heading = "About this release",
-                            Content = new List<IContentBlock>()
-                            {
-                                new HtmlBlock()
-                                {
-                                    Id = new Guid("fc2e623d-2d9b-4312-ac6a-1ca1bf5ad10c"),
-                                    Type = "HtmlBlock",
-                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>    ",
-                                }
-                            }
-                        },
-                        new ContentSectionViewModel()
-                        {
-                            Id = new Guid("7bce6d46-5dc3-431b-847d-a3f9fa447a55"),
-                            Order = 0,
-                            Caption = "New content caption",
-                            Heading = "New content",
-                            Content = new List<IContentBlock>()
-                            {
-                                new HtmlBlock()
-                                {
-                                    Id = new Guid("3a38fbf2-c4b4-4928-ba2e-139e32317f27"),
-                                    Type = "HtmlBlock",
-                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>    ",
-                                }
-                            }
-                        }
-                    }
-                }
-            , HydrateReleaseForReleaseViewModel);
+                    ContentSections = release.Content
+                        .Select(ContentSectionViewModel.ToViewModel)
+                        .ToList()
+                    
+                }, HydrateReleaseForReleaseViewModel);
         }
-        
+
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             return values
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Type);
+                .Include(r => r.Type)
+                .Include(r => r.Content)
+                .ThenInclude(content => content.Content);
         }
     }
 }
