@@ -2,6 +2,7 @@ export type ImportStatusCode =
   | 'COMPLETE'
   | 'RUNNING_PHASE_1'
   | 'RUNNING_PHASE_2'
+  | 'RUNNING_PHASE_3'
   | 'NOT_FOUND'
   | 'FAILED';
 

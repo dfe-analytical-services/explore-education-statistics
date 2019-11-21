@@ -1,36 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ReleaseUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
     public class RelatedInformationService : IRelatedInformationService
     {
         private readonly ContentDbContext _context;
+        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
         public RelatedInformationService(ContentDbContext context)
         {
             _context = context;
+            _releaseHelper = new PersistenceHelper<Release, Guid>(
+                _context, 
+                context.Releases, 
+                ValidationErrorMessages.ReleaseNotFound);
         }
         
         public Task<Either<ValidationResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
         {
-            return CheckReleaseExists(_context, releaseId, release => release.RelatedInformation);
+            return _releaseHelper.CheckEntityExists(releaseId, release => release.RelatedInformation);
         }
 
         public Task<Either<ValidationResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
         {
-            return CheckReleaseExists(_context, releaseId, async release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 release.RelatedInformation.Add(new BasicLink
                 {
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, List<BasicLink>>> UpdateRelatedInformationAsync(
             Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
-            return CheckReleaseExists(_context, releaseId, async release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 var toUpdate = release.RelatedInformation.Find(item => item.Id == relatedInformationId);
 
@@ -68,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         
         public Task<Either<ValidationResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
         {
-            return CheckReleaseExists(_context, releaseId, async release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 release.RelatedInformation.Remove(
                     release.RelatedInformation.Find(item => item.Id == relatedInformationId));
