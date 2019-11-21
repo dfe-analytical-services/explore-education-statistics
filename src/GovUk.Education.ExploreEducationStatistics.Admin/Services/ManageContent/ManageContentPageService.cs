@@ -4,30 +4,34 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ReleaseUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
     public class ManageContentPageService : IManageContentPageService
     {
-        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
         public ManageContentPageService(ContentDbContext context, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
+            _releaseHelper = new PersistenceHelper<Release, Guid>(
+                context, 
+                context.Releases, 
+                ValidationErrorMessages.ReleaseNotFound);
         }
         
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId)
         {
-            return CheckReleaseExists(_context, releaseId, release =>
+            return _releaseHelper.CheckEntityExists(releaseId, release =>
                 new ManageContentPageViewModel
                 {
                     Release = _mapper.Map<ReleaseViewModel>(release),

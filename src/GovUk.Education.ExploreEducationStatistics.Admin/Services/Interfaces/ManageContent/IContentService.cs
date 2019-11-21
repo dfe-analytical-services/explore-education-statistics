@@ -12,5 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ValidationResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(Guid releaseId);
 
         Task<Either<ValidationResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(Guid releaseId, Dictionary<Guid, int> newSectionOrder);
+        
+        Task<Either<ValidationResult, ContentSectionViewModel>> AddContentSectionAsync(Guid releaseId);
+
+        Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(Guid releaseId,
+            Guid contentSectionId);
     }
 }
