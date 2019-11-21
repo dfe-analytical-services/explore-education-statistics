@@ -67,13 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 var orderForNewSection = request?.Order ?? 
                                          release.Content.Max(contentSection => contentSection.Order) + 1;
                 
-                release.Content.ForEach(contentSection =>
-                {
-                    if (contentSection.Order >= orderForNewSection)
-                    {
-                        contentSection.Order++;
-                    }
-                });
+                release.Content
+                    .FindAll(contentSection => contentSection.Order >= orderForNewSection)
+                    .ForEach(contentSection => contentSection.Order++);
 
                 var newContentSection = new ContentSection
                 {
@@ -94,11 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
-                var (release, sectionToUpdate) = tuple;
+                var (_, sectionToUpdate) = tuple;
                 
                 sectionToUpdate.Heading = newHeading;
 
-                _context.Releases.Update(release);
+                _context.ContentSections.Update(sectionToUpdate);
                 await _context.SaveChangesAsync();
                 return ContentSectionViewModel.ToViewModel(sectionToUpdate);
             });
@@ -116,13 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 var removedSectionOrder = sectionToRemove.Order;
                 
-                release.Content.ForEach(contentSection =>
-                {
-                    if (contentSection.Order > removedSectionOrder)
-                    {
-                        contentSection.Order--;
-                    }
-                });
+                release.Content
+                    .FindAll(contentSection => contentSection.Order > removedSectionOrder)
+                    .ForEach(contentSection => contentSection.Order--);
                 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
@@ -150,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 
                 _context.ContentSections.Update(section);
                 await _context.SaveChangesAsync();
-                return section.Content;
+                return OrderedContentBlocks(section);
             });
         }
 
@@ -163,13 +155,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 
                 var orderForNewBlock = request.Order ?? section.Content.Max(contentBlock => contentBlock.Order) + 1;
 
-                section.Content.ForEach(contentBlock =>
-                {
-                    if (contentBlock.Order >= orderForNewBlock)
-                    {
-                        contentBlock.Order++;
-                    }
-                });
+                section.Content
+                    .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
+                    .ForEach(contentBlock => contentBlock.Order++);
                     
                 IContentBlock newContentBlock = CreateContentBlockForType(request.Type);
                 newContentBlock.Order = orderForNewBlock;
@@ -179,18 +167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 await _context.SaveChangesAsync();
                 return newContentBlock;
             });
-        }
-
-        private static IContentBlock CreateContentBlockForType(ContentBlockType type)
-        {
-            return type switch
-            {
-                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
-                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
-                ContentBlockType.HtmlBlock => new HtmlBlock(),
-                ContentBlockType.DataBlock => new DataBlock(),
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
         }
 
         public Task<Either<ValidationResult, List<IContentBlock>>> RemoveContentBlockAsync(
@@ -211,19 +187,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 section.Content.Remove(blockToRemove);
 
                 var removedBlockOrder = blockToRemove.Order;
-                
-                section.Content.ForEach(contentBlock =>
-                {
-                    if (contentBlock.Order > removedBlockOrder)
-                    {
-                        contentBlock.Order--;
-                    }
-                });
+
+                section.Content
+                    .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
+                    .ForEach(contentBlock => contentBlock.Order--);
                 
                 _context.ContentSections.Update(section);
                 await _context.SaveChangesAsync();
-                return section.Content.OrderBy(block => block.Order).ToList();
+                return OrderedContentBlocks(section);
             });
+        }
+
+        private static IContentBlock CreateContentBlockForType(ContentBlockType type)
+        {
+            return type switch
+            {
+                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
+                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
+                ContentBlockType.HtmlBlock => new HtmlBlock(),
+                ContentBlockType.DataBlock => new DataBlock(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
+        {
+            return section
+                .Content
+                .OrderBy(block => block.Order)
+                .ToList();
         }
 
         private static List<ContentSectionViewModel> OrderedContentSections(Release release)
