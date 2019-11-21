@@ -59,8 +59,9 @@ const ReleaseContentPage = () => {
       ];
 
       const contentBlock = {
+        id: "cb-000",
         order: 0,
-        heading: 'test',
+        heading: 'test 1',
         caption: 'test',
         content: [
           {
@@ -78,19 +79,19 @@ const ReleaseContentPage = () => {
         ],
       };
 
-      const contentBlocks = [contentBlock, { ...contentBlock, order: 1 }];
+      const contentBlocks = [contentBlock, { ...contentBlock, order: 1, id: "cb-001", heading: "test 2" }];
 
       const releaseDataAsEditable = {
         ...releaseData,
         keyStatistics: releaseData.keyStatistics as EditableContentBlock,
         content:
-          (releaseData.content &&
-            releaseData.content.map(section => ({
+          (releaseContent.contentSections &&
+              releaseContent.contentSections.map(section => ({
               ...section,
               content: section.content.map<EditableContentBlock>(
                 (block, index) => ({
                   ...block,
-                  id: `${index}`,
+                  id: `aaa-${index}`,
                   comments: [],
                 }),
               ),

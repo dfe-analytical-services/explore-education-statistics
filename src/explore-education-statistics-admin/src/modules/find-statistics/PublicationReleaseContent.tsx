@@ -43,7 +43,7 @@ const nullLogEvent = () => {
 interface ReleaseContentAccordionProps {
   release: AbstractRelease<EditableContentBlock>,
   content: AbstractRelease<EditableContentBlock>['content'],
-  strings: string[],
+  accordionId: string,
   sectionName: string;
 }
 
@@ -51,14 +51,15 @@ interface ReleaseContentAccordionProps {
 const ReleaseContentAccordion = ({
   release,
   content,
-  strings,
+  accordionId,
   sectionName
 }: ReleaseContentAccordionProps) => (
   <>
     {content.length > 0 && (
-      <Accordion id={strings[0]} canReorder sectionName={sectionName}>
-        {content.map(({heading, caption, order, content: contentdata}, index) => (
+      <Accordion releaseId={release.id} id={accordionId} canReorder sectionName={sectionName}>
+        {content.map(({id, heading, caption, order, content: contentdata}, index) => (
           <AccordionSection
+            id={id}
             index={index}
             heading={heading || ''}
             caption={caption}
@@ -75,7 +76,6 @@ const ReleaseContentAccordion = ({
     )}
   </>
 );
-
 
 
 const PublicationReleaseContent = ({
@@ -269,7 +269,7 @@ const PublicationReleaseContent = ({
 
       {/* <editor-fold desc="Content blocks"> */}
 
-      <ReleaseContentAccordion release={release} content={release.content} strings={accId} sectionName="Contents" />
+      <ReleaseContentAccordion release={release} content={release.content} accordionId={accId[0]} sectionName="Contents" />
 
       {/* </editor-fold> */}
 
