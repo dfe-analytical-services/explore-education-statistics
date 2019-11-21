@@ -79,7 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             try
             {
                 var import = await GetImport(releaseId, dataFileName);
-                if (import.Status == IStatus.FAILED) return false;
+                if (import.Status == IStatus.FAILED)
+                {
+                    return false;
+                }
+
                 import.Status = status;
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
@@ -155,9 +159,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     if (se.RequestInformation.HttpStatusCode == (int) HttpStatusCode.Conflict)
                         // A Conflict has been found, lease is being used by another process
                         // wait and try again.
+                    {
                         Thread.Sleep(TimeSpan.FromSeconds(2));
+                    }
                     else
+                    {
                         throw se;
+                    }
                 }
 
             return leaseId;

@@ -55,7 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ValidateMetaHeader(metaHeaders, errors);
 
             // If the meta header not ok then stop error checks
-            if (errors.Count != 0) return errors;
+            if (errors.Count != 0)
+            {
+                return errors;
+            }
+
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
             ValidateObservations(subjectData.GetCsvLines(), errors);
 
@@ -66,14 +70,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             if (RowContainsQuotes(header))
                 // No further checks if quotes exist
+            {
                 errors.Add(ValidationErrorMessages.MetaHeaderContainsQuotes.GetEnumLabel());
+            }
             else
                 // Check for unexpected column names
+            {
                 Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
                 {
                     if (!header.Contains(col))
+                    {
                         errors.Add(ValidationErrorMessages.MetaFileHasUnexpectedColumns.GetEnumLabel());
+                    }
                 });
+            }
         }
 
         private static void ValidateMetaRows(IEnumerable<string> lines, List<string> errors)
@@ -105,8 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             else
             {
                 if (HasUnexpectedNumberOfColumns(row, numExpectedColumns))
+                {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
+                }
 
                 try
                 {
@@ -131,8 +143,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             else
             {
                 if (HasUnexpectedNumberOfColumns(row, headers.Count))
+                {
                     errors.Add($"error at row {rowNumber}: " +
                                ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel());
+                }
 
                 try
                 {

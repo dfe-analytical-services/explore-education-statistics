@@ -48,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Potentially status could already be failed so don't continue
             if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
                 IStatus.RUNNING_PHASE_3))
+            {
                 try
                 {
                     _importerService.ImportObservations(
@@ -63,7 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     // then delete each split batch processed
 
                     if (message.NumBatches > 1)
+                    {
                         _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
+                    }
 
                     await _batchService.UpdateBatchCount(
                         message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo);
@@ -83,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     throw e;
                 }
+            }
         }
 
         public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)

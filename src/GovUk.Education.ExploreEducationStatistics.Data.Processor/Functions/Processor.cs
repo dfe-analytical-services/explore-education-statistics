@@ -57,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
 
             if (await IsDataFileValid(message, batchSettings.RowsPerBatch, logger))
+            {
                 try
                 {
                     var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
@@ -68,9 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                                     $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
                     throw;
                 }
+            }
             else
+            {
                 logger.LogError(
                     $"Import FAILED for {message.DataFileName}...check log");
+            }
         }
 
         [FunctionName("ProcessUploadsSequentially")]
@@ -88,9 +92,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             var allValid = true;
             foreach (var message in messages)
                 if (!await IsDataFileValid(message, batchSettings.RowsPerBatch, logger))
+                {
                     allValid = false;
+                }
 
             if (allValid)
+            {
                 foreach (var message in messages)
                 {
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
@@ -99,9 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
                 }
+            }
             else
+            {
                 logger.LogError(
                     "Seeding FAILED...check log");
+            }
         }
 
         [FunctionName("ImportObservations")]
@@ -149,7 +159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             var errors = _validatorService.Validate(message, subjectData);
 
-            if (errors.Count <= 0) return true;
+            if (errors.Count <= 0)
+            {
+                return true;
+            }
 
             logger.LogInformation($"Datafile: {message.DataFileName} has errors");
 

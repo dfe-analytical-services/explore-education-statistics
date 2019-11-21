@@ -41,7 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
 
-            if (subject != null) context.Subject.Remove(subject);
+            if (subject != null)
+            {
+                context.Subject.Remove(subject);
+            }
 
             subject = context.Subject.Add(new Subject(name, release)).Entity;
 
