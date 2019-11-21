@@ -9,6 +9,7 @@ import dashboardRoutes from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
+import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
@@ -60,217 +61,222 @@ function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
+      <AriaLiveAnnouncer>
+        <ApiAuthorizationRoutes />
 
-      <ApiAuthorizationRoutes />
+        <ProtectedRoutes>
+          <Switch>
+            <ProtectedRoute
+              exact
+              path={dashboardRoutes.adminDashboard}
+              component={AdminDashboardPage}
+            />
+            <ProtectedRoute
+              path={dashboardRoutes.adminDashboardThemeTopic}
+              component={AdminDashboardPage}
+            />
 
-      <ProtectedRoutes>
-        <Switch>
+            <Redirect exact strict from="/" to="/dashboard" />
+          </Switch>
+
           <ProtectedRoute
             exact
-            path={dashboardRoutes.adminDashboard}
-            component={AdminDashboardPage}
+            path={ApplicationPaths.LoggedOut}
+            component={SignedOutPage}
+            redirectIfNotLoggedIn={false}
           />
           <ProtectedRoute
-            path={dashboardRoutes.adminDashboardThemeTopic}
-            component={AdminDashboardPage}
+            exact
+            path={publicationRoutes.createPublication.route}
+            component={CreatePublicationPage}
+          />
+          <ProtectedRoute
+            exact
+            path={releaseRoutes.createReleaseRoute.route}
+            component={CreateReleasePage}
+          />
+          <ProtectedRoute
+            path="/publication/:publicationId/release/:releaseId"
+            component={ManageReleasePageContainer}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/"
+            component={AdminDocumentationHome}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/content-design-standards-guide"
+            component={AdminDocumentationContentDesignStandards}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/glossary"
+            component={AdminDocumentationGlossary}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/style-guide"
+            component={AdminDocumentationStyle}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/using-dashboard"
+            component={AdminDocumentationUsingDashboard}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/create-new-release"
+            component={AdminDocumentationCreateNewRelease}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/create-new-publication"
+            component={AdminDocumentationCreateNewPublication}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/edit-release"
+            component={AdminDocumentationEditRelease}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/manage-content"
+            component={AdminDocumentationManageContent}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/manage-data"
+            component={AdminDocumentationManageData}
+          />
+          <ProtectedRoute
+            exact
+            path="/documentation/manage-data-block"
+            component={AdminDocumentationManageDataBlocks}
+          />
+        </ProtectedRoutes>
+
+        {/* Prototype Routes */}
+        <Route exact path="/index" component={IndexPage} />
+
+        <LoginContext.Provider value={PrototypeLoginService.login()}>
+          <Route exact path="/prototypes/" component={PrototypesIndexPage} />
+
+          <Route
+            exact
+            path="/prototypes/admin-dashboard"
+            component={PrototypeAdminDashboard}
           />
 
-          <Redirect exact strict from="/" to="/dashboard" />
-        </Switch>
+          <Route
+            exact
+            path="/prototypes/charts"
+            component={PrototypeChartTest}
+          />
+          <Route
+            exact
+            path="/prototypes/table-tool"
+            component={PrototypeTableTool}
+          />
 
-        <ProtectedRoute
-          exact
-          path={ApplicationPaths.LoggedOut}
-          component={SignedOutPage}
-          redirectIfNotLoggedIn={false}
-        />
-        <ProtectedRoute
-          exact
-          path={publicationRoutes.createPublication.route}
-          component={CreatePublicationPage}
-        />
-        <ProtectedRoute
-          exact
-          path={releaseRoutes.createReleaseRoute.route}
-          component={CreateReleasePage}
-        />
-        <ProtectedRoute
-          path="/publication/:publicationId/release/:releaseId"
-          component={ManageReleasePageContainer}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/"
-          component={AdminDocumentationHome}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/content-design-standards-guide"
-          component={AdminDocumentationContentDesignStandards}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/glossary"
-          component={AdminDocumentationGlossary}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/style-guide"
-          component={AdminDocumentationStyle}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/using-dashboard"
-          component={AdminDocumentationUsingDashboard}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/create-new-release"
-          component={AdminDocumentationCreateNewRelease}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/create-new-publication"
-          component={AdminDocumentationCreateNewPublication}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/edit-release"
-          component={AdminDocumentationEditRelease}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-content"
-          component={AdminDocumentationManageContent}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-data"
-          component={AdminDocumentationManageData}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-data-block"
-          component={AdminDocumentationManageDataBlocks}
-        />
-      </ProtectedRoutes>
-
-      {/* Prototype Routes */}
-      <Route exact path="/index" component={IndexPage} />
-
-      <LoginContext.Provider value={PrototypeLoginService.login()}>
-        <Route exact path="/prototypes/" component={PrototypesIndexPage} />
-
-        <Route
-          exact
-          path="/prototypes/admin-dashboard"
-          component={PrototypeAdminDashboard}
-        />
-
-        <Route exact path="/prototypes/charts" component={PrototypeChartTest} />
-        <Route
-          exact
-          path="/prototypes/table-tool"
-          component={PrototypeTableTool}
-        />
-
-        <Route
-          exact
-          path="/prototypes/publication-edit"
-          component={PublicationEditPage}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-unresolved-comments"
-          component={PublicationEditUnresolvedComments}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-review"
-          render={() => <PublicationEditUnresolvedComments reviewing />}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-higher-review"
-          component={PublicationReviewPage}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-preview"
-          component={PublicationReviewPage}
-          render={() => <PublicationReviewPage />}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new"
-          component={PublicationCreateNew}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-assign-methodology"
-          component={PublicationAssignMethodology}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-confirm-new"
-          component={PublicationConfirmNew}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-edit-new"
-          component={PublicationEditNew}
-        />
-        <Route
-          exact
-          path="/prototypes/release-create-new"
-          component={ReleaseCreateNew}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence"
-          render={() => <PublicationEditUnresolvedComments newBlankRelease />}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-config"
-          component={PublicationCreateNewAbsenceConfig}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-config-edit"
-          component={PublicationCreateNewAbsenceConfigEdit}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-data"
-          component={PublicationCreateNewAbsenceData}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-table"
-          component={PublicationCreateNewAbsenceTable}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-view-table"
-          component={PublicationCreateNewAbsenceViewTables}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-schedule"
-          component={PublicationCreateNewAbsenceSchedule}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-schedule-edit"
-          component={PublicationCreateNewAbsenceScheduleEdit}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-status"
-          component={PublicationCreateNewAbsenceStatus}
-        />
-      </LoginContext.Provider>
+          <Route
+            exact
+            path="/prototypes/publication-edit"
+            component={PublicationEditPage}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-unresolved-comments"
+            component={PublicationEditUnresolvedComments}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-review"
+            render={() => <PublicationEditUnresolvedComments reviewing />}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-higher-review"
+            component={PublicationReviewPage}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-preview"
+            component={PublicationReviewPage}
+            render={() => <PublicationReviewPage />}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new"
+            component={PublicationCreateNew}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-assign-methodology"
+            component={PublicationAssignMethodology}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-confirm-new"
+            component={PublicationConfirmNew}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-edit-new"
+            component={PublicationEditNew}
+          />
+          <Route
+            exact
+            path="/prototypes/release-create-new"
+            component={ReleaseCreateNew}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence"
+            render={() => <PublicationEditUnresolvedComments newBlankRelease />}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-config"
+            component={PublicationCreateNewAbsenceConfig}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-config-edit"
+            component={PublicationCreateNewAbsenceConfigEdit}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-data"
+            component={PublicationCreateNewAbsenceData}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-table"
+            component={PublicationCreateNewAbsenceTable}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-view-table"
+            component={PublicationCreateNewAbsenceViewTables}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-schedule"
+            component={PublicationCreateNewAbsenceSchedule}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-schedule-edit"
+            component={PublicationCreateNewAbsenceScheduleEdit}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-status"
+            component={PublicationCreateNewAbsenceStatus}
+          />
+        </LoginContext.Provider>
+      </AriaLiveAnnouncer>
     </BrowserRouter>
   );
 }
