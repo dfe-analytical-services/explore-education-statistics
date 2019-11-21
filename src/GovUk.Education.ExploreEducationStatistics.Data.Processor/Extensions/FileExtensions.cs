@@ -23,10 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions
             var list = new List<string>();
             using (var sr = new StreamReader(await blockBlob.OpenReadAsync()))
             {
-                while (sr.Peek() >= 0)
-                {
-                    list.Add(sr.ReadLine());
-                }
+                while (sr.Peek() >= 0) list.Add(sr.ReadLine());
             }
 
             return list.ToArray();

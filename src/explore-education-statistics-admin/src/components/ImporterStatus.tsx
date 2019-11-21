@@ -32,6 +32,8 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
       return 'Validating';
     case 'RUNNING_PHASE_2':
       return 'Importing';
+    case 'RUNNING_PHASE_3':
+      return 'Importing';
     case 'COMPLETE':
       return 'Complete';
     case 'FAILED':
@@ -69,6 +71,8 @@ class ImporterStatus extends Component<Props> {
         return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_2':
         return [styles.ragStatusAmber];
+      case 'RUNNING_PHASE_3':
+        return [styles.ragStatusAmber];
       case 'COMPLETE':
         this.cancelTimer();
         return [styles.ragStatusGreen];
@@ -101,7 +105,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
-            running: 'NOT_FOUND,RUNNING_PHASE_1, RUNNING_PHASE_2'.match(
+            running: 'NOT_FOUND,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
               importStatus.status,
             ),
           }),

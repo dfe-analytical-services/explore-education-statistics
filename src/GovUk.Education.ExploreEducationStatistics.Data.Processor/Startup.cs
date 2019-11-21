@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
-                .AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")))
+                .AddTransient<IFileStorageService, FileStorageService>(s =>
+                    new FileStorageService(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<ImporterSchoolService>()
                 .AddTransient<IImporterService, ImporterService>()
@@ -30,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
                 .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
                 .AddTransient<ImporterMemoryCache>()
-                .AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")))
+                .AddTransient<ITableStorageService, TableStorageService>(s =>
+                    new TableStorageService(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")))
                 .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IImportStatusService, ImportStatusService>()
                 .AddSingleton<IValidatorService, ValidatorService>()
