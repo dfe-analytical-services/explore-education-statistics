@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileStorageService : IFileStorageService
     {
+        private const string ContainerName = "releases";
         private readonly CloudBlobContainer _blobContainer;
         private readonly TimeSpan _minimumAcquireLeaseTimeSpan = TimeSpan.FromSeconds(15);
-
-        private const string ContainerName = "releases";
 
         public FileStorageService(string connectionString)
         {
@@ -40,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
         }
 
-        public async Task<Boolean> UploadDataFileAsync(
+        public async Task<bool> UploadDataFileAsync(
             Guid releaseId,
             MemoryStream stream,
             string metaFileName,
@@ -49,12 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             string contentType)
         {
             await UploadFileAsync(releaseId.ToString(), stream, new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("name", name),
-                new KeyValuePair<string, string>("metafile", metaFileName)
-            },
-            fileName,
-            contentType);
+                {
+                    new KeyValuePair<string, string>("name", name),
+                    new KeyValuePair<string, string>("metafile", metaFileName)
+                },
+                fileName,
+                contentType);
             return true;
         }
 
@@ -96,10 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private static async Task AddMetaValuesAsync(CloudBlob blob, IEnumerable<KeyValuePair<string, string>> values)
         {
-            foreach (var value in values)
-            {
-                blob.Metadata.Add(value);
-            }
+            foreach (var value in values) blob.Metadata.Add(value);
 
             await blob.SetMetadataAsync();
         }
