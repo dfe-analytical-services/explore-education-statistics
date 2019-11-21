@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -59,15 +60,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ValidationResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId)
+            Guid releaseId, AddContentSectionRequest request)
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var maxOrderNumber = release.Content.Max(section => section.Order);
+                release.Content.ForEach(contentSection =>
+                {
+                    if (contentSection.Order >= request.Order)
+                    {
+                        contentSection.Order++;
+                    }
+                });
+                    
                 release.Content.Add(new ContentSection
                 {
                     Heading = "New section",
-                    Order = maxOrderNumber + 1
+                    Order = request.Order
                 });
                 
                 _context.Releases.Update(release);
@@ -141,17 +149,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             });
         }
 
-        public Task<Either<ValidationResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId) 
+        public Task<Either<ValidationResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
+            AddContentBlockRequest request) 
         {
             return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
                 var (_, section) = tuple;
 
-                var maxOrderNumber = section.Content.Max(block => block.Order);
-                
+                section.Content.ForEach(contentBlock =>
+                {
+                    if (contentBlock.Order >= request.Order)
+                    {
+                        contentBlock.Order++;
+                    }
+                });
+                    
                 IContentBlock newContentBlock = new HtmlBlock
                 {
-                    Order = maxOrderNumber + 1
+                    Order = request.Order
                 };
                 
                 section.Content.Add(newContentBlock);
