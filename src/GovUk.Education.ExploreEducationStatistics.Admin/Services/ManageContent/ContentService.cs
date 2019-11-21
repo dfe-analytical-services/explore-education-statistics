@@ -192,6 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
                     .ForEach(contentBlock => contentBlock.Order--);
                 
+                _context.ContentBlocks.Remove(blockToRemove);
                 _context.ContentSections.Update(section);
                 await _context.SaveChangesAsync();
                 return OrderedContentBlocks(section);
