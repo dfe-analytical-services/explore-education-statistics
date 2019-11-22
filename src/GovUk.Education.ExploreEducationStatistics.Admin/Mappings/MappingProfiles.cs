@@ -62,7 +62,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(summary => summary.Release.Status));
 
             CreateMap<Methodology, MethodologyViewModel>();
-
+            CreateMap<Methodology, MethodologyStatusViewModel>();
+            CreateMap<Publication, MethodologyStatusPublications>();
+            
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.ThemeId,

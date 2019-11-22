@@ -23,8 +23,8 @@ const PageFooter = ({ wide }: Props) => (
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
-              <a href="/tools" className="govuk-footer__link">
-                BAU Tools
+              <a href="/administration" className="govuk-footer__link">
+                Platform administration
               </a>
             </li>
             <li className="govuk-footer__inline-list-item">
