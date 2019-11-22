@@ -99,22 +99,22 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'Choose a different file name for data and metadata files',
     ),
     errorCodeToFieldError(
-      'DATA_FILE_CAN_NOT_BE_EMPTY',
+      'DATA_FILE_CANNOT_BE_EMPTY',
       'dataFile',
       'Choose a data file that is not empty',
     ),
     errorCodeToFieldError(
-      'METADATA_FILE_CAN_NOT_BE_EMPTY',
+      'METADATA_FILE_CANNOT_BE_EMPTY',
       'metadataFile',
       'Choose a metadata file that is not empty',
     ),
     errorCodeToFieldError(
-      'DATA_FILE_MUST_BE_A_CSV_FILE',
+      'DATA_FILE_MUST_BE_CSV_FILE',
       'dataFile',
       'Data file must be a csv file',
     ),
     errorCodeToFieldError(
-      'META_FILE_MUST_BE_A_CSV_FILE',
+      'META_FILE_MUST_BE_CSV_FILE',
       'metadataFile',
       'Meta file must be a csv file',
     ),

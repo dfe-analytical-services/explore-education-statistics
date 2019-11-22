@@ -30,5 +30,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             input = input.Replace(" ", "");
             return input;
         }
+
+        public static string SnakeCase(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            input = Regex.Replace(input, "(^_([A-Z]))", "$2_$3");
+
+            return input.TrimStart('_').ToLower();
+        }
+
+        public static string ScreamingSnakeCase(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            return SnakeCase(input).ToUpper();
+        }
     }
 }
