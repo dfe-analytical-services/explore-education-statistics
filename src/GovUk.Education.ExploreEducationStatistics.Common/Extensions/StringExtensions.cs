@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 return input;
             }
 
-            input = Regex.Replace(input, "(^_([A-Z]))", "$2_$3");
+            input = Regex.Replace(input, "(([^_A-Z])([A-Z]))", "$2_$3");
 
             return input.TrimStart('_').ToLower();
         }

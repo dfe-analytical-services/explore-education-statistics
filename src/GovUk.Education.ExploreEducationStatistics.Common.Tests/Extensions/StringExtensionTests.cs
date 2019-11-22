@@ -102,16 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
-        public void AcronymsAreScreamingSnakeCased()
+        public void AcronymsAreAlreadyScreamingSnakeCased()
         {
-            Assert.Equal("A_B_C", "ABC".ScreamingSnakeCase());
+            Assert.Equal("ABC", "ABC".ScreamingSnakeCase());
         }
 
         [Fact]
         public void CamelCasedStringsAreScreamingSnakeCased()
         {
             Assert.Equal("FOO", "foo".ScreamingSnakeCase());
-            Assert.Equal("CAMEL_CASE", "camelCase".ScreamingSnakeCase());
+            Assert.Equal("CAMEL_CASE_STRING", "camelCaseString".ScreamingSnakeCase());
         }
 
         [Fact]
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public void PascalCasedStringsAreScreamingSnakeCased()
         {
             Assert.Equal("FOO_BAR", "FooBar".ScreamingSnakeCase());
-            Assert.Equal("FOO_B_AR", "FooBAr".ScreamingSnakeCase());
+            Assert.Equal("FOO_BAR", "FooBAr".ScreamingSnakeCase());
         }
     }
 }
