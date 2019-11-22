@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -15,18 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
-        {
-            return observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItem).Distinct();
-        }
-
         public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
         {
-            var filterItems = observations.SelectMany(observation => observation.FilterItems)
+            var filterItems = observations
+                .SelectMany(observation => observation.FilterItems)
                 .Select(item => item.FilterItem)
-                .Include(item => item.FilterGroup)
-                .ThenInclude(group => group.Filter)
                 .ToList();
 
             return filterItems.Distinct();

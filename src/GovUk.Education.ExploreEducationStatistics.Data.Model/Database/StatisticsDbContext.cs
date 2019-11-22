@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; }
         public DbSet<Footnote> Footnote { get; set; }
-        public DbQuery<GeoJson> GeoJson { get; set; }
+        public DbSet<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
         public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; }
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
@@ -343,13 +343,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
-            modelBuilder.Query<GeoJson>().ToView("geojson");
+            modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
         }
 
         private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
         {
             // Register types used by custom SQL queries
-            modelBuilder.Query<IdWrapper>();
+            modelBuilder.Entity<IdWrapper>();
         }
     }
 }

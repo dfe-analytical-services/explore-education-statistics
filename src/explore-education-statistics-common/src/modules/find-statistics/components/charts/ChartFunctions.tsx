@@ -675,7 +675,7 @@ function calculateMajorTicks(
   return undefined;
 }
 
-function getNiceMaxValue(maxValue: number) {
+export function getNiceMaxValue(maxValue: number) {
   if (maxValue === 0) {
     return 0;
   }

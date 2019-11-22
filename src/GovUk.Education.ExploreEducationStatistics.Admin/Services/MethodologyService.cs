@@ -4,18 +4,20 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using TopicId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class MethodologyService : IMethodologyService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public MethodologyService(ApplicationDbContext context, IMapper mapper)
+        public MethodologyService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -27,7 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MethodologyViewModel>>(result);
             
         }
-        
+
+        public async Task<List<MethodologyStatusViewModel>> ListStatusAsync()
+        {
+            var result = await _context.Methodologies.Include(m => m.Publications).ToListAsync();
+
+            return _mapper.Map<List<MethodologyStatusViewModel>>(result);
+        }
         public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId)
         {
             var methodologies = await _context.Publications

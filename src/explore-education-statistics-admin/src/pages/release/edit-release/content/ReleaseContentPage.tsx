@@ -45,46 +45,6 @@ const ReleaseContentPage = () => {
         },
       ];
 
-      // const contentBlock = {
-      //   order: 0,
-      //   heading: 'test',
-      //   caption: 'test',
-      //   content: [
-      //     {
-      //       type: 'HtmlBlock',
-      //       body: 'This is a test',
-      //       comments: [
-      //         {
-      //           name: 'A user',
-      //           time: new Date(),
-      //           comment: 'A comment',
-      //           state: 'open',
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // };
-      //
-      // const contentBlocks = [contentBlock, {...contentBlock, order: 1}];
-      //
-      // const releaseDataAsEditable = {
-      //   ...releaseData,
-      //   keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-      //   content:
-      //     (releaseData.content &&
-      //       releaseData.content.map(section => ({
-      //         ...section,
-      //         content: section.content.map<EditableContentBlock>(
-      //           (block, index) => ({
-      //             ...block,
-      //             id: `${index}`,
-      //             comments: [],
-      //           }),
-      //         ),
-      //       }))) ||
-      //     contentBlocks,
-      // };
-
       // </editor-fold>
 
       setModel({

@@ -21,20 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
     public class ImporterMetaService : IImporterMetaService
     {
-        private readonly StatisticsDbContext _context;
-
-        public ImporterMetaService(
-            StatisticsDbContext context)
+        public ImporterMetaService()
         {
-            _context = context;
         }
 
-        public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
+        public SubjectMeta Import(IEnumerable<string> lines, Subject subject, StatisticsDbContext context)
         {
             var headers = GetHeaders(lines);
             var metaRows = GetMetaRows(lines, headers);
-            var filters = ImportFilters(metaRows, subject).ToList();
-            var indicators = ImportIndicators(metaRows, subject).ToList();
+            var filters = ImportFilters(metaRows, subject, context).ToList();
+            var indicators = ImportIndicators(metaRows, subject, context).ToList();
             
             return new SubjectMeta
             {
@@ -43,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
         }
 
-        public SubjectMeta Get(IEnumerable<string> lines, Subject subject)
+        public SubjectMeta Get(IEnumerable<string> lines, Subject subject, StatisticsDbContext context)
         {
             var headers = GetHeaders(lines);
             var metaRows = GetMetaRows(lines, headers);
-            var filters = GetFilters(metaRows, subject).ToList();
-            var indicators = GetIndicators(metaRows, subject).ToList();
+            var filters = GetFilters(metaRows, subject, context).ToList();
+            var indicators = GetIndicators(metaRows, subject, context).ToList();
             
             return new SubjectMeta
             {
@@ -87,39 +83,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
-            IEnumerable<MetaRow> metaRows, Subject subject)
+            IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
         {
-            var filters = GetFilters(metaRows, subject).ToList();
-            _context.Filter.AddRange(filters.Select(triple => triple.Filter));
+            var filters = GetFilters(metaRows, subject, context).ToList();
+            context.Filter.AddRange(filters.Select(triple => triple.Filter));
 
             return filters;
         }
 
         private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject)
+            Subject subject, StatisticsDbContext context)
         {
-            var indicators = GetIndicators(metaRows, subject).ToList();
+            var indicators = GetIndicators(metaRows, subject, context).ToList();
 
-            _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
+            context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
 
             return indicators;
         }
 
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
-            IEnumerable<MetaRow> metaRows, Subject subject)
+            IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
         {
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
                     filter: 
-                        _context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName) ??
+                        context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName) ??
                         new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
 
         private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject)
+            Subject subject, StatisticsDbContext context)
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
 
@@ -134,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(rows => rows.Key, rows =>
-                    _context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
+                    context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
                     new IndicatorGroup(rows.Key, subject)
                 );
 
@@ -144,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     indicatorGroups.TryGetValue(row.IndicatorGrouping, out var indicatorGroup);
                     return (
                         indicator:
-                        _context.Indicator.FirstOrDefault(i =>
+                        context.Indicator.FirstOrDefault(i =>
                             i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
                             i.Unit == row.IndicatorUnit) ?? new Indicator
                         {

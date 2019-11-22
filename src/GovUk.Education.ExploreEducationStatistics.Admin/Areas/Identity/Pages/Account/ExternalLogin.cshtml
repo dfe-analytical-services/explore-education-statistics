@@ -1,0 +1,47 @@
+﻿@page
+@model ExternalLoginModel
+
+@{
+    var loginProvider = @Model.LoginProvider;
+    
+    // override this to a friendly name
+    loginProvider = "Department for Education";
+}
+<h1 class="govuk-heading-l">
+    <span class="govuk-caption-l">Register</span>
+    Associate your @loginProvider account.
+</h1>
+
+<p class="govuk-inset-text">
+    You've successfully authenticated with your <strong>@loginProvider</strong> account.
+    Please enter your profile information for this site below and click the Register button to finish
+    logging in.
+</p>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.FirstName" class="govuk-label">First name</label>
+                <input asp-for="Input.FirstName" class="govuk-input"/>
+                <span asp-validation-for="Input.FirstName" class="govuk-error-message"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.LastName" class="govuk-label">Last name</label>
+                <input asp-for="Input.LastName" class="govuk-input"/>
+                <span asp-validation-for="Input.LastName" class="govuk-error-message"></span>
+            </div>
+            <div class="form-group">
+                 <label asp-for="Input.Email" class="govuk-label">Email address</label>
+                 <input asp-for="Input.Email" class="govuk-input"/>
+                 <span asp-validation-for="Input.Email" class="govuk-error-message"></span>
+             </div>
+            <button type="submit" class="govuk-button">Register</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

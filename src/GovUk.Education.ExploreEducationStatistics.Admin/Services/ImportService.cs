@@ -15,18 +15,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ImportService : IImportService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         
         private readonly ILogger _logger;
 
-        public ImportService(ApplicationDbContext applicationDbContext,
+        public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
             IConfiguration config)
         {
-            _context = applicationDbContext;
+            _context = contentDbContext;
             _mapper = mapper;
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _logger = logger;

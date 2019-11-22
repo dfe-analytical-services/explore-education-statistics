@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -13,22 +18,27 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
@@ -36,12 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostingEnvironment HostingEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,8 +65,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+            services.AddDbContext<UsersAndRolesDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+            );
+
+            services.AddDbContext<ContentDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+            );
+
+            services.AddDbContext<StatisticsDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                    .EnableSensitiveDataLogging()
+            );
+
+            // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
+
+            services
+                .AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<UsersAndRolesDbContext>()
+                .AddDefaultTokenProviders();
+
+            if (HostingEnvironment.IsDevelopment())
+            {
+                services
+                    .AddIdentityServer(options =>
+                    {
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
+                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
+                    .AddProfileService<ApplicationUserProfileService>()
+                    .AddDeveloperSigningCredential();
+            }
+            else
+            {
+                services
+                    .AddIdentityServer(options =>
+                    {
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
+                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
+                    .AddProfileService<ApplicationUserProfileService>()
+                    // TODO DW - this should be conditional based upon whether or not we're in dev mode
+                    .AddSigningCredentials();
+                
+                services.Configure<JwtBearerOptions>(
+                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                    options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = false,
+                            ValidateIssuer = false,
+                        };
+                    });
+            }
+
+            services
+                .AddAuthentication()
+                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
+                .AddIdentityServerJwt();
+
+            // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
+            // This config tells UserManager to expect the logged in user's id to be in a Claim called
+            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
+            // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
+            //
+            // It doesn't seem to be possible to remove the renaming (via
+            // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the 
+            // authentication process requires it to be in the Claim named
+            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+            });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -65,29 +165,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         .RequireAuthenticatedUser()
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
+                    options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options => {
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
-            );
-            
-            services.AddDbContext<StatisticsDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"), 
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
-                    .EnableSensitiveDataLogging()
-                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
-            );
-
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+
+            services.AddApplicationInsightsTelemetry();
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
@@ -102,7 +192,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
+
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
+            services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
@@ -128,22 +220,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+                new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
 
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
                 c.CustomSchemaIds((type) => type.FullName);
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -162,9 +257,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseCsp(opts => opts
                 .BlockAllMixedContent()
                 .StyleSources(s => s.Self())
-                .StyleSources(s => s.UnsafeInline())
+                .StyleSources(s => s
+                    .CustomSources(" https://cdnjs.cloudflare.com")
+                    .UnsafeInline())
                 .FontSources(s => s.Self())
-                .FormActions(s => s.Self())
+                .FormActions(s => s
+                    .CustomSources("https://login.microsoftonline.com")
+                    .Self()
+                )
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self())
                 .ImageSources(s => s.CustomSources("data:"))
@@ -178,13 +278,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            app.UseIdentityServer();
+            app.UseAuthorization();
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "Areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-                
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
@@ -206,13 +308,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 }
             });
         }
-        
+
         private static void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
                 using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
+                }
+
+                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
+                }
+
+                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();

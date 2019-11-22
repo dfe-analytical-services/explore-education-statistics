@@ -220,6 +220,7 @@ export interface AbstractRelease<
     reason: string;
   }[];
   content: {
+    id?: string;
     order: number;
     heading: string;
     caption: string;

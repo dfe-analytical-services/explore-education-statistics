@@ -34,6 +34,8 @@ junit.xml
 /tests/robot-tests/.env.*
 /tests/robot-tests/.pabotsuitenames
 /tests/robot-tests/geckodriver.log
+**/*/chromedriver
+**/*/jwt
 
 ## Data API Seed CSV data
 
@@ -51,3 +53,5 @@ lerna-debug.log
 admin-start.sh
 remote-profile
 
+## IdentityServer Developer Signing key
+**/*/tempkey.rsa

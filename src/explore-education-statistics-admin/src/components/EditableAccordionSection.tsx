@@ -3,13 +3,13 @@ import AccordionSection, {
 } from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, {createElement, createRef, useState, ReactNode} from 'react';
+import React, { createElement, createRef, useState, ReactNode } from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
   headingButtons?: ReactNode | ReactNode[];
-  canToggle?: boolean
+  canToggle?: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -63,7 +63,7 @@ const EditableAccordionSection = ({
             {heading}
           </span>,
           headingButtons,
-          canToggle && (<span className="govuk-accordion__icon" />),
+          canToggle && <span className="govuk-accordion__icon" />,
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>

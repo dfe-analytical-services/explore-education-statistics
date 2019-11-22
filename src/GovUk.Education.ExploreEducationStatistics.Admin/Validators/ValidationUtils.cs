@@ -114,6 +114,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("RELEASE_NOT_FOUND");
                 case RelatedInformationItemNotFound:
                     return new ValidationResult("RELATED_INFORMATION_ITEM_NOT_FOUND");
+                case EntityNotFound:
+                    return new ValidationResult("NOT_FOUND");
+                case ContentSectionNotFound:
+                    return new ValidationResult("CONTENT_SECTION_NOT_FOUND");
+                case ContentBlockNotFound:
+                    return new ValidationResult("CONTENT_BLOCK_NOT_FOUND");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -138,7 +144,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
         SubjectTitleMustBeUnique,
+        EntityNotFound,
         ReleaseNotFound,
-        RelatedInformationItemNotFound
+        RelatedInformationItemNotFound,
+        ContentSectionNotFound,
+        ContentBlockNotFound,
     }
 }

@@ -16,19 +16,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public ManageContentPageService(ApplicationDbContext context, IMapper mapper)
+        public ManageContentPageService(ContentDbContext context, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
+            _releaseHelper = new PersistenceHelper<Release, Guid>(
+                context, 
+                context.Releases, 
+                ValidationErrorMessages.ReleaseNotFound);
         }
         
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId)
         {
-            return CheckReleaseExists(_context, releaseId, release => 
-                new ManageContentPageViewModel()
+            return _releaseHelper.CheckEntityExists(releaseId, release =>
+                new ManageContentPageViewModel
                 {
                     Release = _mapper.Map<ReleaseViewModel>(release),
                     RelatedInformation = new List<BasicLink>()

@@ -21,14 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Footnote, FootnoteViewModel>();
-
-            CreateMap<IndicatorFootnote, long>().ConvertUsing(footnote => footnote.IndicatorId);
-            CreateMap<FilterFootnote, long>().ConvertUsing(footnote => footnote.FilterId);
-            CreateMap<FilterGroupFootnote, long>().ConvertUsing(footnote => footnote.FilterGroupId);
-            CreateMap<FilterItemFootnote, long>().ConvertUsing(footnote => footnote.FilterItemId);
-            CreateMap<SubjectFootnote, long>().ConvertUsing(footnote => footnote.SubjectId);
-            
             CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
                 opts => opts.MapFrom(release => release.ReleaseName));
             
@@ -72,7 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(summary => summary.Release.Status));
 
             CreateMap<Methodology, MethodologyViewModel>();
-
+            CreateMap<Methodology, MethodologyStatusViewModel>();
+            CreateMap<Publication, MethodologyStatusPublications>();
+            
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.ThemeId,

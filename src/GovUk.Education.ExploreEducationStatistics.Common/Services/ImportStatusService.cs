@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         RUNNING_PHASE_1,
         RUNNING_PHASE_2,
+        RUNNING_PHASE_3,
         COMPLETE,
         FAILED,
         NOT_FOUND

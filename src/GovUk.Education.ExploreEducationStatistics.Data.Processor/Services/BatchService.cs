@@ -20,10 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class BatchService : IBatchService
     {
-        private readonly ILogger<IBatchService> _logger;
-        private readonly CloudTable _table;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
+        private readonly ILogger<IBatchService> _logger;
+        private readonly CloudTable _table;
 
         public BatchService(
             ITableStorageService tblStorageService,
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             try
             {
-                import = GetImport(releaseId, dataFileName).Result;
+                import = await GetImport(releaseId, dataFileName);
                 var bitArray = new BitArray(import.BatchesProcessed);
                 bitArray.Set(batchNo - 1, true);
                 bitArray.CopyTo(import.BatchesProcessed, 0);
@@ -57,7 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
 
-            if (_importStatusService.GetImportStatus(releaseId, dataFileName).Result.PercentageComplete == 100)
+            var result = await _importStatusService.GetImportStatus(releaseId, dataFileName);
+            if (result.PercentageComplete == 100)
             {
                 await UpdateStatus(releaseId, dataFileName,
                     import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
@@ -78,7 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             try
             {
                 var import = await GetImport(releaseId, dataFileName);
-                if (import.Status == IStatus.FAILED) return false;
+                if (import.Status == IStatus.FAILED)
+                {
+                    return false;
+                }
+
                 import.Status = status;
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
@@ -86,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
+
             return true;
         }
 
@@ -133,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId,
                 dataFileName,
-                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string> {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
 
             return (DatafileImport) result.Result;
         }
@@ -144,18 +150,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             // TODO Improve error handling & max retries 
             while (leaseId == null)
-            {
                 try
                 {
                     leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
                 }
                 catch (StorageException se)
                 {
-                    var response = se.RequestInformation.HttpStatusCode;
-                    if (response != null && (response == (int) HttpStatusCode.Conflict))
-                    {
+                    if (se.RequestInformation.HttpStatusCode == (int) HttpStatusCode.Conflict)
                         // A Conflict has been found, lease is being used by another process
                         // wait and try again.
+                    {
                         Thread.Sleep(TimeSpan.FromSeconds(2));
                     }
                     else
@@ -163,7 +167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         throw se;
                     }
                 }
-            }
 
             return leaseId;
         }

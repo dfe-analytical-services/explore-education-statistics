@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ILogger logger
         )
         {
-            var errors = new List<string>() { "File failed to import for unknown reason in upload processing stage."};
-            
+            var errors = new List<string> {"File failed to import for unknown reason in upload processing stage."};
+
             await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.OrigDataFileName,
@@ -38,8 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ImportMessage message,
             ILogger logger)
         {
-            var errors = new List<string>() { "File failed to import for unknown reason in observation import stage." };
-            
+            var errors = new List<string> {"File failed to import for unknown reason in observation import stage."};
+
             await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.OrigDataFileName,
