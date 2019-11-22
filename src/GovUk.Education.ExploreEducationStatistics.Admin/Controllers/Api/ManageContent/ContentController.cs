@@ -100,5 +100,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.RemoveContentBlockAsync(releaseId, contentSectionId, contentBlockId),
                 Ok);
         }
+
+        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
+        public Task<ActionResult<IContentBlock>> UpdateTextBasedContentBlock(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.UpdateTextBasedContentBlockAsync(
+                    releaseId, contentSectionId, contentBlockId, request),
+                Ok);
+        }
     }
 }
