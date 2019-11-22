@@ -14,13 +14,16 @@ const EditableMarkdownRenderer = ({ contentId, source }: MarkdownRendererProps) 
   return (
     <>
       <WysiwygEditor
-        content={marked(source || '')}
+        content={source || ''}
         editable
+        useMarkdown
         onContentChange={ss => {
           // eslint-disable-next-line no-console
           console.log(editingContext.releaseId);
           console.log(contentId);
           console.log(ss);
+
+
         }}
       />
     </>

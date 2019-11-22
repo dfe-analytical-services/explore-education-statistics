@@ -1,24 +1,47 @@
 import styles from '@admin/pages/prototypes/components/PrototypeEditableContent.module.scss';
-// No types generated for ckeditor 5 for react
-// @ts-ignore
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
+
 import classnames from 'classnames';
-import React, { ChangeEvent } from 'react';
+import React, {ChangeEvent} from 'react';
+import marked from 'marked';
+// No types generated for ckeditor 5 for react
+// @ts-ignore
+import GFMDataProcessor from '@ckeditor/ckeditor5-markdown-gfm/src/gfmdataprocessor';
+// @ts-ignore
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface Props {
   editable?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
   content: string;
+  useMarkdown?: boolean;
   onContentChange?: (content: string) => void;
 }
 
-const WysiwygEditor = ({ editable, content, onContentChange }: Props) => {
+const WysiwygEditor = ({
+  editable,
+  content,
+  onContentChange,
+  useMarkdown = false,
+}: Props) => {
   const [editing, setEditing] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [temporaryContent, setTemporaryContent] = React.useState(content);
+
+  const plugins = React.useMemo(() => {
+    if (useMarkdown) {
+      return [
+        (editor: unknown) => {
+          // @ts-ignore
+          editor.data.processor = new GFMDataProcessor(); // eslint-disable-line no-param-reassign
+        },
+      ];
+    }
+
+    return [];
+  }, [useMarkdown]);
 
   const save = () => {
     setEditing(false);
@@ -68,6 +91,26 @@ const WysiwygEditor = ({ editable, content, onContentChange }: Props) => {
           <CKEditor
             editor={ClassicEditor}
             data={content}
+            config={{
+              plugins: [...plugins, ...ClassicEditor.builtinPlugins],
+              toolbar: [
+                'heading',
+                '|',
+                'bold',
+                'italic',
+                'link',
+                'bulletedList',
+                'numberedList',
+                'imageUpload',
+                'blockQuote',
+                'insertTable',
+                'mediaEmbed',
+                'undo',
+                'redo',
+                'markdown',
+              ],
+            }}
+            plugins={plugins}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {
               setTemporaryContent(editor.getData());
             }}
@@ -78,7 +121,9 @@ const WysiwygEditor = ({ editable, content, onContentChange }: Props) => {
         ) : (
           <div
             // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{
+              __html: useMarkdown ? marked(content) : content,
+            }}
             className="govuk-!-padding-left-1 govuk-!-padding-right-1"
           />
         )}
