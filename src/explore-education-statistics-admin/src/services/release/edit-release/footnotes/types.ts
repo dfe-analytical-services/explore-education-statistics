@@ -57,29 +57,31 @@ export interface FootnoteMetaGetters {
   getFilterItem: (id: string) => { label: string; value: string };
 }
 
-export interface FootnoteProps {
-  content: string;
-  subjects: {
+export interface FootnoteSubject {
+  selected: boolean;
+  indicatorGroups: {
     [key: string]: {
       selected: boolean;
-      indicatorGroups: {
+      indicators: string[];
+    };
+  };
+  filters: {
+    [key: string]: {
+      selected: boolean;
+      filterGroups: {
         [key: string]: {
           selected: boolean;
-          indicators: string[];
-        };
-      };
-      filters: {
-        [key: string]: {
-          selected: boolean;
-          filterGroups: {
-            [key: string]: {
-              selected: boolean;
-              filterItems: string[];
-            };
-          };
+          filterItems: string[];
         };
       };
     };
+  };
+}
+
+export interface FootnoteProps {
+  content: string;
+  subjects: {
+    [key: string]: FootnoteSubject
   };
 }
 

@@ -1,12 +1,12 @@
 import {
   Footnote,
-  FootnoteMetaGetters,
+  FootnoteMetaGetters, FootnoteSubject,
 } from '@admin/services/release/edit-release/footnotes/types';
 import React, { ReactNode } from 'react';
 
 interface Props {
   subjectId: string;
-  subject: Footnote['subjects'][string];
+  subject: FootnoteSubject;
   footnoteMetaGetters: FootnoteMetaGetters;
 }
 

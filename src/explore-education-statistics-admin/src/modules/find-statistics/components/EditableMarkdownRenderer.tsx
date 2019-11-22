@@ -3,11 +3,14 @@ import { RendererProps } from '@admin/modules/find-statistics/PublicationRelease
 import marked from 'marked';
 import React from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import wrapEditableComponent, { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
 
-const EditableMarkdownRenderer = ({ source }: MarkdownRendererProps) => {
+const EditableMarkdownRenderer = ({ contentId, source }: MarkdownRendererProps) => {
+
+  const editingContext = React.useContext(EditingContext);
+
   return (
     <>
       <WysiwygEditor
@@ -15,6 +18,8 @@ const EditableMarkdownRenderer = ({ source }: MarkdownRendererProps) => {
         editable
         onContentChange={ss => {
           // eslint-disable-next-line no-console
+          console.log(editingContext.releaseId);
+          console.log(contentId);
           console.log(ss);
         }}
       />
