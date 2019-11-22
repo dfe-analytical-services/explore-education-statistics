@@ -1,11 +1,12 @@
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import commonService from '@admin/services/common/service';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import FormattedDate from '@common/components/FormattedDate';
 import {
+  AbstractRelease,
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@admin/services/common/types';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import FormattedDate from '@common/components/FormattedDate';
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useEffect, useState } from 'react';
 
@@ -20,7 +21,7 @@ const nationalStatisticsLogo: ReleaseTypeIcon = {
 };
 
 interface Props {
-  release: ReleaseSummaryDetails;
+  release: AbstractRelease<EditableContentBlock>;
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {
@@ -58,9 +59,11 @@ const BasicReleaseSummary = ({ release }: Props) => {
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">Publish date: </dt>
               <dd>
-                <strong>
-                  <FormattedDate>{release.publishScheduled}</FormattedDate>
-                </strong>
+                {release.publishScheduled && (
+                  <strong>
+                    <FormattedDate>{release.publishScheduled}</FormattedDate>
+                  </strong>
+                )}
               </dd>
               <div>
                 <dt className="govuk-caption-m">Next update: </dt>

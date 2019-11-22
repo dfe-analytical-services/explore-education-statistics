@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 release.RelatedInformation.Add(new BasicLink
                 {
                     Id = Guid.NewGuid(),
-                    Title = request.Title,
+                    Description = request.Description,
                     Url = request.Url
                 });
 
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     return ValidationResult(ValidationErrorMessages.RelatedInformationItemNotFound);
                 }
 
-                toUpdate.Title = request.Title;
+                toUpdate.Description = request.Description;
                 toUpdate.Url = request.Url;
 
                 _context.Releases.Update(release);

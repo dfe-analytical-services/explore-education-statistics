@@ -1,10 +1,8 @@
 import client from '@admin/services/util/service';
-import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import { ContentSectionViewModel, ManageContentPageViewModel } from './types';
 
 export interface ReleaseContentService {
-  getRelease: (releaseId: string) => Promise<Release>;
   getContent: (releaseId: string) => Promise<ManageContentPageViewModel>;
   getContentSections: (releaseId: string) => Promise<ContentSectionViewModel[]>;
   updateContentSectionsOrder: (
@@ -14,9 +12,6 @@ export interface ReleaseContentService {
 }
 
 const service: ReleaseContentService = {
-  getRelease(releaseId: string): Promise<Release> {
-    return client.get<Release>(`/releases/${releaseId}`);
-  },
   getContent(releaseId: string): Promise<ManageContentPageViewModel> {
     return client.get<ManageContentPageViewModel>(
       `/release/${releaseId}/content`,

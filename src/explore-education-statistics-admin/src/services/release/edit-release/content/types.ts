@@ -1,6 +1,5 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
-import { ContactDetails } from '@admin/services/common/types';
+import { AbstractRelease } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
@@ -16,35 +15,8 @@ export interface ContentSectionViewModel {
   content: EditableContentBlock[];
 }
 
-export interface ReleaseViewModel {
-  id: string;
-  typeId?: string;
-  timePeriodCoverage: TimeIdentifier;
-  publishScheduled?: Date;
-  nextReleaseDate: {
-    day: string;
-    month: string;
-    year: string;
-  };
-  title: string;
-  yearTitle: string;
-  coverageTitle: string;
-  releaseName: string;
-  slug: string;
-  publicationTitle: string;
-  publicationId: string;
-  contact: ContactDetails;
-}
-
 export interface ManageContentPageViewModel {
-  release: ReleaseViewModel;
-
-  previousReleases: BasicLink[];
-
-  releaseNotes: {
-    content: string;
-    publishedDate: Date;
-  }[];
+  release: AbstractRelease<EditableContentBlock>;
 
   relatedInformation: BasicLink[];
 
