@@ -166,6 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
                     options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options =>

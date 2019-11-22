@@ -77,24 +77,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             {
                 Id = section.Id,
                 Caption = section.Caption,
-                Content = section.Content,
+                Content = section.Content?.OrderBy(contentBlock => contentBlock.Order).ToList(),
                 Heading = section.Heading,
                 Order = section.Order
             };
             
-            UnsetUnwantedFields(model);
-
             return model;
-        }
-
-        // remove unwanted fields from the ContentBlock JSON structure
-        private static void UnsetUnwantedFields(ContentSectionViewModel model)
-        {
-            model.Content?.ForEach(contentBlock =>
-            {
-                contentBlock.ContentSection = null;
-                contentBlock.ContentSectionId = null;
-            });
         }
 
         public Guid Id { get; set; }
