@@ -1,11 +1,9 @@
 .dragHandle {
+  margin-top: -1.125rem;
   position: absolute;
   right: 32px;
-
   top: 50%;
-  margin-top: -1.125rem;
   width: 1rem;
-
   &::before {
     color: #999;
     content: '\2630';

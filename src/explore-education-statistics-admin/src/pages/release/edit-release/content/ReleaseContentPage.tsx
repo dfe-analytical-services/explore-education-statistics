@@ -11,17 +11,11 @@ import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import {
-  AbstractRelease,
-  ContentBlockType,
-} from '@common/services/publicationService';
+import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import {
-  CommentState,
-  EditableContentBlock,
-} from '@admin/services/publicationService';
+import { EditableContentBlock } from '@admin/services/publicationService';
 
 type PageMode = 'edit' | 'preview';
 

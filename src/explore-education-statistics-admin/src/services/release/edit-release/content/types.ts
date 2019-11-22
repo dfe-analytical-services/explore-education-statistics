@@ -1,4 +1,3 @@
-import { ReleaseContentService } from '@admin/services/release/edit-release/content/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
 import { ContactDetails } from '@admin/services/common/types';

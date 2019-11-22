@@ -48,7 +48,9 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
           },
         );
       } catch (e) {
-        console.error(e);
+        // if an error occurs during the import it breaks the entire page
+        // eslint-disable-next-line no-console
+        console.error('An error occured importing radios', e);
       }
     }
   }
