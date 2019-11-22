@@ -36,6 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
+                if (release.RelatedInformation == null)
+                {
+                    release.RelatedInformation = new List<BasicLink>();
+                }
+                
                 release.RelatedInformation.Add(new BasicLink
                 {
                     Id = Guid.NewGuid(),

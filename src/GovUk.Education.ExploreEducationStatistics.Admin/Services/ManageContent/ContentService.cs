@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -59,78 +60,163 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ValidationResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId)
+            Guid releaseId, AddContentSectionRequest? request)
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var maxOrderNumber = release.Content.Max(section => section.Order);
-                release.Content.Add(new ContentSection
+                var orderForNewSection = request?.Order ?? 
+                                         release.Content.Max(contentSection => contentSection.Order) + 1;
+                
+                release.Content
+                    .FindAll(contentSection => contentSection.Order >= orderForNewSection)
+                    .ForEach(contentSection => contentSection.Order++);
+
+                var newContentSection = new ContentSection
                 {
                     Heading = "New section",
-                    Order = maxOrderNumber + 1
-                });
+                    Order = orderForNewSection
+                };
+                
+                release.Content.Add(newContentSection);
                 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return OrderedContentSections(release).Last();
+                return ContentSectionViewModel.ToViewModel(newContentSection);
             }, HydrateContentSectionsAndBlocks);
         }
 
         public Task<Either<ValidationResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
             Guid releaseId, Guid contentSectionId, string newHeading)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
-                var sectionToUpdate = release
-                    .Content
-                    .Find(contentSection => contentSection.Id == contentSectionId);
-
-                if (sectionToUpdate == null)
-                {
-                    return new Either<ValidationResult, ContentSectionViewModel>(
-                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentSectionNotFound));
-                }
-
+                var (_, sectionToUpdate) = tuple;
+                
                 sectionToUpdate.Heading = newHeading;
 
-                _context.Releases.Update(release);
+                _context.ContentSections.Update(sectionToUpdate);
                 await _context.SaveChangesAsync();
-                return OrderedContentSections(release).Last();
-            }, HydrateContentSectionsAndBlocks);
+                return ContentSectionViewModel.ToViewModel(sectionToUpdate);
+            });
         }
         
         public Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
             Guid releaseId,
             Guid contentSectionId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
-                var sectionToRemove = release
-                    .Content
-                    .Find(contentSection => contentSection.Id == contentSectionId);
-
-                if (sectionToRemove == null)
-                {
-                    return new Either<ValidationResult, List<ContentSectionViewModel>>(
-                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentSectionNotFound));
-                }
-
+                var (release, sectionToRemove) = tuple;
+                
                 release.Content.Remove(sectionToRemove);
 
                 var removedSectionOrder = sectionToRemove.Order;
                 
-                release.Content.ForEach(contentSection =>
-                {
-                    if (contentSection.Order > removedSectionOrder)
-                    {
-                        contentSection.Order--;
-                    }
-                });
+                release.Content
+                    .FindAll(contentSection => contentSection.Order > removedSectionOrder)
+                    .ForEach(contentSection => contentSection.Order--);
                 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return OrderedContentSections(release);
-            }, HydrateContentSectionsAndBlocks);
+            });
+        }
+
+        public Task<Either<ValidationResult, ContentSectionViewModel>> GetContentSectionAsync(Guid releaseId, Guid contentSectionId)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, 
+                tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
+        }
+
+        public Task<Either<ValidationResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+            {
+                var (_, section) = tuple;
+
+                newBlocksOrder.ToList().ForEach(kvp =>
+                {
+                    var (blockId, newOrder) = kvp;
+                    section.Content.Find(block => block.Id == blockId).Order = newOrder;
+                });
+                
+                _context.ContentSections.Update(section);
+                await _context.SaveChangesAsync();
+                return OrderedContentBlocks(section);
+            });
+        }
+
+        public Task<Either<ValidationResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
+            AddContentBlockRequest request) 
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+            {
+                var (_, section) = tuple;
+                
+                var orderForNewBlock = request.Order ?? section.Content.Max(contentBlock => contentBlock.Order) + 1;
+
+                section.Content
+                    .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
+                    .ForEach(contentBlock => contentBlock.Order++);
+                    
+                IContentBlock newContentBlock = CreateContentBlockForType(request.Type);
+                newContentBlock.Order = orderForNewBlock;
+                section.Content.Add(newContentBlock);
+                
+                _context.ContentSections.Update(section);
+                await _context.SaveChangesAsync();
+                return newContentBlock;
+            });
+        }
+
+        public Task<Either<ValidationResult, List<IContentBlock>>> RemoveContentBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+            {
+                var (_, section) = tuple;
+
+                var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
+
+                if (blockToRemove == null)
+                {
+                    return new Either<ValidationResult, List<IContentBlock>>(
+                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentBlockNotFound)); 
+                }
+                
+                section.Content.Remove(blockToRemove);
+
+                var removedBlockOrder = blockToRemove.Order;
+
+                section.Content
+                    .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
+                    .ForEach(contentBlock => contentBlock.Order--);
+                
+                _context.ContentBlocks.Remove(blockToRemove);
+                _context.ContentSections.Update(section);
+                await _context.SaveChangesAsync();
+                return OrderedContentBlocks(section);
+            });
+        }
+
+        private static IContentBlock CreateContentBlockForType(ContentBlockType type)
+        {
+            return type switch
+            {
+                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
+                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
+                ContentBlockType.HtmlBlock => new HtmlBlock(),
+                ContentBlockType.DataBlock => new DataBlock(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
+        {
+            return section
+                .Content
+                .OrderBy(block => block.Order)
+                .ToList();
         }
 
         private static List<ContentSectionViewModel> OrderedContentSections(Release release)
@@ -147,6 +233,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return releases
                 .Include(r => r.Content)
                 .ThenInclude(section => section.Content);
+        }
+        
+        private Task<Either<ValidationResult, T>> CheckContentSectionExists<T>(
+            Guid releaseId, Guid contentSectionId, 
+            Func<Tuple<Release, ContentSection>, Task<T>> contentSectionFn)
+        {
+            Task<Either<ValidationResult, T>> ContentSectionEitherFn(Tuple<Release, ContentSection> tuple)
+            {
+                return contentSectionFn
+                    .Invoke(tuple)
+                    .ContinueWith(result => new Either<ValidationResult, T>(result.Result));
+            }
+            
+            return CheckContentSectionExists(releaseId, contentSectionId, ContentSectionEitherFn);
+        }
+
+        private Task<Either<ValidationResult, T>> CheckContentSectionExists<T>(
+            Guid releaseId, Guid contentSectionId, 
+            Func<Tuple<Release, ContentSection>, Either<ValidationResult, T>> contentSectionFn)
+        {
+            Task<Either<ValidationResult, T>> ContentSectionTaskFn(
+                Tuple<Release, ContentSection> tuple)
+            {
+                var result = contentSectionFn.Invoke(tuple);
+                return Task.FromResult(result);
+            }
+
+            return CheckContentSectionExists(releaseId, contentSectionId, ContentSectionTaskFn);
+        }
+
+        private Task<Either<ValidationResult, T>> CheckContentSectionExists<T>(
+            Guid releaseId, Guid contentSectionId, 
+            Func<Tuple<Release, ContentSection>, T> contentSectionFn)
+        {
+            Either<ValidationResult, T> ContentSectionTaskFn(
+                Tuple<Release, ContentSection> tuple)
+            {
+                return new Either<ValidationResult, T>(contentSectionFn.Invoke(tuple));
+            }
+
+            return CheckContentSectionExists(releaseId, contentSectionId, ContentSectionTaskFn);
+        }
+
+        private Task<Either<ValidationResult, T>> CheckContentSectionExists<T>(
+            Guid releaseId, Guid contentSectionId, 
+            Func<Tuple<Release, ContentSection>, Task<Either<ValidationResult, T>>> contentSectionFn)
+        {
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            {
+                var section = release
+                    .Content
+                    .Find(contentSection => contentSection.Id == contentSectionId);
+
+                if (section == null)
+                {
+                    return new Either<ValidationResult, T>(
+                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentSectionNotFound));
+                }
+
+                return await contentSectionFn.Invoke(new Tuple<Release, ContentSection>(release, section));
+            }, HydrateContentSectionsAndBlocks);
         }
     }
 }
