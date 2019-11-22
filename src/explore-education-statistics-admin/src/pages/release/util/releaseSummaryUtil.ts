@@ -1,15 +1,13 @@
-import {
-  dayMonthYearInputsToDate,
-  dayMonthYearInputsToValues,
-  TimePeriodCoverageGroup,
-} from '@admin/services/common/types';
-import {
-  AdminDashboardRelease,
-  ReleaseStatus,
-} from '@admin/services/dashboard/types';
+import { TimePeriodCoverageGroup } from '@admin/services/common/types';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
+import {
+  dayMonthYearInputsToDate,
+  dayMonthYearInputsToValues,
+  ReleaseStatus,
+} from '@common/services/publicationService';
 import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
 import { EditFormValues } from '../summary/ReleaseSummaryForm';
 

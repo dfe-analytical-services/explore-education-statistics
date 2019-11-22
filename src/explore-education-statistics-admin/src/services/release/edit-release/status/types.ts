@@ -1,4 +1,4 @@
-import { ReleaseStatus } from '@admin/services/dashboard/types';
+import { ReleaseStatus } from '@common/services/publicationService';
 
 export interface UpdateReleaseStatusRequest {
   releaseStatus: ReleaseStatus;

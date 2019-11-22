@@ -1,12 +1,12 @@
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import commonService from '@admin/services/common/service';
-import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
-} from '@admin/services/common/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
-import { AbstractRelease } from '@common/services/publicationService';
+import {
+  AbstractRelease,
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useEffect, useState } from 'react';
 
