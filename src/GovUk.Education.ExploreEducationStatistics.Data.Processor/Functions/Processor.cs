@@ -55,14 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            var batchSettings = GetBatchSettings(LoadAppSettings(context));
-
-            if (await IsDataFileValid(message, batchSettings.RowsPerBatch, logger))
+            message.RowsPerBatch = GetBatchSettings(LoadAppSettings(context)).RowsPerBatch;
+            
+            if (await IsDataFileValid(message, logger))
             {
                 try
                 {
                     var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
-                    await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+                    await _splitFileService.SplitDataFile(collector, message, subjectData);
                 }
                 catch (Exception e)
                 {
@@ -92,10 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             // Log all initial validation messages
             var allValid = true;
             foreach (var message in messages)
-                if (!await IsDataFileValid(message, batchSettings.RowsPerBatch, logger))
+            {
+                message.RowsPerBatch = batchSettings.RowsPerBatch;
+                if (!await IsDataFileValid(message, logger))
                 {
                     allValid = false;
                 }
+            }
 
             if (allValid)
             {
@@ -104,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
                     await ProcessSubject(message, DbUtils.CreateDbContext());
                     var subjectData = await _fileStorageService.GetSubjectData(message);
-                    await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+                    await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
                 }
             }
@@ -143,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             return subjectData;
         }
 
-        private async Task<bool> IsDataFileValid(ImportMessage message, int rowsPerBatch, ILogger logger)
+        private async Task<bool> IsDataFileValid(ImportMessage message, ILogger logger)
         {
             logger.LogInformation($"Validating Datafile: {message.DataFileName}");
 
@@ -155,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 message.Release.Id.ToString(),
                 message.DataFileName,
                 numberOfRows,
-                SplitFileService.GetNumBatches(numberOfRows, rowsPerBatch),
+                SplitFileService.GetNumBatches(numberOfRows, message.RowsPerBatch),
                 message
             );
 

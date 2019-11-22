@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId,
                 dataFileName,
-                new List<string> {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string> {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors", "Message"}));
 
             return (DatafileImport) result.Result;
         }
