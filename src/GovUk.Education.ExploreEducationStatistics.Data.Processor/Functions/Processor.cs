@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
@@ -154,7 +155,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 message.Release.Id.ToString(),
                 message.DataFileName,
                 numberOfRows,
-                SplitFileService.GetNumBatches(numberOfRows, rowsPerBatch)
+                SplitFileService.GetNumBatches(numberOfRows, rowsPerBatch),
+                message
             );
 
             var errors = _validatorService.Validate(message, subjectData);

@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, async () =>
                 {
                     await _tableStorageService.DeleteEntityAsync("imports",
-                        new DatafileImport(releaseId.ToString(), fileName, 0,0));
+                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });

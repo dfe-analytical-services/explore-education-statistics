@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage;
@@ -127,10 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return bitArray.Get(batchNo - 1);
         }
 
-        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches)
+        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numberOfRows, numBatches))
+                new DatafileImport(releaseId, dataFileName, numberOfRows, numBatches, JsonConvert.SerializeObject(message)))
             );
         }
 

@@ -38,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IValidatorService, ValidatorService>()
                 .AddApplicationInsightsTelemetry()
                 .BuildServiceProvider();
+            
+            ImportChecker.CheckIncompleteImport();
         }
     }
 }
