@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7f5ac04a-ba58-4b33-8a4f-533834aa47e6",
+		"_postman_id": "33550044-86b5-4e42-b422-029fe898f08e",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1983,7 +1983,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { ",
 											"    pm.response.to.have.status(200); ",
@@ -2016,7 +2016,7 @@
 											"    pm.expect(release.releaseName).to.equal(\"2016\");",
 											"    pm.expect(release.slug).to.equal(\"2016-17\");",
 											"    ",
-											"    // TODO is this the intro section's content?  In which case this'll be a content section eventually",
+											"    // TODO DW - is this the intro section's content?  In which case this'll be a content section eventually",
 											"    pm.expect(release.summary).to.equal(\"Read national statistical summaries, view charts and tables and download data files.\");",
 											"    ",
 											"    pm.expect(release.latestRelease).to.be.true;",
@@ -2029,7 +2029,6 @@
 											"    pm.expect(release.updates[1].id).to.equal(\"c9948cde-01ce-4315-87af-eaa6cd7c6879\");",
 											"    pm.expect(release.updates[1].reason).to.equal(\"Release note 2\");",
 											"    pm.expect(release.updates[1].on).to.equal(\"2019-08-10T00:00:00\");",
-											"    ",
 											"",
 											"    pm.expect(release.publicationId).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
 											"    pm.expect(release.publication.id).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
@@ -2057,32 +2056,12 @@
 											"    pm.expect(release.publication.methodology.id).to.equal(\"c8c911e3-39c1-452b-801f-25bb79d1deb7\");",
 											"    pm.expect(release.publication.methodology.title).to.equal(\"Pupil exclusion statistics: methodology\");",
 											"    ",
-											"    pm.expect(release.content.length).to.equal(2);",
+											"    pm.expect(release.content.length).to.equal(9);",
 											"    ",
-											"    pm.expect(release.content[0].id).to.equal(\"4675309a-97f3-4072-b79a-b54c59ff6686\");",
-											"    pm.expect(release.content[0].order).to.equal(0);",
+											"    pm.expect(release.content[0].order).to.equal(1);",
 											"    pm.expect(release.content[0].heading).to.equal(\"About this release\");",
-											"    pm.expect(release.content[0].caption).to.equal(\"About this release caption\");",
-											"    ",
-											"    pm.expect(release.content[0].content.length).to.equal(1);",
-											"    pm.expect(release.content[0].content[0].id).to.equal(\"fc2e623d-2d9b-4312-ac6a-1ca1bf5ad10c\");",
-											"    pm.expect(release.content[0].content[0].type).to.equal(\"HtmlBlock\");",
-											"    pm.expect(release.content[0].content[0].body).to.equal(\"<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>\");",
-											"    ",
-											"    pm.expect(release.content[1].id).to.equal(\"7bce6d46-5dc3-431b-847d-a3f9fa447a55\");",
-											"    pm.expect(release.content[1].order).to.equal(1);",
-											"    pm.expect(release.content[1].heading).to.equal(\"New content\");",
-											"    pm.expect(release.content[1].caption).to.equal(\"New content caption\");",
-											"    ",
-											"    pm.expect(release.content[1].content.length).to.equal(2);",
-											"    pm.expect(release.content[1].content[0].id).to.equal(\"3a38fbf2-c4b4-4928-ba2e-139e32317f27\");",
-											"    pm.expect(release.content[1].content[0].type).to.equal(\"HtmlBlock\");",
-											"    pm.expect(release.content[1].content[0].body).to.equal(\"<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>\");",
-											"    ",
-											"    pm.expect(release.content[1].content[1].id).to.equal(\"3a72a162-689b-433c-9cf4-d2b963dc850e\");",
-											"    pm.expect(release.content[1].content[1].type).to.equal(\"HtmlBlock\");",
-											"    pm.expect(release.content[1].content[1].body).to.equal(\"<p>Second content block.</p>\");",
-											"    ",
+											"    pm.expect(release.content[0].caption).to.equal(\"\");",
+											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
 											"});",
 											"",
 											"pm.test(\"Related Information section should contain the correct details\", function () { ",
@@ -2128,6 +2107,7 @@
 							},
 							"request": {
 								"method": "GET",
+								"header": [],
 								"body": {
 									"mode": "raw",
 									"raw": ""

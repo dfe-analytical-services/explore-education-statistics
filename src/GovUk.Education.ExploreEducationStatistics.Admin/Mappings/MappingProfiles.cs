@@ -75,7 +75,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content, 
                     m => m.MapFrom(r => 
-                        r.Content.Select(ContentSectionViewModel.ToViewModel)))
+                        r.Content
+                            .Select(ContentSectionViewModel.ToViewModel)
+                            .OrderBy(s => s.Order)))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => new List<ReleaseNoteViewModel>
