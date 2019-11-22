@@ -1,7 +1,6 @@
 import {
   dayMonthYearInputsToDate,
   dayMonthYearInputsToValues,
-  IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import {

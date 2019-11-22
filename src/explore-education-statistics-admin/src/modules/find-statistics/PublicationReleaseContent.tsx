@@ -2,17 +2,19 @@ import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
+import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import MarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
+import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { baseUrl } from '@common/services/api';
 import {
   AbstractRelease,
@@ -21,9 +23,6 @@ import {
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 
 export interface RendererProps {
   contentId?: string;

@@ -1,5 +1,4 @@
 import client from '@admin/services/util/service';
-import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import { ContentSectionViewModel, ManageContentPageViewModel } from './types';
 

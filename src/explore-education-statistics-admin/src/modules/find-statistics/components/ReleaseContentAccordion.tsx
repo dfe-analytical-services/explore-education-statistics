@@ -8,8 +8,6 @@ import releaseContentService from '@admin/services/release/edit-release/content/
 import { Dictionary } from '@common/types/util';
 
 interface ReleaseContentAccordionProps {
-  releaseId: string;
-
   release: AbstractRelease<EditableContentBlock>;
   content: AbstractRelease<EditableContentBlock>['content'];
   accordionId: string;
@@ -17,7 +15,6 @@ interface ReleaseContentAccordionProps {
 }
 
 const ReleaseContentAccordion = ({
-  releaseId,
   release,
   accordionId,
   sectionName,
@@ -27,14 +24,14 @@ const ReleaseContentAccordion = ({
   >([]);
 
   const onReorder = async (ids: Dictionary<number>) => {
-    return releaseContentService.updateContentSectionsOrder(releaseId, ids);
+    return releaseContentService.updateContentSectionsOrder(release.id, ids);
   };
 
   React.useEffect(() => {
     releaseContentService
-      .getContentSections(releaseId)
+      .getContentSections(release.id)
       .then(result => setContent(result));
-  }, [releaseId]);
+  }, [release.id]);
 
   return (
     <>
