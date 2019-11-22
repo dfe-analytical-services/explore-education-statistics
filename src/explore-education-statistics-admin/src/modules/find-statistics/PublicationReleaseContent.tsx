@@ -23,7 +23,7 @@ import classNames from 'classnames';
 import React from 'react';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
+import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 
 export interface RendererProps {
   contentId?: string;
@@ -233,28 +233,13 @@ const PublicationReleaseContent = ({
 
       {/* <editor-fold desc="Content blocks"> */}
 
-      {release.content.length > 0 && (
-        <Accordion id={accId[0]}>
-          {release.content.map(
-            ({ heading, caption, order, content }, index) => {
-              return (
-                <AccordionSection
-                  index={index}
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={release.publication}
-                  />
-                </AccordionSection>
-              );
-            },
-          )}
-        </Accordion>
-      )}
+      <ReleaseContentAccordion
+        releaseId={release.id}
+        release={release}
+        content={release.content}
+        accordionId={accId[0]}
+        sectionName="Contents"
+      />
 
       {/* </editor-fold> */}
 

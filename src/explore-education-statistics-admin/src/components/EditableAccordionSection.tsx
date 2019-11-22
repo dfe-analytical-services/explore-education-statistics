@@ -3,14 +3,13 @@ import AccordionSection, {
 } from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, createRef, useState } from 'react';
+import React, { createElement, createRef, useState, ReactNode } from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-
-// import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
-  droppableIndex?: number;
+  headingButtons?: ReactNode | ReactNode[];
+  canToggle?: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -20,8 +19,10 @@ const EditableAccordionSection = ({
   contentId,
   goToTop = true,
   heading,
+  headingButtons,
   headingId,
   headingTag = 'h2',
+  canToggle = true,
   open = false,
   onToggle,
 }: EditableAccordionSectionProps) => {
@@ -38,7 +39,7 @@ const EditableAccordionSection = ({
     <div
       ref={target}
       onClick={() => {
-        if (onToggle) {
+        if (canToggle && onToggle) {
           onToggle(isOpen);
         }
       }}
@@ -53,7 +54,7 @@ const EditableAccordionSection = ({
           {
             className: 'govuk-accordion__section-heading',
             onClick: () => {
-              if (target.current) {
+              if (canToggle && target.current) {
                 setIsOpen(!isOpen);
               }
             },
@@ -61,7 +62,8 @@ const EditableAccordionSection = ({
           <span className="govuk-accordion__section-button" id={headingId}>
             {heading}
           </span>,
-          <span className="govuk-accordion__icon" />,
+          headingButtons,
+          canToggle && <span className="govuk-accordion__icon" />,
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>
