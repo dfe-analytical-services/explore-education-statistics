@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class TopicController : ControllerBase
     {
-        private ITopicService _topicService;
+        private readonly ITopicService _topicService;
 
         public TopicController(ITopicService topicService)
         {
@@ -31,6 +33,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             }
 
             return Ok(topic);
+        }
+
+        // POST api/theme/{themeId}/topics
+        [HttpPost("theme/{themeId}/topics")]
+        public async Task<ActionResult<TopicViewModel>> CreateTopicAsync(
+            CreateTopicViewModel topic, Guid themeId)
+        {
+           topic.ThemeId = themeId;
+           var result = await _topicService.CreateTopicAsync(topic);
+           if (result.IsLeft)
+           {
+               ValidationUtils.AddErrors(ModelState, result.Left);
+               return ValidationProblem(new ValidationProblemDetails(ModelState));
+           }
+
+           return result.Right;
         }
     }
 }
