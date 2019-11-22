@@ -199,6 +199,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             });
         }
 
+        public Task<Either<ValidationResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+            {
+                var (_, section) = tuple;
+
+                var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+
+                if (blockToUpdate == null)
+                {
+                    return new Either<ValidationResult, IContentBlock>(
+                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentBlockNotFound));
+                }
+
+                switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
+                {
+                    case ContentBlockType.MarkDownBlock:
+                        return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body);
+                    case ContentBlockType.HtmlBlock:
+                        return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body);
+                    case ContentBlockType.InsetTextBlock:
+                        return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body);
+                    case ContentBlockType.DataBlock:
+                        return new Either<ValidationResult, IContentBlock>(
+                            ValidationUtils.ValidationResult(ValidationErrorMessages.IncorrectContentBlockTypeForUpdate));
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
+        }
+
+        private async Task<Either<ValidationResult, IContentBlock>> UpdateMarkDownBlock(MarkDownBlock blockToUpdate, string body)
+        {
+            blockToUpdate.Body = body;
+            return await SaveContentBlock(blockToUpdate);
+        }
+
+        private async Task<Either<ValidationResult, IContentBlock>> UpdateHtmlBlock(HtmlBlock blockToUpdate, string body)
+        {
+            blockToUpdate.Body = body;
+            return await SaveContentBlock(blockToUpdate);
+        }
+
+        private async Task<Either<ValidationResult, IContentBlock>> UpdateInsetTextBlock(InsetTextBlock blockToUpdate, string heading, string body)
+        {
+            blockToUpdate.Heading = heading;
+            blockToUpdate.Body = body;
+            return await SaveContentBlock(blockToUpdate);
+        }
+
+        private async Task<IContentBlock> SaveContentBlock(IContentBlock blockToUpdate)
+        {
+            _context.ContentBlocks.Update(blockToUpdate);
+            await _context.SaveChangesAsync();
+            return blockToUpdate;
+        }
+
         private static IContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             return type switch
