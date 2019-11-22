@@ -1,11 +1,11 @@
 export interface MethodologyStatus {
-    id: string;
-    title: string;
-    status: string;
-    publications: MethodologyStatusPublication[]
-  }
+  id: string;
+  title: string;
+  status: string;
+  publications: MethodologyStatusPublication[];
+}
 
 export interface MethodologyStatusPublication {
-    id: string;
-    title: string;
+  id: string;
+  title: string;
 }

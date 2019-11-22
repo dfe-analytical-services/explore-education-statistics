@@ -33,8 +33,8 @@ import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
 import IndexPage from './pages/IndexPage';
 
-import BauDashboardPage from './pages/bau/BauDashboardPage'
-import BauMethodologyPage from './pages/bau/BauMethodologyPage'
+import BauDashboardPage from './pages/bau/BauDashboardPage';
+import BauMethodologyPage from './pages/bau/BauMethodologyPage';
 
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
