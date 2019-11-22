@@ -32,7 +32,7 @@ const service: ReleaseContentService = {
     order: Dictionary<number>,
   ): Promise<ContentSectionViewModel[]> {
     return client.put<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/sections`,
+      `/release/${releaseId}/content/sections/order`,
       order,
     );
   },

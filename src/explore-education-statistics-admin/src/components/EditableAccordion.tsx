@@ -2,102 +2,19 @@
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classnames from 'classnames';
-import React, { cloneElement, createRef, ReactElement, ReactNode } from 'react';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-
+import React, { createRef, ReactElement } from 'react';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { Dictionary } from '@common/types/util';
+import DroppableAccordion from '@admin/components/DroppableAccordion';
+import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
 import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
 
 export interface EditableAccordionProps extends AccordionProps {
-  releaseId: string;
-  index?: number;
   canReorder?: boolean;
   sectionName?: string;
+  onSaveOrder: (order: Dictionary<number>) => Promise<unknown>;
 }
-
-interface DroppableAccordionProps {
-  id: string;
-  isReordering: boolean;
-  children: ReactNode;
-}
-
-const DroppableAccordion = ({
-  id,
-  isReordering,
-  children,
-}: DroppableAccordionProps) => {
-  if (isReordering) {
-    return (
-      <Droppable droppableId={id} type="accordion">
-        {(droppableProvided, snapshot) => (
-          <div
-            {...droppableProvided.droppableProps}
-            ref={droppableProvided.innerRef}
-            style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : '' }}
-          >
-            {children}
-
-            {droppableProvided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    );
-  }
-
-  return <>{children}</>;
-};
-
-interface DraggableAccordionSectionProps {
-  id: string;
-  isReordering: boolean;
-  index: number;
-  openAll: boolean;
-  section: ReactElement<EditableAccordionSectionProps>;
-}
-
-const DraggableAccordionSection = ({
-  id,
-  isReordering,
-  index,
-  openAll,
-  section,
-}: DraggableAccordionSectionProps) => {
-  if (isReordering) {
-    return (
-      <Draggable draggableId={id} type="section" index={index}>
-        {draggableProvided => (
-          <div
-            {...draggableProvided.draggableProps}
-            ref={draggableProvided.innerRef}
-            className={styles.dragContainer}
-          >
-            {cloneElement<EditableAccordionSectionProps>(section, {
-              index,
-              open: false,
-              canToggle: false,
-              headingButtons: (
-                <span
-                  className={styles.dragHandle}
-                  {...draggableProvided.dragHandleProps}
-                />
-              ),
-            })}
-          </div>
-        )}
-      </Draggable>
-    );
-  }
-
-  return cloneElement<EditableAccordionSectionProps>(section, {
-    index,
-    open: openAll,
-  });
-};
 
 interface ChildSection {
   id: string;
@@ -109,14 +26,14 @@ interface ChildSection {
 const EditableAccordion = ({
   children,
   id,
-  index,
   canReorder,
   sectionName,
-  releaseId,
+  onSaveOrder,
 }: EditableAccordionProps) => {
   const ref = createRef<HTMLDivElement>();
   const [openAll, setOpenAll] = React.useState(false);
   const [isReordering, setIsReordering] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
 
   const [currentChildren, setCurrentChildren] = React.useState<ChildSection[]>(
     () => {
@@ -168,31 +85,48 @@ const EditableAccordion = ({
   };
 
   const reorder = () => {
+    setIsError(false);
     setIsReordering(true);
   };
-  const saveOrder = () => {
-    setIsReordering(false);
 
-    const ids = currentChildren.map(({ id }) => id);
+  const saveOrder = () => {
+    if (onSaveOrder) {
+      const ids = currentChildren.reduce<Dictionary<number>>(
+        (result, { id, index }) => ({ ...result, [id]: index }),
+        {},
+      );
+
+      onSaveOrder(ids)
+        .then(() => {
+          setIsReordering(false);
+        })
+        .catch(() => {
+          setIsError(true);
+        });
+    }
   };
 
   const onDragEnd = (result: DropResult) => {
-    console.log(result);
-    const movedSection = currentChildren.find(
-      ({ id }) => id === result.draggableId,
-    );
+    const { source, destination } = result;
 
-    if (movedSection && result.source && result.destination) {
+    if (source && destination) {
       const newChildren = [...currentChildren];
-      const [removed] = newChildren.splice(result.source.index, 1);
-      newChildren.splice(result.destination.index, 0, removed);
-      setCurrentChildren(newChildren);
+      const [removed] = newChildren.splice(source.index, 1);
+      newChildren.splice(destination.index, 0, removed);
+
+      const reordered = newChildren.map((child, index) => ({
+        ...child,
+        index,
+      }));
+
+      setCurrentChildren(reordered);
     }
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <h2 className="govuk-heading-l reorderable-relative">
+        {isError && <span className={styles.error}>An error occurred</span>}
         {canReorder &&
           (isReordering ? (
             <button

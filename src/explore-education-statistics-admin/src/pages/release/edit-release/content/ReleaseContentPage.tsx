@@ -11,11 +11,17 @@ import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import { AbstractRelease } from '@common/services/publicationService';
+import {
+  AbstractRelease,
+  ContentBlockType,
+} from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import {
+  CommentState,
+  EditableContentBlock,
+} from '@admin/services/publicationService';
 
 type PageMode = 'edit' | 'preview';
 
@@ -39,11 +45,9 @@ const ReleaseContentPage = () => {
       releaseSummaryService.getReleaseSummaryDetails(releaseId),
       commonService.getBasicThemeDetails(publication.themeId),
       releaseContentService.getRelease(releaseId),
-      releaseContentService.getContent(releaseId),
-    ]).then(([releaseSummary, theme, releaseData, releaseContent]) => {
+      releaseContentService.getContentSections(releaseId),
+    ]).then(([releaseSummary, theme, releaseData, releaseContentSections]) => {
       // <editor-fold desc="TODO - content population">
-
-      console.log(releaseContent);
 
       const unresolvedComments: Comment[] = [
         {
@@ -58,48 +62,20 @@ const ReleaseContentPage = () => {
         },
       ];
 
-      const contentBlock = {
-        id: "cb-000",
-        order: 0,
-        heading: 'test 1',
-        caption: 'test',
-        content: [
-          {
-            type: 'HtmlBlock',
-            body: 'This is a test',
-            comments: [
-              {
-                name: 'A user',
-                time: new Date(),
-                comment: 'A comment',
-                state: 'open',
-              },
-            ],
-          },
-        ],
-      };
-
-      const contentBlocks = [contentBlock, { ...contentBlock, order: 1, id: "cb-001", heading: "test 2" }];
-
       const releaseDataAsEditable = {
         ...releaseData,
         keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content:
-          (releaseContent.contentSections &&
-              releaseContent.contentSections.map(section => ({
-              ...section,
-              content: section.content.map<EditableContentBlock>(
-                (block, index) => ({
-                  ...block,
-                  id: `aaa-${index}`,
-                  comments: [],
-                }),
-              ),
-            }))) ||
-          contentBlocks,
+        content: releaseContentSections.map(section => ({
+          ...section,
+          content: section.content.map<EditableContentBlock>(
+            (block, index) => ({
+              ...block,
+              id: `aaa-${index}`,
+              comments: [],
+            }),
+          ),
+        })),
       };
-
-      console.log(releaseDataAsEditable.content);
 
       const release: AbstractRelease<EditableContentBlock> = {
         ...releaseDataAsEditable,
