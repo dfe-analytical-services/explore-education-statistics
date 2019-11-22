@@ -59,16 +59,7 @@ const ReleaseContentPage = () => {
       const releaseDataAsEditable = {
         ...releaseData,
         keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content: releaseContentSections.map(section => ({
-          ...section,
-          content: section.content.map<EditableContentBlock>(
-            (block, index) => ({
-              ...block,
-              id: `aaa-${index}`,
-              comments: [],
-            }),
-          ),
-        })),
+        content: releaseContentSections,
       };
 
       const release: AbstractRelease<EditableContentBlock> = {
