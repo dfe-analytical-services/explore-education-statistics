@@ -67,19 +67,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public string Title { get; set; }
 
-        // TODO - needed?
         public string Slug { get; set; }
 
-        // TODO - needed?
         public string Description { get; set; }
         
-        // TODO - needed?
         public string DataSource { get; set; }
         
-        // TODO - needed?
         public string Summary { get; set; }
         
-        // TODO - needed?
         public DateTime? NextUpdate { get; set; }
         
         public List<PreviousReleaseViewModel> Releases { get; set; }
@@ -104,10 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     {
         public Guid Id { get; set; }
         
-        // was content
         public string Reason { get; set; }
         
-        // was publisheddate
         public DateTime On { get; set; }
     }
     
