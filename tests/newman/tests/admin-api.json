@@ -2153,7 +2153,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
 											"    pm.expect(lastItem.id).to.not.be.empty;",
 											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
@@ -2180,7 +2180,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"title\": \"Related Information 1\",\n}"
+									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"description\": \"Related Information 1\",\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
@@ -2217,7 +2217,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
@@ -2271,7 +2271,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
@@ -2291,7 +2291,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\"\n}\n"
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"description\": \"Related Information updated\"\n}\n"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
@@ -2329,7 +2329,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
