@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -71,6 +70,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     Order = maxOrderNumber + 1
                 });
                 
+                _context.Releases.Update(release);
+                await _context.SaveChangesAsync();
+                return OrderedContentSections(release).Last();
+            }, HydrateContentSectionsAndBlocks);
+        }
+
+        public Task<Either<ValidationResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
+            Guid releaseId, Guid contentSectionId, string newHeading)
+        {
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            {
+                var sectionToUpdate = release
+                    .Content
+                    .Find(contentSection => contentSection.Id == contentSectionId);
+
+                if (sectionToUpdate == null)
+                {
+                    return new Either<ValidationResult, ContentSectionViewModel>(
+                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentSectionNotFound));
+                }
+
+                sectionToUpdate.Heading = newHeading;
+
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return OrderedContentSections(release).Last();

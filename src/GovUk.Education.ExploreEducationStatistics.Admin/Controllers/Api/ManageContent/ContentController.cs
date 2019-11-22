@@ -45,6 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 Ok);
         }
 
+        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/heading")]
+        public Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(Guid releaseId, Guid contentSectionId, UpdateContentSectionHeadingRequest request)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.UpdateContentSectionHeadingAsync(releaseId, contentSectionId, request.Heading),
+                Ok);
+        }
+
         [HttpDelete("release/{releaseId}/content/section/{contentSectionId}")]
         public Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(Guid releaseId, Guid contentSectionId)
         {
