@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var institutionListParam =
                 CreateIdListType("institutionList", query.Institution);
             var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthority);
+            var localAuthorityOldCodeListParam = CreateIdListType("localAuthorityOldCodeList", new List<string>());
             var localAuthorityDistrictListParam =
                 CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistrict);
             var localEnterprisePartnershipListParam =
@@ -68,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@countriesList," +
                             "@institutionList," +
                             "@localAuthorityList," +
+                            "@localAuthorityOldCodeList," +
                             "@localAuthorityDistrictList," +
                             "@localEnterprisePartnershipList," +
                             "@mayoralCombinedAuthorityList," +
@@ -85,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     countriesListParam,
                     institutionListParam,
                     localAuthorityListParam,
+                    localAuthorityOldCodeListParam,
                     localAuthorityDistrictListParam,
                     localEnterprisePartnershipListParam,
                     mayoralCombinedAuthorityListParam,
