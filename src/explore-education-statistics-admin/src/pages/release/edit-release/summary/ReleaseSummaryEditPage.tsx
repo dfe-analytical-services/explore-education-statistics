@@ -6,12 +6,12 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
+import service from '@admin/services/release/edit-release/summary/service';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import {
   dateToDayMonthYear,
   dayMonthYearValuesToInputs,
-} from '@admin/services/common/types';
-import service from '@admin/services/release/edit-release/summary/service';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+} from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 

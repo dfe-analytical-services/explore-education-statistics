@@ -1,29 +1,23 @@
+import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 // eslint-disable-next-line import/no-named-as-default
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import commonService from '@admin/services/common/service';
-import { IdTitlePair } from '@admin/services/common/types';
 import { Comment } from '@admin/services/dashboard/types';
+import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
-import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { EditableContentBlock } from '@admin/services/publicationService';
 
 type PageMode = 'edit' | 'preview';
 
 interface Model {
   unresolvedComments: Comment[];
   pageMode: PageMode;
-  releaseSummary: ReleaseSummaryDetails;
-  theme: IdTitlePair;
   release: AbstractRelease<EditableContentBlock>;
 }
 
@@ -35,12 +29,7 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    Promise.all([
-      releaseSummaryService.getReleaseSummaryDetails(releaseId),
-      commonService.getBasicThemeDetails(publication.themeId),
-      releaseContentService.getRelease(releaseId),
-      releaseContentService.getContentSections(releaseId),
-    ]).then(([releaseSummary, theme, releaseData, releaseContentSections]) => {
+    releaseContentService.getContent(releaseId).then(content => {
       // <editor-fold desc="TODO - content population">
 
       const unresolvedComments: Comment[] = [
@@ -56,52 +45,12 @@ const ReleaseContentPage = () => {
         },
       ];
 
-      const releaseDataAsEditable = {
-        ...releaseData,
-        keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content: releaseContentSections,
-      };
-
-      const release: AbstractRelease<EditableContentBlock> = {
-        ...releaseDataAsEditable,
-        summary: 'This is the summary ..... ',
-        updates: [
-          {
-            id: '',
-            on: '',
-            reason: '',
-            releaseId: '',
-          },
-        ],
-        publication: {
-          ...publication,
-          slug: '',
-          description: '',
-          dataSource: '',
-          summary: '',
-          releases: [],
-          legacyReleases: [],
-          topic: {
-            theme,
-          },
-          nextUpdate: '',
-          contact: {
-            contactName: '',
-            contactTelNo: '',
-            teamEmail: '',
-            teamName: '',
-          },
-        },
-      };
-
       // </editor-fold>
 
       setModel({
         unresolvedComments,
         pageMode: 'edit',
-        releaseSummary,
-        theme,
-        release,
+        release: content.release,
       });
     });
   }, [releaseId, publication.themeId, publication]);
@@ -159,7 +108,6 @@ const ReleaseContentPage = () => {
                 editing={model.pageMode === 'edit'}
                 basicPublication={publication}
                 release={model.release}
-                releaseSummary={model.releaseSummary}
                 styles={{}}
               />
             </div>

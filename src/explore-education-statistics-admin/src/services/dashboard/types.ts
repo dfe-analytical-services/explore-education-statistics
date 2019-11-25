@@ -1,12 +1,13 @@
 import {
   ContactDetails,
-  DayMonthYearValues,
   IdLabelPair,
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';
-
-export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
+import {
+  DayMonthYearValues,
+  ReleaseStatus,
+} from '@common/services/publicationService';
 
 export interface ThemeAndTopics {
   title: string;

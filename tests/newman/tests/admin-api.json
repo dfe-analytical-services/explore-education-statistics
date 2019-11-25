@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7f5ac04a-ba58-4b33-8a4f-533834aa47e6",
+		"_postman_id": "33550044-86b5-4e42-b422-029fe898f08e",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1975,6 +1975,162 @@
 			"name": "Manage Content",
 			"item": [
 				{
+					"name": "Manage Content Page",
+					"item": [
+						{
+							"name": "Get Manage Content Page data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Manage Content Page response should include all expected top level items\", function () {",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    pm.expect(respJson.release).to.exist;",
+											"    pm.expect(respJson.relatedInformation).to.exist;",
+											"    pm.expect(respJson.introductionSection).to.exist;",
+											"});",
+											"",
+											"pm.test(\"Release section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const release = respJson.release;",
+											"    ",
+											"    pm.expect(release.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+											"    ",
+											"    pm.expect(release.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\");",
+											"    pm.expect(release.type.title).to.equal(\"Official Statistics\");",
+											"    ",
+											"    pm.expect(release.yearTitle).to.equal(\"2016/17\");",
+											"    pm.expect(release.coverageTitle).to.equal(\"Academic Year\");",
+											"    ",
+											"    pm.expect(release.published).to.equal(\"2018-07-19T00:00:00\");",
+											"    pm.expect(release.releaseName).to.equal(\"2016\");",
+											"    pm.expect(release.slug).to.equal(\"2016-17\");",
+											"    ",
+											"    // TODO DW - is this the intro section's content?  In which case this'll be a content section eventually",
+											"    pm.expect(release.summary).to.equal(\"Read national statistical summaries, view charts and tables and download data files.\");",
+											"    ",
+											"    pm.expect(release.latestRelease).to.be.true;",
+											"    ",
+											"    pm.expect(release.updates.length).to.equal(2);    ",
+											"    pm.expect(release.updates[0].id).to.equal(\"df18b1f6-9f24-4e87-9275-31a0c78b1dad\");",
+											"    pm.expect(release.updates[0].reason).to.equal(\"Release note 1\");",
+											"    pm.expect(release.updates[0].on).to.equal(\"2019-06-02T00:00:00\");",
+											"    ",
+											"    pm.expect(release.updates[1].id).to.equal(\"c9948cde-01ce-4315-87af-eaa6cd7c6879\");",
+											"    pm.expect(release.updates[1].reason).to.equal(\"Release note 2\");",
+											"    pm.expect(release.updates[1].on).to.equal(\"2019-08-10T00:00:00\");",
+											"",
+											"    pm.expect(release.publicationId).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.id).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.title).to.equal(\"Permanent and fixed-period exclusions in England\");",
+											"    pm.expect(release.publication.slug).to.equal(\"permanent-and-fixed-period-exclusions-in-england\");",
+											"    pm.expect(release.publication.summary).to.equal(\"\");",
+											"    pm.expect(release.publication.nextUpdate).to.equal(\"2019-07-19T00:00:00\");",
+											"    ",
+											"    // TODO add some data so we can pull back some alternative releases",
+											"    pm.expect(release.publication.releases.length).to.equal(0);",
+											"    ",
+											"    pm.expect(release.publication.legacyReleases.length).to.equal(8);",
+											"    pm.expect(release.publication.legacyReleases[0].id).to.equal(\"08134c1d-8a58-49a4-8d8b-22e586ffd5ae\");",
+											"    pm.expect(release.publication.legacyReleases[0].description).to.equal(\"2008 to 2009\");",
+											"    pm.expect(release.publication.legacyReleases[0].url).to.equal(\"https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009\");",
+											"    ",
+											"    pm.expect(release.publication.topic.theme.title).to.equal(\"Pupils and schools\");",
+											"   ",
+											"    pm.expect(release.publication.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
+											"    pm.expect(release.publication.contact.teamName).to.equal(\"School absence and exclusions team\");",
+											"    pm.expect(release.publication.contact.teamEmail).to.equal(\"schools.statistics@education.gov.uk\");",
+											"    pm.expect(release.publication.contact.contactName).to.equal(\"Mark Pearson\");",
+											"    pm.expect(release.publication.contact.contactTelNo).to.equal(\"01142742585\");",
+											"    ",
+											"    pm.expect(release.publication.methodology.id).to.equal(\"c8c911e3-39c1-452b-801f-25bb79d1deb7\");",
+											"    pm.expect(release.publication.methodology.title).to.equal(\"Pupil exclusion statistics: methodology\");",
+											"    ",
+											"    pm.expect(release.content.length).to.equal(9);",
+											"    ",
+											"    pm.expect(release.content[0].order).to.equal(1);",
+											"    pm.expect(release.content[0].heading).to.equal(\"About this release\");",
+											"    pm.expect(release.content[0].caption).to.equal(\"\");",
+											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Related Information section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const relatedInformation = respJson.relatedInformation;",
+											"    ",
+											"    pm.expect(relatedInformation.length).to.equal(2);",
+											"    ",
+											"    pm.expect(relatedInformation[0].id).to.equal(\"15a8dbb8-d8b7-4247-b841-e798860a4700\");",
+											"    pm.expect(relatedInformation[0].description).to.equal(\"Pupil absence statistics: guidance and methodology\");",
+											"    pm.expect(relatedInformation[0].url).to.equal(\"http://example.com/1\");",
+											"    ",
+											"    pm.expect(relatedInformation[1].id).to.equal(\"fadedcb1-f386-4faa-a24f-6731be534097\");",
+											"    pm.expect(relatedInformation[1].description).to.equal(\"This is an example of a related information link\");",
+											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com/2\");",
+											"});",
+											"",
+											"pm.test(\"Introduction section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const introductionSection = respJson.introductionSection;",
+											"    ",
+											"    pm.expect(introductionSection.id).to.equal(\"bcb96e42-a09a-4791-a377-9649b0876c58\");",
+											"    pm.expect(introductionSection.order).to.equal(0);",
+											"    pm.expect(introductionSection.heading).to.equal(\"Introduction section heading\");",
+											"    pm.expect(introductionSection.caption).to.equal(\"Introduction section caption\");",
+											"",
+											"    pm.expect(introductionSection.content.length).to.equal(1);",
+											"    pm.expect(introductionSection.content[0].id).to.equal(\"65187a0b-eb17-4481-b234-949dc85f1efa\");",
+											"    pm.expect(introductionSection.content[0].type).to.equal(\"HtmlBlock\");",
+											"    pm.expect(introductionSection.content[0].body).to.equal(\"<p>Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.</p><p>You can also view a regional breakdown of statistics and data within the <a href=\\\"#\\\">local authorities section</a></p>\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Related Information",
 					"item": [
 						{
@@ -1997,7 +2153,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
 											"    pm.expect(lastItem.id).to.not.be.empty;",
 											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
@@ -2024,7 +2180,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"title\": \"Related Information 1\",\n}"
+									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"description\": \"Related Information 1\",\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
@@ -2061,7 +2217,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
@@ -2115,7 +2271,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
@@ -2135,7 +2291,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\"\n}\n"
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"description\": \"Related Information updated\"\n}\n"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
@@ -2173,7 +2329,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"

@@ -2,7 +2,6 @@ import Link from '@admin/components/Link';
 import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
 import {
-  DayMonthYearInputs,
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
@@ -23,6 +22,7 @@ import handleServerSideValidation, {
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
+import { DayMonthYearInputs } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
