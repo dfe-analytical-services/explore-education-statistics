@@ -2,6 +2,7 @@ import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/compone
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import AdminDashboardReadyForPublication from '@admin/pages/prototypes/components/AdminDashboardReadyForPublication';
 import RelatedInformation from '@common/components/RelatedInformation';
+import { FormGroup, FormSelect } from '@common/components/form';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
@@ -78,6 +79,11 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           </RelatedInformation>
         </div>
       </div>
+      <h2 className="govuk-medium">
+        {userContext.user && userContext.user.permissions.includes('team lead')
+          ? 'Manage publications and releases'
+          : 'Manage releases'}
+      </h2>
       <Tabs id="dashboard-tabs">
         <TabsSection
           id="publications"
@@ -117,7 +123,103 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <AdminDashboardReadyForPublication task="approvedPublication" />
         </TabsSection>
       </Tabs>
-
+      <h2 className="govuk-medium">Manage methodology</h2>
+      <Tabs id="methodology-tabs">
+        <TabsSection id="methodology" title="Manage methodology">
+          <>
+            <table className="govuk-table">
+              <thead>
+                <tr>
+                  <th>Methodology title</th>
+                  <th>Status</th>
+                  <th>Related publications</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>
+                    <a href="#">Pupil exclusion statistics: methodology</a>
+                  </th>
+                  <td>
+                    <span className="govuk-tag">Live</span>
+                  </td>
+                  <td>
+                    <a href="#">
+                      Permanent and fixed-period exclusions in England
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <th rowSpan={3}>
+                    <a href="#">Pupil absence statistics: methodology</a>
+                  </th>
+                  <td rowSpan={3}>
+                    {' '}
+                    <span className="govuk-tag">Live</span>
+                  </td>
+                  <td>
+                    <a href="#">Pupil absence in schools in England</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="#">
+                      Pupil absence in schools in England: autumn and spring
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="#">
+                      Pupil absence in schools in England: autumn term
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <th>
+                    <a href="#">
+                      Secondary and primary school applications and offers:
+                      methodology
+                    </a>
+                  </th>
+                  <td>
+                    <span className="govuk-tag">Live</span>
+                  </td>
+                  <td>
+                    <a href="#">
+                      Secondary and primary schools applications and offers
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <th>
+                    <a href="#">School capacity: methodology</a>
+                  </th>
+                  <td>
+                    <span className="govuk-tag">Draft</span>
+                  </td>
+                  <td>N/A</td>
+                </tr>
+                <tr>
+                  <th>
+                    <a href="#">School capacity: methodology</a>
+                  </th>
+                  <td>
+                    <span className="govuk-tag">Approved</span>
+                  </td>
+                  <td>N/A</td>
+                </tr>
+              </tbody>
+            </table>
+            <a className="govuk-button" href="/prototypes/methodology-edit">
+              Create new methodology
+            </a>
+          </>
+        </TabsSection>
+        <TabsSection id="methodology-raft" title="Draft methodology">
+          <p>Content here</p>
+        </TabsSection>
+      </Tabs>
       {/* <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
         <AccordionSection
