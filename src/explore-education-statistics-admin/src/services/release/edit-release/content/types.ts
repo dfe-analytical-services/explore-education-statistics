@@ -1,6 +1,7 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
 import { ContactDetails } from '@admin/services/common/types';
+import { ContentBlockType } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
@@ -52,5 +53,14 @@ export interface ManageContentPageViewModel {
 
   contentSections: ContentSectionViewModel[];
 }
+
+export interface ContentBlockViewModel {
+  id: string;
+  order: number;
+  type: ContentBlockType;
+  body: string;
+}
+
+export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
 
 export default {};

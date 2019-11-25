@@ -4,6 +4,7 @@ import React from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
+import ContentService from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
 
@@ -11,20 +12,33 @@ const EditableMarkdownRenderer = ({
   contentId,
   source,
 }: MarkdownRendererProps) => {
+  const [markdown, setMarkdown] = React.useState(source);
+
   const editingContext = React.useContext(EditingContentBlockContext);
 
   return (
     <>
       <WysiwygEditor
-        content={source || ''}
+        content={markdown || ''}
         editable
         useMarkdown
-        onContentChange={ss => {
-          // eslint-disable-next-line no-console
-          console.log(editingContext.releaseId);
-          console.log(editingContext.sectionId);
-          console.log(contentId);
-          console.log(ss);
+        onContentChange={async ss => {
+          if (
+            editingContext.releaseId &&
+            editingContext.sectionId &&
+            contentId
+          ) {
+            const { body } = await ContentService.updateContentSectionBlock(
+              editingContext.releaseId,
+              editingContext.sectionId,
+              contentId,
+              {
+                body: ss,
+              },
+            );
+
+            setMarkdown(body);
+          }
         }}
       />
     </>

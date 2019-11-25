@@ -16,7 +16,7 @@ interface Props {
   resolveComments?: boolean;
   content: string;
   useMarkdown?: boolean;
-  onContentChange?: (content: string) => void;
+  onContentChange?: (content: string) => Promise<unknown>;
 }
 
 const WysiwygEditor = ({
@@ -35,16 +35,19 @@ const WysiwygEditor = ({
   const turndownService = React.useMemo(() => new TurndownService(), []);
 
   const save = () => {
-    setEditing(false);
-    setSaved(true);
-
     if (onContentChange) {
       let contentChangeContent = temporaryContent;
 
       if (useMarkdown) {
         contentChangeContent = turndownService.turndown(contentChangeContent);
       }
-      onContentChange(contentChangeContent);
+      onContentChange(contentChangeContent).then(() => {
+        setEditing(false);
+        setSaved(true);
+      });
+    } else {
+      setEditing(false);
+      setSaved(true);
     }
   };
 

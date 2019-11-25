@@ -1,4 +1,4 @@
-import React, { ComponentType, useContext, ReactNode } from 'react';
+import React, { ComponentType, useContext } from 'react';
 
 export interface ReleaseContentContext {
   isEditing: boolean;
