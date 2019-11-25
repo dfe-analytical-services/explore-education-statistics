@@ -9,8 +9,6 @@ import {
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
@@ -19,6 +17,10 @@ import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {

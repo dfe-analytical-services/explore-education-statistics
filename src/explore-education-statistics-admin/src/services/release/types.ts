@@ -1,5 +1,8 @@
-import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
-import { ReleaseStatus } from '@admin/services/dashboard/types';
+import { IdTitlePair } from '@admin/services/common/types';
+import {
+  DayMonthYearValues,
+  ReleaseStatus,
+} from '@common/services/publicationService';
 
 export interface ReleaseSummaryDetails {
   id: string;

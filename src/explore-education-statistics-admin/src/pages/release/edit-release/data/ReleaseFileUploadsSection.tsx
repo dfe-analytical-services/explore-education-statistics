@@ -55,7 +55,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       'Choose a unique file name',
     ),
     errorCodeToFieldError(
-      'FILE_CAN_NOT_BE_EMPTY',
+      'FILE_CANNOT_BE_EMPTY',
       'file',
       'Choose a file that is not empty',
     ),
