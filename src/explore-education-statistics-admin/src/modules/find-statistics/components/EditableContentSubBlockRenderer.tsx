@@ -4,7 +4,7 @@ import React from 'react';
 // import { Draggable } from 'react-beautiful-dnd';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
-import {EditableContentBlock} from "@admin/services/publicationService";
+import { EditableContentBlock } from '@admin/services/publicationService';
 import EditableMarkdownRenderer from './EditableMarkdownRenderer';
 
 interface Props {
@@ -20,15 +20,13 @@ function EditableContentSubBlockRenderer({
   editable,
   onContentChange,
   id,
+
 }: Props) {
   switch (block.type) {
     case 'MarkDownBlock':
       return (
         <>
-          <EditableMarkdownRenderer
-            contentId={block.id}
-            source={block.body}
-          />
+          <EditableMarkdownRenderer contentId={block.id} source={block.body} />
         </>
       );
     case 'InsetTextBlock':

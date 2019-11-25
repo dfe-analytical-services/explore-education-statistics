@@ -81,7 +81,7 @@ export interface FootnoteSubject {
 export interface FootnoteProps {
   content: string;
   subjects: {
-    [key: string]: FootnoteSubject
+    [key: string]: FootnoteSubject;
   };
 }
 

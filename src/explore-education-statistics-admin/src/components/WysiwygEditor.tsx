@@ -32,9 +32,7 @@ const WysiwygEditor = ({
     return content;
   });
 
-  const turndownService = React.useMemo(() => new TurndownService(), [
-    useMarkdown,
-  ]);
+  const turndownService = React.useMemo(() => new TurndownService(), []);
 
   const save = () => {
     setEditing(false);

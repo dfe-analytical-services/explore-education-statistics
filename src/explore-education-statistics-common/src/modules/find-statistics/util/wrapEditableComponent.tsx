@@ -1,14 +1,15 @@
-import React, { ComponentType, useContext } from 'react';
+import React, { ComponentType, useContext, ReactNode } from 'react';
 
 export interface ReleaseContentContext {
   isEditing: boolean;
-  releaseId: string | undefined
+  releaseId: string | undefined;
 }
 
 export const EditingContext = React.createContext<ReleaseContentContext>({
   isEditing: true,
-  releaseId: undefined
+  releaseId: undefined,
 });
+
 
 const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
   EditableComponent: ComponentType<EditableProps>,

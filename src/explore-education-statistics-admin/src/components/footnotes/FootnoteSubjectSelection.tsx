@@ -1,6 +1,7 @@
 import {
   Footnote,
-  FootnoteMetaGetters, FootnoteSubject,
+  FootnoteMetaGetters,
+  FootnoteSubject,
 } from '@admin/services/release/edit-release/footnotes/types';
 import React, { ReactNode } from 'react';
 
