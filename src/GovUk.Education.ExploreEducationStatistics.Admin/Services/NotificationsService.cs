@@ -13,12 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class NotificationsService : INotificationsService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly string _storageConnectionString;
 
         private readonly ILogger _logger;
 
-        public NotificationsService(ApplicationDbContext context,
+        public NotificationsService(ContentDbContext context,
             ILogger<NotificationsService> logger,
             IConfiguration config)
         {

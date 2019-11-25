@@ -1,12 +1,10 @@
 using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -31,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
-            return blob.Exists() && IsFileReleased(blob);
+            return blob.Exists() && FileStorageUtils.IsFileReleased(blob);
         }
 
         public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
@@ -68,26 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 await blob.UploadFromStreamAsync(stream);
             }
-        }
-
-        private static bool IsFileReleased(ICloudBlob blob)
-        {
-            if (!blob.Exists())
-            {
-                throw new ArgumentException("File not found: {blobName}", blob.Name);
-            }
-
-            if (blob.Metadata.TryGetValue("releasedatetime", out var releaseDateTime))
-            {
-                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
-            }
-
-            return false;
-        }
-
-        private static DateTime ParseDateTime(string dateTime)
-        {
-            return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
     }
 }

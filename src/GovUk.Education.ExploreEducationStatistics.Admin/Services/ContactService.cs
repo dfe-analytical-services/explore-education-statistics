@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ContactService : IContactService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public ContactService(ApplicationDbContext context)
+        public ContactService(ContentDbContext context)
         {
             _context = context;
         }

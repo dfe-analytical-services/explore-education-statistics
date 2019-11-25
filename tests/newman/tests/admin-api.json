@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "90eb0249-5913-4394-afa0-6c45131b3638",
+		"_postman_id": "33550044-86b5-4e42-b422-029fe898f08e",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -43,13 +43,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/contacts",
 							"host": [
@@ -119,13 +113,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/timeidentifiers",
 							"host": [
@@ -173,13 +161,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/releasetypes",
 							"host": [
@@ -231,13 +213,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/methodologies",
 							"host": [
@@ -275,13 +251,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
 							"host": [
@@ -346,13 +316,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/themes",
 							"host": [
@@ -453,13 +417,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad",
 							"host": [
@@ -542,13 +500,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 							"host": [
@@ -623,13 +575,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=1a9636e4-29d5-4c90-8c07-f41db8dd019c",
 							"host": [
@@ -750,13 +696,7 @@
 									],
 									"request": {
 										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
-											}
-										],
+										"header": [],
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject/1",
 											"host": [
@@ -856,11 +796,6 @@
 												"name": "Content-Type",
 												"type": "text",
 												"value": "application/json"
-											},
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
 											}
 										],
 										"body": {
@@ -925,13 +860,7 @@
 									],
 									"request": {
 										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
-											}
-										],
+										"header": [],
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 											"host": [
@@ -1067,11 +996,6 @@
 										"name": "Content-Type",
 										"type": "text",
 										"value": "application/json"
-									},
-									{
-										"key": "Cookie",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-										"type": "text"
 									}
 								],
 								"body": {
@@ -1148,7 +1072,7 @@
 											"pm.test(\"All results should have correction geographicLevel\", function () {",
 											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-											"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
+											"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
 											"        });",
 											"    }",
 											"});"
@@ -1175,11 +1099,6 @@
 										"name": "Content-Type",
 										"type": "text",
 										"value": "application/json"
-									},
-									{
-										"key": "Cookie",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-										"type": "text"
 									}
 								],
 								"body": {
@@ -1213,6 +1132,218 @@
 					"name": "Footnotes",
 					"item": [
 						{
+							"name": "Create Footnote for Subjects",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"footnote_for_subjects_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
+											"});",
+											"",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [1,2]\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Subjects",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_subjects_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_subjects_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Footnote for Indicators",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"footnote_for_indicators_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
+											"});",
+											"",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Indicators",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_indicators_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_indicators_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Create Footnote for Filters",
 							"event": [
 								{
@@ -1244,8 +1375,6 @@
 									"script": {
 										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
 										"exec": [
-											"pm.globals.set(\"F_AbsenceRatePercentBands_SchoolType\", \"11\");",
-											"",
 											""
 										],
 										"type": "text/javascript"
@@ -1256,11 +1385,6 @@
 								"method": "POST",
 								"header": [
 									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
-									{
 										"key": "Content-Type",
 										"name": "Content-Type",
 										"type": "text",
@@ -1269,7 +1393,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1FILT_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [1]\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1FILT_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1310,13 +1434,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filters_id}}",
 									"host": [
@@ -1373,11 +1491,6 @@
 								"method": "POST",
 								"header": [
 									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
-									{
 										"key": "Content-Type",
 										"name": "Content-Type",
 										"type": "text",
@@ -1386,7 +1499,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{1FG_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": [1]\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{1FG_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1427,13 +1540,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_groups_id}}",
 									"host": [
@@ -1490,11 +1597,6 @@
 								"method": "POST",
 								"header": [
 									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
-									{
 										"key": "Content-Type",
 										"name": "Content-Type",
 										"type": "text",
@@ -1503,7 +1605,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__Total}}\n    ],\n    \"subjects\": [1]\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__Total}}\n    ],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1561,11 +1663,6 @@
 								"method": "PUT",
 								"header": [
 									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
-									{
 										"key": "Content-Type",
 										"name": "Content-Type",
 										"type": "text",
@@ -1574,7 +1671,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__StateFundedPrimary}},\n    \t{{1F_SchoolType__StateFundedSecondary}},\n    \t{{1F_SchoolType__Special}}\n    ],\n    \"subjects\": [1]\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__StateFundedPrimary}},\n    \t{{1F_SchoolType__StateFundedSecondary}},\n    \t{{1F_SchoolType__Special}}\n    ],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
@@ -1616,13 +1713,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
 									"host": [
@@ -1663,13 +1754,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/99999",
 									"host": [
@@ -1679,6 +1764,57 @@
 										"data",
 										"footnote",
 										"99999"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Footnotes for Absence Release",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/release/4FA4FE8E-9A15-46BB-823F-49BF8E0CDEC5",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"release",
+										"4FA4FE8E-9A15-46BB-823F-49BF8E0CDEC5"
 									]
 								}
 							},
@@ -1756,13 +1892,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5/data/absence_by_characteristic.csv/import/status",
 							"host": [
@@ -1820,13 +1950,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/228f8aaf-e438-4155-8912-983943a88989/data/expected_not_found.csv/import/status",
 							"host": [
@@ -1843,6 +1967,2392 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Manage Content",
+			"item": [
+				{
+					"name": "Manage Content Page",
+					"item": [
+						{
+							"name": "Get Manage Content Page data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Manage Content Page response should include all expected top level items\", function () {",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    pm.expect(respJson.release).to.exist;",
+											"    pm.expect(respJson.relatedInformation).to.exist;",
+											"    pm.expect(respJson.introductionSection).to.exist;",
+											"});",
+											"",
+											"pm.test(\"Release section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const release = respJson.release;",
+											"    ",
+											"    pm.expect(release.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+											"    ",
+											"    pm.expect(release.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\");",
+											"    pm.expect(release.type.title).to.equal(\"Official Statistics\");",
+											"    ",
+											"    pm.expect(release.yearTitle).to.equal(\"2016/17\");",
+											"    pm.expect(release.coverageTitle).to.equal(\"Academic Year\");",
+											"    ",
+											"    pm.expect(release.published).to.equal(\"2018-07-19T00:00:00\");",
+											"    pm.expect(release.releaseName).to.equal(\"2016\");",
+											"    pm.expect(release.slug).to.equal(\"2016-17\");",
+											"    ",
+											"    // TODO DW - is this the intro section's content?  In which case this'll be a content section eventually",
+											"    pm.expect(release.summary).to.equal(\"Read national statistical summaries, view charts and tables and download data files.\");",
+											"    ",
+											"    pm.expect(release.latestRelease).to.be.true;",
+											"    ",
+											"    pm.expect(release.updates.length).to.equal(2);    ",
+											"    pm.expect(release.updates[0].id).to.equal(\"df18b1f6-9f24-4e87-9275-31a0c78b1dad\");",
+											"    pm.expect(release.updates[0].reason).to.equal(\"Release note 1\");",
+											"    pm.expect(release.updates[0].on).to.equal(\"2019-06-02T00:00:00\");",
+											"    ",
+											"    pm.expect(release.updates[1].id).to.equal(\"c9948cde-01ce-4315-87af-eaa6cd7c6879\");",
+											"    pm.expect(release.updates[1].reason).to.equal(\"Release note 2\");",
+											"    pm.expect(release.updates[1].on).to.equal(\"2019-08-10T00:00:00\");",
+											"",
+											"    pm.expect(release.publicationId).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.id).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.title).to.equal(\"Permanent and fixed-period exclusions in England\");",
+											"    pm.expect(release.publication.slug).to.equal(\"permanent-and-fixed-period-exclusions-in-england\");",
+											"    pm.expect(release.publication.summary).to.equal(\"\");",
+											"    pm.expect(release.publication.nextUpdate).to.equal(\"2019-07-19T00:00:00\");",
+											"    ",
+											"    // TODO add some data so we can pull back some alternative releases",
+											"    pm.expect(release.publication.releases.length).to.equal(0);",
+											"    ",
+											"    pm.expect(release.publication.legacyReleases.length).to.equal(8);",
+											"    pm.expect(release.publication.legacyReleases[0].id).to.equal(\"08134c1d-8a58-49a4-8d8b-22e586ffd5ae\");",
+											"    pm.expect(release.publication.legacyReleases[0].description).to.equal(\"2008 to 2009\");",
+											"    pm.expect(release.publication.legacyReleases[0].url).to.equal(\"https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009\");",
+											"    ",
+											"    pm.expect(release.publication.topic.theme.title).to.equal(\"Pupils and schools\");",
+											"   ",
+											"    pm.expect(release.publication.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
+											"    pm.expect(release.publication.contact.teamName).to.equal(\"School absence and exclusions team\");",
+											"    pm.expect(release.publication.contact.teamEmail).to.equal(\"schools.statistics@education.gov.uk\");",
+											"    pm.expect(release.publication.contact.contactName).to.equal(\"Mark Pearson\");",
+											"    pm.expect(release.publication.contact.contactTelNo).to.equal(\"01142742585\");",
+											"    ",
+											"    pm.expect(release.publication.methodology.id).to.equal(\"c8c911e3-39c1-452b-801f-25bb79d1deb7\");",
+											"    pm.expect(release.publication.methodology.title).to.equal(\"Pupil exclusion statistics: methodology\");",
+											"    ",
+											"    pm.expect(release.content.length).to.equal(9);",
+											"    ",
+											"    pm.expect(release.content[0].order).to.equal(1);",
+											"    pm.expect(release.content[0].heading).to.equal(\"About this release\");",
+											"    pm.expect(release.content[0].caption).to.equal(\"\");",
+											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Related Information section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const relatedInformation = respJson.relatedInformation;",
+											"    ",
+											"    pm.expect(relatedInformation.length).to.equal(2);",
+											"    ",
+											"    pm.expect(relatedInformation[0].id).to.equal(\"15a8dbb8-d8b7-4247-b841-e798860a4700\");",
+											"    pm.expect(relatedInformation[0].description).to.equal(\"Pupil absence statistics: guidance and methodology\");",
+											"    pm.expect(relatedInformation[0].url).to.equal(\"http://example.com/1\");",
+											"    ",
+											"    pm.expect(relatedInformation[1].id).to.equal(\"fadedcb1-f386-4faa-a24f-6731be534097\");",
+											"    pm.expect(relatedInformation[1].description).to.equal(\"This is an example of a related information link\");",
+											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com/2\");",
+											"});",
+											"",
+											"pm.test(\"Introduction section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const introductionSection = respJson.introductionSection;",
+											"    ",
+											"    pm.expect(introductionSection.id).to.equal(\"bcb96e42-a09a-4791-a377-9649b0876c58\");",
+											"    pm.expect(introductionSection.order).to.equal(0);",
+											"    pm.expect(introductionSection.heading).to.equal(\"Introduction section heading\");",
+											"    pm.expect(introductionSection.caption).to.equal(\"Introduction section caption\");",
+											"",
+											"    pm.expect(introductionSection.content.length).to.equal(1);",
+											"    pm.expect(introductionSection.content[0].id).to.equal(\"65187a0b-eb17-4481-b234-949dc85f1efa\");",
+											"    pm.expect(introductionSection.content[0].type).to.equal(\"HtmlBlock\");",
+											"    pm.expect(introductionSection.content[0].body).to.equal(\"<p>Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.</p><p>You can also view a regional breakdown of statistics and data within the <a href=\\\"#\\\">local authorities section</a></p>\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Related Information",
+					"item": [
+						{
+							"name": "Add Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.environment.set(\"latest_related_information_id\", lastItem.id);",
+											"    pm.environment.set(\"number_of_related_information_items\", respJson.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"description\": \"Related Information 1\",\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Related Information entry added",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"description\": \"Related Information updated\"\n}\n"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information",
+										"{{latest_related_information_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Related Information entry updated",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information",
+										"{{latest_related_information_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Related Information entry deleted",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"Unset variables\", function () {",
+											"    pm.environment.unset(\"latest_related_information_id\");",
+											"    pm.environment.unset(\"number_of_related_information_items\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Content",
+					"item": [
+						{
+							"name": "Content Sections",
+							"item": [
+								{
+									"name": "Get Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Sections should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(9);",
+													"",
+													"    // assert that all of our content sections are coming back with details ",
+													"    respJson.forEach(section => {",
+													"        pm.expect(section.id).to.not.be.null;",
+													"        pm.expect(section.heading).to.not.be.null;",
+													"        pm.expect(section.caption).to.not.be.null;",
+													"        pm.expect(section.content.length).to.be.above(0);",
+													"    });",
+													"    ",
+													"    // assert that all of our sections are coming back in correct order",
+													"    respJson.forEach((section, index) => {",
+													"        pm.expect(section.order).to.equal(index + 1);",
+													"    });",
+													"    ",
+													"    // assert that the content sections' content blocks are coming back with details",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.id).to.not.be.null;",
+													"            pm.expect(contentBlock.type).to.not.be.null;",
+													"        }); ",
+													"    });",
+													"    ",
+													"    // assert that the deliberately blanked out fields are undefined",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.contentSection).to.be.undefined;",
+													"            pm.expect(contentBlock.contentSectionId).to.be.undefined;",
+													"       }); ",
+													"    });",
+													"    ",
+													"    // test a specific content section's content",
+													"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson[0].caption).to.equal(\"\");",
+													"    ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson[0].content.length).to.equal(1);",
+													"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"",
+													"    // test a DataBlock's content",
+													"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
+													"    pm.expect(respJson[1].content[2].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[1].content[2].heading).to.equal(\"Chart showing permanent exclusions in England\");",
+													"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Store environment variables\", function() {",
+													"    pm.environment.set(\"added_content_section_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 2\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify new Content Section added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'New section',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section Order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'New section',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Content Section heading",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should have an updated heading\", function () { ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.heading).to.equal('Updated heading');",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\theading: 'Updated heading'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"heading"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 4,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 1,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 2,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 3,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 7,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 5,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 6,\n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n    '{{added_content_section_id}}': 8,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Sections Order updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Restore Content Sections order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 1,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 2,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 3,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 4,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 5,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 6,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 7,\n    '{{added_content_section_id}}': 8, \n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Content Section Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson.caption).to.equal(\"\");",
+													"    ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section removed",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
+													"});",
+													"",
+													"pm.test(\"Unset variables\", function () {",
+													"    pm.environment.unset(\"added_content_section_id\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Content Section without specifying order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(10);",
+													"});",
+													"",
+													"pm.test(\"Store environment variables for following tests\", function() {",
+													"   pm.environment.set(\"added_content_section_without_order_id\", pm.response.json().id); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Content Section added without order specified",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"",
+													"pm.test(\"Remove temporary environment variables\", function() {",
+													"   pm.environment.unset(\"added_content_section_without_order_id\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_without_order_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_without_order_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Content Blocks",
+							"item": [
+								{
+									"name": "Get Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson.caption).to.equal(\"\");",
+													"    ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New HTMLBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.environment.set(\"added_html_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 1,\n\ttype: 'HtmlBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New MarkDownBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.environment.set(\"added_markdown_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 1,\n\ttype: 'MarkDownBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add InsetText Block (in the middle)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New MarkDownBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.environment.set(\"added_inset_text_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 2,\n\ttype: 'InsetTextBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Data Block (without specifying order)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New DataBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(5);",
+													"    pm.expect(respJson.type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.environment.set(\"added_data_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\ttype: 'DataBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should contain the 4 newly added Content Blocks\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson.content[3].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[3].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson.content[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[4].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[4].order).to.equal(5);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The HTML Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.order).to.equal(3);",
+													"    pm.expect(respJson.body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tbody: '<h1>Update!></h1><p>This is the new body for the HTML Block.<p>'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_html_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The MarkDown Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tbody: '*Update!*\\n\\nThis is the new body for the _MarkDown Block._'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_markdown_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_markdown_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update InsetText Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The Inset Text Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"    pm.expect(respJson.heading).to.equal(\"Update!\");",
+													"    pm.expect(respJson.body).to.equal(\"This is the new body for the Inset Text Block.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\theading: 'Update!',\n\tbody: 'This is the new body for the Inset Text Block.'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_inset_text_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_inset_text_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should contain the updated Content Block details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
+													"    ",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].heading).to.equal(\"Update!\");",
+													"    pm.expect(respJson.content[1].body).to.equal(\"This is the new body for the Inset Text Block.\");",
+													"    ",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Content Blocks",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"",
+													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[4].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[4].order).to.equal(5);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_html_block_id}}': 1,\n\t'{{added_markdown_block_id}}': 2,\n\t'{{added_inset_text_block_id}}': 3,\n\t'{{added_data_block_id}}': 4,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks order updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[2].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson.content[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[4].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[4].order).to.equal(5);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_html_block_id}}': 1,\n\t'{{added_html_block_id}}': 2,\n\t'{{added_html_block_id}}': 3,\n\t'{{added_html_block_id}}': 4,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Restore Content Blocks order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Blocks should be in previous order again\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[3].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[3].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[4].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[4].order).to.equal(5);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_markdown_block_id}}': 1,\n\t'{{added_inset_text_block_id}}': 2,\n\t'{{added_html_block_id}}': 3,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 4,\n\t'{{added_data_block_id}}': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete InsetText Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"InsetText Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[2].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_inset_text_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_inset_text_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify InsetText Block deleted",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"InsetText Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.content.length).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson.content[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[2].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"MarkDown Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_markdown_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_markdown_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Data Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_data_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_data_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"HTML Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Remove temporary environment variables\", function() {",
+													"   pm.environment.unset(\"added_html_block_id\"); ",
+													"   pm.environment.unset(\"added_markdown_block_id\"); ",
+													"   pm.environment.unset(\"added_inset_text_block_id\"); ",
+													"   pm.environment.unset(\"added_data_block_id\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_html_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -1912,13 +4422,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/scheduled",
 							"host": [
@@ -1991,13 +4495,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/draft",
 							"host": [
@@ -2025,7 +4523,9 @@
 									"",
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.title\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
@@ -2038,8 +4538,8 @@
 									"    pm.expect(respJson.id).to.equal(\"06c45b1e-533d-4c95-900b-62beb4620f59\");",
 									"});",
 									"",
-									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"pm.test(\"type.id should should be correct\", function () { ",
+									"    pm.expect(respJson.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2058,13 +4558,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
 							"host": [
@@ -2094,7 +4588,9 @@
 									"",
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.title\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
@@ -2126,11 +4622,6 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -2170,7 +4661,9 @@
 									"",
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"type.title\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
@@ -2183,8 +4676,8 @@
 									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
 									"});",
 									"",
-									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"pm.test(\"type.id should should be correct\", function () { ",
+									"    pm.expect(respJson.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2207,11 +4700,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -2289,11 +4777,6 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
 							}
 						],
 						"body": {
@@ -2363,11 +4846,6 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
 							}
 						],
 						"body": {
@@ -2423,11 +4901,6 @@
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
 								"type": "text"
 							}
 						],
@@ -2496,13 +4969,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
 							"host": [
@@ -2521,13 +4988,7 @@
 					"name": "Delete data file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2580,13 +5041,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2647,13 +5102,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
 							"host": [
@@ -2678,13 +5127,7 @@
 					"name": "Delete ancillary file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2734,13 +5177,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2801,13 +5238,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
 							"host": [
@@ -2826,13 +5257,7 @@
 					"name": "Delete chart file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2902,13 +5327,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks/",
 							"host": [
@@ -2972,11 +5391,6 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -3046,13 +5460,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
 							"host": [
@@ -3112,11 +5520,6 @@
 						"method": "PUT",
 						"header": [
 							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
-							{
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
@@ -3166,13 +5569,7 @@
 					],
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
 							"host": [
@@ -3212,13 +5609,7 @@
 					],
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/815c6a6d-fbad-4f76-a226-13b7e1602f7e",
 							"host": [
@@ -3274,11 +5665,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3352,11 +5738,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3412,11 +5793,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3490,11 +5866,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3550,11 +5921,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3628,11 +5994,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3688,11 +6049,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3766,11 +6122,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3826,11 +6177,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3904,11 +6250,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3964,11 +6305,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4042,11 +6378,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4102,11 +6433,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4180,11 +6506,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4240,11 +6561,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4318,11 +6634,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4378,11 +6689,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4456,11 +6762,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4516,11 +6817,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4594,11 +6890,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4654,11 +6945,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4732,11 +7018,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4792,11 +7073,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4870,11 +7146,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4930,11 +7201,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5008,11 +7274,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5068,11 +7329,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5146,11 +7402,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5206,11 +7457,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5284,11 +7530,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5324,11 +7565,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5376,11 +7612,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5410,11 +7641,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5462,11 +7688,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5496,11 +7717,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5548,11 +7764,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5582,11 +7793,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5634,11 +7840,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5668,11 +7869,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5720,11 +7916,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5754,11 +7945,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5806,11 +7992,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5840,11 +8021,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5892,11 +8068,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5926,11 +8097,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5978,11 +8144,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6012,11 +8173,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6064,11 +8220,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6098,11 +8249,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6150,11 +8296,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6184,11 +8325,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6236,11 +8372,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6270,11 +8401,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6322,11 +8448,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6356,11 +8477,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6408,11 +8524,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6442,11 +8553,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6494,11 +8600,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6528,11 +8629,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6580,11 +8676,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6614,11 +8705,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6666,11 +8752,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6700,11 +8781,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6752,11 +8828,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6786,11 +8857,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6838,11 +8904,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6872,11 +8933,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6924,11 +8980,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6958,11 +9009,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7010,11 +9056,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7044,11 +9085,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7096,11 +9132,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7130,11 +9161,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7182,11 +9208,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7216,11 +9237,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7268,11 +9284,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7302,11 +9313,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7354,11 +9360,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7388,11 +9389,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7440,11 +9436,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7474,11 +9465,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7526,11 +9512,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7560,11 +9541,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7612,11 +9588,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7646,11 +9617,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7698,11 +9664,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7732,11 +9693,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7784,11 +9740,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7818,11 +9769,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7870,11 +9816,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7904,11 +9845,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7956,11 +9892,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7990,11 +9921,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8042,11 +9968,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8076,11 +9997,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8128,11 +10044,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8162,11 +10073,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8214,11 +10120,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8248,11 +10149,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8300,11 +10196,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8334,11 +10225,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8386,11 +10272,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8420,11 +10301,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8472,11 +10348,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8506,11 +10377,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8558,11 +10424,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8592,11 +10453,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8644,11 +10500,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8678,11 +10529,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8730,11 +10576,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8764,11 +10605,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8816,11 +10652,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8850,11 +10681,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8902,11 +10728,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8936,11 +10757,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8988,11 +10804,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -9014,268 +10825,18 @@
 				}
 			],
 			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Manage Content",
-			"item": [
-				{
-					"name": "Related Information",
-					"item": [
-						{
-							"name": "Add Related Information",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 201\", function () { ",
-											"    pm.response.to.have.status(201); ",
-											"});",
-											"",
-											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.be.above(0);",
-											"});",
-											"",
-											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
-											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
-											"    pm.expect(lastItem.id).to.not.be.empty;",
-											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
-											"});",
-											"",
-											"pm.test(\"Store variables for upcoming tests\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.environment.set(\"latest_related_information_id\", lastItem.id);",
-											"    pm.environment.set(\"number_of_related_information_items\", respJson.length);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"title\": \"Related Information 1\",\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"related-information"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Edit Related Information",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
-											"});",
-											"",
-											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
-											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									},
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\",\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"related-information",
-										"{{latest_related_information_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Related Information",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
-											"});",
-											"",
-											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
-											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"related-information"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Related Information",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Related Information array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
-											"});",
-											"",
-											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"related-information",
-										"{{latest_related_information_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				}
-			],
-			"protocolProfileBehavior": {}
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",

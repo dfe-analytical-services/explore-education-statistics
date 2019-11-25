@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -76,47 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
         {
-            switch (message)
-            {
-                case CannotOverwriteFile:
-                    return new ValidationResult("CANNOT_OVERWRITE_FILE");
-                case SlugNotUnique:
-                    return new ValidationResult("SLUG_NOT_UNIQUE");
-                case PartialDateNotValid:
-                    return new ValidationResult("PARTIAL_DATE_NOT_VALID");
-                case CannotUseGenericFunctionToDeleteDataFile:
-                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_DELETE_DATA_FILE");
-                case UnableToFindMetadataFileToDelete:
-                    return new ValidationResult("UNABLE_TO_FIND_METADATA_FILE_TO_DELETE");
-                case FileNotFound:
-                    return new ValidationResult("FILE_NOT_FOUND");
-                case FileCannotBeEmpty: 
-                    return new ValidationResult("FILE_CAN_NOT_BE_EMPTY");
-                case DataFileCannotBeEmpty: 
-                    return new ValidationResult("DATA_FILE_CAN_NOT_BE_EMPTY");
-                case MetadataFileCannotBeEmpty: 
-                    return new ValidationResult("METADATA_FILE_CAN_NOT_BE_EMPTY");
-                case CannotUseGenericFunctionToAddDataFile: 
-                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_ADD_DATA_FILE");
-                case CannotOverwriteDataFile: 
-                    return new ValidationResult("CANNOT_OVERWRITE_DATA_FILE");
-                case CannotOverwriteMetadataFile: 
-                    return new ValidationResult("CANNOT_OVERWRITE_METADATA_FILE");
-                case DataAndMetadataFilesCannotHaveTheSameName: 
-                    return new ValidationResult("DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME");
-                case DataFileMustBeCsvFile: 
-                    return new ValidationResult("DATA_FILE_MUST_BE_A_CSV_FILE");
-                case MetaFileMustBeCsvFile: 
-                    return new ValidationResult("META_FILE_MUST_BE_A_CSV_FILE");
-                case SubjectTitleMustBeUnique: 
-                    return new ValidationResult("SUBJECT_TITLE_MUST_BE_UNIQUE");
-                case ReleaseNotFound:
-                    return new ValidationResult("RELEASE_NOT_FOUND");
-                case RelatedInformationItemNotFound:
-                    return new ValidationResult("RELATED_INFORMATION_ITEM_NOT_FOUND");
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(message), message, null);
-            }
+            return new ValidationResult(message.ToString().ScreamingSnakeCase());
         }
     }
 
@@ -138,7 +99,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
         SubjectTitleMustBeUnique,
+        EntityNotFound,
         ReleaseNotFound,
-        RelatedInformationItemNotFound
+        RelatedInformationItemNotFound,
+        ContentSectionNotFound,
+        ContentBlockNotFound,
+        IncorrectContentBlockTypeForUpdate,
     }
 }

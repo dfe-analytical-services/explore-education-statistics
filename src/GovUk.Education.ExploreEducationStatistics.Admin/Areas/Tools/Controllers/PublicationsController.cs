@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class PublicationsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public PublicationsController(ApplicationDbContext context)
+        public PublicationsController(ContentDbContext context)
         {
             _context = context;
         }

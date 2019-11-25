@@ -41,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             var geoJsonList = _context.GeoJson.Where(geoJson =>
                 geoJson.BoundaryLevelId == boundaryLevelId &&
-                codes.Contains(geoJson.Code));
+                codes.Contains(geoJson.Code)).ToList();
 
-            AddAllToCache(boundaryLevelId, geoJsonList.ToList());
+            AddAllToCache(boundaryLevelId, geoJsonList);
 
             return geoJsonList;
         }

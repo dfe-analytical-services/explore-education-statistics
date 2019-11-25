@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         [FunctionName("PublicationNotifier")]
         // ReSharper disable once UnusedMember.Global
         public void PublicationNotifierFunc(
-            [QueueTrigger("publication-queue", Connection = "")]
+            [QueueTrigger("publication-queue")]
             JObject pn,
             ILogger logger,
             ExecutionContext context)

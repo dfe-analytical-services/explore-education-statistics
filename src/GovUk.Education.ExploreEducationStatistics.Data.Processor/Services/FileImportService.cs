@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -17,30 +16,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileImportService : IFileImportService
     {
-        private readonly StatisticsDbContext _context;
+        private readonly IBatchService _batchService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
-        private readonly IBatchService _batchService;
         private readonly ILogger<IFileImportService> _logger;
 
         public FileImportService(
-            StatisticsDbContext context,
             IFileStorageService fileStorageService,
             IImporterService importerService,
             IBatchService batchService,
             ILogger<IFileImportService> logger)
         {
-            _context = context;
             _fileStorageService = fileStorageService;
             _importerService = importerService;
             _batchService = batchService;
             _logger = logger;
         }
 
-        public async Task ImportObservations(ImportMessage message)
+        public async Task ImportObservations(ImportMessage message, StatisticsDbContext context)
         {
-            var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var subject = GetSubject(message, subjectData.Name);
+            var subjectData = await _fileStorageService.GetSubjectData(message);
+            var subject = GetSubject(message, subjectData.Name, context);
             var releaseId = message.Release.Id.ToString();
 
             if (await _batchService.IsBatchProcessed(releaseId, message.OrigDataFileName, message.BatchNo))
@@ -50,20 +46,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             // Potentially status could already be failed so don't continue
-            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_2))
+            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_3))
             {
-
                 try
                 {
-                    var batch = subjectData.GetCsvLines().ToList();
-                    var metaLines = subjectData.GetMetaLines().ToList();
-
                     _importerService.ImportObservations(
-                        batch,
+                        subjectData.GetCsvLines().ToList(),
                         subject,
-                        _importerService.GetMeta(metaLines, subject),
+                        _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
                         message.BatchNo,
-                        message.RowsPerBatch
+                        message.RowsPerBatch,
+                        context
                     );
 
                     // If the batch size is > 1 i.e. The file was split into batches
@@ -74,16 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
                     }
 
-                    _batchService.UpdateBatchCount(
-                        message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo).Wait();
+                    await _batchService.UpdateBatchCount(
+                        message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo);
                 }
                 catch (Exception e)
                 {
-                    _batchService.LogErrors(
+                    await _batchService.LogErrors(
                         message.Release.Id.ToString(),
                         message.OrigDataFileName,
-                        new List<String> {e.Message}
-                    ).Wait();
+                        new List<string> {e.Message}
+                    );
 
                     _logger.LogError(
                         $"{GetType().Name} function FAILED: : Batch: " +
@@ -94,23 +88,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             }
         }
-        
-        public void ImportFiltersLocationsAndSchools(ImportMessage message)
+
+        public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
-            var subject = GetSubject(message, subjectData.Name);
-            
+            var subject = GetSubject(message, subjectData.Name, context);
+
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
-                _importerService.GetMeta(metaLines, subject),
-                subject);
+                _importerService.GetMeta(metaLines, subject, context),
+                subject,
+                context);
         }
 
-        private Subject GetSubject(ImportMessage message, string subjectName)
+        private static Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)
         {
-            return _context.Subject
+            return context.Subject
                 .Include(s => s.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)

@@ -15,17 +15,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class PublishingService : IPublishingService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly string _storageConnectionString;
 
         private readonly ILogger _logger;
 
-        public PublishingService(ApplicationDbContext applicationDbContext,
+        public PublishingService(ContentDbContext contentDbContext,
             IConfiguration config,
             ILogger<PublishingService> logger
         )
         {
-            _context = applicationDbContext;
+            _context = contentDbContext;
             _storageConnectionString = config.GetConnectionString("PublicStorage");
             _logger = logger;
         }

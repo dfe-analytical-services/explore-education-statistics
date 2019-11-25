@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseService : IReleaseService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public ReleaseService(ApplicationDbContext context, IMapper mapper)
+        public ReleaseService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
-            if (_context.Releases.Any(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
+            if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
             {
                 return ValidationResult(SlugNotUnique);
             }

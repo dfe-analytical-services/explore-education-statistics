@@ -12,6 +12,7 @@ import {
   ChartDataB,
   ChartMetaData,
   createSortedAndMappedDataForAxis,
+  getNiceMaxValue,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockData } from '@common/services/dataBlockService';
 import {
@@ -144,6 +145,29 @@ const ChartAxisConfiguration = ({
         valueOrUndef,
       ],
     });
+  };
+
+  const getReasonableMinTickSpacing = (): number => {
+    if (axisConfiguration) {
+      const { min, max } = axisConfiguration;
+      return getNiceMaxValue(Math.floor((Number(max) - Number(min)) / 100));
+    }
+    return 1;
+  };
+
+  const getTickSpacing = (): number => {
+    // to avoid rendering a ridiculous amount of ticks
+    // we conditionally return a reasonableTickSpacing
+    if (axisConfiguration) {
+      const { tickSpacing } = axisConfiguration;
+      const reasonableTickSpacing = getReasonableMinTickSpacing();
+      if (tickSpacing) {
+        return Number(tickSpacing) > reasonableTickSpacing
+          ? Number(tickSpacing)
+          : reasonableTickSpacing;
+      }
+    }
+    return 1;
   };
 
   React.useEffect(() => {
@@ -348,18 +372,21 @@ const ChartAxisConfiguration = ({
                           type="number"
                           width={10}
                           label="Every nth value"
-                          defaultValue="1"
+                          defaultValue={`${getTickSpacing()}`}
                           onChange={e => {
-                            if (
-                              parseInt(e.target.value, 10) > 0 &&
-                              e.target.value !== ''
-                            ) {
+                            const theValue = parseInt(e.target.value, 10);
+                            if (theValue > 0 && e.target.value !== '') {
+                              const reasonableMinTickSpacing = getReasonableMinTickSpacing();
                               updateAxisConfiguration({
-                                tickSpacing: e.target.value,
+                                tickSpacing: `${
+                                  theValue > reasonableMinTickSpacing
+                                    ? theValue
+                                    : reasonableMinTickSpacing
+                                }`,
                               });
-                            } else if (e.target.value === '') {
+                            } else {
                               updateAxisConfiguration({
-                                tickSpacing: '1',
+                                tickSpacing: `${getTickSpacing()}`,
                               });
                             }
                           }}

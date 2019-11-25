@@ -7,7 +7,6 @@ import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import {
-  emptyDayMonthYear,
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
@@ -16,7 +15,10 @@ import { CreateReleaseRequest } from '@admin/services/release/create-release/typ
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
-import { Publication } from '@common/services/publicationService';
+import {
+  emptyDayMonthYear,
+  Publication,
+} from '@common/services/publicationService';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
