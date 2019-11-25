@@ -41,7 +41,7 @@ export interface Props {
 }
 
 const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
-  const { setSelectedThemeAndTopic, selectedThemeAndTopic } = useContext(
+  const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     TopLevelStateContext,
   );
 
@@ -84,10 +84,12 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
 
   useEffect(() => {
     if (themes) {
-      setSelectedThemeAndTopic({
-        theme: themes[0],
-        topic: orderBy(themes[0].topics, topic => topic.title)[0],
-      });
+      if (!selectedThemeAndTopic) {
+        setSelectedThemeAndTopic({
+          theme: themes[0],
+          topic: orderBy(themes[0].topics, topic => topic.title)[0],
+        });
+      }
       if (themePropId && topicPropId) {
         const theme = themes.find(function findTheme(t) {
           return t.id === themePropId;
@@ -108,11 +110,13 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
 
   useEffect(() => {
     if (selectedThemeAndTopic) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications);
+      if (selectedThemeAndTopic.topic.id) {
+        dashboardService
+          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .then(setMyPublications);
+      }
 
-      window.history.replaceState(
+      window.history.pushState(
         '',
         '',
         `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
