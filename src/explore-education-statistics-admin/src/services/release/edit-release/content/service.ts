@@ -5,6 +5,7 @@ import {
   ContentBlockViewModel,
   ContentSectionViewModel,
   ManageContentPageViewModel,
+  BasicLink,
 } from './types';
 
 export interface ReleaseContentService {
@@ -56,4 +57,35 @@ const service: ReleaseContentService = {
   },
 };
 
-export default service;
+const relatedInformationService = {
+  getAll: (
+    releaseId: string,
+  ): Promise<ManageContentPageViewModel['relatedInformation']> => {
+    return client.get(`/release/${releaseId}/content/related-information`);
+  },
+  create: (
+    releaseId: string,
+    link: Omit<BasicLink, 'id'>,
+  ): Promise<BasicLink> => {
+    return client.post(
+      `/release/${releaseId}/content/related-information`,
+      link,
+    );
+  },
+  update: (
+    releaseId: string,
+    link: { id: string; description: string; url: string },
+  ): Promise<BasicLink> => {
+    return client.put(
+      `/release/${releaseId}/content/related-information/${link.id}`,
+      link,
+    );
+  },
+  delete: (releaseId: string, linkId: string): Promise<void> => {
+    return client.delete(
+      `/release/${releaseId}/content/related-information/${linkId}`,
+    );
+  },
+};
+
+export default { ...service, relatedInfo: relatedInformationService };

@@ -6,6 +6,7 @@ import ManageReleaseContext, {
 import { Comment } from '@admin/services/dashboard/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
@@ -15,10 +16,9 @@ import React, { useContext, useEffect, useState } from 'react';
 
 type PageMode = 'edit' | 'preview';
 
-interface Model {
+interface Model extends ManageContentPageViewModel {
   unresolvedComments: Comment[];
   pageMode: PageMode;
-  release: AbstractRelease<EditableContentBlock>;
 }
 
 const ReleaseContentPage = () => {
@@ -29,30 +29,35 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService.getContent(releaseId).then(content => {
-      // <editor-fold desc="TODO - content population">
+    releaseContentService
+      .getContent(releaseId)
+      .then(({ introductionSection, relatedInformation, release }) => {
+        // <editor-fold desc="TODO - content population">
 
-      const unresolvedComments: Comment[] = [
-        {
-          message: 'Please resolve this.\nThank you.',
-          authorName: 'Amy Newton',
-          createdDate: new Date('2019-08-10 10:15').toISOString(),
-        },
-        {
-          message: 'And this too.\nThank you.',
-          authorName: 'Dave Matthews',
-          createdDate: new Date('2019-06-13 10:15').toISOString(),
-        },
-      ];
+        const unresolvedComments: Comment[] = [
+          {
+            message: 'Please resolve this.\nThank you.',
+            authorName: 'Amy Newton',
+            createdDate: new Date('2019-08-10 10:15').toISOString(),
+          },
+          {
+            message: 'And this too.\nThank you.',
+            authorName: 'Dave Matthews',
+            createdDate: new Date('2019-06-13 10:15').toISOString(),
+          },
+        ];
 
-      // </editor-fold>
+        // </editor-fold>
 
-      setModel({
-        unresolvedComments,
-        pageMode: 'edit',
-        release: content.release,
+        setModel({
+          unresolvedComments,
+          pageMode: 'edit',
+          introductionSection,
+          relatedInformation,
+          release,
+          contentSections: [],
+        });
       });
-    });
   }, [releaseId, publication.themeId, publication]);
 
   return (
@@ -108,6 +113,7 @@ const ReleaseContentPage = () => {
                 editing={model.pageMode === 'edit'}
                 basicPublication={publication}
                 release={model.release}
+                relatedInformation={model.relatedInformation}
                 styles={{}}
               />
             </div>

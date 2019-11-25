@@ -6,7 +6,7 @@ import {
 
 export interface BasicLink {
   id: string;
-  title: string;
+  description: string;
   url: string;
 }
 

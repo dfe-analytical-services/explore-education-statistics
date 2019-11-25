@@ -9,6 +9,7 @@ import ReleaseContentAccordion from '@admin/modules/find-statistics/components/R
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -23,6 +24,7 @@ import {
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
+import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
   contentId?: string;
@@ -32,7 +34,8 @@ export interface RendererProps {
 interface Props {
   editing: boolean;
   basicPublication: BasicPublicationDetails;
-  release: AbstractRelease<EditableContentBlock>;
+  release: ManageContentPageViewModel['release'];
+  relatedInformation: ManageContentPageViewModel['relatedInformation'];
   styles: Dictionary<string>;
 
   logEvent?: (...params: string[]) => void;
@@ -44,6 +47,7 @@ const PublicationReleaseContent = ({
   editing = true,
   basicPublication,
   release,
+  relatedInformation,
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
@@ -200,21 +204,10 @@ const PublicationReleaseContent = ({
                 </Details>
               </dd>
             </dl>
-            <h2
-              className="govuk-heading-m govuk-!-margin-top-6"
-              id="related-content"
-            >
-              Related guidance
-            </h2>
-            <nav role="navigation" aria-labelledby="related-content">
-              <ul className="govuk-list">
-                <li>
-                  <Link to={`/methodology/${release.publication.slug}`}>
-                    {`${release.publication.title}: methodology`}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
+            <RelatedInformationSection
+              release={release}
+              relatedInformation={relatedInformation}
+            />
           </RelatedAside>
         </div>
       </div>
