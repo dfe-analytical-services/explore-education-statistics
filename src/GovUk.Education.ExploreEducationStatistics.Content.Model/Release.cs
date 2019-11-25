@@ -63,9 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Update> Updates { get; set; }
 
+        [JsonIgnore]
         public List<ContentSection> Content { get; set; }
 
         [NotMapped]
+        [JsonProperty("Content")]
         public IEnumerable<ContentSection> GenericContent
         {
             get 

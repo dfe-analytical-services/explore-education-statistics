@@ -25,7 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 
         public string Slug { get; set; }
 
-        public string Summary { get; set; }
+        public ContentSection SummarySection { get; set; }
+
+        public ContentSection HeadlinesSection { get; set; }
 
         public Guid PublicationId { get; set; }
 
