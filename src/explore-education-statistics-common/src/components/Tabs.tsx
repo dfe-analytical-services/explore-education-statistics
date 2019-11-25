@@ -7,6 +7,7 @@ import React, {
   ReactComponentElement,
   ReactNode,
   RefAttributes,
+  useEffect,
   useState,
 } from 'react';
 import TabsSection, { TabsSectionProps } from './TabsSection';
@@ -43,6 +44,22 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
   if (selectedTabIndex >= sections.length)
     setSelectedTabIndex(sections.length - 1);
+
+  useEffect(() => {
+    if (window) {
+      let tabIndex = 0;
+      sections.map(function getTabIndex(e, index) {
+        if (e.props.id === window.location.hash.substr(1)) {
+          tabIndex = index;
+        }
+        return null;
+      });
+
+      if (tabIndex !== null) {
+        setSelectedTabIndex(tabIndex);
+      }
+    }
+  }, [sections]);
 
   return (
     <div className="govuk-tabs">
