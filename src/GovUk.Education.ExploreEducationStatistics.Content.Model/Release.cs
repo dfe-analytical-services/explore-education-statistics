@@ -90,6 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         [NotMapped]
+        public ContentSection KeyStatisticsSection
+        {
+            get { return Content.Find(section => section.Type == ContentSectionType.KeyStatistics); }
+            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatistics, new List<ContentSection> { value });
+        }
+
+        [NotMapped]
         public ContentSection HeadlinesSection
         {
             get { return Content.Find(section => section.Type == ContentSectionType.Headlines); }

@@ -1816,6 +1816,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Type = ContentSectionType.ReleaseSummary
                 },
                 
+                // Key Statistics sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatistics
+                },
+                new ContentSection
+                {
+                    Id = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatistics
+                },
+                new ContentSection
+                {
+                    Id = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatistics
+                },
+                
                 // Headline sections for each Release
                 new ContentSection
                 {
@@ -2092,11 +2115,338 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             );
 
             modelBuilder.Entity<DataBlock>().HasData(
-                // absence
+                // absence key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), 
+                    Order = 1,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Overall_absence_rate),
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Overall_absence_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 4.6% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Overall_absence_rate),
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Overall absence rate",
+                                        Unit = "%",
+                                        Colour = "#f5a450",
+                                        symbol = ChartSymbol.cross
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Similar to previous years",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Authorised absence rate",
+                                        Unit = "%",
+                                        Colour = "#005ea5",
+                                        symbol = ChartSymbol.diamond
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Unauthorised_absence_rate)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 1.1% in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Unauthorised absence rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                    ContentSectionId = null, //KeyStatistics
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2355,6 +2705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // absence generic content
                 new DataBlock
                 {
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
@@ -2463,11 +2814,314 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 },
 
-                // exclusions
+                // exclusions key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Order = 1,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 0.08% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12,
+                                                IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Permanent_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Permanent exclusion rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                
+                // exclusions key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 4.29% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Fixed period exclusion rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                
+                // exclusions key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                
+                // exclusions key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                    ContentSectionId = null, // KeyStatistics
+                    ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
@@ -2762,11 +3416,170 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 },
 
-                // Secondary and primary schools applications offers
+                // Secondary and primary schools applications offers key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Order = 1,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_applications_received),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_applications_received),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 620,330 in 2017",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of applications received for places at primary and secondary schools.",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_applications_received),
+                            }
+                        }
+                    }
+                },
+
+                // Secondary and primary schools applications offers key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 558,411 in 2017"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of first preferences offered to applicants by schools."
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                            }
+                        }
+                    }
+                },
+                
+                // Secondary and primary schools applications offers key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 34,792 in 2017"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of second preferences offered to applicants by schools."
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                            }
+                        }
+                    }
+                },
+                
+                // Secondary and primary schools applications offers key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                    ContentSectionId = null, // KeyStatistics
+                    ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
