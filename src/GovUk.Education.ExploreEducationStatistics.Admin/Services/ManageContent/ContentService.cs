@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _releaseHelper.CheckEntityExists(releaseId, release => 
                 release
-                    .Content
+                    .GenericContent
                     .Select(ContentSectionViewModel.ToViewModel)
                     .OrderBy(c => c.Order)
                     .ToList(),
@@ -50,7 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 newSectionOrder.ToList().ForEach(kvp =>
                 {
                     var (sectionId, newOrder) = kvp;
-                    release.Content.Find(section => section.Id == sectionId).Order = newOrder;
+                    release
+                        .GenericContent
+                        .ToList()
+                        .Find(section => section.Id == sectionId).Order = newOrder;
                 });
                 
                 _context.Releases.Update(release);
@@ -65,9 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 var orderForNewSection = request?.Order ?? 
-                                         release.Content.Max(contentSection => contentSection.Order) + 1;
+                                         release.GenericContent.Max(contentSection => contentSection.Order) + 1;
                 
-                release.Content
+                release.GenericContent
+                    .ToList()
                     .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                     .ForEach(contentSection => contentSection.Order++);
 
@@ -77,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     Order = orderForNewSection
                 };
                 
-                release.Content.Add(newContentSection);
+                release.AddGenericContentSection(newContentSection);
                 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
@@ -108,11 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 var (release, sectionToRemove) = tuple;
                 
-                release.Content.Remove(sectionToRemove);
+                release.RemoveGenericContentSection(sectionToRemove);
 
                 var removedSectionOrder = sectionToRemove.Order;
                 
-                release.Content
+                release.GenericContent
+                    .ToList()
                     .FindAll(contentSection => contentSection.Order > removedSectionOrder)
                     .ForEach(contentSection => contentSection.Order--);
                 
@@ -280,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private static List<ContentSectionViewModel> OrderedContentSections(Release release)
         {
             return release
-                .Content
+                .GenericContent
                 .Select(ContentSectionViewModel.ToViewModel)
                 .OrderBy(c => c.Order)
                 .ToList();

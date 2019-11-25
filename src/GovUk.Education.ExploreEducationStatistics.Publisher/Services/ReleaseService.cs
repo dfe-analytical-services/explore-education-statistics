@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         ReleaseName = r.ReleaseName,
                         Published = r.Published,
                         Slug = r.Slug,
-                        Summary = r.Summary,
                         Publication = r.Publication,
                         PublicationId = r.PublicationId,
                         Updates = r.Updates
@@ -92,7 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     ReleaseName = r.ReleaseName,
                     Published = r.Published,
                     Slug = r.Slug,
-                    Summary = r.Summary,
                     Publication = r.Publication,
                     PublicationId = r.PublicationId,
                     Updates = r.Updates

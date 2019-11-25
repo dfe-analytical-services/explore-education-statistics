@@ -24,8 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public string Slug => Current?.Slug;
 
-        [NotMapped] public string Summary => Current?.Summary;
-
         [NotMapped] public ReleaseType Type => Current?.Type;
 
         [NotMapped] public Guid? TypeId => Current?.TypeId;

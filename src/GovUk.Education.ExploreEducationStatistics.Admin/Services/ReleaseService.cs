@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     
-                    var newSummaryVersion = new ReleaseSummaryVersion()
+                    var newSummaryVersion = new ReleaseSummaryVersion
                     {
                         Slug = request.Slug,
                         TypeId = request.TypeId,
@@ -132,8 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ReleaseName = request.ReleaseName,
                         NextReleaseDate = request.NextReleaseDate,
                         TimePeriodCoverage = request.TimePeriodCoverage,
-                        Created = DateTime.Now,
-                        Summary = release.ReleaseSummary.Current.Summary
+                        Created = DateTime.Now
                     };
                     
                     release.ReleaseSummary.Versions.Add(newSummaryVersion);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -56,8 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug { get; set; }
 
-        public string Summary { get; set; }
-
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
@@ -65,6 +64,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
+
+        [NotMapped]
+        public IEnumerable<ContentSection> GenericContent
+        {
+            get 
+            { 
+                return Content
+                    .FindAll(section => section.Type == ContentSectionType.Generic)
+                    .ToImmutableList(); 
+            }
+            set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
+        }
+        
+        public void AddGenericContentSection(ContentSection section)
+        {
+            Content.Add(section);
+        }
+        
+        public void RemoveGenericContentSection(ContentSection section)
+        {
+            Content.Remove(section);
+        }
+
+        [NotMapped]
+        public ContentSection HeadlinesSection
+        {
+            get { return Content.Find(section => section.Type == ContentSectionType.Headlines); }
+            set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, new List<ContentSection> { value });
+        }
+
+        [NotMapped]
+        public ContentSection SummarySection
+        {
+            get { return Content.Find(section => section.Type == ContentSectionType.ReleaseSummary); }
+            set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
+        }
+
+        private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
+        {
+            Content.RemoveAll(section => section.Type == type);
+            Content.AddRange(replacementSections);
+        }
 
         public Guid? KeyStatisticsId { get; set; }
         

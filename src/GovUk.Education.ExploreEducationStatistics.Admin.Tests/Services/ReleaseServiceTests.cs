@@ -226,7 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     {    
                                         Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
                                         Created = DateTime.Now,
-                                        Summary = "",
                                         TypeId = addHocReleaseTypeId,
                                     }
                                 }
@@ -308,7 +307,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     {    
                                         Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
                                         Created = DateTime.Now,
-                                        Summary = "",
                                         TypeId = adhocReleaseType.Id,
                                         Type = adhocReleaseType,
                                         PublishScheduled = publishScheduled,

@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
 
         public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
-        
-        public ContentSectionViewModel IntroductionSection { get; set; } = new ContentSectionViewModel();
     }
     
     public class ReleaseViewModel
@@ -36,8 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public string Slug { get; set; }
 
-        public string Summary { get; set; }
-
         public Guid PublicationId { get; set; }
 
         public PublicationViewModel Publication { get; set; }
@@ -51,6 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
         
         public KeyStatisticsViewModel KeyStatistics { get; set; }
+        
+        public ContentSectionViewModel SummarySection { get; set; } = new ContentSectionViewModel();
+        
+        public ContentSectionViewModel HeadlinesSection { get; set; } = new ContentSectionViewModel();
         
         // dataFiles
         

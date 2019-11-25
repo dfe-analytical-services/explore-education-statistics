@@ -50,26 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             Url = "http://example.com/2"
                         }
                     },
-                    IntroductionSection = new ContentSectionViewModel
-                    {
-                        Id = new Guid("bcb96e42-a09a-4791-a377-9649b0876c58"),
-                        Order = 0,
-                        Caption = "Introduction section caption",
-                        Heading = "Introduction section heading",
-                        Content = new List<IContentBlock>()
-                        {
-                            new HtmlBlock()
-                            {
-                                Id = new Guid("65187a0b-eb17-4481-b234-949dc85f1efa"),
-                                Type = "HtmlBlock",
-                                Body = "<p>Read national statistical summaries and definitions, view charts and " +
-                                       "tables and download data files across a range of pupil absence subject " +
-                                       "areas.</p>" + 
-                                       "<p>You can also view a regional breakdown of statistics and data within the " +
-                                       "<a href=\"#\">local authorities section</a></p>",
-                            }
-                        }
-                    },
                 }
             , HydrateReleaseForReleaseViewModel);
         }

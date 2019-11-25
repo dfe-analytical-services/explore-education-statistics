@@ -6,6 +6,13 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
+    public enum ContentSectionType
+    {
+        Generic,
+        ReleaseSummary,
+        Headlines
+    }
+    
     public class ContentSection
     {
         public Guid Id { get; set; }
@@ -21,6 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release Release { get; set; }
 
         public Guid ReleaseId { get; set; }
+        
+        [JsonIgnore]
+        public ContentSectionType Type { get; set; }
     }
 
     public enum ContentBlockType
