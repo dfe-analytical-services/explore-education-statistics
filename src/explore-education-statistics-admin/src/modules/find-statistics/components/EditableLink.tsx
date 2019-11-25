@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Link, { LinkProps } from '@admin/components/Link';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import wrapEditableComponent, {
+  EditingContext,
+} from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 
 interface Props extends LinkProps {
@@ -8,7 +10,11 @@ interface Props extends LinkProps {
 }
 
 const EditableLink = ({ removeOnClick, ...props }: Props) => {
-  return (
+  const { isEditing } = useContext(EditingContext);
+
+  return !isEditing ? (
+    <Link {...props} />
+  ) : (
     <div>
       <div>
         <Link {...props} />
@@ -24,4 +30,4 @@ const EditableLink = ({ removeOnClick, ...props }: Props) => {
   );
 };
 
-export default wrapEditableComponent(EditableLink, Link);
+export default EditableLink;
