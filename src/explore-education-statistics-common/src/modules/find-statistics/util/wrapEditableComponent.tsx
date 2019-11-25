@@ -10,7 +10,6 @@ export const EditingContext = React.createContext<ReleaseContentContext>({
   releaseId: undefined,
 });
 
-
 const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
   EditableComponent: ComponentType<EditableProps>,
   RenderComponent: ComponentType<RenderProps>,

@@ -1,6 +1,8 @@
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
-import ContentBlock, {EditingContentBlockContext} from '@admin/modules/find-statistics/components/EditableContentBlock';
+import ContentBlock, {
+  EditingContentBlockContext,
+} from '@admin/modules/find-statistics/components/EditableContentBlock';
 import React from 'react';
 import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';

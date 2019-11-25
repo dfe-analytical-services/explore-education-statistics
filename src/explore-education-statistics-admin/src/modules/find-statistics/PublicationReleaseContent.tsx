@@ -59,7 +59,7 @@ const PublicationReleaseContent = ({
 
   return (
     <EditingContext.Provider
-      value={{ isEditing: editing, releaseId: release.id}}
+      value={{ isEditing: editing, releaseId: release.id }}
     >
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">

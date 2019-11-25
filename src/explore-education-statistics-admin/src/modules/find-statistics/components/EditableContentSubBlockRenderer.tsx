@@ -20,7 +20,6 @@ function EditableContentSubBlockRenderer({
   editable,
   onContentChange,
   id,
-
 }: Props) {
   switch (block.type) {
     case 'MarkDownBlock':

@@ -4,7 +4,9 @@ import ContentBlock, {
 } from '@common/modules/find-statistics/components/ContentBlock';
 import { ContentBlock as ContentBlockData } from '@common/services/publicationService';
 import React from 'react';
-import wrapEditableComponent, { ReleaseContentContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import wrapEditableComponent, {
+  ReleaseContentContext,
+} from '@common/modules/find-statistics/util/wrapEditableComponent';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -22,10 +24,12 @@ interface EditingContentBlockContext extends ReleaseContentContext {
   sectionId?: string;
 }
 
-export const EditingContentBlockContext = React.createContext<EditingContentBlockContext>({
+export const EditingContentBlockContext = React.createContext<
+  EditingContentBlockContext
+>({
   releaseId: undefined,
   isEditing: false,
-  sectionId: undefined
+  sectionId: undefined,
 });
 
 const EditableContentBlock = ({
