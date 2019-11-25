@@ -31,7 +31,7 @@ export interface ManageContentPageViewModel {
 export interface ContentBlockViewModel {
   id: string;
   order: number;
-  type: ContentBlockType;
+  type: string;
   body: string;
 }
 
