@@ -47,7 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<List<ContentSection>> GetContentAsync(ReleaseId id)
         {
-            return await _context.ContentSections.Where(section => section.ReleaseId == id).ToListAsync();
+            return await _context
+                .ContentSections
+                .Where(section => section.ReleaseId == id && section.Type == ContentSectionType.Generic)
+                .ToListAsync();
         }
         
         public List<Release> List()
@@ -76,7 +79,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseSummary.Created = DateTime.Now;
                     
                     var release = _mapper.Map<Release>(createRelease);
-                    release.Content = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    release.SummarySection = new ContentSection
+                    {
+                        Type = ContentSectionType.ReleaseSummary
+                    };
+                    release.HeadlinesSection = new ContentSection{
+                        Type = ContentSectionType.Headlines
+                    };
                     release.Order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
                     release.ReleaseSummary = new ReleaseSummary
                     {

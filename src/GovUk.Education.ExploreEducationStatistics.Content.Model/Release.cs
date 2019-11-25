@@ -105,6 +105,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
         {
+            if (Content == null)
+            {
+                Content = new List<ContentSection>();
+            }
+            
             Content.RemoveAll(section => section.Type == type);
             Content.AddRange(replacementSections);
         }
