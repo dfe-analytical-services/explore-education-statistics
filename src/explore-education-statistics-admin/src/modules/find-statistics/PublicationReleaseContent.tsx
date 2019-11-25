@@ -73,7 +73,7 @@ const PublicationReleaseContent = ({
           <MarkdownRenderer
             contentId=""
             releaseId={release.id}
-            source={release.summary}
+            source={release.summarySection.content[0].body}
           />
 
           {release.downloadFiles && (
