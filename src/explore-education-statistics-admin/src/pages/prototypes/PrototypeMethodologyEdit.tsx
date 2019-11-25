@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import Link from '@admin/components/Link';
 import PrototypeMethodologyService from '@admin/pages/prototypes/components/PrototypeMethodologyService';
 import EditableMethodologyPage from '@admin/pages/prototypes/components/EditableMethodologyPage';
 import PrototypePage from './components/PrototypePage';
-import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
+import PrototypeMethodologyNavigation from './components/PrototypeMethodologyNavigation';
 
 interface State {
   // data: Release | undefined;
@@ -32,19 +33,14 @@ class MethodologyPage extends Component<{}, State> {
 
   public render() {
     const { editing } = this.state;
+    const sectionId = 'addContent';
 
     return (
       <PrototypePage
         wide
-        breadcrumbs={[
-          {
-            link: '/prototypes/admin-dashboard?status=editLiveRelease',
-            text: 'Administrator dashboard',
-          },
-          { text: 'Edit methodology', link: '#' },
-        ]}
+        breadcrumbs={[{ text: 'Edit methodology', link: '#' }]}
       >
-        <p>TEST123</p>
+        <PrototypeMethodologyNavigation sectionId={sectionId} />
         <div className="govuk-form-group govuk-width-container">
           <fieldset className="govuk-fieldset dfe-toggle-edit">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -95,6 +91,25 @@ class MethodologyPage extends Component<{}, State> {
             editing={editing}
             data={PrototypeMethodologyService.getNewPublication()}
           />
+        </div>
+        <hr />
+        <div className="govuk-grid-row govuk-!-margin-top-9">
+          <div className="govuk-grid-column-one-half ">
+            <Link to="/prototypes/publication-create-new-methodology-config">
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Previous step
+              </span>
+              Methodology summary
+            </Link>
+          </div>
+          <div className="govuk-grid-column-one-half dfe-align--right">
+            <Link to="/prototypes/publication-create-new-methodology-status">
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Next step
+              </span>
+              Update methodology status
+            </Link>
+          </div>
         </div>
       </PrototypePage>
     );

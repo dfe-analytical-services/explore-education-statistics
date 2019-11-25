@@ -5,7 +5,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import { FormGroup, FormSelect } from '@common/components/form';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React from 'react';
+import React, { useState } from 'react';
 import { RouteChildrenProps } from 'react-router';
 import { LoginContext } from '@admin/components/Login';
 import Link from '@admin/components/Link';
@@ -43,6 +43,14 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       ? 'higherReviewUser'
       : 'standardUser';
 
+  const taskMethodology = location.search.includes('status=readyMethodology')
+    ? 'readyMethodologyApproval'
+    : 'readyMethodologyHigherReview';
+
+  const [dashboardView, setDashboardView] = useState(
+    taskMethodology === 'readyMethodologyApproval' ? 'methodology' : '',
+  );
+
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
@@ -79,24 +87,56 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           </RelatedInformation>
         </div>
       </div>
-      <h2 className="govuk-medium">
-        {userContext.user && userContext.user.permissions.includes('team lead')
-          ? 'Manage publications and releases'
-          : 'Manage releases'}
-      </h2>
-      <Tabs id="dashboard-tabs">
-        <TabsSection
-          id="publications"
-          title={
-            userContext.user &&
+
+      <p>This is your administration dashboard here you can:</p>
+
+      <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
+        <li>
+          <a
+            href="#dashboard-tabs"
+            onClick={() => {
+              setDashboardView('releases');
+            }}
+          >
+            {userContext.user &&
+            userContext.user.permissions.includes('team lead')
+              ? 'manage publications and releases'
+              : 'manage releases'}
+          </a>
+        </li>
+        <li>
+          <a
+            href="#methodology-tabs"
+            onClick={() => {
+              setDashboardView('methodology');
+            }}
+          >
+            manage methodology
+          </a>
+        </li>
+      </ul>
+
+      {dashboardView !== 'methodology' && (
+        <>
+          <h2 className="govuk-medium">
+            {userContext.user &&
             userContext.user.permissions.includes('team lead')
               ? 'Manage publications and releases'
-              : 'Manage releases'
-          }
-        >
-          <PrototypeAdminDashboardPublications />
-        </TabsSection>
-        {/* <TabsSection
+              : 'Manage releases'}
+          </h2>
+          <Tabs id="dashboard-tabs">
+            <TabsSection
+              id="publications"
+              title={
+                userContext.user &&
+                userContext.user.permissions.includes('team lead')
+                  ? 'Manage publications and releases'
+                  : 'Manage releases'
+              }
+            >
+              <PrototypeAdminDashboardPublications />
+            </TabsSection>
+            {/* <TabsSection
           id="task-in-progress"
           title={`In progress ${
             location.search === '?status=editNewRelease' ? '(2)' : '(1)'
@@ -104,122 +144,165 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         >
           <AdminDashboardInProgress />
         </TabsSection> */}
-        <TabsSection
-          id="task-ready-approval1"
-          title={`View draft releases ${
-            location.search.includes('status=ready') ? '(1)' : '(0)'
-          }`}
-        >
-          <AdminDashboardReadyForApproval task={task} user={user} />
-        </TabsSection>
-        <TabsSection
-          id="task-in-progress2"
-          title={`View scheduled releases ${
-            location.search.includes('status=approvedPublication')
-              ? '(1)'
-              : '(0)'
-          }`}
-        >
-          <AdminDashboardReadyForPublication task="approvedPublication" />
-        </TabsSection>
-      </Tabs>
-      <h2 className="govuk-medium">Manage methodology</h2>
-      <Tabs id="methodology-tabs">
-        <TabsSection id="methodology" title="Manage methodology">
-          <>
-            <table className="govuk-table">
-              <thead>
-                <tr>
-                  <th>Methodology title</th>
-                  <th>Status</th>
-                  <th>Related publications</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>
-                    <a href="#">Pupil exclusion statistics: methodology</a>
-                  </th>
-                  <td>
-                    <span className="govuk-tag">Live</span>
-                  </td>
-                  <td>
-                    <a href="#">
-                      Permanent and fixed-period exclusions in England
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <th rowSpan={3}>
-                    <a href="#">Pupil absence statistics: methodology</a>
-                  </th>
-                  <td rowSpan={3}>
-                    {' '}
-                    <span className="govuk-tag">Live</span>
-                  </td>
-                  <td>
-                    <a href="#">Pupil absence in schools in England</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <a href="#">
-                      Pupil absence in schools in England: autumn and spring
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <a href="#">
-                      Pupil absence in schools in England: autumn term
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <a href="#">
-                      Secondary and primary school applications and offers:
-                      methodology
-                    </a>
-                  </th>
-                  <td>
-                    <span className="govuk-tag">Live</span>
-                  </td>
-                  <td>
-                    <a href="#">
-                      Secondary and primary schools applications and offers
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <a href="#">School capacity: methodology</a>
-                  </th>
-                  <td>
-                    <span className="govuk-tag">Draft</span>
-                  </td>
-                  <td>N/A</td>
-                </tr>
-                <tr>
-                  <th>
-                    <a href="#">School capacity: methodology</a>
-                  </th>
-                  <td>
-                    <span className="govuk-tag">Approved</span>
-                  </td>
-                  <td>N/A</td>
-                </tr>
-              </tbody>
-            </table>
-            <a className="govuk-button" href="/prototypes/methodology-edit">
-              Create new methodology
-            </a>
-          </>
-        </TabsSection>
-        <TabsSection id="methodology-raft" title="Draft methodology">
-          <p>Content here</p>
-        </TabsSection>
-      </Tabs>
+            <TabsSection
+              id="task-ready-approval1"
+              title={`View draft releases ${
+                location.search.includes('status=ready') ? '(1)' : '(0)'
+              }`}
+            >
+              <AdminDashboardReadyForApproval task={task} user={user} />
+            </TabsSection>
+            <TabsSection
+              id="task-in-progress2"
+              title={`View scheduled releases ${
+                location.search.includes('status=approvedPublication')
+                  ? '(1)'
+                  : '(0)'
+              }`}
+            >
+              <AdminDashboardReadyForPublication task="approvedPublication" />
+            </TabsSection>
+          </Tabs>
+        </>
+      )}
+
+      {dashboardView === 'methodology' && (
+        <>
+          <h2 className="govuk-medium">Manage methodology</h2>
+          <Tabs id="methodology-tabs">
+            <TabsSection id="methodology" title="Manage methodology">
+              <>
+                <table className="govuk-table">
+                  <thead>
+                    <tr>
+                      <th>Methodology title</th>
+                      <th>Status</th>
+                      <th>Related publications</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {taskMethodology === 'readyMethodologyApproval' && (
+                      <tr>
+                        <th>
+                          <Link to="/prototypes/methodology-edit">
+                            Example statistics: methodology
+                          </Link>
+                        </th>
+                        <td>
+                          <span className="govuk-tag">Draft</span>
+                        </td>
+                        <td>N/A</td>
+                      </tr>
+                    )}
+
+                    <tr>
+                      <th>
+                        <a href="#">Pupil exclusion statistics: methodology</a>
+                      </th>
+                      <td>
+                        <span className="govuk-tag">Live</span>
+                      </td>
+                      <td>
+                        <a href="#">
+                          Permanent and fixed-period exclusions in England
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th rowSpan={3}>
+                        <a href="#">Pupil absence statistics: methodology</a>
+                      </th>
+                      <td rowSpan={3}>
+                        {' '}
+                        <span className="govuk-tag">Live</span>
+                      </td>
+                      <td>
+                        <a href="#">Pupil absence in schools in England</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="#">
+                          Pupil absence in schools in England: autumn and spring
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="#">
+                          Pupil absence in schools in England: autumn term
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>
+                        <a href="#">
+                          Secondary and primary school applications and offers:
+                          methodology
+                        </a>
+                      </th>
+                      <td>
+                        <span className="govuk-tag">Live</span>
+                      </td>
+                      <td>
+                        <a href="#">
+                          Secondary and primary schools applications and offers
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <Link
+                  className="govuk-button"
+                  to="/prototypes/methodology-create-new"
+                >
+                  Create new methodology
+                </Link>
+              </>
+            </TabsSection>
+            <TabsSection
+              id="methodology-raft"
+              title={`Draft methodology ${
+                location.search.includes('status=readyMethodology')
+                  ? '(1)'
+                  : '(0)'
+              }`}
+            >
+              {taskMethodology !== 'readyMethodologyApproval' && (
+                <div className="govuk-inset-text">
+                  There are currently no draft releases
+                </div>
+              )}
+
+              {taskMethodology === 'readyMethodologyApproval' && (
+                <table className="govuk-table">
+                  <thead>
+                    <tr>
+                      <th>Methodology title</th>
+                      <th>Status</th>
+                      <th>Related publications</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>
+                        <Link to="/prototypes/methodology-edit">
+                          Example statistics: methodology
+                        </Link>
+                      </th>
+                      <td>
+                        <span className="govuk-tag">Draft</span>
+                      </td>
+                      <td>N/A</td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+            </TabsSection>
+          </Tabs>
+        </>
+      )}
+
       {/* <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
         <AccordionSection

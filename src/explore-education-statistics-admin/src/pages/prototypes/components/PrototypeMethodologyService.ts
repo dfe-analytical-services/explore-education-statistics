@@ -1,11 +1,9 @@
-import { GeographicLevel } from '@common/services/dataBlockService';
 import { EditableRelease } from '@admin/services/publicationService';
+import { GeographicLevel } from '@common/services/dataBlockService';
 import { ReleaseType } from '@common/services/publicationService';
 
 const LOREM =
   'TEST Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec elementum, mauris eget vulputate iaculis, dui orci efficitur mi, at consectetur metus lorem tempor neque. Etiam in eleifend magna. Sed hendrerit vitae ante at semper. Mauris a erat a ex porta mollis. Aliquam quis justo eu lectus luctus porttitor nec at dolor. Nunc interdum, diam sed lobortis porta, massa arcu volutpat nunc, eget scelerisque arcu neque vel tortor. Fusce sit amet mauris augue. Praesent sed urna vel lacus suscipit mollis id quis nulla. Duis porta sapien et arcu ornare, eget mollis justo finibus. Nunc commodo felis justo, at efficitur purus mattis in. Donec nibh quam, mollis at eros ac, fringilla porta mi.';
-
-// const LOREM_SMALL = "Lorem ipsum dolor sit ame";
 
 export default class PrototypePublicationService {
   public static getLatestPublicationRelease(
@@ -13,6 +11,14 @@ export default class PrototypePublicationService {
   ): Promise<EditableRelease> {
     // @ts-ignore
     return Promise.resolve({
+      id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
+      title: 'Pupil absence data and statistics for schools in England',
+      releaseName: '2016 to 2017',
+      published: '2017-03-22T00:00:00',
+      slug: '2016-17',
+      summary:
+        'Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n',
+      publicationId: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
       publication: {
         id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
         slug: 'pupil-absence-in-schools-in-england',
@@ -131,7 +137,7 @@ export default class PrototypePublicationService {
       content: [
         {
           order: 1,
-          heading: 'TEST About this release',
+          heading: 'About this release',
           caption: '',
           content: [
             {
@@ -468,7 +474,7 @@ export default class PrototypePublicationService {
       content: [
         {
           order: 1,
-          heading: 'Add content',
+          heading: 'About this release',
           caption: '',
           content: [
             {
@@ -585,6 +591,9 @@ export default class PrototypePublicationService {
           },
         ],
       },
+      publishScheduled: undefined,
+      nextReleaseDate: {},
+      status: 'Approved',
       dataFiles: [
         {
           extension: 'csv',

@@ -10,7 +10,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -145,7 +145,7 @@ class EditableMethodologyPage extends Component<Props, State> {
   ) {
     return (
       <div>
-        <h2 className="govuk-heading-s reorderable-relative">
+        <h2 className="govuk-heading-l reorderable-relative">
           <button
             className="govuk-button govuk-button--secondary reorderable"
             onClick={() => this.setState({ reordering: true })}
@@ -156,7 +156,7 @@ class EditableMethodologyPage extends Component<Props, State> {
           Contents
         </h2>
 
-        <EditableAccordion id="contents-sections" index={0}>
+        <EditableAccordion id="contents-sections">
           {data.content.map(({ heading, caption, order, content }, index) => (
             <EditableAccordionSection
               heading={`${order}. ${heading}`}
@@ -264,7 +264,7 @@ class EditableMethodologyPage extends Component<Props, State> {
     return (
       <>
         <div className={editing ? 'page-editing' : ''}>
-          <h1 className="govuk-heading-l">ADD METHODOLOGY TITLE</h1>
+          <h1 className="govuk-heading-l">Example statistics: methodology</h1>
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
