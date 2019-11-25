@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
@@ -76,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var observations = _observationService.FindObservations(query).AsQueryable();
-            
+
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
@@ -171,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     Hint = "",
                     Legend = pair.Key.GetEnumLabel(),
-                    Options = _mapper.Map<IEnumerable<LabelValue>>(pair.Value)
+                    Options = pair.Value.Select(MapObservationalUnitToLabelValue)
                 });
 
             foreach (var (_, viewModel) in viewModels)
@@ -197,6 +196,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private string GetTotalValue(Filter filter)
         {
             return _filterItemService.GetTotal(filter)?.Id.ToString() ?? string.Empty;
+        }
+
+        private static LabelValue MapObservationalUnitToLabelValue(IObservationalUnit unit)
+        {
+            var value = string.IsNullOrEmpty(unit.Code) && unit is LocalAuthority localAuthority
+                ? localAuthority.OldCode
+                : unit.Code;
+
+            return new LabelValue
+            {
+                Label = unit.Name,
+                Value = value
+            };
         }
     }
 }

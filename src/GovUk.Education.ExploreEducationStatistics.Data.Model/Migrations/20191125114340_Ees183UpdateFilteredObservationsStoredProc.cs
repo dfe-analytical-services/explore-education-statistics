@@ -13,11 +13,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "LocalAuthority_Old_Code",
+                table: "Location",
+                newName: "LocalAuthority_OldCode");
+
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "LocalAuthority_OldCode",
+                table: "Location",
+                newName: "LocalAuthority_Old_Code");
+
             const string previousVersionMigrationId = "20191101153547";
             ExecuteFile(migrationBuilder, $"{previousVersionMigrationId}_Routine_FilteredObservations.sql");
         }

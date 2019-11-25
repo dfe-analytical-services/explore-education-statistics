@@ -56,7 +56,7 @@ DECLARE
             IF (EXISTS(SELECT TOP 1 1 FROM @localAuthorityList))
                 SET @sqlString = @sqlString + N'(l.LocalAuthority_Code IN (SELECT id from @localAuthorityList) AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''LA'')) OR '
             IF (EXISTS(SELECT TOP 1 1 FROM @localAuthorityOldCodeList))
-                SET @sqlString = @sqlString + N'(l.LocalAuthority_Old_Code IN (SELECT id from @localAuthorityOldCodeList) AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''LA'')) OR '
+                SET @sqlString = @sqlString + N'(l.LocalAuthority_OldCode IN (SELECT id from @localAuthorityOldCodeList) AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''LA'')) OR '
             IF (EXISTS(SELECT TOP 1 1 FROM @localAuthorityDistrictList))
                 SET @sqlString = @sqlString + N'(l.LocalAuthorityDistrict_Code IN (SELECT id from @localAuthorityDistrictList) AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''LAD'')) OR '
             IF (EXISTS(SELECT TOP 1 1 FROM @localEnterprisePartnershipsList))
