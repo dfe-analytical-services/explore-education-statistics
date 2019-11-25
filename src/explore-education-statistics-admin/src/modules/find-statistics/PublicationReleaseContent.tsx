@@ -8,7 +8,6 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import { EditableContentBlock } from '@admin/services/publicationService';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
@@ -17,10 +16,7 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { baseUrl } from '@common/services/api';
-import {
-  AbstractRelease,
-  ReleaseType,
-} from '@common/services/publicationService';
+import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
