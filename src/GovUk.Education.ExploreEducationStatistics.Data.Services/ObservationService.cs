@@ -57,26 +57,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", query.Ward);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
+            // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
+
             var inner = _context
-                .Set<IdWrapper>()
+                .Set<Observation>()
                 .FromSqlRaw("EXEC dbo.FilteredObservations " +
-                         "@subjectId," +
-                         "@geographicLevel," +
-                         "@timePeriodList," +
-                         "@countriesList," +
-                         "@institutionList," +
-                         "@localAuthorityList," +
-                         "@localAuthorityDistrictList," +
-                         "@localEnterprisePartnershipList," +
-                         "@mayoralCombinedAuthorityList," +
-                         "@multiAcademyTrustList," +
-                         "@opportunityAreaList," +
-                         "@parliamentaryConstituencyList," +
-                         "@regionsList," +
-                         "@rscRegionsList," +
-                         "@sponsorList," +
-                         "@wardList," +
-                         "@filterItemList",
+                            "@subjectId," +
+                            "@geographicLevel," +
+                            "@timePeriodList," +
+                            "@countriesList," +
+                            "@institutionList," +
+                            "@localAuthorityList," +
+                            "@localAuthorityDistrictList," +
+                            "@localEnterprisePartnershipList," +
+                            "@mayoralCombinedAuthorityList," +
+                            "@multiAcademyTrustList," +
+                            "@opportunityAreaList," +
+                            "@parliamentaryConstituencyList," +
+                            "@regionsList," +
+                            "@rscRegionsList," +
+                            "@sponsorList," +
+                            "@wardList," +
+                            "@filterItemList",
                     subjectIdParam,
                     geographicLevelParam,
                     timePeriodListParam,
