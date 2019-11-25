@@ -1,5 +1,8 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { AbstractRelease } from '@common/services/publicationService';
+import {
+  AbstractRelease,
+  ContentBlockType,
+} from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
@@ -24,5 +27,14 @@ export interface ManageContentPageViewModel {
 
   contentSections: ContentSectionViewModel[];
 }
+
+export interface ContentBlockViewModel {
+  id: string;
+  order: number;
+  type: string;
+  body: string;
+}
+
+export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
 
 export default {};

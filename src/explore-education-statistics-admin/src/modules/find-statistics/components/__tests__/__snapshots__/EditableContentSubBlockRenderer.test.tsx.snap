@@ -1,13 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EditableContentSubBlockRenderer Renders editable Markdown block correctly 1`] = `
-<button type="button"
-        class="govuk-button"
->
-  Add data block to this section
-</button>
 <div>
-  <div class="editableContent  ">
+  <div role="button"
+       class="editableContent unsaved"
+  >
     <div class="editableButton">
       <div class="editableButtonContent">
         <span class="govuk-button govuk-body-s govuk-!-margin-bottom-0">
@@ -16,11 +13,9 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
       </div>
     </div>
     <div class="govuk-!-padding-left-1 govuk-!-padding-right-1">
-      <div classname="govuk-body">
-        <p>
-          test
-        </p>
-      </div>
+      <p>
+        test
+      </p>
     </div>
   </div>
 </div>
@@ -28,7 +23,9 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
 
 exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block correctly 1`] = `
 <div>
-  <div class>
+  <div role="button"
+       class="editableContent unsaved"
+  >
     <div class="editableButton">
       <div class="editableButtonContent">
         <span class="govuk-button govuk-body-s govuk-!-margin-bottom-0">
@@ -37,11 +34,9 @@ exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block cor
       </div>
     </div>
     <div class="govuk-!-padding-left-1 govuk-!-padding-right-1">
-      <div classname="govuk-body">
-        <p>
-          test
-        </p>
-      </div>
+      <p>
+        test
+      </p>
     </div>
   </div>
 </div>
