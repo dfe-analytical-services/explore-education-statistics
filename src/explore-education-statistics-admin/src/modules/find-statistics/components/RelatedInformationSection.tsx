@@ -32,17 +32,15 @@ const RelatedInformationSection = ({ relatedInformation, release }: Props) => {
     return new Promise(resolve => {
       releaseContentService.relatedInfo
         .create(release.id, link)
-        .then((createdLink: BasicLink) => {
-          setLinks([...links, createdLink]);
+        .then(newLinks => {
+          setLinks(newLinks);
           resolve();
         });
     });
   };
 
   const removeLink = (linkId: string) => {
-    releaseContentService.relatedInfo
-      .delete(release.id, linkId)
-      .then(() => setLinks(links.filter(({ id }) => id !== linkId)));
+    releaseContentService.relatedInfo.delete(release.id, linkId).then(setLinks);
   };
 
   const renderLinkForm = () => {

@@ -66,7 +66,7 @@ const relatedInformationService = {
   create: (
     releaseId: string,
     link: Omit<BasicLink, 'id'>,
-  ): Promise<BasicLink> => {
+  ): Promise<BasicLink[]> => {
     return client.post(
       `/release/${releaseId}/content/related-information`,
       link,
@@ -75,13 +75,13 @@ const relatedInformationService = {
   update: (
     releaseId: string,
     link: { id: string; description: string; url: string },
-  ): Promise<BasicLink> => {
+  ): Promise<BasicLink[]> => {
     return client.put(
       `/release/${releaseId}/content/related-information/${link.id}`,
       link,
     );
   },
-  delete: (releaseId: string, linkId: string): Promise<void> => {
+  delete: (releaseId: string, linkId: string): Promise<BasicLink[]> => {
     return client.delete(
       `/release/${releaseId}/content/related-information/${linkId}`,
     );
