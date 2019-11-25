@@ -1,15 +1,14 @@
 import styles from '@admin/pages/prototypes/components/PrototypeEditableContent.module.scss';
-// @ts-ignore
-import CKEditor from '@ckeditor/ckeditor5-react';
-
-import classnames from 'classnames';
-import React, {ChangeEvent} from 'react';
-import marked from 'marked';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
-import GFMDataProcessor from '@ckeditor/ckeditor5-markdown-gfm/src/gfmdataprocessor';
+import CKEditor from '@ckeditor/ckeditor5-react';
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+import classnames from 'classnames';
+import React, { ChangeEvent } from 'react';
+import marked from 'marked';
+import TurndownService from 'turndown';
 
 interface Props {
   editable?: boolean;
@@ -28,27 +27,26 @@ const WysiwygEditor = ({
 }: Props) => {
   const [editing, setEditing] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
-  const [temporaryContent, setTemporaryContent] = React.useState(content);
+  const [temporaryContent, setTemporaryContent] = React.useState(() => {
+    if (useMarkdown) return marked(content);
+    return content;
+  });
 
-  const plugins = React.useMemo(() => {
-    if (useMarkdown) {
-      return [
-        (editor: unknown) => {
-          // @ts-ignore
-          editor.data.processor = new GFMDataProcessor(); // eslint-disable-line no-param-reassign
-        },
-      ];
-    }
-
-    return [];
-  }, [useMarkdown]);
+  const turndownService = React.useMemo(() => new TurndownService(), [
+    useMarkdown,
+  ]);
 
   const save = () => {
     setEditing(false);
     setSaved(true);
 
     if (onContentChange) {
-      onContentChange(temporaryContent);
+      let contentChangeContent = temporaryContent;
+
+      if (useMarkdown) {
+        contentChangeContent = turndownService.turndown(contentChangeContent);
+      }
+      onContentChange(contentChangeContent);
     }
   };
 
@@ -90,27 +88,7 @@ const WysiwygEditor = ({
         {editable && editing ? (
           <CKEditor
             editor={ClassicEditor}
-            data={content}
-            config={{
-              plugins: [...plugins, ...ClassicEditor.builtinPlugins],
-              toolbar: [
-                'heading',
-                '|',
-                'bold',
-                'italic',
-                'link',
-                'bulletedList',
-                'numberedList',
-                'imageUpload',
-                'blockQuote',
-                'insertTable',
-                'mediaEmbed',
-                'undo',
-                'redo',
-                'markdown',
-              ],
-            }}
-            plugins={plugins}
+            data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {
               setTemporaryContent(editor.getData());
             }}
@@ -122,7 +100,7 @@ const WysiwygEditor = ({
           <div
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
-              __html: useMarkdown ? marked(content) : content,
+              __html: temporaryContent,
             }}
             className="govuk-!-padding-left-1 govuk-!-padding-right-1"
           />
