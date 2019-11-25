@@ -114,7 +114,7 @@ const RelatedInformationSection = ({ relatedInformation, release }: Props) => {
           </li>
           {isEditing && <hr />}
 
-          {relatedInformation.map(({ id, description, url }) => (
+          {links.map(({ id, description, url }) => (
             <li key={id}>
               <EditableLink removeOnClick={() => removeLink(id)} to={url}>
                 {description}
