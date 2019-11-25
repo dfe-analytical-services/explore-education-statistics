@@ -46,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
         
-        public KeyStatisticsViewModel KeyStatistics { get; set; }
-        
         public ContentSectionViewModel SummarySection { get; set; } = new ContentSectionViewModel();
         
         public ContentSectionViewModel HeadlinesSection { get; set; } = new ContentSectionViewModel();
+        
+        public ContentSectionViewModel KeyStatisticsSection { get; set; } = new ContentSectionViewModel();
         
         // dataFiles
         

@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<string> dataDefinition { get; set; }
 
-        public MarkDownBlock description { get; set; }
+        public MarkDownBlock? description { get; set; }
     }
 
     public class Table

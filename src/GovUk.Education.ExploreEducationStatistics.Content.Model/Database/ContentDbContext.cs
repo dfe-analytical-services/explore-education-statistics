@@ -2961,7 +2961,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         dataDefinition = new List<string>
                         {
                             @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
-                        },
+                        }
                     },
                     Tables = new List<Table>
                     {
