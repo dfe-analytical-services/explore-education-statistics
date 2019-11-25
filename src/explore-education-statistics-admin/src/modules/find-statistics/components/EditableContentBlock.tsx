@@ -8,6 +8,7 @@ import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import Button from '@common/components/Button';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -18,9 +19,11 @@ export interface Props extends ContentBlockProps {
   sectionId: string;
 
   editable?: boolean;
+  canAddBlocks: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (block: ContentBlockData, content: string) => void;
+  onAddContent?:  (type: string, order: number | undefined) => Promise<unknown>;
 }
 
 interface EditingContentBlockContext extends ReleaseContentContext {
@@ -35,6 +38,19 @@ export const EditingContentBlockContext = React.createContext<
   sectionId: undefined,
 });
 
+interface AddContentButtonProps {
+  order?: number;
+  onClick: (type: string, order: number | undefined) => void;
+}
+
+const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
+  return (
+    <>
+      <Button onClick={() => onClick('HtmlBlock', order)}>Add HTML</Button>
+    </>
+  );
+};
+
 const EditableContentBlock = ({
   content,
   id = '',
@@ -43,6 +59,8 @@ const EditableContentBlock = ({
   onContentChange,
   reviewing,
   resolveComments,
+  canAddBlocks = false,
+  onAddContent,
 }: Props) => {
   const editingContext = React.useContext(EditingContext);
 
@@ -53,6 +71,12 @@ const EditableContentBlock = ({
       </div>
     );
   }
+
+  const onAddContentCallback = (type: string, order: number | undefined) => {
+    if (onAddContent) {
+      onAddContent(type, order);
+    }
+  };
 
   return (
     <EditingContentBlockContext.Provider
@@ -69,6 +93,9 @@ const EditableContentBlock = ({
             {resolveComments && (
               <ResolveComment initialComments={block.comments} />
             )}
+            {canAddBlocks && (
+              <AddContentButton order={index} onClick={onAddContentCallback} />
+            )}
             <EditableContentSubBlockRenderer
               editable={editable}
               block={block}
@@ -80,6 +107,9 @@ const EditableContentBlock = ({
                 }
               }}
             />
+            {canAddBlocks && index === content.length - 1 && (
+              <AddContentButton onClick={onAddContentCallback} />
+            )}
           </React.Fragment>
         );
       })}

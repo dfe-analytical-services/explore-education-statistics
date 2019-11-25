@@ -1,6 +1,7 @@
 import client from '@admin/services/util/service';
 import { Dictionary } from '@common/types/util';
 import {
+  ContentBlockPostModel,
   ContentBlockPutModel,
   ContentBlockViewModel,
   ContentSectionViewModel,
@@ -14,6 +15,13 @@ export interface ReleaseContentService {
     releaseId: string,
     order: Dictionary<number>,
   ) => Promise<ContentSectionViewModel[]>;
+
+  addContentSectionBlock: (
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockPostModel,
+  ) => Promise<ContentBlockViewModel>;
+
   updateContentSectionBlock: (
     releaseId: string,
     sectionId: string,
@@ -40,6 +48,17 @@ const service: ReleaseContentService = {
     return client.put<ContentSectionViewModel[]>(
       `/release/${releaseId}/content/sections/order`,
       order,
+    );
+  },
+
+  addContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockPostModel,
+  ): Promise<ContentBlockViewModel> {
+    return client.post<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/block/add`,
+      block,
     );
   },
 

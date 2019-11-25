@@ -33,6 +33,28 @@ const ReleaseContentAccordion = ({
       .then(result => setContent(result));
   }, [release.id]);
 
+  const onAddContent = async (
+    sectionId: string | undefined,
+    type: string,
+    order: number | undefined,
+  ) => {
+    if (sectionId) {
+      await releaseContentService.addContentSectionBlock(
+        release.id,
+        sectionId,
+        {
+          body: 'Click to edit',
+          type,
+          order,
+        },
+      );
+
+      const result = await releaseContentService.getContentSections(release.id);
+
+      setContent(result);
+    }
+  };
+
   return (
     <>
       {content && content.length > 0 && (
@@ -52,10 +74,14 @@ const ReleaseContentAccordion = ({
                 key={order}
               >
                 <ContentBlock
+                  canAddBlocks
                   sectionId={id}
                   content={contentdata}
                   id={`content_${order}`}
                   publication={release.publication}
+                  onAddContent={(type, position) =>
+                    onAddContent(id, type, position)
+                  }
                 />
               </AccordionSection>
             ),
