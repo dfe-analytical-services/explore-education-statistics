@@ -3,7 +3,7 @@ import { AbstractRelease } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
-  title: string;
+  description: string;
   url: string;
 }
 

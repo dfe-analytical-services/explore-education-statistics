@@ -6,7 +6,7 @@ export interface ReleaseContentContext {
 }
 
 export const EditingContext = React.createContext<ReleaseContentContext>({
-  isEditing: true,
+  isEditing: false,
   releaseId: undefined,
 });
 

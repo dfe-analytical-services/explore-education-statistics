@@ -28,7 +28,7 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService.getContent(releaseId).then(content => {
+    releaseContentService.getContent(releaseId).then(newContent => {
       // <editor-fold desc="TODO - content population">
 
       const unresolvedComments: Comment[] = [
@@ -49,7 +49,7 @@ const ReleaseContentPage = () => {
       setModel({
         unresolvedComments,
         pageMode: 'edit',
-        content,
+        content: newContent,
       });
     });
   }, [releaseId, publication.themeId, publication]);
