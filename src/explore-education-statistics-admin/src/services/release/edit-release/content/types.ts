@@ -1,8 +1,5 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
-import {
-  AbstractRelease,
-  ContentBlockType,
-} from '@common/services/publicationService';
+import { AbstractRelease } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;

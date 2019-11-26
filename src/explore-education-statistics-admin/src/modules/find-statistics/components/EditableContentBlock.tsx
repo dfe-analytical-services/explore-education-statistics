@@ -5,6 +5,7 @@ import ContentBlock, {
 import { ContentBlock as ContentBlockData } from '@common/services/publicationService';
 import React from 'react';
 import wrapEditableComponent, {
+  EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
@@ -13,6 +14,8 @@ import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 export interface Props extends ContentBlockProps {
   content: EditableRelease['content'][0]['content'];
+
+  sectionId: string;
 
   editable?: boolean;
   reviewing?: boolean;
@@ -35,11 +38,14 @@ export const EditingContentBlockContext = React.createContext<
 const EditableContentBlock = ({
   content,
   id = '',
+  sectionId,
   editable,
   onContentChange,
   reviewing,
   resolveComments,
 }: Props) => {
+  const editingContext = React.useContext(EditingContext);
+
   if (content.length === 0) {
     return (
       <div className="govuk-inset-text">
@@ -49,7 +55,12 @@ const EditableContentBlock = ({
   }
 
   return (
-    <>
+    <EditingContentBlockContext.Provider
+      value={{
+        ...editingContext,
+        sectionId,
+      }}
+    >
       {content.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
@@ -72,7 +83,7 @@ const EditableContentBlock = ({
           </React.Fragment>
         );
       })}
-    </>
+    </EditingContentBlockContext.Provider>
   );
 };
 
