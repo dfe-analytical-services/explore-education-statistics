@@ -52,7 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
             var batchCount = 1;
             var numBatches = GetNumBatches(enumerable.Count(), message.RowsPerBatch);
-            var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
             {
@@ -73,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _fileStorageService.UploadDataFileAsync(
                     message.Release.Id,
-                    mStream, BlobUtils.GetMetaFileName(subjectData.DataBlob),
+                    mStream, 
+                    BlobUtils.GetMetaFileName(subjectData.DataBlob),
                     BlobUtils.GetName(subjectData.DataBlob),
                     fileName,
                     "text/csv"

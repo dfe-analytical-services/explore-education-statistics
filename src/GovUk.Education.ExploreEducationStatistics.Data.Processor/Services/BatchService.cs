@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task UpdateBatchCount(string releaseId, string dataFileName, int batchNo)
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
-            var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
+            var cloudBlockBlob = _fileStorageService.GetBlobReference(releaseId, dataFileName);
             var leaseId = await GetLease(cloudBlockBlob);
             DatafileImport import;
 
@@ -64,6 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await UpdateStatus(releaseId, dataFileName,
                     import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
                 );
+                cloudBlockBlob.FetchAttributes();
+                _fileStorageService.DeleteBatches(releaseId,  BlobUtils.GetMetaFileName(cloudBlockBlob));
 
                 _logger.LogInformation(import.Errors.Equals("")
                     ? $"All batches imported for {releaseId} : {dataFileName} with no errors"
@@ -74,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task<bool> UpdateStatus(string releaseId, string dataFileName, IStatus status)
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
-            var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
+            var cloudBlockBlob = _fileStorageService.GetBlobReference(releaseId, dataFileName);
             var leaseId = await GetLease(cloudBlockBlob);
 
             try
@@ -95,13 +98,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return true;
         }
+        
+        public async Task<IStatus> GetStatus(string releaseId, string dataFileName)
+        {
+            var import = await GetImport(releaseId, dataFileName);
+            return import.Status;
+        }
 
         public async Task FailImport(string releaseId, string dataFileName, List<string> errors)
         {
             var import = await GetImport(releaseId, dataFileName);
-            import.Status = IStatus.FAILED;
-            import.Errors = JsonConvert.SerializeObject(errors);
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            if (import.Status != IStatus.COMPLETE)
+            {
+                import.Status = IStatus.FAILED;
+                import.Errors = JsonConvert.SerializeObject(errors);
+                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            }
         }
 
         public async Task LogErrors(string releaseId, string dataFileName, List<string> errors)
@@ -124,8 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo)
         {
             var import = await GetImport(releaseId, dataFileName);
-            var bitArray = new BitArray(import.BatchesProcessed);
-            return bitArray.Get(batchNo - 1);
+            return new BitArray(import.BatchesProcessed).Get(batchNo - 1);
         }
 
         public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message)

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
@@ -55,11 +57,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return true;
         }
 
-        public void Delete(string releaseId, string dataFileName)
+        public void DeleteDatafile(string releaseId, string dataFileName)
         {
-            GetCloudBlockBlob(releaseId, dataFileName).DeleteAsync();
+            GetBlobReference(releaseId, dataFileName).DeleteAsync();
         }
-
+        
+        public void DeleteBatches(string releaseId, string metaFileName)
+        {
+            _blobContainer.ListBlobs(FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
+                    true, BlobListingDetails.Metadata)
+                .Where(cbb => IsBatchedFile(cbb, releaseId))
+                .OfType<CloudBlockBlob>()
+                .ToList().ForEach(file =>
+                {
+                    if (BlobUtils.GetMetaFileName(file).Equals(metaFileName))
+                    {
+                        file.DeleteIfExistsAsync();
+                    }
+                });
+        }
         public Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob)
         {
             return cloudBlockBlob.AcquireLeaseAsync(
@@ -67,9 +83,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 Guid.NewGuid().ToString());
         }
 
-        public CloudBlockBlob GetCloudBlockBlob(string releaseId, string dataFileName)
+        public CloudBlockBlob GetBlobReference(string releaseId, string dataFileName)
         {
             return _blobContainer.GetBlockBlobReference($"{releaseId}/data/{dataFileName}");
+        }
+        
+        private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
+        {
+            return blobItem.Parent.Prefix.Equals(FileStoragePathUtils.AdminReleaseBatchesDirectoryPath(releaseId));
+        }
+        
+        private CloudBlobDirectory GetBatchDirectoryReference(string releaseId)
+        {
+            return _blobContainer.GetDirectoryReference($"{releaseId}/data/{FileStoragePathUtils.BatchesDir}");
         }
 
         private string GenerateCloudLockBlobLeaseName(string blobLeaseNamePrefix)
@@ -79,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task UploadFileAsync(
             string releaseId,
-            MemoryStream stream,
+            Stream stream,
             IEnumerable<KeyValuePair<string, string>> metaValues,
             string fileName,
             string contentType)

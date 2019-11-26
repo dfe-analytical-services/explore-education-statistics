@@ -19,9 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             string fileName,
             string contentType);
 
-        void Delete(string releaseId, string dataFileName);
+        void DeleteDatafile(string releaseId, string dataFileName);
 
-        CloudBlockBlob GetCloudBlockBlob(string releaseId, string dataFileName);
+        void DeleteBatches(string releaseId, string dataFileName);
+
+        CloudBlockBlob GetBlobReference(string releaseId, string dataFileName);
 
         Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob);
     }

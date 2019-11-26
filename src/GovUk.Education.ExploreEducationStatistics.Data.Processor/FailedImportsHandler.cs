@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,11 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class FailedImportsHandler
     {
-        public static void CheckIncompleteImport()
+        public static void CheckIncompleteImports()
         {
-            var tblStorageAccount = Microsoft.Azure.Cosmos.Table.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
+            var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-
             var tClient = tblStorageAccount.CreateCloudTableClient();
             var qClient = storageAccount.CreateCloudQueueClient();
             var aQueue = qClient.GetQueueReference("imports-available");
@@ -31,48 +29,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             do
             {
                 var resultSegment =
-                    table.ExecuteQuerySegmentedAsync(GetQuery(), token).Result;
+                    table.ExecuteQuerySegmentedAsync(BuildQuery(), token).Result;
                 token = resultSegment.ContinuationToken;
 
                 foreach (var entity in resultSegment.Results)
                 {
-                    Console.Out.WriteLine(entity.Status);
                     var lastBatch = ImportStatusService.GetNumBatchesComplete(entity);
-                    if (entity.NumBatches == 1 || entity.NumBatches != lastBatch)
+                    if (entity.NumBatches != 1 && entity.NumBatches == lastBatch)
                     {
-                        // Older entries will not have this recover mechanism so have to ignore 
-                        if (entity.Message != null)
-                        {
-                            var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
-                            Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
+                        continue;
+                    }
 
-                            // If batch was not split then just processing again by adding to pending queue
-                            if (entity.NumBatches == 1 || lastBatch == 0)
-                            {
-                                pQueue.AddMessage(new CloudQueueMessage(entity.Message));
-                            }
-                            else
-                            // Add the batch that it failed on to the queue is missing
-                            {
-                                var mMissing = BuildMessage(m, lastBatch+1);
-                                var messages = aQueue.GetMessages(20);
-                                if (!messages.Any(x => x.AsString.Contains(mMissing)))
-                                {
-                                    aQueue.AddMessage(new CloudQueueMessage(mMissing));
-                                }
-                            }
+                    // Older entries will not have this recover mechanism so have to ignore 
+                    if (entity.Message != null)
+                    {
+                        Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
+
+                        // If batch was not split then just processing again by adding to pending queue
+                        if (entity.NumBatches == 1 || lastBatch == 0)
+                        {
+                            pQueue.AddMessage(new CloudQueueMessage(entity.Message));
                         }
                         else
+                            // Add the batch that failed on to the queue is missing
                         {
-                            Console.Out.WriteLine($"No message stored for import - unable to recover import " +
-                                                  $"{entity.PartitionKey} : {entity.RowKey}");
+                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(
+                                JsonConvert.DeserializeObject<ImportMessage>(entity.Message), 
+                                lastBatch+1)));
                         }
+                    }
+                    else
+                    {
+                        Console.Out.WriteLine($"No message stored for import - unable to recover import " +
+                                              $"{entity.PartitionKey} : {entity.RowKey}");
                     }
                 }
             } while (token != null);
         }
         
-        private static TableQuery<DatafileImport> GetQuery()
+        private static TableQuery<DatafileImport> BuildQuery()
         {
             var f1 = TableQuery.GenerateFilterCondition("Status", 
                 QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.GetEnumValue());
@@ -87,11 +82,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         
         private static string BuildMessage(ImportMessage message, int batchNo)
         {
-            var fileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchNo++:000000}";
-
             var iMessage = new ImportMessage
             {
-                DataFileName = fileName,
+                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchNo:000000}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,
                 BatchNo = batchNo,

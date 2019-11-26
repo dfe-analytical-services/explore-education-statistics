@@ -18,5 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message);
 
         Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo);
+        Task<IStatus> GetStatus(string releaseId, string dataFileName);
     }
 }

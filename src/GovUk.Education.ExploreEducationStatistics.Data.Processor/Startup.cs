@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddApplicationInsightsTelemetry()
                 .BuildServiceProvider();
             
-            FailedImportsHandler.CheckIncompleteImport();
+            FailedImportsHandler.CheckIncompleteImports();
         }
     }
 }

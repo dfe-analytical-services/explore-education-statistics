@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
@@ -62,7 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 try
                 {
                     var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
+                    logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
+                    logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
                 }
                 catch (Exception e)
                 {
@@ -127,8 +130,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
         private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
         {
-            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
-                IStatus.RUNNING_PHASE_2);
+            var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
+            
+            // If the batch is already reached RUNNING_PHASE_2 then don't re-create the subject
+            if ((int)status >= (int)IStatus.RUNNING_PHASE_2)
+            {
+                return await _fileStorageService.GetSubjectData(message); 
+            }
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
@@ -142,6 +150,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
 
             await dbContext.SaveChangesAsync();
+            
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_2);
 
             return subjectData;
         }
@@ -166,6 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             if (errors.Count <= 0)
             {
+                logger.LogInformation($"Validating Datafile: {message.DataFileName} - complete");
                 return true;
             }
 
