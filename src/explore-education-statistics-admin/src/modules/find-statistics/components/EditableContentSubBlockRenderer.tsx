@@ -11,7 +11,7 @@ interface Props {
   id: string;
   index: number;
   editable?: boolean;
-  canDelete: boolean;
+  canDelete?: boolean;
   onContentChange?: (content: string) => void;
   onDelete?: () => void;
 }
@@ -21,7 +21,7 @@ function EditableContentSubBlockRenderer({
   editable,
   onContentChange,
   id,
-  canDelete,
+  canDelete = false,
   onDelete,
 }: Props) {
   switch (block.type) {

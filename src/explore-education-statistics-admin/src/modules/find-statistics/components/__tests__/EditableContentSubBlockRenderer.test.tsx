@@ -24,6 +24,7 @@ describe('EditableContentSubBlockRenderer', () => {
   test('Renders editable Markdown block correctly', () => {
     const { container } = render(
       <EditableContentSubBlockRenderer
+        canDelete
         id="test"
         index={1}
         editable

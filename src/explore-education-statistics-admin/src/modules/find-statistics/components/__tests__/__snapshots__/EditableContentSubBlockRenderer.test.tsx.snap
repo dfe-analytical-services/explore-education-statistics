@@ -10,6 +10,11 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
         <span class="govuk-button govuk-body-s govuk-!-margin-bottom-0">
           Edit this section
         </span>
+        <button type="button"
+                class="govuk-button govuk-button--warning govuk-body-s govuk-!-margin-bottom-0"
+        >
+          Delete this section
+        </button>
       </div>
     </div>
     <div class="govuk-!-padding-left-1 govuk-!-padding-right-1">
