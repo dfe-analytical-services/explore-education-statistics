@@ -87,6 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.KeyStatisticsSection = new ContentSection{
                         Type = ContentSectionType.KeyStatistics
                     };
+                    release.KeyStatisticsSecondarySection = new ContentSection{
+                        Type = ContentSectionType.KeyStatisticsSecondary
+                    };
                     release.HeadlinesSection = new ContentSection{
                         Type = ContentSectionType.Headlines
                     };

@@ -52,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public ContentSectionViewModel KeyStatisticsSection { get; set; } = new ContentSectionViewModel();
         
+        public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new ContentSectionViewModel();
+        
         // dataFiles
         
         // downloadFiles

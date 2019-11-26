@@ -1839,6 +1839,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Type = ContentSectionType.KeyStatistics
                 },
                 
+                // Key Statistics secondary sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    ReleaseId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    ReleaseId = new Guid("1a9a8d11-945d-40e2-8e16-1b3bf21442a0"),
+                    Order = 1, Heading = "", Caption = "", 
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+                
                 // Headline sections for each Release
                 new ContentSection
                 {
@@ -2446,7 +2469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
+                    ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -3121,7 +3144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                    ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
+                    ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
@@ -3579,7 +3602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                    ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,

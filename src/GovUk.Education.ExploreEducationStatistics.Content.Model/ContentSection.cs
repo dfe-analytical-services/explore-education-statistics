@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         Generic,
         ReleaseSummary,
         KeyStatistics,
+        KeyStatisticsSecondary,
         Headlines
     }
     

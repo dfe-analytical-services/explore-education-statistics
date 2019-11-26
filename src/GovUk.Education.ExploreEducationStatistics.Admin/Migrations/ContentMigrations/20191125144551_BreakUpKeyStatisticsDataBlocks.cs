@@ -7,27 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.UpdateData(
-                table: "ContentBlock",
-                keyColumn: "Id",
-                keyValue: new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                column: "ContentSectionId",
-                value: new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"));
-
-            migrationBuilder.UpdateData(
-                table: "ContentBlock",
-                keyColumn: "Id",
-                keyValue: new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                column: "ContentSectionId",
-                value: new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"));
-
-            migrationBuilder.UpdateData(
-                table: "ContentBlock",
-                keyColumn: "Id",
-                keyValue: new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                column: "ContentSectionId",
-                value: new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"));
-
             migrationBuilder.InsertData(
                 table: "ContentSections",
                 columns: new[] { "Id", "Caption", "Heading", "Order", "ReleaseId", "Type" },
@@ -35,7 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 {
                     { new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"), "", "", 1, new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"), "KeyStatistics" },
                     { new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"), "", "", 1, new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"), "KeyStatistics" },
-                    { new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), "", "", 1, new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), "KeyStatistics" }
+                    { new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), "", "", 1, new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), "KeyStatistics" },
+                    { new Guid("e8a813ce-c68a-417b-af31-91db19377b10"), "", "", 1, new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"), "KeyStatisticsSecondary" },
+                    { new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"), "", "", 1, new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"), "KeyStatisticsSecondary" },
+                    { new Guid("30d74065-66b8-4843-9761-4578519e1394"), "", "", 1, new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), "KeyStatisticsSecondary" }
                 });
 
             migrationBuilder.InsertData(
@@ -53,6 +35,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     { new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"), new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"), 2, "DataBlock", null, null, "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"216\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}", null, null, null, "{\"dataKeys\":[\"216\"],\"dataSummary\":[\"Down from 558,411 in 2017\"],\"dataDefinition\":[\"Total number of first preferences offered to applicants by schools.\"],\"description\":null}", "[{\"indicators\":[\"216\"],\"tableHeaders\":null}]" },
                     { new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"), new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"), 3, "DataBlock", null, null, "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"217\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}", null, null, null, "{\"dataKeys\":[\"217\"],\"dataSummary\":[\"Down from 34,792 in 2017\"],\"dataDefinition\":[\"Total number of second preferences offered to applicants by schools.\"],\"description\":null}", "[{\"indicators\":[\"217\"],\"tableHeaders\":null}]" }
                 });
+            
+            migrationBuilder.UpdateData(
+                table: "ContentBlock",
+                keyColumn: "Id",
+                keyValue: new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
+                column: "ContentSectionId",
+                value: new Guid("30d74065-66b8-4843-9761-4578519e1394"));
+
+            migrationBuilder.UpdateData(
+                table: "ContentBlock",
+                keyColumn: "Id",
+                keyValue: new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
+                column: "ContentSectionId",
+                value: new Guid("e8a813ce-c68a-417b-af31-91db19377b10"));
+
+            migrationBuilder.UpdateData(
+                table: "ContentBlock",
+                keyColumn: "Id",
+                keyValue: new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
+                column: "ContentSectionId",
+                value: new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -87,6 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.KeyStatisticsSection, 
                     m => m.MapFrom(r => 
                         ContentSectionViewModel.ToViewModel(r.KeyStatisticsSection)))
+                .ForMember(dest => dest.KeyStatisticsSecondarySection, 
+                    m => m.MapFrom(r => 
+                        ContentSectionViewModel.ToViewModel(r.KeyStatisticsSecondarySection)))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => new List<ReleaseNoteViewModel>
