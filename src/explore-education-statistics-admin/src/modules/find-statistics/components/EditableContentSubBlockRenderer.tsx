@@ -24,8 +24,6 @@ function EditableContentSubBlockRenderer({
   canDelete,
   onDelete,
 }: Props) {
-  console.log(block.type);
-
   switch (block.type) {
     case 'MarkDownBlock':
       return (

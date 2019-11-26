@@ -113,10 +113,9 @@ const EditableContentBlock = ({
         contentId,
       );
 
-      const { content: newContent } = await releaseContentService.getContentSection(
-        releaseId,
-        sectionId,
-      );
+      const {
+        content: newContent,
+      } = await releaseContentService.getContentSection(releaseId, sectionId);
 
       setContentBlocks(newContent);
     }
