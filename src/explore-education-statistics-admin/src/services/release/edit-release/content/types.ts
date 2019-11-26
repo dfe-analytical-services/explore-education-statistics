@@ -25,4 +25,13 @@ export interface ManageContentPageViewModel {
   contentSections: ContentSectionViewModel[];
 }
 
+export interface ContentBlockViewModel {
+  id: string;
+  order: number;
+  type: string;
+  body: string;
+}
+
+export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
+
 export default {};

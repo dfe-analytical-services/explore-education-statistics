@@ -1,27 +1,22 @@
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import React from 'react';
-import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import ContentService from '@admin/services/release/edit-release/content/service';
 
-export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
+export type MarkdownRendererProps = RendererProps & { source: string };
 
-const EditableMarkdownRenderer = ({
-  contentId,
-  source,
-}: MarkdownRendererProps) => {
-  const [markdown, setMarkdown] = React.useState(source);
+const EditableHtmlRenderer = ({ contentId, source }: MarkdownRendererProps) => {
+  const [html, setHtml] = React.useState(source);
 
   const editingContext = React.useContext(EditingContentBlockContext);
 
   return (
     <>
       <WysiwygEditor
-        content={markdown || ''}
+        content={html || ''}
         editable
-        useMarkdown
         onContentChange={async ss => {
           if (
             editingContext.releaseId &&
@@ -37,7 +32,7 @@ const EditableMarkdownRenderer = ({
               },
             );
 
-            setMarkdown(body);
+            setHtml(body);
           }
         }}
       />
@@ -45,4 +40,13 @@ const EditableMarkdownRenderer = ({
   );
 };
 
-export default wrapEditableComponent(EditableMarkdownRenderer, ReactMarkdown);
+const HtmlRenderer = ({ source }: { source: string }) => {
+  return (
+    <div
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: source }}
+    />
+  );
+};
+
+export default wrapEditableComponent(EditableHtmlRenderer, HtmlRenderer);
