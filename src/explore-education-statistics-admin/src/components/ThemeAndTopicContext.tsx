@@ -30,7 +30,7 @@ interface ThisIsWhatTheContextHasInIt {
   };
 }
 
-const TopLevelStateContext = React.createContext<ThisIsWhatTheContextHasInIt>({
+const ThemeAndTopicContext = React.createContext<ThisIsWhatTheContextHasInIt>({
   setSelectedThemeAndTopic: () => {},
   selectedThemeAndTopic: {
     theme: {
@@ -45,4 +45,4 @@ const TopLevelStateContext = React.createContext<ThisIsWhatTheContextHasInIt>({
   },
 });
 
-export default TopLevelStateContext;
+export default ThemeAndTopicContext;

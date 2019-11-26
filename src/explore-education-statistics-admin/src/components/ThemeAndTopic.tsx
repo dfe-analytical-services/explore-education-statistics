@@ -1,11 +1,11 @@
 import React, { ReactNode, useState } from 'react';
-import TopLevelStateContext, {
+import ThemeAndTopicContext, {
   SetThemeAndTopicsCallbackParameters,
-} from '@admin/components/TopLevelStateContext';
+} from '@admin/components/ThemeAndTopicContext';
 import { IdTitlePair } from '@admin/services/common/types';
 import { ThemeAndTopics } from '@admin/services/dashboard/types';
 
-interface TopLevelStateProps {
+interface ThemeAndTopicProps {
   children: ReactNode;
 }
 
@@ -27,7 +27,7 @@ interface Model {
   topic: IdTitlePair;
 }
 
-const TopLevelState = ({ children }: TopLevelStateProps) => {
+const ThemeAndTopic = ({ children }: ThemeAndTopicProps) => {
   const [model, setModel] = useState<Model>();
 
   const onThemeAndTopicChange = (params: SetThemeAndTopicsCallbackParameters) =>
@@ -58,11 +58,11 @@ const TopLevelState = ({ children }: TopLevelStateProps) => {
 
   return (
     <>
-      <TopLevelStateContext.Provider value={contextValue}>
+      <ThemeAndTopicContext.Provider value={contextValue}>
         {children}
-      </TopLevelStateContext.Provider>
+      </ThemeAndTopicContext.Provider>
     </>
   );
 };
 
-export default TopLevelState;
+export default ThemeAndTopic;

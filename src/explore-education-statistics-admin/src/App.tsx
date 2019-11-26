@@ -16,7 +16,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
-import TopLevelState from '@admin/components/TopLevelState';
+import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 
 import { LoginContext } from './components/Login';
@@ -66,7 +66,7 @@ function App() {
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
       <AriaLiveAnnouncer>
-        <TopLevelState>
+        <ThemeAndTopic>
           <ApiAuthorizationRoutes />
 
           <ProtectedRoutes>
@@ -172,7 +172,7 @@ function App() {
               component={AdminDocumentationManageDataBlocks}
             />
           </ProtectedRoutes>
-        </TopLevelState>
+        </ThemeAndTopic>
         {/* Prototype Routes */}
         <Route exact path="/index" component={IndexPage} />
 

@@ -10,7 +10,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdTitlePair } from '@admin/services/common/types';
-import TopLevelStateContext from '@admin/components/TopLevelStateContext';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import Link from '@admin/components/Link';
 import PublicationSummary from './PublicationSummary';
 
@@ -42,7 +42,7 @@ export interface Props {
 
 const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
-    TopLevelStateContext,
+    ThemeAndTopicContext,
   );
 
   const [myPublications, setMyPublications] = useState<
