@@ -10,6 +10,8 @@ describe('EditableContentSubBlockRenderer', () => {
         id="test"
         index={1}
         block={{
+          id: 'block-000',
+          comments: [],
           type: 'MarkDownBlock',
           body: 'test',
         }}
@@ -26,6 +28,8 @@ describe('EditableContentSubBlockRenderer', () => {
         index={1}
         editable
         block={{
+          id: 'block-000',
+          comments: [],
           type: 'MarkDownBlock',
           body: 'test',
         }}
