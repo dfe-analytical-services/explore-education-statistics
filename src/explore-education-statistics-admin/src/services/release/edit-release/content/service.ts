@@ -1,6 +1,11 @@
 import client from '@admin/services/util/service';
 import { Dictionary } from '@common/types/util';
-import { ContentSectionViewModel, ManageContentPageViewModel } from './types';
+import {
+  ContentBlockPutModel,
+  ContentBlockViewModel,
+  ContentSectionViewModel,
+  ManageContentPageViewModel,
+} from './types';
 
 export interface ReleaseContentService {
   getContent: (releaseId: string) => Promise<ManageContentPageViewModel>;
@@ -9,6 +14,12 @@ export interface ReleaseContentService {
     releaseId: string,
     order: Dictionary<number>,
   ) => Promise<ContentSectionViewModel[]>;
+  updateContentSectionBlock: (
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+    block: ContentBlockPutModel,
+  ) => Promise<ContentBlockViewModel>;
 }
 
 const service: ReleaseContentService = {
@@ -29,6 +40,18 @@ const service: ReleaseContentService = {
     return client.put<ContentSectionViewModel[]>(
       `/release/${releaseId}/content/sections/order`,
       order,
+    );
+  },
+
+  updateContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+    block: ContentBlockPutModel,
+  ): Promise<ContentBlockViewModel> {
+    return client.put<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
+      block,
     );
   },
 };

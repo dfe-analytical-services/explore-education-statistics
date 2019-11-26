@@ -1,14 +1,13 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
-import PrototypeExampleTableList from '@admin/pages/prototypes/components/PrototypeAdminExampleTableList';
-import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React from 'react';
-// import { Draggable } from 'react-beautiful-dnd';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
+import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 
 interface Props {
-  block: ContentBlock;
+  block: EditableContentBlock;
   id: string;
   index: number;
   editable?: boolean;
@@ -25,14 +24,7 @@ function EditableContentSubBlockRenderer({
     case 'MarkDownBlock':
       return (
         <>
-          {editable && <PrototypeExampleTableList />}
-          <PrototypeEditableContent
-            editable={editable}
-            onContentChange={onContentChange}
-            content={`
-         <div className="govuk-body">${marked(block.body)} </div>
-      `}
-          />
+          <EditableMarkdownRenderer contentId={block.id} source={block.body} />
         </>
       );
     case 'InsetTextBlock':
@@ -74,7 +66,7 @@ function EditableContentSubBlockRenderer({
         </div>
       );
     case 'HtmlBlock':
-      return <WysiwygEditor editable content={block.body} />;
+      return <EditableHtmlRenderer contentId={block.id} source={block.body} />;
     default:
       return <div>Unable to edit content type {block.type}</div>;
   }

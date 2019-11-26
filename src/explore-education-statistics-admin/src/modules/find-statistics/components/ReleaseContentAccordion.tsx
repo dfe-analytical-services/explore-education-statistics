@@ -52,6 +52,7 @@ const ReleaseContentAccordion = ({
                 key={order}
               >
                 <ContentBlock
+                  sectionId={id}
                   content={contentdata}
                   id={`content_${order}`}
                   publication={release.publication}
