@@ -12,6 +12,7 @@ import Button from '@common/components/Button';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
+import { ContentBlockViewModel } from '@admin/services/release/edit-release/content/types';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 export interface Props extends ContentBlockProps {
@@ -24,10 +25,7 @@ export interface Props extends ContentBlockProps {
   reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (block: ContentBlockData, content: string) => void;
-  onAddContent?: (
-    type: string,
-    order: number | undefined,
-  ) => Promise<EditableRelease['content'][0]['content']>;
+  onAddContent?: (content: ContentBlockViewModel) => void;
 }
 
 interface EditingContentBlockContext extends ReleaseContentContext {
@@ -50,7 +48,12 @@ interface AddContentButtonProps {
 const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
   return (
     <>
-      <Button className="govuk-!-margin-top-4 govuk-!-margin-bottom-4" onClick={() => onClick('HtmlBlock', order)}>Add HTML</Button>
+      <Button
+        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
+        onClick={() => onClick('HtmlBlock', order)}
+      >
+        Add HTML
+      </Button>
     </>
   );
 };
@@ -64,6 +67,7 @@ const EditableContentBlock = ({
   reviewing,
   resolveComments,
   canAddBlocks = false,
+  onAddContent,
 }: Props) => {
   const editingContext = React.useContext(EditingContext);
 
@@ -87,12 +91,34 @@ const EditableContentBlock = ({
           type,
           order,
         })
+        .then(result => {
+          if (onAddContent) onAddContent(result);
+          return result;
+        })
         .then(() =>
           releaseContentService.getContentSection(releaseId, sectionId),
         )
         .then(section => {
           setContentBlocks(section.content);
         });
+    }
+  };
+
+  const onDeleteContent = async (contentId: string) => {
+    const { releaseId } = editingContext;
+    if (releaseId && sectionId && contentId) {
+      await releaseContentService.deleteContentSectionBlock(
+        releaseId,
+        sectionId,
+        contentId,
+      );
+
+      const { content: newContent } = await releaseContentService.getContentSection(
+        releaseId,
+        sectionId,
+      );
+
+      setContentBlocks(newContent);
     }
   };
 
@@ -125,6 +151,7 @@ const EditableContentBlock = ({
                   onContentChange(block, newContent);
                 }
               }}
+              onDelete={() => onDeleteContent(block.id)}
             />
             {canAddBlocks && index === contentBlocks.length - 1 && (
               <AddContentButton onClick={onAddContentCallback} />

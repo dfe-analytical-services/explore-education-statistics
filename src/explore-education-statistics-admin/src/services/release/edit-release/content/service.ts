@@ -33,6 +33,12 @@ export interface ReleaseContentService {
     contentBlockId: string,
     block: ContentBlockPutModel,
   ) => Promise<ContentBlockViewModel>;
+
+  deleteContentSectionBlock: (
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+  ) => Promise<void>;
 }
 
 const service: ReleaseContentService = {
@@ -85,6 +91,16 @@ const service: ReleaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  deleteContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+  ): Promise<void> {
+    return client.delete(
+      `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
     );
   },
 };

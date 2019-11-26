@@ -7,12 +7,13 @@ import { EditingContentBlockContext } from '@admin/modules/find-statistics/compo
 import ContentService from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps &
-  ReactMarkdownProps & { canDelete: boolean };
+  ReactMarkdownProps & { canDelete: boolean; onDelete: () => void };
 
 const EditableMarkdownRenderer = ({
   contentId,
   source,
   canDelete,
+  onDelete,
 }: MarkdownRendererProps) => {
   const [markdown, setMarkdown] = React.useState(source);
 
@@ -43,6 +44,7 @@ const EditableMarkdownRenderer = ({
             setMarkdown(body);
           }
         }}
+        onDelete={onDelete}
       />
     </>
   );

@@ -13,6 +13,7 @@ interface Props {
   editable?: boolean;
   canDelete: boolean;
   onContentChange?: (content: string) => void;
+  onDelete?: () => void;
 }
 
 function EditableContentSubBlockRenderer({
@@ -21,8 +22,8 @@ function EditableContentSubBlockRenderer({
   onContentChange,
   id,
   canDelete,
+  onDelete,
 }: Props) {
-
   console.log(block.type);
 
   switch (block.type) {
@@ -33,6 +34,7 @@ function EditableContentSubBlockRenderer({
             contentId={block.id}
             source={block.body}
             canDelete={canDelete}
+            onDelete={onDelete}
           />
         </>
       );
@@ -80,6 +82,7 @@ function EditableContentSubBlockRenderer({
           contentId={block.id}
           source={block.body}
           canDelete={canDelete}
+          onDelete={onDelete}
         />
       );
     default:

@@ -19,6 +19,7 @@ interface Props {
   content: string;
   useMarkdown?: boolean;
   onContentChange?: (content: string) => Promise<unknown>;
+  onDelete?: () => void;
 }
 
 const WysiwygEditor = ({
@@ -26,6 +27,7 @@ const WysiwygEditor = ({
   canDelete = false,
   content,
   onContentChange,
+  onDelete,
   useMarkdown = false,
 }: Props) => {
   const [editing, setEditing] = React.useState(false);
@@ -59,15 +61,13 @@ const WysiwygEditor = ({
     <div>
       <ModalConfirm
         onConfirm={() => {
-
+          if (onDelete) onDelete();
           setShowConfirmation(false);
         }}
         onExit={() => {
-
           setShowConfirmation(false);
         }}
         onCancel={() => {
-
           setShowConfirmation(false);
         }}
         title="Delete section"
@@ -85,7 +85,6 @@ const WysiwygEditor = ({
           [styles.unsaved]: editable && !saved,
         })}
         onClick={() => {
-          console.log('Editing click');
           if (!editing) setEditing(editable === true);
         }}
         tabIndex={undefined}
