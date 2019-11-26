@@ -2,10 +2,12 @@ import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
+import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -17,8 +19,7 @@ import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
+import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
   contentId?: string;
@@ -42,7 +43,7 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
-  const { release, introductionSection } = content;
+  const { release, introductionSection, relatedInformation } = content;
 
   const accId: string[] = generateIdList(2);
 
@@ -198,21 +199,10 @@ const PublicationReleaseContent = ({
                 </Details>
               </dd>
             </dl>
-            <h2
-              className="govuk-heading-m govuk-!-margin-top-6"
-              id="related-content"
-            >
-              Related guidance
-            </h2>
-            <nav role="navigation" aria-labelledby="related-content">
-              <ul className="govuk-list">
-                <li>
-                  <Link to={`/methodology/${release.publication.slug}`}>
-                    {`${release.publication.title}: methodology`}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
+            <RelatedInformationSection
+              release={release}
+              relatedInformation={relatedInformation}
+            />
           </RelatedAside>
         </div>
       </div>
