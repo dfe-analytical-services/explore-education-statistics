@@ -30,7 +30,6 @@ const AdminDashboardPage = () => {
   const { user } = useContext(LoginContext);
 
   const [model, setModel] = useState<Model>();
-
   useEffect(() => {
     Promise.all([
       dashboardService.getDraftReleases(),
