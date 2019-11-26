@@ -1,6 +1,7 @@
 import client from '@admin/services/util/service';
 import { Dictionary } from '@common/types/util';
 import {
+  ContentBlockPostModel,
   ContentBlockPutModel,
   ContentBlockViewModel,
   ContentSectionViewModel,
@@ -15,12 +16,30 @@ export interface ReleaseContentService {
     releaseId: string,
     order: Dictionary<number>,
   ) => Promise<ContentSectionViewModel[]>;
+
+  getContentSection: (
+    releaseId: string,
+    sectionId: string,
+  ) => Promise<ContentSectionViewModel>;
+
+  addContentSectionBlock: (
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockPostModel,
+  ) => Promise<ContentBlockViewModel>;
+
   updateContentSectionBlock: (
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
     block: ContentBlockPutModel,
   ) => Promise<ContentBlockViewModel>;
+
+  deleteContentSectionBlock: (
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+  ) => Promise<void>;
 }
 
 const service: ReleaseContentService = {
@@ -44,6 +63,26 @@ const service: ReleaseContentService = {
     );
   },
 
+  getContentSection(
+    releaseId: string,
+    sectionId: string,
+  ): Promise<ContentSectionViewModel> {
+    return client.get<ContentSectionViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}`,
+    );
+  },
+
+  addContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockPostModel,
+  ): Promise<ContentBlockViewModel> {
+    return client.post<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
+      block,
+    );
+  },
+
   updateContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -53,6 +92,16 @@ const service: ReleaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  deleteContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+  ): Promise<void> {
+    return client.delete(
+      `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
     );
   },
 };

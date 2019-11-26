@@ -27,10 +27,12 @@ const ReleaseContentAccordion = ({
     return releaseContentService.updateContentSectionsOrder(release.id, ids);
   };
 
+  const updateContent = async (id: string) => {
+    setContent(await releaseContentService.getContentSections(id));
+  };
+
   React.useEffect(() => {
-    releaseContentService
-      .getContentSections(release.id)
-      .then(result => setContent(result));
+    updateContent(release.id);
   }, [release.id]);
 
   return (
@@ -52,6 +54,7 @@ const ReleaseContentAccordion = ({
                 key={order}
               >
                 <ContentBlock
+                  canAddBlocks
                   sectionId={id}
                   content={contentdata}
                   id={`content_${order}`}

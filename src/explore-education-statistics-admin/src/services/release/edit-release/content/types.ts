@@ -27,11 +27,15 @@ export interface ManageContentPageViewModel {
 
 export interface ContentBlockViewModel {
   id: string;
-  order: number;
+  order?: number;
   type: string;
   body: string;
 }
 
 export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
+export type ContentBlockPostModel = Pick<
+  ContentBlockViewModel,
+  'order' | 'type' | 'body'
+>;
 
 export default {};

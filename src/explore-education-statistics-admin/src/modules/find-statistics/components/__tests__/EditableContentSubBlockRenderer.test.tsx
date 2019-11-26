@@ -27,6 +27,7 @@ describe('EditableContentSubBlockRenderer', () => {
     const { container } = render(
       <EditingContext.Provider value={{ isEditing: true, releaseId: '' }}>
         <EditableContentSubBlockRenderer
+          canDelete
           id="test"
           index={1}
           editable

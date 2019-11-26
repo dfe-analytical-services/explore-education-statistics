@@ -6,11 +6,14 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import ContentService from '@admin/services/release/edit-release/content/service';
 
-export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
+export type MarkdownRendererProps = RendererProps &
+  ReactMarkdownProps & { canDelete: boolean; onDelete: () => void };
 
 const EditableMarkdownRenderer = ({
   contentId,
   source,
+  canDelete,
+  onDelete,
 }: MarkdownRendererProps) => {
   const [markdown, setMarkdown] = React.useState(source);
 
@@ -20,6 +23,7 @@ const EditableMarkdownRenderer = ({
     <>
       <WysiwygEditor
         content={markdown || ''}
+        canDelete={canDelete}
         editable
         useMarkdown
         onContentChange={async ss => {
@@ -40,6 +44,7 @@ const EditableMarkdownRenderer = ({
             setMarkdown(body);
           }
         }}
+        onDelete={onDelete}
       />
     </>
   );
