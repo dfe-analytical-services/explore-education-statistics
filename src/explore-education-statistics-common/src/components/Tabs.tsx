@@ -59,7 +59,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
         setSelectedTabIndex(tabIndex);
       }
     }
-  }, [sections]);
+  }, []);
 
   return (
     <div className="govuk-tabs">
