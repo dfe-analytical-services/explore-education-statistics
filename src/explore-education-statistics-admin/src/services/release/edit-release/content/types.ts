@@ -33,6 +33,9 @@ export interface ContentBlockViewModel {
 }
 
 export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
-export type ContentBlockPostModel = Pick<ContentBlockViewModel, 'order' | 'type' | 'body'>;
+export type ContentBlockPostModel = Pick<
+  ContentBlockViewModel,
+  'order' | 'type' | 'body'
+>;
 
 export default {};

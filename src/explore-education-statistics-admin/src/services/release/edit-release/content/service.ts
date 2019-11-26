@@ -16,6 +16,11 @@ export interface ReleaseContentService {
     order: Dictionary<number>,
   ) => Promise<ContentSectionViewModel[]>;
 
+  getContentSection: (
+    releaseId: string,
+    sectionId: string,
+  ) => Promise<ContentSectionViewModel>;
+
   addContentSectionBlock: (
     releaseId: string,
     sectionId: string,
@@ -51,13 +56,22 @@ const service: ReleaseContentService = {
     );
   },
 
+  getContentSection(
+    releaseId: string,
+    sectionId: string,
+  ): Promise<ContentSectionViewModel> {
+    return client.get<ContentSectionViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}`,
+    );
+  },
+
   addContentSectionBlock(
     releaseId: string,
     sectionId: string,
     block: ContentBlockPostModel,
   ): Promise<ContentBlockViewModel> {
     return client.post<ContentBlockViewModel>(
-      `/release/${releaseId}/content/section/${sectionId}/block/add`,
+      `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
       block,
     );
   },

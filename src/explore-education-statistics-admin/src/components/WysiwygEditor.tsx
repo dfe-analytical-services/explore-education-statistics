@@ -1,4 +1,4 @@
-import styles from '@admin/pages/prototypes/components/PrototypeEditableContent.module.scss';
+import styles from '@admin/components/wysiwyg.module.scss';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import React, { ChangeEvent } from 'react';
 import marked from 'marked';
 import TurndownService from 'turndown';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 interface Props {
   editable?: boolean;
+  canDelete?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
   content: string;
@@ -21,6 +23,7 @@ interface Props {
 
 const WysiwygEditor = ({
   editable,
+  canDelete = false,
   content,
   onContentChange,
   useMarkdown = false,
@@ -31,6 +34,7 @@ const WysiwygEditor = ({
     if (useMarkdown) return marked(content);
     return content;
   });
+  const [showConfirmation, setShowConfirmation] = React.useState(false);
 
   const turndownService = React.useMemo(() => new TurndownService(), []);
 
@@ -53,6 +57,25 @@ const WysiwygEditor = ({
 
   return (
     <div>
+      <ModalConfirm
+        onConfirm={() => {
+
+          setShowConfirmation(false);
+        }}
+        onExit={() => {
+
+          setShowConfirmation(false);
+        }}
+        onCancel={() => {
+
+          setShowConfirmation(false);
+        }}
+        title="Delete section"
+        mounted={showConfirmation}
+      >
+        <p>Are you sure you want to delete this section?</p>
+      </ModalConfirm>
+
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus */}
       <div
         role="button"
@@ -62,6 +85,7 @@ const WysiwygEditor = ({
           [styles.unsaved]: editable && !saved,
         })}
         onClick={() => {
+          console.log('Editing click');
           if (!editing) setEditing(editable === true);
         }}
         tabIndex={undefined}
@@ -81,6 +105,21 @@ const WysiwygEditor = ({
                 <span className="govuk-button govuk-body-s govuk-!-margin-bottom-0">
                   Edit this section
                 </span>
+                {canDelete && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowConfirmation(true);
+                      }}
+                      className="govuk-button govuk-button--warning govuk-body-s govuk-!-margin-bottom-0"
+                    >
+                      Delete this section
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

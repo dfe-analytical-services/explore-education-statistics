@@ -5,9 +5,9 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import ContentService from '@admin/services/release/edit-release/content/service';
 
-export type MarkdownRendererProps = RendererProps & { source: string };
+export type Props = RendererProps & { source: string, canDelete: boolean };
 
-const EditableHtmlRenderer = ({ contentId, source }: MarkdownRendererProps) => {
+const EditableHtmlRenderer = ({ contentId, source, canDelete }: Props) => {
   const [html, setHtml] = React.useState(source);
 
   const editingContext = React.useContext(EditingContentBlockContext);
@@ -17,6 +17,7 @@ const EditableHtmlRenderer = ({ contentId, source }: MarkdownRendererProps) => {
       <WysiwygEditor
         content={html || ''}
         editable
+        canDelete={canDelete}
         onContentChange={async ss => {
           if (
             editingContext.releaseId &&

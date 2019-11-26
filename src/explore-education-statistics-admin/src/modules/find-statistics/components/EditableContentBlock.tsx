@@ -9,8 +9,9 @@ import wrapEditableComponent, {
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
-import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
-import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
+import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
+import releaseContentService from '@admin/services/release/edit-release/content/service';
+import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 export interface Props extends ContentBlockProps {
@@ -23,7 +24,10 @@ export interface Props extends ContentBlockProps {
   reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (block: ContentBlockData, content: string) => void;
-  onAddContent?:  (type: string, order: number | undefined) => Promise<unknown>;
+  onAddContent?: (
+    type: string,
+    order: number | undefined,
+  ) => Promise<EditableRelease['content'][0]['content']>;
 }
 
 interface EditingContentBlockContext extends ReleaseContentContext {
@@ -46,7 +50,7 @@ interface AddContentButtonProps {
 const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
   return (
     <>
-      <Button onClick={() => onClick('HtmlBlock', order)}>Add HTML</Button>
+      <Button className="govuk-!-margin-top-4 govuk-!-margin-bottom-4" onClick={() => onClick('HtmlBlock', order)}>Add HTML</Button>
     </>
   );
 };
@@ -60,9 +64,10 @@ const EditableContentBlock = ({
   reviewing,
   resolveComments,
   canAddBlocks = false,
-  onAddContent,
 }: Props) => {
   const editingContext = React.useContext(EditingContext);
+
+  const [contentBlocks, setContentBlocks] = React.useState(content);
 
   if (content.length === 0) {
     return (
@@ -73,8 +78,21 @@ const EditableContentBlock = ({
   }
 
   const onAddContentCallback = (type: string, order: number | undefined) => {
-    if (onAddContent) {
-      onAddContent(type, order);
+    if (editingContext.releaseId && sectionId) {
+      const { releaseId } = editingContext;
+
+      releaseContentService
+        .addContentSectionBlock(releaseId, sectionId, {
+          body: 'Click to edit',
+          type,
+          order,
+        })
+        .then(() =>
+          releaseContentService.getContentSection(releaseId, sectionId),
+        )
+        .then(section => {
+          setContentBlocks(section.content);
+        });
     }
   };
 
@@ -85,7 +103,7 @@ const EditableContentBlock = ({
         sectionId,
       }}
     >
-      {content.map((block, index) => {
+      {contentBlocks.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
           <React.Fragment key={key}>
@@ -98,6 +116,7 @@ const EditableContentBlock = ({
             )}
             <EditableContentSubBlockRenderer
               editable={editable}
+              canDelete={!!canAddBlocks}
               block={block}
               id={id}
               index={index}
@@ -107,7 +126,7 @@ const EditableContentBlock = ({
                 }
               }}
             />
-            {canAddBlocks && index === content.length - 1 && (
+            {canAddBlocks && index === contentBlocks.length - 1 && (
               <AddContentButton onClick={onAddContentCallback} />
             )}
           </React.Fragment>

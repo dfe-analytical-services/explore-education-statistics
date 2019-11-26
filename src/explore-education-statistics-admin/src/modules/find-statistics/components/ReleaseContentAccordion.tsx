@@ -27,33 +27,13 @@ const ReleaseContentAccordion = ({
     return releaseContentService.updateContentSectionsOrder(release.id, ids);
   };
 
-  React.useEffect(() => {
-    releaseContentService
-      .getContentSections(release.id)
-      .then(result => setContent(result));
-  }, [release.id]);
-
-  const onAddContent = async (
-    sectionId: string | undefined,
-    type: string,
-    order: number | undefined,
-  ) => {
-    if (sectionId) {
-      await releaseContentService.addContentSectionBlock(
-        release.id,
-        sectionId,
-        {
-          body: 'Click to edit',
-          type,
-          order,
-        },
-      );
-
-      const result = await releaseContentService.getContentSections(release.id);
-
-      setContent(result);
-    }
+  const updateContent = async (id: string) => {
+    setContent(await releaseContentService.getContentSections(id));
   };
+
+  React.useEffect(() => {
+    updateContent(release.id);
+  }, [release.id]);
 
   return (
     <>
@@ -79,9 +59,6 @@ const ReleaseContentAccordion = ({
                   content={contentdata}
                   id={`content_${order}`}
                   publication={release.publication}
-                  onAddContent={(type, position) =>
-                    onAddContent(id, type, position)
-                  }
                 />
               </AccordionSection>
             ),
