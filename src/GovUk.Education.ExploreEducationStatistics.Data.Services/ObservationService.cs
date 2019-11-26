@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var localAuthorityOldCodes = query.LocalAuthority.Where(s => s.Length == 3).ToList();
-            var localAuthorityCodes = query.LocalAuthority.Except(localAuthorityOldCodes).ToList();
+            var localAuthorityOldCodes = query.LocalAuthority?.Where(s => s.Length == 3).ToList();
+            var localAuthorityCodes = query.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",

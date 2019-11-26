@@ -24,6 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             return new LocalAuthority(null, null, null);
         }
 
+        public string GetCodeOrOldCodeIfEmpty()
+        {
+            return string.IsNullOrEmpty(Code) ? OldCode : Code;
+        }
+
         protected bool Equals(LocalAuthority other)
         {
             return string.Equals(Code, other.Code);

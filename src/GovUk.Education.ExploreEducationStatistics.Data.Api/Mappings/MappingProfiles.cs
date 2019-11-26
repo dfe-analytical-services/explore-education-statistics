@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -28,6 +30,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(indicator => indicator.Unit.GetEnumValue()));
 
             CreateMap<Location, LocationViewModel>();
+
+            AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IObservationalUnit).IsAssignableFrom(p))
+                .ToList().ForEach(type =>
+                {
+                    if (type == typeof(LocalAuthority))
+                    {
+                        CreateMap<LocalAuthority, CodeNameViewModel>()
+                            .ForMember(model => model.Code, opts => opts.MapFrom(localAuthority => localAuthority.GetCodeOrOldCodeIfEmpty()));
+                    }
+                    else
+                    {
+                        CreateMap(type, typeof(CodeNameViewModel));
+                    }
+                });
 
             CreateMap<Permalink, PermalinkViewModel>();
 

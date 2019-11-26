@@ -131,8 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static ObservationalUnitMetaViewModel BuildObservationalUnitMetaViewModel(GeographicLevel level,
             IObservationalUnit unit)
         {
-            var value = string.IsNullOrEmpty(unit.Code) && unit is LocalAuthority localAuthority
-                ? localAuthority.OldCode : unit.Code;
+            var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
             return new ObservationalUnitMetaViewModel
             {
                 Label = unit.Name,
