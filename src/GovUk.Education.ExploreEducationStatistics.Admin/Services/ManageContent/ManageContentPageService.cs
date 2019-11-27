@@ -69,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ThenInclude(publication => publication.Topic.Theme)
                 .Include(r => r.Type)
                 .Include(r => r.Content)
-                .ThenInclude(s => s.Content);
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content);
         }
     }
 }

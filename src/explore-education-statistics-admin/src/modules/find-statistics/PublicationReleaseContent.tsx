@@ -223,7 +223,7 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      <DataBlock {...release.keyStatistics} id="keystats" />
+      <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
 
       {/* <editor-fold desc="Content blocks"> */}
 

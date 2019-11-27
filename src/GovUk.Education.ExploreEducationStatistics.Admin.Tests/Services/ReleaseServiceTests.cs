@@ -62,40 +62,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Id = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
                             ReleaseName = "2018",
-                            Content = new List<ContentSection>
+                            Content = new List<ReleaseContentSection>
                             {
-                                new ContentSection
+                                new ReleaseContentSection
                                 {
-                                    Id = new Guid("3cb10587-7b05-4c30-9f13-9f2025aca6a0"),
                                     ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
-                                    Caption = "Template caption index 0", // Should be copied 
-                                    Heading = "Template heading index 0", // Should be copied
-                                    Order = 0,
-                                    Content = new List<IContentBlock>
+                                    ContentSection = new ContentSection
                                     {
-                                        // TODO currently is not copied - should it be?
-                                        new HtmlBlock
+                                        Id = new Guid("3cb10587-7b05-4c30-9f13-9f2025aca6a0"),
+                                        Caption = "Template caption index 0", // Should be copied 
+                                        Heading = "Template heading index 0", // Should be copied
+                                        Order = 0,
+                                        Content = new List<IContentBlock>
                                         {
-                                            Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
-                                            Body = @"<div></div>"
+                                            // TODO currently is not copied - should it be?
+                                            new HtmlBlock
+                                            {
+                                                Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
+                                                Body = @"<div></div>"
+                                            }
                                         }
                                     }
                                 },
-                                new ContentSection
+                    
+                                new ReleaseContentSection
                                 {
-                                    Id = new Guid("8e804c94-61b3-4955-9d71-83a56d133a89"),
                                     ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
-                                    Caption = "Template caption index 1", // Should be copied 
-                                    Heading = "Template heading index 1", // Should be copied
-                                    Order = 1,
-                                    Content = new List<IContentBlock>
+                                    ContentSection = new ContentSection
                                     {
-                                        // TODO currently is not copied - should it be?
-                                        new InsetTextBlock
+                                        Id = new Guid("8e804c94-61b3-4955-9d71-83a56d133a89"),
+                                        Caption = "Template caption index 1", // Should be copied 
+                                        Heading = "Template heading index 1", // Should be copied
+                                        Order = 1,
+                                        Content = new List<IContentBlock>
                                         {
-                                            Id = new Guid("34884271-a30a-4cbd-9c08-e6d11d7f8c8e"),
-                                            Body = "Text",
-                                            Heading = "Heading"
+                                            // TODO currently is not copied - should it be?
+                                            new InsetTextBlock
+                                            {
+                                                Id = new Guid("34884271-a30a-4cbd-9c08-e6d11d7f8c8e"),
+                                                Body = "Text",
+                                                Heading = "Heading"
+                                            }
                                         }
                                     }
                                 }
@@ -125,15 +132,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(r => r.Content)
                     .Single(r => r.Id == result.Result.Right.Id);
                 Assert.Equal(2, release.Content.Count);
-                Assert.Equal("Template caption index 0", release.Content[0].Caption);
-                Assert.Equal("Template heading index 0", release.Content[0].Heading);
-                Assert.Equal(0, release.Content[0].Order);
-                Assert.Null(release.Content[0].Content); // TODO currently is not copied - should it be?
+                Assert.Equal("Template caption index 0", release.Content[0].ContentSection.Caption);
+                Assert.Equal("Template heading index 0", release.Content[0].ContentSection.Heading);
+                Assert.Equal(0, release.Content[0].ContentSection.Order);
+                Assert.Null(release.Content[0].ContentSection.Content); // TODO currently is not copied - should it be?
 
-                Assert.Equal("Template caption index 1", release.Content[1].Caption);
-                Assert.Equal("Template heading index 1", release.Content[1].Heading);
-                Assert.Equal(1, release.Content[1].Order);
-                Assert.Null(release.Content[1].Content); // TODO currently is not copied - should it be?
+                Assert.Equal("Template caption index 1", release.Content[1].ContentSection.Caption);
+                Assert.Equal("Template heading index 1", release.Content[1].ContentSection.Heading);
+                Assert.Equal(1, release.Content[1].ContentSection.Order);
+                Assert.Null(release.Content[1].ContentSection.Content); // TODO currently is not copied - should it be?
             }
         }
 

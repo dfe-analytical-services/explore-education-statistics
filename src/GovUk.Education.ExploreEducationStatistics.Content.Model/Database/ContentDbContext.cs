@@ -185,6 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseSummaryVersion> ReleaseSummaryVersions { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1595,7 +1596,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21")
                 },
 
                 // exclusions
@@ -1608,7 +1608,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d")
                 },
                 
                 // Secondary and primary schools applications offers
@@ -1621,7 +1620,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2018",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e")
                 }
             );
 
@@ -1630,63 +1628,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 1, Heading = "About these statistics", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 2, Heading = "Pupil absence rates", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 3, Heading = "Persistent absence", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 4, Heading = "Reasons for absence", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 5, Heading = "Distribution of absence", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 6, Heading = "Absence by pupil characteristics", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 7, Heading = "Absence for 4-year-olds", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 8, Heading = "Pupil referral unit absence", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
@@ -1695,63 +1684,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 1, Heading = "About this release", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 2, Heading = "Permanent exclusions", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 3, Heading = "Fixed-period exclusions", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 5, Heading = "Reasons for exclusions", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 7, Heading = "Independent exclusion reviews", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 8, Heading = "Pupil referral units exclusions", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
@@ -1760,35 +1740,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 1, Heading = "About this release", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 2, Heading = "Secondary applications and offers", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 3, Heading = "Secondary geographical variation", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 4, Heading = "Primary applications and offers", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 5, Heading = "Primary geographical variation", Caption = "", 
                     Type = ContentSectionType.Generic
                 },
@@ -1797,21 +1772,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.ReleaseSummary
                 },
                 new ContentSection
                 {
                     Id = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.ReleaseSummary
                 },
                 new ContentSection
                 {
                     Id = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.ReleaseSummary
                 },
@@ -1820,21 +1792,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatistics
                 },
                 new ContentSection
                 {
                     Id = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatistics
                 },
                 new ContentSection
                 {
                     Id = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatistics
                 },
@@ -1843,21 +1812,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
                 new ContentSection
                 {
                     Id = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
-                    ReleaseId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
                 new ContentSection
                 {
                     Id = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
-                    ReleaseId = new Guid("1a9a8d11-945d-40e2-8e16-1b3bf21442a0"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
@@ -1866,23 +1832,214 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.Headlines
                 },
                 new ContentSection
                 {
                     Id = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.Headlines
                 },
                 new ContentSection
                 {
                     Id = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Order = 1, Heading = "", Caption = "", 
                     Type = ContentSectionType.Headlines
+                }
+            );
+
+            modelBuilder.Entity<ReleaseContentSection>()
+                .HasKey(item => new { item.ReleaseId, item.ContentSectionId });
+
+            modelBuilder.Entity<ReleaseContentSection>().HasData(
+                // absence
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+
+                // exclusions
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+
+                // Secondary and primary schools applications offers
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                
+                // Summary sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                
+                // Key Statistics sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                
+                // Key Statistics secondary sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                
+                // Headline sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 }
             );
 

@@ -127,81 +127,88 @@ export default class PrototypePublicationService {
           ],
         },
       ],
-      keyStatistics: {
-        id: '000002',
-        type: 'DataBlock',
-        body: '',
-        dataBlockRequest: {
-          subjectId: '1',
-          filters: ['1', '2'],
-          indicators: ['23', '26', '28'],
-          timePeriod: {
-            startYear: 2016,
-            startCode: 'HT6',
-            endYear: 2017,
-            endCode: 'HT6',
-          },
-          geographicLevel: GeographicLevel.Country,
-        },
-
-        charts: [
+      keyStatisticsSection: {
+        order: 1,
+        heading: '',
+        caption: '',
+        content: [
           {
-            labels: {
-              '23_1_2': {
-                name: '23_1_2',
-                unit: '%',
-                value: '23_1_2',
-                label: 'Unauthorised absence',
+            id: '000002',
+            type: 'DataBlock',
+            body: '',
+            dataBlockRequest: {
+              subjectId: '1',
+              filters: ['1', '2'],
+              indicators: ['23', '26', '28'],
+              timePeriod: {
+                startYear: 2016,
+                startCode: 'HT6',
+                endYear: 2017,
+                endCode: 'HT6',
               },
-              '26_1_2': {
-                name: '26_1_2',
-                unit: '%',
-                value: '26_1_2',
-                label: 'Overall absence',
+              geographicLevel: GeographicLevel.Country,
+            },
+
+            charts: [
+              {
+                labels: {
+                  '23_1_2': {
+                    name: '23_1_2',
+                    unit: '%',
+                    value: '23_1_2',
+                    label: 'Unauthorised absence',
+                  },
+                  '26_1_2': {
+                    name: '26_1_2',
+                    unit: '%',
+                    value: '26_1_2',
+                    label: 'Overall absence',
+                  },
+                  '28_1_2': {
+                    name: '28_1_2',
+                    unit: '%',
+                    value: '28_1_2',
+                    label: 'Authorised absence',
+                  },
+                },
+                axes: {
+                  major: {
+                    name: 'major',
+                    type: 'major',
+                    groupBy: 'timePeriod',
+                    dataSets: [
+                      { indicator: '23', filters: ['1', '2'] },
+                      { indicator: '26', filters: ['1', '2'] },
+                      { indicator: '28', filters: ['1', '2'] },
+                    ],
+                  },
+                  minor: {
+                    name: 'minor',
+                    type: 'minor',
+                    dataSets: [],
+                  },
+                },
+                type: 'line',
               },
-              '28_1_2': {
-                name: '28_1_2',
-                unit: '%',
-                value: '28_1_2',
-                label: 'Authorised absence',
+            ],
+
+            summary: {
+              dataKeys: [],
+              dataSummary: [],
+              dataDefinition: [],
+              description: {
+                type: 'MarkDownBlock',
+                body: LOREM,
               },
             },
-            axes: {
-              major: {
-                name: 'major',
-                type: 'major',
-                groupBy: 'timePeriod',
-                dataSets: [
-                  { indicator: '23', filters: ['1', '2'] },
-                  { indicator: '26', filters: ['1', '2'] },
-                  { indicator: '28', filters: ['1', '2'] },
-                ],
+            comments: [
+              {
+                comment: LOREM.substring(0, 120),
+                name: 'John Smith',
+                time: new Date(),
+                state: 'open',
               },
-              minor: {
-                name: 'minor',
-                type: 'minor',
-                dataSets: [],
-              },
-            },
-            type: 'line',
-          },
-        ],
-
-        summary: {
-          dataKeys: [],
-          dataSummary: [],
-          dataDefinition: [],
-          description: {
-            type: 'MarkDownBlock',
-            body: LOREM,
-          },
-        },
-        comments: [
-          {
-            comment: LOREM.substring(0, 120),
-            name: 'John Smith',
-            time: new Date(),
-            state: 'open',
+            ],
           },
         ],
       },

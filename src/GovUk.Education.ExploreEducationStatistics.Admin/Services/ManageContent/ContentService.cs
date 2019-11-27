@@ -295,6 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return releases
                 .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content);
         }
         
@@ -347,7 +348,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 var section = release
                     .Content
-                    .Find(contentSection => contentSection.Id == contentSectionId);
+                    .Select(join => join.ContentSection)
+                    .ToList()
+                    .Find(join => join.Id == contentSectionId);
 
                 if (section == null)
                 {

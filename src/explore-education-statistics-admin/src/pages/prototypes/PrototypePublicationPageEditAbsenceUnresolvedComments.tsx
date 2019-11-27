@@ -25,7 +25,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
 
   React.useEffect(() => {
     const allComments = [
-      ...data.keyStatistics.comments,
+      ...data.keyStatisticsSection.content[0].comments,
       ...data.content.reduce<ExtendedComment[]>((allComments, content) => {
         return [
           ...allComments,

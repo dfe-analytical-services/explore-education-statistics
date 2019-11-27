@@ -16,16 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DataBlockService : IDataBlockService
     {
         private readonly ContentDbContext _context;
-        private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public DataBlockService(
             ContentDbContext context,
-            IReleaseService releaseService,
             IMapper mapper)
         {
             _context = context;
-            _releaseService = releaseService;
             _mapper = mapper;
         }
 
@@ -58,11 +55,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
         {
-            var release = await _releaseService.GetAsync(releaseId);
-            
-            var dataBlocks = await _context.DataBlocks.Where(block => 
-                block.ContentSection.ReleaseId.Equals(releaseId) || 
-                block.Id.Equals(release.KeyStatisticsId)).ToListAsync();
+            var dataBlocks = await _context
+                .DataBlocks
+                .Join(_context.ReleaseContentSections,
+                    block => block.ContentSectionId,
+                    join => join.ContentSectionId,
+                    (block, join) => new { block, join })
+                .Where(tuple => tuple.join.ReleaseId == releaseId)
+                .Select(tuple => tuple.block)
+                .ToListAsync();
             
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }

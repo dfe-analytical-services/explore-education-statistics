@@ -212,6 +212,7 @@ export interface AbstractRelease<
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
+  keyStatisticsSection: ContentSection<ContentBlockType>;
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
@@ -229,7 +230,6 @@ export interface AbstractRelease<
     reason: string;
   }[];
   content: ContentSection<ContentBlockType>[];
-  keyStatistics: ContentBlockType;
   dataFiles?: {
     extension: string;
     name: string;

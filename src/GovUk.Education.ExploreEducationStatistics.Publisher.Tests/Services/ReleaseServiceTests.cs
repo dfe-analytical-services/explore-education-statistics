@@ -58,14 +58,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new Release
             {
                 Id = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
-                KeyStatisticsId = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
                 PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
                 TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             },
             new Release
             {
                 Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                KeyStatisticsId = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
                 PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9")
             }
         };
@@ -75,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ContentSection
             {
                 Id = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd"),
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
                 Order = 1,
                 Heading = "Content Section 1",
                 Caption = ""
@@ -83,7 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ContentSection
             {
                 Id = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240"),
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
                 Order = 2,
                 Heading = "Content Section 2",
                 Caption = ""
@@ -91,7 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ContentSection
             {
                 Id = new Guid("99c28757-bf61-490e-a51f-98dd58afb578"),
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                 Order = 1,
                 Heading = "Content Section 1",
                 Caption = ""
@@ -99,7 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ContentSection
             {
                 Id = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238"),
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                 Order = 2,
                 Heading = "Content Section 2",
                 Caption = ""

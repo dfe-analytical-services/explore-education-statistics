@@ -48,8 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<ContentSection>> GetContentAsync(ReleaseId id)
         {
             return await _context
-                .ContentSections
-                .Where(section => section.ReleaseId == id && section.Type == ContentSectionType.Generic)
+                .Releases
+                .Where(release => release.Id == id)
+                .Select(release => release.Content)
+                .SelectMany(join => join.Select(j => j.ContentSection))
                 .ToListAsync();
         }
         
@@ -206,7 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return templateContent.Select(c => new ContentSection
                     {
                         Id = new ContentSectionId(),
-                        ReleaseId = c.ReleaseId,
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,

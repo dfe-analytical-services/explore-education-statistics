@@ -27,9 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<IContentBlock> Content { get; set; }
 
-        public Release Release { get; set; }
-
-        public Guid ReleaseId { get; set; }
+        public ReleaseContentSection? Release { get; set; }
         
         [JsonIgnore]
         public ContentSectionType Type { get; set; }

@@ -28,8 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var release = _context.Releases
                 .Include(r => r.Type)
                 .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content)
-                .Include(r => r.KeyStatistics)
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
                 .Include(r => r.Updates)
@@ -69,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var release = _context.Releases
                 .Include(r => r.Type)
                 .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content)
-                .Include(r => r.KeyStatistics)
                 .Include(r => r.Publication).ThenInclude(p => p.LegacyReleases)
                 .Include(r => r.Publication).ThenInclude(p => p.Topic.Theme)
                 .Include(r => r.Publication).ThenInclude(p => p.Contact)
