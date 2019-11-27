@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
@@ -37,6 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
         }
 
+        public async Task<IEnumerable<FileInfo>> ListPublicFilesPreviewAsync(Guid releaseId)
+        {
+            var files = new List<FileInfo>();
+
+            files.AddRange(await ListFilesAsync(releaseId,ReleaseFileTypes.Data));
+            files.AddRange(await ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary));
+
+            return files.OrderBy(f => f.Name);
+        }
+        
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
         {
             return await ListFilesAsync(releaseId.ToString(), type);
@@ -184,14 +195,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return blobContainer
                 .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                .Where(cbb => !IsBatchedFile(cbb, releaseId))
                 .OfType<CloudBlockBlob>()
+                .Where(blob => !IsBatchedFile(blob, releaseId) && !IsMetaDataFile(blob))
                 .Select(file => new FileInfo
                 {
-                    Extension = FileStorageUtils.GetExtension(file),
-                    Name = FileStorageUtils.GetName(file),
+                    Extension = GetExtension(file),
+                    Name = GetName(file),
                     Path = file.Name,
-                    Size = FileStorageUtils.GetSize(file),
+                    Size = GetSize(file),
                     MetaFileName = GetMetaFileName(file),
                     Rows = GetNumberOfRows(file),
                     UserName = GetUserName(file),
@@ -325,10 +336,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return false;
             }
 
-            using (var reader = new StreamReader(fileStream))
-            {
-                return reader.BaseStream.IsTextFile();
-            }
+            using var reader = new StreamReader(fileStream);
+            return reader.BaseStream.IsTextFile();
         }
 
         private static int CalculateNumberOfRows(Stream fileStream)

@@ -23,8 +23,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Gb,
             Tb
         }
-        
+
         private const string NameKey = "name";
+        
+        public const string NumberOfRows = "NumberOfRows";
+
+        public const string UserName = "userName";
+        
+        /**
+         * Property key on a metadata file to point at the data file
+         */
+        public const string DataFileKey = "datafile";
+        
+        /**
+         * Property key on a data file to point at the metadata file
+         */
+        public const string MetaFileKey = "metafile";
         
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
             string containerName, BlobContainerPermissions permissions = null)
@@ -124,6 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return false;
+        }
+        
+        public static bool IsMetaDataFile(CloudBlob blob)
+        {
+            // The meta data file contains a metadata attribute referencing it's corresponding data file
+            return blob.Metadata.ContainsKey(DataFileKey);
         }
         
         private static DateTime ParseDateTime(string dateTime)

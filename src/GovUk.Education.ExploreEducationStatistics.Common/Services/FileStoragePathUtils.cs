@@ -6,26 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public static class FileStoragePathUtils
     {
-        /*
-         * Property key on a data file to point at the metadata file
-         */
-        public const string MetaFileKey = "metafile";
-
-        public const string NumberOfRows = "NumberOfRows";
-
-        public const string UserName = "userName";
-        
-        /*
-         * Property key on a metadata file to point at the data file
-         */
-        public const string DataFileKey = "datafile";
-        
-        /*
-         * Property key on a metadata file to point at the data file
-         */
         public const string BatchesDir = "batches";
-        
-        
+    
         /**
          * The top level admin directory path where files on a release are stored.
          */

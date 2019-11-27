@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
                 releaseViewModel.DataFiles = 
-                    await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+                    await _fileStorageService.ListPublicFilesPreviewAsync(releaseId);
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel,

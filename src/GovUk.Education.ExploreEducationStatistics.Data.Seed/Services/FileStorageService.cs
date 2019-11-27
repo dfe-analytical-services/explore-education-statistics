@@ -11,6 +11,7 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
