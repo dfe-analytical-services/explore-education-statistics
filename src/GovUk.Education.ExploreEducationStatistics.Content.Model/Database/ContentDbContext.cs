@@ -186,6 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
+        
+        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -205,12 +207,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     p => p.ToString(),
                     p => new Uri(p));
-            
+
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<Release>()
                 .Property<List<BasicLink>>("RelatedInformation")
                 .HasConversion(
@@ -220,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
-            
+
             modelBuilder.Entity<ContentSection>()
                 .Property(b => b.Type)
                 .HasConversion(new EnumToStringConverter<ContentSectionType>());
@@ -243,22 +245,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rsv => rsv.ReleaseSummary)
                 .WithMany(rs => rs.Versions)
                 .HasForeignKey(rsv => rsv.ReleaseSummaryId);
-            
+
             modelBuilder.Entity<ReleaseSummaryVersion>()
                 .Property(b => b.NextReleaseDate)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<PartialDate>(v));
-            
+
             modelBuilder.Entity<ReleaseSummaryVersion>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
-                        
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasColumnName("DataBlock_Request");
@@ -276,14 +278,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Summary>(v));
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Tables)
                 .HasColumnName("DataBlock_Tables")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<Table>>(v));
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasConversion(
@@ -293,18 +295,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("HtmlBlock_Body");
- 
+
             modelBuilder.Entity<InsetTextBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("InsetTextBlock_Body");
-            
+
             modelBuilder.Entity<InsetTextBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("InsetTextBlock_Heading");
-            
+
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("MarkDownBlock_Body");
+
+            modelBuilder.Entity<ReleaseContentSection>()
+                .HasKey(item => new {item.ReleaseId, item.ContentSectionId});
+
+            modelBuilder.Entity<ReleaseContentBlock>()
+                .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
@@ -1226,7 +1234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                    
+
                     Title = "Secondary and primary schools applications and offers",
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
@@ -1520,27 +1528,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             );
 
             modelBuilder.Entity<ReleaseSummary>().HasData(
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                        Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                    },
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                        Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
-                    },
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                        Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                    },
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                        Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                    }
-                );
+                new ReleaseSummary
+                {
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
+                    Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
+                }
+            );
 
             modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
                 new ReleaseSummaryVersion
@@ -1583,8 +1591,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     ReleaseSummaryId = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
                 });
-             
-            
+
+
             modelBuilder.Entity<Release>().HasData(
                 //absence
                 new Release
@@ -1609,7 +1617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                 },
-                
+
                 // Secondary and primary schools applications offers
                 new Release
                 {
@@ -1628,55 +1636,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
-                    Order = 1, Heading = "About these statistics", Caption = "", 
+                    Order = 1, Heading = "About these statistics", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
-                    Order = 2, Heading = "Pupil absence rates", Caption = "", 
+                    Order = 2, Heading = "Pupil absence rates", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
-                    Order = 3, Heading = "Persistent absence", Caption = "", 
+                    Order = 3, Heading = "Persistent absence", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    Order = 4, Heading = "Reasons for absence", Caption = "", 
+                    Order = 4, Heading = "Reasons for absence", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
-                    Order = 5, Heading = "Distribution of absence", Caption = "", 
+                    Order = 5, Heading = "Distribution of absence", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
-                    Order = 6, Heading = "Absence by pupil characteristics", Caption = "", 
+                    Order = 6, Heading = "Absence by pupil characteristics", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
-                    Order = 7, Heading = "Absence for 4-year-olds", Caption = "", 
+                    Order = 7, Heading = "Absence for 4-year-olds", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
-                    Order = 8, Heading = "Pupil referral unit absence", Caption = "", 
+                    Order = 8, Heading = "Pupil referral unit absence", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
-                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "", 
+                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                     Type = ContentSectionType.Generic
                 },
 
@@ -1684,55 +1692,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
-                    Order = 1, Heading = "About this release", Caption = "", 
+                    Order = 1, Heading = "About this release", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
-                    Order = 2, Heading = "Permanent exclusions", Caption = "", 
+                    Order = 2, Heading = "Permanent exclusions", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
-                    Order = 3, Heading = "Fixed-period exclusions", Caption = "", 
+                    Order = 3, Heading = "Fixed-period exclusions", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
-                    Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = "", 
+                    Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
-                    Order = 5, Heading = "Reasons for exclusions", Caption = "", 
+                    Order = 5, Heading = "Reasons for exclusions", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
-                    Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "", 
+                    Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
-                    Order = 7, Heading = "Independent exclusion reviews", Caption = "", 
+                    Order = 7, Heading = "Independent exclusion reviews", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
-                    Order = 8, Heading = "Pupil referral units exclusions", Caption = "", 
+                    Order = 8, Heading = "Pupil referral units exclusions", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
-                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "", 
+                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                     Type = ContentSectionType.Generic
                 },
 
@@ -1740,117 +1748,114 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
-                    Order = 1, Heading = "About this release", Caption = "", 
+                    Order = 1, Heading = "About this release", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
-                    Order = 2, Heading = "Secondary applications and offers", Caption = "", 
+                    Order = 2, Heading = "Secondary applications and offers", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
-                    Order = 3, Heading = "Secondary geographical variation", Caption = "", 
+                    Order = 3, Heading = "Secondary geographical variation", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
-                    Order = 4, Heading = "Primary applications and offers", Caption = "", 
+                    Order = 4, Heading = "Primary applications and offers", Caption = "",
                     Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
-                    Order = 5, Heading = "Primary geographical variation", Caption = "", 
+                    Order = 5, Heading = "Primary geographical variation", Caption = "",
                     Type = ContentSectionType.Generic
                 },
-                
+
                 // Summary sections for each Release
                 new ContentSection
                 {
                     Id = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.ReleaseSummary
                 },
                 new ContentSection
                 {
                     Id = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.ReleaseSummary
                 },
                 new ContentSection
                 {
                     Id = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.ReleaseSummary
                 },
-                
+
                 // Key Statistics sections for each Release
                 new ContentSection
                 {
                     Id = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatistics
                 },
                 new ContentSection
                 {
                     Id = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatistics
                 },
                 new ContentSection
                 {
                     Id = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatistics
                 },
-                
+
                 // Key Statistics secondary sections for each Release
                 new ContentSection
                 {
                     Id = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
                 new ContentSection
                 {
                     Id = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
                 new ContentSection
                 {
                     Id = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
-                
+
                 // Headline sections for each Release
                 new ContentSection
                 {
                     Id = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.Headlines
                 },
                 new ContentSection
                 {
                     Id = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.Headlines
                 },
                 new ContentSection
                 {
                     Id = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
-                    Order = 1, Heading = "", Caption = "", 
+                    Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.Headlines
                 }
             );
-
-            modelBuilder.Entity<ReleaseContentSection>()
-                .HasKey(item => new { item.ReleaseId, item.ContentSectionId });
 
             modelBuilder.Entity<ReleaseContentSection>().HasData(
                 // absence
@@ -1973,7 +1978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 },
-                
+
                 // Summary sections for each Release
                 new ReleaseContentSection
                 {
@@ -1990,7 +1995,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 },
-                
+
                 // Key Statistics sections for each Release
                 new ReleaseContentSection
                 {
@@ -2007,7 +2012,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 },
-                
+
                 // Key Statistics secondary sections for each Release
                 new ReleaseContentSection
                 {
@@ -2024,7 +2029,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 },
-                
+
                 // Headline sections for each Release
                 new ReleaseContentSection
                 {
@@ -2039,6 +2044,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                }
+            );
+
+            modelBuilder.Entity<ReleaseContentBlock>().HasData(
+                // absence key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                // absence key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                // absence key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                // absence key stats aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                // exclusions key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // exclusions key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // exclusions key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // exclusions aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // Secondary and primary schools applications key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                // Secondary and primary schools applications key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                // Secondary and primary schools applications key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                // Secondary and primary schools applications aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 }
             );

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.EntityFrameworkCore;
 using ContentSectionId = System.Guid;
 using DataBlockId = System.Guid;
@@ -31,7 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
             dataBlock.Id = DataBlockId.NewGuid();
 
+            var release = _context
+                .Releases
+                .FindByPrimaryKey(_context, releaseId)
+                .First();
+
             await _context.DataBlocks.AddAsync(dataBlock);
+            
+            release.AddContentBlock(dataBlock);
+            _context.Releases.Update(release);
+            
             await _context.SaveChangesAsync();
 
             return await GetAsync(dataBlock.Id);
@@ -56,13 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
         {
             var dataBlocks = await _context
-                .DataBlocks
-                .Join(_context.ReleaseContentSections,
-                    block => block.ContentSectionId,
-                    join => join.ContentSectionId,
-                    (block, join) => new { block, join })
-                .Where(tuple => tuple.join.ReleaseId == releaseId)
-                .Select(tuple => tuple.block)
+                .ReleaseContentBlocks
+                .Where(join => join.ReleaseId == releaseId)
+                .Select(join => join.ContentBlock)
                 .ToListAsync();
             
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);

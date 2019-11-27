@@ -67,6 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore]
         public List<ReleaseContentSection> Content { get; set; }
 
+        [JsonIgnore]
+        public List<ReleaseContentBlock> ContentBlocks { get; set; }
+
         [NotMapped]
         [JsonProperty("Content")]
         public IEnumerable<ContentSection> GenericContent
@@ -94,6 +97,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public void RemoveGenericContentSection(ContentSection section)
         {
             Content.Remove(Content.Find(join => join.ContentSection == section));
+        }
+        
+        public void AddContentBlock(IContentBlock contentBlock)
+        {
+            if (ContentBlocks == null)
+            {
+                ContentBlocks = new List<ReleaseContentBlock>();
+            }
+            
+            ContentBlocks.Add(new ReleaseContentBlock
+            {
+                Release = this,
+                ContentBlock = contentBlock
+            });
         }
 
         [NotMapped]
