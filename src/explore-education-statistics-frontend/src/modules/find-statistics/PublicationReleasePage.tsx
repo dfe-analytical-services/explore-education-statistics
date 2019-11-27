@@ -285,8 +285,11 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        {data.keyStatistics && (
-          <DataBlockWithAnalytics {...data.keyStatistics} id="keystats" />
+        {data.keyStatisticsSection && data.keyStatisticsSection.content && (
+          <DataBlockWithAnalytics
+            {...data.keyStatisticsSection.content[0]}
+            id="keystats"
+          />
         )}
 
         {data.content.length > 0 && (
