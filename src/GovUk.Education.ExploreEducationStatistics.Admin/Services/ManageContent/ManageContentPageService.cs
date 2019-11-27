@@ -18,32 +18,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class ManageContentPageService : IManageContentPageService
     {
         private readonly IMapper _mapper;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly FileStorageService _fileStorageService;
+        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ManageContentPageService(ContentDbContext context, IMapper mapper)
+        public ManageContentPageService(ContentDbContext context, IMapper mapper, FileStorageService fileStorageService)
         {
             _mapper = mapper;
+            _fileStorageService = fileStorageService;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
-                context, 
-                context.Releases, 
+                context,
+                context.Releases,
                 ValidationErrorMessages.ReleaseNotFound);
         }
-        
-        public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId)
+
+        public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
+            Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, release =>
-                new ManageContentPageViewModel
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            {
+                var downloadFiles = await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+                return new ManageContentPageViewModel
                 {
                     Release = _mapper.Map<ReleaseViewModel>(release),
-                    RelatedInformation = new List<BasicLink>()
+                    RelatedInformation = new List<BasicLink>
                     {
-                        new BasicLink()
+                        new BasicLink
                         {
                             Id = new Guid("15a8dbb8-d8b7-4247-b841-e798860a4700"),
                             Description = "Pupil absence statistics: guidance and methodology",
                             Url = "http://example.com/1"
                         },
-                        new BasicLink()
+                        new BasicLink
                         {
                             Id = new Guid("fadedcb1-f386-4faa-a24f-6731be534097"),
                             Description = "This is an example of a related information link",
@@ -56,24 +61,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Order = 0,
                         Caption = "Introduction section caption",
                         Heading = "Introduction section heading",
-                        Content = new List<IContentBlock>()
+                        Content = new List<IContentBlock>
                         {
-                            new HtmlBlock()
+                            new HtmlBlock
                             {
                                 Id = new Guid("65187a0b-eb17-4481-b234-949dc85f1efa"),
                                 Type = "MarkDownBlock",
                                 Body = "Read national statistical summaries and definitions, view charts and " +
                                        "tables and download data files across a range of pupil absence subject " +
-                                       "areas.\n" + 
+                                       "areas.\n" +
                                        "You can also view a regional breakdown of statistics and data within the " +
                                        "[local authorities section](#)",
                             }
                         }
                     },
-                }
-            , HydrateReleaseForReleaseViewModel);
+                    DownloadFiles = downloadFiles
+                };
+            }, HydrateReleaseForReleaseViewModel);
         }
-        
+
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             return values
