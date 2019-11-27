@@ -30,6 +30,8 @@ const EditableLink = ({
       )}
       href={href}
       {...props}
+      rel="noopener noreferrer"
+      target="_blank"
     >
       {children}
     </a>

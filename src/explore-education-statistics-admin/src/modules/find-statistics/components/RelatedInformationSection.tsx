@@ -106,8 +106,11 @@ const RelatedInformationSection = ({ relatedInformation, release }: Props) => {
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
           <li>
-            <Link to={`/methodology/${release.publication.slug}`}>
-              {`${release.publication.title}: methodology`}
+            <Link
+              to={`/methodology/${release.publication.methodology.id}`}
+              target="_blank"
+            >
+              {release.publication.methodology.title}
             </Link>
           </li>
           {isEditing && <hr />}
