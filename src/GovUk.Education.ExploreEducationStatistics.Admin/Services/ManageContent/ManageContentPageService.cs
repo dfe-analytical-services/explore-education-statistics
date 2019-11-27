@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DownloadFiles = 
+                releaseViewModel.DataFiles = 
                     await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data);
                 return new ManageContentPageViewModel
                 {

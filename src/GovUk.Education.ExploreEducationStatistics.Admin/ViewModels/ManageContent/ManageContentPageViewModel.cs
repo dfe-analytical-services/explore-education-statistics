@@ -48,9 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public KeyStatisticsViewModel KeyStatistics { get; set; }
 
-        // dataFiles
-
-        public IEnumerable<FileInfo> DownloadFiles { get; set; }
+        public IEnumerable<FileInfo> DataFiles { get; set; }
 
         public DateTime? PublishScheduled { get; set; }
 
