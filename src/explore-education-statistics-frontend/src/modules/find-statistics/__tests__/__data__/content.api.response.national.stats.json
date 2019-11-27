@@ -11,7 +11,20 @@
     "title": "National Statistics"
   },
   "slug": "2016-17",
-  "summary": "Read national statistical summaries, view charts and tables and download data files.",
+  "summarySection": {
+    "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+    "order": 1,
+    "heading": "",
+    "caption": "",
+    "content": [
+      {
+        "body": "Read national statistical summaries, view charts and tables and download data files.",
+        "type": "MarkDownBlock",
+        "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+        "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+      }
+    ]
+  },
   "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
   "publication": {
     "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -104,7 +117,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -805,7 +831,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -1518,7 +1557,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -2351,7 +2403,20 @@
             "publishScheduled": null,
             "live": true,
             "slug": "2016-17",
-            "summary": "Read national statistical summaries, view charts and tables and download data files.",
+            "summarySection": {
+              "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+              "order": 1,
+              "heading": "",
+              "caption": "",
+              "content": [
+                {
+                  "body": "Read national statistical summaries, view charts and tables and download data files.",
+                  "type": "MarkDownBlock",
+                  "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+                  "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+                }
+              ]
+            },
             "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
             "publication": {
               "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -2905,7 +2970,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -3468,7 +3546,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -4169,7 +4260,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -4864,7 +4968,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -5565,7 +5682,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -6266,7 +6396,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -6967,7 +7110,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -7790,7 +7946,20 @@
             "publishScheduled": null,
             "live": true,
             "slug": "2016-17",
-            "summary": "Read national statistical summaries, view charts and tables and download data files.",
+            "summarySection": {
+              "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+              "order": 1,
+              "heading": "",
+              "caption": "",
+              "content": [
+                {
+                  "body": "Read national statistical summaries, view charts and tables and download data files.",
+                  "type": "MarkDownBlock",
+                  "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+                  "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+                }
+              ]
+            },
             "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
             "publication": {
               "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -8354,7 +8523,20 @@
         "publishScheduled": null,
         "live": true,
         "slug": "2016-17",
-        "summary": "Read national statistical summaries, view charts and tables and download data files.",
+        "summarySection": {
+          "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+          "order": 1,
+          "heading": "",
+          "caption": "",
+          "content": [
+            {
+              "body": "Read national statistical summaries, view charts and tables and download data files.",
+              "type": "MarkDownBlock",
+              "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+              "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+            }
+          ]
+        },
         "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
         "publication": {
           "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
@@ -9071,7 +9253,20 @@
       "publishScheduled": null,
       "live": true,
       "slug": "2016-17",
-      "summary": "Read national statistical summaries, view charts and tables and download data files.",
+      "summarySection": {
+        "id": "6a263091-5f6e-412c-8d37-11e2c9c0a387",
+        "order": 1,
+        "heading": "",
+        "caption": "",
+        "content": [
+          {
+            "body": "Read national statistical summaries, view charts and tables and download data files.",
+            "type": "MarkDownBlock",
+            "id": "d6b02478-107d-4cd6-a662-2102b3a04e58",
+            "contentSectionId": "6a263091-5f6e-412c-8d37-11e2c9c0a387"
+          }
+        ]
+      },
       "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
       "publication": {
         "id": "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
