@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -12,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public enum IStatus
     {
-        RUNNING_PHASE_1 = 1,
-        RUNNING_PHASE_2 = 2,
-        RUNNING_PHASE_3 = 3,
-        COMPLETE = 4,
-        FAILED = 5,
-        NOT_FOUND = 6
+        RUNNING_PHASE_1,
+        RUNNING_PHASE_2,
+        RUNNING_PHASE_3,
+        COMPLETE,
+        FAILED,
+        NOT_FOUND
     };
     
     public class ImportStatusService : IImportStatusService

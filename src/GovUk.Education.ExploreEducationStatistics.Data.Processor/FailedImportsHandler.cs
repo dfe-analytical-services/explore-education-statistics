@@ -1,5 +1,4 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -70,12 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private static TableQuery<DatafileImport> BuildQuery()
         {
             var f1 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.GetEnumValue());
+                QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString());
             var f2 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.GetEnumValue());
+                QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString());
             var combineFilters = TableQuery.CombineFilters(f1, TableOperators.Or, f2);
             var f3 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.GetEnumValue());
+                QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString());
             return new TableQuery<DatafileImport>()
                 .Where(TableQuery.CombineFilters(combineFilters, TableOperators.Or, f3));
         }

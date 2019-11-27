@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
@@ -14,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
@@ -132,8 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
-            // If the batch is already reached RUNNING_PHASE_2 then don't re-create the subject
-            if ((int)status >= (int)IStatus.RUNNING_PHASE_2)
+            // If already reached Phase 2 then don't re-create the subject
+            if ((int)status > (int)IStatus.RUNNING_PHASE_1)
             {
                 return await _fileStorageService.GetSubjectData(message); 
             }
