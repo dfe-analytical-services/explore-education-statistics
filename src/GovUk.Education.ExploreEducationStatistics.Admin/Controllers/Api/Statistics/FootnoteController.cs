@@ -277,8 +277,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                                              filterGroupId => new FootnoteFilterGroupViewModel
                                                              {
                                                                  FilterItems =
-                                                                     filterItemsByFilterGroup.GetValueOrDefault(
-                                                                         filterGroupId) ?? new List<long>(),
+                                                                     filterItemsByFilterGroup
+                                                                         .GetValueOrDefault(filterGroupId)
+                                                                         ?.Select(filterItemId =>
+                                                                             filterItemId.ToString()) ??
+                                                                     new List<string>(),
                                                                  Selected = selectedFilterGroups.Contains(filterGroupId)
                                                              }) ?? new Dictionary<long, FootnoteFilterGroupViewModel>(),
                                           Selected = selectedFilters.Contains(filterId)
@@ -288,8 +291,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                               indicatorGroupId => new FootnoteIndicatorGroupViewModel
                                               {
                                                   Indicators =
-                                                      indicatorsByIndicatorGroup.GetValueOrDefault(indicatorGroupId) ??
-                                                      new List<long>()
+                                                      indicatorsByIndicatorGroup.GetValueOrDefault(indicatorGroupId)
+                                                          ?.Select(indicatorId => indicatorId.ToString()) ??
+                                                      new List<string>()
                                               }) ?? new Dictionary<long, FootnoteIndicatorGroupViewModel>(),
                         Selected = selectedSubjects.Contains(subjectId)
                     })
