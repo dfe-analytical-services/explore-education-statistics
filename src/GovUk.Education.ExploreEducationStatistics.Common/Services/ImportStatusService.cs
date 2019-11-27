@@ -44,12 +44,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new ImportStatus
             {
                 Errors = import.Errors,
-                PercentageComplete = ((from bool b in new BitArray(import.BatchesProcessed)
-                                      where b
-                                      select b).Count() * 100) / import.NumBatches,
+                PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };
+        }
+        
+        public static int GetNumBatchesComplete(DatafileImport import)
+        {
+            return (from bool b in new BitArray(import.BatchesProcessed)
+                where b
+                select b).Count();
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
