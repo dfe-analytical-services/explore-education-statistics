@@ -6,10 +6,11 @@ import {
 } from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdTitlePair } from '@admin/services/common/types';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import Link from '@admin/components/Link';
 import PublicationSummary from './PublicationSummary';
 
@@ -40,16 +41,15 @@ export interface Props {
 }
 
 const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
+  const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
+    ThemeAndTopicContext,
+  );
+
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
-
-  const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
-    theme: ThemeAndTopicsIdsAndTitles;
-    topic: IdTitlePair;
-  }>();
 
   const onThemeChange = (
     themeId: string,
@@ -84,10 +84,12 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
 
   useEffect(() => {
     if (themes) {
-      setSelectedThemeAndTopic({
-        theme: themes[0],
-        topic: orderBy(themes[0].topics, topic => topic.title)[0],
-      });
+      if (!selectedThemeAndTopic) {
+        setSelectedThemeAndTopic({
+          theme: themes[0],
+          topic: orderBy(themes[0].topics, topic => topic.title)[0],
+        });
+      }
       if (themePropId && topicPropId) {
         const theme = themes.find(function findTheme(t) {
           return t.id === themePropId;
@@ -108,11 +110,13 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
 
   useEffect(() => {
     if (selectedThemeAndTopic) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications);
+      if (selectedThemeAndTopic.topic.id) {
+        dashboardService
+          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .then(setMyPublications);
+      }
 
-      window.history.replaceState(
+      window.history.pushState(
         '',
         '',
         `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,

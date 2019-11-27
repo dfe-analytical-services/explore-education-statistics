@@ -30,6 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
+            var localAuthorityOldCodes = query.LocalAuthority?.Where(s => s.Length == 3).ToList();
+            var localAuthorityCodes = query.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
+
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
                 query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
@@ -37,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
                 CreateIdListType("institutionList", query.Institution);
-            var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthority);
+            var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorityCodes);
+            var localAuthorityOldCodeListParam = CreateIdListType("localAuthorityOldCodeList", localAuthorityOldCodes);
             var localAuthorityDistrictListParam =
                 CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistrict);
             var localEnterprisePartnershipListParam =
@@ -57,32 +61,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", query.Ward);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
+            // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
+
             var inner = _context
-                .Set<IdWrapper>()
+                .Set<Observation>()
                 .FromSqlRaw("EXEC dbo.FilteredObservations " +
-                         "@subjectId," +
-                         "@geographicLevel," +
-                         "@timePeriodList," +
-                         "@countriesList," +
-                         "@institutionList," +
-                         "@localAuthorityList," +
-                         "@localAuthorityDistrictList," +
-                         "@localEnterprisePartnershipList," +
-                         "@mayoralCombinedAuthorityList," +
-                         "@multiAcademyTrustList," +
-                         "@opportunityAreaList," +
-                         "@parliamentaryConstituencyList," +
-                         "@regionsList," +
-                         "@rscRegionsList," +
-                         "@sponsorList," +
-                         "@wardList," +
-                         "@filterItemList",
+                            "@subjectId," +
+                            "@geographicLevel," +
+                            "@timePeriodList," +
+                            "@countriesList," +
+                            "@institutionList," +
+                            "@localAuthorityList," +
+                            "@localAuthorityOldCodeList," +
+                            "@localAuthorityDistrictList," +
+                            "@localEnterprisePartnershipList," +
+                            "@mayoralCombinedAuthorityList," +
+                            "@multiAcademyTrustList," +
+                            "@opportunityAreaList," +
+                            "@parliamentaryConstituencyList," +
+                            "@regionsList," +
+                            "@rscRegionsList," +
+                            "@sponsorList," +
+                            "@wardList," +
+                            "@filterItemList",
                     subjectIdParam,
                     geographicLevelParam,
                     timePeriodListParam,
                     countriesListParam,
                     institutionListParam,
                     localAuthorityListParam,
+                    localAuthorityOldCodeListParam,
                     localAuthorityDistrictListParam,
                     localEnterprisePartnershipListParam,
                     mayoralCombinedAuthorityListParam,

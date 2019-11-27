@@ -11,7 +11,9 @@ interface Props {
   id: string;
   index: number;
   editable?: boolean;
+  canDelete?: boolean;
   onContentChange?: (content: string) => void;
+  onDelete?: () => void;
 }
 
 function EditableContentSubBlockRenderer({
@@ -19,12 +21,19 @@ function EditableContentSubBlockRenderer({
   editable,
   onContentChange,
   id,
+  canDelete = false,
+  onDelete,
 }: Props) {
   switch (block.type) {
     case 'MarkDownBlock':
       return (
         <>
-          <EditableMarkdownRenderer contentId={block.id} source={block.body} />
+          <EditableMarkdownRenderer
+            contentId={block.id}
+            source={block.body}
+            canDelete={canDelete}
+            onDelete={onDelete}
+          />
         </>
       );
     case 'InsetTextBlock':
@@ -66,7 +75,14 @@ function EditableContentSubBlockRenderer({
         </div>
       );
     case 'HtmlBlock':
-      return <EditableHtmlRenderer contentId={block.id} source={block.body} />;
+      return (
+        <EditableHtmlRenderer
+          contentId={block.id}
+          source={block.body}
+          canDelete={canDelete}
+          onDelete={onDelete}
+        />
+      );
     default:
       return <div>Unable to edit content type {block.type}</div>;
   }

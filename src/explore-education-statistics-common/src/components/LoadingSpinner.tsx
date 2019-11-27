@@ -18,7 +18,7 @@ const LoadingSpinner = ({
   size = 80,
   inline = false,
   overlay = false,
-  screenReaderMessage = 'The page is loading.',
+  screenReaderMessage = 'The page is loading. Please wait.',
 }: Props) => {
   return (
     <>
