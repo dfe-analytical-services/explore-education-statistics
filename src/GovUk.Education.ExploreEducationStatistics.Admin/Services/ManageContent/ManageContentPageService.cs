@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -18,10 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class ManageContentPageService : IManageContentPageService
     {
         private readonly IMapper _mapper;
-        private readonly FileStorageService _fileStorageService;
+        private readonly IFileStorageService _fileStorageService;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ManageContentPageService(ContentDbContext context, IMapper mapper, FileStorageService fileStorageService)
+        public ManageContentPageService(ContentDbContext context, IMapper mapper,
+            IFileStorageService fileStorageService)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
@@ -36,10 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var downloadFiles = await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                releaseViewModel.DownloadFiles = 
+                    await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data);
                 return new ManageContentPageViewModel
                 {
-                    Release = _mapper.Map<ReleaseViewModel>(release),
+                    Release = releaseViewModel,
                     RelatedInformation = new List<BasicLink>
                     {
                         new BasicLink
@@ -74,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                        "[local authorities section](#)",
                             }
                         }
-                    },
-                    DownloadFiles = downloadFiles
+                    }
                 };
             }, HydrateReleaseForReleaseViewModel);
         }

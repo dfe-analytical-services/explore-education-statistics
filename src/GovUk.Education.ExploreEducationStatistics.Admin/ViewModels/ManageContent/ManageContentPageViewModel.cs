@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
 
         public ContentSectionViewModel IntroductionSection { get; set; } = new ContentSectionViewModel();
-
-        public IEnumerable<FileInfo> DownloadFiles { get; set; }
     }
 
     public class ReleaseViewModel
@@ -52,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         // dataFiles
 
-        // downloadFiles
+        public IEnumerable<FileInfo> DownloadFiles { get; set; }
 
         public DateTime? PublishScheduled { get; set; }
 
