@@ -195,8 +195,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return blobContainer
                 .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
+                .Where(blob => !IsBatchedFile(blob, releaseId))
                 .OfType<CloudBlockBlob>()
-                .Where(blob => !IsBatchedFile(blob, releaseId) && !IsMetaDataFile(blob))
                 .Select(file => new FileInfo
                 {
                     Extension = GetExtension(file),
