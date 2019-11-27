@@ -2381,6 +2381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), 
                     Order = 1,
+                    Name = "Key Stat 1",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2495,6 +2496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Name = "Key Stat 2",
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2592,6 +2594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Name = "Key Stat 3",
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2707,6 +2710,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
                     ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -3079,6 +3084,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 1",
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3186,6 +3192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 2",
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3284,6 +3291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 3",
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3382,6 +3390,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
                     ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
@@ -3681,6 +3691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 1",
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3734,6 +3745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 2",
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3787,6 +3799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 3",
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -3840,6 +3853,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
