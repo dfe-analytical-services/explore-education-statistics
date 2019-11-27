@@ -1,18 +1,19 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import marked from 'marked';
 import React from 'react';
-// import { Draggable } from 'react-beautiful-dnd';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import EditableMarkdownRenderer from './EditableMarkdownRenderer';
+import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
+import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 
 interface Props {
   block: EditableContentBlock;
   id: string;
   index: number;
   editable?: boolean;
+  canDelete?: boolean;
   onContentChange?: (content: string) => void;
+  onDelete?: () => void;
 }
 
 function EditableContentSubBlockRenderer({
@@ -20,12 +21,19 @@ function EditableContentSubBlockRenderer({
   editable,
   onContentChange,
   id,
+  canDelete = false,
+  onDelete,
 }: Props) {
   switch (block.type) {
     case 'MarkDownBlock':
       return (
         <>
-          <EditableMarkdownRenderer contentId={block.id} source={block.body} />
+          <EditableMarkdownRenderer
+            contentId={block.id}
+            source={block.body}
+            canDelete={canDelete}
+            onDelete={onDelete}
+          />
         </>
       );
     case 'InsetTextBlock':
@@ -67,7 +75,14 @@ function EditableContentSubBlockRenderer({
         </div>
       );
     case 'HtmlBlock':
-      return <WysiwygEditor editable content={block.body} />;
+      return (
+        <EditableHtmlRenderer
+          contentId={block.id}
+          source={block.body}
+          canDelete={canDelete}
+          onDelete={onDelete}
+        />
+      );
     default:
       return <div>Unable to edit content type {block.type}</div>;
   }

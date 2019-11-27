@@ -98,13 +98,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
 
-            var viewModels = observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit =>
-                new ObservationalUnitMetaViewModel
-                {
-                    Label = observationalUnit.Name,
-                    Level = pair.Key,
-                    Value = observationalUnit.Code
-                }));
+            var viewModels = observationalUnits.SelectMany(pair =>
+                pair.Value.Select(observationalUnit =>
+                    BuildObservationalUnitMetaViewModel(pair.Key, observationalUnit)));
 
             return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels);
         }
@@ -130,6 +126,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return _timePeriodService.GetTimePeriodRange(observations).Select(tuple =>
                 new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier));
+        }
+
+        private static ObservationalUnitMetaViewModel BuildObservationalUnitMetaViewModel(GeographicLevel level,
+            IObservationalUnit unit)
+        {
+            var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
+            return new ObservationalUnitMetaViewModel
+            {
+                Label = unit.Name,
+                Level = level,
+                Value = value
+            };
         }
     }
 }

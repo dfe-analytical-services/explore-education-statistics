@@ -2,13 +2,12 @@ import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
+import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import MarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
-import { BasicPublicationDetails } from '@admin/services/common/types';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -16,13 +15,11 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { baseUrl } from '@common/services/api';
-import {
-  AbstractRelease,
-  ReleaseType,
-} from '@common/services/publicationService';
+import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
+import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
   contentId?: string;
@@ -31,8 +28,8 @@ export interface RendererProps {
 
 interface Props {
   editing: boolean;
-  basicPublication: BasicPublicationDetails;
-  release: AbstractRelease<EditableContentBlock>;
+  content: ManageContentPageViewModel;
+
   styles: Dictionary<string>;
 
   logEvent?: (...params: string[]) => void;
@@ -42,11 +39,12 @@ const nullLogEvent = () => {};
 
 const PublicationReleaseContent = ({
   editing = true,
-  basicPublication,
-  release,
+  content,
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
+  const { release, introductionSection, relatedInformation } = content;
+
   const accId: string[] = generateIdList(2);
 
   const releaseCount =
@@ -72,10 +70,11 @@ const PublicationReleaseContent = ({
             <BasicReleaseSummary release={release} />
           </div>
 
-          <MarkdownRenderer
-            contentId=""
-            releaseId={release.id}
-            source={release.summary}
+          <ContentBlock
+            sectionId={introductionSection.id}
+            publication={publication}
+            id={introductionSection.id}
+            content={introductionSection.content}
           />
 
           {release.downloadFiles && (
@@ -200,21 +199,10 @@ const PublicationReleaseContent = ({
                 </Details>
               </dd>
             </dl>
-            <h2
-              className="govuk-heading-m govuk-!-margin-top-6"
-              id="related-content"
-            >
-              Related guidance
-            </h2>
-            <nav role="navigation" aria-labelledby="related-content">
-              <ul className="govuk-list">
-                <li>
-                  <Link to={`/methodology/${release.publication.slug}`}>
-                    {`${release.publication.title}: methodology`}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
+            <RelatedInformationSection
+              release={release}
+              relatedInformation={relatedInformation}
+            />
           </RelatedAside>
         </div>
       </div>
@@ -257,7 +245,7 @@ const PublicationReleaseContent = ({
         >
           <p>
             Read our{' '}
-            <Link to={`/methodology/${basicPublication.methodologyId}`}>
+            <Link to={`/methodology/${release.publication.methodology.id}`}>
               {`${publication.title}: methodology`}
             </Link>{' '}
             guidance.

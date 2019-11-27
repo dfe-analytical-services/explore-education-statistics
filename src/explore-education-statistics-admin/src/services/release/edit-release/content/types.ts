@@ -1,12 +1,9 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
-import {
-  AbstractRelease,
-  ContentBlockType,
-} from '@common/services/publicationService';
+import { AbstractRelease } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
-  title: string;
+  description: string;
   url: string;
 }
 
@@ -30,11 +27,15 @@ export interface ManageContentPageViewModel {
 
 export interface ContentBlockViewModel {
   id: string;
-  order: number;
+  order?: number;
   type: string;
   body: string;
 }
 
 export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
+export type ContentBlockPostModel = Pick<
+  ContentBlockViewModel,
+  'order' | 'type' | 'body'
+>;
 
 export default {};

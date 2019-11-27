@@ -1,31 +1,32 @@
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import React from 'react';
-import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import ContentService from '@admin/services/release/edit-release/content/service';
 
-export type MarkdownRendererProps = RendererProps &
-  ReactMarkdownProps & { canDelete: boolean; onDelete: () => void };
+export type Props = RendererProps & {
+  source: string;
+  canDelete: boolean;
+  onDelete: () => void;
+};
 
-const EditableMarkdownRenderer = ({
+const EditableHtmlRenderer = ({
   contentId,
   source,
   canDelete,
   onDelete,
-}: MarkdownRendererProps) => {
-  const [markdown, setMarkdown] = React.useState(source);
+}: Props) => {
+  const [html, setHtml] = React.useState(source);
 
   const editingContext = React.useContext(EditingContentBlockContext);
 
   return (
     <>
       <WysiwygEditor
-        content={markdown || ''}
-        canDelete={canDelete}
+        content={html || ''}
         editable
-        useMarkdown
+        canDelete={canDelete}
         onContentChange={async ss => {
           if (
             editingContext.releaseId &&
@@ -41,7 +42,7 @@ const EditableMarkdownRenderer = ({
               },
             );
 
-            setMarkdown(body);
+            setHtml(body);
           }
         }}
         onDelete={onDelete}
@@ -50,4 +51,13 @@ const EditableMarkdownRenderer = ({
   );
 };
 
-export default wrapEditableComponent(EditableMarkdownRenderer, ReactMarkdown);
+const HtmlRenderer = ({ source }: { source: string }) => {
+  return (
+    <div
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: source }}
+    />
+  );
+};
+
+export default wrapEditableComponent(EditableHtmlRenderer, HtmlRenderer);

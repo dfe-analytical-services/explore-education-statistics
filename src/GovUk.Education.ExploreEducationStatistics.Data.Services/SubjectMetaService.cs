@@ -167,17 +167,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GeographicLevel geographicLevel,
             ICollection<IObservationalUnit> observationalUnits)
         {
-            var codes = observationalUnits.Select(unit => unit.Code);
+            var codes = observationalUnits.Select(unit => unit is LocalAuthority localAuthority ?
+                localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
             var geoJsonByCode = _geoJsonService.Find(boundaryLevelId, codes).ToDictionary(g => g.Code);
             return observationalUnits.Select(observationalUnit =>
             {
-                var geoJson = DeserializeGeoJson(geoJsonByCode.GetValueOrDefault(observationalUnit.Code));
+                var value = observationalUnit is LocalAuthority localAuthority ?
+                    localAuthority.GetCodeOrOldCodeIfEmpty() : observationalUnit.Code;
+                
+                var geoJson = DeserializeGeoJson(geoJsonByCode.GetValueOrDefault(value));
                 return new ObservationalUnitGeoJsonMeta
                 {
                     GeoJson = geoJson,
                     Label = observationalUnit.Name,
                     Level = geographicLevel,
-                    Value = observationalUnit.Code
+                    Value = value 
                 };
             });
         }

@@ -5,7 +5,11 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -17,6 +21,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<Location, LocationViewModel>();
+
+            AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IObservationalUnit).IsAssignableFrom(p))
+                .ToList().ForEach(type =>
+                {
+                    if (type == typeof(LocalAuthority))
+                    {
+                        CreateMap<LocalAuthority, CodeNameViewModel>()
+                            .ForMember(model => model.Code, opts => opts.MapFrom(localAuthority => localAuthority.GetCodeOrOldCodeIfEmpty()));
+                    }
+                    else
+                    {
+                        CreateMap(type, typeof(CodeNameViewModel));
+                    }
+                });
+            
             CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
                 opts => opts.MapFrom(release => release.ReleaseName));
             
