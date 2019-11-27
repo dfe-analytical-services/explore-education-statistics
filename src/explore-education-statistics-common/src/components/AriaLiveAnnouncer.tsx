@@ -45,6 +45,7 @@ const AriaLiveAnnouncer = ({ children }: Props) => {
     >
       {children}
       <div
+        role="alert"
         aria-live="assertive"
         aria-atomic="false"
         aria-relevant="additions"
@@ -53,10 +54,13 @@ const AriaLiveAnnouncer = ({ children }: Props) => {
         {messageList
           .filter(message => message.type === 'assertive')
           .map(({ message, id }) => (
-            <p key={id}>{message}</p>
+            <div id={id} key={id}>
+              {message}
+            </div>
           ))}
       </div>
       <div
+        role="alert"
         aria-live="polite"
         aria-atomic="false"
         aria-relevant="additions"
@@ -65,7 +69,9 @@ const AriaLiveAnnouncer = ({ children }: Props) => {
         {messageList
           .filter(message => message.type === 'polite')
           .map(({ message, id }) => (
-            <p key={id}>{message}</p>
+            <div id={id} key={id}>
+              {message}
+            </div>
           ))}
       </div>
     </AriaLiveContext.Provider>
