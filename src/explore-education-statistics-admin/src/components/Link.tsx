@@ -16,8 +16,28 @@ const Link = ({
   className,
   to,
   unvisited = false,
+  href,
   ...props
 }: LinkProps) => {
+  if (href && !to) {
+    return (
+      <a
+        className={classNames(
+          'govuk-link',
+          {
+            'govuk-link--no-visited-state': unvisited,
+          },
+          className,
+        )}
+        href={href}
+        {...props}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {children}
+      </a>
+    );
+  }
   return (
     <RouterLink
       {...props}

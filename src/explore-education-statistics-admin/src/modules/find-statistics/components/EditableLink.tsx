@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import classNames from 'classnames';
-import { LinkProps } from '@admin/components/Link';
+import Link, { LinkProps } from '@admin/components/Link';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 
@@ -13,46 +12,32 @@ const EditableLink = ({
   removeOnClick,
   to: href,
   children,
-  unvisited,
-  className,
   ...props
 }: Props) => {
   const { isEditing } = useContext(EditingContext);
 
   return !isEditing ? (
-    <a
-      className={classNames(
-        'govuk-link',
-        {
-          'govuk-link--no-visited-state': unvisited,
-        },
-        className,
-      )}
+    <Link
+      to=""
       href={href}
       {...props}
       rel="noopener noreferrer"
       target="_blank"
     >
       {children}
-    </a>
+    </Link>
   ) : (
     <div>
       <div>
-        <a
-          className={classNames(
-            'govuk-link',
-            {
-              'govuk-link--no-visited-state': unvisited,
-            },
-            className,
-          )}
+        <Link
+          to=""
           href={href}
           {...props}
           rel="noopener noreferrer"
           target="_blank"
         >
           {children}
-        </a>
+        </Link>
       </div>
       <Button
         className="govuk-!-margin-bottom-1"
