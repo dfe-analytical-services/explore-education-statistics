@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
         
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (existingValue == null)
+            if (reader.TokenType == JsonToken.Null)
             {
                 return null;
             }

@@ -29,6 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 
         public ContentSection HeadlinesSection { get; set; }
 
+        public ContentSection KeyStatisticsSection { get; set; }
+        
+        public ContentSection KeyStatisticsSecondarySection { get; set; }
+
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
@@ -36,8 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
-
-        public DataBlock KeyStatistics { get; set; }
         
         // Files to download are the actual data files and ancillary files, but currently not the chart files.
         public List<FileInfo> DownloadFiles { get; set; }

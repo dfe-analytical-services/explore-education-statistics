@@ -72,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Id = new Guid("3cb10587-7b05-4c30-9f13-9f2025aca6a0"),
                                         Caption = "Template caption index 0", // Should be copied 
                                         Heading = "Template heading index 0", // Should be copied
-                                        Order = 0,
+                                        Type = ContentSectionType.Generic,
+                                        Order = 1,
                                         Content = new List<IContentBlock>
                                         {
                                             // TODO currently is not copied - should it be?
@@ -93,7 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Id = new Guid("8e804c94-61b3-4955-9d71-83a56d133a89"),
                                         Caption = "Template caption index 1", // Should be copied 
                                         Heading = "Template heading index 1", // Should be copied
-                                        Order = 1,
+                                        Type = ContentSectionType.Generic,
+                                        Order = 2,
                                         Content = new List<IContentBlock>
                                         {
                                             // TODO currently is not copied - should it be?
@@ -130,17 +132,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Do an in depth check of the saved release
                 var release = context.Releases
                     .Include(r => r.Content)
+                    .ThenInclude(join => join.ContentSection)
+                    .ThenInclude(section => section.Content)
                     .Single(r => r.Id == result.Result.Right.Id);
-                Assert.Equal(2, release.Content.Count);
+
+                var contentSections = release.GenericContent.ToList();
+                
+                Assert.Equal(2, contentSections.Count);
                 Assert.Equal("Template caption index 0", release.Content[0].ContentSection.Caption);
                 Assert.Equal("Template heading index 0", release.Content[0].ContentSection.Heading);
-                Assert.Equal(0, release.Content[0].ContentSection.Order);
-                Assert.Null(release.Content[0].ContentSection.Content); // TODO currently is not copied - should it be?
+                Assert.Equal(1, release.Content[0].ContentSection.Order);
+                Assert.Empty(contentSections[0].Content); // TODO currently is not copied - should it be?
 
                 Assert.Equal("Template caption index 1", release.Content[1].ContentSection.Caption);
                 Assert.Equal("Template heading index 1", release.Content[1].ContentSection.Heading);
-                Assert.Equal(1, release.Content[1].ContentSection.Order);
-                Assert.Null(release.Content[1].ContentSection.Content); // TODO currently is not copied - should it be?
+                Assert.Equal(2, release.Content[1].ContentSection.Order);
+                Assert.Empty(contentSections[1].Content); // TODO currently is not copied - should it be?
+                
+                Assert.Equal(ContentSectionType.ReleaseSummary, release.SummarySection.Type);
+                Assert.Equal(ContentSectionType.Headlines, release.HeadlinesSection.Type);
+                Assert.Equal(ContentSectionType.KeyStatistics, release.KeyStatisticsSection.Type);
+                Assert.Equal(ContentSectionType.KeyStatisticsSecondary, release.KeyStatisticsSecondarySection.Type);
             }
         }
 
