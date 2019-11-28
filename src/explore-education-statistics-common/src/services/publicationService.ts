@@ -230,12 +230,6 @@ export interface AbstractRelease<
     content: ContentBlockType[];
   }[];
   keyStatistics: ContentBlockType;
-  dataFiles?: {
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
   downloadFiles: {
     extension: string;
     name: string;
