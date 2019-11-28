@@ -130,14 +130,14 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                     <h4 className="govuk-heading-m">{file.title}</h4>
                   </SummaryListItem>
                   <SummaryListItem term="File">
-                    <a
-                      href={service.createDownloadAncillaryFileLink(
-                        releaseId,
-                        file.filename,
-                      )}
+                    <Link
+                      to="#"
+                      onClick={() =>
+                        service.downloadAncillaryFile(releaseId, file.filename)
+                      }
                     >
                       {file.filename}
-                    </a>
+                    </Link>
                   </SummaryListItem>
                   <SummaryListItem term="Filesize">
                     {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
