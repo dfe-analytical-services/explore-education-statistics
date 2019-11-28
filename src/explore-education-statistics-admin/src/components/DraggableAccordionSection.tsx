@@ -1,5 +1,5 @@
 import React, { cloneElement, ReactElement } from 'react';
-import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import EditableAccordionSection, { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
 import { Draggable } from 'react-beautiful-dnd';
 import styles from '@admin/components/DraggableAccordionSection.module.scss';
 
@@ -18,6 +18,7 @@ const DraggableAccordionSection = ({
   openAll,
   section,
 }: DraggableAccordionSectionProps) => {
+
   if (isReordering) {
     return (
       <Draggable draggableId={id} type="section" index={index}>
@@ -31,12 +32,13 @@ const DraggableAccordionSection = ({
               index,
               open: false,
               canToggle: false,
-              headingButtons: (
+              headingButtons: [(
                 <span
+                  key="drag_handle"
                   className={styles.dragHandle}
                   {...draggableProvided.dragHandleProps}
                 />
-              ),
+              )],
             })}
           </div>
         )}
@@ -46,7 +48,7 @@ const DraggableAccordionSection = ({
 
   return cloneElement<EditableAccordionSectionProps>(section, {
     index,
-    open: openAll,
+    open: openAll
   });
 };
 
