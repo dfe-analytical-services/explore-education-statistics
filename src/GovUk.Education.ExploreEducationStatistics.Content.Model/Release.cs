@@ -75,7 +75,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public IEnumerable<ContentSection> GenericContent
         {
             get 
-            { 
+            {
+                if (Content == null)
+                {
+                    return new List<ContentSection>();
+                }
+
                 return Content
                     .Select(join => join.ContentSection)    
                     .ToList()
@@ -143,6 +148,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         private ContentSection FindSingleSectionByType(ContentSectionType type)
         {
+            if (Content == null)
+            {
+                Content = new List<ReleaseContentSection>();
+            }
+            
             return Content
                 .Select(join => join.ContentSection)
                 .ToList()
