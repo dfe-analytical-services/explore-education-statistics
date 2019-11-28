@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TopicId = System.Guid;
@@ -31,6 +32,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
         {
             return await _methodologyService.ListAsync();
+        }
+        
+        // POST api/topic/{topicId}/publications
+        [HttpPost("api/methodologies")]
+        public async Task<ActionResult<MethodologyViewModel>> CreatePublicationAsync(
+            CreateMethodologyViewModel methodology)
+        {
+            var result = await _methodologyService.CreateMethodologyAsync(methodology);
+            
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem(new ValidationProblemDetails(ModelState));
+            }
+
+            return result.Right;
         }
         
     }
