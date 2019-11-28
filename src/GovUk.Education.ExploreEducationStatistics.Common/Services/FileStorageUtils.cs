@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
             var result = blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
-                .Where(blob => !releasedFilesOnly || IsFileReleased(blob))
+                .Where(blob => !IsMetaDataFile(blob) && (!releasedFilesOnly || IsFileReleased(blob)))
                 .Select(file => new FileInfo
                 {
                     Extension = GetExtension(file),
