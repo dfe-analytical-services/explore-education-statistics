@@ -10,8 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using TopicId = System.Guid;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -29,6 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(
             CreateMethodologyViewModel methodology)
         {
+            return await ValidateMethodologySlugUnique(methodology.Slug)
+                .OnSuccess(async () =>
+                {
             var model = new Methodology
             {
                 Title = methodology.Title,
@@ -40,6 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.SaveChangesAsync();
 
             return await GetAsync(saved.Entity.Id);
+                });
+
         }
 
         public async Task<MethodologyViewModel> GetAsync(Guid id)
@@ -64,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MethodologyStatusViewModel>>(result);
         }
 
-        public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId)
+        public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId)
         {
             var methodologies = await _context.Publications
                 .Where(p => p.TopicId == topicId)
@@ -73,6 +78,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Distinct()
                 .ToListAsync();
             return _mapper.Map<List<MethodologyViewModel>>(methodologies);
+        }
+        
+        private async Task<Either<ValidationResult, bool>> ValidateMethodologySlugUnique(string slug)
+        {
+            if (await _context.Methodologies.AnyAsync(r => r.Slug == slug))
+            {
+                return new ValidationResult(ValidationErrorMessages.SlugNotUnique.ToString());
+            }
+
+            return true;
         }
     }
 }
