@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return _releaseHelper.CheckEntityExists(releaseId, release =>
             {
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DataFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel,
