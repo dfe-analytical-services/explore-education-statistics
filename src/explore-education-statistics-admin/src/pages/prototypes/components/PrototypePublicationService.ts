@@ -466,6 +466,7 @@ export default class PrototypePublicationService {
         },
         methodology: {
           id: '00000000-0000-0000-0000-000000000000',
+          title: 'methodology link title',
         },
       },
       latestRelease: true,
