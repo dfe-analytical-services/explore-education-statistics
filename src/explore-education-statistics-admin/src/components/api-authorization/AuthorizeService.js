@@ -16,7 +16,8 @@ export class AuthorizeService {
   _popUpDisabled = true;
 
   async isAuthenticated() {
-    const user = await this.getUser();
+    await this.ensureUserManagerInitialized();
+    const user = await this.userManager.getUser();
     return !!user;
   }
 
