@@ -39,6 +39,9 @@
 
 <h3 class="govuk-heading-m">Content</h3>
 
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.SummarySection)</h4>
+<p class="govuk-body">@Html.DisplayFor(model => model.SummarySection)</p>
+
 <h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.KeyStatisticsSection)</h4>
 <pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.KeyStatisticsSection))</pre>
 
