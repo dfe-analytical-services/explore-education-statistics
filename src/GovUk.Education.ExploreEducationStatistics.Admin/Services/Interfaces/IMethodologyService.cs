@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<List<MethodologyStatusViewModel>> ListStatusAsync();
         
+        Task<MethodologyViewModel> GetAsync(Guid id);
+        
         Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId);
         
         Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(

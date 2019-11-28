@@ -3,10 +3,10 @@ import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
+import methodologyService from '@admin/services/methodology/service';
 import Button from '@common/components/Button';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import handleServerSideValidation, {
@@ -20,23 +20,21 @@ import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Topic } from '@admin/services/edit-publication/types';
+import { CreateMethodologyRequest } from '@admin/services/methodology/types'
 
 interface MatchProps {
   topicId: string;
 }
 
 interface FormValues {
-  publicationTitle: string;
-  methodologyChoice?: 'existing' | 'new';
-  selectedMethodologyId?: string;
+  methodologyTitle: string;
   selectedContactId: string;
 }
 
 const serverSideValidationHandler = handleServerSideValidation(
   errorCodeToFieldError(
     'SLUG_NOT_UNIQUE',
-    'publicationTitle',
+    'methodologyTitle',
     'Choose a unique title',
   ),
 );
@@ -44,6 +42,7 @@ const serverSideValidationHandler = handleServerSideValidation(
 interface CreateMethodologyModel {
   contacts: ContactDetails[];
 }
+
 
 const CreateMethodologyPage = ({
   match,
@@ -64,17 +63,20 @@ const CreateMethodologyPage = ({
   }, []);
 
   const submitFormHandler = async (values: FormValues) => {
-    await service.createPublication({
-      topicId,
-      ...values,
-    });
 
+    const submission: CreateMethodologyRequest = { 
+      title: values.methodologyTitle, 
+      publishScheduled: "",
+      contactId: values.selectedContactId,
+    };
+
+    const createdMethodology = await methodologyService.createMethodology(submission);
+
+   // TODO: redirect to the methodology summary
     history.push(dashboardRoutes.adminDashboard);
   };
 
-  const cancelHandler = () => {
-    history.push(dashboardRoutes.adminDashboard);
-  };
+  const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
 
   const getSelectedContact = (
     contactId: string,
@@ -114,26 +116,19 @@ const CreateMethodologyPage = ({
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            publicationTitle: '',
+            methodologyTitle: '',
             selectedContactId: orderBy(
               model.contacts,
               contact => contact.contactName,
             )[0].id,
-            methodologyChoice: undefined,
           }}
           validationSchema={Yup.object<FormValues>({
-            publicationTitle: Yup.string().required(
-              'Enter a publication title',
+            methodologyTitle: Yup.string().required(
+              'Enter a methodology title',
             ),
             selectedContactId: Yup.string().required(
-              'Choose a publication and release contact',
+              'Choose a methodology contact',
             ),
-            methodologyChoice: Yup.mixed().required('Choose a methodology'),
-            selectedMethodologyId: Yup.string().when('methodologyChoice', {
-              is: 'existing',
-              then: Yup.string().required('Choose a methodology'),
-              otherwise: Yup.string(),
-            }),
           })}
           onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
@@ -143,16 +138,16 @@ const CreateMethodologyPage = ({
                 submitValidationHandler={serverSideValidationHandler}
               >
                 <FormFieldTextInput
-                  id={`${formId}-publicationTitle`}
+                  id={`${formId}-methodologyTitle`}
                   label="Enter methodology title"
                   name="methodologyTitle"
                 />
 
                 <FormFieldset
                   id={`${formId}-selectedContactIdFieldset`}
-                  legend="Choose the contact for this publication"
+                  legend="Choose the contact for this methodology"
                   legendSize="m"
-                  hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+                  hint="They will be the main point of contact for this methodology and its associated publications."
                 >
                   <FormFieldSelect
                     id={`${formId}-selectedContactId`}
