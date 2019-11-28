@@ -16,7 +16,7 @@
   "extensions": {
     "queues": {
       "batchSize": 1,
-      "maxDequeueCount": 1,
+      "maxDequeueCount": 3,
       "newBatchThreshold": 0
     }
   }

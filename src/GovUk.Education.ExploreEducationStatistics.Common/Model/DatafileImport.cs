@@ -7,15 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class DatafileImport : TableEntity
     {
-        public byte[] BatchesProcessed { get; set; }
-        public int NumBatches { get; set; }
-        [EntityEnumPropertyConverter]
-        public IStatus Status { get; set; }
-        public string Errors { get; set; }
-        
-        public int NumberOfRows { get; set; }
-
-        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, int numBatches)
+        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, string message)
         {
             PartitionKey = releaseId;
             RowKey = dataFileName;
@@ -24,12 +16,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Errors = "";
             Status = IStatus.RUNNING_PHASE_1;
             NumberOfRows = numberOfRows;
+            Message = message;
         }
 
         public DatafileImport()
         {
         }
+
+        public byte[] BatchesProcessed { get; set; }
+        public int NumBatches { get; set; }
+
+        [EntityEnumPropertyConverter] public IStatus Status { get; set; }
+
+        public string Errors { get; set; }
+
+        public int NumberOfRows { get; set; }
         
+        public string Message { get; set; }
+
         public override IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
         {
             var results = base.WriteEntity(operationContext);
@@ -37,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return results;
         }
 
-        public override void ReadEntity(IDictionary<string, EntityProperty> properties, OperationContext operationContext)
+        public override void ReadEntity(IDictionary<string, EntityProperty> properties,
+            OperationContext operationContext)
         {
             base.ReadEntity(properties, operationContext);
             EntityEnumPropertyConverter.Deserialize(this, properties);

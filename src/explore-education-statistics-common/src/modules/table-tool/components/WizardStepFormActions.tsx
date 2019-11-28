@@ -54,10 +54,7 @@ const WizardStepFormActions = ({
           Previous step
         </Button>
       )}
-
-      {form.isSubmitting && (
-        <LoadingSpinner screenReaderMessage="Loading..." inline size={39} />
-      )}
+      {form.isSubmitting && <LoadingSpinner inline size={39} />}
     </FormGroup>
   );
 };

@@ -35,6 +35,9 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
+  methodology: {
+    id: string;
+  };
 }
 
 export interface PublicationContact {

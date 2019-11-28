@@ -26,41 +26,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task SplitDataFile(
             ICollector<ImportMessage> collector,
             ImportMessage message,
-            SubjectData subjectData,
-            BatchSettings batchSettings)
+            SubjectData subjectData)
         {
             var csvLines = subjectData.GetCsvLines().ToList();
 
-            if (csvLines.Count() > batchSettings.RowsPerBatch + 1)
+            if (csvLines.Count() > message.RowsPerBatch + 1)
             {
-                await SplitFiles(message, csvLines, batchSettings.RowsPerBatch, subjectData, collector);
+                await SplitFiles(message, csvLines, subjectData, collector);
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
             {
-                message.RowsPerBatch = batchSettings.RowsPerBatch;
                 collector.Add(message);
             }
         }
 
-        private async Task<List<ImportMessage>> SplitFiles(
+        private async Task SplitFiles(
             ImportMessage message,
             IEnumerable<string> csvLines,
-            int rowsPerBatch,
             SubjectData subjectData,
             ICollector<ImportMessage> collector)
         {
             var enumerable = csvLines.ToList();
             var header = enumerable.First();
-            var batches = enumerable.Skip(1).Batch(rowsPerBatch);
-            var index = 1;
+            var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
             var batchCount = 1;
-            var numBatches = GetNumBatches(enumerable.Count(), rowsPerBatch);
-            var messages = new List<ImportMessage>();
+            var numBatches = GetNumBatches(enumerable.Count(), message.RowsPerBatch);
 
             foreach (var batch in batches)
             {
-                var fileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{index++:000000}";
+                var fileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchCount:000000}";
                 var lines = batch.ToList();
                 var mStream = new MemoryStream();
                 var writer = new StreamWriter(mStream);
@@ -77,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _fileStorageService.UploadDataFileAsync(
                     message.Release.Id,
-                    mStream, BlobUtils.GetMetaFileName(subjectData.DataBlob),
+                    mStream, 
+                    BlobUtils.GetMetaFileName(subjectData.DataBlob),
                     BlobUtils.GetName(subjectData.DataBlob),
                     fileName,
                     "text/csv"
@@ -88,15 +84,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     DataFileName = fileName,
                     OrigDataFileName = message.DataFileName,
                     Release = message.Release,
-                    BatchNo = batchCount++,
+                    BatchNo = batchCount,
                     NumBatches = numBatches,
-                    RowsPerBatch = rowsPerBatch
+                    RowsPerBatch = message.RowsPerBatch
                 };
 
                 collector.Add(iMessage);
+                batchCount++;
             }
-
-            return messages;
         }
 
         public static int GetNumBatches(int rows, int rowsPerBatch)

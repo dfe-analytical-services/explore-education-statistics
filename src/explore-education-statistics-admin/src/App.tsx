@@ -16,6 +16,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
+import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 
 import { LoginContext } from './components/Login';
@@ -65,112 +66,113 @@ function App() {
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
       <AriaLiveAnnouncer>
-        <ApiAuthorizationRoutes />
+        <ThemeAndTopic>
+          <ApiAuthorizationRoutes />
 
-        <ProtectedRoutes>
-          <Switch>
+          <ProtectedRoutes>
+            <Switch>
+              <ProtectedRoute
+                exact
+                path={dashboardRoutes.adminDashboard}
+                component={AdminDashboardPage}
+              />
+              <ProtectedRoute
+                path={dashboardRoutes.adminDashboardThemeTopic}
+                component={AdminDashboardPage}
+              />
+
+              <Redirect exact strict from="/" to="/dashboard" />
+            </Switch>
+
             <ProtectedRoute
               exact
-              path={dashboardRoutes.adminDashboard}
-              component={AdminDashboardPage}
+              path="/administration"
+              component={BauDashboardPage}
+            />
+
+            <ProtectedRoute
+              exact
+              path="/administration/methodology"
+              component={BauMethodologyPage}
+            />
+
+            <ProtectedRoute
+              exact
+              path={ApplicationPaths.LoggedOut}
+              component={SignedOutPage}
+              redirectIfNotLoggedIn={false}
             />
             <ProtectedRoute
-              path={dashboardRoutes.adminDashboardThemeTopic}
-              component={AdminDashboardPage}
+              exact
+              path={publicationRoutes.createPublication.route}
+              component={CreatePublicationPage}
             />
-
-            <Redirect exact strict from="/" to="/dashboard" />
-          </Switch>
-
-          <ProtectedRoute
-            exact
-            path="/administration"
-            component={BauDashboardPage}
-          />
-
-          <ProtectedRoute
-            exact
-            path="/administration/methodology"
-            component={BauMethodologyPage}
-          />
-
-          <ProtectedRoute
-            exact
-            path={ApplicationPaths.LoggedOut}
-            component={SignedOutPage}
-            redirectIfNotLoggedIn={false}
-          />
-          <ProtectedRoute
-            exact
-            path={publicationRoutes.createPublication.route}
-            component={CreatePublicationPage}
-          />
-          <ProtectedRoute
-            exact
-            path={releaseRoutes.createReleaseRoute.route}
-            component={CreateReleasePage}
-          />
-          <ProtectedRoute
-            path="/publication/:publicationId/release/:releaseId"
-            component={ManageReleasePageContainer}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/"
-            component={AdminDocumentationHome}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/content-design-standards-guide"
-            component={AdminDocumentationContentDesignStandards}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/glossary"
-            component={AdminDocumentationGlossary}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/style-guide"
-            component={AdminDocumentationStyle}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/using-dashboard"
-            component={AdminDocumentationUsingDashboard}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/create-new-release"
-            component={AdminDocumentationCreateNewRelease}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/create-new-publication"
-            component={AdminDocumentationCreateNewPublication}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/edit-release"
-            component={AdminDocumentationEditRelease}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/manage-content"
-            component={AdminDocumentationManageContent}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/manage-data"
-            component={AdminDocumentationManageData}
-          />
-          <ProtectedRoute
-            exact
-            path="/documentation/manage-data-block"
-            component={AdminDocumentationManageDataBlocks}
-          />
-        </ProtectedRoutes>
-
+            <ProtectedRoute
+              exact
+              path={releaseRoutes.createReleaseRoute.route}
+              component={CreateReleasePage}
+            />
+            <ProtectedRoute
+              path="/publication/:publicationId/release/:releaseId"
+              component={ManageReleasePageContainer}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/"
+              component={AdminDocumentationHome}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/content-design-standards-guide"
+              component={AdminDocumentationContentDesignStandards}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/glossary"
+              component={AdminDocumentationGlossary}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/style-guide"
+              component={AdminDocumentationStyle}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/using-dashboard"
+              component={AdminDocumentationUsingDashboard}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/create-new-release"
+              component={AdminDocumentationCreateNewRelease}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/create-new-publication"
+              component={AdminDocumentationCreateNewPublication}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/edit-release"
+              component={AdminDocumentationEditRelease}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/manage-content"
+              component={AdminDocumentationManageContent}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/manage-data"
+              component={AdminDocumentationManageData}
+            />
+            <ProtectedRoute
+              exact
+              path="/documentation/manage-data-block"
+              component={AdminDocumentationManageDataBlocks}
+            />
+          </ProtectedRoutes>
+        </ThemeAndTopic>
         {/* Prototype Routes */}
         <Route exact path="/index" component={IndexPage} />
 
