@@ -67,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataBlocks = await _context
                 .ReleaseContentBlocks
-                .Where(join => join.ReleaseId == releaseId)
+                .Where(join => join.ReleaseId == releaseId 
+                               && join.ContentBlock.Type == ContentBlockType.DataBlock.ToString())
                 .Select(join => join.ContentBlock)
                 .ToListAsync();
             
