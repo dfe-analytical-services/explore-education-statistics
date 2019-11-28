@@ -39,5 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
         
         // Files to download are the actual data files and ancillary files, but currently not the chart files.
         public List<FileInfo> DownloadFiles { get; set; }
+        
+        public List<BasicLink> RelatedInformation { get; set; }
     }
 }

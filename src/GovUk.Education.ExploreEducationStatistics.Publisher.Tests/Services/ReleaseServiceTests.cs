@@ -61,12 +61,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 KeyStatisticsId = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
                 PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
                 TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
+                RelatedInformation = new List<BasicLink>
+                {
+                    new BasicLink
+                    {
+                        Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
+                        Description = "Related Information",
+                        Url = "http://example.com"
+                    }
+                }
             },
             new Release
             {
                 Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                 KeyStatisticsId = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
-                PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9")
+                PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
+                RelatedInformation = new List<BasicLink>
+                {
+                    new BasicLink
+                    {
+                        Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
+                        Description = "Related Information",
+                        Url = "http://example.com"
+                    }
+                }
             }
         };
 
@@ -183,6 +201,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(2, content.Count);
                 Assert.Equal(new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd"), content[0].Id);
                 Assert.Equal(new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240"), content[1].Id);
+
+                Assert.Single(result.RelatedInformation);
+                Assert.Equal(new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"), result.RelatedInformation[0].Id);
             }
         }
     }
