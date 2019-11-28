@@ -21,20 +21,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _methodologyService = methodologyService;
         }
 
-        // GET api/topic/{topicId}/methodologies
+        [Produces("application/json")]
         [HttpGet("api/topic/{topicId}/methodologies")]
         public async Task<ActionResult<List<MethodologyViewModel>>> GetTopicMethodologiesAsync([Required]TopicId topicId)
         {
             return await _methodologyService.GetTopicMethodologiesAsync(topicId);
         }
         
+        [Produces("application/json")]
         [HttpGet("api/methodologies")]
         public async Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
         {
             return await _methodologyService.ListAsync();
         }
         
-        // POST api/topic/{topicId}/publications
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(MethodologyViewModel), 200)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [HttpPost("api/methodologies")]
         public async Task<ActionResult<MethodologyViewModel>> CreatePublicationAsync(
             CreateMethodologyViewModel methodology)
