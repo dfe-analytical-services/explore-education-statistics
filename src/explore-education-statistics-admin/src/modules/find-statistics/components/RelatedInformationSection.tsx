@@ -1,9 +1,10 @@
+import {
+  AbstractRelease,
+  BasicLink,
+} from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
-import {
-  ManageContentPageViewModel,
-  BasicLink,
-} from '@admin/services/release/edit-release/content/types';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Link from '@admin/components/Link';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
@@ -19,7 +20,7 @@ import EditableLink from './EditableLink';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
-  relatedInformation: ManageContentPageViewModel['relatedInformation'];
+  relatedInformation: AbstractRelease<{}>['relatedInformation'];
 }
 
 const RelatedInformationSection = ({ relatedInformation, release }: Props) => {

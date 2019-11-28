@@ -43,7 +43,7 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
-  const { release, introductionSection, relatedInformation } = content;
+  const { release, introductionSection } = content;
 
   const accId: string[] = generateIdList(2);
 
@@ -201,7 +201,7 @@ const PublicationReleaseContent = ({
             </dl>
             <RelatedInformationSection
               release={release}
-              relatedInformation={relatedInformation}
+              relatedInformation={release.relatedInformation}
             />
           </RelatedAside>
         </div>

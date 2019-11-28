@@ -1,21 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
 {
     public class ManageContentPageViewModel
     {
         public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
-
-        public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
         
         public ContentSectionViewModel IntroductionSection { get; set; } = new ContentSectionViewModel();
     }
@@ -59,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public DateTime? PublishScheduled { get; set; }
         
         public PartialDate NextReleaseDate { get; set; }
+        
+        public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
     }
 
     public class PublicationViewModel
