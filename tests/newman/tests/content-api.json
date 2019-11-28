@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "817c7f85-1638-4c7e-b927-ab795fc17895",
+		"_postman_id": "dbe97421-7a4b-4793-bc32-99c1ec7d52b3",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -419,6 +419,75 @@
 							"path": [
 								"methodology",
 								"pupil-absence-in-schools-in-england"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Notify",
+			"item": [
+				{
+					"name": "Subscribe to absence publication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e355658b-1bca-4e05-b5db-66398063d878",
+								"exec": [
+									"// Don't run test if running against localhost",
+									"(pm.environment.get(\"content_api_url\") === \"http://localhost:5011/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response text should be correct\", function () {",
+									"    pm.expect(pm.response.text()).to.equal(\"Thanks! Please check your email.\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e2b44420-ec2d-4be3-9b4c-2694972357b8",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"mark@hiveit.co.uk\",\n\t\"id\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n\t\"slug\": \"pupil-absence-in-schools-in-england\",\n\t\"title\": \"Pupil absence in schools in England\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{notify_api_url}}/publication/subscribe",
+							"host": [
+								"{{notify_api_url}}"
+							],
+							"path": [
+								"publication",
+								"subscribe"
 							]
 						}
 					},
