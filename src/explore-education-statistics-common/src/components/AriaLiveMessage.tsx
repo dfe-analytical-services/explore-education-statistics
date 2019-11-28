@@ -10,7 +10,7 @@ interface AriaLiveProps {
   setting?: 'polite' | 'assertive';
 }
 
-const AriaLiveMessage = ({ message, setting = 'polite' }: AriaLiveProps) => {
+const AriaLiveMessage = ({ message, setting = 'assertive' }: AriaLiveProps) => {
   const [messageId] = useState<string>(uuidv4());
   const [messageSent, setMessageSent] = useState<boolean>(false);
 
@@ -52,10 +52,10 @@ const Message = ({
       setMessageSent(true);
     }
 
-    return function cleanup() {
+    return () => {
       removeMessage(liveMessage.id);
     };
-  });
+  }, []);
   return null;
 };
 

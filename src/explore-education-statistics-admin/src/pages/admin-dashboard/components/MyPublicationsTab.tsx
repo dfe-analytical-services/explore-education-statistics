@@ -84,7 +84,7 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
 
   useEffect(() => {
     if (themes) {
-      if (!selectedThemeAndTopic) {
+      if (selectedThemeAndTopic.theme.id === '') {
         setSelectedThemeAndTopic({
           theme: themes[0],
           topic: orderBy(themes[0].topics, topic => topic.title)[0],
@@ -106,7 +106,7 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
         }
       }
     }
-  }, [themes, topicPropId, themePropId]);
+  }, [themePropId, themes, topicPropId]);
 
   useEffect(() => {
     if (selectedThemeAndTopic) {

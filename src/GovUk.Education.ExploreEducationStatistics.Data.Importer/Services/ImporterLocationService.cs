@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             return string.Join(separator, observationalUnits
                 .Where(unit => unit != null)
-                .Select(unit => unit.Code));
+                .Select(unit => $"{unit.GetType()}:{unit.Code}"));
         }
 
         private Location LookupOrCreate(
