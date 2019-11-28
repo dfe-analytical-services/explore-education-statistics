@@ -220,24 +220,27 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <h4 className="govuk-heading-m">{dataFile.title}</h4>
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  <a
-                    href={service.createDownloadDataFileLink(
-                      releaseId,
-                      dataFile.filename,
-                    )}
+                  <Link
+                    to="#"
+                    onClick={() =>
+                      service.downloadDataFile(releaseId, dataFile.filename)
+                    }
                   >
                     {dataFile.filename}
-                  </a>
+                  </Link>
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  <a
-                    href={service.createDownloadDataMetadataFileLink(
-                      releaseId,
-                      dataFile.metadataFilename,
-                    )}
+                  <Link
+                    to="#"
+                    onClick={() =>
+                      service.downloadDataMetadataFile(
+                        releaseId,
+                        dataFile.metadataFilename,
+                      )
+                    }
                   >
                     {dataFile.metadataFilename}
-                  </a>
+                  </Link>
                 </SummaryListItem>
                 <SummaryListItem term="Data file size">
                   {dataFile.fileSize.size.toLocaleString()}{' '}
