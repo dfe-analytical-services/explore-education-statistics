@@ -1,4 +1,4 @@
-import client, { baseURL } from '@admin/services/util/service';
+import client from '@admin/services/util/service';
 
 import {
   AncillaryFile,
