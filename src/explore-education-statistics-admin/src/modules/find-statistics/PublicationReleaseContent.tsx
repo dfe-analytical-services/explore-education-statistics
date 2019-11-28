@@ -77,7 +77,7 @@ const PublicationReleaseContent = ({
             content={introductionSection.content}
           />
 
-          {release.dataFiles && (
+          {release.downloadFiles && (
             <Details
               summary="Download data files"
               onToggle={(open: boolean) =>
@@ -90,17 +90,19 @@ const PublicationReleaseContent = ({
               }
             >
               <ul className="govuk-list govuk-list--bullet">
-                {release.dataFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
-                    <Link
-                      to={`${baseUrl.data}/download/${path}`}
-                      className="govuk-link"
-                    >
-                      {name}
-                    </Link>
-                    {` (${extension}, ${size})`}
-                  </li>
-                ))}
+                {release.downloadFiles.map(
+                  ({ extension, name, path, size }) => (
+                    <li key={path}>
+                      <Link
+                        to={`${baseUrl.data}/download/${path}`}
+                        className="govuk-link"
+                      >
+                        {name}
+                      </Link>
+                      {` (${extension}, ${size})`}
+                    </li>
+                  ),
+                )}
               </ul>
             </Details>
           )}
