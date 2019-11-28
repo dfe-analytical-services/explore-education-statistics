@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -124,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .AddProfileService<ApplicationUserProfileService>()
                     // TODO DW - this should be conditional based upon whether or not we're in dev mode
                     .AddSigningCredentials();
-                
+
                 services.Configure<JwtBearerOptions>(
                     IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
                     options =>
@@ -196,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
-            
+
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
@@ -231,8 +230,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
                 // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
                 c.CustomSchemaIds((type) => type.FullName);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Description = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new[] {string.Empty}
+                    }
+                });
             });
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -295,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
                 c.RoutePrefix = "docs";
             });
 
