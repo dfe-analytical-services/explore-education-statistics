@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "33550044-86b5-4e42-b422-029fe898f08e",
+		"_postman_id": "09092033-5105-4cd1-8963-7143e4ed4a12",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -910,6 +910,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
 											"});",
 											"",
+											"// EES-756",
+											"/*",
 											"pm.test(\"Validate footnotes\", function () {",
 											"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
 											"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
@@ -957,6 +959,7 @@
 											"        }",
 											"    }",
 											"});",
+											"*/",
 											"",
 											"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(8); });",
 											"",
@@ -1998,6 +2001,8 @@
 											"    pm.expect(respJson.introductionSection).to.exist;",
 											"});",
 											"",
+											"// EES-754",
+											"/*",
 											"pm.test(\"Release section should contain the correct details\", function () { ",
 											"    ",
 											"    var respJson = pm.response.json();",
@@ -2063,6 +2068,7 @@
 											"    pm.expect(release.content[0].caption).to.equal(\"\");",
 											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
 											"});",
+											"*/",
 											"",
 											"pm.test(\"Related Information section should contain the correct details\", function () { ",
 											"    ",
@@ -2490,6 +2496,7 @@
 													"    pm.response.to.have.status(200); ",
 													"});",
 													"",
+													"",
 													"pm.test(\"Content Sections should contain the correct information\", function () { ",
 													"",
 													"    var respJson = pm.response.json();",
@@ -2530,7 +2537,9 @@
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
 													"    pm.expect(respJson[0].caption).to.equal(\"\");",
-													"    ",
+													"",
+													"    // EES-754",
+													"    /*  ",
 													"    // test a MarkDownBlock's content",
 													"    pm.expect(respJson[0].content.length).to.equal(1);",
 													"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
@@ -2544,6 +2553,7 @@
 													"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
 													"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
 													"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
+													"    */",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3035,6 +3045,7 @@
 													"    pm.response.to.have.status(200); ",
 													"});",
 													"",
+													"",
 													"pm.test(\"Content Section should contain the correct information\", function () { ",
 													"",
 													"    var respJson = pm.response.json();",
@@ -3043,12 +3054,15 @@
 													"    pm.expect(respJson.order).to.equal(1);",
 													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
 													"    pm.expect(respJson.caption).to.equal(\"\");",
-													"    ",
+													"",
+													"    // EES-754",
+													"    /*   ",
 													"    // test a MarkDownBlock's content",
 													"    pm.expect(respJson.content.length).to.equal(1);",
 													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"    */",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3281,12 +3295,15 @@
 													"    pm.expect(respJson.order).to.equal(1);",
 													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
 													"    pm.expect(respJson.caption).to.equal(\"\");",
-													"    ",
+													"",
+													"    // EES-754",
+													"    /*",
 													"    // test a MarkDownBlock's content",
 													"    pm.expect(respJson.content.length).to.equal(1);",
 													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"    */",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3596,11 +3613,14 @@
 													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[2].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
-													"    ",
+													"",
+													"    // EES-754",
+													"    /*    ",
 													"    pm.expect(respJson.content[3].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson.content[3].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
-													"    ",
+													"    */",
+													"  ",
 													"    pm.expect(respJson.content[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[4].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[4].order).to.equal(5);",
@@ -3859,6 +3879,8 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"// EES-754",
+													"/*",
 													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
 													"",
 													"    var respJson = pm.response.json();",
@@ -3884,7 +3906,8 @@
 													"    pm.expect(respJson[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[4].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[4].order).to.equal(5);",
-													"});"
+													"});",
+													"*/"
 												],
 												"type": "text/javascript"
 											}
@@ -3929,6 +3952,8 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"// EES-754",
+													"/*",
 													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
 													"",
 													"    var respJson = pm.response.json();",
@@ -3954,7 +3979,8 @@
 													"    pm.expect(respJson.content[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson.content[4].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[4].order).to.equal(5);",
-													"});"
+													"});",
+													"*/"
 												],
 												"type": "text/javascript"
 											}
@@ -4000,6 +4026,8 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"// EES-754",
+													"/*",
 													"pm.test(\"Content Blocks should be in previous order again\", function () { ",
 													"",
 													"    var respJson = pm.response.json();",
@@ -4025,7 +4053,8 @@
 													"    pm.expect(respJson[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[4].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[4].order).to.equal(5);",
-													"});"
+													"});",
+													"*/"
 												],
 												"type": "text/javascript"
 											}
@@ -4084,9 +4113,12 @@
 													"    pm.expect(respJson[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"    ",
+													"    // EES-754",
+													"    /*",
 													"    pm.expect(respJson[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[2].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    */",
 													"    ",
 													"    pm.expect(respJson[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
@@ -4144,9 +4176,12 @@
 													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[1].order).to.equal(2);",
 													"    ",
+													"    // EES-754",
+													"    /*",
 													"    pm.expect(respJson.content[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson.content[2].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    */",
 													"    ",
 													"    pm.expect(respJson.content[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
@@ -4201,9 +4236,12 @@
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    ",
+													"    // EES-754",
+													"    /*",
 													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    */",
 													"    ",
 													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[2].type).to.equal(\"DataBlock\");",
@@ -4257,9 +4295,12 @@
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    ",
+													"    // EES-754",
+													"    /*",
 													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    */",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4305,9 +4346,12 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(1);",
 													"    ",
+													"    // EES-754",
+													"    /*",
 													"    pm.expect(respJson[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    */",
 													"});",
 													"",
 													"pm.test(\"Remove temporary environment variables\", function() {",

@@ -59,6 +59,12 @@ Select Characteristics
     user clicks category checkbox   Characteristic   Gender female
     user clicks category checkbox   Characteristic   Gender male
 
+# EES-706
+Select School type Total
+    [Tags]  HappyPath
+    user opens details dropdown   School type
+    user clicks category checkbox  School type   Total
+
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
@@ -78,8 +84,9 @@ Validate results table row headings
     [Tags]  HappyPath
     user checks results table row heading contains  1    1    England
 
-    user checks results table row heading contains  1    2    Gender male
-    user checks results table row heading contains  1    3    Unauthorised absence rate
+    user checks results table row heading contains  1    2    Gender
+    user checks results table row heading contains  1    3    Gender male
+    user checks results table row heading contains  1    4    Unauthorised absence rate
     user checks results table row heading contains  2    1    Overall absence rate
     user checks results table row heading contains  3    1    Authorised absence rate
 
@@ -133,7 +140,6 @@ Validate Gender female Authorised absence rate row
 User generates a permanent link
     [Tags]   HappyPath
     user clicks element    xpath://*[text()="Generate permanent link"]
-    # Extra timeout until EES-234
     user waits until page contains element   xpath://a[text()="View permanent link"]   60
     user checks generated permalink is valid
 
@@ -156,8 +162,9 @@ User validates permalink table rows
     [Tags]   HappyPath
     user checks results table row heading contains  1    1    England
 
-    user checks results table row heading contains  1    2    Gender male
-    user checks results table row heading contains  1    3    Unauthorised absence rate
+    user checks results table row heading contains  1    2    Gender
+    user checks results table row heading contains  1    3    Gender male
+    user checks results table row heading contains  1    4    Unauthorised absence rate
     user checks results table row heading contains  2    1    Overall absence rate
     user checks results table row heading contains  3    1    Authorised absence rate
 

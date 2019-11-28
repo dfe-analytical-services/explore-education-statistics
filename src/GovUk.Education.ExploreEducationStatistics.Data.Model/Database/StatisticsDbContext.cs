@@ -38,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ConfigureAdditionalTypes(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
@@ -344,12 +343,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
-        }
-
-        private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
-        {
-            // Register types used by custom SQL queries
-            modelBuilder.Entity<IdWrapper>();
         }
     }
 }

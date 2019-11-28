@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   FormGroup,
   FormFieldset,
+  FormSelect,
   FormTextInput,
   FormRadioGroup,
 } from '@common/components/form';
@@ -14,6 +15,8 @@ interface Props {
 }
 
 const PrototypeMethodologyConfig = ({ sectionId, title }: Props) => {
+  const contactSelection = document.querySelector('#select-lead-statistician');
+
   return (
     <>
       {sectionId === 'setup' && (
@@ -94,6 +97,37 @@ const PrototypeMethodologyConfig = ({ sectionId, title }: Props) => {
             </div>
           </div>
         </fieldset>
+
+        <FormGroup>
+          <FormFieldset
+            id="lead-statisician"
+            legend="Choose the contact for this methodology"
+            legendSize="m"
+          >
+            <p className="govuk-hint">
+              They will be the main point of contact for methodology enquiries.
+            </p>
+            <FormSelect
+              id="select-lead-statisician"
+              label="Publication and release contact"
+              name="select-lead-statisician"
+              options={[
+                { label: 'Mark Pearson', value: 'mark-pearson' },
+                { label: 'Alex Miller', value: 'alex-miller' },
+              ]}
+            />
+          </FormFieldset>
+        </FormGroup>
+        <dl className="govuk-summary-list govuk-width-container">
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Email</dt>
+            <dd className="govuk-summary-list__value">example@email.co.uk</dd>
+          </div>
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Telephone</dt>
+            <dd className="govuk-summary-list__value">07954 765423</dd>
+          </div>
+        </dl>
 
         {!sectionId && (
           <button type="submit" className="govuk-button">

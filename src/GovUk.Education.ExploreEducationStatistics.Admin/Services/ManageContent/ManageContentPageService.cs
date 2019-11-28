@@ -61,12 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             new HtmlBlock()
                             {
                                 Id = new Guid("65187a0b-eb17-4481-b234-949dc85f1efa"),
-                                Type = "HtmlBlock",
-                                Body = "<p>Read national statistical summaries and definitions, view charts and " +
+                                Type = "MarkDownBlock",
+                                Body = "Read national statistical summaries and definitions, view charts and " +
                                        "tables and download data files across a range of pupil absence subject " +
-                                       "areas.</p>" + 
-                                       "<p>You can also view a regional breakdown of statistics and data within the " +
-                                       "<a href=\"#\">local authorities section</a></p>",
+                                       "areas.\n" + 
+                                       "You can also view a regional breakdown of statistics and data within the " +
+                                       "[local authorities section](#)",
                             }
                         }
                     },

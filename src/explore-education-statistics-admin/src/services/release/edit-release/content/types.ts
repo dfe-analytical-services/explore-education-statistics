@@ -3,7 +3,7 @@ import { AbstractRelease } from '@common/services/publicationService';
 
 export interface BasicLink {
   id: string;
-  title: string;
+  description: string;
   url: string;
 }
 
@@ -24,5 +24,18 @@ export interface ManageContentPageViewModel {
 
   contentSections: ContentSectionViewModel[];
 }
+
+export interface ContentBlockViewModel {
+  id: string;
+  order?: number;
+  type: string;
+  body: string;
+}
+
+export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
+export type ContentBlockPostModel = Pick<
+  ContentBlockViewModel,
+  'order' | 'type' | 'body'
+>;
 
 export default {};

@@ -4,21 +4,20 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import { Comment } from '@admin/services/dashboard/types';
-import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 
 type PageMode = 'edit' | 'preview';
 
 interface Model {
   unresolvedComments: Comment[];
   pageMode: PageMode;
-  release: AbstractRelease<EditableContentBlock>;
+  content: ManageContentPageViewModel;
 }
 
 const ReleaseContentPage = () => {
@@ -29,7 +28,7 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService.getContent(releaseId).then(content => {
+    releaseContentService.getContent(releaseId).then(newContent => {
       // <editor-fold desc="TODO - content population">
 
       const unresolvedComments: Comment[] = [
@@ -50,7 +49,7 @@ const ReleaseContentPage = () => {
       setModel({
         unresolvedComments,
         pageMode: 'edit',
-        release: content.release,
+        content: newContent,
       });
     });
   }, [releaseId, publication.themeId, publication]);
@@ -106,8 +105,7 @@ const ReleaseContentPage = () => {
             <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
               <PublicationReleaseContent
                 editing={model.pageMode === 'edit'}
-                basicPublication={publication}
-                release={model.release}
+                content={model.content}
                 styles={{}}
               />
             </div>
