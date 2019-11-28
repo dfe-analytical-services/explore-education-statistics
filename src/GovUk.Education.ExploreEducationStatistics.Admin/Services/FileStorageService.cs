@@ -38,19 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
         }
 
-        public async Task<IEnumerable<FileInfo>> ListPublicFilesPreviewAsync(Guid releaseId)
+        public IEnumerable<Common.Model.FileInfo> ListPublicFilesPreview(Guid releaseId)
         {
-            var files = new List<FileInfo>();
-
-            files.AddRange(await ListFilesAsync(releaseId,ReleaseFileTypes.Data));
-            files.AddRange(await ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary));
-
-            return files.OrderBy(f => f.Name);
-        }
-        
-        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
-        {
-            return await ListFilesAsync(releaseId.ToString(), type);
+            return FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId);
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
@@ -189,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
-        private async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
+        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
 
@@ -252,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
-            return await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
+            return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -288,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
 
-        private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
+        private static bool IsBatchedFile(IListBlobItem blobItem, Guid releaseId)
         {
             return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
         }

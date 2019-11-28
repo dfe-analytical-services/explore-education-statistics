@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -48,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public KeyStatisticsViewModel KeyStatistics { get; set; }
 
-        public IEnumerable<FileInfo> DataFiles { get; set; }
+        public IEnumerable<Common.Model.FileInfo> DataFiles { get; set; }
 
         public DateTime? PublishScheduled { get; set; }
 

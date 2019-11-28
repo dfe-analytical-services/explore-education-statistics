@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -71,26 +72,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return blobContainer;
         }
-        
-        public static IEnumerable<FileInfo> ListPublicFiles(string storageConnectionString, string containerName, string publication, string release)
+
+        public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
+            Guid releaseId)
         {
             var files = new List<FileInfo>();
 
-            files.AddRange(ListFiles(storageConnectionString, containerName, publication, release, ReleaseFileTypes.Data));
-            files.AddRange(ListFiles(storageConnectionString, containerName, publication, release, ReleaseFileTypes.Ancillary));
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data), false));
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Ancillary), false));
 
             return files.OrderBy(f => f.Name);
         }
 
-        private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName, string publication, string release, ReleaseFileTypes type)
+        public static IEnumerable<FileInfo> ListPublicFiles(string storageConnectionString, string containerName,
+            string publication, string release)
+        {
+            var files = new List<FileInfo>();
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data), true));
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary), true));
+
+            return files.OrderBy(f => f.Name);
+        }
+
+        private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
+            string prefix, bool releasedFilesOnly)
         {
             var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-
-            var result = blobContainer
-                .ListBlobs(FileStoragePathUtils.PublicReleaseDirectoryPath(publication, release, type), true,
-                    BlobListingDetails.Metadata)
+            var result = blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
-                .Where(IsFileReleased)
+                .Where(blob => !releasedFilesOnly || IsFileReleased(blob))
                 .Select(file => new FileInfo
                 {
                     Extension = GetExtension(file),

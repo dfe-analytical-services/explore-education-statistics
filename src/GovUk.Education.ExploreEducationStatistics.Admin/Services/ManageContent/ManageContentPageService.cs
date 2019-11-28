@@ -36,11 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            return _releaseHelper.CheckEntityExists(releaseId, release =>
             {
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DataFiles = 
-                    await _fileStorageService.ListPublicFilesPreviewAsync(releaseId);
+                releaseViewModel.DataFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel,
