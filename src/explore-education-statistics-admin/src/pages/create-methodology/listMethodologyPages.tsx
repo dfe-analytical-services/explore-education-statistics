@@ -77,7 +77,7 @@ const ListMethodologyPages = () => {
         </table>
       )}
 
-      <Link to="/methodology/create-methodology" className="govuk-button">
+      <Link to="/methodology/create" className="govuk-button">
         Create new methodology
       </Link>
     </Page>
