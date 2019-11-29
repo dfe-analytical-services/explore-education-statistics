@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel,
-                    introductionSection = new ContentSectionViewModel
+                    IntroductionSection = new ContentSectionViewModel
                     {
                         Id = new Guid("bcb96e42-a09a-4791-a377-9649b0876c58"),
                         Order = 0,
