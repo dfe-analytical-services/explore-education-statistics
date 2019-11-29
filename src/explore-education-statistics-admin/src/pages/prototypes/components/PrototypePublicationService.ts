@@ -474,6 +474,7 @@ export default class PrototypePublicationService {
         id: '00000000-0000-0000-0000-000000000000',
         title: ReleaseType.OfficialStatistics,
       },
+      relatedInformation: [],
       updates: [],
       content: [
         {

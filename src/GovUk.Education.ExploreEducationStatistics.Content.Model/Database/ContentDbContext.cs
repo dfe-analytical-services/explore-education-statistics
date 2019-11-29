@@ -1620,6 +1620,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    RelatedInformation = new List<BasicLink> {
+                        new BasicLink {
+                            Id = new Guid("f3c67bc9-6132-496e-a848-c39dfcd16f49"),
+                            Description = "Additional guidance",
+                            Url = "http://example.com"
+                        },
+                        new BasicLink {
+                            Id = new Guid("45acb50c-8b21-46b4-989f-36f4b0ee37fb"),
+                            Description = "Statistics guide",
+                            Url = "http://example.com"
+                        }
+                    },
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     KeyStatisticsId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d")
                 },

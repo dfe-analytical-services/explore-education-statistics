@@ -43,21 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel,
-                    RelatedInformation = new List<BasicLink>
-                    {
-                        new BasicLink
-                        {
-                            Id = new Guid("15a8dbb8-d8b7-4247-b841-e798860a4700"),
-                            Description = "Pupil absence statistics: guidance and methodology",
-                            Url = "http://example.com/1"
-                        },
-                        new BasicLink
-                        {
-                            Id = new Guid("fadedcb1-f386-4faa-a24f-6731be534097"),
-                            Description = "This is an example of a related information link",
-                            Url = "http://example.com/2"
-                        }
-                    },
                     IntroductionSection = new ContentSectionViewModel
                     {
                         Id = new Guid("bcb96e42-a09a-4791-a377-9649b0876c58"),

@@ -10,8 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     {
         public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
 
-        public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
-
         public ContentSectionViewModel IntroductionSection { get; set; } = new ContentSectionViewModel();
     }
 
@@ -52,6 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public DateTime? PublishScheduled { get; set; }
 
         public PartialDate NextReleaseDate { get; set; }
+        
+        public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
     }
 
     public class PublicationViewModel
