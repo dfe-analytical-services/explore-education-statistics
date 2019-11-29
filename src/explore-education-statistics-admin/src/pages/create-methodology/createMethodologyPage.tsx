@@ -28,9 +28,7 @@ import {
   dayMonthYearValuesToInputs,
   dayMonthYearInputsToDate,
 } from '@common/services/publicationService';
-import {
-  validateMandatoryDayMonthYearField
-} from '@admin/validation/validation';
+import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 
 interface MatchProps {
   topicId: string;
