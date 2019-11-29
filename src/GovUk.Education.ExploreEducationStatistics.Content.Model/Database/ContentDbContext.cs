@@ -2073,6 +2073,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentBlockId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
                     ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                 },
+                // absence generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
+                // absence generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                },
                 // exclusions key stats tile 1 data block
                 new ReleaseContentBlock
                 {
@@ -2097,6 +2109,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentBlockId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
                     ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                 },
+                // exclusions generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // exclusions generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("038093a2-0be3-440b-8b22-8116e34aa616"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
+                // exclusions detached data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
                 // Secondary and primary schools applications key stats tile 1 data block
                 new ReleaseContentBlock
                 {
@@ -2119,6 +2149,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                // Secondary and primary schools applications generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                },
+                // Secondary and primary schools applications generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("a8c408ed-45d8-4690-a9f3-2fb0e86377bf"),
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                 }
             );
@@ -2847,6 +2889,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // absence generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
@@ -2970,7 +3013,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                // absence generic content
                 new DataBlock
                 {
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
@@ -3515,6 +3557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // exclusions generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
@@ -3677,6 +3720,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         Label = "Fixed period exclusion rate",
                                         Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                
+                // exclusions detached Data Block (not yet belonging to any Content Section)
+                new DataBlock
+                {
+                    Id = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
+                    ContentSectionId = null, // not yet used in any Content
+                    Name = "Available Data Block",
+                    Order = 0,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     }
@@ -3922,6 +4064,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // Secondary and primary schools applications offers generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),

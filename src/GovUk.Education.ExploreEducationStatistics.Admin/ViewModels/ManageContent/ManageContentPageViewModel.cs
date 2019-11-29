@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
 
         public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
+        
+        public List<DataBlock> GetAvailableDataBlocks { get; set; } = new List<DataBlock>();
     }
     
     public class ReleaseViewModel

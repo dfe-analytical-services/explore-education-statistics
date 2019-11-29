@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9347d09c-a3b2-4efb-adb0-35b50740c595",
+		"_postman_id": "d5916ea1-8455-4b12-86d4-7a11ff49cce9",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -4438,6 +4438,64 @@
 												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
 												"block",
 												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Data Blocks",
+							"item": [
+								{
+									"name": "Get Available Data Blocks",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should be one available Data Block (that has not yet been included in any Content Section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
 											]
 										}
 									},

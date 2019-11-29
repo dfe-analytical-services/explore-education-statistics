@@ -110,5 +110,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                     releaseId, contentSectionId, contentBlockId, request),
                 Ok);
         }
+
+        [HttpGet("release/{releaseId}/content/available-datablocks")]
+        public Task<ActionResult<List<IContentBlock>>> GetAvailableDataBlocks(Guid releaseId)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.GetUnattachedContentBlocksAsync(releaseId, ContentBlockType.DataBlock),
+                Ok);
+        }
+
+        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
+        public Task<ActionResult<IContentBlock>> AddContentBlock(
+            Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.AttachContentBlockAsync(releaseId, contentSectionId, request),
+                Ok);
+        }
     }
 }
