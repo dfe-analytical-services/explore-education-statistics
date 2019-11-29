@@ -18,7 +18,14 @@ export class AuthorizeService {
   async isAuthenticated() {
     await this.ensureUserManagerInitialized();
     const user = await this.userManager.getUser();
-    return !!user;
+    if (user) {
+      const expired =
+        new Date(
+          `${user.expires_at}${user.expires_at.length === 10 && '000'}`,
+        ) < new Date();
+      return !expired;
+    }
+    return false;
   }
 
   async getUser() {

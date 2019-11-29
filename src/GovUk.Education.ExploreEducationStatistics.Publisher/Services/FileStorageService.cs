@@ -115,16 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (source is CloudBlockBlob blob)
             {
                 await blob.FetchAttributesAsync();
-                return !IsMetaDataFile(blob);
+                return !FileStorageUtils.IsMetaDataFile(blob);
             }
 
             return true;
-        }
-
-        private static bool IsMetaDataFile(CloudBlockBlob blob)
-        {
-            // The meta data file contains a metadata attribute referencing it's corresponding data file
-            return blob.Metadata.ContainsKey(DataFileKey);
         }
 
         private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
