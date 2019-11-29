@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
 
         public ManageContentPageService(ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageServic)
+            IFileStorageService fileStorageService)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             Url = "http://example.com/2"
                         }
                     },
-                }
+                };
             }, HydrateReleaseForReleaseViewModel);
         }
         
