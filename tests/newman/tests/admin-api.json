@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9347d09c-a3b2-4efb-adb0-35b50740c595",
+		"_postman_id": "228d9a4c-7a0b-4763-8332-4aa4276bdc6a",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1980,6 +1980,56 @@
 				{
 					"name": "Manage Content Page",
 					"item": [
+						{
+							"name": "Add Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Release notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"releaseNote\": \"Update from Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
 						{
 							"name": "Get Manage Content Page data",
 							"event": [
