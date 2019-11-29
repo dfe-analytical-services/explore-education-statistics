@@ -14,11 +14,11 @@ import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { baseUrl } from '@common/services/api';
 import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
+import service from '@admin/services/release/edit-release/data/service';
 import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
@@ -94,7 +94,8 @@ const PublicationReleaseContent = ({
                   ({ extension, name, path, size }) => (
                     <li key={path}>
                       <Link
-                        to={`${baseUrl.data}/download/${path}`}
+                        to="#"
+                        onClick={() => service.downloadFile(path, name)}
                         className="govuk-link"
                       >
                         {name}
