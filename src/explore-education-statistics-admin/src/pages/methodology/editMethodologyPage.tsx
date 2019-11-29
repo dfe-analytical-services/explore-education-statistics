@@ -10,8 +10,14 @@ const EditMethodologyPage = () => {
   const [model, setModel] = useState<Model>();
 
   return (
-    <Page wide breadcrumbs={[{ name: 'Methodology' }]}>
-      <p>placeholder page</p>
+    <Page
+      wide
+      breadcrumbs={[
+        { name: 'Manage methodology', link: '/methodology' },
+        { name: 'Edit methodology' },
+      ]}
+    >
+      <p>Edit methodology placeholder page</p>
     </Page>
   );
 };

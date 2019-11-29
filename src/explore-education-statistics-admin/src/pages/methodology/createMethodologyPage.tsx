@@ -100,6 +100,7 @@ const CreateMethodologyPage = ({
       breadcrumbs={[
         {
           name: 'Manage methodology',
+          link: '/methodology',
         },
         {
           name: 'Create new methodology',
