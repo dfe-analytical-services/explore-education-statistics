@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<MethodologyStatusViewModel>> ListStatusAsync()
         {
             var result = await _context.Methodologies
-                .Include(m => m.Publications.OrderBy(p => p.Title))
+                .Include(m => m.Publications)//.OrderBy(p => p.Title))
                 .OrderBy(m => m.Title)
                 .ToListAsync();
 
