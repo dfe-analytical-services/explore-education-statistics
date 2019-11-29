@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
 import Link, { LinkProps } from '@admin/components/Link';
-import wrapEditableComponent, {
-  EditingContext,
-} from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 
 interface Props extends LinkProps {

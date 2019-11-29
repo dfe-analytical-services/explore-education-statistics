@@ -1,11 +1,9 @@
-import Accordion, {
-  EditableAccordionProps,
-} from '@admin/components/EditableAccordion';
-import AccordionSection, {
-  EditableAccordionSectionProps,
-} from '@admin/components/EditableAccordionSection';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import React, { ReactNode } from 'react';
+import Accordion from '@admin/components/EditableAccordion';
+import AccordionSection from '@admin/components/EditableAccordionSection';
+import ContentBlock, {
+  ReorderHook,
+} from '@admin/modules/find-statistics/components/EditableContentBlock';
+import React, { MouseEventHandler, ReactNode } from 'react';
 import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
@@ -39,9 +37,28 @@ const ReleaseContentAccordionSection = ({
   headingButtons,
   canToggle = true,
 }: ReleaseContentAccordionSectionProps) => {
-  const { caption, content, heading, order } = contentItem;
+  const { caption, heading, order } = contentItem;
 
   const [isReordering, setIsReordering] = React.useState(false);
+
+  const [content, setContent] = React.useState(contentItem.content);
+
+  const saveOrder = React.useRef<ReorderHook>();
+
+  const onReorderClick: MouseEventHandler = e => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (isReordering) {
+      if (saveOrder.current) {
+        saveOrder.current(contentItem.id).then(() => setIsReordering(false));
+      } else {
+        setIsReordering(false);
+      }
+    } else {
+      setIsReordering(true);
+    }
+  };
 
   return (
     <AccordionSection
@@ -56,11 +73,7 @@ const ReleaseContentAccordionSection = ({
             key="toggle_reordering"
             className={classnames(styles.toggleContentDragging)}
             type="button"
-            onClick={e => {
-              e.stopPropagation();
-              e.preventDefault();
-              setIsReordering(!isReordering);
-            }}
+            onClick={onReorderClick}
           >
             {isReordering ? 'Save order' : 'Reorder Content'}
           </button>
@@ -75,6 +88,10 @@ const ReleaseContentAccordionSection = ({
         content={content}
         id={`content_${order}`}
         publication={release.publication}
+        onContentChange={newContent => setContent(newContent)}
+        onReorderHook={s => {
+          saveOrder.current = s;
+        }}
       />
     </AccordionSection>
   );

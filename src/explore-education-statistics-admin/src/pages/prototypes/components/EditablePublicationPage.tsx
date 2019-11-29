@@ -170,9 +170,6 @@ class EditablePublicationPage extends Component<Props, State> {
                 reviewing={reviewing}
                 resolveComments={resolveComments}
                 id={`editable-block-${index}`}
-                onContentChange={(block, newContent) => {
-                  block.body = newContent;
-                }}
                 publication={data.publication}
               />
             </EditableAccordionSection>

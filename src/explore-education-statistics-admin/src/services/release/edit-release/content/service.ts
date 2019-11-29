@@ -35,6 +35,12 @@ export interface ReleaseContentService {
     block: ContentBlockPutModel,
   ) => Promise<ContentBlockViewModel>;
 
+  updateContentSectionBlocksOrder: (
+    releaseId: string,
+    sectionId: string,
+    order: Dictionary<number>,
+  ) => Promise<ContentBlockViewModel[]>;
+
   deleteContentSectionBlock: (
     releaseId: string,
     sectionId: string,
@@ -92,6 +98,17 @@ const service: ReleaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  updateContentSectionBlocksOrder(
+    releaseId: string,
+    sectionId: string,
+    order: Dictionary<number>,
+  ): Promise<ContentBlockViewModel[]> {
+    return client.put<ContentBlockViewModel[]>(
+      `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
+      order,
     );
   },
 

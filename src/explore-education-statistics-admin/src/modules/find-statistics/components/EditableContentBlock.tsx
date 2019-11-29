@@ -3,29 +3,27 @@ import { EditableRelease } from '@admin/services/publicationService';
 import ContentBlock, {
   ContentBlockProps,
 } from '@common/modules/find-statistics/components/ContentBlock';
-import { ContentBlock as ContentBlockData } from '@common/services/publicationService';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import Button from '@common/components/Button';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
-import { ContentBlockViewModel } from '@admin/services/release/edit-release/content/types';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import classnames from 'classnames';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
+import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
+import { Dictionary } from '@common/types/util';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
-import styles from './EditableContentBlock.module.scss';
+import ContentBlockDraggable from './ContentBlockDraggable';
+
+type ContentType = EditableRelease['content'][0]['content'];
+
+export type ReorderHook = (sectionId?: string) => Promise<void>;
 
 export interface Props extends ContentBlockProps {
-  content: EditableRelease['content'][0]['content'];
+  content: ContentType;
 
   sectionId: string;
 
@@ -34,8 +32,8 @@ export interface Props extends ContentBlockProps {
   isReordering?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
-  onContentChange?: (block: ContentBlockData, content: string) => void;
-  onAddContent?: (content: ContentBlockViewModel) => void;
+  onContentChange?: (content: ContentType) => void;
+  onReorderHook?: (callback: ReorderHook) => void;
 }
 
 interface EditingContentBlockContext extends ReleaseContentContext {
@@ -50,88 +48,6 @@ export const EditingContentBlockContext = React.createContext<
   sectionId: undefined,
 });
 
-interface AddContentButtonProps {
-  order?: number;
-  onClick: (type: string, order: number | undefined) => void;
-}
-
-const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
-  return (
-    <>
-      <Button
-        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => onClick('HtmlBlock', order)}
-      >
-        Add HTML
-      </Button>
-    </>
-  );
-};
-
-const WrappedInDroppable = ({
-  draggable,
-  droppableId,
-  children,
-}: {
-  draggable: boolean;
-  droppableId: string;
-  children: ReactNode | ReactNode[];
-}) => {
-  return (
-    <>
-      {draggable ? (
-        <Droppable droppableId={droppableId} type="content">
-          {droppableProvided => (
-            <div
-              {...droppableProvided.droppableProps}
-              ref={droppableProvided.innerRef}
-            >
-              {children}
-              {droppableProvided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      ) : (
-        children
-      )}
-    </>
-  );
-};
-
-const WrappedInDraggable = ({
-  draggable,
-  draggableId,
-  index,
-  children,
-}: {
-  draggable: boolean;
-  draggableId: string;
-  index: number;
-  children: ReactNode | ReactNode[];
-}) => (
-  <>
-    {draggable ? (
-      <Draggable draggableId={draggableId} index={index} type="contentBlock">
-        {draggableProvided => (
-          <div
-            {...draggableProvided.draggableProps}
-            ref={draggableProvided.innerRef}
-            className={styles.isDragging}
-          >
-            <span
-              {...draggableProvided.dragHandleProps}
-              className={styles.dragHandle}
-            />
-            {children}
-          </div>
-        )}
-      </Draggable>
-    ) : (
-      children
-    )}
-  </>
-);
-
 const EditableContentBlock = ({
   content,
   id = '',
@@ -141,20 +57,36 @@ const EditableContentBlock = ({
   reviewing,
   resolveComments,
   canAddBlocks = false,
-  onAddContent,
   isReordering = false,
+  onReorderHook = undefined,
 }: Props) => {
   const editingContext = React.useContext(EditingContext);
 
   const [contentBlocks, setContentBlocks] = React.useState(content);
 
-  if (content.length === 0) {
-    return (
-      <div className="govuk-inset-text">
-        There is no content for this section.
-      </div>
-    );
-  }
+  React.useEffect(() => {
+    if (onReorderHook) {
+      const saveOrder: ReorderHook = async contentSectionId => {
+        if (editingContext.releaseId && contentSectionId) {
+          const newOrder = contentBlocks.reduce<Dictionary<number>>(
+            (order, next, index) => ({ ...order, [next.id]: index }),
+            {},
+          );
+
+          await releaseContentService.updateContentSectionBlocksOrder(
+            editingContext.releaseId,
+            contentSectionId,
+            newOrder,
+          );
+
+          if (onContentChange) {
+            onContentChange(contentBlocks);
+          }
+        }
+      };
+      onReorderHook(saveOrder);
+    }
+  }, [contentBlocks, editingContext.releaseId, onContentChange, onReorderHook]);
 
   const onAddContentCallback = (type: string, order: number | undefined) => {
     if (editingContext.releaseId && sectionId) {
@@ -166,18 +98,28 @@ const EditableContentBlock = ({
           type,
           order,
         })
-        .then(result => {
-          if (onAddContent) onAddContent(result);
-          return result;
-        })
         .then(() =>
           releaseContentService.getContentSection(releaseId, sectionId),
         )
         .then(section => {
+          if (onContentChange) onContentChange(section.content);
           setContentBlocks(section.content);
         });
     }
   };
+
+  if (content.length === 0) {
+    return (
+      <>
+        <div className="govuk-inset-text">
+          There is no content for this section.
+        </div>
+        {canAddBlocks && (
+          <AddContentButton order={0} onClick={onAddContentCallback} />
+        )}
+      </>
+    );
+  }
 
   const onDeleteContent = async (contentId: string) => {
     const { releaseId } = editingContext;
@@ -189,10 +131,12 @@ const EditableContentBlock = ({
       );
 
       const {
-        content: newContent,
+        content: newContentBlocks,
       } = await releaseContentService.getContentSection(releaseId, sectionId);
 
-      setContentBlocks(newContent);
+      setContentBlocks(newContentBlocks);
+
+      if (onContentChange) onContentChange(newContentBlocks);
     }
   };
 
@@ -201,14 +145,11 @@ const EditableContentBlock = ({
 
     if (type === 'content' && destination) {
       const newContentBlocks = [...contentBlocks];
-      const [removed] = newContentBlocks.splice(source.index,1);
+      const [removed] = newContentBlocks.splice(source.index, 1);
       newContentBlocks.splice(destination.index, 0, removed);
       setContentBlocks(newContentBlocks);
+      if (onContentChange) onContentChange(newContentBlocks);
     }
-  };
-
-  const saveOrder = () => {
-
   };
 
   return (
@@ -219,12 +160,12 @@ const EditableContentBlock = ({
       }}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <WrappedInDroppable
+        <ContentBlockDroppable
           draggable={isReordering}
           droppableId={`${sectionId}`}
         >
           {contentBlocks.map((block, index) => (
-            <WrappedInDraggable
+            <ContentBlockDraggable
               draggable={isReordering}
               draggableId={`${block.id}`}
               key={`${block.id}`}
@@ -252,8 +193,11 @@ const EditableContentBlock = ({
                 id={id}
                 index={index}
                 onContentChange={newContent => {
+                  const newBlocks = [...contentBlocks];
+                  newBlocks[index].body = newContent;
+                  setContentBlocks(newBlocks);
                   if (onContentChange) {
-                    onContentChange(block, newContent);
+                    onContentChange(newBlocks);
                   }
                 }}
                 onDelete={() => onDeleteContent(block.id)}
@@ -264,9 +208,9 @@ const EditableContentBlock = ({
                 index === contentBlocks.length - 1 && (
                   <AddContentButton onClick={onAddContentCallback} />
                 )}
-            </WrappedInDraggable>
+            </ContentBlockDraggable>
           ))}
-        </WrappedInDroppable>
+        </ContentBlockDroppable>
       </DragDropContext>
     </EditingContentBlockContext.Provider>
   );
