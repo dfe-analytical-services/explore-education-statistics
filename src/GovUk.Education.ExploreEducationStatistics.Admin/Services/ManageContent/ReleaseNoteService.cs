@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -39,13 +41,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     Id = Guid.NewGuid(),
                     On = DateTime.Now,
-                    Reason = request.ReleaseNote
+                    Reason = request.ReleaseNote,
+                    ReleaseId = release.Id
                 });
 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return release.Updates;
-            });
+            }, HydrateRelease);
+        }
+        
+        private static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
+        {
+            return values.Include(r => r.Updates);
         }
     }
 }

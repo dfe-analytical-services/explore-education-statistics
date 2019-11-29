@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent
 {
     public class CreateReleaseNoteRequest
     {
