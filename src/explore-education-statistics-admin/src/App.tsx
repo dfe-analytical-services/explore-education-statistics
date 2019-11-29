@@ -1,6 +1,7 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ProtectedRoutes from '@admin/components/ProtectedRoutes';
+import ListMethodologyPages from '@admin/pages/create-methodology/listMethodologyPages';
 import CreateMethodologyPage from '@admin/pages/create-methodology/createMethodologyPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
@@ -106,6 +107,11 @@ function App() {
               path={ApplicationPaths.LoggedOut}
               component={SignedOutPage}
               redirectIfNotLoggedIn={false}
+            />
+            <ProtectedRoute
+              exact
+              path="/methodology"
+              component={ListMethodologyPages}
             />
             <ProtectedRoute
               exact

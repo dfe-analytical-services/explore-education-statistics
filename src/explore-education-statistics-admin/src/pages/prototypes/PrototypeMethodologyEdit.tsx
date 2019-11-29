@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Link from '@admin/components/Link';
-import PrototypeMethodologyService from '@admin/pages/prototypes/components/PrototypeMethodologyService';
+import PrototypeMethodologyService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditableMethodologyPage from '@admin/pages/prototypes/components/EditableMethodologyPage';
 import PrototypePage from './components/PrototypePage';
 import PrototypeMethodologyNavigation from './components/PrototypeMethodologyNavigation';
