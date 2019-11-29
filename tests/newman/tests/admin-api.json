@@ -1994,8 +1994,16 @@
 											"    pm.response.to.have.status(201); ",
 											"});",
 											"",
-											"pm.test(\"Release notes array contains values\", function () {",
+											"pm.test(\"Release Notes array contains values\", function () {",
 											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
+											"    const latestReleaseNote = respJson[0];",
+											"    pm.expect(latestReleaseNote.id).to.not.be.empty;",
+											"    pm.expect(latestReleaseNote.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(latestReleaseNote.on).to.not.be.empty;",
+											"    pm.expect(latestReleaseNote.reason).to.equal(\"Update from Postman\");",
 											"});"
 										],
 										"type": "text/javascript"
