@@ -35,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     }
                 });
 
-
             CreateMap<Publication, PublicationMetaViewModel>();
 
             CreateMap<Subject, IdLabel>()
