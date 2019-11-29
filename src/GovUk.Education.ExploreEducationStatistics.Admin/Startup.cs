@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 c.CustomSchemaIds((type) => type.FullName);
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
-                    Description = "Please enter into field the word 'Bearer' following by space and JWT",
+                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
