@@ -88,7 +88,9 @@ export default function SummaryRenderer({
           );
         })}
       </div>
-      {description.body !== '' && <ReactMarkdown source={description.body} />}
+      {description && description.body !== '' && (
+        <ReactMarkdown source={description.body} />
+      )}
     </>
   );
 }

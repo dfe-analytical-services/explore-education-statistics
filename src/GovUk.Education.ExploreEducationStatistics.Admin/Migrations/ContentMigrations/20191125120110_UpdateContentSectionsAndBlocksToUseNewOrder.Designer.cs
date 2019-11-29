@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191125120110_UpdateContentSectionsAndBlocksToUseNewOrder")]
+    partial class UpdateContentSectionsAndBlocksToUseNewOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,11 +125,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ContentSections");
 
@@ -138,6 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "About these statistics",
                             Order = 1,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -146,6 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Pupil absence rates",
                             Order = 2,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -154,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Persistent absence",
                             Order = 3,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -162,6 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Reasons for absence",
                             Order = 4,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -170,6 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Distribution of absence",
                             Order = 5,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -178,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Absence by pupil characteristics",
                             Order = 6,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -186,6 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Absence for 4-year-olds",
                             Order = 7,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -194,6 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Pupil referral unit absence",
                             Order = 8,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -202,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Regional and local authority (LA) breakdown",
                             Order = 9,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Generic"
                         },
                         new
@@ -210,6 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "About this release",
                             Order = 1,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -218,6 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Permanent exclusions",
                             Order = 2,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -226,6 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Fixed-period exclusions",
                             Order = 3,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -234,6 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Number and length of fixed-period exclusions",
                             Order = 4,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -242,6 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Reasons for exclusions",
                             Order = 5,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -250,6 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Exclusions by pupil characteristics",
                             Order = 6,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -258,6 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Independent exclusion reviews",
                             Order = 7,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -266,6 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Pupil referral units exclusions",
                             Order = 8,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -274,6 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Regional and local authority (LA) breakdown",
                             Order = 9,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Generic"
                         },
                         new
@@ -282,6 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "About this release",
                             Order = 1,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Generic"
                         },
                         new
@@ -290,6 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Secondary applications and offers",
                             Order = 2,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Generic"
                         },
                         new
@@ -298,6 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Secondary geographical variation",
                             Order = 3,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Generic"
                         },
                         new
@@ -306,6 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Primary applications and offers",
                             Order = 4,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Generic"
                         },
                         new
@@ -314,6 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "Primary geographical variation",
                             Order = 5,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Generic"
                         },
                         new
@@ -322,6 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "ReleaseSummary"
                         },
                         new
@@ -330,6 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "ReleaseSummary"
                         },
                         new
@@ -338,55 +370,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "ReleaseSummary"
-                        },
-                        new
-                        {
-                            Id = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatistics"
-                        },
-                        new
-                        {
-                            Id = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatistics"
-                        },
-                        new
-                        {
-                            Id = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatistics"
-                        },
-                        new
-                        {
-                            Id = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatisticsSecondary"
-                        },
-                        new
-                        {
-                            Id = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatisticsSecondary"
-                        },
-                        new
-                        {
-                            Id = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
-                            Caption = "",
-                            Heading = "",
-                            Order = 1,
-                            Type = "KeyStatisticsSecondary"
                         },
                         new
                         {
@@ -394,6 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Type = "Headlines"
                         },
                         new
@@ -402,6 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Type = "Headlines"
                         },
                         new
@@ -410,6 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Caption = "",
                             Heading = "",
                             Order = 1,
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Type = "Headlines"
                         });
                 });
@@ -653,8 +641,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
-                            Annexes = "[{\"Id\":\"0522bb29-1e0d-455a-88ef-5887f76fb069\",\"Order\":1,\"Heading\":\"Annex A - Calculations\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8b90b3b2-f63d-4499-91aa-41ccae74e1c7\",\"Order\":0}],\"Release\":null},{\"Id\":\"f1aac714-665d-436e-a488-1ca409d618bf\",\"Order\":2,\"Heading\":\"Annex B - School attendance codes\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"47f3e500-ec9f-4a00-96f8-c488f76b06e6\",\"Order\":0}],\"Release\":null},{\"Id\":\"0b888133-215a-4b28-8c24-e0ee9a32df6e\",\"Order\":3,\"Heading\":\"Annex C - Links to pupil absence national statistics and data\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a00a7765-aa81-43f2-afe1-fead7f070291\",\"Order\":0}],\"Release\":null},{\"Id\":\"4c4c71e2-24e1-4b57-8a23-ce54fae9b329\",\"Order\":4,\"Heading\":\"Annex D - Standard breakdowns\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"7cc516d4-fc79-4e22-b35b-a042d5b14d35\",\"Order\":0}],\"Release\":null},{\"Id\":\"97a138bf-4ebb-4b17-86ab-ed78584608e3\",\"Order\":5,\"Heading\":\"Annex E - Timeline\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8ddc6877-acd2-479d-a86f-1139c1bd429f\",\"Order\":0}],\"Release\":null},{\"Id\":\"dc00e749-0893-47f7-8440-5a4da47ceed7\",\"Order\":6,\"Heading\":\"Annex F - Absence rates over time\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"0fd71cfd-cfdd-42c5-86e7-9e311beee646\",\"Order\":0}],\"Release\":null}]",
-                            Content = "[{\"Id\":\"5a7fd947-d131-475d-afcd-11ab2b1ece67\",\"Order\":1,\"Heading\":\"1. Overview of absence statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09\",\"Order\":0}],\"Release\":null},{\"Id\":\"dabb7562-0433-42fc-96e4-64a68f399dac\",\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"6bf20dd4-a7d6-4bc6-a13a-9f574935c9af\",\"Order\":0}],\"Release\":null},{\"Id\":\"50b5031a-93e4-4756-843e-21f88f52ba68\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"63a318d9-05fa-40eb-9808-b825a6deb54a\",\"Order\":0}],\"Release\":null},{\"Id\":\"e4ca520f-b609-4abb-a38c-c2d610a18e9f\",\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"7714efb9-cc82-4895-ba27-bf5464541e38\",\"Order\":0}],\"Release\":null},{\"Id\":\"da91d355-b878-4135-a0a9-fb538c601246\",\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"6f81ab70-5730-4cf1-a513-669f5c4bef09\",\"Order\":0}],\"Release\":null},{\"Id\":\"8df45966-5444-4487-be49-763c5009eea6\",\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a40d6c9e-fe61-48c0-b907-9757148beb0d\",\"Order\":0}],\"Release\":null},{\"Id\":\"bf6870de-07d3-4e65-a877-373a63dbcc5d\",\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"f620a229-21b7-4c6e-afd4-e9feb111f09a\",\"Order\":0}],\"Release\":null}]",
+                            Annexes = "[{\"Id\":\"0522bb29-1e0d-455a-88ef-5887f76fb069\",\"Order\":1,\"Heading\":\"Annex A - Calculations\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8b90b3b2-f63d-4499-91aa-41ccae74e1c7\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"f1aac714-665d-436e-a488-1ca409d618bf\",\"Order\":2,\"Heading\":\"Annex B - School attendance codes\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"47f3e500-ec9f-4a00-96f8-c488f76b06e6\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"0b888133-215a-4b28-8c24-e0ee9a32df6e\",\"Order\":3,\"Heading\":\"Annex C - Links to pupil absence national statistics and data\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a00a7765-aa81-43f2-afe1-fead7f070291\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"4c4c71e2-24e1-4b57-8a23-ce54fae9b329\",\"Order\":4,\"Heading\":\"Annex D - Standard breakdowns\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"7cc516d4-fc79-4e22-b35b-a042d5b14d35\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"97a138bf-4ebb-4b17-86ab-ed78584608e3\",\"Order\":5,\"Heading\":\"Annex E - Timeline\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8ddc6877-acd2-479d-a86f-1139c1bd429f\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"dc00e749-0893-47f7-8440-5a4da47ceed7\",\"Order\":6,\"Heading\":\"Annex F - Absence rates over time\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"0fd71cfd-cfdd-42c5-86e7-9e311beee646\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"}]",
+                            Content = "[{\"Id\":\"5a7fd947-d131-475d-afcd-11ab2b1ece67\",\"Order\":1,\"Heading\":\"1. Overview of absence statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"dabb7562-0433-42fc-96e4-64a68f399dac\",\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"6bf20dd4-a7d6-4bc6-a13a-9f574935c9af\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"50b5031a-93e4-4756-843e-21f88f52ba68\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"63a318d9-05fa-40eb-9808-b825a6deb54a\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"e4ca520f-b609-4abb-a38c-c2d610a18e9f\",\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"7714efb9-cc82-4895-ba27-bf5464541e38\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"da91d355-b878-4135-a0a9-fb538c601246\",\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"6f81ab70-5730-4cf1-a513-669f5c4bef09\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"8df45966-5444-4487-be49-763c5009eea6\",\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a40d6c9e-fe61-48c0-b907-9757148beb0d\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"bf6870de-07d3-4e65-a877-373a63dbcc5d\",\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"f620a229-21b7-4c6e-afd4-e9feb111f09a\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"}]",
                             LastUpdated = new DateTime(2019, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "pupil-absence-in-schools-in-england",
@@ -664,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                            Content = "[{\"Id\":\"d82b2a2c-b117-4f96-b812-80de5304ae21\",\"Order\":1,\"Heading\":\"1. Overview of applications and offers statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"ff7b34e3-58ba-4578-849a-e5044fc14b8d\",\"Order\":0}],\"Release\":null},{\"Id\":\"f0814433-92d4-4ce5-b63b-2f2cb1b6f48a\",\"Order\":2,\"Heading\":\"2. The admissions process\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"d7f310d7-e917-47e2-9e05-065c8bcab891\",\"Order\":0}],\"Release\":null},{\"Id\":\"1d7a492b-3e59-4624-9a2a-076635d1f780\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a89226ef-1d6a-48ba-a795-0dbc334a9198\",\"Order\":0}],\"Release\":null},{\"Id\":\"f129939b-803f-461b-8838-e7a3d8c6eca2\",\"Order\":4,\"Heading\":\"4. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"16898320-cf69-45c4-8dbb-2486901759b1\",\"Order\":0}],\"Release\":null}]",
+                            Content = "[{\"Id\":\"d82b2a2c-b117-4f96-b812-80de5304ae21\",\"Order\":1,\"Heading\":\"1. Overview of applications and offers statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"ff7b34e3-58ba-4578-849a-e5044fc14b8d\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"f0814433-92d4-4ce5-b63b-2f2cb1b6f48a\",\"Order\":2,\"Heading\":\"2. The admissions process\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"d7f310d7-e917-47e2-9e05-065c8bcab891\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"1d7a492b-3e59-4624-9a2a-076635d1f780\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"a89226ef-1d6a-48ba-a795-0dbc334a9198\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"f129939b-803f-461b-8838-e7a3d8c6eca2\",\"Order\":4,\"Heading\":\"4. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"16898320-cf69-45c4-8dbb-2486901759b1\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"}]",
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "secondary-and-primary-schools-applications-and-offers",
                             Summary = "",
@@ -673,8 +661,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
-                            Annexes = "[{\"Id\":\"2bb1ce6d-8b54-4a77-bf7d-466c5f7f6bc3\",\"Order\":1,\"Heading\":\"Annex A - Calculations\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"c2d4d345-59b6-443b-bcb0-67c1f1dd9732\",\"Order\":0}],\"Release\":null},{\"Id\":\"01e9feb8-8ca0-4d98-8a17-78672e4641a7\",\"Order\":2,\"Heading\":\"Annex B - Exclusion by reason codes\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"e4e4f98b-cbeb-451f-bd17-8e2d572b83f4\",\"Order\":0}],\"Release\":null},{\"Id\":\"39576875-4a54-4028-bdb0-fecc67041f82\",\"Order\":3,\"Heading\":\"Annex C - Links to pupil exclusions statistics and data\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"94246f85-e43a-4b6c-97a0-b045701dc077\",\"Order\":0}],\"Release\":null},{\"Id\":\"e3bfcc04-7d91-45b7-b0ee-19713de4b433\",\"Order\":4,\"Heading\":\"Annex D - Standard breakdowns\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"b05ae1f7-b2d1-4ae3-9db6-28fb0edf98ae\",\"Order\":0}],\"Release\":null}]",
-                            Content = "[{\"Id\":\"bceaafc1-9548-4a03-98d5-d3476c8b9d99\",\"Order\":1,\"Heading\":\"1. Overview of exclusion statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"9a034a5f-7cdb-4895-b205-864e7f834ebf\",\"Order\":0}],\"Release\":null},{\"Id\":\"66b15928-46c6-48d5-90e6-12cf354b4e04\",\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"f745893e-68a6-4813-ba8b-35d44c0935aa\",\"Order\":0}],\"Release\":null},{\"Id\":\"863f2b02-67b1-41bd-b1c9-f998f4581297\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"4c88cbdd-e0e2-4019-a656-31e4b97d19d5\",\"Order\":0}],\"Release\":null},{\"Id\":\"fc66f72e-0176-4c75-b15f-2f35c7329563\",\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"085ba061-918b-4e6e-9a02-3a8b12671587\",\"Order\":0}],\"Release\":null},{\"Id\":\"0c44636a-9a31-4e05-8db7-331ed5eae366\",\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"29f138eb-070e-41fe-95c6-e271cdf4eaf4\",\"Order\":0}],\"Release\":null},{\"Id\":\"69df08b6-dcda-449e-828e-5666c8e6d533\",\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8263cdc1-a2e8-4db6-a581-44043a6add64\",\"Order\":0}],\"Release\":null},{\"Id\":\"fa315759-a51b-4860-8ae5-7b9505873108\",\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"e1eb03d9-25e4-4247-b3de-49805cce7889\",\"Order\":0}],\"Release\":null}]",
+                            Annexes = "[{\"Id\":\"2bb1ce6d-8b54-4a77-bf7d-466c5f7f6bc3\",\"Order\":1,\"Heading\":\"Annex A - Calculations\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"c2d4d345-59b6-443b-bcb0-67c1f1dd9732\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"01e9feb8-8ca0-4d98-8a17-78672e4641a7\",\"Order\":2,\"Heading\":\"Annex B - Exclusion by reason codes\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"e4e4f98b-cbeb-451f-bd17-8e2d572b83f4\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"39576875-4a54-4028-bdb0-fecc67041f82\",\"Order\":3,\"Heading\":\"Annex C - Links to pupil exclusions statistics and data\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"94246f85-e43a-4b6c-97a0-b045701dc077\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"e3bfcc04-7d91-45b7-b0ee-19713de4b433\",\"Order\":4,\"Heading\":\"Annex D - Standard breakdowns\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"b05ae1f7-b2d1-4ae3-9db6-28fb0edf98ae\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"}]",
+                            Content = "[{\"Id\":\"bceaafc1-9548-4a03-98d5-d3476c8b9d99\",\"Order\":1,\"Heading\":\"1. Overview of exclusion statistics\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"9a034a5f-7cdb-4895-b205-864e7f834ebf\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"66b15928-46c6-48d5-90e6-12cf354b4e04\",\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"f745893e-68a6-4813-ba8b-35d44c0935aa\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"863f2b02-67b1-41bd-b1c9-f998f4581297\",\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"4c88cbdd-e0e2-4019-a656-31e4b97d19d5\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"fc66f72e-0176-4c75-b15f-2f35c7329563\",\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"085ba061-918b-4e6e-9a02-3a8b12671587\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"0c44636a-9a31-4e05-8db7-331ed5eae366\",\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"29f138eb-070e-41fe-95c6-e271cdf4eaf4\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"69df08b6-dcda-449e-828e-5666c8e6d533\",\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"8263cdc1-a2e8-4db6-a581-44043a6add64\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"},{\"Id\":\"fa315759-a51b-4860-8ae5-7b9505873108\",\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[{\"Body\":\"\",\"Type\":\"HtmlBlock\",\"Id\":\"e1eb03d9-25e4-4247-b3de-49805cce7889\",\"Order\":0}],\"Release\":null,\"ReleaseId\":\"00000000-0000-0000-0000-000000000000\"}]",
                             Published = new DateTime(2018, 8, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "permanent-and-fixed-period-exclusions-in-england",
                             Summary = "",
@@ -1360,6 +1348,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("KeyStatisticsId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 
@@ -1398,6 +1389,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KeyStatisticsId");
+
                     b.HasIndex("PublicationId");
 
                     b.HasIndex("TypeId");
@@ -1408,6 +1401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            KeyStatisticsId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
                             Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1420,6 +1414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            KeyStatisticsId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
                             Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1432,6 +1427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            KeyStatisticsId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
                             Order = 0,
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1440,276 +1436,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Status = "Draft",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
-                        });
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentBlock", b =>
-                {
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ContentBlockId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ReleaseId", "ContentBlockId");
-
-                    b.HasIndex("ContentBlockId");
-
-                    b.ToTable("ReleaseContentBlocks");
-
-                    b.HasData(
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentBlockId = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentBlockId = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentBlockId = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentBlockId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentBlockId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentBlockId = new Guid("695de169-947f-4f66-8564-6392b6113dfc")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentBlockId = new Guid("17251e1c-e978-419c-98f5-963131c952f7")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentBlockId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentBlockId = new Guid("5947759d-c6f3-451b-b353-a4da063f020a")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentBlockId = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentBlockId = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentBlockId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e")
-                        });
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentSection", b =>
-                {
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ContentSectionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ReleaseId", "ContentSectionId");
-
-                    b.HasIndex("ContentSectionId")
-                        .IsUnique();
-
-                    b.ToTable("ReleaseContentSections");
-
-                    b.HasData(
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("5708d443-7669-47d8-b6a3-6ad851090710")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692")
-                        },
-                        new
-                        {
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da")
                         });
                 });
 
@@ -2436,49 +2162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
-                            ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                            Order = 1,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"26_1_58_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"26\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 1",
-                            Summary = "{\"dataKeys\":[\"26\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\\\"/glossary#overall-absence\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"26\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
-                            ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                            Order = 2,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"28_1_58_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"28\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 2",
-                            Summary = "{\"dataKeys\":[\"28\"],\"dataSummary\":[\"Similar to previous years\"],\"dataDefinition\":[\"Number of authorised absences as a percentage of the overall school population. <a href=\\\"/glossary#authorised-absence\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"28\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
-                            ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                            Order = 3,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"23_1_58_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 3",
-                            Summary = "{\"dataKeys\":[\"23\"],\"dataSummary\":[\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Number of unauthorised absences as a percentage of the overall school population. <a href=\\\"/glossary#unauthorised-absence\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"23\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
                             Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                            ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
-                            Order = 1,
+                            Order = 0,
                             Type = "DataBlock",
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"23_1_58_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"26_1_58_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"28_1_58_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
                             DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\",\"26\",\"28\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stats aggregate table",
                             Summary = "{\"dataKeys\":[\"26\",\"28\",\"23\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\\\"/glossary#overall-absence\\\">More >>></a>\",\"Number of authorised absences as a percentage of the overall school population. <a href=\\\"/glossary#authorised-absence\\\">More >>></a>\",\"Number of unauthorised absences as a percentage of the overall school population. <a href=\\\"/glossary#unauthorised-absence\\\">More >>></a>\"],\"description\":null}",
                             Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"],\"tableHeaders\":null}]"
                         },
@@ -2503,49 +2191,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         },
                         new
                         {
-                            Id = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
-                            ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                            Order = 1,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"179_461_____\":{\"Label\":\"Permanent exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"181\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"183\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"179\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 1",
-                            Summary = "{\"dataKeys\":[\"179\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"179\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
-                            ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                            Order = 2,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"181_461_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"181\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"181\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 2",
-                            Summary = "{\"dataKeys\":[\"181\"],\"dataSummary\":[\"Up from 4.29% in 2015/16\"],\"dataDefinition\":[\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"181\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
-                            ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                            Order = 3,
-                            Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"178_461_____\":{\"Label\":\"Number of permanent exclusions\",\"Value\":null,\"Name\":null,\"Unit\":\"\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"178\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"178\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 3",
-                            Summary = "{\"dataKeys\":[\"178\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"178\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
                             Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                            ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
-                            Order = 1,
+                            Order = 0,
                             Type = "DataBlock",
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"181_461_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"183_461_____\":{\"Label\":\"Pupils with one or more exclusion\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":[{\"Indicator\":\"181\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"183\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":0,\"Height\":0}]",
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"176\",\"177\",\"178\",\"179\",\"180\",\"181\",\"183\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stats aggregate table",
                             Summary = "{\"dataKeys\":[\"179\",\"181\",\"178\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\",\"Up from 4.29% in 2015/16\",\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":null}",
                             Tables = "[{\"indicators\":[\"179\",\"181\",\"178\"],\"tableHeaders\":null}]"
                         },
@@ -2573,45 +2223,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         },
                         new
                         {
-                            Id = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
-                            ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                            Order = 1,
-                            Type = "DataBlock",
-                            DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"212\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 1",
-                            Summary = "{\"dataKeys\":[\"212\"],\"dataSummary\":[\"Down from 620,330 in 2017\"],\"dataDefinition\":[\"Total number of applications received for places at primary and secondary schools.\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"212\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
-                            ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                            Order = 2,
-                            Type = "DataBlock",
-                            DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"216\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 2",
-                            Summary = "{\"dataKeys\":[\"216\"],\"dataSummary\":[\"Down from 558,411 in 2017\"],\"dataDefinition\":[\"Total number of first preferences offered to applicants by schools.\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"216\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
-                            Id = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
-                            ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                            Order = 3,
-                            Type = "DataBlock",
-                            DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"217\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stat 3",
-                            Summary = "{\"dataKeys\":[\"217\"],\"dataSummary\":[\"Down from 34,792 in 2017\"],\"dataDefinition\":[\"Total number of second preferences offered to applicants by schools.\"],\"description\":null}",
-                            Tables = "[{\"indicators\":[\"217\"],\"tableHeaders\":null}]"
-                        },
-                        new
-                        {
                             Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                            ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
-                            Order = 1,
+                            Order = 0,
                             Type = "DataBlock",
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"211\",\"212\",\"216\",\"217\",\"218\",\"219\",\"220\",\"221\",\"222\"],\"Country\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null}",
-                            Name = "Key Stats aggregate table",
                             Summary = "{\"dataKeys\":[\"212\",\"216\",\"217\"],\"dataSummary\":[\"Down from 620,330 in 2017\",\"Down from 558,411 in 2017\",\"Down from 34,792 in 2017\"],\"dataDefinition\":[\"Total number of applications received for places at primary and secondary schools.\",\"Total number of first preferences offered to applicants by schools.\",\"Total number of second preferences offered to applicants by schools.\"],\"description\":null}",
                             Tables = "[{\"indicators\":[\"212\",\"211\",\"216\",\"217\",\"218\",\"221\",\"222\"],\"tableHeaders\":null}]"
                         },
@@ -3395,6 +3010,15 @@ Find out how and why these statistics are collected and published - [Secondary a
                         });
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentSection", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithMany("Content")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentSection", "ContentSection")
@@ -3430,6 +3054,10 @@ Find out how and why these statistics are collected and published - [Secondary a
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", "KeyStatistics")
+                        .WithMany()
+                        .HasForeignKey("KeyStatisticsId");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
@@ -3439,36 +3067,6 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentBlock", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock", "ContentBlock")
-                        .WithMany()
-                        .HasForeignKey("ContentBlockId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany("ContentBlocks")
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentSection", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentSection", "ContentSection")
-                        .WithOne("Release")
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentSection", "ContentSectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany("Content")
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", b =>

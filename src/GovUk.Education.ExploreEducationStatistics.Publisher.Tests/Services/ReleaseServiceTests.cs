@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
     {
         private readonly MapperConfiguration _config = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Release, ReleaseViewModel>();
+            cfg.AddProfile(new MappingProfiles());
         });
 
         private static readonly Contact Contact = new Contact
@@ -58,14 +58,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new Release
             {
                 Id = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
-                KeyStatisticsId = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
                 PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
                 TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             },
             new Release
             {
                 Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                KeyStatisticsId = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
                 PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9")
             }
         };
@@ -75,34 +73,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ContentSection
             {
                 Id = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd"),
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
                 Order = 1,
                 Heading = "Content Section 1",
-                Caption = ""
+                Caption = "",
+                Type = ContentSectionType.Generic
             },
             new ContentSection
             {
                 Id = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240"),
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
                 Order = 2,
                 Heading = "Content Section 2",
-                Caption = ""
+                Caption = "",
+                Type = ContentSectionType.Generic
+            },
+            new ContentSection
+            {
+                Id = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5"),
+                Order = 2,
+                Heading = "Content Section 3",
+                Caption = "",
+                Type = ContentSectionType.KeyStatistics
             },
             new ContentSection
             {
                 Id = new Guid("99c28757-bf61-490e-a51f-98dd58afb578"),
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                 Order = 1,
                 Heading = "Content Section 1",
-                Caption = ""
+                Caption = "",
+                Type = ContentSectionType.Generic
             },
             new ContentSection
             {
                 Id = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238"),
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                 Order = 2,
                 Heading = "Content Section 2",
-                Caption = ""
+                Caption = "",
+                Type = ContentSectionType.Generic
+            },
+            new ContentSection
+            {
+                Id = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766"),
+                Order = 2,
+                Heading = "Content Section 3",
+                Caption = "",
+                Type = ContentSectionType.KeyStatistics
+            }
+        };
+
+        private static readonly List<ReleaseContentSection> ReleaseContentSections = new List<ReleaseContentSection>
+        {
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ContentSectionId = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd")
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ContentSectionId = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240")
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ContentSectionId = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5")
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ContentSectionId = new Guid("99c28757-bf61-490e-a51f-98dd58afb578")
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ContentSectionId = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238")
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ContentSectionId = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766")
             }
         };
 
@@ -110,11 +158,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             new DataBlock
             {
-                Id = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62")
+                Id = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
+                ContentSectionId = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5")
             },
             new DataBlock
             {
-                Id = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8")
+                Id = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
+                ContentSectionId = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766")
             }
         };
 
@@ -165,6 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.AddRange(Publications);
                 context.AddRange(Releases);
                 context.AddRange(ContentSections);
+                context.AddRange(ReleaseContentSections);
                 context.AddRange(DataBlocks);
                 context.SaveChanges();
             }
@@ -177,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal("Academic Year Q1", result.Title);
                 Assert.Equal(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), result.Publication.Id);
-                Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"), result.KeyStatistics.Id);
+                Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"), result.KeyStatisticsSection.Content[0].Id);
 
                 var content = result.Content;
                 Assert.Equal(2, content.Count);

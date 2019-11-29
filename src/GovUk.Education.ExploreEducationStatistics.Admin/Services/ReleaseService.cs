@@ -47,7 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<List<ContentSection>> GetContentAsync(ReleaseId id)
         {
-            return await _context.ContentSections.Where(section => section.ReleaseId == id).ToListAsync();
+            return await _context
+                .ReleaseContentSections
+                .Include(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .Where(join => join.ReleaseId == id)
+                .Select(join => join.ContentSection)
+                .ToListAsync();
         }
         
         public List<Release> List()
@@ -76,7 +82,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseSummary.Created = DateTime.Now;
                     
                     var release = _mapper.Map<Release>(createRelease);
-                    release.Content = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    release.SummarySection = new ContentSection
+                    {
+                        Type = ContentSectionType.ReleaseSummary
+                    };
+                    release.KeyStatisticsSection = new ContentSection{
+                        Type = ContentSectionType.KeyStatistics
+                    };
+                    release.KeyStatisticsSecondarySection = new ContentSection{
+                        Type = ContentSectionType.KeyStatisticsSecondary
+                    };
+                    release.HeadlinesSection = new ContentSection{
+                        Type = ContentSectionType.Headlines
+                    };
                     release.Order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
                     release.ReleaseSummary = new ReleaseSummary
                     {
@@ -124,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     
-                    var newSummaryVersion = new ReleaseSummaryVersion()
+                    var newSummaryVersion = new ReleaseSummaryVersion
                     {
                         Slug = request.Slug,
                         TypeId = request.TypeId,
@@ -132,8 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ReleaseName = request.ReleaseName,
                         NextReleaseDate = request.NextReleaseDate,
                         TimePeriodCoverage = request.TimePeriodCoverage,
-                        Created = DateTime.Now,
-                        Summary = release.ReleaseSummary.Current.Summary
+                        Created = DateTime.Now
                     };
                     
                     release.ReleaseSummary.Versions.Add(newSummaryVersion);
@@ -191,7 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return templateContent.Select(c => new ContentSection
                     {
                         Id = new ContentSectionId(),
-                        ReleaseId = c.ReleaseId,
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,

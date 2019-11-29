@@ -43,7 +43,7 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
-  const { release, introductionSection, relatedInformation } = content;
+  const { release, relatedInformation } = content;
 
   const accId: string[] = generateIdList(2);
 
@@ -71,10 +71,10 @@ const PublicationReleaseContent = ({
           </div>
 
           <ContentBlock
-            sectionId={introductionSection.id}
+            sectionId={release.summarySection.id}
             publication={publication}
-            id={introductionSection.id}
-            content={introductionSection.content}
+            id={release.summarySection.id as string}
+            content={release.summarySection.content}
           />
 
           {release.downloadFiles && (
@@ -213,7 +213,7 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      <DataBlock {...release.keyStatistics} id="keystats" />
+      <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
 
       {/* <editor-fold desc="Content blocks"> */}
 

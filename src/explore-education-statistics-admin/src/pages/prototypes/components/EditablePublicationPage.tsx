@@ -302,10 +302,18 @@ class EditablePublicationPage extends Component<Props, State> {
               </div>
 
               {reviewing && data && (
-                <AddComment initialComments={data.keyStatistics.comments} />
+                <AddComment
+                  initialComments={
+                    data.keyStatisticsSection.content[0].comments
+                  }
+                />
               )}
               {resolveComments && data && (
-                <ResolveComment initialComments={data.keyStatistics.comments} />
+                <ResolveComment
+                  initialComments={
+                    data.keyStatisticsSection.content[0].comments
+                  }
+                />
               )}
               <PrototypeEditableContent
                 reviewing={reviewing}
@@ -524,10 +532,14 @@ class EditablePublicationPage extends Component<Props, State> {
             Latest headline facts and figures - 2018/19
           </h2>
           {reviewing && data && (
-            <AddComment initialComments={data.keyStatistics.comments} />
+            <AddComment
+              initialComments={data.keyStatisticsSection.content[0].comments}
+            />
           )}
           {resolveComments && data && (
-            <ResolveComment initialComments={data.keyStatistics.comments} />
+            <ResolveComment
+              initialComments={data.keyStatisticsSection.content[0].comments}
+            />
           )}
 
           <PrototypeDataSample
