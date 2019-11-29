@@ -1,5 +1,8 @@
 import client from '@admin/services/util/service';
-import { MethodologyStatus, CreateMethodologyRequest } from '@admin/services/methodology/types';
+import {
+  MethodologyStatus,
+  CreateMethodologyRequest,
+} from '@admin/services/methodology/types';
 import { IdTitlePair } from '../common/types';
 
 export interface MethodologyService {
@@ -17,11 +20,8 @@ const service: MethodologyService = {
   createMethodology(
     createRequest: CreateMethodologyRequest,
   ): Promise<IdTitlePair> {
-    return client.post(
-      `/methodologies/`,
-      createRequest,
-    );
-  }
+    return client.post(`/methodologies/`, createRequest);
+  },
 };
 
 export default service;

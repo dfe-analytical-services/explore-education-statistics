@@ -12,6 +12,6 @@ export interface MethodologyStatusPublication {
 
 export interface CreateMethodologyRequest {
   title: string;
-  publishScheduled: string;
-  contactId: string,
+  publishScheduled: Date;
+  contactId: string;
 }

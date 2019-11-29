@@ -6,6 +6,7 @@ import service from '@admin/services/edit-publication/service';
 import methodologyService from '@admin/services/methodology/service';
 import Button from '@common/components/Button';
 import { FormFieldset, Formik } from '@common/components/form';
+import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -20,7 +21,16 @@ import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { CreateMethodologyRequest } from '@admin/services/methodology/types'
+import { CreateMethodologyRequest } from '@admin/services/methodology/types';
+import {
+  DayMonthYearInputs,
+  dateToDayMonthYear,
+  dayMonthYearValuesToInputs,
+  dayMonthYearInputsToDate,
+} from '@common/services/publicationService';
+import {
+  validateMandatoryDayMonthYearField
+} from '@admin/validation/validation';
 
 interface MatchProps {
   topicId: string;
@@ -29,6 +39,7 @@ interface MatchProps {
 interface FormValues {
   methodologyTitle: string;
   selectedContactId: string;
+  scheduledPublishDate: DayMonthYearInputs;
 }
 
 const serverSideValidationHandler = handleServerSideValidation(
@@ -43,13 +54,10 @@ interface CreateMethodologyModel {
   contacts: ContactDetails[];
 }
 
-
 const CreateMethodologyPage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
-  const { topicId } = match.params;
-
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {
@@ -63,16 +71,17 @@ const CreateMethodologyPage = ({
   }, []);
 
   const submitFormHandler = async (values: FormValues) => {
-
-    const submission: CreateMethodologyRequest = { 
-      title: values.methodologyTitle, 
-      publishScheduled: "",
+    const submission: CreateMethodologyRequest = {
+      title: values.methodologyTitle,
+      publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
       contactId: values.selectedContactId,
     };
 
-    const createdMethodology = await methodologyService.createMethodology(submission);
+    const createdMethodology = await methodologyService.createMethodology(
+      submission,
+    );
 
-   // TODO: redirect to the methodology summary
+    // TODO: redirect to the methodology summary
     history.push(dashboardRoutes.adminDashboard);
   };
 
@@ -121,14 +130,18 @@ const CreateMethodologyPage = ({
               model.contacts,
               contact => contact.contactName,
             )[0].id,
+            scheduledPublishDate: dayMonthYearValuesToInputs(
+              dateToDayMonthYear(new Date('')),
+            ),
           }}
-          validationSchema={Yup.object<FormValues>({
+          validationSchema={Yup.object({
             methodologyTitle: Yup.string().required(
               'Enter a methodology title',
             ),
             selectedContactId: Yup.string().required(
               'Choose a methodology contact',
             ),
+            scheduledPublishDate: validateMandatoryDayMonthYearField,
           })}
           onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
@@ -141,6 +154,15 @@ const CreateMethodologyPage = ({
                   id={`${formId}-methodologyTitle`}
                   label="Enter methodology title"
                   name="methodologyTitle"
+                />
+
+                <FormFieldDayMonthYear<FormValues>
+                  formId={formId}
+                  fieldName="scheduledPublishDate"
+                  fieldsetLegend="Schedule publish date"
+                  day={form.values.scheduledPublishDate.day}
+                  month={form.values.scheduledPublishDate.month}
+                  year={form.values.scheduledPublishDate.year}
                 />
 
                 <FormFieldset
