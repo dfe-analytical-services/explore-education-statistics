@@ -438,14 +438,15 @@
 							"script": {
 								"id": "e355658b-1bca-4e05-b5db-66398063d878",
 								"exec": [
-									"// Don't run test if running against localhost",
-									"(pm.environment.get(\"content_api_url\") === \"http://localhost:5011/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Response text should be correct\", function () {",
-									"    pm.expect(pm.response.text()).to.equal(\"Thanks! Please check your email.\")",
-									"});"
+									"if(pm.environment.get('env') === 'localhost') {",
+									"    pm.test(\"Status code is 200\", function () { ",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"    ",
+									"    pm.test(\"Response text should be correct\", function () {",
+									"        pm.expect(pm.response.text()).to.equal(\"Thanks! Please check your email.\")",
+									"    });",
+									"}"
 								],
 								"type": "text/javascript"
 							}
