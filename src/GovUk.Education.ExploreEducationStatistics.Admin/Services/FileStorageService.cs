@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
@@ -37,9 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
         }
 
-        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
+        public IEnumerable<Common.Model.FileInfo> ListPublicFilesPreview(Guid releaseId)
         {
-            return await ListFilesAsync(releaseId.ToString(), type);
+            return FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId);
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
@@ -178,20 +179,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
-        private async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
+        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
 
             return blobContainer
                 .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                .Where(cbb => !IsBatchedFile(cbb, releaseId))
+                .Where(blob => !IsBatchedFile(blob, releaseId))
                 .OfType<CloudBlockBlob>()
                 .Select(file => new FileInfo
                 {
-                    Extension = FileStorageUtils.GetExtension(file),
-                    Name = FileStorageUtils.GetName(file),
+                    Extension = GetExtension(file),
+                    Name = GetName(file),
                     Path = file.Name,
-                    Size = FileStorageUtils.GetSize(file),
+                    Size = GetSize(file),
                     MetaFileName = GetMetaFileName(file),
                     Rows = GetNumberOfRows(file),
                     UserName = GetUserName(file),
@@ -241,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
-            return await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
+            return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -277,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
 
-        private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
+        private static bool IsBatchedFile(IListBlobItem blobItem, Guid releaseId)
         {
             return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
         }
@@ -325,10 +326,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return false;
             }
 
-            using (var reader = new StreamReader(fileStream))
-            {
-                return reader.BaseStream.IsTextFile();
-            }
+            using var reader = new StreamReader(fileStream);
+            return reader.BaseStream.IsTextFile();
         }
 
         private static int CalculateNumberOfRows(Stream fileStream)

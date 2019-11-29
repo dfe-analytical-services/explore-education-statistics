@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -23,8 +24,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Gb,
             Tb
         }
-        
+
         private const string NameKey = "name";
+        
+        public const string NumberOfRows = "NumberOfRows";
+
+        public const string UserName = "userName";
+        
+        /**
+         * Property key on a metadata file to point at the data file
+         */
+        public const string DataFileKey = "datafile";
+        
+        /**
+         * Property key on a data file to point at the metadata file
+         */
+        public const string MetaFileKey = "metafile";
         
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
             string containerName, BlobContainerPermissions permissions = null)
@@ -57,26 +72,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return blobContainer;
         }
-        
-        public static IEnumerable<FileInfo> ListPublicFiles(string storageConnectionString, string containerName, string publication, string release)
+
+        public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
+            Guid releaseId)
         {
             var files = new List<FileInfo>();
 
-            files.AddRange(ListFiles(storageConnectionString, containerName, publication, release, ReleaseFileTypes.Data));
-            files.AddRange(ListFiles(storageConnectionString, containerName, publication, release, ReleaseFileTypes.Ancillary));
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data), false));
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Ancillary), false));
 
             return files.OrderBy(f => f.Name);
         }
 
-        private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName, string publication, string release, ReleaseFileTypes type)
+        public static IEnumerable<FileInfo> ListPublicFiles(string storageConnectionString, string containerName,
+            string publication, string release)
+        {
+            var files = new List<FileInfo>();
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data), true));
+
+            files.AddRange(ListFiles(storageConnectionString, containerName,
+                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary), true));
+
+            return files.OrderBy(f => f.Name);
+        }
+
+        private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
+            string prefix, bool releasedFilesOnly)
         {
             var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-
-            var result = blobContainer
-                .ListBlobs(FileStoragePathUtils.PublicReleaseDirectoryPath(publication, release, type), true,
-                    BlobListingDetails.Metadata)
+            var result = blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
-                .Where(IsFileReleased)
+                .Where(blob => !IsMetaDataFile(blob) && (!releasedFilesOnly || IsFileReleased(blob)))
                 .Select(file => new FileInfo
                 {
                     Extension = GetExtension(file),
@@ -124,6 +155,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return false;
+        }
+        
+        public static bool IsMetaDataFile(CloudBlob blob)
+        {
+            // The meta data file contains a metadata attribute referencing it's corresponding data file
+            return blob.Metadata.ContainsKey(DataFileKey);
         }
         
         private static DateTime ParseDateTime(string dateTime)
