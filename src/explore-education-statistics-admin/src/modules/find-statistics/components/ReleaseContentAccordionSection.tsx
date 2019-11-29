@@ -9,7 +9,7 @@ import styles from '@admin/modules/find-statistics/components/ReleaseContentAcco
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { AbstractRelease } from '@common/services/publicationService';
 
-interface Props {
+export interface ReleaseContentAccordionSectionProps {
   id?: string;
   contentItem: ContentType;
   index: number;
@@ -25,7 +25,8 @@ const ReleaseContentAccordionSection = ({
   release,
   headingButtons,
   canToggle = true,
-}: Props) => {
+  ...restOfProps
+}: ReleaseContentAccordionSectionProps) => {
   const { caption, heading, order } = contentItem;
 
   const [isReordering, setIsReordering] = React.useState(false);
@@ -69,6 +70,7 @@ const ReleaseContentAccordionSection = ({
         ),
         ...(headingButtons || []),
       ]}
+      {...restOfProps}
     >
       <ContentBlock
         isReordering={isReordering}
