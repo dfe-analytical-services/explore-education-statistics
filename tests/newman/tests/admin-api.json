@@ -1999,11 +1999,11 @@
 											"});",
 											"",
 											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
-											"    const latestReleaseNote = respJson[0];",
-											"    pm.expect(latestReleaseNote.id).to.not.be.empty;",
-											"    pm.expect(latestReleaseNote.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
-											"    pm.expect(latestReleaseNote.on).to.not.be.empty;",
-											"    pm.expect(latestReleaseNote.reason).to.equal(\"Update from Postman\");",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(lastItem.on).to.not.be.empty;",
+											"    pm.expect(lastItem.reason).to.equal(\"Update from Postman\");",
 											"});"
 										],
 										"type": "text/javascript"
