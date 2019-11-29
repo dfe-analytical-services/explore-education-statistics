@@ -14,13 +14,15 @@ import AddComment from '@admin/pages/prototypes/components/PrototypeEditableCont
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { ContentBlockViewModel } from '@admin/services/release/edit-release/content/types';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import classnames from 'classnames';
+import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import styles from './EditableContentBlock.module.scss';
 
 export interface Props extends ContentBlockProps {
   content: EditableRelease['content'][0]['content'];
@@ -109,17 +111,17 @@ const WrappedInDraggable = ({
 }) => (
   <>
     {draggable ? (
-      <Draggable
-        draggableId={draggableId}
-        index={index}
-        type="contentBlock"
-      >
+      <Draggable draggableId={draggableId} index={index} type="contentBlock">
         {draggableProvided => (
           <div
             {...draggableProvided.draggableProps}
             ref={draggableProvided.innerRef}
+            className={styles.isDragging}
           >
-            <span {...draggableProvided.dragHandleProps}>DRAG</span>
+            <span
+              {...draggableProvided.dragHandleProps}
+              className={styles.dragHandle}
+            />
             {children}
           </div>
         )}
@@ -195,7 +197,18 @@ const EditableContentBlock = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    console.log(result);
+    const { source, destination, type } = result;
+
+    if (type === 'content' && destination) {
+      const newContentBlocks = [...contentBlocks];
+      const [removed] = newContentBlocks.splice(source.index,1);
+      newContentBlocks.splice(destination.index, 0, removed);
+      setContentBlocks(newContentBlocks);
+    }
+  };
+
+  const saveOrder = () => {
+
   };
 
   return (
@@ -208,13 +221,13 @@ const EditableContentBlock = ({
       <DragDropContext onDragEnd={onDragEnd}>
         <WrappedInDroppable
           draggable={isReordering}
-          droppableId={`content_block_${sectionId}`}
+          droppableId={`${sectionId}`}
         >
           {contentBlocks.map((block, index) => (
             <WrappedInDraggable
               draggable={isReordering}
-              draggableId={`block_${block.id}`}
-              key={`${index}-${block.heading}-${block.type}`}
+              draggableId={`${block.id}`}
+              key={`${block.id}`}
               index={index}
             >
               {!isReordering && (
@@ -246,9 +259,11 @@ const EditableContentBlock = ({
                 onDelete={() => onDeleteContent(block.id)}
               />
 
-              {!isReordering && canAddBlocks && index === contentBlocks.length - 1 && (
-                <AddContentButton onClick={onAddContentCallback} />
-              )}
+              {!isReordering &&
+                canAddBlocks &&
+                index === contentBlocks.length - 1 && (
+                  <AddContentButton onClick={onAddContentCallback} />
+                )}
             </WrappedInDraggable>
           ))}
         </WrappedInDroppable>

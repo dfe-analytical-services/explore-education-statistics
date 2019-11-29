@@ -1,7 +1,11 @@
-import Accordion, {EditableAccordionProps} from '@admin/components/EditableAccordion';
-import AccordionSection, { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import Accordion, {
+  EditableAccordionProps,
+} from '@admin/components/EditableAccordion';
+import AccordionSection, {
+  EditableAccordionSectionProps,
+} from '@admin/components/EditableAccordionSection';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
@@ -18,7 +22,7 @@ interface ReleaseContentAccordionProps {
   sectionName: string;
 }
 
-interface ReleaseContentAccordionSectionProps   {
+interface ReleaseContentAccordionSectionProps {
   id?: string;
   contentItem: ContentType;
   index: number;
@@ -47,19 +51,21 @@ const ReleaseContentAccordionSection = ({
       caption={caption}
       canToggle={canToggle}
       headingButtons={[
-        <button
-          key="toggle_reordering"
-          className={classnames(styles.toggleContentDragging)}
-          type="button"
-          onClick={e => {
-            e.stopPropagation();
-            e.preventDefault();
-            setIsReordering(!isReordering);
-          }}
-        >
-          {isReordering ? 'Save order' : 'Reorder Content'}
-        </button>,
-        ...headingButtons || []
+        content.length > 1 && (
+          <button
+            key="toggle_reordering"
+            className={classnames(styles.toggleContentDragging)}
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              e.preventDefault();
+              setIsReordering(!isReordering);
+            }}
+          >
+            {isReordering ? 'Save order' : 'Reorder Content'}
+          </button>
+        ),
+        ...(headingButtons || []),
       ]}
     >
       <ContentBlock
