@@ -115,7 +115,7 @@ function App() {
             />
             <ProtectedRoute
               exact
-              path="/methodology/create-methodology"
+              path="/methodology/create"
               component={CreateMethodologyPage}
             />
             <ProtectedRoute
