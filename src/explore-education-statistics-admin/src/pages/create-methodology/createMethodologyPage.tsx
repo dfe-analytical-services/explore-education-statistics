@@ -80,10 +80,10 @@ const CreateMethodologyPage = ({
     );
 
     // TODO: redirect to the methodology summary
-    history.push(dashboardRoutes.adminDashboard);
+    history.push('/methodology');
   };
 
-  const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
+  const cancelHandler = () => history.push('/methodology');
 
   const getSelectedContact = (
     contactId: string,
