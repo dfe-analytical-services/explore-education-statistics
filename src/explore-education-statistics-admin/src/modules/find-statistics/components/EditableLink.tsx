@@ -4,18 +4,40 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import Button from '@common/components/Button';
 
 interface Props extends LinkProps {
+  to: string;
   removeOnClick: () => void;
 }
 
-const EditableLink = ({ removeOnClick, ...props }: Props) => {
+const EditableLink = ({
+  removeOnClick,
+  to: href,
+  children,
+  ...props
+}: Props) => {
   const { isEditing } = useContext(EditingContext);
 
   return !isEditing ? (
-    <Link {...props} />
+    <Link
+      to=""
+      href={href}
+      {...props}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {children}
+    </Link>
   ) : (
     <div>
       <div>
-        <Link {...props} />
+        <Link
+          to=""
+          href={href}
+          {...props}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {children}
+        </Link>
       </div>
       <Button
         className="govuk-!-margin-bottom-1"

@@ -37,6 +37,7 @@ export interface Publication {
   contact: PublicationContact;
   methodology: {
     id: string;
+    title: string;
   };
 }
 
@@ -230,12 +231,6 @@ export interface AbstractRelease<
     content: ContentBlockType[];
   }[];
   keyStatistics: ContentBlockType;
-  dataFiles?: {
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
   downloadFiles: {
     extension: string;
     name: string;

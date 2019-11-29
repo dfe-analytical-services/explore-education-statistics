@@ -651,7 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                             b1.Property<string>("Name")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Old_Code")
+                            b1.Property<string>("OldCode")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("LocationId");

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -11,16 +15,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         public DataMappingProfiles()
         {
             CreateMap<BoundaryLevel, IdLabel>();
-            
-            CreateMap<IObservationalUnit, LabelValue>()
-                .ForMember(dest => dest.Label, opts => { opts.MapFrom(unit => unit.Name); })
-                .ForMember(dest => dest.Value, opts => { opts.MapFrom(unit => unit.Code); });
 
             CreateMap<Indicator, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(indicator => indicator.Unit.GetEnumValue()));
 
             CreateMap<Location, LocationViewModel>();
+
+            AppDomain.CurrentDomain.GetAssemblies().SelectMany(GetTypesFromAssembly)
+                .Where(p => typeof(IObservationalUnit).IsAssignableFrom(p))
+                .ToList().ForEach(type =>
+                {
+                    if (type == typeof(LocalAuthority))
+                    {
+                        CreateMap<LocalAuthority, CodeNameViewModel>()
+                            .ForMember(model => model.Code,
+                                opts => opts.MapFrom(localAuthority => localAuthority.GetCodeOrOldCodeIfEmpty()));
+                    }
+                    else
+                    {
+                        CreateMap(type, typeof(CodeNameViewModel));
+                    }
+                });
 
             CreateMap<Publication, PublicationMetaViewModel>();
 
@@ -30,6 +46,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Theme, ThemeMetaViewModel>();
 
             CreateMap<Topic, TopicMetaViewModel>();
+        }
+
+        private IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(t => t != null);
+            }
         }
     }
 }

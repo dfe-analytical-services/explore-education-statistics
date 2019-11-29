@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task SplitDataFile(
             ICollector<ImportMessage> collector,
             ImportMessage message,
-            SubjectData subjectData,
-            BatchSettings batchSettings);
+            SubjectData subjectData);
     }
 }

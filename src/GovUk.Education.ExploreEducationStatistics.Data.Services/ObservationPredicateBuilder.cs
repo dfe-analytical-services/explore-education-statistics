@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 var timePeriodRange = GetTimePeriodRange(query.TimePeriod);
 
                 var subPredicate = PredicateBuilder.False<Observation>();
-                
+
                 foreach (var tuple in timePeriodRange)
                 {
                     var year = tuple.Year;
@@ -31,13 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     subPredicate = subPredicate.Or(observation =>
                         observation.Year == year && observation.TimeIdentifier == timeIdentifier);
                 }
-                
+
                 predicate = predicate.AndAlso(subPredicate);
             }
 
             if (query.GeographicLevel != null)
             {
-                predicate = predicate.AndAlso(observation => 
+                predicate = predicate.AndAlso(observation =>
                     observation.GeographicLevel == query.GeographicLevel);
             }
 
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         )
         {
             var predicate = PredicateBuilder.False<Observation>();
-            
+
             if (query.Country != null)
             {
                 predicate = predicate.Or(CountryPredicate(query));
@@ -154,8 +154,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> LocalAuthorityPredicate(SubjectMetaQueryContext query)
         {
+            var localAuthorityOldCodes = query.LocalAuthority.Where(s => s.Length == 3).ToList();
+            var localAuthorityCodes = query.LocalAuthority.Except(localAuthorityOldCodes).ToList();
+
             return ObservationalUnitPredicate(query, GeographicLevel.LocalAuthority,
-                observation => query.LocalAuthority.Contains(observation.Location.LocalAuthority.Code));
+                observation => localAuthorityCodes.Contains(observation.Location.LocalAuthority.Code) ||
+                               localAuthorityOldCodes.Contains(observation.Location.LocalAuthority.OldCode));
         }
 
         private static Expression<Func<Observation, bool>> LocalAuthorityDistrictPredicate(
@@ -228,12 +232,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> ObservationalUnitPredicate(SubjectMetaQueryContext query,
             GeographicLevel geographicLevel, Expression<Func<Observation, bool>> expression)
         {
-            return query.GeographicLevel == null 
-                ? expression.AndAlso(observation => observation.GeographicLevel == geographicLevel) 
+            return query.GeographicLevel == null
+                ? expression.AndAlso(observation => observation.GeographicLevel == geographicLevel)
                 : expression;
         }
 
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(TimePeriodQuery timePeriod)
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            TimePeriodQuery timePeriod)
         {
             if (timePeriod.StartCode.IsNumberOfTerms() || timePeriod.EndCode.IsNumberOfTerms())
             {
