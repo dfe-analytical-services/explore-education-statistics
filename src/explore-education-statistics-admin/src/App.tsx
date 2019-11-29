@@ -1,8 +1,9 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ProtectedRoutes from '@admin/components/ProtectedRoutes';
-import ListMethodologyPages from '@admin/pages/create-methodology/listMethodologyPages';
-import CreateMethodologyPage from '@admin/pages/create-methodology/createMethodologyPage';
+import ListMethodologyPages from '@admin/pages/methodology/listMethodologyPages';
+import EditMethodologyPage from '@admin/pages/methodology/editMethodologyPage';
+import CreateMethodologyPage from '@admin/pages/methodology/createMethodologyPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -117,6 +118,11 @@ function App() {
               exact
               path="/methodology/create"
               component={CreateMethodologyPage}
+            />
+            <ProtectedRoute
+              exact
+              path="/methodology/:methodologyId"
+              component={EditMethodologyPage}
             />
             <ProtectedRoute
               exact
