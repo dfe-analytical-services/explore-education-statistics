@@ -231,6 +231,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
                 // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
                 c.CustomSchemaIds((type) => type.FullName);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new[] {string.Empty}
+                    }
+                });
             });
         }
 
