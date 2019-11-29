@@ -60,7 +60,9 @@ const ListMethodologyPages = () => {
           <tbody className="govuk-table__body">
             {model.methodologies.map(methodology => (
               <tr className="govuk-table__row" key={methodology.id}>
-                <td className="govuk-table__header">{methodology.title}</td>
+                <td className="govuk-table__header">
+                  <Link to={`/methodology/${methodology.id}`}>{methodology.title}</Link>
+                </td>
                 <td className="govuk-table__cell">
                   <strong className="govuk-tag">{methodology.status}</strong>
                 </td>
