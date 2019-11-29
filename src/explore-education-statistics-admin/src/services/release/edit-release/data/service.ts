@@ -21,6 +21,7 @@ export interface EditReleaseService {
     releaseId: string,
     fileId: string,
   ) => Promise<void>;
+  downloadFile: (path: string, fileName: string) => Promise<void>;
 
   getAncillaryFiles: (releaseId: string) => Promise<AncillaryFile[]>;
   uploadAncillaryFile: (
@@ -122,6 +123,13 @@ const service: EditReleaseService = {
   downloadDataMetadataFile(releaseId: string, fileName: string): Promise<void> {
     return client
       .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
+  },
+  downloadFile(path: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${path}`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
