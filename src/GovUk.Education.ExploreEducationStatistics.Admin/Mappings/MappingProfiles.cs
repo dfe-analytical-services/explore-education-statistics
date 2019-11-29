@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         r.Content
                             .Select(ContentSectionViewModel.ToViewModel)
                             .OrderBy(s => s.Order)))
+                // TODO EES-147 Remove this to get real Release Notes
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => new List<ReleaseNoteViewModel>
@@ -143,6 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+            
+            CreateMap<Update, ReleaseNoteViewModel>();
         }
     }
 }

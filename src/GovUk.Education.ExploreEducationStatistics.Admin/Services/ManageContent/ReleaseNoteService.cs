@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -16,11 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ReleaseNoteService : IReleaseNoteService
     {
+        private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ReleaseNoteService(ContentDbContext context)
+        public ReleaseNoteService(IMapper mapper, ContentDbContext context)
         {
+            _mapper = mapper;
             _context = context;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
                 _context, 
@@ -28,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 ValidationErrorMessages.ReleaseNotFound);
         }
 
-        public Task<Either<ValidationResult, List<Update>>> AddReleaseNoteAsync(Guid releaseId, CreateReleaseNoteRequest request)
+        public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId, CreateReleaseNoteRequest request)
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
@@ -39,15 +43,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 
                 release.Updates.Add(new Update
                 {
-                    Id = Guid.NewGuid(),
                     On = DateTime.Now,
                     Reason = request.ReleaseNote,
-                    ReleaseId = release.Id
                 });
 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return release.Updates;
+                return _mapper.Map<List<ReleaseNoteViewModel>>(release.Updates);
             }, HydrateRelease);
         }
         
