@@ -80,7 +80,7 @@ const CreateMethodologyPage = ({
     );
 
     // TODO: redirect to the methodology summary
-    history.push('/methodology');
+    history.push(`/methodology/${createdMethodology.id}`);
   };
 
   const cancelHandler = () => history.push('/methodology');
