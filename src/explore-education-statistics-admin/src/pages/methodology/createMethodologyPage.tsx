@@ -115,7 +115,7 @@ const CreateMethodologyPage = ({
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
-                <Link to="#" target="blank">
+                <Link to="/documentation" target="blank">
                   Creating new methodology{' '}
                 </Link>
               </li>

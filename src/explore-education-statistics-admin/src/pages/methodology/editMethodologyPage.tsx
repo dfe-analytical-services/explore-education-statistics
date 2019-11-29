@@ -31,8 +31,8 @@ const EditMethodologyPage = () => {
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
-                <Link to="/documentation/create-new-release" target="_blank">
-                  Creating a new release{' '}
+                <Link to="/documentation" target="blank">
+                  Creating new methodology{' '}
                 </Link>
               </li>
             </ul>
