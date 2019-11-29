@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return _mapper.Map<List<ReleaseNoteViewModel>>(release.Updates);
+                return _mapper.Map<List<ReleaseNoteViewModel>>(release.Updates.OrderBy(update => update.On));
             }, HydrateRelease);
         }
         
