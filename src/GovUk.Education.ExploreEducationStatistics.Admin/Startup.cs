@@ -210,6 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
+            services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
             services.AddTransient<ISubjectService, SubjectService>();
