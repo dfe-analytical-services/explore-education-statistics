@@ -88,7 +88,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
 
-      <p>This is your administration dashboard here you can:</p>
+      <p>This is your administration dashboard - here you can:</p>
 
       <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
         <li>
