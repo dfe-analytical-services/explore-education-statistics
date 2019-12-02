@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Title = methodology.Title,
                 Slug = methodology.Slug,
-                // PublishScheduled = methodology.PublishScheduled
+                PublishScheduled = methodology.PublishScheduled
             };
 
             var saved = _context.Methodologies.Add(model);

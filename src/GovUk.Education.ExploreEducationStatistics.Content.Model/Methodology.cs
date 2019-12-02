@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public DateTime? Published { get; set; }
         
-        // public DateTime? PublishScheduled { get; set; }
+        public DateTime? PublishScheduled { get; set; }
 
         public DateTime? LastUpdated { get; set; }
  
