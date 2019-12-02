@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 {
@@ -106,6 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         SubjectTitleMustBeUnique,
         EntityNotFound,
         ReleaseNotFound,
+        ReleaseNoteNotFound,
         RelatedInformationItemNotFound,
         ContentSectionNotFound,
         ContentBlockNotFound,
