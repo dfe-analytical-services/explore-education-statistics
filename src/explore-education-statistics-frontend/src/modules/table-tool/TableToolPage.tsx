@@ -1,18 +1,10 @@
 import tableBuilderService, {
-  TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import ButtonText from '@common/components/ButtonText';
-import LinkContainer from '@common/components/LinkContainer';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import TableTool from '@frontend/components/TableTool';
 import { NextContext } from 'next';
-import React, { Component, createRef } from 'react';
-import permalinkService from '@common/modules/full-table/services/permalinkService';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TableTool from '@common/modules/table-tool/components/TableTool';
+import React, { Component } from 'react';
 
 export interface PublicationOptions {
   id: string;
@@ -33,19 +25,7 @@ interface Props {
   publicationId: string;
 }
 
-interface State {
-  permalinkId: string;
-  permalinkLoading: boolean;
-}
-
-class TableToolPage extends Component<Props, State> {
-  public state: State = {
-    permalinkId: '',
-    permalinkLoading: false,
-  };
-
-  private dataTableRef = createRef<HTMLTableElement>();
-
+class TableToolPage extends Component<Props> {
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
 
@@ -60,34 +40,8 @@ class TableToolPage extends Component<Props, State> {
     };
   }
 
-  private handlePermalinkClick = async ({
-    query,
-    tableHeaders,
-  }: {
-    query: TableDataQuery;
-    tableHeaders: TableHeadersFormValues;
-  }) => {
-    this.setState({ permalinkLoading: true });
-
-    const { id: permalinkId } = await permalinkService.createTablePermalink({
-      ...query,
-      configuration: {
-        tableHeadersConfig: tableHeaders,
-      },
-    });
-
-    this.setState({
-      permalinkId,
-      permalinkLoading: false,
-    });
-
-    // Router.push(`${window.location.pathname}/permalink/${permalinkId}`);
-  };
-
   public render() {
     const { themeMeta, publicationId } = this.props;
-    const { permalinkId, permalinkLoading } = this.state;
-
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
         <p>
@@ -100,105 +54,7 @@ class TableToolPage extends Component<Props, State> {
           for your own offline analysis.
         </p>
 
-        <TableTool
-          publicationId={publicationId}
-          themeMeta={themeMeta}
-          finalStepExtra={({
-            publication,
-            query,
-            tableHeaders,
-            createdTable,
-          }) =>
-            createdTable &&
-            tableHeaders &&
-            query && (
-              <>
-                <h3>Share your table</h3>
-                <ul className="govuk-list">
-                  <li>
-                    {permalinkId ? (
-                      <>
-                        <div>Generated permanent link:</div>
-                        <LinkContainer
-                          url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
-                        />
-                        <div>
-                          <a
-                            className="govuk-link"
-                            href={`/data-tables/permalink/${permalinkId}`}
-                            title="View created table permalink"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View permanent link
-                          </a>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {permalinkLoading ? (
-                          <>
-                            <LoadingSpinner
-                              inline
-                              size={19}
-                              text="Generating permanent link"
-                            />
-                          </>
-                        ) : (
-                          <ButtonText
-                            disabled={permalinkLoading}
-                            onClick={() =>
-                              this.handlePermalinkClick({ query, tableHeaders })
-                            }
-                          >
-                            Generate permanent link
-                          </ButtonText>
-                        )}
-                      </>
-                    )}
-                  </li>
-                </ul>
-
-                <h3>Additional options</h3>
-                {publication && (
-                  <ul className="govuk-list">
-                    <li>
-                      <Link
-                        as={`/find-statistics/${publication.slug}`}
-                        to={`/find-statistics/publication?publication=${publication.slug}`}
-                      >
-                        Go to publication
-                      </Link>
-                    </li>
-                    <li>
-                      <DownloadCsvButton
-                        publicationSlug={publication.slug}
-                        fullTable={createdTable}
-                      />
-                    </li>
-
-                    <li>
-                      <a href="#api">Access developer API</a>
-                    </li>
-                    <li>
-                      <Link
-                        as={`/methodology/${publication.slug}`}
-                        to={`/methodology/methodology?publication=${publication.slug}`}
-                      >
-                        Go to methodology
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-                <p className="govuk-body">
-                  If you have a question about the data or methods used to
-                  create this table contact the named statistician via the
-                  relevant release page.
-                </p>
-              </>
-            )
-          }
-        />
+        <TableTool themeMeta={themeMeta} publicationId={publicationId} />
       </Page>
     );
   }
