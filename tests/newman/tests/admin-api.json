@@ -1981,6 +1981,64 @@
 					"name": "Manage Content Page",
 					"item": [
 						{
+							"name": "Add Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(lastItem.on).to.not.be.empty;",
+											"    pm.expect(lastItem.reason).to.equal(\"Update from Postman\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"releaseNote\": \"Update from Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get Manage Content Page data",
 							"event": [
 								{
@@ -1997,7 +2055,6 @@
 											"    var respJson = pm.response.json();",
 											"",
 											"    pm.expect(respJson.release).to.exist;",
-											"    pm.expect(respJson.relatedInformation).to.exist;",
 											"});",
 											"",
 											"// EES-754",
@@ -2064,6 +2121,7 @@
 											"    pm.expect(release.content[0].caption).to.equal(\"\");",
 											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
 											"});",
+											"}",
 											"",
 											"pm.test(\"Summary section should contain the correct details\", function () { ",
 											"    ",
@@ -2141,7 +2199,7 @@
 											"    ",
 											"    var respJson = pm.response.json();",
 											"",
-											"    const relatedInformation = respJson.relatedInformation;",
+											"    const relatedInformation = respJson.release.relatedInformation;",
 											"    ",
 											"    pm.expect(relatedInformation.length).to.equal(2);",
 											"    ",

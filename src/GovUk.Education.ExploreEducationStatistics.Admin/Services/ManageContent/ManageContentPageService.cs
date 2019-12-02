@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
         public ManageContentPageService(ContentDbContext context, IMapper mapper,
             IFileStorageService fileStorageService)
@@ -28,12 +28,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _mapper = mapper;
             _fileStorageService = fileStorageService;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
-                context, 
-                context.Releases, 
+                context,
+                context.Releases,
                 ValidationErrorMessages.ReleaseNotFound);
         }
-        
-        public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId)
+
+        public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
+            Guid releaseId)
         {
             return _releaseHelper.CheckEntityExists(releaseId, release =>
             {
@@ -41,22 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
                 return new ManageContentPageViewModel
                 {
-                    Release = releaseViewModel,
-                    RelatedInformation = new List<BasicLink>
-                    {
-                        new BasicLink
-                        {
-                            Id = new Guid("15a8dbb8-d8b7-4247-b841-e798860a4700"),
-                            Description = "Pupil absence statistics: guidance and methodology",
-                            Url = "http://example.com/1"
-                        },
-                        new BasicLink
-                        {
-                            Id = new Guid("fadedcb1-f386-4faa-a24f-6731be534097"),
-                            Description = "This is an example of a related information link",
-                            Url = "http://example.com/2"
-                        }
-                    },
+                    Release = releaseViewModel
                 };
             }, HydrateReleaseForReleaseViewModel);
         }
