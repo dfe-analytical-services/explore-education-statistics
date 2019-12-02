@@ -37,7 +37,7 @@ const ReleaseContentAccordion = ({
 
   return (
     <>
-      {content && content.length > 0 && (
+      {content && (
         <Accordion
           id={accordionId}
           canReorder
