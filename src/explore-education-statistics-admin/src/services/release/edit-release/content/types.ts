@@ -1,12 +1,6 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { AbstractRelease } from '@common/services/publicationService';
 
-export interface BasicLink {
-  id: string;
-  description: string;
-  url: string;
-}
-
 export interface ContentSectionViewModel {
   id: string;
   order: number;
@@ -17,8 +11,6 @@ export interface ContentSectionViewModel {
 
 export interface ManageContentPageViewModel {
   release: AbstractRelease<EditableContentBlock>;
-
-  relatedInformation: BasicLink[];
 }
 
 export interface ContentBlockViewModel {

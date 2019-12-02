@@ -189,6 +189,12 @@ export interface ContentBlock {
   summary?: Summary;
 }
 
+export interface BasicLink {
+  id: string;
+  description: string;
+  url: string;
+}
+
 export enum ReleaseType {
   AdHoc = 'Ad Hoc',
   NationalStatistics = 'National Statistics',
@@ -223,6 +229,7 @@ export interface AbstractRelease<
   publishScheduled?: string;
   nextReleaseDate: DayMonthYearValues;
   status: ReleaseStatus;
+  relatedInformation: BasicLink[];
   type: {
     id: string;
     title: ReleaseType;
