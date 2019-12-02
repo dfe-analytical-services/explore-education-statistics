@@ -21,6 +21,7 @@ import React from 'react';
 import service from '@admin/services/release/edit-release/data/service';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import RelatedInformationSection from './components/RelatedInformationSection';
+import ReleaseNotesSection from './components/ReleaseNotesSection';
 
 export interface RendererProps {
   contentId?: string;
@@ -173,34 +174,7 @@ const PublicationReleaseContent = ({
                 </Details>
               </dd>
             </dl>
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">Last updated:</dt>
-              <dd data-testid="last-updated">
-                <strong>
-                  <FormattedDate>{release.updates[0].on}</FormattedDate>
-                </strong>
-                <Details
-                  onToggle={(open: boolean) =>
-                    open &&
-                    logEvent(
-                      'Last Updates',
-                      'Release page last updates dropdown opened',
-                      window.location.pathname,
-                    )
-                  }
-                  summary={`See all ${release.updates.length} updates`}
-                >
-                  {release.updates.map(elem => (
-                    <div data-testid="last-updated-element" key={elem.on}>
-                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                        {elem.on}
-                      </FormattedDate>
-                      <p>{elem.reason}</p>
-                    </div>
-                  ))}
-                </Details>
-              </dd>
-            </dl>
+            <ReleaseNotesSection release={release} />
             <RelatedInformationSection release={release} />
           </RelatedAside>
         </div>

@@ -195,6 +195,13 @@ export interface BasicLink {
   url: string;
 }
 
+export interface ReleaseNote {
+  id: string;
+  releaseId: string;
+  on: string;
+  reason: string;
+}
+
 export enum ReleaseType {
   AdHoc = 'Ad Hoc',
   NationalStatistics = 'National Statistics',
@@ -234,12 +241,7 @@ export interface AbstractRelease<
     id: string;
     title: ReleaseType;
   };
-  updates: {
-    id: string;
-    releaseId: string;
-    on: string;
-    reason: string;
-  }[];
+  updates: ReleaseNote[];
   content: ContentSection<ContentBlockType>[];
   dataFiles?: {
     extension: string;
