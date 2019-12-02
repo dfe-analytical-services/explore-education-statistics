@@ -39,15 +39,14 @@
 
 <h3 class="govuk-heading-m">Content</h3>
 
-<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.Summary)</h4>
-<p class="govuk-body">@Html.DisplayFor(model => model.Summary)</p>
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.SummarySection)</h4>
+<p class="govuk-body">@Html.DisplayFor(model => model.SummarySection)</p>
 
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.KeyStatisticsSection)</h4>
+<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.KeyStatisticsSection))</pre>
 
-<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.KeyStatistics)</h4>
-<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.KeyStatistics))</pre>
-
-<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.Content)</h4>
-<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.Content))</pre>
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.GenericContent)</h4>
+<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.GenericContent))</pre>
 
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id" class="govuk-button">Edit</a>

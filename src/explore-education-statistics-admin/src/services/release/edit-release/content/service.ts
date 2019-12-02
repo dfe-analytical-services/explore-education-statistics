@@ -1,4 +1,8 @@
 import client from '@admin/services/util/service';
+import {
+  AbstractRelease,
+  BasicLink,
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import {
   ContentBlockPostModel,
@@ -6,7 +10,6 @@ import {
   ContentBlockViewModel,
   ContentSectionViewModel,
   ManageContentPageViewModel,
-  BasicLink,
 } from './types';
 
 export interface ReleaseContentService {
@@ -109,7 +112,7 @@ const service: ReleaseContentService = {
 const relatedInformationService = {
   getAll: (
     releaseId: string,
-  ): Promise<ManageContentPageViewModel['relatedInformation']> => {
+  ): Promise<AbstractRelease<{}>['relatedInformation']> => {
     return client.get(`/release/${releaseId}/content/related-information`);
   },
   create: (

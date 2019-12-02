@@ -209,6 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
+            services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
             services.AddTransient<ISubjectService, SubjectService>();
@@ -232,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 c.CustomSchemaIds((type) => type.FullName);
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
-                    Description = "JWT",
+                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey

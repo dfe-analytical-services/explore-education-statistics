@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191127164112_UpdateKeyStatsDataBlockNames")]
+    partial class UpdateKeyStatsDataBlockNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1423,7 +1425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RelatedInformation = "[{\"Id\":\"f3c67bc9-6132-496e-a848-c39dfcd16f49\",\"Description\":\"Additional guidance\",\"Url\":\"http://example.com\"},{\"Id\":\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\",\"Description\":\"Statistics guide\",\"Url\":\"http://example.com\"}]",
                             ReleaseName = "2016",
                             Slug = "2016-17",
                             Status = "Draft",

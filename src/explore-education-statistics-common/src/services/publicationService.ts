@@ -189,10 +189,24 @@ export interface ContentBlock {
   summary?: Summary;
 }
 
+export interface BasicLink {
+  id: string;
+  description: string;
+  url: string;
+}
+
 export enum ReleaseType {
   AdHoc = 'Ad Hoc',
   NationalStatistics = 'National Statistics',
   OfficialStatistics = 'Official Statistics',
+}
+
+export interface ContentSection<ContentBlockType> {
+  id?: string;
+  order: number;
+  heading: string;
+  caption: string;
+  content: ContentBlockType[];
 }
 
 export interface AbstractRelease<
@@ -206,13 +220,16 @@ export interface AbstractRelease<
   releaseName: string;
   published: string;
   slug: string;
-  summary: string;
+  summarySection: ContentSection<ContentBlockType>;
+  headlinesSection: ContentSection<ContentBlockType>;
+  keyStatisticsSection: ContentSection<ContentBlockType>;
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
   nextReleaseDate: DayMonthYearValues;
   status: ReleaseStatus;
+  relatedInformation: BasicLink[];
   type: {
     id: string;
     title: ReleaseType;
@@ -223,14 +240,13 @@ export interface AbstractRelease<
     on: string;
     reason: string;
   }[];
-  content: {
-    id?: string;
-    order: number;
-    heading: string;
-    caption: string;
-    content: ContentBlockType[];
+  content: ContentSection<ContentBlockType>[];
+  dataFiles?: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
   }[];
-  keyStatistics: ContentBlockType;
   downloadFiles: {
     extension: string;
     name: string;

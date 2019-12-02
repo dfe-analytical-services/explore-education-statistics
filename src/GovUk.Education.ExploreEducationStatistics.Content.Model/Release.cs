@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -56,19 +58,121 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug { get; set; }
 
-        public string Summary { get; set; }
-
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
 
         public List<Update> Updates { get; set; }
 
-        public List<ContentSection> Content { get; set; }
+        [JsonIgnore]
+        public List<ReleaseContentSection> Content { get; set; }
 
-        public Guid? KeyStatisticsId { get; set; }
+        [JsonIgnore]
+        public List<ReleaseContentBlock> ContentBlocks { get; set; }
+
+        [NotMapped]
+        [JsonProperty("Content")]
+        public IEnumerable<ContentSection> GenericContent
+        {
+            get 
+            {
+                if (Content == null)
+                {
+                    return new List<ContentSection>();
+                }
+
+                return Content
+                    .Select(join => join.ContentSection)    
+                    .ToList()
+                    .FindAll(section => section.Type == ContentSectionType.Generic)
+                    .ToImmutableList(); 
+            }
+            set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
+        }
         
-        public DataBlock KeyStatistics { get; set; }
+        public void AddGenericContentSection(ContentSection section)
+        {
+            Content.Add(new ReleaseContentSection
+            {
+                Release = this,
+                ContentSection = section
+            });
+        }
+        
+        public void RemoveGenericContentSection(ContentSection section)
+        {
+            Content.Remove(Content.Find(join => join.ContentSection == section));
+        }
+        
+        public void AddContentBlock(IContentBlock contentBlock)
+        {
+            if (ContentBlocks == null)
+            {
+                ContentBlocks = new List<ReleaseContentBlock>();
+            }
+            
+            ContentBlocks.Add(new ReleaseContentBlock
+            {
+                Release = this,
+                ContentBlock = contentBlock
+            });
+        }
+
+        [NotMapped]
+        public ContentSection KeyStatisticsSection
+        {
+            get => FindSingleSectionByType(ContentSectionType.KeyStatistics);
+            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatistics, new List<ContentSection> { value });
+        }
+
+        [NotMapped]
+        public ContentSection KeyStatisticsSecondarySection
+        {
+            get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
+            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
+        }
+
+        [NotMapped]
+        public ContentSection HeadlinesSection
+        {
+            get => FindSingleSectionByType(ContentSectionType.Headlines);
+            set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, new List<ContentSection> { value });
+        }
+
+        [NotMapped]
+        public ContentSection SummarySection
+        {
+            get => FindSingleSectionByType(ContentSectionType.ReleaseSummary);
+            set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
+        }
+
+        private ContentSection FindSingleSectionByType(ContentSectionType type)
+        {
+            if (Content == null)
+            {
+                Content = new List<ReleaseContentSection>();
+            }
+            
+            return Content
+                .Select(join => join.ContentSection)
+                .ToList()
+                .Find(section => section.Type == type);
+        }
+        
+        private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
+        {
+            if (Content == null)
+            {
+                Content = new List<ReleaseContentSection>();
+            }
+            
+            Content.RemoveAll(join => join.ContentSection.Type == type);
+            Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
+            {
+               Release = this,
+               ContentSection = section,
+            }));
+        }
 
         public Guid? TypeId { get; set; }
 
