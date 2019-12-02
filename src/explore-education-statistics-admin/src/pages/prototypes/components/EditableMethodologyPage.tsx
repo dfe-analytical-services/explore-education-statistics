@@ -303,12 +303,12 @@ class EditableMethodologyPage extends Component<Props, State> {
             </div>
           </div>
 
-          {reviewing && data && (
+          {/* {reviewing && data && (
             <AddComment initialComments={data.keyStatistics.comments} />
           )}
           {resolveComments && data && (
             <ResolveComment initialComments={data.keyStatistics.comments} />
-          )}
+          )} */}
 
           {data &&
             data.content.length > 0 &&
