@@ -7,6 +7,7 @@ import {
 import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 import Link from '@frontend/components/Link';
 import React, { ReactNode } from 'react';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -99,42 +100,10 @@ const HelpAndSupport = ({
           </AccordionSection>
         )}
         <AccordionSection heading="Contact us" headingTag="h3">
-          <p>
-            If you have a specific enquiry about {themeTitle} statistics and
-            data:
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            {publicationContact.teamName}
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            Email <br />
-            <a href={`mailto:${publicationContact.teamEmail}`}>
-              {publicationContact.teamEmail}
-            </a>
-          </p>
-          <p>
-            Telephone: {publicationContact.contactName} <br />{' '}
-            {publicationContact.contactTelNo}
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Press office
-          </h4>
-          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
-          <p>
-            Telephone <br />
-            020 7925 6789
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Public enquiries
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            If you have a general enquiry about the Department for Education
-            (DfE) or education:
-          </p>
-          <p>
-            Telephone <br />
-            037 0000 2288
-          </p>
+          <ContactUsSection
+            publicationContact={publicationContact}
+            themeTitle={themeTitle}
+          />
         </AccordionSection>
       </AccordionComponent>
     </>
