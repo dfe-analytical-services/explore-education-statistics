@@ -1,5 +1,3 @@
-import Accordion from '@admin/components/EditableAccordion';
-import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
@@ -14,12 +12,11 @@ import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
 import service from '@admin/services/release/edit-release/data/service';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
@@ -217,8 +214,6 @@ const PublicationReleaseContent = ({
 
       <DataBlock {...release.keyStatistics} id="keystats" />
 
-      {/* <editor-fold desc="Content blocks"> */}
-
       <ReleaseContentAccordion
         release={release}
         content={release.content}
@@ -226,86 +221,10 @@ const PublicationReleaseContent = ({
         sectionName="Contents"
       />
 
-      {/* </editor-fold> */}
-
-      {/* <editor-fold desc="Help and support"> */}
-      <h2
-        className="govuk-heading-m govuk-!-margin-top-9"
-        data-testid="extra-information"
-      >
-        Help and support
-      </h2>
-
-      <Accordion
-        // publicationTitle={publication.title}
-        id="static-content-section"
-      >
-        <AccordionSection
-          heading={`${publication.title}: methodology`}
-          caption="Find out how and why we collect, process and publish these statistics"
-          headingTag="h3"
-        >
-          <p>
-            Read our{' '}
-            <Link to={`/methodology/${release.publication.methodology.id}`}>
-              {`${publication.title}: methodology`}
-            </Link>{' '}
-            guidance.
-          </p>
-        </AccordionSection>
-        {release.type && release.type.title === ReleaseType.NationalStatistics && (
-          <AccordionSection heading="National Statistics" headingTag="h3">
-            <p className="govuk-body">
-              The{' '}
-              <a href="https://www.statisticsauthority.gov.uk/">
-                United Kingdom Statistics Authority
-              </a>{' '}
-              designated these statistics as National Statistics in accordance
-              with the{' '}
-              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                Statistics and Registration Service Act 2007
-              </a>{' '}
-              and signifying compliance with the Code of Practice for
-              Statistics.
-            </p>
-            <p className="govuk-body">
-              Designation signifying their compliance with the authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                Code of Practice for Statistics
-              </a>{' '}
-              which broadly means these statistics are:
-            </p>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                managed impartially and objectively in the public interest
-              </li>
-              <li>meet identified user needs</li>
-              <li>produced according to sound methods</li>
-              <li>well explained and readily accessible</li>
-            </ul>
-            <p className="govuk-body">
-              Once designated as National Statistics it's a statutory
-              requirement for statistics to follow and comply with the Code of
-              Practice for Statistics to be observed.
-            </p>
-            <p className="govuk-body">
-              Find out more about the standards we follow to produce these
-              statistics through our{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics published by DfE
-              </a>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
-        )}
-        <AccordionSection heading="Contact us" headingTag="h3">
-          <ContactUsSection
-            publicationContact={publication.contact}
-            themeTitle={publication.topic.theme.title}
-          />
-        </AccordionSection>
-      </Accordion>
-      {/* </editor-fold> */}
+      <AdminPublicationReleaseHelpAndSupportSection
+        publication={publication}
+        release={release}
+      />
     </EditingContext.Provider>
   );
 };
