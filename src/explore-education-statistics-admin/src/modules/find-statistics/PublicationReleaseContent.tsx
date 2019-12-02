@@ -19,6 +19,7 @@ import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
 import service from '@admin/services/release/edit-release/data/service';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
@@ -298,48 +299,10 @@ const PublicationReleaseContent = ({
           </AccordionSection>
         )}
         <AccordionSection heading="Contact us" headingTag="h3">
-          <p>
-            If you have a specific enquiry about {publication.topic.theme.title}{' '}
-            statistics and data:
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            {publication.contact && publication.contact.teamName}
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            Email <br />
-            {publication.contact && (
-              <a href={`mailto:${publication.contact.teamEmail}`}>
-                {publication.contact.teamEmail}
-              </a>
-            )}
-          </p>
-          <p>
-            {publication.contact && (
-              <>
-                Telephone: {publication.contact.contactName} <br />{' '}
-                {publication.contact.contactTelNo}
-              </>
-            )}
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Press office
-          </h4>
-          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
-          <p>
-            Telephone <br />
-            020 7925 6789
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Public enquiries
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            If you have a general enquiry about the Department for Education
-            (DfE) or education:
-          </p>
-          <p>
-            Telephone <br />
-            037 0000 2288
-          </p>
+          <ContactUsSection
+            publicationContact={publication.contact}
+            themeTitle={publication.topic.theme.title}
+          />
         </AccordionSection>
       </Accordion>
       {/* </editor-fold> */}
