@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b5260b05-675a-45f3-be2c-bbda6606f321",
+		"_postman_id": "010009be-fb61-4506-9168-1b9abbe01baf",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2003,7 +2003,13 @@
 											"    pm.expect(lastItem.id).to.not.be.empty;",
 											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
 											"    pm.expect(lastItem.on).to.not.be.empty;",
-											"    pm.expect(lastItem.reason).to.equal(\"Update from Postman\");",
+											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.environment.set(\"latest_release_note_id\", lastItem.id);",
+											"    pm.environment.set(\"number_of_release_notes\", respJson.length);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2021,7 +2027,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"releaseNote\": \"Update from Postman\"\n}"
+									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
@@ -2033,6 +2039,119 @@
 										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
 										"content",
 										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_release_notes\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
+											"    const updatedItem = respJson.find(item => item.id === pm.environment.get(\"latest_release_note_id\"));",
+											"    pm.expect(updatedItem).to.not.be.empty;",
+											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
+											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_release_notes\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_release_note_id\"))).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
 									]
 								}
 							},

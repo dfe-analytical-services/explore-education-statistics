@@ -186,8 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public DbSet<Update> Update { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
