@@ -1,22 +1,20 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import TableToolWizard, {
+  FinalStepProps,
+  TableToolState,
+} from '@common/modules/table-tool/components/TableToolWizard';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { createRef } from 'react';
-import TableToolWizard, {
-  FinalStepProps,
-  TableToolState,
-} from '@common/modules/table-tool/components/TableToolWizard';
-import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 
 interface Props {
   releaseId: string;
@@ -75,15 +73,15 @@ const CreateDataBlocks = ({
       undefined;
 
     return (props: FinalStepProps) => {
-      if (props.createdTable) {
+      if (props.table) {
         const headers =
           props.tableHeaders ||
           (tableHeadersForCB &&
             reverseMapTableHeadersConfig(
               tableHeadersForCB,
-              props.createdTable.subjectMeta,
+              props.table.subjectMeta,
             )) ||
-          getDefaultTableHeaderConfig(props.createdTable.subjectMeta);
+          getDefaultTableHeaderConfig(props.table.subjectMeta);
 
         const tableHeadersConfig = {
           columnGroups: headers.columnGroups,
@@ -110,48 +108,20 @@ const CreateDataBlocks = ({
         releaseId={releaseId}
         themeMeta={[]}
         initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
-        onTableConfigurationChange={queryCompleted}
         finalStep={finalStepProps => (
           <WizardStep>
             {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>
-                  Configure data block
+                  Data block details
                 </WizardStepHeading>
-
-                <div className="govuk-!-margin-bottom-4">
-                  <TableHeadersForm
-                    initialValues={tableHeaders}
-                    onSubmit={tableHeaderConfig => {
-                      setTableHeaders(tableHeaderConfig);
-
-                      if (dataTableRef.current) {
-                        dataTableRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    }}
-                  />
-                  {finalStepProps.createdTable && tableHeaders && (
-                    <div className="govuk-width-container">
-                      <TimePeriodDataTable
-                        ref={dataTableRef}
-                        fullTable={finalStepProps.createdTable}
-                        tableHeadersConfig={tableHeaders}
-                      />
-                    </div>
-                  )}
-                </div>
 
                 {finalStepProps.query && tableHeaders && (
                   <DataBlockDetailsForm
                     initialValues={{
                       title:
-                        finalStepProps && finalStepProps.createdTable
-                          ? generateTableTitle(
-                              finalStepProps.createdTable.subjectMeta,
-                            )
+                        finalStepProps && finalStepProps.table
+                          ? generateTableTitle(finalStepProps.table.subjectMeta)
                           : undefined,
                     }}
                     query={finalStepProps.query}
@@ -159,7 +129,19 @@ const CreateDataBlocks = ({
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
                     onDataBlockSave={db => onDataBlockSave(db)}
-                  />
+                  >
+                    {finalStepProps.table && tableHeaders && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <div className="govuk-width-container">
+                          <TimePeriodDataTable
+                            ref={dataTableRef}
+                            fullTable={finalStepProps.table}
+                            tableHeadersConfig={tableHeaders}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </DataBlockDetailsForm>
                 )}
               </>
             )}
