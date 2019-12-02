@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -21,41 +20,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly PersistenceHelper<Update, Guid> _updateHelper;
 
         public ReleaseNoteService(IMapper mapper, ContentDbContext context)
         {
             _mapper = mapper;
             _context = context;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(
-                _context, 
-                context.Releases, 
-                ValidationErrorMessages.ReleaseNotFound);
+            _releaseHelper =
+                new PersistenceHelper<Release, Guid>(_context, context.Releases,
+                    ValidationErrorMessages.ReleaseNotFound);
+            _updateHelper = new PersistenceHelper<Update, Guid>(_context, context.Updates,
+                ValidationErrorMessages.ReleaseNoteNotFound);
         }
 
-        public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId, CreateReleaseNoteRequest request)
+        public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId,
+            CreateOrUpdateReleaseNoteRequest request)
         {
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                if (release.Updates == null)
+                _context.Updates.Add(new Update
                 {
-                    release.Updates = new List<Update>();
-                }
-                
-                release.Updates.Add(new Update
-                {
-                    On = DateTime.Now,
+                    On = request.On ?? DateTime.Now,
                     Reason = request.ReleaseNote,
+                    ReleaseId = release.Id
                 });
 
-                _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
-                return _mapper.Map<List<ReleaseNoteViewModel>>(release.Updates.OrderBy(update => update.On));
-            }, HydrateRelease);
+                return GetReleaseNoteViewModels(release.Id);
+            });
         }
-        
-        private static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
+
+        public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(Guid releaseId,
+            Guid releaseNoteId, CreateOrUpdateReleaseNoteRequest request)
         {
-            return values.Include(r => r.Updates);
+            return _releaseHelper.CheckEntityExists(releaseId, release =>
+            {
+                return _updateHelper.CheckEntityExists(releaseNoteId, async releaseNote =>
+                {
+                    releaseNote.On = request.On ?? DateTime.Now;
+                    releaseNote.Reason = request.ReleaseNote;
+
+                    _context.Updates.Update(releaseNote);
+                    await _context.SaveChangesAsync();
+                    return GetReleaseNoteViewModels(release.Id);
+                });
+            });
+        }
+
+        public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> DeleteReleaseNoteAsync(Guid releaseId,
+            Guid releaseNoteId)
+        {
+            return _releaseHelper.CheckEntityExists(releaseId, release =>
+            {
+                return _updateHelper.CheckEntityExists(releaseNoteId, async releaseNote =>
+                {
+                    _context.Updates.Remove(releaseNote);
+                    await _context.SaveChangesAsync();
+                    return GetReleaseNoteViewModels(release.Id);
+                });
+            });
+        }
+
+        private List<ReleaseNoteViewModel> GetReleaseNoteViewModels(Guid releaseId)
+        {
+            var releaseNotes = _context.Updates
+                .Where(update => update.ReleaseId == releaseId)
+                .OrderBy(update => update.On);
+            return _mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
         }
     }
 }

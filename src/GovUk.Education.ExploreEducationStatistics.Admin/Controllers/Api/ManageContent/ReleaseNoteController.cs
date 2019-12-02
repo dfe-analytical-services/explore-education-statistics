@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
                 
         [HttpPost("release/{releaseId}/content/release-note")]
-        public Task<ActionResult<List<ReleaseNoteViewModel>>> AddRelatedInformation(CreateReleaseNoteRequest request, Guid releaseId)
+        public Task<ActionResult<List<ReleaseNoteViewModel>>> AddRelatedInformation(CreateOrUpdateReleaseNoteRequest request, Guid releaseId)
         {
             return this.HandlingValidationErrorsAsync(
                 () => _releaseNoteService.AddReleaseNoteAsync(releaseId, request),
