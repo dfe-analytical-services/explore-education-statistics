@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
-import { MethodologyStatus } from 'src/services/methodology/types';
+import { MethodologyStatus } from '@admin/services/methodology/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 
 interface Model {
