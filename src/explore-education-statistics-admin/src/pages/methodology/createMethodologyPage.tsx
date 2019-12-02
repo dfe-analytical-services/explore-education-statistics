@@ -79,7 +79,6 @@ const CreateMethodologyPage = ({
       submission,
     );
 
-    // TODO: redirect to the methodology summary
     history.push(`/methodology/${createdMethodology.id}`);
   };
 
