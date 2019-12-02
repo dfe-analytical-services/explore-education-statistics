@@ -93,7 +93,7 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 </span>
               </h1>
 
-              <p>This is your administration dashboard here you can:</p>
+              <p>This is your administration dashboard - here you can:</p>
 
               <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
                 <li>
