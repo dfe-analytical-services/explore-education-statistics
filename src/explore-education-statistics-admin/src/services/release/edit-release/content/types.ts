@@ -11,10 +11,6 @@ export interface ContentSectionViewModel {
 
 export interface ManageContentPageViewModel {
   release: AbstractRelease<EditableContentBlock>;
-
-  introductionSection: ContentSectionViewModel;
-
-  contentSections: ContentSectionViewModel[];
 }
 
 export interface ContentBlockViewModel {
