@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3790aaec-0435-40d5-8953-eb83cb671b5d",
+		"_postman_id": "53772991-7958-4493-9b65-00ad4fa55475",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1981,183 +1981,6 @@
 					"name": "Manage Content Page",
 					"item": [
 						{
-							"name": "Add Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 201\", function () { ",
-											"    pm.response.to.have.status(201); ",
-											"});",
-											"",
-											"pm.test(\"Release Notes array contains values\", function () {",
-											"    pm.expect(respJson.length).to.be.above(0);",
-											"});",
-											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.id).to.not.be.empty;",
-											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
-											"    pm.expect(lastItem.on).to.not.be.empty;",
-											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
-											"});",
-											"",
-											"pm.test(\"Store variables for upcoming tests\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.globals.set(\"latest_release_note_id\", lastItem.id);",
-											"    pm.globals.set(\"number_of_release_notes\", respJson.length);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Related Notes array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\"));",
-											"});",
-											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
-											"    const updatedItem = respJson.find(item => item.id === pm.globals.get(\"latest_release_note_id\"));",
-											"    pm.expect(updatedItem).to.not.be.empty;",
-											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
-											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note",
-										"{{latest_release_note_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Release Notes array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\") - 1);",
-											"});",
-											"",
-											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_release_note_id\"))).to.be.false;",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note",
-										"{{latest_release_note_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Get Manage Content Page data",
 							"event": [
 								{
@@ -2174,6 +1997,7 @@
 											"    var respJson = pm.response.json();",
 											"",
 											"    pm.expect(respJson.release).to.exist;",
+											"    pm.expect(respJson.availableDataBlocks).to.exist;",
 											"});",
 											"",
 											"// EES-754",
@@ -2329,6 +2153,23 @@
 											"    pm.expect(relatedInformation[1].id).to.equal(\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\");",
 											"    pm.expect(relatedInformation[1].description).to.equal(\"Statistics guide\");",
 											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com\");",
+											"});",
+											"",
+											"pm.test(\"Available Data Blocks section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const availableDataBlocks = respJson.availableDataBlocks;",
+											"    ",
+											"    pm.expect(availableDataBlocks.length).to.equal(2);",
+											"    ",
+											"    pm.expect(availableDataBlocks[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+											"    pm.expect(availableDataBlocks[0].name).to.equal(\"Available Data Block\");",
+											"    pm.expect(availableDataBlocks[0].order).to.equal(0);",
+											"",
+											"    pm.expect(availableDataBlocks[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+											"    pm.expect(availableDataBlocks[1].name).to.equal(\"Available Data Block 2\");",
+											"    pm.expect(availableDataBlocks[1].order).to.equal(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2354,6 +2195,195 @@
 										"release",
 										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
 										"content"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Release Notes",
+					"item": [
+						{
+							"name": "Add Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(lastItem.on).to.not.be.empty;",
+											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.globals.set(\"latest_release_note_id\", lastItem.id);",
+											"    pm.globals.set(\"number_of_release_notes\", respJson.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
+											"    const updatedItem = respJson.find(item => item.id === pm.globals.get(\"latest_release_note_id\"));",
+											"    pm.expect(updatedItem).to.not.be.empty;",
+											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
+											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_release_note_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"unset variables\", function() {",
+											"   pm.globals.unset(\"number_of_release_notes\"); ",
+											"   pm.globals.unset(\"latest_release_note_id\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
 									]
 								}
 							},

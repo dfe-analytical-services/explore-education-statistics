@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,13 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IContentService _contentService;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ManageContentPageService(ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageService)
+        public ManageContentPageService(
+            ContentDbContext context, IMapper mapper,
+            IFileStorageService fileStorageService, IContentService contentService)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
+            _contentService = contentService;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
                 context,
                 context.Releases,
@@ -36,14 +38,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
-                return new ManageContentPageViewModel
+                var availableDataBlocks =
+                    await _contentService.GetUnattachedContentBlocksAsync(releaseId, ContentBlockType.DataBlock);
+
+                return availableDataBlocks.Map(blocks =>
                 {
-                    Release = releaseViewModel
-                };
+                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                    releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                    return new ManageContentPageViewModel
+                    {
+                        Release = releaseViewModel,
+                        AvailableDataBlocks = blocks
+                    };
+                });
+                
             }, HydrateReleaseForReleaseViewModel);
         }
         
