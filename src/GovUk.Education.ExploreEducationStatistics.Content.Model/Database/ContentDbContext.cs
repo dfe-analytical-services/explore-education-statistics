@@ -2139,6 +2139,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentBlockId = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
                     ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                 },
+                // exclusions detached data block 2
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("0b4c43cd-fc12-4159-88b9-0c8646424555"),
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                },
                 // Secondary and primary schools applications key stats tile 1 data block
                 new ReleaseContentBlock
                 {
@@ -3747,6 +3753,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block",
+                    Order = 0,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // another exclusions detached Data Block (not yet belonging to any Content Section)
+                new DataBlock
+                {
+                    Id = new Guid("0b4c43cd-fc12-4159-88b9-0c8646424555"),
+                    ContentSectionId = null, // not yet used in any Content
+                    Name = "Available Data Block 2",
                     Order = 0,
                     DataBlockRequest = new DataBlockRequest
                     {

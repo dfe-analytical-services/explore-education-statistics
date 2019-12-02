@@ -11,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using IdentityServer4.Extensions;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -117,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 sectionToRemove
                     .Content
                     .FindAll(contentBlock => contentBlock.Type == ContentBlockType.DataBlock.ToString())
-                    .ForEach(async dataBlock => await 
-                        RemoveContentBlockFromContentSectionAndSaveAsync(sectionToRemove, dataBlock, false));
+                    .ForEach(dataBlock =>  
+                        RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
                 
                 release.RemoveGenericContentSection(sectionToRemove);
 
@@ -194,8 +196,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockNotAttachedToThisContentSection);
                 }
 
-                var deleteContentBlock = blockToRemove.Type != ContentBlockType.DataBlock.ToString();
-                await RemoveContentBlockFromContentSectionAndSaveAsync(section, blockToRemove, deleteContentBlock);
+                var deleteContentBlock = blockToRemove.Type != ContentBlockType.DataBlock.ToString(); 
+                RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
+                
+                _context.ContentSections.Update(section);
+                await _context.SaveChangesAsync();
                 return OrderedContentBlocks(section);
             });
         }
@@ -241,6 +246,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Where(contentBlock => contentBlock.ContentSectionId == null 
                                        && contentBlock.Type == type.ToString())
                 .ToListAsync();
+
+            if (type == ContentBlockType.DataBlock)
+            {
+                return new Either<ValidationResult, List<IContentBlock>>(
+                    unattachedContentBlocks
+                        .OrderBy(contentBlock => ((DataBlock) contentBlock).Name)
+                        .ToList());
+            }
             
             return new Either<ValidationResult, List<IContentBlock>>(unattachedContentBlocks);
         }
@@ -251,7 +264,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 var (_, section) = tuple;
 
-                var blockToAttach = section.Content.Find(block => block.Id == request.ContentBlockId);
+                var blockToAttach = _context
+                    .ContentBlocks
+                    .FirstOrDefault(block => block.Id == request.ContentBlockId);
 
                 if (blockToAttach == null)
                 {
@@ -275,7 +290,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<Either<ValidationResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
             IContentBlock newContentBlock)
         {
-            var orderForNewBlock = order ?? section.Content.Max(contentBlock => contentBlock.Order) + 1;
+            if (section.Content == null)
+            {
+                section.Content = new List<IContentBlock>();
+            }
+            
+            var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
 
             section.Content
                 .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
@@ -289,7 +309,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return newContentBlock;
         }
 
-        private async Task RemoveContentBlockFromContentSectionAndSaveAsync(
+        private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
+        {
+            if (order != null)
+            {
+                return (int) order;
+            }
+
+            if (!section.Content.IsNullOrEmpty())
+            {
+                return section.Content.Max(contentBlock => contentBlock.Order) + 1;
+            }
+
+            return 1;
+        }
+
+        private void RemoveContentBlockFromContentSection(
             ContentSection section, 
             IContentBlock blockToRemove,
             bool deleteContentBlock)
@@ -312,9 +347,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 blockToRemove.ContentSectionId = null;
                 _context.ContentBlocks.Update(blockToRemove);
             }
-
-            _context.ContentSections.Update(section);
-            await _context.SaveChangesAsync();
         }
         
         private async Task<Either<ValidationResult, IContentBlock>> UpdateMarkDownBlock(MarkDownBlock blockToUpdate, string body)
