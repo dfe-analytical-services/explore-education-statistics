@@ -1,7 +1,4 @@
-import {
-  AbstractRelease,
-  BasicLink,
-} from '@common/services/publicationService';
+import { BasicLink } from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
@@ -20,11 +17,10 @@ import EditableLink from './EditableLink';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
-  relatedInformation: AbstractRelease<{}>['relatedInformation'];
 }
 
-const RelatedInformationSection = ({ relatedInformation, release }: Props) => {
-  const [links, setLinks] = useState<BasicLink[]>(relatedInformation);
+const RelatedInformationSection = ({ release }: Props) => {
+  const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
   const { isEditing } = useContext(EditingContext);
