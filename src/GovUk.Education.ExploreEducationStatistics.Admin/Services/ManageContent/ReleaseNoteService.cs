@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             var releaseNotes = _context.Update
                 .Where(update => update.ReleaseId == releaseId)
-                .OrderBy(update => update.On);
+                .OrderByDescending(update => update.On);
             return _mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
         }
     }

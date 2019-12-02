@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,6 +39,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
                 releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+
+                // TODO EES-147 Every release needs an update
+                if (releaseViewModel.Updates.Count == 0)
+                {
+                    releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                    {
+                        Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
+                        On = new DateTime(2019, 12, 01),           
+                        Reason = "First published"
+                    });
+                }
+
                 return new ManageContentPageViewModel
                 {
                     Release = releaseViewModel
@@ -63,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(join => join.ContentSection)
-                .ThenInclude(section => section.Content);
+                .ThenInclude(section => section.Content)
+                .Include(r => r.Updates);
         }
     }
 }
