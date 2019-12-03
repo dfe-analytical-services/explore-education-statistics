@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
 
@@ -32,13 +34,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore]
         public ContentSectionType Type { get; set; }
     }
+    
+    [AttributeUsage(AttributeTargets.Field)]
+    public class ContentBlockClassType : Attribute
+    {
+        public Type Type { get; set; }
+    }
 
     public enum ContentBlockType
     {
+        [ContentBlockClassType(Type = typeof(MarkDownBlock))]
         MarkDownBlock,
+        
+        [ContentBlockClassType(Type = typeof(HtmlBlock))]
         HtmlBlock,
+        
+        [ContentBlockClassType(Type = typeof(InsetTextBlock))]
         InsetTextBlock,
-        DataBlock,
+        
+        [ContentBlockClassType(Type = typeof(DataBlock))]
+        DataBlock
     }
 
     [JsonConverter(typeof(ContentBlockConverter))]
@@ -155,5 +170,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public string label { get; set; }
         public string value { get; set; }
+    }
+
+    public static class ContentBlockUtil
+    {
+        public static ContentBlockType GetContentBlockTypeEnumValueFromType<T>() 
+            where T : IContentBlock
+        {
+            var enumValues = new List<ContentBlockType>(Enum
+                .GetValues(typeof(ContentBlockType)).OfType<ContentBlockType>());
+
+            return enumValues.Find(value => GetContentBlockClassTypeFromEnumValue(value) == typeof(T));
+        }
+        
+        public static Type GetContentBlockClassTypeFromEnumValue(ContentBlockType enumValue) 
+        {
+            return enumValue.GetEnumAttribute<ContentBlockClassType>().Type;
+        }
     }
 }

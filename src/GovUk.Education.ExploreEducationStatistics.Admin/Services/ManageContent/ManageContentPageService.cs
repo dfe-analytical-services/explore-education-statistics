@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
                 var availableDataBlocks =
-                    await _contentService.GetUnattachedContentBlocksAsync(releaseId, ContentBlockType.DataBlock);
+                    await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
 
                 return availableDataBlocks.Map(blocks =>
                 {

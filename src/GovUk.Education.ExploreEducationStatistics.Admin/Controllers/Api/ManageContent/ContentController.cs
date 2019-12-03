@@ -112,10 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/available-datablocks")]
-        public Task<ActionResult<List<IContentBlock>>> GetAvailableDataBlocks(Guid releaseId)
+        public Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return this.HandlingValidationErrorsAsync(
-                () => _contentService.GetUnattachedContentBlocksAsync(releaseId, ContentBlockType.DataBlock),
+                () => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId),
                 Ok);
         }
 

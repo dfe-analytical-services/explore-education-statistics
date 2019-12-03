@@ -42,8 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ValidationResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request);
         
-        Task<Either<ValidationResult, List<IContentBlock>>> GetUnattachedContentBlocksAsync(
-            Guid releaseId, ContentBlockType type);
+        Task<Either<ValidationResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
+            where T : IContentBlock;
         
         Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request);

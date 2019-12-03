@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -185,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockNotFound); 
                 }
                 
-                if (blockToRemove.ContentSectionId == null)
+                if (!blockToRemove.ContentSectionId.HasValue)
                 {
                     return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockAlreadyDetached);
                 }
@@ -235,26 +236,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             });
         }
 
-        public async Task<Either<ValidationResult, List<IContentBlock>>> GetUnattachedContentBlocksAsync(Guid releaseId, ContentBlockType type)
+        public async Task<Either<ValidationResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId) 
+            where T : IContentBlock
         {
+            var contentBlockTypeEnum = GetContentBlockTypeEnumValueFromType<T>();
+            
             var unattachedContentBlocks = await _context
                 .ReleaseContentBlocks
                 .Include(join => join.ContentBlock)
                 .Where(join => join.ReleaseId == releaseId)
                 .Select(join => join.ContentBlock)
                 .Where(contentBlock => contentBlock.ContentSectionId == null 
-                                       && contentBlock.Type == type.ToString())
+                                       && contentBlock.Type == contentBlockTypeEnum.ToString())
+                .OfType<T>()
                 .ToListAsync();
 
-            if (type == ContentBlockType.DataBlock)
+            if (typeof(T) == typeof(DataBlock))
             {
-                return new Either<ValidationResult, List<IContentBlock>>(
+                return new Either<ValidationResult, List<T>>(
                     unattachedContentBlocks
-                        .OrderBy(contentBlock => ((DataBlock) contentBlock).Name)
+                        .OfType<DataBlock>()
+                        .OrderBy(contentBlock => contentBlock.Name)
+                        .OfType<T>()
                         .ToList());
             }
             
-            return new Either<ValidationResult, List<IContentBlock>>(unattachedContentBlocks);
+            return new Either<ValidationResult, List<T>>(unattachedContentBlocks);
         }
 
         public Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
@@ -277,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     return ValidationResult(ValidationErrorMessages.IncorrectContentBlockTypeForAttach);
                 }
 
-                if (blockToAttach.ContentSectionId != null)
+                if (blockToAttach.ContentSectionId.HasValue)
                 {
                     return ValidationResult(ValidationErrorMessages.ContentBlockAlreadyAttachedToContentSection);
                 }
@@ -310,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
         {
-            if (order != null)
+            if (order.HasValue)
             {
                 return (int) order;
             }
@@ -376,14 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         private static IContentBlock CreateContentBlockForType(ContentBlockType type)
         {
-            return type switch
-            {
-                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
-                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
-                ContentBlockType.HtmlBlock => new HtmlBlock(),
-                ContentBlockType.DataBlock => new DataBlock(),
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
+            var classType = GetContentBlockClassTypeFromEnumValue(type);
+            return (IContentBlock) Activator.CreateInstance(classType);
         }
 
         private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
