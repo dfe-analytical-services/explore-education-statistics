@@ -1,4 +1,4 @@
-import React, { cloneElement, ReactElement } from 'react';
+import React, { cloneElement, ReactElement, ReactNode } from 'react';
 import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
 import { Draggable } from 'react-beautiful-dnd';
 import styles from '@admin/components/DraggableAccordionSection.module.scss';
@@ -9,6 +9,7 @@ interface DraggableAccordionSectionProps {
   index: number;
   openAll: boolean;
   section: ReactElement<EditableAccordionSectionProps>;
+  headingButtons?: ReactNode[];
 }
 
 const DraggableAccordionSection = ({
@@ -17,6 +18,7 @@ const DraggableAccordionSection = ({
   index,
   openAll,
   section,
+  headingButtons,
 }: DraggableAccordionSectionProps) => {
   if (isReordering) {
     return (
@@ -32,6 +34,7 @@ const DraggableAccordionSection = ({
               open: false,
               canToggle: false,
               headingButtons: [
+                ...(headingButtons || []),
                 <span
                   key="drag_handle"
                   className={styles.dragHandle}
@@ -48,6 +51,7 @@ const DraggableAccordionSection = ({
   return cloneElement<EditableAccordionSectionProps>(section, {
     index,
     open: openAll,
+    headingButtons,
   });
 };
 

@@ -70,6 +70,7 @@ const ReleaseContentAccordionSection = ({
         ),
         ...(headingButtons || []),
       ]}
+      canEditHeading
       {...restOfProps}
     >
       <ContentBlock
