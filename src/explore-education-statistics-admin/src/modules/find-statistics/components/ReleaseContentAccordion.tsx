@@ -24,22 +24,48 @@ const ReleaseContentAccordion = ({
 }: ReleaseContentAccordionProps) => {
   const [content, setContent] = React.useState<ContentType[]>([]);
 
-  const onReorder = async (ids: Dictionary<number>) => {
-    return releaseContentService.updateContentSectionsOrder(release.id, ids);
-  };
+  const onReorder = React.useCallback(
+    async (ids: Dictionary<number>) => {
+      const newContent = await releaseContentService.updateContentSectionsOrder(
+        release.id,
+        ids,
+      );
+      setContent(newContent);
+    },
+    [release.id],
+  );
 
   React.useEffect(() => {
     releaseContentService.getContentSections(release.id).then(setContent);
   }, [release.id]);
 
-  const onAddSection = async () => {
+  const onAddSection = React.useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
       await releaseContentService.addContentSection(release.id, content.length),
     ];
 
     setContent(newContent);
-  };
+  }, [content, release.id]);
+
+  const onUpdateHeading = React.useCallback(
+    async (block: ContentType, index: number, newTitle: string) => {
+      let result;
+      if (block.id) {
+        result = await releaseContentService.updateContentSectionHeading(
+          release.id,
+          block.id,
+          newTitle,
+        );
+
+        const newContent = [...content];
+        newContent[index].heading = newTitle;
+        setContent(newContent);
+      }
+      return result;
+    },
+    [content, release.id],
+  );
 
   return (
     <>
@@ -57,6 +83,9 @@ const ReleaseContentAccordion = ({
             contentItem={contentItem}
             index={index}
             release={release}
+            onHeadingChange={title =>
+              onUpdateHeading(contentItem, index, title)
+            }
           />
         ))}
       </Accordion>

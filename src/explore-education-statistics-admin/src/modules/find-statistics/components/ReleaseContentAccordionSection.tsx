@@ -3,7 +3,9 @@ import React, { MouseEventHandler, ReactNode } from 'react';
 import ContentBlock, {
   ReorderHook,
 } from '@admin/modules/find-statistics/components/EditableContentBlock';
-import AccordionSection from '@admin/components/EditableAccordionSection';
+import AccordionSection, {
+  EditableAccordionSectionProps,
+} from '@admin/components/EditableAccordionSection';
 import classnames from 'classnames';
 import styles from '@admin/modules/find-statistics/components/ReleaseContentAccordion.module.scss';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
@@ -15,6 +17,7 @@ export interface ReleaseContentAccordionSectionProps {
   index: number;
   release: AbstractRelease<EditableContentBlock>;
   headingButtons?: ReactNode[];
+  onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   canToggle?: boolean;
 }
 
@@ -25,6 +28,7 @@ const ReleaseContentAccordionSection = ({
   release,
   headingButtons,
   canToggle = true,
+  onHeadingChange,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading, order } = contentItem;
@@ -71,6 +75,7 @@ const ReleaseContentAccordionSection = ({
         ...(headingButtons || []),
       ]}
       canEditHeading
+      onHeadingChange={onHeadingChange}
       {...restOfProps}
     >
       <ContentBlock

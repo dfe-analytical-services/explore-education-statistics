@@ -12,7 +12,7 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
   headingButtons?: ReactNode[];
   canToggle?: boolean;
-  onHeadingChange: (heading: string) => Promise<void>;
+  onHeadingChange: (heading: string) => Promise<unknown>;
   canEditHeading: boolean;
 }
 
@@ -52,9 +52,9 @@ const EditableAccordionSection = ({
       onHeadingChange(currentHeading).then(() => {
         setIsEditingHeading(false);
       });
+    } else {
+      setIsEditingHeading(!isEditingHeading);
     }
-
-    setIsEditingHeading(!isEditingHeading);
   };
 
   return (
