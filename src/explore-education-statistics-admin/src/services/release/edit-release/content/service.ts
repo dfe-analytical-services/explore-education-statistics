@@ -120,12 +120,17 @@ const releaseNoteService = {
       releaseNote,
     );
   },
-  delete: (
+  delete: (id: string, releaseId: string): Promise<ReleaseNote[]> => {
+    return client.delete(`/release/${releaseId}/content/release-note/${id}`);
+  },
+  edit: (
+    id: string,
     releaseId: string,
-    releaseNoteId: string,
+    releaseNote: Omit<ReleaseNote, 'id' | 'releaseId'>,
   ): Promise<ReleaseNote[]> => {
-    return client.delete(
-      `/release/${releaseId}/content/release-note/${releaseNoteId}`,
+    return client.put(
+      `/release/${releaseId}/content/release-note/${id}`,
+      releaseNote,
     );
   },
 };
