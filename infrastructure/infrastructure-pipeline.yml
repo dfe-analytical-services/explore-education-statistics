@@ -13,6 +13,7 @@ trigger:
     - infrastructure/*
     exclude:
     - README.md
+pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
