@@ -33,6 +33,7 @@ const DraggableAccordionSection = ({
               index,
               open: false,
               canToggle: false,
+              canEditHeading: section.props.canEditHeading && !isReordering,
               headingButtons: [
                 ...(headingButtons || []),
                 <span
