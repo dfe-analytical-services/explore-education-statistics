@@ -1,9 +1,9 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ProtectedRoutes from '@admin/components/ProtectedRoutes';
-import ListMethodologyPages from '@admin/pages/methodology/listMethodologyPages';
-import EditMethodologyPage from 'src/pages/methodology/EditMethodologyPage';
-import CreateMethodologyPage from 'src/pages/methodology/CreateMethodologyPage';
+import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
+import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
+import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
