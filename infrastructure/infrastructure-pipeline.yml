@@ -32,7 +32,7 @@ steps:
 #     templateLocation: 'URL of the file'
 #     csmFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/templates/template.json'
 #     csmParametersFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/dev.parameters.json'
-    deploymentMode: 'Validation'
+#    deploymentMode: 'Validation'
 
 - task: PublishPipelineArtifact@0
   inputs:
