@@ -2,7 +2,7 @@
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classnames from 'classnames';
-import React, { createRef, ReactElement } from 'react';
+import React, { createRef, ReactElement, ReactNode } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { Dictionary } from '@common/types/util';
 import DroppableAccordion from '@admin/components/DroppableAccordion';
@@ -14,6 +14,7 @@ export interface EditableAccordionProps extends AccordionProps {
   canReorder?: boolean;
   sectionName?: string;
   onSaveOrder: (order: Dictionary<number>) => Promise<unknown>;
+  onAddSection: () => Promise<unknown>;
 }
 
 interface ChildSection {
@@ -23,44 +24,44 @@ interface ChildSection {
   section: ReactElement<EditableAccordionSectionProps>;
 }
 
+const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
+  React.Children.map(children, (child, thisIndex) => {
+    if (child) {
+      const section = child as ReactElement<EditableAccordionSectionProps>;
+
+      const key = section.props.id || `unknown_section_id_${thisIndex}`;
+
+      return {
+        id: key,
+        key,
+        index: thisIndex,
+        section,
+      };
+    }
+
+    return undefined;
+  }).filter(item => !!item) as ChildSection[];
+
 const EditableAccordion = ({
   children,
   id,
   canReorder,
   sectionName,
   onSaveOrder,
+  onAddSection,
 }: EditableAccordionProps) => {
   const ref = createRef<HTMLDivElement>();
   const [openAll, setOpenAll] = React.useState(false);
   const [isReordering, setIsReordering] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
 
-  const getChildrenFromNodes = React.useCallback(() => {
-    return React.Children.map(children, (child, thisIndex) => {
-      if (child) {
-        const section = child as ReactElement<EditableAccordionSectionProps>;
-
-        const key = section.props.id || `unknown_section_id_${thisIndex}`;
-
-        return {
-          id: key,
-          key,
-          index: thisIndex,
-          section,
-        };
-      }
-
-      return undefined;
-    }).filter(item => !!item) as ChildSection[];
-  }, [children]);
-
   const [currentChildren, setCurrentChildren] = React.useState<ChildSection[]>(
-    getChildrenFromNodes,
+    [],
   );
 
-  React.useEffect(() => setCurrentChildren(getChildrenFromNodes()), [
-    getChildrenFromNodes,
-  ]);
+  React.useEffect(() => {
+    setCurrentChildren(mapReactNodeToChildSection(children));
+  }, [children]);
 
   const goToHash = React.useCallback(() => {
     if (ref.current && window.location.hash) {
@@ -113,22 +114,24 @@ const EditableAccordion = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, type } = result;
+    const { source, destination } = result;
 
-    if (type === 'accordion') {
-      if (source && destination) {
-        const newChildren = [...currentChildren];
-        const [removed] = newChildren.splice(source.index, 1);
-        newChildren.splice(destination.index, 0, removed);
+    if (source && destination) {
+      const newChildren = [...currentChildren];
+      const [removed] = newChildren.splice(source.index, 1);
+      newChildren.splice(destination.index, 0, removed);
 
-        const reordered = newChildren.map((child, index) => ({
-          ...child,
-          index,
-        }));
+      const reordered = newChildren.map((child, index) => ({
+        ...child,
+        index,
+      }));
 
-        setCurrentChildren(reordered);
-      }
+      setCurrentChildren(reordered);
     }
+  };
+
+  const addSection = () => {
+    if (onAddSection) onAddSection().then(() => {});
   };
 
   return (
@@ -136,6 +139,7 @@ const EditableAccordion = ({
       <h2 className="govuk-heading-l reorderable-relative">
         {isError && <span className={styles.error}>An error occurred</span>}
         {canReorder &&
+          currentChildren.length > 1 &&
           (isReordering ? (
             <button
               className="govuk-button reorderable"
@@ -179,6 +183,21 @@ const EditableAccordion = ({
           ))}
         </div>
       </DroppableAccordion>
+
+      {canReorder && (
+        <div className="govuk-accordion" style={{ border: 'none' }}>
+          <div className={classnames('govuk-accordion__controls')}>
+            <button
+              type="button"
+              key="add_section"
+              onClick={() => addSection()}
+              className={classnames(styles.addSectionButton, 'govuk-button')}
+            >
+              Add new section
+            </button>
+          </div>
+        </div>
+      )}
     </DragDropContext>
   );
 };

@@ -68,12 +68,14 @@ const PublicationReleaseContent = ({
             <BasicReleaseSummary release={release} />
           </div>
 
-          <ContentBlock
-            sectionId={release.summarySection.id}
-            publication={publication}
-            id={release.summarySection.id as string}
-            content={release.summarySection.content}
-          />
+          {release.summarySection && (
+            <ContentBlock
+              sectionId={release.summarySection.id}
+              publication={publication}
+              id={release.summarySection.id as string}
+              content={release.summarySection.content}
+            />
+          )}
 
           {release.downloadFiles && (
             <Details
@@ -209,7 +211,9 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
+      {release.keyStatisticsSection && (
+        <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
+      )}
 
       <ReleaseContentAccordion
         release={release}
