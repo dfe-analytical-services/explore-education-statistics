@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "010009be-fb61-4506-9168-1b9abbe01baf",
+		"_postman_id": "53772991-7958-4493-9b65-00ad4fa55475",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1981,183 +1981,6 @@
 					"name": "Manage Content Page",
 					"item": [
 						{
-							"name": "Add Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 201\", function () { ",
-											"    pm.response.to.have.status(201); ",
-											"});",
-											"",
-											"pm.test(\"Release Notes array contains values\", function () {",
-											"    pm.expect(respJson.length).to.be.above(0);",
-											"});",
-											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.id).to.not.be.empty;",
-											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
-											"    pm.expect(lastItem.on).to.not.be.empty;",
-											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
-											"});",
-											"",
-											"pm.test(\"Store variables for upcoming tests\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.environment.set(\"latest_release_note_id\", lastItem.id);",
-											"    pm.environment.set(\"number_of_release_notes\", respJson.length);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Related Notes array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_release_notes\"));",
-											"});",
-											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
-											"    const updatedItem = respJson.find(item => item.id === pm.environment.get(\"latest_release_note_id\"));",
-											"    pm.expect(updatedItem).to.not.be.empty;",
-											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
-											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note",
-										"{{latest_release_note_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Release Note",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Release Notes array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_release_notes\") - 1);",
-											"});",
-											"",
-											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_release_note_id\"))).to.be.false;",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"release-note",
-										"{{latest_release_note_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Get Manage Content Page data",
 							"event": [
 								{
@@ -2174,6 +1997,7 @@
 											"    var respJson = pm.response.json();",
 											"",
 											"    pm.expect(respJson.release).to.exist;",
+											"    pm.expect(respJson.availableDataBlocks).to.exist;",
 											"});",
 											"",
 											"// EES-754",
@@ -2329,6 +2153,23 @@
 											"    pm.expect(relatedInformation[1].id).to.equal(\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\");",
 											"    pm.expect(relatedInformation[1].description).to.equal(\"Statistics guide\");",
 											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com\");",
+											"});",
+											"",
+											"pm.test(\"Available Data Blocks section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const availableDataBlocks = respJson.availableDataBlocks;",
+											"    ",
+											"    pm.expect(availableDataBlocks.length).to.equal(2);",
+											"    ",
+											"    pm.expect(availableDataBlocks[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+											"    pm.expect(availableDataBlocks[0].name).to.equal(\"Available Data Block\");",
+											"    pm.expect(availableDataBlocks[0].order).to.equal(0);",
+											"",
+											"    pm.expect(availableDataBlocks[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+											"    pm.expect(availableDataBlocks[1].name).to.equal(\"Available Data Block 2\");",
+											"    pm.expect(availableDataBlocks[1].order).to.equal(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2354,6 +2195,195 @@
 										"release",
 										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
 										"content"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Release Notes",
+					"item": [
+						{
+							"name": "Add Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(lastItem.on).to.not.be.empty;",
+											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.globals.set(\"latest_release_note_id\", lastItem.id);",
+											"    pm.globals.set(\"number_of_release_notes\", respJson.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
+											"    const updatedItem = respJson.find(item => item.id === pm.globals.get(\"latest_release_note_id\"));",
+											"    pm.expect(updatedItem).to.not.be.empty;",
+											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
+											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_release_note_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"unset variables\", function() {",
+											"   pm.globals.unset(\"number_of_release_notes\"); ",
+											"   pm.globals.unset(\"latest_release_note_id\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
 									]
 								}
 							},
@@ -2394,8 +2424,8 @@
 											"",
 											"pm.test(\"Store variables for upcoming tests\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.environment.set(\"latest_related_information_id\", lastItem.id);",
-											"    pm.environment.set(\"number_of_related_information_items\", respJson.length);",
+											"    pm.globals.set(\"latest_related_information_id\", lastItem.id);",
+											"    pm.globals.set(\"number_of_related_information_items\", respJson.length);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2445,14 +2475,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
 											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2499,14 +2529,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
 											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2557,14 +2587,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
 											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2611,11 +2641,11 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\") - 1);",
 											"});",
 											"",
 											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_related_information_id\"))).to.be.false;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2660,16 +2690,16 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\") - 1);",
 											"});",
 											"",
 											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_related_information_id\"))).to.be.false;",
 											"});",
 											"",
 											"pm.test(\"Unset variables\", function () {",
-											"    pm.environment.unset(\"latest_related_information_id\");",
-											"    pm.environment.unset(\"number_of_related_information_items\");",
+											"    pm.globals.unset(\"latest_related_information_id\");",
+											"    pm.globals.unset(\"number_of_related_information_items\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2832,7 +2862,7 @@
 													"});",
 													"",
 													"pm.test(\"Store environment variables\", function() {",
-													"    pm.environment.set(\"added_content_section_id\", pm.response.json().id);",
+													"    pm.globals.set(\"added_content_section_id\", pm.response.json().id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3263,68 +3293,6 @@
 									"response": []
 								},
 								{
-									"name": "Get Content Section Copy",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { ",
-													"    pm.response.to.have.status(200); ",
-													"});",
-													"",
-													"",
-													"pm.test(\"Content Section should contain the correct information\", function () { ",
-													"",
-													"    var respJson = pm.response.json();",
-													"",
-													"    pm.expect(respJson.id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
-													"    pm.expect(respJson.order).to.equal(1);",
-													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
-													"    pm.expect(respJson.caption).to.equal(\"\");",
-													"",
-													"    // EES-754",
-													"    if(pm.environment.get('env') === 'local') {",
-													"    // test a MarkDownBlock's content",
-													"    pm.expect(respJson.content.length).to.equal(1);",
-													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
-													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
-													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-												"content",
-												"section",
-												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Verify Content Section removed",
 									"event": [
 										{
@@ -3403,7 +3371,7 @@
 													"});",
 													"",
 													"pm.test(\"Store environment variables for following tests\", function() {",
-													"   pm.environment.set(\"added_content_section_without_order_id\", pm.response.json().id); ",
+													"   pm.globals.set(\"added_content_section_without_order_id\", pm.response.json().id); ",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3590,7 +3558,7 @@
 													"",
 													"pm.test(\"Store variables for upcoming tests\", function () {",
 													"    ",
-													"    pm.environment.set(\"added_html_block_id\", pm.response.json().id);",
+													"    pm.globals.set(\"added_html_block_id\", pm.response.json().id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3653,7 +3621,7 @@
 													"",
 													"pm.test(\"Store variables for upcoming tests\", function () {",
 													"    ",
-													"    pm.environment.set(\"added_markdown_block_id\", pm.response.json().id);",
+													"    pm.globals.set(\"added_markdown_block_id\", pm.response.json().id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3716,7 +3684,7 @@
 													"",
 													"pm.test(\"Store variables for upcoming tests\", function () {",
 													"    ",
-													"    pm.environment.set(\"added_inset_text_block_id\", pm.response.json().id);",
+													"    pm.globals.set(\"added_inset_text_block_id\", pm.response.json().id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3779,7 +3747,7 @@
 													"",
 													"pm.test(\"Store variables for upcoming tests\", function () {",
 													"    ",
-													"    pm.environment.set(\"added_data_block_id\", pm.response.json().id);",
+													"    pm.globals.set(\"added_data_block_id\", pm.response.json().id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3831,15 +3799,15 @@
 													"",
 													"    pm.expect(respJson.content.length).to.equal(5);",
 													"    ",
-													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[0].order).to.equal(1);",
 													"",
-													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson.content[1].type).to.equal(\"InsetTextBlock\");",
 													"    pm.expect(respJson.content[1].order).to.equal(2);",
 													"    ",
-													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[2].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
 													"",
@@ -3850,7 +3818,7 @@
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
 													"    }",
 													"  ",
-													"    pm.expect(respJson.content[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[4].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[4].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[4].order).to.equal(5);",
 													"});"
@@ -3897,7 +3865,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"    ",
-													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.order).to.equal(3);",
 													"    pm.expect(respJson.body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
@@ -3950,7 +3918,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"    ",
-													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.order).to.equal(1);",
 													"    pm.expect(respJson.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
@@ -4003,7 +3971,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"    ",
-													"    pm.expect(respJson.id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
 													"    pm.expect(respJson.order).to.equal(2);",
 													"    pm.expect(respJson.heading).to.equal(\"Update!\");",
@@ -4059,14 +4027,14 @@
 													"",
 													"    pm.expect(respJson.content.length).to.equal(5);",
 													"    ",
-													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.content[0].body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
 													"    ",
-													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson.content[1].heading).to.equal(\"Update!\");",
 													"    pm.expect(respJson.content[1].body).to.equal(\"This is the new body for the Inset Text Block.\");",
 													"    ",
-													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[2].body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
 													"});"
 												],
@@ -4116,19 +4084,19 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(5);",
 													"    ",
-													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    ",
-													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"",
-													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson[2].type).to.equal(\"InsetTextBlock\");",
 													"    pm.expect(respJson[2].order).to.equal(3);",
 													"    ",
-													"    pm.expect(respJson[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[3].order).to.equal(4);",
 													"    ",
@@ -4189,19 +4157,19 @@
 													"",
 													"    pm.expect(respJson.content.length).to.equal(5);",
 													"    ",
-													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[0].order).to.equal(1);",
 													"    ",
-													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.content[1].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[1].order).to.equal(2);",
 													"",
-													"    pm.expect(respJson.content[2].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson.content[2].type).to.equal(\"InsetTextBlock\");",
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
 													"    ",
-													"    pm.expect(respJson.content[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
 													"    ",
@@ -4263,15 +4231,15 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(5);",
 													"    ",
-													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"",
-													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
 													"    pm.expect(respJson[1].type).to.equal(\"InsetTextBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"    ",
-													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[2].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[2].order).to.equal(3);",
 													"    ",
@@ -4279,7 +4247,7 @@
 													"    pm.expect(respJson[3].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[3].order).to.equal(4);",
 													"    ",
-													"    pm.expect(respJson[4].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[4].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[4].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[4].order).to.equal(5);",
 													"});",
@@ -4334,11 +4302,11 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(4);",
 													"    ",
-													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"",
-													"    pm.expect(respJson[1].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"    ",
@@ -4349,7 +4317,7 @@
 													"    pm.expect(respJson[2].order).to.equal(3);",
 													"    }",
 													"    ",
-													"    pm.expect(respJson[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[3].order).to.equal(4);",
 													"});"
@@ -4397,11 +4365,11 @@
 													"",
 													"    pm.expect(respJson.content.length).to.equal(4);",
 													"    ",
-													"    pm.expect(respJson.content[0].id).to.equal(pm.environment.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson.content[0].order).to.equal(1);",
 													"",
-													"    pm.expect(respJson.content[1].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[1].order).to.equal(2);",
 													"    ",
@@ -4412,7 +4380,7 @@
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
 													"    }",
 													"    ",
-													"    pm.expect(respJson.content[3].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
 													"});"
@@ -4461,7 +4429,7 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(3);",
 													"    ",
-													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    ",
@@ -4472,7 +4440,7 @@
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"    }",
 													"    ",
-													"    pm.expect(respJson[2].id).to.equal(pm.environment.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[2].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[2].order).to.equal(3);",
 													"});"
@@ -4520,7 +4488,7 @@
 													"",
 													"    pm.expect(respJson.length).to.equal(2);",
 													"    ",
-													"    pm.expect(respJson[0].id).to.equal(pm.environment.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
 													"    ",
@@ -4584,10 +4552,10 @@
 													"});",
 													"",
 													"pm.test(\"Remove temporary environment variables\", function() {",
-													"   pm.environment.unset(\"added_html_block_id\"); ",
-													"   pm.environment.unset(\"added_markdown_block_id\"); ",
-													"   pm.environment.unset(\"added_inset_text_block_id\"); ",
-													"   pm.environment.unset(\"added_data_block_id\"); ",
+													"   pm.globals.unset(\"added_html_block_id\"); ",
+													"   pm.globals.unset(\"added_markdown_block_id\"); ",
+													"   pm.globals.unset(\"added_inset_text_block_id\"); ",
+													"   pm.globals.unset(\"added_data_block_id\"); ",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4614,6 +4582,834 @@
 												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
 												"block",
 												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Data Blocks",
+							"item": [
+								{
+									"name": "Get Available Data Blocks",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should be two available Data Blocks (that have not yet been included in any Content Section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[1].name).to.equal(\"Available Data Block 2\");",
+													"    pm.expect(respJson[1].order).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add a Content Section to attach an available Data Block to",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Store environment variables\", function() {",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.globals.set(\"added_content_section_id\", respJson.id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 2\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach available Data Block to new Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '1869d10a-ca3f-450c-9685-780b11d916f5'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(1);",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify available Data Blocks no longer shows attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should now only be one available Data Block (as the other is attached to a content section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach another available Data Block to new Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '0b4c43cd-fc12-4159-88b9-0c8646424555'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(2);",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[1].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[1].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify available Data Blocks is empty",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should be no available Data Blocks now\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Detach a Data Block from the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"The detatched Data Block should no longer be on the Content Section\", function() {",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if (pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.length).to.equal(1);",
+													"",
+													"        pm.expect(respJson[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson[0].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/block/1869d10a-ca3f-450c-9685-780b11d916f5",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"block",
+												"1869d10a-ca3f-450c-9685-780b11d916f5"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify the detached Data Block is no longer on the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should no longer contain the detached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify the detached Data Block is available again",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"The detached Data Block should be available again\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach the newly available Data Block to the Content Section with explicit order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '1869d10a-ca3f-450c-9685-780b11d916f5',\n\t\torder: 1\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        ",
+													"        pm.expect(respJson.content.length).to.equal(2);",
+													"        ",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[1].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[1].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove the Content Section to verify Data Blocks aren't deleted as well",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify that the Data Blocks are available again after deleting the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"The 2 Data Blocks should be available again (rather than being deleted along with the removed Content Section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[1].name).to.equal(\"Available Data Block 2\");",
+													"    pm.expect(respJson[1].order).to.equal(0);",
+													"});",
+													"",
+													"pm.test(\"Clear up variables\", function () { ",
+													"    pm.globals.unset(\"added_content_section_id\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
 											]
 										}
 									},

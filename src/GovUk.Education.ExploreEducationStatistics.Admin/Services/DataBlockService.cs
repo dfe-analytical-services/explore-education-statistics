@@ -70,6 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(join => join.ReleaseId == releaseId 
                                && join.ContentBlock.Type == ContentBlockType.DataBlock.ToString())
                 .Select(join => join.ContentBlock)
+                .OrderBy(dataBlock => ((DataBlock)dataBlock).Name)
                 .ToListAsync();
             
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);

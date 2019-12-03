@@ -11,7 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using IdentityServer4.Extensions;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -104,13 +107,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             });
         }
         
-        public Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
+        public  Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
             Guid releaseId,
             Guid contentSectionId)
         {
             return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
                 var (release, sectionToRemove) = tuple;
+                
+                // detach DataBlocks before removing the ContentSection and its ContentBlocks
+                sectionToRemove
+                    .Content
+                    .FindAll(contentBlock => contentBlock.Type == ContentBlockType.DataBlock.ToString())
+                    .ForEach(dataBlock =>  
+                        RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
                 
                 release.RemoveGenericContentSection(sectionToRemove);
 
@@ -157,20 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
             {
                 var (_, section) = tuple;
-                
-                var orderForNewBlock = request.Order ?? section.Content.Max(contentBlock => contentBlock.Order) + 1;
-
-                section.Content
-                    .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
-                    .ForEach(contentBlock => contentBlock.Order++);
-                    
-                IContentBlock newContentBlock = CreateContentBlockForType(request.Type);
-                newContentBlock.Order = orderForNewBlock;
-                section.Content.Add(newContentBlock);
-                
-                _context.ContentSections.Update(section);
-                await _context.SaveChangesAsync();
-                return newContentBlock;
+                var newContentBlock = CreateContentBlockForType(request.Type);
+                return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, newContentBlock);
             });
         }
 
@@ -185,19 +183,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 if (blockToRemove == null)
                 {
-                    return new Either<ValidationResult, List<IContentBlock>>(
-                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentBlockNotFound)); 
+                    return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockNotFound); 
                 }
                 
-                section.Content.Remove(blockToRemove);
-
-                var removedBlockOrder = blockToRemove.Order;
-
-                section.Content
-                    .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
-                    .ForEach(contentBlock => contentBlock.Order--);
+                if (!blockToRemove.ContentSectionId.HasValue)
+                {
+                    return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockAlreadyDetached);
+                }
                 
-                _context.ContentBlocks.Remove(blockToRemove);
+                if (blockToRemove.ContentSectionId != contentSectionId)
+                {
+                    return ValidationResult<List<IContentBlock>>(ValidationErrorMessages.ContentBlockNotAttachedToThisContentSection);
+                }
+
+                var deleteContentBlock = blockToRemove.Type != ContentBlockType.DataBlock.ToString(); 
+                RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
+                
                 _context.ContentSections.Update(section);
                 await _context.SaveChangesAsync();
                 return OrderedContentBlocks(section);
@@ -215,8 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 if (blockToUpdate == null)
                 {
-                    return new Either<ValidationResult, IContentBlock>(
-                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentBlockNotFound));
+                    return ValidationResult<IContentBlock>(ValidationErrorMessages.ContentBlockNotFound);
                 }
 
                 switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
@@ -228,14 +228,133 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     case ContentBlockType.InsetTextBlock:
                         return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body);
                     case ContentBlockType.DataBlock:
-                        return new Either<ValidationResult, IContentBlock>(
-                            ValidationUtils.ValidationResult(ValidationErrorMessages.IncorrectContentBlockTypeForUpdate));
+                        return ValidationResult<IContentBlock>(
+                            ValidationErrorMessages.IncorrectContentBlockTypeForUpdate);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             });
         }
 
+        public async Task<Either<ValidationResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId) 
+            where T : IContentBlock
+        {
+            var contentBlockTypeEnum = GetContentBlockTypeEnumValueFromType<T>();
+            
+            var unattachedContentBlocks = await _context
+                .ReleaseContentBlocks
+                .Include(join => join.ContentBlock)
+                .Where(join => join.ReleaseId == releaseId)
+                .Select(join => join.ContentBlock)
+                .Where(contentBlock => contentBlock.ContentSectionId == null 
+                                       && contentBlock.Type == contentBlockTypeEnum.ToString())
+                .OfType<T>()
+                .ToListAsync();
+
+            if (typeof(T) == typeof(DataBlock))
+            {
+                return new Either<ValidationResult, List<T>>(
+                    unattachedContentBlocks
+                        .OfType<DataBlock>()
+                        .OrderBy(contentBlock => contentBlock.Name)
+                        .OfType<T>()
+                        .ToList());
+            }
+            
+            return new Either<ValidationResult, List<T>>(unattachedContentBlocks);
+        }
+
+        public Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+            {
+                var (_, section) = tuple;
+
+                var blockToAttach = _context
+                    .ContentBlocks
+                    .FirstOrDefault(block => block.Id == request.ContentBlockId);
+
+                if (blockToAttach == null)
+                {
+                    return ValidationResult(ValidationErrorMessages.ContentBlockNotFound);
+                }
+                
+                if (blockToAttach.Type != ContentBlockType.DataBlock.ToString())
+                {
+                    return ValidationResult(ValidationErrorMessages.IncorrectContentBlockTypeForAttach);
+                }
+
+                if (blockToAttach.ContentSectionId.HasValue)
+                {
+                    return ValidationResult(ValidationErrorMessages.ContentBlockAlreadyAttachedToContentSection);
+                }
+                
+                return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, blockToAttach);
+            });
+        }
+        
+        private async Task<Either<ValidationResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
+            IContentBlock newContentBlock)
+        {
+            if (section.Content == null)
+            {
+                section.Content = new List<IContentBlock>();
+            }
+            
+            var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
+
+            section.Content
+                .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
+                .ForEach(contentBlock => contentBlock.Order++);
+
+            newContentBlock.Order = orderForNewBlock;
+            section.Content.Add(newContentBlock);
+
+            _context.ContentSections.Update(section);
+            await _context.SaveChangesAsync();
+            return newContentBlock;
+        }
+
+        private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
+        {
+            if (order.HasValue)
+            {
+                return (int) order;
+            }
+
+            if (!section.Content.IsNullOrEmpty())
+            {
+                return section.Content.Max(contentBlock => contentBlock.Order) + 1;
+            }
+
+            return 1;
+        }
+
+        private void RemoveContentBlockFromContentSection(
+            ContentSection section, 
+            IContentBlock blockToRemove,
+            bool deleteContentBlock)
+        {
+            section.Content.Remove(blockToRemove);
+
+            var removedBlockOrder = blockToRemove.Order;
+
+            section.Content
+                .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
+                .ForEach(contentBlock => contentBlock.Order--);
+
+            if (deleteContentBlock)
+            {
+                _context.ContentBlocks.Remove(blockToRemove);
+            }
+            else
+            {
+                blockToRemove.Order = 0;
+                blockToRemove.ContentSectionId = null;
+                _context.ContentBlocks.Update(blockToRemove);
+            }
+        }
+        
         private async Task<Either<ValidationResult, IContentBlock>> UpdateMarkDownBlock(MarkDownBlock blockToUpdate, string body)
         {
             blockToUpdate.Body = body;
@@ -264,14 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         private static IContentBlock CreateContentBlockForType(ContentBlockType type)
         {
-            return type switch
-            {
-                ContentBlockType.MarkDownBlock => (IContentBlock) new MarkDownBlock(),
-                ContentBlockType.InsetTextBlock => new InsetTextBlock(),
-                ContentBlockType.HtmlBlock => new HtmlBlock(),
-                ContentBlockType.DataBlock => new DataBlock(),
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
+            var classType = GetContentBlockClassTypeFromEnumValue(type);
+            return (IContentBlock) Activator.CreateInstance(classType);
         }
 
         private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
@@ -354,8 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                 if (section == null)
                 {
-                    return new Either<ValidationResult, T>(
-                        ValidationUtils.ValidationResult(ValidationErrorMessages.ContentSectionNotFound));
+                    return ValidationResult(ValidationErrorMessages.ContentSectionNotFound);
                 }
 
                 return await contentSectionFn.Invoke(new Tuple<Release, ContentSection>(release, section));
