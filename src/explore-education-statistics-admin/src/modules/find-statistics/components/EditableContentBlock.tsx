@@ -49,7 +49,7 @@ export const EditingContentBlockContext = React.createContext<
 });
 
 const EditableContentBlock = ({
-  content,
+  content = [],
   id = '',
   sectionId,
   editable = true,

@@ -58,7 +58,7 @@ const ReleaseContentAccordionSection = ({
       caption={caption}
       canToggle={canToggle}
       headingButtons={[
-        content.length > 1 && (
+        content && content.length > 1 && (
           <button
             key="toggle_reordering"
             className={classnames(styles.toggleContentDragging)}
