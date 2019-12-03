@@ -28,15 +28,6 @@ const WizardStepFormActions = ({
 }: Props) => {
   return (
     <FormGroup>
-      <Button
-        disabled={form.isSubmitting}
-        id={`${formId}-submit`}
-        type="submit"
-        onClick={onSubmitClick}
-      >
-        {form.isSubmitting ? submittingText : submitText}
-      </Button>
-
       {stepNumber > 1 && (
         <Button
           type="button"
@@ -54,6 +45,16 @@ const WizardStepFormActions = ({
           Previous step
         </Button>
       )}
+
+      <Button
+        disabled={form.isSubmitting}
+        id={`${formId}-submit`}
+        type="submit"
+        onClick={onSubmitClick}
+      >
+        {form.isSubmitting ? submittingText : submitText}
+      </Button>
+
       {form.isSubmitting && <LoadingSpinner inline size={39} />}
     </FormGroup>
   );
