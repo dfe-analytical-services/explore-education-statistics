@@ -89,6 +89,24 @@ const WysiwygEditor = ({
         {editable && editing ? (
           <CKEditor
             editor={ClassicEditor}
+            config={{
+              toolbar: [
+                'heading',
+                '|',
+                'bold',
+                'italic',
+                'link',
+                '|',
+                'bulletedList',
+                'numberedList',
+                '|',
+                'blockQuote',
+                'insertTable',
+                '|',
+                'redo',
+                'undo',
+              ],
+            }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {
               setTemporaryContent(editor.getData());
