@@ -77,6 +77,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     currentStep,
     stepNumber,
     initialValues,
+    isActive,
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -129,7 +130,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       render={(form: FormikProps<FormValues>) => {
         const { getError } = createErrorHelper(form);
 
-        return (
+        return isActive ? (
           <div ref={ref}>
             <Form {...form} id={formId}>
               {stepHeading}
@@ -214,6 +215,30 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               />
             </Form>
           </div>
+        ) : (
+          <>
+            {stepHeading}
+            {
+              // <SummaryList noBorder>
+              //   <SummaryListItem term="Indicators" shouldCollapse>
+              //     {form.values.indicators.map(indicator => (
+              //       <div key={indicator}>
+              //         {subjectMeta.indicators[indicator]}
+              //       </div>
+              //     ))}
+              //   </SummaryListItem>
+              //   {Object.entries(form.values.filters).map(
+              //     ([filterGroupId, filterItemIds]) => (
+              //       <SummaryListItem term={filterGroupId} shouldCollapse>
+              //         {filterItemIds.map(filterItemId => (
+              //           <div key={filterItemId}>{filterItemId}</div>
+              //         ))}
+              //       </SummaryListItem>
+              //     ),
+              //   )}
+              // </SummaryList>
+            }
+          </>
         );
       }}
     />

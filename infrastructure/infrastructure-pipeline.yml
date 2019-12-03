@@ -1,0 +1,35 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infrastructure/*
+    exclude:
+    - README.md
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    ConnectedServiceName: 's101-datahub-development-spn-ees'
+    subscriptionName: '48ea0797-73c6-4202-bf90-b01c817058e9'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 's101d01-rg-ees'
+    location: 'West Europe'
+    templateLocation: 'URL of the file'
+    csmFileLink: 'armTemplates/ees-service/template.json'
+    csmParametersFileLink: 'armTemplates/ees-service/dev.parameters.json'
+    deploymentMode: 'Validation'

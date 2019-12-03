@@ -70,6 +70,8 @@ const ReleaseManageDataBlocksPage = () => {
     releaseId: string,
     selectedDataBlockId: string,
   ) => {
+    // Load's the datablock of 'selectedDataBlockId' in datablock form
+
     setIsLoading(true);
 
     if (!selectedDataBlockId) return {};

@@ -1,11 +1,10 @@
 /* eslint-disable */
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import React from 'react';
-import TableTool from '@common/modules/table-tool/components/TableTool';
 import tableBuilderService, {
-  TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
+import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 
 const PrototypeTableTool = () => {
   const publicationSlug = undefined; //"pupil-absence-in-schools-in-england";
@@ -28,7 +27,7 @@ const PrototypeTableTool = () => {
   return (
     <PrototypePage wide>
       {themeMeta && publicationId !== undefined && (
-        <TableTool publicationId={publicationId} themeMeta={themeMeta} />
+        <TableToolWizard publicationId={publicationId} themeMeta={themeMeta} />
       )}
     </PrototypePage>
   );
