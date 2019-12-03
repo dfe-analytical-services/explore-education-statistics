@@ -11,7 +11,7 @@ trigger:
 pr: none
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 steps:
 # This would validate the ARM template, however csm paramerts need a uri 
