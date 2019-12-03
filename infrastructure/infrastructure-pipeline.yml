@@ -35,4 +35,4 @@ steps:
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'arm-template'
-    targetPath: 'armTemplates'
+    targetPath: 'infrastructure'

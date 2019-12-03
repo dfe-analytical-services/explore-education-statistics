@@ -2,7 +2,13 @@ variables:
   BuildConfiguration: 'Release'
   CI: true
 
-trigger: [ 'master' ]
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - infrastructure/*
 pr: none
 
 jobs:
