@@ -138,7 +138,8 @@ const EditableAccordion = ({
     <DragDropContext onDragEnd={onDragEnd}>
       <h2 className="govuk-heading-l reorderable-relative">
         {isError && <span className={styles.error}>An error occurred</span>}
-        {canReorder && currentChildren.length > 1 &&
+        {canReorder &&
+          currentChildren.length > 1 &&
           (isReordering ? (
             <button
               className="govuk-button reorderable"

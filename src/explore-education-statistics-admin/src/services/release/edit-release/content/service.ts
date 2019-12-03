@@ -15,6 +15,10 @@ import {
 export interface ReleaseContentService {
   getContent: (releaseId: string) => Promise<ManageContentPageViewModel>;
   getContentSections: (releaseId: string) => Promise<ContentSectionViewModel[]>;
+  addContentSection: (
+    releaseId: string,
+    order: number,
+  ) => Promise<ContentSectionViewModel>;
   updateContentSectionsOrder: (
     releaseId: string,
     order: Dictionary<number>,
@@ -54,6 +58,15 @@ const service: ReleaseContentService = {
   getContentSections(releaseId: string): Promise<ContentSectionViewModel[]> {
     return client.get<ContentSectionViewModel[]>(
       `/release/${releaseId}/content/sections`,
+    );
+  },
+  addContentSection(
+    releaseId: string,
+    order: number,
+  ): Promise<ContentSectionViewModel> {
+    return client.post<ContentSectionViewModel>(
+      `/release/${releaseId}/content/sections/add`,
+      { order },
     );
   },
   updateContentSectionsOrder(

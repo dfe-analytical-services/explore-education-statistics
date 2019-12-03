@@ -59,7 +59,7 @@ const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
 };
 
 const EditableContentBlock = ({
-  content,
+  content = [],
   id = '',
   sectionId,
   editable,

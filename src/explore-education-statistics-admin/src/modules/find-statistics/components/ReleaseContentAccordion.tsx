@@ -6,7 +6,6 @@ import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import { Dictionary } from '@common/types/util';
-import styles from './ReleaseContentAccordion.module.scss';
 
 interface ReleaseContentAccordionProps {
   release: AbstractRelease<EditableContentBlock>;
@@ -39,14 +38,9 @@ const ReleaseContentAccordion = ({
   }, [release.id]);
 
   const onAddSection = async () => {
-    const newContent : AbstractRelease<EditableContentBlock>['content'] = [
+    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
-      {
-        caption: "",
-        heading: "New Section",
-        content: [],
-        order: content.length
-      }
+      await releaseContentService.addContentSection(release.id, content.length),
     ];
 
     setContent(newContent);
