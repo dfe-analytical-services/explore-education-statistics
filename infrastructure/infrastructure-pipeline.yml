@@ -18,18 +18,21 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# potentially this can be used to verify the template is valid
+# - task: AzureResourceManagerTemplateDeployment@3
+#   inputs:
+#     deploymentScope: 'Resource Group'
+#     ConnectedServiceName: 's101-datahub-development-spn-ees'
+#     subscriptionName: '48ea0797-73c6-4202-bf90-b01c817058e9'
+#     action: 'Create Or Update Resource Group'
+#     resourceGroupName: 's101d01-rg-ees'
+#     location: 'West Europe'
+#     templateLocation: 'URL of the file'
+#     csmFileLink: 'armTemplates/ees-service/template.json'
+#     csmParametersFileLink: 'armTemplates/ees-service/dev.parameters.json'
+#     deploymentMode: 'Validation'
 
-- task: AzureResourceManagerTemplateDeployment@3
+- task: PublishPipelineArtifact@0
   inputs:
-    deploymentScope: 'Resource Group'
-    ConnectedServiceName: 's101-datahub-development-spn-ees'
-    subscriptionName: '48ea0797-73c6-4202-bf90-b01c817058e9'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: 's101d01-rg-ees'
-    location: 'West Europe'
-    templateLocation: 'URL of the file'
-    csmFileLink: 'armTemplates/ees-service/template.json'
-    csmParametersFileLink: 'armTemplates/ees-service/dev.parameters.json'
-    deploymentMode: 'Validation'
+    artifactName: 'arm-template'
+    targetPath: 'armTemplates'
