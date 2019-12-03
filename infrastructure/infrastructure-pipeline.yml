@@ -14,26 +14,11 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
-# This would validate the ARM template, however csm paramerts need a uri 
-# - task: AzureResourceManagerTemplateDeployment@3
-#   displayName: 'Validate ARM template'
-#   inputs:
-#     deploymentScope: 'Resource Group'
-#     ConnectedServiceName: 's101-datahub-development-spn-ees'
-#     subscriptionName: '48ea0797-73c6-4202-bf90-b01c817058e9'
-#     action: 'Create Or Update Resource Group'
-#     resourceGroupName: 's101d01-rg-ees'
-#     location: 'West Europe'
-#     templateLocation: 'URL of the file'
-#     csmFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/templates/template.json'
-#     csmParametersFileLink: '
-#    deploymentMode: 'Validation'
-
 - task: AzSKARMTemplateChecker@4
+  enabled: false
   inputs:
     ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
     ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
-
 
 - task: PublishPipelineArtifact@0
   inputs:
