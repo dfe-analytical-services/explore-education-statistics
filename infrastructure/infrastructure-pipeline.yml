@@ -26,8 +26,14 @@ steps:
 #     location: 'West Europe'
 #     templateLocation: 'URL of the file'
 #     csmFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/templates/template.json'
-#     csmParametersFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/dev.parameters.json'
+#     csmParametersFileLink: '
 #    deploymentMode: 'Validation'
+
+- task: AzSKARMTemplateChecker@4
+  inputs:
+    ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
+    ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/''
+
 
 - task: PublishPipelineArtifact@0
   inputs:
