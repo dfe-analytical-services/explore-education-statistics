@@ -15,10 +15,11 @@ import {
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
+  children?: ReactNode;
   initialValues: { title?: string };
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
@@ -35,6 +36,7 @@ interface FormValues {
 }
 
 const DataBlockDetailsForm = ({
+  children,
   initialValues,
   query,
   tableHeaders,
@@ -144,48 +146,47 @@ const DataBlockDetailsForm = ({
           <div>
             <Form {...form} id="dataBlockDetails">
               <FormGroup>
-                <FormFieldset id="details" legend="Data block details">
-                  <FormFieldTextInput<FormValues>
-                    id="data-block-name"
-                    name="name"
-                    label="Data block name"
-                    hint=" Name and save your datablock before viewing it under the
+                <FormFieldTextInput<FormValues>
+                  id="data-block-name"
+                  name="name"
+                  label="Data block name"
+                  hint=" Name and save your datablock before viewing it under the
                     'View data blocks' tab at the top of this page."
-                    percentageWidth="one-half"
-                  />
+                  percentageWidth="one-half"
+                />
 
-                  <hr />
+                <hr />
+                {children}
 
-                  <FormFieldTextArea<FormValues>
-                    id="data-block-title"
-                    name="title"
-                    label="Table title"
-                    additionalClass="govuk-!-width-two-thirds"
-                    rows={2}
-                  />
+                <FormFieldTextArea<FormValues>
+                  id="data-block-title"
+                  name="title"
+                  label="Table title"
+                  additionalClass="govuk-!-width-two-thirds"
+                  rows={2}
+                />
 
-                  <FormFieldTextInput<FormValues>
-                    id="data-block-source"
-                    name="source"
-                    label="Source"
-                    percentageWidth="two-thirds"
-                  />
+                <FormFieldTextInput<FormValues>
+                  id="data-block-source"
+                  name="source"
+                  label="Source"
+                  percentageWidth="two-thirds"
+                />
 
-                  <FormFieldTextArea<FormValues>
-                    id="data-block-footnotes"
-                    name="customFootnotes"
-                    label="Footnotes"
-                    additionalClass="govuk-!-width-two-thirds"
-                  />
+                <FormFieldTextArea<FormValues>
+                  id="data-block-footnotes"
+                  name="customFootnotes"
+                  label="Footnotes"
+                  additionalClass="govuk-!-width-two-thirds"
+                />
 
-                  <Button
-                    disabled={!form.isValid}
-                    type="submit"
-                    className="govuk-!-margin-top-6"
-                  >
-                    {initialDataBlock ? 'Update data block' : 'Save data block'}
-                  </Button>
-                </FormFieldset>
+                <Button
+                  disabled={!form.isValid}
+                  type="submit"
+                  className="govuk-!-margin-top-6"
+                >
+                  {initialDataBlock ? 'Update data block' : 'Save data block'}
+                </Button>
               </FormGroup>
 
               {blockState.error && (
