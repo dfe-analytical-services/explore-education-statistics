@@ -1,0 +1,35 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infrastructure/*
+    exclude:
+    - README.md
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+# This would validate the ARM template, however csm paramerts need a uri 
+# - task: AzureResourceManagerTemplateDeployment@3
+#   displayName: 'Validate ARM template'
+#   inputs:
+#     deploymentScope: 'Resource Group'
+#     ConnectedServiceName: 's101-datahub-development-spn-ees'
+#     subscriptionName: '48ea0797-73c6-4202-bf90-b01c817058e9'
+#     action: 'Create Or Update Resource Group'
+#     resourceGroupName: 's101d01-rg-ees'
+#     location: 'West Europe'
+#     templateLocation: 'URL of the file'
+#     csmFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/templates/template.json'
+#     csmParametersFileLink: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/dev.parameters.json'
+#    deploymentMode: 'Validation'
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'arm-template'
+    targetPath: 'infrastructure'

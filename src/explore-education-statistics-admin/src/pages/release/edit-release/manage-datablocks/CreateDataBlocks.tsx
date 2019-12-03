@@ -1,24 +1,23 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import TableToolWizard, {
+  TableToolState,
+} from '@common/modules/table-tool/components/TableToolWizard';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { createRef } from 'react';
-import TableToolWizard, {
-  FinalStepProps,
-  TableToolState,
-} from '@common/modules/table-tool/components/TableToolWizard';
-import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import React, { createRef, useState, useEffect } from 'react';
+import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 
-interface Props {
+interface CreateDataBlockProps {
   releaseId: string;
   dataBlock?: DataBlock;
   dataBlockResponse?: DataBlockResponse;
@@ -33,76 +32,45 @@ const CreateDataBlocks = ({
   releaseId,
   dataBlock,
   onDataBlockSave,
+  dataBlockResponse,
   onTableToolLoaded,
-}: Props) => {
+}: CreateDataBlockProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const initialTableHeaders = React.useMemo(() => {
-    const configuredTableHeaders =
-      (dataBlock &&
-        dataBlock.tables &&
-        dataBlock.tables.length > 0 && {
-          ...dataBlock.tables[0].tableHeaders,
-        }) ||
-      undefined;
+  const [query, setQuery] = useState<TableDataQuery | undefined>(
+    (dataBlock && dataBlock.dataBlockRequest) || undefined,
+  );
+  const [table, setTable] = useState<FullTable | undefined>(
+    dataBlockResponse && mapDataBlockResponseToFullTable(dataBlockResponse),
+  );
 
-    return (
-      (configuredTableHeaders &&
-        configuredTableHeaders.rowGroups !== undefined &&
-        configuredTableHeaders.columnGroups !== undefined &&
-        configuredTableHeaders.columns !== undefined &&
-        configuredTableHeaders.rows !== undefined &&
-        configuredTableHeaders) ||
-      undefined
-    );
-  }, [dataBlock]);
-
-  const [tableHeaders, setTableHeaders] = React.useState<
+  const [tableHeaders, setTableHeaders] = useState<
     TableHeadersFormValues | undefined
-  >(initialTableHeaders);
+  >();
 
-  React.useEffect(() => {
-    setTableHeaders(initialTableHeaders);
-  }, [initialTableHeaders]);
+  useEffect(() => {
+    if (dataBlock && dataBlockResponse) {
+      setQuery(dataBlock.dataBlockRequest);
+      const dataTable = mapDataBlockResponseToFullTable(dataBlockResponse);
+      setTable(dataTable);
 
-  const queryCompleted = React.useMemo(() => {
-    const tableHeadersForCB =
-      (dataBlock &&
+      const firstTableConfig = dataBlock &&
         dataBlock.tables &&
         dataBlock.tables.length > 0 && {
           ...dataBlock.tables[0].tableHeaders,
-        }) ||
-      undefined;
-
-    return (props: FinalStepProps) => {
-      if (props.createdTable) {
-        const headers =
-          props.tableHeaders ||
-          (tableHeadersForCB &&
-            reverseMapTableHeadersConfig(
-              tableHeadersForCB,
-              props.createdTable.subjectMeta,
-            )) ||
-          getDefaultTableHeaderConfig(props.createdTable.subjectMeta);
-
-        const tableHeadersConfig = {
-          columnGroups: headers.columnGroups,
-          columns: headers.columns.filter(_ => _ !== undefined),
-          rowGroups: headers.rowGroups,
-          rows: headers.rows.filter(_ => _ !== undefined),
         };
-
-        if (
-          tableHeadersConfig.columns.length !== 0 &&
-          tableHeadersConfig.rows.length !== 0
-        ) {
-          setTableHeaders(headers);
-        }
+      if (firstTableConfig) {
+        setTableHeaders(firstTableConfig);
+      } else {
+        setTableHeaders(
+          getDefaultTableHeaderConfig(
+            mapDataBlockResponseToFullTable(dataBlockResponse).subjectMeta,
+          ),
+        );
       }
-
-      if (onTableToolLoaded) onTableToolLoaded();
-    };
-  }, [dataBlock, onTableToolLoaded]);
+    }
+    if (onTableToolLoaded) onTableToolLoaded();
+  }, [dataBlock, dataBlockResponse]);
 
   return (
     <div>
@@ -110,56 +78,44 @@ const CreateDataBlocks = ({
         releaseId={releaseId}
         themeMeta={[]}
         initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
-        onTableConfigurationChange={queryCompleted}
-        finalStep={finalStepProps => (
+        onTableCreated={response => {
+          setQuery(response.query);
+          setTable(response.table);
+          setTableHeaders(response.tableHeaders);
+        }}
+        finalStep={() => (
           <WizardStep>
             {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>
-                  Configure data block
+                  Data block details
                 </WizardStepHeading>
 
-                <div className="govuk-!-margin-bottom-4">
-                  <TableHeadersForm
-                    initialValues={tableHeaders}
-                    onSubmit={tableHeaderConfig => {
-                      setTableHeaders(tableHeaderConfig);
-
-                      if (dataTableRef.current) {
-                        dataTableRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    }}
-                  />
-                  {finalStepProps.createdTable && tableHeaders && (
-                    <div className="govuk-width-container">
-                      <TimePeriodDataTable
-                        ref={dataTableRef}
-                        fullTable={finalStepProps.createdTable}
-                        tableHeadersConfig={tableHeaders}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {finalStepProps.query && tableHeaders && (
+                {query && tableHeaders && (
                   <DataBlockDetailsForm
                     initialValues={{
-                      title:
-                        finalStepProps && finalStepProps.createdTable
-                          ? generateTableTitle(
-                              finalStepProps.createdTable.subjectMeta,
-                            )
-                          : undefined,
+                      title: table
+                        ? generateTableTitle(table.subjectMeta)
+                        : undefined,
                     }}
-                    query={finalStepProps.query}
-                    tableHeaders={tableHeaders}
+                    query={query}
+                    tableHeaders={tableHeaders || tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
                     onDataBlockSave={db => onDataBlockSave(db)}
-                  />
+                  >
+                    {table && tableHeaders && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <div className="govuk-width-container">
+                          <TimePeriodDataTable
+                            ref={dataTableRef}
+                            fullTable={table}
+                            tableHeadersConfig={tableHeaders}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </DataBlockDetailsForm>
                 )}
               </>
             )}

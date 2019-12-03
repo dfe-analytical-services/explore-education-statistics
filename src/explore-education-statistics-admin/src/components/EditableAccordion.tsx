@@ -35,26 +35,32 @@ const EditableAccordion = ({
   const [isReordering, setIsReordering] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
 
+  const getChildrenFromNodes = React.useCallback(() => {
+    return React.Children.map(children, (child, thisIndex) => {
+      if (child) {
+        const section = child as ReactElement<EditableAccordionSectionProps>;
+
+        const key = section.props.id || `unknown_section_id_${thisIndex}`;
+
+        return {
+          id: key,
+          key,
+          index: thisIndex,
+          section,
+        };
+      }
+
+      return undefined;
+    }).filter(item => !!item) as ChildSection[];
+  }, [children]);
+
   const [currentChildren, setCurrentChildren] = React.useState<ChildSection[]>(
-    () => {
-      return React.Children.map(children, (child, thisIndex) => {
-        if (child) {
-          const section = child as ReactElement<EditableAccordionSectionProps>;
-
-          const key = section.props.id || `unknown_section_id_${thisIndex}`;
-
-          return {
-            id: key,
-            key,
-            index: thisIndex,
-            section,
-          };
-        }
-
-        return undefined;
-      }).filter(item => !!item) as ChildSection[];
-    },
+    getChildrenFromNodes,
   );
+
+  React.useEffect(() => setCurrentChildren(getChildrenFromNodes()), [
+    getChildrenFromNodes,
+  ]);
 
   const goToHash = React.useCallback(() => {
     if (ref.current && window.location.hash) {
@@ -107,19 +113,21 @@ const EditableAccordion = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    const { source, destination, type } = result;
 
-    if (source && destination) {
-      const newChildren = [...currentChildren];
-      const [removed] = newChildren.splice(source.index, 1);
-      newChildren.splice(destination.index, 0, removed);
+    if (type === 'accordion') {
+      if (source && destination) {
+        const newChildren = [...currentChildren];
+        const [removed] = newChildren.splice(source.index, 1);
+        newChildren.splice(destination.index, 0, removed);
 
-      const reordered = newChildren.map((child, index) => ({
-        ...child,
-        index,
-      }));
+        const reordered = newChildren.map((child, index) => ({
+          ...child,
+          index,
+        }));
 
-      setCurrentChildren(reordered);
+        setCurrentChildren(reordered);
+      }
     }
   };
 
