@@ -261,6 +261,9 @@
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -430,6 +433,9 @@
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -595,6 +601,9 @@
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -785,6 +794,9 @@
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1222,6 +1234,9 @@
           "phpVersion": "off",
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1381,6 +1396,9 @@
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1521,6 +1539,9 @@
           "phpVersion": "off",
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
               "*"
