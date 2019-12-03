@@ -6,6 +6,7 @@ import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import { Dictionary } from '@common/types/util';
+import styles from './ReleaseContentAccordion.module.scss';
 
 interface ReleaseContentAccordionProps {
   release: AbstractRelease<EditableContentBlock>;
@@ -13,6 +14,8 @@ interface ReleaseContentAccordionProps {
   accordionId: string;
   sectionName: string;
 }
+
+type ContentBlock = AbstractRelease<EditableContentBlock>['content'];
 
 const ReleaseContentAccordion = ({
   release,
@@ -35,36 +38,49 @@ const ReleaseContentAccordion = ({
     updateContent(release.id);
   }, [release.id]);
 
+  const onAddSection = async () => {
+    const newContent : AbstractRelease<EditableContentBlock>['content'] = [
+      ...content,
+      {
+        caption: "",
+        heading: "New Section",
+        content: [],
+        order: content.length
+      }
+    ];
+
+    setContent(newContent);
+  };
+
   return (
     <>
-      {content && (
-        <Accordion
-          id={accordionId}
-          canReorder
-          sectionName={sectionName}
-          onSaveOrder={onReorder}
-        >
-          {content.map(
-            ({ id, heading, caption, order, content: contentdata }, index) => (
-              <AccordionSection
-                id={id}
-                index={index}
-                heading={heading || ''}
-                caption={caption}
-                key={order}
-              >
-                <ContentBlock
-                  canAddBlocks
-                  sectionId={id}
-                  content={contentdata}
-                  id={`content_${order}`}
-                  publication={release.publication}
-                />
-              </AccordionSection>
-            ),
-          )}
-        </Accordion>
-      )}
+      <Accordion
+        id={accordionId}
+        canReorder
+        sectionName={sectionName}
+        onSaveOrder={onReorder}
+        onAddSection={onAddSection}
+      >
+        {content.map(
+          ({ id, heading, caption, order, content: contentdata }, index) => (
+            <AccordionSection
+              id={id}
+              index={index}
+              heading={heading || ''}
+              caption={caption}
+              key={order}
+            >
+              <ContentBlock
+                canAddBlocks
+                sectionId={id}
+                content={contentdata}
+                id={`content_${order}`}
+                publication={release.publication}
+              />
+            </AccordionSection>
+          ),
+        )}
+      </Accordion>
     </>
   );
 };
