@@ -4,7 +4,15 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infrastructure/*
+    exclude:
+    - README.md
 
 pool:
   vmImage: 'ubuntu-latest'
