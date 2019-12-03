@@ -12,3 +12,4 @@ steps:
   inputs:
     ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
     ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
+    SkipControlsFromFile: '$(System.DefaultWorkingDirectory)/infrastructure/template-checker/skip-controls.csv'
