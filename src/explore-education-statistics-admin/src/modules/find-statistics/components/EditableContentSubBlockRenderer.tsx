@@ -29,6 +29,7 @@ function EditableContentSubBlockRenderer({
       return (
         <>
           <EditableMarkdownRenderer
+            editable={editable}
             contentId={block.id}
             source={block.body}
             canDelete={canDelete}
@@ -77,6 +78,7 @@ function EditableContentSubBlockRenderer({
     case 'HtmlBlock':
       return (
         <EditableHtmlRenderer
+          editable={editable}
           contentId={block.id}
           source={block.body}
           canDelete={canDelete}

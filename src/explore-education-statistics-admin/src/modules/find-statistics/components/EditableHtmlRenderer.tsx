@@ -9,6 +9,7 @@ export type Props = RendererProps & {
   source: string;
   canDelete: boolean;
   onDelete: () => void;
+  editable?: boolean;
 };
 
 const EditableHtmlRenderer = ({
@@ -16,6 +17,7 @@ const EditableHtmlRenderer = ({
   source,
   canDelete,
   onDelete,
+  editable = true,
 }: Props) => {
   const [html, setHtml] = React.useState(source);
 
@@ -25,7 +27,7 @@ const EditableHtmlRenderer = ({
     <>
       <WysiwygEditor
         content={html || ''}
-        editable
+        editable={editable}
         canDelete={canDelete}
         onContentChange={async ss => {
           if (

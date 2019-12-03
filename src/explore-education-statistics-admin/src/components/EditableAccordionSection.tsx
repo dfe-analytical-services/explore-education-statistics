@@ -8,7 +8,7 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
-  headingButtons?: ReactNode | ReactNode[];
+  headingButtons?: ReactNode[];
   canToggle?: boolean;
 }
 
