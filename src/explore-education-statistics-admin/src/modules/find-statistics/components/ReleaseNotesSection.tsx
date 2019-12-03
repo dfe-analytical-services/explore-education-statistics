@@ -31,7 +31,9 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
 
   const { isEditing } = useContext(EditingContext);
 
-  const addReleaseNote = (releaseNote: Omit<ReleaseNote, 'id'>) => {
+  const addReleaseNote = (
+    releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>,
+  ) => {
     return new Promise(resolve => {
       releaseNoteService.releaseNote
         .create(release.id, releaseNote)
@@ -52,17 +54,21 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     return !formOpen ? (
       <Button onClick={() => setFormOpen(true)}>Add note</Button>
     ) : (
-      <Formik<Omit<ReleaseNote, 'id'>>
-        initialValues={{ reason: '', releaseId: '', on: '' }}
-        validationSchema={Yup.object({
-          description: Yup.string().required('Release note must be provided'),
+      <Formik<Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>>
+        initialValues={{ reason: '' }}
+        validationSchema={Yup.object<
+          Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>
+        >({
+          reason: Yup.string().required('Release note must be provided'),
         })}
         onSubmit={releaseNote =>
           addReleaseNote(releaseNote).then(() => {
             setFormOpen(false);
           })
         }
-        render={(form: FormikProps<Omit<ReleaseNote, 'id'>>) => {
+        render={(
+          form: FormikProps<Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>>,
+        ) => {
           return (
             <Form {...form} id="create-new-release-note-form">
               <FormFieldset

@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
     public class CreateOrUpdateReleaseNoteRequest
     {
         public DateTime? On { get; set; }
-        public string ReleaseNote { get; set; }
+        public string Reason { get; set; }
     }
 }

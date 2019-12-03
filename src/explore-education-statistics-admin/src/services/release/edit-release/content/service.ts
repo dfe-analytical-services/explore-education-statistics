@@ -113,7 +113,7 @@ const service: ReleaseContentService = {
 const releaseNoteService = {
   create: (
     releaseId: string,
-    releaseNote: Omit<ReleaseNote, 'id'>,
+    releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>,
   ): Promise<ReleaseNote[]> => {
     return client.post(
       `/release/${releaseId}/content/release-note`,
