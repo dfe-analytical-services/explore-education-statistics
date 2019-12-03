@@ -43,25 +43,23 @@ const ReleaseContentAccordion = ({
 
   return (
     <>
-      {content && content.length > 0 && (
-        <Accordion
-          id={accordionId}
-          canReorder
-          sectionName={sectionName}
-          onSaveOrder={onReorder}
-          onAddSection={onAddSection}
-        >
-          {content.map((contentItem, index) => (
-            <ReleaseContentAccordionSection
-              id={contentItem.id}
-              key={contentItem.order}
-              contentItem={contentItem}
-              index={index}
-              release={release}
-            />
-          ))}
-        </Accordion>
-      )}
+      <Accordion
+        id={accordionId}
+        canReorder
+        sectionName={sectionName}
+        onSaveOrder={onReorder}
+        onAddSection={onAddSection}
+      >
+        {content.map((contentItem, index) => (
+          <ReleaseContentAccordionSection
+            id={contentItem.id}
+            key={contentItem.order}
+            contentItem={contentItem}
+            index={index}
+            release={release}
+          />
+        ))}
+      </Accordion>
     </>
   );
 };
