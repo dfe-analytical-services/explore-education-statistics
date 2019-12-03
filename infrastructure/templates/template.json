@@ -292,14 +292,14 @@
         "name": "[variables('dataAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "hostingEnvironment": "",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -460,14 +460,14 @@
         "name": "[variables('contentAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
         "hostingEnvironment": "",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -624,14 +624,14 @@
         "name": "[variables('adminAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
         "hostingEnvironment": "",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "clientAffinityEnabled": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -849,14 +849,14 @@
         "name": "[variables('publicAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
         "hostingEnvironment": "",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1281,12 +1281,12 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1438,13 +1438,13 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1578,12 +1578,12 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
-        "httpsOnly": "True",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
-          "webSocketsEnabled": "False",
+          "webSocketsEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
