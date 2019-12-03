@@ -33,8 +33,3 @@ steps:
     csmFileLink: 'armTemplates/ees-service/template.json'
     csmParametersFileLink: 'armTemplates/ees-service/dev.parameters.json'
     deploymentMode: 'Validation'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
