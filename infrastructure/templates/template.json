@@ -300,6 +300,7 @@
           "phpVersion": "off",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -468,6 +469,7 @@
           "phpVersion": "off",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -632,6 +634,7 @@
           "phpVersion": "off",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -857,6 +860,7 @@
           "phpVersion": "off",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1287,6 +1291,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1445,6 +1450,7 @@
           "phpVersion": "off",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1584,6 +1590,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
