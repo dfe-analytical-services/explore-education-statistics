@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     1, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Characteristic__Total, 66
+                            FilterItemName.Characteristic__Total, 1
                         },
                         {
-                            FilterItemName.School_Type__Total, 70
+                            FilterItemName.School_Type__Total, 58
                         }
                     }
                 },
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.School_Type__Total, 456
+                            FilterItemName.School_Type__Total, 461
                         }
                     }
                 },
@@ -81,10 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_All_primary, 574
+                            FilterItemName.Year_of_admission__Primary_All_primary, 575
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_All_secondary, 572
+                            FilterItemName.Year_of_admission__Secondary_All_secondary, 577
                         }
                     }
                 }
