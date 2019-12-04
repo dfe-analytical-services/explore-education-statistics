@@ -268,8 +268,3 @@ jobs:
         inputs:
           artifactName: 'auth-token-script'
           targetPath: 'useful-scripts/auth-tokens'
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish ARM templates'
-        inputs:
-          artifactName: 'arm-templates'
-          targetPath: 'armTemplates'

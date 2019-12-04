@@ -9,7 +9,7 @@ export type ToggleHandler = (open: boolean) => void;
 
 export interface AccordionSectionProps {
   caption?: string;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   contentId?: string;
   goToTop?: boolean;
@@ -89,7 +89,6 @@ const AccordionSection = ({
           </div>
         )}
       </div>
-
       <div
         className={classes.sectionContent}
         aria-labelledby={headingId}

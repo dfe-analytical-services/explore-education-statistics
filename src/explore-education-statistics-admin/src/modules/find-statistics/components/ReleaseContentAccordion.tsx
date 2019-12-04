@@ -15,6 +15,8 @@ interface ReleaseContentAccordionProps {
   sectionName: string;
 }
 
+type ContentBlock = AbstractRelease<EditableContentBlock>['content'];
+
 const ReleaseContentAccordion = ({
   release,
   accordionId,
@@ -30,26 +32,34 @@ const ReleaseContentAccordion = ({
     releaseContentService.getContentSections(release.id).then(setContent);
   }, [release.id]);
 
+  const onAddSection = async () => {
+    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
+      ...content,
+      await releaseContentService.addContentSection(release.id, content.length),
+    ];
+
+    setContent(newContent);
+  };
+
   return (
     <>
-      {content && content.length > 0 && (
-        <Accordion
-          id={accordionId}
-          canReorder
-          sectionName={sectionName}
-          onSaveOrder={onReorder}
-        >
-          {content.map((contentItem, index) => (
-            <ReleaseContentAccordionSection
-              id={contentItem.id}
-              key={contentItem.order}
-              contentItem={contentItem}
-              index={index}
-              release={release}
-            />
-          ))}
-        </Accordion>
-      )}
+      <Accordion
+        id={accordionId}
+        canReorder
+        sectionName={sectionName}
+        onSaveOrder={onReorder}
+        onAddSection={onAddSection}
+      >
+        {content.map((contentItem, index) => (
+          <ReleaseContentAccordionSection
+            id={contentItem.id}
+            key={contentItem.order}
+            contentItem={contentItem}
+            index={index}
+            release={release}
+          />
+        ))}
+      </Accordion>
     </>
   );
 };

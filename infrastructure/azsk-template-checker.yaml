@@ -1,0 +1,14 @@
+trigger:
+  paths:
+    include:
+    - infrastructure/*
+
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: AzSKARMTemplateChecker@4
+  inputs:
+    ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
+    ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
