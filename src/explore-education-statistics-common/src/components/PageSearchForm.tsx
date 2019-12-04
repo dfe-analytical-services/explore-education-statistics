@@ -10,8 +10,9 @@ import findAllParents from '@common/lib/dom/findAllParents';
 import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode, useEffect } from 'react';
 import Highlighter from 'react-highlight-words';
+import AriaLiveMessage from '@common/components/AriaLiveMessage';
 import styles from './PageSearchForm.module.scss';
 
 interface SearchResult {
@@ -130,23 +131,25 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
             // still change focus to the selected element even if we
             // proceed to remove the tabindex shortly afterwards
             // TODO: Verify this works
-            const previousTabIndex = element.getAttribute('tabindex');
+            const previousTabIndex = element.getAttribute('tabIndex');
 
             if (!previousTabIndex) {
-              element.setAttribute('tabindex', '-1');
+              element.setAttribute('tabIndex', '-1');
             }
 
-            element.focus();
             element.scrollIntoView({
               behavior: 'smooth',
               block: 'start',
             });
+            element.focus();
 
-            if (previousTabIndex) {
-              element.setAttribute('tabindex', previousTabIndex);
-            } else {
-              element.removeAttribute('tabindex');
-            }
+            setTimeout(() => {
+              if (previousTabIndex) {
+                element.setAttribute('tabIndex', previousTabIndex);
+              } else {
+                element.removeAttribute('tabIndex');
+              }
+            }, 5000);
           });
         },
       };
@@ -166,6 +169,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
     const { className, id, inputLabel } = this.props;
     const { searchResults, searchComplete } = this.state;
 
+    // @ts-ignore
     return (
       <form
         className={classNames(
@@ -224,7 +228,8 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
           }}
           onSelect={selectedItem => {
             if (searchResults[selectedItem]) {
-              searchResults[selectedItem].scrollIntoView();
+              const selectedResult = searchResults[selectedItem];
+              selectedResult.scrollIntoView();
             }
           }}
         />
