@@ -37,12 +37,12 @@ export interface EditFormValues {
 const nullLogEvent = () => {};
 
 const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
+  const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
+  const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
+  const [selectedReleaseNote, setSelectedReleaseNote] = useState<ReleaseNote>();
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
     release.updates,
   );
-  const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
-  const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-
   const { isEditing } = useContext(EditingContext);
 
   const addReleaseNote = (releaseNote: AddFormValues) => {
@@ -56,10 +56,10 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     });
   };
 
-  const editReleaseNote = (releaseNote: EditFormValues) => {
+  const editReleaseNote = (id: string, releaseNote: EditFormValues) => {
     return new Promise(resolve => {
       releaseNoteService.releaseNote
-        .edit(release.id, release.id, {
+        .edit(id, release.id, {
           on: dayMonthYearInputsToDate(releaseNote.on),
           reason: releaseNote.reason,
         })
@@ -76,9 +76,20 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
       .then(setReleaseNotes);
   };
 
+  const openAddForm = () => {
+    setAddFormOpen(true);
+    setEditFormOpen(false);
+  };
+
+  const openEditForm = (selected: ReleaseNote) => {
+    setAddFormOpen(false);
+    setEditFormOpen(true);
+    setSelectedReleaseNote(selected);
+  };
+
   const renderAddForm = () => {
     return !addFormOpen ? (
-      <Button onClick={() => setAddFormOpen(true)}>Add note</Button>
+      <Button onClick={openAddForm}>Add note</Button>
     ) : (
       <Formik<AddFormValues>
         initialValues={{ reason: '' }}
@@ -100,7 +111,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
               >
                 <FormFieldTextArea
                   id="reason"
-                  label="Release Note"
+                  label="Release note"
                   name="reason"
                   rows={3}
                 />
@@ -128,8 +139,13 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     );
   };
 
-  const renderEditForm = (r: ReleaseNote) => {
+  const renderEditForm = () => {
     const formId = 'edit-release-note-form';
+
+    // TODO
+    if (!selectedReleaseNote) {
+      return null;
+    }
 
     const generateInitialValues = () => {
       const initialValue: EditFormValues = {
@@ -142,8 +158,8 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
       };
 
       return merge(initialValue, {
-        on: dateToDayMonthYear(new Date(r.on)),
-        reason: r.reason,
+        on: dateToDayMonthYear(new Date(selectedReleaseNote.on)),
+        reason: selectedReleaseNote.reason,
       });
     };
 
@@ -155,7 +171,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
           reason: Yup.string().required('Release note must be provided'),
         })}
         onSubmit={releaseNote =>
-          editReleaseNote(releaseNote).then(() => {
+          editReleaseNote(selectedReleaseNote.id, releaseNote).then(() => {
             setEditFormOpen(false);
           })
         }
@@ -178,7 +194,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                 />
                 <FormFieldTextArea
                   id="reason"
-                  label="Edit release Note"
+                  label="Edit release note"
                   name="reason"
                   rows={3}
                 />
@@ -225,8 +241,11 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
           summary={`See all ${release.updates.length} updates`}
         >
           {releaseNotes.map((elem, index) =>
-            isEditing && editFormOpen ? (
-              renderEditForm(elem)
+            isEditing &&
+            editFormOpen &&
+            selectedReleaseNote &&
+            selectedReleaseNote.id === elem.id ? (
+              renderEditForm()
             ) : (
               <div data-testid="last-updated-element" key={elem.id}>
                 <FormattedDate className="govuk-body govuk-!-font-weight-bold">
@@ -239,7 +258,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                     <Link
                       to="#"
                       className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
-                      onClick={() => setEditFormOpen(true)}
+                      onClick={() => openEditForm(elem)}
                     >
                       Edit
                     </Link>
