@@ -213,6 +213,15 @@
     },
     "openIdConnectClientSecret": {
       "type": "string"
+    },
+    "minTlsVersion": {
+      "type": "string",
+      "defaultValue": "1.2",
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
     }
   },
   "variables": {
@@ -287,8 +296,11 @@
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -453,8 +465,11 @@
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -615,8 +630,11 @@
         "clientAffinityEnabled": true,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -838,8 +856,11 @@
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -947,6 +968,10 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-07-01",
       "location": "westeurope",
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -959,10 +984,6 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
       },
       "dependsOn": [
       ],
@@ -1142,6 +1163,9 @@
       "sku": {
         "name": "Standard_LRS"
       },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1165,6 +1189,9 @@
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1267,7 +1294,10 @@
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1422,8 +1452,11 @@
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1560,7 +1593,10 @@
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
           "cors": {
             "allowedOrigins": [
               "*"

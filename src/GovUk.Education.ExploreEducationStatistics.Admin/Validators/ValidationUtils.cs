@@ -78,6 +78,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         {
             return new ValidationResult(message.ToString().ScreamingSnakeCase());
         }
+        
+        public static Either<ValidationResult, T> ValidationResult<T>(ValidationErrorMessages message)
+        {
+            return ValidationResult(message);
+        }
     }
 
     public enum ValidationErrorMessages
@@ -105,5 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentSectionNotFound,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
+        ContentBlockAlreadyAttachedToContentSection,
+        IncorrectContentBlockTypeForAttach,
+        ContentBlockAlreadyDetached,
+        ContentBlockNotAttachedToThisContentSection
     }
 }

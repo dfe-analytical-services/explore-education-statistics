@@ -273,6 +273,12 @@ class PublicationReleasePage extends Component<Props> {
                     <Link to={`/methodology/${data.publication.slug}`}>
                       {`${data.publication.title}: methodology`}
                     </Link>
+                    {data.relatedInformation &&
+                      data.relatedInformation.map(link => (
+                        <a key={link.id} href={link.url}>
+                          {link.description}
+                        </a>
+                      ))}
                   </li>
                 </ul>
               </nav>

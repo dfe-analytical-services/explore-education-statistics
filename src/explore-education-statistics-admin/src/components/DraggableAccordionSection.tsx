@@ -31,12 +31,13 @@ const DraggableAccordionSection = ({
               index,
               open: false,
               canToggle: false,
-              headingButtons: (
+              headingButtons: [
                 <span
+                  key="drag_handle"
                   className={styles.dragHandle}
                   {...draggableProvided.dragHandleProps}
-                />
-              ),
+                />,
+              ],
             })}
           </div>
         )}

@@ -19,13 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IContentService _contentService;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ManageContentPageService(ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageService)
+        public ManageContentPageService(
+            ContentDbContext context, IMapper mapper,
+            IFileStorageService fileStorageService, IContentService contentService)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
+            _contentService = contentService;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
                 context,
                 context.Releases,
@@ -35,26 +38,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                var availableDataBlocks =
+                    await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
 
-                // TODO EES-147 Every release needs an update
-                if (releaseViewModel.Updates.Count == 0)
+                return availableDataBlocks.Map(blocks =>
                 {
-                    releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                    releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                    
+                    // TODO EES-147 Every release needs an update
+                    if (releaseViewModel.Updates.Count == 0)
                     {
-                        Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
-                        On = new DateTime(2019, 12, 01),           
-                        Reason = "First published"
-                    });
-                }
-
-                return new ManageContentPageViewModel
-                {
-                    Release = releaseViewModel
-                };
+                        releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                        {
+                            Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
+                            On = new DateTime(2019, 12, 01),           
+                            Reason = "First published"
+                        });
+                    }
+                    
+                    return new ManageContentPageViewModel
+                    {
+                        Release = releaseViewModel,
+                        AvailableDataBlocks = blocks
+                    };
+                });
+                
             }, HydrateReleaseForReleaseViewModel);
         }
         

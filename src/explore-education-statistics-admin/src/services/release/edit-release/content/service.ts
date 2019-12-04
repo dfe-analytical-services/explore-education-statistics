@@ -16,6 +16,10 @@ import {
 export interface ReleaseContentService {
   getContent: (releaseId: string) => Promise<ManageContentPageViewModel>;
   getContentSections: (releaseId: string) => Promise<ContentSectionViewModel[]>;
+  addContentSection: (
+    releaseId: string,
+    order: number,
+  ) => Promise<ContentSectionViewModel>;
   updateContentSectionsOrder: (
     releaseId: string,
     order: Dictionary<number>,
@@ -39,6 +43,12 @@ export interface ReleaseContentService {
     block: ContentBlockPutModel,
   ) => Promise<ContentBlockViewModel>;
 
+  updateContentSectionBlocksOrder: (
+    releaseId: string,
+    sectionId: string,
+    order: Dictionary<number>,
+  ) => Promise<ContentBlockViewModel[]>;
+
   deleteContentSectionBlock: (
     releaseId: string,
     sectionId: string,
@@ -55,6 +65,15 @@ const service: ReleaseContentService = {
   getContentSections(releaseId: string): Promise<ContentSectionViewModel[]> {
     return client.get<ContentSectionViewModel[]>(
       `/release/${releaseId}/content/sections`,
+    );
+  },
+  addContentSection(
+    releaseId: string,
+    order: number,
+  ): Promise<ContentSectionViewModel> {
+    return client.post<ContentSectionViewModel>(
+      `/release/${releaseId}/content/sections/add`,
+      { order },
     );
   },
   updateContentSectionsOrder(
@@ -96,6 +115,17 @@ const service: ReleaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  updateContentSectionBlocksOrder(
+    releaseId: string,
+    sectionId: string,
+    order: Dictionary<number>,
+  ): Promise<ContentBlockViewModel[]> {
+    return client.put<ContentBlockViewModel[]>(
+      `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
+      order,
     );
   },
 
