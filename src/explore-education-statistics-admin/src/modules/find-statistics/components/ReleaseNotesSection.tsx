@@ -240,41 +240,43 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
           }
           summary={`See all ${release.updates.length} updates`}
         >
-          {releaseNotes.map((elem, index) =>
-            isEditing &&
-            editFormOpen &&
-            selectedReleaseNote &&
-            selectedReleaseNote.id === elem.id ? (
-              renderEditForm()
-            ) : (
-              <div data-testid="last-updated-element" key={elem.id}>
-                <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                  {elem.on}
-                </FormattedDate>
-                <p>{elem.reason}</p>
+          {releaseNotes.map((elem, index) => (
+            <>
+              {isEditing &&
+              editFormOpen &&
+              selectedReleaseNote &&
+              selectedReleaseNote.id === elem.id ? (
+                renderEditForm()
+              ) : (
+                <div data-testid="last-updated-element" key={elem.id}>
+                  <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                    {elem.on}
+                  </FormattedDate>
+                  <p>{elem.reason}</p>
 
-                {isEditing && (
-                  <>
-                    <Link
-                      to="#"
-                      className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
-                      onClick={() => openEditForm(elem)}
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      to="#"
-                      className="govuk-button govuk-button--warning"
-                      onClick={() => removeReleaseNote(elem.id)}
-                    >
-                      Remove
-                    </Link>
-                  </>
-                )}
-                {index < release.updates.length - 1 && <hr />}
-              </div>
-            ),
-          )}
+                  {isEditing && (
+                    <>
+                      <Link
+                        to="#"
+                        className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+                        onClick={() => openEditForm(elem)}
+                      >
+                        Edit
+                      </Link>
+                      <Link
+                        to="#"
+                        className="govuk-button govuk-button--warning"
+                        onClick={() => removeReleaseNote(elem.id)}
+                      >
+                        Remove
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+              {index < release.updates.length - 1 && <hr />}
+            </>
+          ))}
         </Details>
       </dd>
       {isEditing && renderAddForm()}
