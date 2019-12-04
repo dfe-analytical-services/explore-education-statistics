@@ -22,8 +22,8 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">
-        Pupil absence statistics and data for schools in England
         <span className="govuk-caption-l">Assign methodology</span>
+        Pupil absence statistics and data for schools in England
       </h1>
       <form method="get">
         <FormGroup>

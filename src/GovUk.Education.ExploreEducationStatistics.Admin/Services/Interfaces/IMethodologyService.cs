@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using TopicId = System.Guid;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -11,6 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<List<MethodologyStatusViewModel>> ListStatusAsync();
         
-        Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId);
+        Task<MethodologyViewModel> GetAsync(Guid id);
+        
+        Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId);
+        
+        Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(
+            CreateMethodologyViewModel methodology);
     }
 }
