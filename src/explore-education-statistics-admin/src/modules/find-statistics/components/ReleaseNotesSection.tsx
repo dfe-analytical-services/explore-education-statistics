@@ -19,6 +19,7 @@ import Yup from '@common/lib/validation/yup';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
@@ -36,10 +37,22 @@ export interface EditFormValues {
 
 const nullLogEvent = () => {};
 
+const emptyReleaseNote: ReleaseNote = {
+  id: '',
+  releaseId: '',
+  on: new Date(),
+  reason: '',
+};
+
 const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [selectedReleaseNote, setSelectedReleaseNote] = useState<ReleaseNote>();
+  const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
+    emptyReleaseNote,
+  );
+  const [selectedReleaseNote, setSelectedReleaseNote] = useState<ReleaseNote>(
+    emptyReleaseNote,
+  );
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
     release.updates,
   );
@@ -68,12 +81,6 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
           resolve();
         });
     });
-  };
-
-  const removeReleaseNote = (releaseNoteId: string) => {
-    releaseNoteService.releaseNote
-      .delete(releaseNoteId, release.id)
-      .then(setReleaseNotes);
   };
 
   const openAddForm = () => {
@@ -141,11 +148,6 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
 
   const renderEditForm = () => {
     const formId = 'edit-release-note-form';
-
-    // TODO
-    if (!selectedReleaseNote) {
-      return null;
-    }
 
     const generateInitialValues = () => {
       const initialValue: EditFormValues = {
@@ -223,64 +225,80 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   };
 
   return (
-    <dl className="dfe-meta-content">
-      <dt className="govuk-caption-m">Last updated:</dt>
-      <dd data-testid="last-updated">
-        <strong>
-          <FormattedDate>{release.updates[0].on}</FormattedDate>
-        </strong>
-        <Details
-          onToggle={(open: boolean) =>
-            open &&
-            logEvent(
-              'Last Updates',
-              'Release page last updates dropdown opened',
-              window.location.pathname,
-            )
-          }
-          summary={`See all ${release.updates.length} updates`}
-        >
-          {releaseNotes.map((elem, index) => (
-            <>
-              {isEditing &&
-              editFormOpen &&
-              selectedReleaseNote &&
-              selectedReleaseNote.id === elem.id ? (
-                renderEditForm()
-              ) : (
-                <div data-testid="last-updated-element" key={elem.id}>
-                  <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                    {elem.on}
-                  </FormattedDate>
-                  <p>{elem.reason}</p>
+    <>
+      <dl className="dfe-meta-content">
+        <dt className="govuk-caption-m">Last updated:</dt>
+        <dd data-testid="last-updated">
+          <strong>
+            <FormattedDate>{releaseNotes[0].on}</FormattedDate>
+          </strong>
+          <Details
+            onToggle={(open: boolean) =>
+              open &&
+              logEvent(
+                'Last Updates',
+                'Release page last updates dropdown opened',
+                window.location.pathname,
+              )
+            }
+            summary={`See all ${releaseNotes.length} updates`}
+          >
+            {releaseNotes.map((elem, index) => (
+              <>
+                {isEditing &&
+                editFormOpen &&
+                selectedReleaseNote.id === elem.id ? (
+                  renderEditForm()
+                ) : (
+                  <div data-testid="last-updated-element" key={elem.id}>
+                    <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                      {elem.on}
+                    </FormattedDate>
+                    <p>{elem.reason}</p>
 
-                  {isEditing && (
-                    <>
-                      <Link
-                        to="#"
-                        className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
-                        onClick={() => openEditForm(elem)}
-                      >
-                        Edit
-                      </Link>
-                      <Link
-                        to="#"
-                        className="govuk-button govuk-button--warning"
-                        onClick={() => removeReleaseNote(elem.id)}
-                      >
-                        Remove
-                      </Link>
-                    </>
-                  )}
-                </div>
-              )}
-              {index < release.updates.length - 1 && <hr />}
-            </>
-          ))}
-        </Details>
-      </dd>
-      {isEditing && renderAddForm()}
-    </dl>
+                    {isEditing && (
+                      <>
+                        <Link
+                          to="#"
+                          className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+                          onClick={() => openEditForm(elem)}
+                        >
+                          Edit
+                        </Link>
+                        <Link
+                          to="#"
+                          className="govuk-button govuk-button--warning"
+                          onClick={() => setDeletedReleaseNote(elem)}
+                        >
+                          Remove
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                )}
+                {index < releaseNotes.length - 1 && <hr />}
+              </>
+            ))}
+          </Details>
+        </dd>
+        {isEditing && renderAddForm()}
+      </dl>
+
+      <ModalConfirm
+        mounted={deletedReleaseNote.id.length > 0}
+        title="Confirm deletion of release note"
+        onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
+        onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}
+        onConfirm={async () => {
+          await releaseNoteService.releaseNote
+            .delete(deletedReleaseNote.id, release.id)
+            .then(setReleaseNotes)
+            .finally(() => setDeletedReleaseNote(emptyReleaseNote));
+        }}
+      >
+        <p>This release note will be removed from this release</p>
+      </ModalConfirm>
+    </>
   );
 };
 
