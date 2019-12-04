@@ -1,6 +1,9 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ProtectedRoutes from '@admin/components/ProtectedRoutes';
+import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
+import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
+import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -46,6 +49,7 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
+import MethodologyEditPage from './pages/prototypes/PrototypeMethodologyEdit';
 import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
@@ -58,6 +62,9 @@ import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublic
 import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
 import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
+import MethodologyCreateNew from './pages/prototypes/PrototypeMethodologyPageCreateNew';
+import MethodologyCreateNewConfig from './pages/prototypes/PrototypeMethodologyConfig';
+import MethodologyCreateNewStatus from './pages/prototypes/PrototypeMethodologyStatus';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 
@@ -101,6 +108,21 @@ function App() {
               path={ApplicationPaths.LoggedOut}
               component={SignedOutPage}
               redirectIfNotLoggedIn={false}
+            />
+            <ProtectedRoute
+              exact
+              path="/methodology"
+              component={ListMethodologyPages}
+            />
+            <ProtectedRoute
+              exact
+              path="/methodology/create"
+              component={CreateMethodologyPage}
+            />
+            <ProtectedRoute
+              exact
+              path="/methodology/:methodologyId"
+              component={EditMethodologyPage}
             />
             <ProtectedRoute
               exact
@@ -203,6 +225,11 @@ function App() {
           />
           <Route
             exact
+            path="/prototypes/methodology-edit"
+            component={MethodologyEditPage}
+          />
+          <Route
+            exact
             path="/prototypes/publication-unresolved-comments"
             component={PublicationEditUnresolvedComments}
           />
@@ -249,6 +276,11 @@ function App() {
           />
           <Route
             exact
+            path="/prototypes/methodology-create-new"
+            component={MethodologyCreateNew}
+          />
+          <Route
+            exact
             path="/prototypes/publication-create-new-absence"
             render={() => <PublicationEditUnresolvedComments newBlankRelease />}
           />
@@ -256,6 +288,11 @@ function App() {
             exact
             path="/prototypes/publication-create-new-absence-config"
             component={PublicationCreateNewAbsenceConfig}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-methodology-config"
+            component={MethodologyCreateNewConfig}
           />
           <Route
             exact
@@ -291,6 +328,11 @@ function App() {
             exact
             path="/prototypes/publication-create-new-absence-status"
             component={PublicationCreateNewAbsenceStatus}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-methodology-status"
+            component={MethodologyCreateNewStatus}
           />
         </LoginContext.Provider>
       </AriaLiveAnnouncer>

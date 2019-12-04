@@ -227,7 +227,7 @@ const PrototypeAdminDashboardPublications = () => {
                 to="/prototypes/publication-assign-methodology"
                 className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
               >
-                Manage methodology
+                Assign methodology
               </Link>
             </div>
             {userContext.user && userContext.user.permissions.includes('bau') && (
@@ -309,7 +309,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/publication-assign-methodology"
             className="govuk-button govuk-button--secondary"
           >
-            Manage methodology
+            Assign methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -380,7 +380,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/publication-assign-methodology"
             className="govuk-button govuk-button--secondary"
           >
-            Manage methodology
+            Assign methodology
           </Link>
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
