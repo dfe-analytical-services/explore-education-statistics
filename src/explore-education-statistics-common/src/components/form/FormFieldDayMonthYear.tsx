@@ -13,6 +13,7 @@ interface DayMonthYearValues {
 interface Props<FormValues> extends DayMonthYearValues {
   error?: ReactNode | string;
   fieldsetLegend: string;
+  fieldsetLegendSize?: 'xl' | 'l' | 'm' | 's';
   formId: string;
   fieldName: keyof FormValues;
   showError?: boolean;
@@ -23,6 +24,7 @@ const FormFieldDayMonthYear = <FormValues extends {}>({
   formId,
   fieldName,
   showError = true,
+  fieldsetLegendSize = 'l',
 }: Props<FormValues>) => {
   return (
     <Field name={fieldName}>
@@ -32,6 +34,7 @@ const FormFieldDayMonthYear = <FormValues extends {}>({
           <FormFieldset
             id={`${formId}-${fieldName}`}
             legend={fieldsetLegend}
+            legendSize={fieldsetLegendSize}
             error={showError ? getError(fieldName) : ''}
           >
             <FormFieldTextInput<DayMonthYearValues>

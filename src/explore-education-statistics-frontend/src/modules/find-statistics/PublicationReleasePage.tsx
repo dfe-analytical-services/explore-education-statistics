@@ -251,7 +251,7 @@ class PublicationReleasePage extends Component<Props> {
                     summary={`See all ${data.updates.length} updates`}
                   >
                     {data.updates.map(elem => (
-                      <div data-testid="last-updated-element" key={elem.on}>
+                      <div data-testid="last-updated-element" key={elem.id}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                           {elem.on}
                         </FormattedDate>
