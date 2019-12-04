@@ -8,7 +8,7 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
-  headingButtons?: ReactNode | ReactNode[];
+  headingButtons?: ReactNode[];
   canToggle?: boolean;
 }
 
@@ -69,16 +69,17 @@ const EditableAccordionSection = ({
           <span className="govuk-accordion__section-summary">{caption}</span>
         )}
       </div>
+      {children && (
+        <div
+          className="govuk-accordion__section-content"
+          aria-labelledby={headingId}
+          id={contentId}
+        >
+          {children}
 
-      <div
-        className="govuk-accordion__section-content"
-        aria-labelledby={headingId}
-        id={contentId}
-      >
-        {children}
-
-        {goToTop && <GoToTopLink />}
-      </div>
+          {goToTop && <GoToTopLink />}
+        </div>
+      )}
     </div>
   );
 };

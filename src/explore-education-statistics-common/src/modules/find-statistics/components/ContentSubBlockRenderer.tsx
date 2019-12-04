@@ -55,6 +55,7 @@ const ContentSubBlockRenderer = ({
               <p>Use our table tool to explore this data.</p>
               <ButtonLink
                 as={`/data-tables/${publication.slug}`}
+                to={`/data-tables?publicationSlug=${publication.slug}`}
                 href={`/data-tables?publicationSlug=${publication.slug}`}
               >
                 Explore data

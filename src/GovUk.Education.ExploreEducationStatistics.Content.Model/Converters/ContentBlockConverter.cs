@@ -16,6 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
         
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
+            
             var jsonObject = JObject.Load(reader);
             var contentBlock = default(IContentBlock);
             

@@ -7,13 +7,18 @@ import { EditingContentBlockContext } from '@admin/modules/find-statistics/compo
 import ContentService from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps &
-  ReactMarkdownProps & { canDelete: boolean; onDelete: () => void };
+  ReactMarkdownProps & {
+    canDelete: boolean;
+    onDelete: () => void;
+    editable?: boolean;
+  };
 
 const EditableMarkdownRenderer = ({
   contentId,
   source,
   canDelete,
   onDelete,
+  editable = true,
 }: MarkdownRendererProps) => {
   const [markdown, setMarkdown] = React.useState(source);
 
@@ -24,7 +29,7 @@ const EditableMarkdownRenderer = ({
       <WysiwygEditor
         content={markdown || ''}
         canDelete={canDelete}
-        editable
+        editable={editable}
         useMarkdown
         onContentChange={async ss => {
           if (

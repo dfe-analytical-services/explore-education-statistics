@@ -1,0 +1,24 @@
+@import '~govuk-frontend/govuk/all';
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder */
+.toggleContentDragging {
+  @extend .govuk-button, .govuk-button--secondary;
+}
+
+.toggleContentDragging {
+  display: none;
+
+  &:active {
+    top: auto;
+  }
+}
+
+:global(.govuk-accordion__section--expanded) {
+  .toggleContentDragging {
+    display: inline;
+
+    font-size: 1rem;
+    position: absolute;
+    right: 32px;
+  }
+}

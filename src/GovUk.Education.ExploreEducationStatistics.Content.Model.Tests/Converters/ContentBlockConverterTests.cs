@@ -74,5 +74,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Convert
             
             Assert.Equal("heading", result.Heading);
         }
+        
+        [Fact]
+        public void ContentBlockConverterReturnsBlockWithNullSummaryDescription()
+        {
+            const string testString = "{\"Type\":\"DataBlock\", \"Heading\":\"heading\", \"Summary\": {description: null}}";
+            
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.Converters.Add(new ContentBlockConverter());
+
+            var serializer = JsonSerializer.Create(serializerSettings);
+
+            var jObject = JObject.Parse(testString);
+            
+            var result = jObject.ToObject<DataBlock>(serializer);
+            
+            Assert.Equal("heading", result.Heading);
+        }
     }
 }

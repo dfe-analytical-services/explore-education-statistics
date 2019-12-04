@@ -8,6 +8,7 @@ import tableBuilderService, {
 } from '@common/modules/full-table/services/tableBuilderService';
 import { LocationFilter } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import FiltersForm, {
   FilterFormSubmitHandler,
@@ -30,8 +31,6 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { Dictionary } from '@common/types/util';
 import mapValues from 'lodash/mapValues';
 import React, { ReactElement } from 'react';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
   DateRangeState,
   getDefaultSubjectMeta,
@@ -47,8 +46,11 @@ interface Publication {
 }
 
 export interface TableToolState {
-  query: TableDataQuery | undefined;
-  createdTable: FullTable | undefined;
+  response?: {
+    query: TableDataQuery;
+    table: FullTable;
+    tableHeaders: TableHeadersConfig;
+  };
   validInitialQuery: TableDataQuery | undefined;
   dateRange: DateRangeState;
   locations: Dictionary<LocationFilter[]>;
@@ -56,39 +58,34 @@ export interface TableToolState {
   subjectMeta: PublicationSubjectMeta;
 }
 
-type PartialState = {
-  [P in keyof TableToolState]?: TableToolState[P];
-};
-
 export interface FinalStepProps {
   publication?: Publication;
-  createdTable?: FullTable;
-  tableHeadersConfig?: TableHeadersConfig;
-  tableHeaders?: TableHeadersFormValues;
+  table?: FullTable;
   query?: TableDataQuery;
+  tableHeaders?: TableHeadersConfig;
 }
 
-interface Props {
+export interface TableToolWizardProps {
   themeMeta: ThemeMeta[];
   publicationId?: string;
   releaseId?: string;
-
-  finalStep?: (props: FinalStepProps) => ReactElement;
-
   initialQuery?: TableDataQuery;
-  onTableConfigurationChange?: (props: FinalStepProps) => void;
+  finalStep?: (props: FinalStepProps) => ReactElement;
+  onTableCreated?: (response: {
+    table: FullTable;
+    query: TableDataQuery;
+    tableHeaders: TableHeadersConfig;
+  }) => void;
 }
 
-const TableToolWizard = (props: Props) => {
-  const {
-    themeMeta,
-    publicationId,
-    releaseId,
-    finalStep,
-    initialQuery,
-    onTableConfigurationChange,
-  } = props;
-
+const TableToolWizard = ({
+  themeMeta,
+  publicationId,
+  releaseId,
+  initialQuery,
+  finalStep,
+  onTableCreated,
+}: TableToolWizardProps) => {
   const [publication, setPublication] = React.useState<Publication>();
   const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
 
@@ -108,9 +105,7 @@ const TableToolWizard = (props: Props) => {
   };
 
   const [tableToolState, setTableToolState] = React.useState<TableToolState>(
-    () => {
-      return getInitialState();
-    },
+    getInitialState(),
   );
 
   React.useEffect(() => {
@@ -134,8 +129,6 @@ const TableToolWizard = (props: Props) => {
       dateRange: {},
       locations: {},
       subjectId: '',
-      query: undefined,
-      createdTable: undefined,
       validInitialQuery: undefined,
     });
 
@@ -150,12 +143,9 @@ const TableToolWizard = (props: Props) => {
         setInitialStep(initialStep);
 
         setTableToolState(state);
-
-        if (onTableConfigurationChange)
-          onTableConfigurationChange({ ...state });
       }
     });
-  }, [initialQuery, onTableConfigurationChange, releaseId]);
+  }, [initialQuery, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -249,11 +239,7 @@ const TableToolWizard = (props: Props) => {
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const {
-      table,
-      tableHeaders: generatedTableHeaders,
-      query: createdQuery,
-    } = await tableGeneration(
+    const tableQueryResponse = await tableGeneration(
       tableToolState.dateRange,
       tableToolState.subjectMeta,
       values,
@@ -262,16 +248,16 @@ const TableToolWizard = (props: Props) => {
       releaseId,
     );
 
-    if (table && generatedTableHeaders && createdQuery) {
+    if (tableQueryResponse) {
       const newState = {
         ...tableToolState,
-        createdTable: table,
-        tableHeaders: generatedTableHeaders,
-        query: createdQuery,
+        response: tableQueryResponse,
       };
 
-      if (onTableConfigurationChange) onTableConfigurationChange(newState);
       setTableToolState(newState);
+      if (onTableCreated) {
+        onTableCreated(tableQueryResponse);
+      }
     }
   };
 
@@ -344,7 +330,11 @@ const TableToolWizard = (props: Props) => {
                 />
               )}
             </WizardStep>
-            {finalStep && finalStep({ ...tableToolState, publication })}
+            {finalStep &&
+              finalStep({
+                ...tableToolState.response,
+                publication,
+              })}
           </Wizard>
 
           <PreviousStepModalConfirm />

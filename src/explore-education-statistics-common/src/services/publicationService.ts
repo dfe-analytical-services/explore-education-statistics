@@ -201,6 +201,14 @@ export enum ReleaseType {
   OfficialStatistics = 'Official Statistics',
 }
 
+export interface ContentSection<ContentBlockType> {
+  id?: string;
+  order: number;
+  heading: string;
+  caption: string;
+  content: ContentBlockType[];
+}
+
 export interface AbstractRelease<
   ContentBlockType,
   PublicationType = Publication
@@ -212,7 +220,9 @@ export interface AbstractRelease<
   releaseName: string;
   published: string;
   slug: string;
-  summary: string;
+  summarySection: ContentSection<ContentBlockType>;
+  headlinesSection: ContentSection<ContentBlockType>;
+  keyStatisticsSection: ContentSection<ContentBlockType>;
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
@@ -230,14 +240,13 @@ export interface AbstractRelease<
     on: string;
     reason: string;
   }[];
-  content: {
-    id?: string;
-    order: number;
-    heading: string;
-    caption: string;
-    content: ContentBlockType[];
+  content: ContentSection<ContentBlockType>[];
+  dataFiles?: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
   }[];
-  keyStatistics: ContentBlockType;
   downloadFiles: {
     extension: string;
     name: string;

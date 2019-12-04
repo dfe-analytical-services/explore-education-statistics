@@ -11,7 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public MappingProfiles()
         {
-            CreateMap<Release, ReleaseViewModel>();
+            CreateMap<Release, ReleaseViewModel>()
+                .ForMember(
+                    dest => dest.Content,
+                    m => m.MapFrom(r => r.GenericContent));
 
             CreateMap<Theme, ThemeTree>()
                 .ForMember(dest => dest.Topics, m => m.MapFrom(theme => theme.Topics));

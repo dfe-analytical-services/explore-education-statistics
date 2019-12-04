@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,13 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IContentService _contentService;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ManageContentPageService(ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageService)
+        public ManageContentPageService(
+            ContentDbContext context, IMapper mapper,
+            IFileStorageService fileStorageService, IContentService contentService)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
+            _contentService = contentService;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
                 context,
                 context.Releases,
@@ -36,37 +38,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, release =>
+            return _releaseHelper.CheckEntityExists(releaseId, async release =>
             {
-                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
-                return new ManageContentPageViewModel
+                var availableDataBlocks =
+                    await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
+
+                return availableDataBlocks.Map(blocks =>
                 {
-                    Release = releaseViewModel,
-                    IntroductionSection = new ContentSectionViewModel
+                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                    releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                    return new ManageContentPageViewModel
                     {
-                        Id = new Guid("bcb96e42-a09a-4791-a377-9649b0876c58"),
-                        Order = 0,
-                        Caption = "Introduction section caption",
-                        Heading = "Introduction section heading",
-                        Content = new List<IContentBlock>
-                        {
-                            new HtmlBlock
-                            {
-                                Id = new Guid("65187a0b-eb17-4481-b234-949dc85f1efa"),
-                                Type = "MarkDownBlock",
-                                Body = "Read national statistical summaries and definitions, view charts and " +
-                                       "tables and download data files across a range of pupil absence subject " +
-                                       "areas.\n" +
-                                       "You can also view a regional breakdown of statistics and data within the " +
-                                       "[local authorities section](#)",
-                            }
-                        }
-                    }
-                };
+                        Release = releaseViewModel,
+                        AvailableDataBlocks = blocks
+                    };
+                });
+                
             }, HydrateReleaseForReleaseViewModel);
         }
-
+        
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             return values
@@ -82,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ThenInclude(publication => publication.Topic.Theme)
                 .Include(r => r.Type)
                 .Include(r => r.Content)
-                .ThenInclude(s => s.Content);
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content);
         }
     }
 }

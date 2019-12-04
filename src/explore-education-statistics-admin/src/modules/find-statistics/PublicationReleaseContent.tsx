@@ -1,5 +1,3 @@
-import Accordion from '@admin/components/EditableAccordion';
-import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
@@ -14,11 +12,11 @@ import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
 import service from '@admin/services/release/edit-release/data/service';
+import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import RelatedInformationSection from './components/RelatedInformationSection';
 
 export interface RendererProps {
@@ -43,7 +41,7 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
 }: Props) => {
-  const { release, introductionSection } = content;
+  const { release } = content;
 
   const accId: string[] = generateIdList(2);
 
@@ -70,12 +68,14 @@ const PublicationReleaseContent = ({
             <BasicReleaseSummary release={release} />
           </div>
 
-          <ContentBlock
-            sectionId={introductionSection.id}
-            publication={publication}
-            id={introductionSection.id}
-            content={introductionSection.content}
-          />
+          {release.summarySection && (
+            <ContentBlock
+              sectionId={release.summarySection.id}
+              publication={publication}
+              id={release.summarySection.id as string}
+              content={release.summarySection.content}
+            />
+          )}
 
           {release.downloadFiles && (
             <Details
@@ -200,10 +200,7 @@ const PublicationReleaseContent = ({
                 </Details>
               </dd>
             </dl>
-            <RelatedInformationSection
-              release={release}
-              relatedInformation={release.relatedInformation}
-            />
+            <RelatedInformationSection release={release} />
           </RelatedAside>
         </div>
       </div>
@@ -214,9 +211,9 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      <DataBlock {...release.keyStatistics} id="keystats" />
-
-      {/* <editor-fold desc="Content blocks"> */}
+      {release.keyStatisticsSection && (
+        <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
+      )}
 
       <ReleaseContentAccordion
         release={release}
@@ -225,124 +222,10 @@ const PublicationReleaseContent = ({
         sectionName="Contents"
       />
 
-      {/* </editor-fold> */}
-
-      {/* <editor-fold desc="Help and support"> */}
-      <h2
-        className="govuk-heading-m govuk-!-margin-top-9"
-        data-testid="extra-information"
-      >
-        Help and support
-      </h2>
-
-      <Accordion
-        // publicationTitle={publication.title}
-        id="static-content-section"
-      >
-        <AccordionSection
-          heading={`${publication.title}: methodology`}
-          caption="Find out how and why we collect, process and publish these statistics"
-          headingTag="h3"
-        >
-          <p>
-            Read our{' '}
-            <Link to={`/methodology/${release.publication.methodology.id}`}>
-              {`${publication.title}: methodology`}
-            </Link>{' '}
-            guidance.
-          </p>
-        </AccordionSection>
-        {release.type && release.type.title === ReleaseType.NationalStatistics && (
-          <AccordionSection heading="National Statistics" headingTag="h3">
-            <p className="govuk-body">
-              The{' '}
-              <a href="https://www.statisticsauthority.gov.uk/">
-                United Kingdom Statistics Authority
-              </a>{' '}
-              designated these statistics as National Statistics in accordance
-              with the{' '}
-              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                Statistics and Registration Service Act 2007
-              </a>{' '}
-              and signifying compliance with the Code of Practice for
-              Statistics.
-            </p>
-            <p className="govuk-body">
-              Designation signifying their compliance with the authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                Code of Practice for Statistics
-              </a>{' '}
-              which broadly means these statistics are:
-            </p>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                managed impartially and objectively in the public interest
-              </li>
-              <li>meet identified user needs</li>
-              <li>produced according to sound methods</li>
-              <li>well explained and readily accessible</li>
-            </ul>
-            <p className="govuk-body">
-              Once designated as National Statistics it's a statutory
-              requirement for statistics to follow and comply with the Code of
-              Practice for Statistics to be observed.
-            </p>
-            <p className="govuk-body">
-              Find out more about the standards we follow to produce these
-              statistics through our{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics published by DfE
-              </a>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
-        )}
-        <AccordionSection heading="Contact us" headingTag="h3">
-          <p>
-            If you have a specific enquiry about {publication.topic.theme.title}{' '}
-            statistics and data:
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            {publication.contact && publication.contact.teamName}
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            Email <br />
-            {publication.contact && (
-              <a href={`mailto:${publication.contact.teamEmail}`}>
-                {publication.contact.teamEmail}
-              </a>
-            )}
-          </p>
-          <p>
-            {publication.contact && (
-              <>
-                Telephone: {publication.contact.contactName} <br />{' '}
-                {publication.contact.contactTelNo}
-              </>
-            )}
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Press office
-          </h4>
-          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
-          <p>
-            Telephone <br />
-            020 7925 6789
-          </p>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Public enquiries
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            If you have a general enquiry about the Department for Education
-            (DfE) or education:
-          </p>
-          <p>
-            Telephone <br />
-            037 0000 2288
-          </p>
-        </AccordionSection>
-      </Accordion>
-      {/* </editor-fold> */}
+      <AdminPublicationReleaseHelpAndSupportSection
+        publication={publication}
+        release={release}
+      />
     </EditingContext.Provider>
   );
 };
