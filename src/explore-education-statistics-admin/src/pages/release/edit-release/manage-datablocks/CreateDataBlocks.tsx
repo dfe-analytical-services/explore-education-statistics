@@ -72,6 +72,22 @@ const CreateDataBlocks = ({
     if (onTableToolLoaded) onTableToolLoaded();
   }, [dataBlock, dataBlockResponse]);
 
+  const getInitialValues = () => {
+    if (!dataBlock) {
+      return {
+        title: table ? generateTableTitle(table.subjectMeta) : undefined,
+      };
+    }
+
+    const { heading: title, name, source, customFootnotes } = dataBlock;
+    return {
+      title,
+      name,
+      source,
+      customFootnotes,
+    };
+  };
+
   return (
     <div>
       <TableToolWizard
@@ -93,11 +109,7 @@ const CreateDataBlocks = ({
 
                 {query && tableHeaders && (
                   <DataBlockDetailsForm
-                    initialValues={{
-                      title: table
-                        ? generateTableTitle(table.subjectMeta)
-                        : undefined,
-                    }}
+                    initialValues={getInitialValues()}
                     query={query}
                     tableHeaders={tableHeaders || tableHeaders}
                     initialDataBlock={dataBlock}

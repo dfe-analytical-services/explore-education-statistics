@@ -7,7 +7,7 @@ import tableBuilderService, {
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 
 const PrototypeTableTool = () => {
-  const publicationSlug = undefined; //"pupil-absence-in-schools-in-england";
+  const publicationSlug = undefined;
 
   const [themeMeta, setThemeMeta] = React.useState<ThemeMeta[]>();
   const [publicationId, setPublicationId] = React.useState<string>();
