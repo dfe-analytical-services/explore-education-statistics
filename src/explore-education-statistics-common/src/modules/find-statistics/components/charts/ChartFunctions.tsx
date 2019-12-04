@@ -598,6 +598,30 @@ const parseNumberOrDefault = (
   return parsed;
 };
 
+export function getNiceMaxValue(maxValue: number) {
+  if (maxValue === 0) {
+    return 0;
+  }
+
+  const maxIsLessThanOne = Math.abs(maxValue) < 1;
+  let max = maxValue;
+  if (maxIsLessThanOne) {
+    max = maxValue * 100;
+  }
+
+  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
+  const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
+
+  if (maxReducedToLessThan10 % 2 && maxReducedToLessThan10 % 5) {
+    return maxIsLessThanOne
+      ? ((maxReducedToLessThan10 + 1) * numberOf0s) / 100
+      : (maxReducedToLessThan10 + 1) * numberOf0s;
+  }
+  return maxIsLessThanOne
+    ? (maxReducedToLessThan10 * numberOf0s) / 100
+    : maxReducedToLessThan10 * numberOf0s;
+}
+
 function calculateMinorTicks(
   config: string | undefined,
   min: number,
@@ -616,6 +640,13 @@ function calculateMinorTicks(
     return undefined;
 
   if (config === 'custom') {
+    const minimumSpacingValue = getNiceMaxValue(
+      Math.floor((Number(max) - Number(min)) / 100),
+    );
+    if (spacingValue < minimumSpacingValue) {
+      spacingValue = minimumSpacingValue;
+    }
+
     const result = [];
 
     let [start, end] = [min, max];
@@ -673,30 +704,6 @@ function calculateMajorTicks(
     return [categories[min], categories[max]];
   }
   return undefined;
-}
-
-export function getNiceMaxValue(maxValue: number) {
-  if (maxValue === 0) {
-    return 0;
-  }
-
-  const maxIsLessThanOne = Math.abs(maxValue) < 1;
-  let max = maxValue;
-  if (maxIsLessThanOne) {
-    max = maxValue * 100;
-  }
-
-  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
-  const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
-
-  if (maxReducedToLessThan10 % 2 && maxReducedToLessThan10 % 5) {
-    return maxIsLessThanOne
-      ? ((maxReducedToLessThan10 + 1) * numberOf0s) / 100
-      : (maxReducedToLessThan10 + 1) * numberOf0s;
-  }
-  return maxIsLessThanOne
-    ? (maxReducedToLessThan10 * numberOf0s) / 100
-    : maxReducedToLessThan10 * numberOf0s;
 }
 
 export function generateMinorAxis(
