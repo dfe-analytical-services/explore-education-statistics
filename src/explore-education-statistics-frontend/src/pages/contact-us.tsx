@@ -7,57 +7,68 @@ function ContactPage() {
       title="Contact explore education statistics"
       breadcrumbLabel="Contact"
     >
-      <h2>General enquiries</h2>
-      <p>
-        If you need help and support using the service or have any general
-        questions about education statistics and data contact:
-      </p>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <section>
+            <h2 className="govuk-heading-m">General enquiries</h2>
+            <p>
+              If you need help and support using the service or have any general
+              questions about education statistics and data contact:
+            </p>
 
-      <p>
-        <strong>Explore education statistics team</strong>
-      </p>
+            <h3 className="govuk-heading-s">
+              Explore education statistics team
+            </h3>
 
-      <p>
-        Email
-        <br />
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>
-      </p>
-      <h2 className="govuk-!-margin-top-9">Data and methodology enquiries</h2>
-      <p>
-        If you have a question about the data or methods used in a specific set
-        of our statistics contact the team or statistician listed within the
-        ‘Contact us’ section of the relevant page.
-      </p>
-      <h2 className="govuk-!-margin-top-9">Statistical policy enquiries</h2>
-      <p>
-        If you have a question about statistical policies such as about the Code
-        of Practice, revisions and confidentiality contact:
-      </p>
+            <p>
+              Email:{' '}
+              <a href="mailto:explore.statistics@education.gov.uk">
+                explore.statistics@education.gov.uk
+              </a>
+            </p>
+          </section>
 
-      <p>
-        <strong>DfE Head of Profession for Statistics</strong>
-      </p>
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">Data and methodology enquiries</h2>
+            <p>
+              If you have a question about the data or methods used in a
+              specific set of our statistics contact the team or statistician
+              listed within the ‘Contact us’ section of the relevant page.
+            </p>
+          </section>
 
-      <p>
-        Email
-        <br />
-        <a href="mailto:hop.statistics@education.gov.uk">
-          hop.statistics@education.gov.uk
-        </a>
-      </p>
-      <h2 className="govuk-!-margin-top-9">
-        Freedom of information (FOI) requests
-      </h2>
-      <p>
-        If you want access to data or statistics which are not available within
-        this service submit a{' '}
-        <a href="https://form.education.gov.uk/en/AchieveForms/?form_uri=sandbox-publish://AF-Process-f1453496-7d8a-463f-9f33-1da2ac47ed76/AF-Stage-1e64d4cc-25fb-499a-a8d7-74e98203ac00/definition.json&redirectlink=%2Fen&cancelRedirectLink=%2Fen">
-          freedom of information (FOI) request
-        </a>
-        .
-      </p>
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">Statistical policy enquiries</h2>
+            <p>
+              If you have a question about statistical policies such as about
+              the Code of Practice, revisions and confidentiality contact:
+            </p>
+            <h3 className="govuk-heading-s">
+              DfE Head of Profession for Statistics
+            </h3>
+            <p>
+              Email:{' '}
+              <a href="mailto:hop.statistics@education.gov.uk">
+                hop.statistics@education.gov.uk
+              </a>
+            </p>
+          </section>
+
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">
+              Freedom of information (FOI) requests
+            </h2>
+            <p>
+              If you want access to data or statistics which are not available
+              within this service submit a{' '}
+              <a href="https://form.education.gov.uk/en/AchieveForms/?form_uri=sandbox-publish://AF-Process-f1453496-7d8a-463f-9f33-1da2ac47ed76/AF-Stage-1e64d4cc-25fb-499a-a8d7-74e98203ac00/definition.json&redirectlink=%2Fen&cancelRedirectLink=%2Fen">
+                freedom of information (FOI) request
+              </a>
+              .
+            </p>
+          </section>
+        </div>
+      </div>
     </Page>
   );
 }
