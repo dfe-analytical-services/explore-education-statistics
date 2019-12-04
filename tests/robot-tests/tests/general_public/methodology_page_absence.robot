@@ -50,13 +50,19 @@ Validate accordion sections order
     user checks accordion is in position  Annex E - Timeline                        12
     user checks accordion is in position  Annex F - Absence rates over time         13
 
+# EES-807
+#Validate first section contains correct contents
+#    [Tags]  HappyPath
+#    write tests here
+
 Validate page has Print this page link
     [Tags]  HappyPath
     user checks page contains link with text and url  Print this page   \#
 
-Validate search works
-    [Tags]  HappyPath
-    user clicks element   css:#pageSearchForm-input
-    user presses keys    number of pupil enrolments
-    user checks element contains  css:#pageSearchForm-resultsLabel   Found 1 result
-    user clicks element   css:#pageSearchForm-option-0 div
+# EES-807
+#Validate search works
+#    [Tags]  HappyPath
+#    user clicks element   css:#pageSearchForm-input
+#    user presses keys    number of pupil enrolments
+#    user checks element contains  css:#pageSearchForm-resultsLabel   Found 1 result
+#    user clicks element   css:#pageSearchForm-option-0 div
