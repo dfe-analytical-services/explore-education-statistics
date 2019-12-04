@@ -1,6 +1,5 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import ButtonText from './ButtonText';
 import CollapsibleList from './CollapsibleList';
 
 interface Props {
