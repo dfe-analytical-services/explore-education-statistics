@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return topic;
         }
         
-        public async Task<Either<ValidationResult, TopicViewModel>> CreateTopicAsync(CreateTopicViewModel topic)
+        public async Task<Either<ValidationResult, TopicViewModel>> CreateTopicRequest(Guid themeId, CreateTopicViewModel topic)
         {
             if (_context.Topics.Any(t => t.Slug == topic.Slug))
             {
@@ -45,10 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Title = topic.Title,
                 Slug = topic.Slug,
                 Description = topic.Description,
-                ThemeId = topic.ThemeId,
+                ThemeId = themeId,
                 Summary = topic.Summary,
             });
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return await GetViewModelAsync(saved.Entity.Id);
         }
 

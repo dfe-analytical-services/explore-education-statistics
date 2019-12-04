@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Topic> GetTopicAsync(Guid topicId);
 
-        Task<Either<ValidationResult, TopicViewModel>> CreateTopicAsync(
+        Task<Either<ValidationResult, TopicViewModel>> CreateTopicRequest(
+            Guid themeId,
             CreateTopicViewModel topic
         );
     }
