@@ -1,5 +1,6 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
+import Link from '@frontend/components/Link';
 
 function AcccessibilityStatementPage() {
   return (
@@ -135,38 +136,78 @@ function AcccessibilityStatementPage() {
               The content listed below is non-accessible for the following
               reasons.
             </p>
-            <p className="govuk-body">[TO BE ADDED]</p>
-            <h3 className="govuk-heading-m">
-              Non compliance with the accessibility regulations
-            </h3>
-            <p className="govuk-body">[TO BE ADDED]</p>
-            <h3 className="govuk-heading-m">Disproportionate burden</h3>
             <p className="govuk-body">
-              [TO BE ADDED - Charts are not accessible, but always sit alongside
-              accessible tables showing the same information]
+              The chart feature was not accessible to screen reader, voice
+              activation users or users that rely on a keyboard to navigate. As
+              a result, users were unable to access this feature without
+              assistance.Users need to be informed that this information can be
+              accessedin another area of the page.
             </p>
-            <h3 className="govuk-heading-m">
-              Content that’s not within the scope of the accessibility
-              regulations
-            </h3>
-            <p className="govuk-body">[TO BE ADDED]</p>
+            <p>
+              The map feature was not accessible to screen reader, voice
+              activation users or users that rely on a keyboard to navigate. As
+              a result, users were unableto access this feature without
+              assistance.
+            </p>
+            <h3 className="govuk-heading-m">Disproportionate burden</h3>
+            <p className="govuk-body">Not applicable</p>
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-l">How we tested this website</h2>
             <p className="govuk-body">
-              This website was last tested on 23 September 2019. The test was
-              carried out by dac digital accessibility centre.
-            </p>
-
-            <p className="govuk-body">
-              All the functionality of the public facing service was assessed
-              against the Web Content{' '}
+              This website was last tested on 23 September 2019 against{' '}
               <a href="https://www.w3.org/TR/WCAG21/" rel="external">
                 Accessibility Guidelines WCAG2.1
               </a>
+              .
+            </p>
+            <p className="govuk-body">
+              The test was carried out by the{' '}
+              <a href="https://digitalaccessibilitycentre.org/">
+                Digital accessibility centre (DAC)
+              </a>
+              .
+            </p>
+            <p className="govuk-body">
+              DAC tested a sample of pages to cover the core funcationality of
+              the service including:
             </p>
 
-            <p className="govuk-body">[LINK TO ACCESSIBILITY REPORT??]</p>
+            <ul className="govuk-list--bullet">
+              <li>
+                <Link to="/">the homepage</Link>
+              </li>
+              <li>
+                <Link to="/data-tables">table tool page</Link>
+              </li>
+              <li>
+                <Link to="/download-latest-data">download data page</Link>
+              </li>
+              <li>
+                <Link to="/find-statistics">find statistics and data page</Link>
+              </li>
+              <li>
+                <Link to="/find-statistics/pupil-absence-in-schools-in-england">
+                  publication page
+                </Link>
+              </li>
+              <li>
+                <Link to="/methodology">methodology homepage</Link>
+              </li>
+              <li>
+                <Link to="/methodology/pupil-absence-in-schools-in-england">
+                  specific release methodology
+                </Link>
+              </li>
+              <li>
+                <Link to="/glossary">glossary page</Link>
+              </li>
+              <li>
+                <Link to="/subscriptions?slug=pupil-absence-in-schools-in-england">
+                  notify me page
+                </Link>
+              </li>
+            </ul>
           </section>
 
           <section className="govuk-section-break govuk-section-break--xl">
@@ -174,12 +215,11 @@ function AcccessibilityStatementPage() {
               What we’re doing to improve accessibility
             </h2>
             <p className="govuk-body">
-              Our accessibility roadmap [add link to roadmap] shows how and when
-              we plan to improve accessibility on this website.
+              We plan to continually test the service for accessibility issues,
+              and create a prioritised list of issues to resolve.
             </p>
             <p className="govuk-body">
-              This statement was prepared on [date when it was first published].
-              It was last updated on [date when it was last updated].
+              This statement was prepared on 4 December 2019.
             </p>
           </section>
         </div>
