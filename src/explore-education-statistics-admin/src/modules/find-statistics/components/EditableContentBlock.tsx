@@ -29,6 +29,7 @@ export interface Props extends ContentBlockProps {
 
   editable?: boolean;
   canAddBlocks: boolean;
+  canAddSingleBlock?: boolean;
   isReordering?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
@@ -57,12 +58,15 @@ const EditableContentBlock = ({
   reviewing,
   resolveComments,
   canAddBlocks = false,
+  canAddSingleBlock = false,
   isReordering = false,
   onReorderHook = undefined,
 }: Props) => {
   const editingContext = React.useContext(EditingContext);
 
-  const [contentBlocks, setContentBlocks] = React.useState(content);
+  const [contentBlocks, setContentBlocks] = React.useState<ContentType>(
+    content,
+  );
 
   React.useEffect(() => {
     if (onReorderHook) {
@@ -108,13 +112,13 @@ const EditableContentBlock = ({
     }
   };
 
-  if (content.length === 0) {
+  if (contentBlocks.length === 0) {
     return (
       <>
         <div className="govuk-inset-text">
           There is no content for this section.
         </div>
-        {canAddBlocks && (
+        {(canAddBlocks || canAddSingleBlock) && (
           <AddContentButton order={0} onClick={onAddContentCallback} />
         )}
       </>
