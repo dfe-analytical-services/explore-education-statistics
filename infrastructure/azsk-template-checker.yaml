@@ -3,6 +3,10 @@ trigger:
     include:
     - infrastructure/*
 
+pr:
+  paths:
+    include:
+    - infrastructure/*
 
 pool:
   vmImage: 'windows-latest'
