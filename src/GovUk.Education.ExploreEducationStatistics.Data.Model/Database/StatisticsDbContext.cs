@@ -163,7 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.LocalAuthority,
-                    builder => builder.HasIndex(localAuthority => localAuthority.Code));
+                    builder => builder.HasIndex(localAuthority => localAuthority.Code))
+                .OwnsOne(level => level.LocalAuthority,
+                    builder => builder.HasIndex(localAuthority => localAuthority.OldCode));
         }
 
         private static void ConfigureLocalAuthorityDistrict(ModelBuilder modelBuilder)
