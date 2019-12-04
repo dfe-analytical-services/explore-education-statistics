@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.Azure.Documents.SystemFunctions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -16,7 +18,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Slug { get; set; }
 
         public string Summary { get; set; }
-        
+
+        [NotMapped]
+        public string Status => Published == null ?  "Draft" : "Live" ;
+
         public DateTime? Published { get; set; }
         
         public DateTime? PublishScheduled { get; set; }

@@ -10,8 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Title { get; set; }
         
-        // TODO: fake the status until the it is added to methodology as a concept
-        public string Status => "Live";
+        public string Status { get; set; }
 
         public List<MethodologyStatusPublications> Publications { get; set; }
     }
