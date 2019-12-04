@@ -13,18 +13,19 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const arr: any = [];
-    const ele = document.getElementsByClassName('govuk-tabs__panel');
-    for (let i = 0; i < ele.length; i += 1) {
-      if (ele[i].classList.contains('govuk-visually-hidden')) arr.push(ele[i]);
-      ele[i].classList.remove('govuk-visually-hidden');
+    const hiddenTabs: any = [];
+    const tabs = document.getElementsByClassName('govuk-tabs__panel');
+    for (let i = 0; i < tabs.length; i += 1) {
+      if (tabs[i].classList.contains('govuk-visually-hidden'))
+        hiddenTabs.push(tabs[i]);
+      tabs[i].classList.remove('govuk-visually-hidden');
     }
 
     setTimeout(() => window.print(), 1000);
 
     setTimeout(function hideTabs() {
-      for (let i = 0; i < arr.length; i += 1) {
-        arr[i].classList.add('govuk-visually-hidden');
+      for (let i = 0; i < hiddenTabs.length; i += 1) {
+        hiddenTabs[i].classList.add('govuk-visually-hidden');
       }
     }, 1000);
   };
