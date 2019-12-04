@@ -107,6 +107,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   id="select-lead-statisician"
                   label="Publication and release contact"
                   name="select-lead-statisician"
+                  onChange={() => {
+                    const selected = 'test';
+                    console.log(selected);
+                  }}
                   options={[
                     { label: 'Mark Pearson', value: 'mark-pearson' },
                     { label: 'Alex Miller', value: 'alex-miller' },

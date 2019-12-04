@@ -92,7 +92,19 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   </li>
                 </span>
               </h1>
+
+              <p>This is your administration dashboard - here you can:</p>
+
+              <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
+                <li>
+                  <Link to="/dashboard">manage publications and releases</Link>
+                </li>
+                <li>
+                  <Link to="/methodology">manage methodology</Link>
+                </li>
+              </ul>
             </div>
+
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
@@ -113,6 +125,7 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
               </RelatedInformation>
             </div>
           </div>
+
           <Tabs id="publicationTabs">
             <TabsSection
               id="my-publications"
