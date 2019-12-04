@@ -3,7 +3,6 @@ import ThemeAndTopicContext, {
   SetThemeAndTopicsCallbackParameters,
 } from '@admin/components/ThemeAndTopicContext';
 import { IdTitlePair } from '@admin/services/common/types';
-import { ThemeAndTopics } from '@admin/services/dashboard/types';
 
 interface ThemeAndTopicProps {
   children: ReactNode;
@@ -12,15 +11,6 @@ interface ThemeAndTopicProps {
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
   topics: IdTitlePair[];
 }
-
-const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
-  id: theme.id,
-  title: theme.title,
-  topics: theme.topics.map(topic => ({
-    id: topic.id,
-    title: topic.title,
-  })),
-});
 
 interface Model {
   theme: ThemeAndTopicsIdsAndTitles;

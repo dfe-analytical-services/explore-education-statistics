@@ -1,7 +1,6 @@
 import Button from '@common/components/Button';
 import {
   Form,
-  FormFieldset,
   FormFieldTextInput,
   FormGroup,
   Formik,

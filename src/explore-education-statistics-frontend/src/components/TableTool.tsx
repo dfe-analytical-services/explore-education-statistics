@@ -125,7 +125,7 @@ const TableToolFinalStep = ({
                     as={`/find-statistics/${publication.slug}`}
                     to={`/find-statistics/publication?publication=${publication.slug}`}
                   >
-                    Go to publication
+                    View the release for this data
                   </Link>
                 </li>
                 <li>

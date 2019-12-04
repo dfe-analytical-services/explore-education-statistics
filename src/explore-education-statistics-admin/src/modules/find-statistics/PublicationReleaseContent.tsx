@@ -74,6 +74,7 @@ const PublicationReleaseContent = ({
               publication={publication}
               id={release.summarySection.id as string}
               content={release.summarySection.content}
+              canAddSingleBlock
             />
           )}
 

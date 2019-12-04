@@ -1,5 +1,4 @@
 import {
-  Footnote,
   FootnoteMetaGetters,
   FootnoteSubject,
 } from '@admin/services/release/edit-release/footnotes/types';

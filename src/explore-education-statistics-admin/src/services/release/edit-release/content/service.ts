@@ -35,6 +35,12 @@ export interface ReleaseContentService {
     block: ContentBlockPostModel,
   ) => Promise<ContentBlockViewModel>;
 
+  updateContentSectionHeading: (
+    releaseId: string,
+    sectionId: string,
+    heading: string,
+  ) => Promise<ContentSectionViewModel>;
+
   updateContentSectionBlock: (
     releaseId: string,
     sectionId: string,
@@ -102,6 +108,17 @@ const service: ReleaseContentService = {
     return client.post<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
       block,
+    );
+  },
+
+  updateContentSectionHeading(
+    releaseId: string,
+    sectionId: string,
+    heading: string,
+  ): Promise<ContentSectionViewModel> {
+    return client.put<ContentSectionViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/heading`,
+      { heading },
     );
   },
 

@@ -10,7 +10,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -20,8 +20,8 @@ import {
 } from 'react-beautiful-dnd';
 import { EditableRelease } from '@admin/services/publicationService';
 import {
-  FormGroup,
   FormFieldset,
+  FormGroup,
   FormTextInput,
 } from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
