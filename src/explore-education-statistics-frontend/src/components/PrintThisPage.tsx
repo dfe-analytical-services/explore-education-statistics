@@ -11,7 +11,23 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
     if (analytics) {
       logEvent(analytics.category, analytics.action, window.location.pathname);
     }
-    window.print();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hiddenTabs: any = [];
+    const tabs = document.getElementsByClassName('govuk-tabs__panel');
+    for (let i = 0; i < tabs.length; i += 1) {
+      if (tabs[i].classList.contains('govuk-visually-hidden'))
+        hiddenTabs.push(tabs[i]);
+      tabs[i].classList.remove('govuk-visually-hidden');
+    }
+
+    setTimeout(() => window.print(), 1000);
+
+    setTimeout(function hideTabs() {
+      for (let i = 0; i < hiddenTabs.length; i += 1) {
+        hiddenTabs[i].classList.add('govuk-visually-hidden');
+      }
+    }, 1000);
   };
 
   return (
