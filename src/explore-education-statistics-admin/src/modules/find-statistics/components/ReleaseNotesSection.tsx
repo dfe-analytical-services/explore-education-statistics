@@ -2,9 +2,11 @@ import {
   ReleaseNote,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
+  dateToDayMonthYear,
 } from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
+import merge from 'lodash/merge';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -126,11 +128,28 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     );
   };
 
-  const renderEditForm = () => {
+  const renderEditForm = (r: ReleaseNote) => {
     const formId = 'edit-release-note-form';
+
+    const generateInitialValues = () => {
+      const initialValue: EditFormValues = {
+        on: {
+          day: '',
+          month: '',
+          year: '',
+        },
+        reason: '',
+      };
+
+      return merge(initialValue, {
+        on: dateToDayMonthYear(new Date(r.on)),
+        reason: r.reason,
+      });
+    };
+
     return (
       <Formik<EditFormValues>
-        initialValues={{ on: { day: '', month: '', year: '' }, reason: '' }}
+        initialValues={generateInitialValues()}
         validationSchema={Yup.object<EditFormValues>({
           on: validateMandatoryDayMonthYearField,
           reason: Yup.string().required('Release note must be provided'),
@@ -207,7 +226,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
         >
           {releaseNotes.map((elem, index) =>
             isEditing && editFormOpen ? (
-              renderEditForm()
+              renderEditForm(elem)
             ) : (
               <div data-testid="last-updated-element" key={elem.id}>
                 <FormattedDate className="govuk-body govuk-!-font-weight-bold">
