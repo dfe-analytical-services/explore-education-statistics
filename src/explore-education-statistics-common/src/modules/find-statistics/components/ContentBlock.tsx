@@ -17,7 +17,7 @@ const ContentBlock = ({
   publication,
   onToggle,
 }: ContentBlockProps) => {
-  return content.length > 0 ? (
+  return content && content.length > 0 ? (
     <>
       {content.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;

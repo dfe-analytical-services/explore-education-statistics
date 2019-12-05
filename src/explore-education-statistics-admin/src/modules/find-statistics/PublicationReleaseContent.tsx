@@ -186,7 +186,7 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      {release.keyStatisticsSection && (
+      {release.keyStatisticsSection && release.keyStatisticsSection.content && (
         <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
       )}
 

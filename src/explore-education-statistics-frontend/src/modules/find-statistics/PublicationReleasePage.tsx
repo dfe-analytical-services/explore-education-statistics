@@ -63,7 +63,7 @@ class PublicationReleasePage extends Component<Props> {
       <Page
         title={data.publication.title}
         caption={data.title}
-        description={data.summarySection.content[0].body}
+        description={data.summarySection.content && data.summarySection.content[0].body}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
@@ -135,7 +135,7 @@ class PublicationReleasePage extends Component<Props> {
 
             <ReactMarkdown
               className="govuk-body"
-              source={data.summarySection.content[0].body}
+              source={data.summarySection.content && data.summarySection.content[0].body}
             />
             {data.downloadFiles && (
               <Details

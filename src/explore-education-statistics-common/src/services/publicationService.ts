@@ -213,7 +213,7 @@ export interface ContentSection<ContentBlockType> {
   order: number;
   heading: string;
   caption: string;
-  content: ContentBlockType[];
+  content?: ContentBlockType[];
 }
 
 export interface AbstractRelease<
