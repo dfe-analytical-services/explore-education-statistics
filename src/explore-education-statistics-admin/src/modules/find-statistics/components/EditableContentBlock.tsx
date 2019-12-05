@@ -20,6 +20,8 @@ import ContentBlockDraggable from './ContentBlockDraggable';
 
 type ContentType = EditableRelease['content'][0]['content'];
 
+export type EditableContentType = ContentType;
+
 export type ReorderHook = (sectionId?: string) => Promise<void>;
 
 export interface Props extends ContentBlockProps {
@@ -72,19 +74,21 @@ const EditableContentBlock = ({
     if (onReorderHook) {
       const saveOrder: ReorderHook = async contentSectionId => {
         if (editingContext.releaseId && contentSectionId) {
-          const newOrder = contentBlocks.reduce<Dictionary<number>>(
-            (order, next, index) => ({ ...order, [next.id]: index }),
-            {},
-          );
+          if (contentBlocks) {
+            const newOrder = contentBlocks.reduce<Dictionary<number>>(
+              (order, next, index) => ({ ...order, [next.id]: index }),
+              {},
+            );
 
-          await releaseContentService.updateContentSectionBlocksOrder(
-            editingContext.releaseId,
-            contentSectionId,
-            newOrder,
-          );
+            await releaseContentService.updateContentSectionBlocksOrder(
+              editingContext.releaseId,
+              contentSectionId,
+              newOrder,
+            );
 
-          if (onContentChange) {
-            onContentChange(contentBlocks);
+            if (onContentChange) {
+              onContentChange(contentBlocks);
+            }
           }
         }
       };
@@ -112,7 +116,7 @@ const EditableContentBlock = ({
     }
   };
 
-  if (contentBlocks.length === 0) {
+  if (contentBlocks === undefined || contentBlocks.length === 0) {
     return (
       <>
         <div className="govuk-inset-text">
