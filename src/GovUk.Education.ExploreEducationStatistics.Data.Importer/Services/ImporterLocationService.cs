@@ -67,14 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
 
             const string separator = "_";
-
-            // TODO avoid possibility of a collision between different types of codes
-
-            var key = string.Join(separator, observationalUnits
+            
+            return string.Join(separator, observationalUnits
                 .Where(unit => unit != null)
                 .Select(unit => $"{unit.GetType()}:{(unit is LocalAuthority la ? la.GetCodeOrOldCodeIfEmpty() : unit.Code )}"));
-            
-            return key;
         }
 
         private Location LookupOrCreate(
