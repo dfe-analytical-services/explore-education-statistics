@@ -13,12 +13,14 @@
     list-style: none;
   }
 
-  :global(.govuk-tabs__list-teim) {
+  :global(.govuk-tabs__list-item) {
     display: block;
   }
 
   :global(.govuk-tabs__panel) {
-    display: block !important;
+    display: contents !important;
+    position: relative !important;
+    width: 100% !important;
   }
 
   :global(.govuk-tabs__tab) {

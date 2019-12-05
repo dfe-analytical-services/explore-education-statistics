@@ -92,25 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.KeyStatisticsSecondarySection, 
                     m => m.MapFrom(r => 
                         ContentSectionViewModel.ToViewModel(r.KeyStatisticsSecondarySection)))
-                // TODO EES-147 Remove this to get real Release Notes
                 .ForMember(
                     dest => dest.Updates,
-                    m => m.MapFrom(r => new List<ReleaseNoteViewModel>
-                    {
-                        new ReleaseNoteViewModel
-                        {
-                            Id = new Guid("df18b1f6-9f24-4e87-9275-31a0c78b1dad"),
-                            Reason = "Release note 1",
-                            On = new DateTime(2019, 06, 02)
-                        },
-                        new ReleaseNoteViewModel
-                        {
-                            Id = new Guid("c9948cde-01ce-4315-87af-eaa6cd7c6879"),
-                            Reason = "Release note 2",
-                            On = new DateTime(2019, 08, 10)
-                        }
-                    })
-                )
+                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
                 .ForMember(dest => dest.Publication,
                     m => m.MapFrom(r => new ViewModels.ManageContent.PublicationViewModel
                     {

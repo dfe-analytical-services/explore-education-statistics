@@ -2,6 +2,7 @@ import client from '@admin/services/util/service';
 import {
   AbstractRelease,
   BasicLink,
+  ReleaseNote,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import {
@@ -156,6 +157,31 @@ const service: ReleaseContentService = {
   },
 };
 
+const releaseNoteService = {
+  create: (
+    releaseId: string,
+    releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>,
+  ): Promise<ReleaseNote[]> => {
+    return client.post(
+      `/release/${releaseId}/content/release-note`,
+      releaseNote,
+    );
+  },
+  delete: (id: string, releaseId: string): Promise<ReleaseNote[]> => {
+    return client.delete(`/release/${releaseId}/content/release-note/${id}`);
+  },
+  edit: (
+    id: string,
+    releaseId: string,
+    releaseNote: Omit<ReleaseNote, 'id' | 'releaseId'>,
+  ): Promise<ReleaseNote[]> => {
+    return client.put(
+      `/release/${releaseId}/content/release-note/${id}`,
+      releaseNote,
+    );
+  },
+};
+
 const relatedInformationService = {
   getAll: (
     releaseId: string,
@@ -187,4 +213,8 @@ const relatedInformationService = {
   },
 };
 
-export default { ...service, relatedInfo: relatedInformationService };
+export default {
+  ...service,
+  releaseNote: releaseNoteService,
+  relatedInfo: relatedInformationService,
+};

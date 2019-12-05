@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "53772991-7958-4493-9b65-00ad4fa55475",
+		"_postman_id": "4bad498a-b87b-4e71-bbf3-3ad39d4fba1a",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2217,7 +2217,7 @@
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
-											"pm.test(\"Status code is 201\", function () { ",
+											"pm.test(\"Status code is 201\", function () {",
 											"    pm.response.to.have.status(201); ",
 											"});",
 											"",
@@ -2225,17 +2225,17 @@
 											"    pm.expect(respJson.length).to.be.above(0);",
 											"});",
 											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.id).to.not.be.empty;",
-											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
-											"    pm.expect(lastItem.on).to.not.be.empty;",
-											"    pm.expect(lastItem.reason).to.equal(\"Release Note created by Postman\");",
+											"const latestItem = respJson[0];",
+											"",
+											"pm.test(\"Latest Release note entry should contain the correct details\", function () {",
+											"    pm.expect(latestItem.id).to.not.be.empty;",
+											"    pm.expect(latestItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(latestItem.on).to.not.be.empty;",
+											"    pm.expect(latestItem.reason).to.equal(\"Release note created by Postman\");",
 											"});",
 											"",
-											"pm.test(\"Store variables for upcoming tests\", function () { ",
-											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.globals.set(\"latest_release_note_id\", lastItem.id);",
+											"pm.test(\"Store variables for upcoming tests\", function () {",
+											"    pm.globals.set(\"latest_release_note_id\", latestItem.id);",
 											"    pm.globals.set(\"number_of_release_notes\", respJson.length);",
 											"});"
 										],
@@ -2254,7 +2254,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"releaseNote\": \"Release Note created by Postman\"\n}"
+									"raw": "{\n    \"reason\": \"Release note created by Postman\"\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
@@ -2285,15 +2285,15 @@
 											"    pm.response.to.have.status(200); ",
 											"});",
 											"",
-											"pm.test(\"Related Notes array contains values\", function () {",
+											"pm.test(\"Release notes array contains values\", function () {",
 											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\"));",
 											"});",
 											"",
-											"pm.test(\"Latest Release Note entry should contain the correct details\", function () {",
+											"pm.test(\"Latest Release notes entry should contain the correct details\", function () {",
 											"    const updatedItem = respJson.find(item => item.id === pm.globals.get(\"latest_release_note_id\"));",
 											"    pm.expect(updatedItem).to.not.be.empty;",
 											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
-											"    pm.expect(updatedItem.reason).to.equal(\"Release Note updated by Postman\");",
+											"    pm.expect(updatedItem.reason).to.equal(\"Release note updated by Postman\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2311,7 +2311,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"reason\": \"Release note updated by Postman\"\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
@@ -2343,11 +2343,11 @@
 											"    pm.response.to.have.status(200); ",
 											"});",
 											"",
-											"pm.test(\"Release Notes array contains one less value than before\", function () {",
+											"pm.test(\"Release notes array contains one less value than before\", function () {",
 											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\") - 1);",
 											"});",
 											"",
-											"pm.test(\"Release Notes array should no longer contain the deleted item\", function () { ",
+											"pm.test(\"Release notes array should no longer contain the deleted item\", function () { ",
 											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_release_note_id\"))).to.be.false;",
 											"});",
 											"",

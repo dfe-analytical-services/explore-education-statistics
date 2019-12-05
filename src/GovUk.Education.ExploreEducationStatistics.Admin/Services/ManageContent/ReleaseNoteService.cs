@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 _context.Update.Add(new Update
                 {
                     On = request.On ?? DateTime.Now,
-                    Reason = request.ReleaseNote,
+                    Reason = request.Reason,
                     ReleaseId = release.Id
                 });
 
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 return _updateHelper.CheckEntityExists(releaseNoteId, async releaseNote =>
                 {
                     releaseNote.On = request.On ?? DateTime.Now;
-                    releaseNote.Reason = request.ReleaseNote;
+                    releaseNote.Reason = request.Reason;
 
                     _context.Update.Update(releaseNote);
                     await _context.SaveChangesAsync();
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             var releaseNotes = _context.Update
                 .Where(update => update.ReleaseId == releaseId)
-                .OrderBy(update => update.On);
+                .OrderByDescending(update => update.On);
             return _mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
         }
     }
