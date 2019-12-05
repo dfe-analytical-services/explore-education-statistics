@@ -67,6 +67,15 @@ const ReleaseContentAccordion = ({
     [content, release.id],
   );
 
+  const updateContentSection = (
+    index: number,
+    contentBlock?: EditableContentBlock[],
+  ) => {
+    const newContent = [...content];
+    newContent[index].content = contentBlock;
+    setContent(newContent);
+  };
+
   return (
     <>
       <Accordion
@@ -85,6 +94,9 @@ const ReleaseContentAccordion = ({
             release={release}
             onHeadingChange={title =>
               onUpdateHeading(contentItem, index, title)
+            }
+            onContentChange={newContent =>
+              updateContentSection(index, newContent)
             }
           />
         ))}

@@ -34,6 +34,7 @@ function EditableContentSubBlockRenderer({
             source={block.body}
             canDelete={canDelete}
             onDelete={onDelete}
+            onContentChange={onContentChange}
           />
         </>
       );
@@ -83,6 +84,7 @@ function EditableContentSubBlockRenderer({
           source={block.body}
           canDelete={canDelete}
           onDelete={onDelete}
+          onContentChange={onContentChange}
         />
       );
     default:
