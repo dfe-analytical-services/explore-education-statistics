@@ -167,7 +167,6 @@ class EditableMethodologyPage extends Component<Props, State> {
               <EditableContentBlock
                 editable={editing}
                 content={content}
-                reviewing={reviewing}
                 resolveComments={resolveComments}
                 id={`editable-block-${index}`}
                 publication={data.publication}

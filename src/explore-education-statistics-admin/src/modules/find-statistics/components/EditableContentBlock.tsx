@@ -8,7 +8,6 @@ import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
@@ -17,6 +16,7 @@ import ContentBlockDroppable from '@admin/modules/find-statistics/components/Con
 import { Dictionary } from '@common/types/util';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 import ContentBlockDraggable from './ContentBlockDraggable';
+import Comments from './Comments';
 
 type ContentType = EditableRelease['content'][0]['content'];
 
@@ -33,7 +33,6 @@ export interface Props extends ContentBlockProps {
   canAddBlocks: boolean;
   canAddSingleBlock?: boolean;
   isReordering?: boolean;
-  reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (content: ContentType) => void;
   onReorderHook?: (callback: ReorderHook) => void;
@@ -47,6 +46,7 @@ export const EditingContentBlockContext = React.createContext<
   EditingContentBlockContext
 >({
   releaseId: undefined,
+  isReviewing: false,
   isEditing: false,
   sectionId: undefined,
 });
@@ -57,7 +57,6 @@ const EditableContentBlock = ({
   sectionId,
   editable = true,
   onContentChange,
-  reviewing,
   resolveComments,
   canAddBlocks = false,
   canAddSingleBlock = false,
@@ -181,15 +180,15 @@ const EditableContentBlock = ({
             >
               {!isReordering && (
                 <>
-                  {reviewing && <AddComment initialComments={block.comments} />}
-                  {resolveComments && (
-                    <ResolveComment initialComments={block.comments} />
-                  )}
                   {canAddBlocks && (
                     <AddContentButton
                       order={index}
                       onClick={onAddContentCallback}
                     />
+                  )}
+                  {editingContext.isReviewing && <Comments initialComments={block.comments} />}
+                  {resolveComments && (
+                    <ResolveComment initialComments={block.comments} />
                   )}
                 </>
               )}

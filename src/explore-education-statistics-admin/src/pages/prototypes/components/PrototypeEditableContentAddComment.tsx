@@ -35,7 +35,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
     };
 
     setComments([
-      { name: user.name, time: new Date(), comment, state: 'open' },
+      { id:'', name: user.name, time: new Date(), comment, state: 'open' },
       ...comments,
     ]);
     setCurrentComment('');
