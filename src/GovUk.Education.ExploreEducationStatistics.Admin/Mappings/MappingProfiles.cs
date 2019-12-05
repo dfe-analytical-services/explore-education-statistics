@@ -5,9 +5,9 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
+using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -74,6 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
+            CreateMap<Topic, ApiTopicViewModel>();
+
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content, 
                     m => m.MapFrom(r => 
@@ -106,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
                         NextUpdate = r.Publication.NextUpdate,
-                        Topic = new TopicViewModel
+                        Topic = new ManageContentTopicViewModel
                         {
                             Theme = new ThemeViewModel
                             {
