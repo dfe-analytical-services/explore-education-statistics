@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20191205101342_ChangeFilterItemsIdsPreSeed")]
+    [Migration("20191205114819_ChangeFilterItemsIdsPreSeed")]
     partial class ChangeFilterItemsIdsPreSeed
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
