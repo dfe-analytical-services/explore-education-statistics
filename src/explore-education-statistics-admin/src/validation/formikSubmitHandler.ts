@@ -1,4 +1,3 @@
-import { FormValues } from '@admin/pages/release/create-release/CreateReleasePage';
 import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,
@@ -27,14 +26,10 @@ const isServerValidationError = <T extends {}>(error: T) => {
   );
 };
 
-const submitWithFormikValidation: (
+const submitWithFormikValidation = <FormValues>(
   submitFn: FormikSubmitHandler<FormValues>,
   fallbackErrorHandler: (error: AxiosResponse) => void,
   ...messageMappers: ServerValidationMessageMapper[]
-) => FormikSubmitHandler<FormValues> = (
-  submitFn,
-  fallbackErrorHandler,
-  ...messageMappers
 ) => {
   return async (values: FormValues, actions: FormikActions<FormValues>) => {
     try {

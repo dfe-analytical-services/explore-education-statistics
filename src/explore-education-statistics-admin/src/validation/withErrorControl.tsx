@@ -2,6 +2,10 @@ import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import { AxiosResponse } from 'axios';
 import React from 'react';
 
+export interface ErrorControlProps {
+  apiErrorFallbackHandler: (error: AxiosResponse) => void;
+}
+
 const withErrorControl = <P extends object>(
   Component: React.ComponentType<P>,
 ) => {

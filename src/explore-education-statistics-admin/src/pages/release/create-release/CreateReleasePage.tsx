@@ -13,7 +13,9 @@ import {
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl from '@admin/validation/withErrorControl';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import {
   errorCodeAndFieldNameToFieldError,
@@ -25,17 +27,12 @@ import {
   emptyDayMonthYear,
   Publication,
 } from '@common/services/publicationService';
-import { AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
   publicationId: string;
-}
-
-interface ErrorControlProps {
-  apiErrorFallbackHandler: (error: AxiosResponse) => void;
 }
 
 export type FormValues = {
@@ -82,7 +79,7 @@ const CreateReleasePage = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation(
+  const submitHandler = submitWithFormikValidation<FormValues>(
     async values => {
       const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
         publicationId,
