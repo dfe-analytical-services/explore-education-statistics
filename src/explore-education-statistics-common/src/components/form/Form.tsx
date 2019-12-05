@@ -21,6 +21,7 @@ interface Props {
     setFieldError: FieldErrorSetter,
     setGlobalError: GlobalErrorSetter,
   ) => void;
+  displayErrorMessageOnUncaughtErrors?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ const Form = ({
   submitId = `${id}-submit`,
   formik,
   submitValidationHandler,
+  displayErrorMessageOnUncaughtErrors = false,
 }: Props & { formik: FormikContext<{}> }) => {
   const { errors, touched } = formik;
 
@@ -108,13 +110,14 @@ const Form = ({
                     message,
                   }),
               );
-            } else {
+            } else if (displayErrorMessageOnUncaughtErrors) {
               setSubmitError({
                 id: submitId,
                 message: error.message,
               });
             }
           }
+          throw error;
         }
       }}
     >

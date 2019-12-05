@@ -12,19 +12,30 @@ import {
 } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import withErrorControl from '@admin/validation/withErrorControl';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import {
+  errorCodeAndFieldNameToFieldError,
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
 import {
   emptyDayMonthYear,
   Publication,
 } from '@common/services/publicationService';
+import { AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
   publicationId: string;
+}
+
+interface ErrorControlProps {
+  apiErrorFallbackHandler: (error: AxiosResponse) => void;
 }
 
 export type FormValues = {
@@ -39,7 +50,8 @@ interface TemplateReleaseModel {
 const CreateReleasePage = ({
   match,
   history,
-}: RouteComponentProps<MatchProps>) => {
+  apiErrorFallbackHandler,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { publicationId } = match.params;
 
   const [model, setModel] = useState<TemplateReleaseModel>();
@@ -56,15 +68,33 @@ const CreateReleasePage = ({
     });
   }, [publicationId]);
 
-  const submitHandler = async (values: FormValues) => {
-    const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
-      publicationId,
-      values,
-    );
+  const errorCodeMappings = [
+    errorCodeToFieldError(
+      'SLUG_NOT_UNIQUE',
+      'timePeriodCoverageStartYear',
+      'Choose a unique combination of time period and start year',
+    ),
+    errorCodeAndFieldNameToFieldError(
+      'PARTIAL_DATE_NOT_VALID',
+      'NextReleaseDate',
+      'nextReleaseDate',
+      'Enter a valid date',
+    ),
+  ];
 
-    const createdRelease = await service.createRelease(createReleaseDetails);
-    history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
-  };
+  const submitHandler = submitWithFormikValidation(
+    async values => {
+      const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
+        publicationId,
+        values,
+      );
+
+      const createdRelease = await service.createRelease(createReleaseDetails);
+      history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
+    },
+    apiErrorFallbackHandler,
+    ...errorCodeMappings,
+  );
 
   const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
 
@@ -152,4 +182,4 @@ const CreateReleasePage = ({
   );
 };
 
-export default CreateReleasePage;
+export default withErrorControl(CreateReleasePage);

@@ -131,7 +131,7 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab themePropId={themeId} topicPropId={topicId} />
+              <MyPublicationsTab themeId={themeId} topicId={topicId} />
             </TabsSection>
             <TabsSection
               id="draft-releases"

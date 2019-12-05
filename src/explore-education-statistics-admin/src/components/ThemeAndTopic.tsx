@@ -1,14 +1,14 @@
-import React, { ReactNode, useState } from 'react';
 import ThemeAndTopicContext, {
-  SetThemeAndTopicsCallbackParameters,
+  SetThemeAndTopicCallbackParameters,
 } from '@admin/components/ThemeAndTopicContext';
 import { IdTitlePair } from '@admin/services/common/types';
+import React, { ReactNode, useState } from 'react';
 
 interface ThemeAndTopicProps {
   children: ReactNode;
 }
 
-interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
+export interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
   topics: IdTitlePair[];
 }
 
@@ -20,7 +20,7 @@ interface Model {
 const ThemeAndTopic = ({ children }: ThemeAndTopicProps) => {
   const [model, setModel] = useState<Model>();
 
-  const onThemeAndTopicChange = (params: SetThemeAndTopicsCallbackParameters) =>
+  const onThemeAndTopicChange = (params: SetThemeAndTopicCallbackParameters) =>
     setModel(params);
 
   const contextValue = model

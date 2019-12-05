@@ -12,6 +12,7 @@ import {
   dateToDayMonthYear,
   dayMonthYearValuesToInputs,
 } from '@common/services/publicationService';
+import { FormikActions } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -30,7 +31,10 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
   }, [releaseId]);
 
-  const submitHandler = async (values: EditFormValues) => {
+  const submitHandler = async (
+    values: EditFormValues,
+    actions: FormikActions<EditFormValues>,
+  ) => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
       releaseId,
       values,
