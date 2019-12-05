@@ -8,7 +8,6 @@ import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
-import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
