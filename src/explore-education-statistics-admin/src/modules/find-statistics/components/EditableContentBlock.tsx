@@ -76,14 +76,14 @@ const EditableContentBlock = ({
         if (editingContext.releaseId && contentSectionId) {
           if (contentBlocks) {
             const newOrder = contentBlocks.reduce<Dictionary<number>>(
-                (order, next, index) => ({...order, [next.id]: index}),
-                {},
+              (order, next, index) => ({ ...order, [next.id]: index }),
+              {},
             );
 
             await releaseContentService.updateContentSectionBlocksOrder(
-                editingContext.releaseId,
-                contentSectionId,
-                newOrder,
+              editingContext.releaseId,
+              contentSectionId,
+              newOrder,
             );
 
             if (onContentChange) {
