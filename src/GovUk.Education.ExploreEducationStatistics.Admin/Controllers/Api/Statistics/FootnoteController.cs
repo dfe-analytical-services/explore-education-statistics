@@ -95,8 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
         {
-            var footnote = _footnoteService.GetFootnote(id);
-            return footnote == null ? NotFound() : andThen.Invoke();
+            return _footnoteService.Exists(id) ? andThen.Invoke() : NotFound();
         }
 
         private Dictionary<long, FootnotesIndicatorsMetaViewModel> GetIndicators(long subjectId)

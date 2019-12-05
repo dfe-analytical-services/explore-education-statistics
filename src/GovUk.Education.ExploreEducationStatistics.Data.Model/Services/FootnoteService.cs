@@ -79,7 +79,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public Footnote GetFootnote(long id)
         {
-            return Find(id);
+            return DbSet().Where(footnote => footnote.Id == id)
+                .Include(footnote => footnote.Filters)
+                .ThenInclude(filterFootnote => filterFootnote.Filter)
+                .Include(footnote => footnote.FilterGroups)
+                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
+                .Include(footnote => footnote.FilterItems)
+                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
+                .ThenInclude(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
+                .Include(footnote => footnote.Indicators)
+                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
+                .ThenInclude(indicator => indicator.IndicatorGroup)
+                .Include(footnote => footnote.Subjects)
+                .SingleOrDefault();
         }
 
         public Footnote UpdateFootnote(long id,
@@ -151,10 +165,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     && (!footnote.Indicators.Any() || footnote.Indicators.Any(indicatorFootnote =>
                             indicatorFootnote.Indicator.IndicatorGroup.Subject.ReleaseId == releaseId)))
                 .Include(footnote => footnote.Filters)
-                .ThenInclude(footnote => footnote.Filter)
+                .ThenInclude(filterFootnote => filterFootnote.Filter)
                 .Include(footnote => footnote.FilterGroups)
+                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
                 .Include(footnote => footnote.FilterItems)
+                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
+                .ThenInclude(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
                 .Include(footnote => footnote.Indicators)
+                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
+                .ThenInclude(indicator => indicator.IndicatorGroup)
                 .Include(footnote => footnote.Subjects);
         }
 

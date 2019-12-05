@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         void DeleteFootnote(long id);
 
+        bool Exists(long id);
+
         Footnote GetFootnote(long id);
 
         IEnumerable<Footnote> GetFootnotes(Guid releaseId);
