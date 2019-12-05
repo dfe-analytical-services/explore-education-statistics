@@ -1,8 +1,9 @@
 using System;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return topic;
         }
         
-        public async Task<Either<ValidationResult, TopicViewModel>> CreateTopicRequest(Guid themeId, CreateTopicViewModel topic)
+        public async Task<Either<ValidationResult, TopicViewModel>> CreateTopicAsync(Guid themeId, CreateTopicRequest topic)
         {
             if (_context.Topics.Any(t => t.Slug == topic.Slug))
             {

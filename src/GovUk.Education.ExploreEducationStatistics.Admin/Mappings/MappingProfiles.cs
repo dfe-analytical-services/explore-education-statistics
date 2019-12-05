@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
-using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
+using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
-using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -78,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
             CreateMap<Topic, ApiTopicViewModel>();
-            CreateMap<CreateTopicViewModel, Topic>();
 
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content, 

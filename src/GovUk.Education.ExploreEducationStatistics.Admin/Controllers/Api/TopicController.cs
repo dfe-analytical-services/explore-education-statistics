@@ -37,10 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // POST api/theme/{themeId}/topics
         [HttpPost("theme/{themeId}/topics")]
-        public async Task<ActionResult<TopicViewModel>> CreateTopicRequest(
-            CreateTopicViewModel topic, Guid themeId)
+        public async Task<ActionResult<TopicViewModel>> CreateTopicAsync(
+            CreateTopicRequest topic, Guid themeId)
         {
-           var result = await _topicService.CreateTopicRequest(themeId, topic);
+           var result = await _topicService.CreateTopicAsync(themeId, topic);
            if (result.IsLeft)
            {
                ValidationUtils.AddErrors(ModelState, result.Left);
