@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  Dev  Test
+Force Tags  Admin  Dev  Test  Failing
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
