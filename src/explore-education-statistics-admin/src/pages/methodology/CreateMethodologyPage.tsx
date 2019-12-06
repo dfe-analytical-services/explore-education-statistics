@@ -62,15 +62,14 @@ const CreateMethodologyPage = ({
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {
-    handleApiErrors(
-      Promise.all([service.getPublicationAndReleaseContacts()]).then(
-        ([contacts]) => {
-          setModel({
-            contacts,
-          });
-        },
-      ),
-    );
+    service
+      .getPublicationAndReleaseContacts()
+      .then(contacts => {
+        setModel({
+          contacts,
+        });
+      })
+      .catch(handleApiErrors);
   }, []);
 
   const submitFormHandler = async (values: FormValues) => {

@@ -3,7 +3,7 @@ import { RendererProps } from '@admin/modules/find-statistics/PublicationRelease
 import React from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
-import ContentService from '@admin/services/release/edit-release/content/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 
 export type Props = RendererProps & {
   source: string;
@@ -35,7 +35,9 @@ const EditableHtmlRenderer = ({
             editingContext.sectionId &&
             contentId
           ) {
-            const { body } = await ContentService.updateContentSectionBlock(
+            const {
+              body,
+            } = await releaseContentService.updateContentSectionBlock(
               editingContext.releaseId,
               editingContext.sectionId,
               contentId,

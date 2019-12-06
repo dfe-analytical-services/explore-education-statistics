@@ -85,13 +85,12 @@ const MyPublicationsTab = ({
   };
 
   useEffect(() => {
-    handleApiErrors(
-      dashboardService
-        .getMyThemesAndTopics()
-        .then(themeList =>
-          setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-        ),
-    );
+    dashboardService
+      .getMyThemesAndTopics()
+      .then(themeList =>
+        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
+      )
+      .catch(handleApiErrors);
   }, []);
 
   useEffect(() => {
@@ -117,11 +116,10 @@ const MyPublicationsTab = ({
 
   useEffect(() => {
     if (selectedThemeAndTopic.topic.id === topicId) {
-      handleApiErrors(
-        dashboardService
-          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-          .then(setMyPublications),
-      );
+      dashboardService
+        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+        .then(setMyPublications)
+        .catch(handleApiErrors);
     } else if (selectedThemeAndTopic.topic.id !== '') {
       history.push(
         generateAdminDashboardThemeTopicLink(

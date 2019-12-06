@@ -11,7 +11,7 @@ import { ManageContentPageViewModel } from '@admin/services/release/edit-release
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import Link from '@admin/components/Link';
-import releaseNoteService from '@admin/services/release/edit-release/content/service';
+import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 import { Formik, FormFieldset, Form } from '@common/components/form';
@@ -60,7 +60,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
 
   const addReleaseNote = (releaseNote: AddFormValues) => {
     return new Promise(resolve => {
-      releaseNoteService.releaseNote
+      releaseNoteService
         .create(release.id, releaseNote)
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
@@ -71,7 +71,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
 
   const editReleaseNote = (id: string, releaseNote: EditFormValues) => {
     return new Promise(resolve => {
-      releaseNoteService.releaseNote
+      releaseNoteService
         .edit(id, release.id, {
           on: dayMonthYearInputsToDate(releaseNote.on),
           reason: releaseNote.reason,
@@ -290,7 +290,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
         onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
         onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}
         onConfirm={async () => {
-          await releaseNoteService.releaseNote
+          await releaseNoteService
             .delete(deletedReleaseNote.id, release.id)
             .then(setReleaseNotes)
             .finally(() => setDeletedReleaseNote(emptyReleaseNote));

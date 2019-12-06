@@ -1,3 +1,4 @@
+import { ApiErrorHandler } from '@admin/validation/withErrorControl';
 import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,
@@ -27,29 +28,29 @@ const isServerValidationError = <T extends {}>(error: T) => {
 
 const submitWithFormikValidation = <FormValues>(
   submitFn: FormikSubmitHandler<FormValues>,
-  handleApiErrors: <T>(promise: Promise<T>) => Promise<T>,
+  handleApiErrors: ApiErrorHandler,
   ...messageMappers: ServerValidationMessageMapper[]
 ) => {
   return async (values: FormValues, actions: FormikActions<FormValues>) => {
-    return handleApiErrors(
-      submitFn(values, actions).catch(error => {
-        if (!isServerValidationError(error)) {
-          throw error;
-        }
+    try {
+      await submitFn(values, actions);
+    } catch (error) {
+      if (!isServerValidationError(error)) {
+        handleApiErrors(error);
+      }
 
-        const validationHandler = handleServerSideValidation(...messageMappers);
+      const validationHandler = handleServerSideValidation(...messageMappers);
 
-        const errorHandled = validationHandler(
-          error.data as ServerValidationErrors,
-          actions.setFieldError,
-          actions.setError,
-        );
+      const errorHandled = validationHandler(
+        error.data as ServerValidationErrors,
+        actions.setFieldError,
+        actions.setError,
+      );
 
-        if (!errorHandled) {
-          throw error;
-        }
-      }),
-    );
+      if (!errorHandled) {
+        handleApiErrors(error);
+      }
+    }
   };
 };
 

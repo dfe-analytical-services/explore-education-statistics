@@ -54,17 +54,17 @@ const CreateReleasePage = ({
   const [model, setModel] = useState<TemplateReleaseModel>();
 
   useEffect(() => {
-    handleApiErrors(
-      Promise.all([
-        service.getTemplateRelease(publicationId),
-        service.getPublication(publicationId),
-      ]).then(([templateRelease, publication]) => {
+    Promise.all([
+      service.getTemplateRelease(publicationId),
+      service.getPublication(publicationId),
+    ])
+      .then(([templateRelease, publication]) => {
         setModel({
           templateRelease,
           publication,
         });
-      }),
-    );
+      })
+      .catch(handleApiErrors);
   }, [publicationId]);
 
   const errorCodeMappings = [

@@ -3,8 +3,10 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { Omit } from 'react-router';
 
+export type ApiErrorHandler = (error: AxiosResponse) => any;
+
 export interface ErrorControlProps {
-  handleApiErrors: <T>(promise: Promise<T>) => Promise<T>;
+  handleApiErrors: ApiErrorHandler;
 }
 
 /**
@@ -34,12 +36,10 @@ function withErrorControl<
         return (
           <Component
             {...props}
-            handleApiErrors={(promise: Promise<T>) =>
-              promise.catch(error => {
-                setErrorCode(error.status);
-                return Promise.reject(error);
-              })
-            }
+            handleApiErrors={(error: AxiosResponse) => {
+              setErrorCode(error.status || 500);
+              throw error;
+            }}
           />
         );
       }}

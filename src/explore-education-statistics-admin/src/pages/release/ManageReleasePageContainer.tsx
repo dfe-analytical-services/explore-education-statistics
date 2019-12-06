@@ -28,9 +28,10 @@ const ManageReleasePageContainer = ({
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   useEffect(() => {
-    handleApiErrors(
-      service.getBasicPublicationDetails(publicationId).then(setPublication),
-    );
+    service
+      .getBasicPublicationDetails(publicationId)
+      .then(setPublication)
+      .catch(handleApiErrors);
   }, [publicationId, releaseId]);
 
   const currentRouteIndex =

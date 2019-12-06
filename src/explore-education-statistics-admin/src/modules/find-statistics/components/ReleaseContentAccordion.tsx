@@ -2,7 +2,7 @@ import Accordion from '@admin/components/EditableAccordion';
 import React from 'react';
 import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { Dictionary } from '@common/types/util';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
@@ -14,8 +14,6 @@ interface ReleaseContentAccordionProps {
   accordionId: string;
   sectionName: string;
 }
-
-type ContentBlock = AbstractRelease<EditableContentBlock>['content'];
 
 const ReleaseContentAccordion = ({
   release,

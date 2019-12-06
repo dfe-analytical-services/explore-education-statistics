@@ -4,7 +4,7 @@ import React from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
-import ContentService from '@admin/services/release/edit-release/content/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
@@ -37,7 +37,9 @@ const EditableMarkdownRenderer = ({
             editingContext.sectionId &&
             contentId
           ) {
-            const { body } = await ContentService.updateContentSectionBlock(
+            const {
+              body,
+            } = await releaseContentService.updateContentSectionBlock(
               editingContext.releaseId,
               editingContext.sectionId,
               contentId,

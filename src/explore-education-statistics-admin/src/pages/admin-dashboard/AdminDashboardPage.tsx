@@ -43,12 +43,12 @@ const AdminDashboardPage = ({
   const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
   useEffect(() => {
-    handleApiErrors(
-      Promise.all([
-        dashboardService.getDraftReleases(),
-        dashboardService.getScheduledReleases(),
-        dashboardService.getAvailablePreReleaseContacts(),
-      ]).then(
+    Promise.all([
+      dashboardService.getDraftReleases(),
+      dashboardService.getScheduledReleases(),
+      dashboardService.getAvailablePreReleaseContacts(),
+    ])
+      .then(
         ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
           const contactResultsByRelease = scheduledReleases.map(release =>
             dashboardService
@@ -59,26 +59,24 @@ const AdminDashboardPage = ({
               })),
           );
 
-          handleApiErrors(
-            Promise.all(contactResultsByRelease).then(contactResults => {
-              const preReleaseContactsByScheduledRelease: Dictionary<
-                UserDetails[]
-              > = {};
-              contactResults.forEach(result => {
-                const { releaseId, contacts } = result;
-                preReleaseContactsByScheduledRelease[releaseId] = contacts;
-              });
-              setModel({
-                draftReleases,
-                scheduledReleases,
-                availablePreReleaseContacts,
-                preReleaseContactsByScheduledRelease,
-              });
-            }),
-          );
+          return Promise.all(contactResultsByRelease).then(contactResults => {
+            const preReleaseContactsByScheduledRelease: Dictionary<
+              UserDetails[]
+            > = {};
+            contactResults.forEach(result => {
+              const { releaseId, contacts } = result;
+              preReleaseContactsByScheduledRelease[releaseId] = contacts;
+            });
+            setModel({
+              draftReleases,
+              scheduledReleases,
+              availablePreReleaseContacts,
+              preReleaseContactsByScheduledRelease,
+            });
+          });
         },
-      ),
-    );
+      )
+      .catch(handleApiErrors);
   }, []);
 
   return (
@@ -211,12 +209,12 @@ const AdminDashboardPage = ({
                         order={[]}
                         className="govuk-!-width-one-third"
                         onChange={async event => {
-                          const updatedContacts = await handleApiErrors(
-                            dashboardService.addPreReleaseContactToRelease(
+                          const updatedContacts = await dashboardService
+                            .addPreReleaseContactToRelease(
                               release.id,
                               event.target.value,
-                            ),
-                          );
+                            )
+                            .catch(handleApiErrors);
 
                           setModel({
                             ...model,
@@ -240,12 +238,12 @@ const AdminDashboardPage = ({
                             <Link
                               to=""
                               onClick={async _ => {
-                                const updatedContacts = await handleApiErrors(
-                                  dashboardService.removePreReleaseContactFromRelease(
+                                const updatedContacts = await dashboardService
+                                  .removePreReleaseContactFromRelease(
                                     release.id,
                                     existingContact.id,
-                                  ),
-                                );
+                                  )
+                                  .catch(handleApiErrors);
 
                                 setModel({
                                   ...model,

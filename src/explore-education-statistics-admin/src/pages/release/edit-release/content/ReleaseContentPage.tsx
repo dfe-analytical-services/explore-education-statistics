@@ -1,10 +1,12 @@
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-// eslint-disable-next-line import/no-named-as-default
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import { Comment } from '@admin/services/dashboard/types';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
@@ -20,7 +22,7 @@ interface Model {
   content: ManageContentPageViewModel;
 }
 
-const ReleaseContentPage = () => {
+const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(
@@ -28,30 +30,33 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService.getContent(releaseId).then(newContent => {
-      // <editor-fold desc="TODO - content population">
+    releaseContentService
+      .getContent(releaseId)
+      .then(newContent => {
+        // <editor-fold desc="TODO - content population">
 
-      const unresolvedComments: Comment[] = [
-        {
-          message: 'Please resolve this.\nThank you.',
-          authorName: 'Amy Newton',
-          createdDate: new Date('2019-08-10 10:15').toISOString(),
-        },
-        {
-          message: 'And this too.\nThank you.',
-          authorName: 'Dave Matthews',
-          createdDate: new Date('2019-06-13 10:15').toISOString(),
-        },
-      ];
+        const unresolvedComments: Comment[] = [
+          {
+            message: 'Please resolve this.\nThank you.',
+            authorName: 'Amy Newton',
+            createdDate: new Date('2019-08-10 10:15').toISOString(),
+          },
+          {
+            message: 'And this too.\nThank you.',
+            authorName: 'Dave Matthews',
+            createdDate: new Date('2019-06-13 10:15').toISOString(),
+          },
+        ];
 
-      // </editor-fold>
+        // </editor-fold>
 
-      setModel({
-        unresolvedComments,
-        pageMode: 'edit',
-        content: newContent,
-      });
-    });
+        setModel({
+          unresolvedComments,
+          pageMode: 'edit',
+          content: newContent,
+        });
+      })
+      .catch(handleApiErrors);
   }, [releaseId, publication.themeId, publication]);
 
   return (
@@ -116,4 +121,4 @@ const ReleaseContentPage = () => {
   );
 };
 
-export default ReleaseContentPage;
+export default withErrorControl(ReleaseContentPage);

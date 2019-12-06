@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Link from '@admin/components/Link';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 import {
@@ -27,17 +27,15 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      releaseContentService.relatedInfo
-        .create(release.id, link)
-        .then(newLinks => {
-          setLinks(newLinks);
-          resolve();
-        });
+      relatedInformationService.create(release.id, link).then(newLinks => {
+        setLinks(newLinks);
+        resolve();
+      });
     });
   };
 
   const removeLink = (linkId: string) => {
-    releaseContentService.relatedInfo.delete(release.id, linkId).then(setLinks);
+    relatedInformationService.delete(release.id, linkId).then(setLinks);
   };
 
   const renderLinkForm = () => {

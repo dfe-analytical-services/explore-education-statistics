@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import { EditableRelease } from '@admin/services/publicationService';
 import ContentBlock, {
   ContentBlockProps,
@@ -9,7 +8,7 @@ import wrapEditableComponent, {
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';

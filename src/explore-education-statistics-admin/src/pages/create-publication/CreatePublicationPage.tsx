@@ -53,19 +53,19 @@ const CreatePublicationPage = ({
   const [model, setModel] = useState<CreatePublicationModel>();
 
   useEffect(() => {
-    handleApiErrors(
-      Promise.all([
-        service.getMethodologies(),
-        service.getPublicationAndReleaseContacts(),
-        service.getTopic(topicId),
-      ]).then(([methodologies, contacts, topic]) => {
+    Promise.all([
+      service.getMethodologies(),
+      service.getPublicationAndReleaseContacts(),
+      service.getTopic(topicId),
+    ])
+      .then(([methodologies, contacts, topic]) => {
         setModel({
           methodologies,
           contacts,
           topic,
         });
-      }),
-    );
+      })
+      .catch(handleApiErrors);
   }, [topicId]);
 
   const submitFormHandler = submitWithFormikValidation(
