@@ -1,14 +1,14 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin
+Force Tags  Admin   UnderConstruction
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
 Verify correct data is shown when theme and topic is shown
-    [Tags]  HappyPath   Dev   Test
+    [Tags]  HappyPath   Dev   Test   UnderConstruction
     user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
     user checks page contains accordion  Automated Test Publication for Edit Release
     user opens accordion section  Automated Test Publication for Edit Release
