@@ -47,22 +47,24 @@ interface TemplateReleaseModel {
 const CreateReleasePage = ({
   match,
   history,
-  apiErrorFallbackHandler,
+  handleApiErrors,
 }: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { publicationId } = match.params;
 
   const [model, setModel] = useState<TemplateReleaseModel>();
 
   useEffect(() => {
-    Promise.all([
-      service.getTemplateRelease(publicationId),
-      service.getPublication(publicationId),
-    ]).then(([templateRelease, publication]) => {
-      setModel({
-        templateRelease,
-        publication,
-      });
-    });
+    handleApiErrors(
+      Promise.all([
+        service.getTemplateRelease(publicationId),
+        service.getPublication(publicationId),
+      ]).then(([templateRelease, publication]) => {
+        setModel({
+          templateRelease,
+          publication,
+        });
+      }),
+    );
   }, [publicationId]);
 
   const errorCodeMappings = [
@@ -89,7 +91,7 @@ const CreateReleasePage = ({
       const createdRelease = await service.createRelease(createReleaseDetails);
       history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
     },
-    apiErrorFallbackHandler,
+    handleApiErrors,
     ...errorCodeMappings,
   );
 

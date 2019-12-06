@@ -2,7 +2,6 @@ import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,
 } from '@common/components/form/util/serverValidationHandler';
-import { AxiosResponse } from 'axios';
 import { FormikActions } from 'formik';
 
 type FormikSubmitHandler<FormValues> = (
@@ -28,30 +27,29 @@ const isServerValidationError = <T extends {}>(error: T) => {
 
 const submitWithFormikValidation = <FormValues>(
   submitFn: FormikSubmitHandler<FormValues>,
-  fallbackErrorHandler: (error: AxiosResponse) => void,
+  handleApiErrors: <T>(promise: Promise<T>) => Promise<T>,
   ...messageMappers: ServerValidationMessageMapper[]
 ) => {
   return async (values: FormValues, actions: FormikActions<FormValues>) => {
-    try {
-      await submitFn(values, actions);
-    } catch (error) {
-      if (!isServerValidationError(error)) {
-        fallbackErrorHandler(error);
-        return;
-      }
+    return handleApiErrors(
+      submitFn(values, actions).catch(error => {
+        if (!isServerValidationError(error)) {
+          throw error;
+        }
 
-      const validationHandler = handleServerSideValidation(...messageMappers);
+        const validationHandler = handleServerSideValidation(...messageMappers);
 
-      const errorHandled = validationHandler(
-        error.data as ServerValidationErrors,
-        actions.setFieldError,
-        actions.setError,
-      );
+        const errorHandled = validationHandler(
+          error.data as ServerValidationErrors,
+          actions.setFieldError,
+          actions.setError,
+        );
 
-      if (!errorHandled) {
-        fallbackErrorHandler(error);
-      }
-    }
+        if (!errorHandled) {
+          throw error;
+        }
+      }),
+    );
   };
 };
 

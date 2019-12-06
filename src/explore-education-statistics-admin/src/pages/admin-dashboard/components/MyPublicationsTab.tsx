@@ -49,7 +49,6 @@ const MyPublicationsTab = ({
   themeId,
   topicId,
   history,
-  apiErrorFallbackHandler,
   handleApiErrors,
 }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
@@ -92,7 +91,6 @@ const MyPublicationsTab = ({
         .then(themeList =>
           setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
         ),
-      apiErrorFallbackHandler,
     );
   }, []);
 
@@ -123,7 +121,6 @@ const MyPublicationsTab = ({
         dashboardService
           .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
           .then(setMyPublications),
-        apiErrorFallbackHandler,
       );
     } else if (selectedThemeAndTopic.topic.id !== '') {
       history.push(

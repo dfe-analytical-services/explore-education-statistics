@@ -3,15 +3,13 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { Omit } from 'react-router';
 
-export type ApiErrorHandler = (error: AxiosResponse) => void;
-
 export interface ErrorControlProps {
   handleApiErrors: <T>(promise: Promise<T>) => Promise<T>;
 }
 
 /**
  * This function creates a higher order component of the provided Component, that supplies it with the
- * "apiErrorFallbackHandler" function for ease of signalling errors back to the ErrorBoundary surrounding the
+ * "handleApiErrors" function for ease of signalling errors back to the ErrorBoundary surrounding the
  * component tree and resulting in an error page.
  *
  * The <P> type represents the props that the passed-in Component has on it.

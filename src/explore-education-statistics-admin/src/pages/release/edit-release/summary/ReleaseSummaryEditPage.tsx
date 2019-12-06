@@ -25,7 +25,7 @@ import { RouteComponentProps } from 'react-router';
 
 const ReleaseSummaryEditPage = ({
   history,
-  apiErrorFallbackHandler,
+  handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
@@ -65,7 +65,7 @@ const ReleaseSummaryEditPage = ({
       await service.updateReleaseSummaryDetails(updatedReleaseDetails);
       history.push(summaryRoute.generateLink(publication.id, releaseId));
     },
-    apiErrorFallbackHandler,
+    handleApiErrors,
     ...errorCodeMappings,
   );
 
