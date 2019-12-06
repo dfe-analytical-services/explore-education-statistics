@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Subjects = new List<SubjectFootnote>()
             };
 
-            footnoteService.Setup(s => s.GetFootnote(FootnoteId)).Returns(footnote);
+            footnoteService.Setup(s => s.Exists(FootnoteId)).Returns(true);
 
             footnoteService.Setup(s => s.CreateFootnote("Sample footnote",
                 It.IsAny<IEnumerable<long>>(),

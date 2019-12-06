@@ -47,6 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return queryable;
         }
 
+        public bool Exists(TKey id)
+        {
+            return Find(id) != null;
+        }
+        
         public TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include)
         {
             var queryable = DbSet().AsQueryable();
