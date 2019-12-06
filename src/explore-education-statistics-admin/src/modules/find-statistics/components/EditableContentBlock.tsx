@@ -46,6 +46,7 @@ export const EditingContentBlockContext = React.createContext<
   EditingContentBlockContext
 >({
   releaseId: undefined,
+  isCommenting: false,
   isReviewing: false,
   isEditing: false,
   sectionId: undefined,
@@ -201,10 +202,13 @@ const EditableContentBlock = ({
                       onClick={onAddContentCallback}
                     />
                   )}
-                  {editingContext.isReviewing && (
+                  {(editingContext.isCommenting ||
+                    editingContext.isReviewing) && (
                     <Comments
                       contentBlockId={block.id}
                       initialComments={block.comments}
+                      canResolve={editingContext.isReviewing}
+                      canComment={editingContext.isCommenting}
                       onCommentsChange={async comments => {
                         const newBlocks = [...contentBlocks];
                         newBlocks[index].comments = comments;

@@ -12,12 +12,16 @@ interface Props {
   contentBlockId: string;
   initialComments: ExtendedComment[];
   onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
+  canResolve?: boolean;
+  canComment?: boolean;
 }
 
 const Comments = ({
   contentBlockId,
   initialComments,
-  onCommentsChange,
+  onCommentsChange = () => Promise.resolve(),
+  canResolve = false,
+  canComment = false,
 }: Props) => {
   const [newComment, setNewComment] = React.useState<string>('');
   const [comments, setComments] = React.useState<ExtendedComment[]>(
@@ -57,29 +61,62 @@ const Comments = ({
             newComments = [...newComments, ...comments];
           }
 
-          if (onCommentsChange) {
-            onCommentsChange(newComments).then(() => {
-              setComments(newComments);
-              setNewComment('');
-            });
-          } else {
+          onCommentsChange(newComments).then(() => {
             setComments(newComments);
             setNewComment('');
-          }
+          });
         });
     }
   };
 
   const removeComment = (index: number) => {
-    comments.splice(index, 1);
-    setComments([...comments]);
+    const commentId = comments[index].id;
+
+    if (editingContext.releaseId && editingContext.sectionId) {
+      service
+        .deleteContentSectionComment(
+          editingContext.releaseId,
+          editingContext.sectionId,
+          contentBlockId,
+          commentId,
+        )
+        .then(() => {
+          const newComments = [...comments];
+
+          newComments.splice(index, 1);
+
+          onCommentsChange(newComments).then(() => {
+            setComments(newComments);
+          });
+        });
+    }
   };
 
   const resolveComment = (index: number) => {
-    comments[index].state = 'resolved';
-    comments[index].resolvedOn = new Date();
-    comments[index].resolvedBy = context.user && context.user.name;
-    setComments([...comments]);
+    const resolvedComment = { ...comments[index] };
+
+    resolvedComment.state = 'resolved';
+    resolvedComment.resolvedOn = new Date();
+    resolvedComment.resolvedBy = context.user && context.user.name;
+
+    if (editingContext.releaseId && editingContext.sectionId) {
+      service
+        .updateContentSectionComment(
+          editingContext.releaseId,
+          editingContext.sectionId,
+          contentBlockId,
+          resolvedComment,
+        )
+        .then(() => {
+          const newComments = [...comments];
+
+          newComments[index] = resolvedComment;
+
+          onCommentsChange(newComments).then(() => {
+            setComments(newComments);
+          });
+        });
+    }
   };
 
   const ref = React.createRef<HTMLDivElement>();
@@ -92,7 +129,7 @@ const Comments = ({
         className={classNames('dfe-comment-block', [styles.addComment])}
       >
         <Details
-          summary="Add / view comments to section"
+          summary={`${canComment ? `Add / ` : ''}View comments for section`}
           className="govuk-!-margin-bottom-1 govuk-body-s"
           onToggle={isOpen => {
             if (ref.current) {
@@ -104,25 +141,29 @@ const Comments = ({
             }
           }}
         >
-          <form>
-            <textarea
-              name="comment"
-              id="comment"
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-            />
-            <button
-              type="button"
-              className="govuk-button"
-              disabled={newComment.length === 0}
-              onClick={() => {
-                addComment(newComment);
-              }}
-            >
-              Submit
-            </button>
-          </form>
-          <hr />
+          {canComment && (
+            <>
+              <form>
+                <textarea
+                  name="comment"
+                  id="comment"
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="govuk-button"
+                  disabled={newComment.length === 0}
+                  onClick={() => {
+                    addComment(newComment);
+                  }}
+                >
+                  Submit
+                </button>
+              </form>
+              <hr />
+            </>
+          )}
           <div className={styles.commentsContainer}>
             {comments &&
               comments.map(
@@ -137,15 +178,20 @@ const Comments = ({
                     <p className="govuk-body-xs govuk-!-margin-bottom-1">
                       {comment}
                     </p>
-                    {state === 'open' && (
-                      <button
-                        type="button"
-                        className="govuk-body-xs govuk-!-margin-right-3"
-                        onClick={() => resolveComment(index)}
-                      >
-                        Resolve
-                      </button>
-                    )}
+                    {state === 'open' &&
+                      (canResolve ? (
+                        <button
+                          type="button"
+                          className="govuk-body-xs govuk-!-margin-right-3"
+                          onClick={() => resolveComment(index)}
+                        >
+                          Resolve
+                        </button>
+                      ) : (
+                        <span className="govuk-body-xs govuk-!-margin-right-3">
+                          Open
+                        </span>
+                      ))}
                     {state === 'resolved' && (
                       <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
                         <em>
@@ -155,17 +201,21 @@ const Comments = ({
                         </em>
                       </p>
                     )}
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                    <a
-                      className="govuk-body-xs"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => removeComment(index)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      Remove
-                    </a>
-                    <hr />
+                    {canComment && (
+                      <>
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                        <a
+                          className="govuk-body-xs"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => removeComment(index)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          Remove
+                        </a>
+                        <hr />
+                      </>
+                    )}
                   </div>
                 ),
               )}

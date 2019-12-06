@@ -3,8 +3,6 @@ import { ExtendedComment } from '@admin/services/publicationService';
 import { Dictionary } from '@common/types';
 import * as realService from './service';
 
-const commentsCache: Dictionary<ExtendedComment> = {};
-
 const key = (
   releaseId: string,
   sectionId: string,
@@ -21,6 +19,8 @@ const genId = () => {
     return v.toString(16);
   });
 };
+
+const commentsCache: Dictionary<ExtendedComment> = {};
 
 const service = {
   ...realService.default,

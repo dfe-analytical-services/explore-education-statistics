@@ -2,12 +2,14 @@ import React, { ComponentType, useContext } from 'react';
 
 export interface ReleaseContentContext {
   isEditing: boolean;
+  isCommenting: boolean;
   isReviewing: boolean;
   releaseId: string | undefined;
 }
 
 export const EditingContext = React.createContext<ReleaseContentContext>({
   isEditing: false,
+  isCommenting: false,
   isReviewing: false,
   releaseId: undefined,
 });
