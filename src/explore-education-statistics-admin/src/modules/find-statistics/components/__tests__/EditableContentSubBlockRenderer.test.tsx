@@ -7,7 +7,12 @@ describe('EditableContentSubBlockRenderer', () => {
   test('Renders non-editable Markdown block correctly', () => {
     const { container } = render(
       <EditingContext.Provider
-        value={{ isEditing: true, releaseId: '', isReviewing: false }}
+        value={{
+          isEditing: true,
+          releaseId: '',
+          isReviewing: false,
+          isCommenting: false,
+        }}
       >
         <EditableContentSubBlockRenderer
           id="test"
@@ -28,7 +33,12 @@ describe('EditableContentSubBlockRenderer', () => {
   test('Renders editable Markdown block correctly', () => {
     const { container } = render(
       <EditingContext.Provider
-        value={{ isEditing: true, releaseId: '', isReviewing: false }}
+        value={{
+          isEditing: true,
+          releaseId: '',
+          isReviewing: false,
+          isCommenting: false,
+        }}
       >
         <EditableContentSubBlockRenderer
           canDelete

@@ -427,7 +427,7 @@ const metaData: DataBlockMetadata = {
   },
 };
 
-const chartMetaData: ChartMetaData = parseMetaData(metaData);
+const chartMetaData: ChartMetaData = parseMetaData(metaData) as ChartMetaData;
 
 const AbstractChartProps: ChartProps = {
   data,
@@ -643,7 +643,7 @@ const testResponseData_23_26__1_2_LA: DataBlockResponse = {
 
 const AbstractLargeDataChartPropsMeta = parseMetaData(
   testResponseData_23_26_28__1_2_LA.metaData,
-);
+) as ChartMetaData;
 const AbstractLargeDataChartProps: ChartProps = {
   data: testResponseData_23_26_28__1_2_LA,
   meta: AbstractLargeDataChartPropsMeta,
@@ -711,7 +711,8 @@ const AbstractLargeDataChartProps: ChartProps = {
 
 const AbstractLargeDataChartProps_smaller_datasetsMeta = parseMetaData(
   testResponseData_23_26_28__1_2_LA.metaData,
-);
+) as ChartMetaData;
+
 const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
   data: testResponseData_23_26__1_2_LA,
   meta: AbstractLargeDataChartProps_smaller_datasetsMeta,

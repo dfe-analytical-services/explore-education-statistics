@@ -3,7 +3,12 @@ import {
   AxisConfiguration,
   ChartDataSet,
 } from '@common/services/publicationService';
-import * as ChartFunctions from '../ChartFunctions';
+import {
+  ChartMetaData,
+  createDataForAxis,
+  createSortedDataForAxis,
+  parseMetaData,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import Data from './__data__/chartFunctionsData';
 
@@ -30,7 +35,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -39,7 +44,7 @@ describe('ChartFunctions', () => {
       dataSets: [dataSet26_1_72],
     };
 
-    const chartData = ChartFunctions.createDataForAxis(
+    const chartData = createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
       chartMeta,
@@ -71,7 +76,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis can sort by indicator from single indicator', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axis: AxisConfiguration = {
       name: meta.indicators['99'].label,
@@ -82,7 +87,7 @@ describe('ChartFunctions', () => {
       dataSets: [dataSet99_1_72],
     };
 
-    const chartData = ChartFunctions.createSortedDataForAxis(
+    const chartData = createSortedDataForAxis(
       axis,
       Data.responseData.result,
       chartMeta,
@@ -114,7 +119,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple indicators', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -123,7 +128,7 @@ describe('ChartFunctions', () => {
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
 
-    const chartData = ChartFunctions.createDataForAxis(
+    const chartData = createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
       chartMeta,
@@ -160,7 +165,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple filters', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -169,7 +174,7 @@ describe('ChartFunctions', () => {
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
-    const chartData = ChartFunctions.createDataForAxis(
+    const chartData = createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
       chartMeta,
@@ -206,7 +211,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis returns full data range if data is missing', () => {
     const meta = Data.responseWithMissingData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axisConfig: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -215,7 +220,7 @@ describe('ChartFunctions', () => {
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
-    const chartData = ChartFunctions.createDataForAxis(
+    const chartData = createDataForAxis(
       axisConfig,
       Data.responseWithMissingData.result,
       chartMeta,
@@ -250,7 +255,7 @@ describe('ChartFunctions', () => {
 
   test('parseMetaData', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = ChartFunctions.parseMetaData(meta);
+    const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     expect(chartMeta.filters).not.toBeUndefined();
     expect(chartMeta.indicators).not.toBeUndefined();

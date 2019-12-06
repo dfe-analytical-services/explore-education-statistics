@@ -9,7 +9,6 @@ import wrapEditableComponent, {
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
-import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
@@ -58,7 +57,6 @@ const EditableContentBlock = ({
   sectionId,
   editable = true,
   onContentChange,
-  resolveComments,
   canAddBlocks = false,
   canAddSingleBlock = false,
   isReordering = false,
@@ -218,9 +216,6 @@ const EditableContentBlock = ({
                         }
                       }}
                     />
-                  )}
-                  {resolveComments && (
-                    <ResolveComment initialComments={block.comments} />
                   )}
                 </>
               )}
