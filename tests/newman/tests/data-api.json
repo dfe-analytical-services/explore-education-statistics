@@ -6698,7 +6698,7 @@
 									"});",
 									"",
 									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    pm.expect(respJson.observationCount).to.be.above(1101760);",
+									"    pm.expect(respJson.observationCount).to.be.above(1101149);",
 									"});",
 									"",
 									"pm.test(\"Release count is above the expected count\", function () {",
