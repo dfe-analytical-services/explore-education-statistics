@@ -4,28 +4,28 @@ import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
 import classNames from 'classnames';
 import React from 'react';
+import service from '@admin/services/release/edit-release/content/fake-comments-service';
+import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import styles from './Comments.module.scss';
 
-const key = (() => {
-  let keyValue = 0;
-  return () => {
-    // eslint-disable-next-line no-plusplus
-    keyValue++;
-    return keyValue;
-  };
-})();
-
 interface Props {
+  contentBlockId: string;
   initialComments: ExtendedComment[];
+  onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
 }
 
-const Comments = ({ initialComments }: Props) => {
+const Comments = ({
+  contentBlockId,
+  initialComments,
+  onCommentsChange,
+}: Props) => {
   const [newComment, setNewComment] = React.useState<string>('');
   const [comments, setComments] = React.useState<ExtendedComment[]>(
     initialComments,
   );
 
   const context = React.useContext(LoginContext);
+  const editingContext = React.useContext(EditingContentBlockContext);
 
   const addComment = (comment: string) => {
     const user: User = context.user || {
@@ -42,12 +42,32 @@ const Comments = ({ initialComments }: Props) => {
       state: 'open',
     };
 
-    if (comments) {
-      setComments([additionalComment, ...comments]);
-    } else {
-      setComments([additionalComment]);
+    if (editingContext.releaseId && editingContext.sectionId) {
+      service
+        .addContentSectionComment(
+          editingContext.releaseId,
+          editingContext.sectionId,
+          contentBlockId,
+          additionalComment,
+        )
+        .then(populatedComment => {
+          let newComments = [populatedComment];
+
+          if (comments) {
+            newComments = [...newComments, ...comments];
+          }
+
+          if (onCommentsChange) {
+            onCommentsChange(newComments).then(() => {
+              setComments(newComments);
+              setNewComment('');
+            });
+          } else {
+            setComments(newComments);
+            setNewComment('');
+          }
+        });
     }
-    setNewComment('');
   };
 
   const removeComment = (index: number) => {
@@ -107,10 +127,10 @@ const Comments = ({ initialComments }: Props) => {
             {comments &&
               comments.map(
                 (
-                  { name, time, comment, state, resolvedOn, resolvedBy },
+                  { id, name, time, comment, state, resolvedOn, resolvedBy },
                   index,
                 ) => (
-                  <div key={key()}>
+                  <div key={id}>
                     <h2 className="govuk-body-xs govuk-!-margin-0">
                       <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
                     </h2>

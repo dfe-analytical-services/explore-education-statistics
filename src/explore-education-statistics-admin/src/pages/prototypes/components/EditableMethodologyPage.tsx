@@ -4,11 +4,6 @@ import EditableAccordion from '@admin/components/EditableAccordion';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
-import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
-import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { Component } from 'react';
 import {
@@ -19,13 +14,6 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { EditableRelease } from '@admin/services/publicationService';
-import {
-  FormGroup,
-  FormFieldset,
-  FormTextInput,
-} from '@common/components/form';
-import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
-import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { ContentBlockType } from '@common/services/publicationService';
 
 interface State {

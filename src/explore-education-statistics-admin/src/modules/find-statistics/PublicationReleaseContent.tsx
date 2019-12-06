@@ -31,6 +31,8 @@ interface Props {
   styles: Dictionary<string>;
 
   logEvent?: (...params: string[]) => void;
+
+  onReleaseChange?: (content: ManageContentPageViewModel['release']) => void;
 }
 
 const nullLogEvent = () => {};
@@ -40,15 +42,54 @@ const PublicationReleaseContent = ({
   content,
   styles,
   logEvent = nullLogEvent,
+  onReleaseChange,
 }: Props) => {
-  const { release } = content;
+  const [release, _setRelease] = React.useState(content.release);
+
+  const setRelease = React.useCallback(
+    (newRelease: ManageContentPageViewModel['release']) => {
+      if (onReleaseChange) onReleaseChange(newRelease);
+      _setRelease(newRelease);
+    },
+    [onReleaseChange],
+  );
 
   const accId: string[] = generateIdList(2);
 
-  const releaseCount =
-    release.publication.releases.length +
-    release.publication.legacyReleases.length;
-  const { publication } = release;
+  const releaseCount = React.useMemo(
+    () =>
+      release.publication.releases.length +
+      release.publication.legacyReleases.length,
+    [
+      release.publication.legacyReleases.length,
+      release.publication.releases.length,
+    ],
+  );
+
+  const publication = React.useMemo(() => release.publication, [release]);
+
+  const onAccordionContentChange = React.useCallback(
+    newContent => {
+      setRelease({
+        ...release,
+        content: newContent,
+      });
+    },
+    [release, setRelease],
+  );
+
+  const onSummaryContentChange = React.useCallback(
+    newContent => {
+      setRelease({
+        ...release,
+        summarySection: {
+          ...release.summarySection,
+          content: newContent,
+        },
+      });
+    },
+    [release, setRelease],
+  );
 
   return (
     <EditingContext.Provider
@@ -75,6 +116,7 @@ const PublicationReleaseContent = ({
               id={release.summarySection.id as string}
               content={release.summarySection.content}
               canAddSingleBlock
+              onContentChange={onSummaryContentChange}
             />
           )}
 
@@ -190,10 +232,11 @@ const PublicationReleaseContent = ({
       )}
 
       <ReleaseContentAccordion
-        release={release}
-        content={release.content}
+        releaseId={release.id}
+        publication={publication}
         accordionId={accId[0]}
         sectionName="Contents"
+        onContentChange={c => onAccordionContentChange(c)}
       />
 
       <AdminPublicationReleaseHelpAndSupportSection

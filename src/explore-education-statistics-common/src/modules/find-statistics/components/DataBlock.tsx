@@ -107,6 +107,8 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const data: DataBlockData = response;
     const chartMetadata = parseMetaData(response.metaData);
 
+    if (chartMetadata === undefined) return;
+
     const { charts, summary, tables, heading } = this.props;
 
     if (response.result.length > 0) {

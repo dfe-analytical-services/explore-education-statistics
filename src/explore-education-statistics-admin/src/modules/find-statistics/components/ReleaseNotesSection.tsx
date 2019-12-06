@@ -244,7 +244,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
             summary={`See all ${releaseNotes.length} updates`}
           >
             {releaseNotes.map((elem, index) => (
-              <>
+              <React.Fragment key={elem.id}>
                 {isEditing &&
                 editFormOpen &&
                 selectedReleaseNote.id === elem.id ? (
@@ -277,7 +277,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                   </div>
                 )}
                 {index < releaseNotes.length - 1 && <hr />}
-              </>
+              </React.Fragment>
             ))}
           </Details>
         </dd>
