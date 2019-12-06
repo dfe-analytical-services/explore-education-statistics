@@ -28,7 +28,7 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
@@ -179,4 +179,4 @@ const CreateReleasePage = ({
   );
 };
 
-export default withErrorControl(CreateReleasePage);
+export default withErrorControl(withRouter(CreateReleasePage));

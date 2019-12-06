@@ -190,10 +190,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
             ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId, () =>
-            {
-                return _releaseService.EditReleaseSummaryAsync(releaseId, request);
-            });
+            return await CheckReleaseExistsAsync(releaseId, 
+                () => _releaseService.EditReleaseSummaryAsync(releaseId, request));
         }
 
         // GET api/publications/{publicationId}/releases

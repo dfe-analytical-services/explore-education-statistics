@@ -5,6 +5,9 @@ import {
   AdminDashboardPublication,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
@@ -37,12 +40,17 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-export interface Props extends RouteComponentProps {
+export interface Props extends RouteComponentProps, ErrorControlProps {
   themeId?: string;
   topicId?: string;
 }
 
-const MyPublicationsTab = ({ themeId, topicId, history }: Props) => {
+const MyPublicationsTab = ({
+  themeId,
+  topicId,
+  history,
+  apiErrorFallbackHandler,
+}: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -81,7 +89,8 @@ const MyPublicationsTab = ({ themeId, topicId, history }: Props) => {
       .getMyThemesAndTopics()
       .then(themeList =>
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      );
+      )
+      .catch(apiErrorFallbackHandler);
   }, []);
 
   useEffect(() => {
@@ -207,4 +216,4 @@ const MyPublicationsTab = ({ themeId, topicId, history }: Props) => {
   );
 };
 
-export default withRouter(MyPublicationsTab);
+export default withErrorControl(withRouter(MyPublicationsTab));

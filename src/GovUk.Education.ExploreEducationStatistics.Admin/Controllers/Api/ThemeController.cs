@@ -27,6 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/me/themes")]
         public ActionResult<List<Theme>> GetMyThemes()
         {
+            if (true)
+            {
+                return new ForbidResult();
+            }
+
             var userId = new Guid(); // TODO get the Guid from AD
 
             var result = _themeService.GetUserThemes(userId);
