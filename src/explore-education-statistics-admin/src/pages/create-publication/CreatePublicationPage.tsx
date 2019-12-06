@@ -3,6 +3,9 @@ import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
@@ -50,30 +53,35 @@ interface CreatePublicationModel {
 const CreatePublicationPage = ({
   match,
   history,
-}: RouteComponentProps<MatchProps>) => {
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { topicId } = match.params;
 
   const [model, setModel] = useState<CreatePublicationModel>();
 
   useEffect(() => {
-    Promise.all([
-      service.getMethodologies(),
-      service.getPublicationAndReleaseContacts(),
-      service.getTopic(topicId),
-    ]).then(([methodologies, contacts, topic]) => {
-      setModel({
-        methodologies,
-        contacts,
-        topic,
-      });
-    });
+    handleApiErrors(
+      Promise.all([
+        service.getMethodologies(),
+        service.getPublicationAndReleaseContacts(),
+        service.getTopic(topicId),
+      ]).then(([methodologies, contacts, topic]) => {
+        setModel({
+          methodologies,
+          contacts,
+          topic,
+        });
+      }),
+    );
   }, [topicId]);
 
   const submitFormHandler = async (values: FormValues) => {
-    await service.createPublication({
-      topicId,
-      ...values,
-    });
+    await handleApiErrors(
+      service.createPublication({
+        topicId,
+        ...values,
+      }),
+    );
 
     history.push(dashboardRoutes.adminDashboard);
   };
@@ -240,4 +248,4 @@ const CreatePublicationPage = ({
   );
 };
 
-export default CreatePublicationPage;
+export default withErrorControl(CreatePublicationPage);

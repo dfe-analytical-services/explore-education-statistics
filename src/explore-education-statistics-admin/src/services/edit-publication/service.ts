@@ -5,14 +5,7 @@ import {
 } from '@admin/services/edit-publication/types';
 import client from '@admin/services/util/service';
 
-export interface PublicationService {
-  getMethodologies: () => Promise<IdTitlePair[]>;
-  getPublicationAndReleaseContacts: () => Promise<ContactDetails[]>;
-  getTopic: (topicId: string) => Promise<Topic>;
-  createPublication: (createRequest: CreatePublicationRequest) => Promise<void>;
-}
-
-const service: PublicationService = {
+const service = {
   getMethodologies(): Promise<IdTitlePair[]> {
     return client.get<IdTitlePair[]>('/methodologies');
   },
@@ -22,7 +15,7 @@ const service: PublicationService = {
   getTopic(topicId: string): Promise<Topic> {
     return client.get<Topic>(`topic/${topicId}/`);
   },
-  createPublication(createRequest) {
+  createPublication(createRequest: CreatePublicationRequest) {
     return client.post(`/topic/${createRequest.topicId}/publications`, {
       title: createRequest.publicationTitle,
       contactId: createRequest.selectedContactId,

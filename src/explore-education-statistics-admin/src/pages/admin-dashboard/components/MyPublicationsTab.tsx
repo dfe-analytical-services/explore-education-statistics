@@ -1,5 +1,8 @@
+import Link from '@admin/components/Link';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
+import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import {
   AdminDashboardPublication,
@@ -8,14 +11,11 @@ import {
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
-import { IdTitlePair } from '@admin/services/common/types';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import Link from '@admin/components/Link';
 import { RouteComponentProps, withRouter } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
@@ -50,6 +50,7 @@ const MyPublicationsTab = ({
   topicId,
   history,
   apiErrorFallbackHandler,
+  handleApiErrors,
 }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
@@ -85,12 +86,14 @@ const MyPublicationsTab = ({
   };
 
   useEffect(() => {
-    dashboardService
-      .getMyThemesAndTopics()
-      .then(themeList =>
-        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      )
-      .catch(apiErrorFallbackHandler);
+    handleApiErrors(
+      dashboardService
+        .getMyThemesAndTopics()
+        .then(themeList =>
+          setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
+        ),
+      apiErrorFallbackHandler,
+    );
   }, []);
 
   useEffect(() => {
@@ -116,9 +119,12 @@ const MyPublicationsTab = ({
 
   useEffect(() => {
     if (selectedThemeAndTopic.topic.id === topicId) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications);
+      handleApiErrors(
+        dashboardService
+          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .then(setMyPublications),
+        apiErrorFallbackHandler,
+      );
     } else if (selectedThemeAndTopic.topic.id !== '') {
       history.push(
         generateAdminDashboardThemeTopicLink(

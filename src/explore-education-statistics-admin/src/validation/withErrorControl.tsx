@@ -3,8 +3,10 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { Omit } from 'react-router';
 
+export type ApiErrorHandler = (error: AxiosResponse) => void;
+
 export interface ErrorControlProps {
-  apiErrorFallbackHandler: (error: AxiosResponse) => void;
+  handleApiErrors: <T>(promise: Promise<T>) => Promise<T>;
 }
 
 /**
@@ -24,7 +26,8 @@ export interface ErrorControlProps {
  */
 function withErrorControl<
   P extends ErrorControlProps & any,
-  O extends Omit<P, keyof ErrorControlProps>
+  O extends Omit<P, keyof ErrorControlProps>,
+  T
 >(Component: React.ComponentType<P>): (props: O) => JSX.Element {
   // eslint-disable-next-line react/display-name
   return (props: O) => (
@@ -33,8 +36,11 @@ function withErrorControl<
         return (
           <Component
             {...props}
-            apiErrorFallbackHandler={(error: AxiosResponse) =>
-              setErrorCode(error.status)
+            handleApiErrors={(promise: Promise<T>) =>
+              promise.catch(error => {
+                setErrorCode(error.status);
+                return Promise.reject(error);
+              })
             }
           />
         );
