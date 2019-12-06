@@ -3,6 +3,7 @@ import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -36,14 +37,6 @@ interface FormValues {
   selectedContactId: string;
 }
 
-const serverSideValidationHandler = handleServerSideValidation(
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'publicationTitle',
-    'Choose a unique title',
-  ),
-);
-
 interface CreatePublicationModel {
   methodologies: IdTitlePair[];
   contacts: ContactDetails[];
@@ -75,16 +68,22 @@ const CreatePublicationPage = ({
     );
   }, [topicId]);
 
-  const submitFormHandler = async (values: FormValues) => {
-    await handleApiErrors(
-      service.createPublication({
+  const submitFormHandler = submitWithFormikValidation(
+    async (values: FormValues) => {
+      await service.createPublication({
         topicId,
         ...values,
-      }),
-    );
+      });
 
-    history.push(dashboardRoutes.adminDashboard);
-  };
+      history.push(dashboardRoutes.adminDashboard);
+    },
+    handleApiErrors,
+    errorCodeToFieldError(
+      'SLUG_NOT_UNIQUE',
+      'publicationTitle',
+      'Choose a unique title',
+    ),
+  );
 
   const cancelHandler = () => {
     history.push(dashboardRoutes.adminDashboard);
@@ -161,10 +160,7 @@ const CreatePublicationPage = ({
           onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
-              <Form
-                id={formId}
-                submitValidationHandler={serverSideValidationHandler}
-              >
+              <Form id={formId}>
                 <FormFieldTextInput
                   id={`${formId}-publicationTitle`}
                   label="Enter publication title"
