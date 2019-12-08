@@ -4,6 +4,9 @@ import ManageReleaseContext, {
 } from '@admin/pages/release/ManageReleaseContext';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import service from '@admin/services/release/edit-release/status/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -18,13 +21,19 @@ interface FormValues {
   internalReleaseNote: string;
 }
 
-const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
+const ReleaseStatusPage = ({
+  history,
+  handleApiErrors,
+}: RouteComponentProps & ErrorControlProps) => {
   const [releaseStatus, setReleaseStatus] = useState<ReleaseStatus>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   useEffect(() => {
-    service.getReleaseStatus(releaseId).then(setReleaseStatus);
+    service
+      .getReleaseStatus(releaseId)
+      .then(setReleaseStatus)
+      .catch(handleApiErrors);
   }, [releaseId]);
 
   const formId = 'releaseStatusForm';
@@ -42,7 +51,10 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
             internalReleaseNote: '',
           }}
           onSubmit={async (values: FormValues) => {
-            await service.updateReleaseStatus(releaseId, values);
+            await service
+              .updateReleaseStatus(releaseId, values)
+              .catch(handleApiErrors);
+
             history.push(dashboardRoutes.adminDashboard);
           }}
           validationSchema={Yup.object<FormValues>({
@@ -98,4 +110,4 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
   );
 };
 
-export default ReleaseStatusPage;
+export default withErrorControl(ReleaseStatusPage);
