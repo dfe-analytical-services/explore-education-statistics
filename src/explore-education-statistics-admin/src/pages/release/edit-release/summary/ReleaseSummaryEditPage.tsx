@@ -58,7 +58,7 @@ const ReleaseSummaryEditPage = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation<EditFormValues>(
+  const submitFormHandler = submitWithFormikValidation<EditFormValues>(
     async values => {
       const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
         releaseId,
@@ -97,7 +97,7 @@ const ReleaseSummaryEditPage = ({
                 releaseSummaryDetails.nextReleaseDate,
               ),
             })}
-            onSubmitHandler={submitHandler}
+            onSubmitHandler={submitFormHandler}
             onCancelHandler={cancelHandler}
           />
         </>

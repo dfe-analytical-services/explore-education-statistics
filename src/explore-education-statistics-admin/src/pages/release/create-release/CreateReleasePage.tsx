@@ -81,7 +81,7 @@ const CreateReleasePage = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation<FormValues>(
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
       const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
         publicationId,
@@ -154,7 +154,7 @@ const CreateReleasePage = ({
               ? Yup.string().required('Choose a template')
               : Yup.string(),
         })}
-        onSubmitHandler={submitHandler}
+        onSubmitHandler={submitFormHandler}
         onCancelHandler={cancelHandler}
         additionalFields={
           model && (

@@ -137,7 +137,7 @@ const ReleaseDataUploadsSection = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation<FormValues>(
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
       await service
         .uploadDataFiles(releaseId, {
@@ -161,7 +161,7 @@ const ReleaseDataUploadsSection = ({
         dataFile: null,
         metadataFile: null,
       }}
-      onSubmit={submitHandler}
+      onSubmit={submitFormHandler}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')

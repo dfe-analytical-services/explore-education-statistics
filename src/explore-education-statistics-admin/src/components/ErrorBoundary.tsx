@@ -19,6 +19,13 @@ interface State {
   errorCode?: number;
 }
 
+/**
+ * This Component is responsible for rendering error pages of specific types (or a fallback "Service problems" page
+ * dependant on the type of error encountered.
+ *
+ * This Component provides a Context which allows child components to use a "handleApiErrors" callback to signal errors
+ * back to this page.
+ */
 class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   public state: State = {};
 

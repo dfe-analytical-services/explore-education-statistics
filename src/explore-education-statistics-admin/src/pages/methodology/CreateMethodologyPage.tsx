@@ -75,7 +75,7 @@ const CreateMethodologyPage = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation<FormValues>(
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
       const submission: CreateMethodologyRequest = {
         title: values.methodologyTitle,
@@ -146,7 +146,7 @@ const CreateMethodologyPage = ({
             ),
             scheduledPublishDate: validateMandatoryDayMonthYearField,
           })}
-          onSubmit={submitHandler}
+          onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>

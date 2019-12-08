@@ -70,7 +70,7 @@ const ReleaseFileUploadsSection = ({
     ),
   ];
 
-  const submitHandler = submitWithFormikValidation<FormValues>(
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
       await service
         .uploadAncillaryFile(releaseId, {
@@ -92,7 +92,7 @@ const ReleaseFileUploadsSection = ({
         name: '',
         file: null,
       }}
-      onSubmit={submitHandler}
+      onSubmit={submitFormHandler}
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
