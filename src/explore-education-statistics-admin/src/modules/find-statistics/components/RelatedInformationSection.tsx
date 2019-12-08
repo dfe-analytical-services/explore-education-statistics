@@ -1,3 +1,6 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import { BasicLink } from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
@@ -19,7 +22,10 @@ interface Props {
   release: ManageContentPageViewModel['release'];
 }
 
-const RelatedInformationSection = ({ release }: Props) => {
+const RelatedInformationSection = ({
+  release,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
@@ -27,15 +33,21 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      relatedInformationService.create(release.id, link).then(newLinks => {
-        setLinks(newLinks);
-        resolve();
-      });
+      relatedInformationService
+        .create(release.id, link)
+        .then(newLinks => {
+          setLinks(newLinks);
+          resolve();
+        })
+        .catch(handleApiErrors);
     });
   };
 
   const removeLink = (linkId: string) => {
-    relatedInformationService.delete(release.id, linkId).then(setLinks);
+    relatedInformationService
+      .delete(release.id, linkId)
+      .then(setLinks)
+      .catch(handleApiErrors);
   };
 
   const renderLinkForm = () => {
@@ -124,4 +136,4 @@ const RelatedInformationSection = ({ release }: Props) => {
   );
 };
 
-export default RelatedInformationSection;
+export default withErrorControl(RelatedInformationSection);

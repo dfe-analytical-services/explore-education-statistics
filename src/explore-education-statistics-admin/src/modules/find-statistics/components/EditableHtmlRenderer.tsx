@@ -1,6 +1,7 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import React from 'react';
+import React, { useContext } from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
@@ -23,6 +24,8 @@ const EditableHtmlRenderer = ({
 
   const editingContext = React.useContext(EditingContentBlockContext);
 
+  const { handleApiErrors } = useContext(ErrorControlContext);
+
   return (
     <>
       <WysiwygEditor
@@ -35,16 +38,16 @@ const EditableHtmlRenderer = ({
             editingContext.sectionId &&
             contentId
           ) {
-            const {
-              body,
-            } = await releaseContentService.updateContentSectionBlock(
-              editingContext.releaseId,
-              editingContext.sectionId,
-              contentId,
-              {
-                body: ss,
-              },
-            );
+            const { body } = await releaseContentService
+              .updateContentSectionBlock(
+                editingContext.releaseId,
+                editingContext.sectionId,
+                contentId,
+                {
+                  body: ss,
+                },
+              )
+              .catch(handleApiErrors);
 
             setHtml(body);
           }

@@ -1,3 +1,6 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import {
   ReleaseNote,
   DayMonthYearInputs,
@@ -44,7 +47,11 @@ const emptyReleaseNote: ReleaseNote = {
   reason: '',
 };
 
-const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
+const ReleaseNotesSection = ({
+  release,
+  logEvent = nullLogEvent,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
@@ -65,7 +72,8 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        });
+        })
+        .catch(handleApiErrors);
     });
   };
 
@@ -79,7 +87,8 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        });
+        })
+        .catch(handleApiErrors);
     });
   };
 
@@ -293,6 +302,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
           await releaseNoteService
             .delete(deletedReleaseNote.id, release.id)
             .then(setReleaseNotes)
+            .catch(handleApiErrors)
             .finally(() => setDeletedReleaseNote(emptyReleaseNote));
         }}
       >
@@ -302,4 +312,4 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   );
 };
 
-export default ReleaseNotesSection;
+export default withErrorControl(ReleaseNotesSection);

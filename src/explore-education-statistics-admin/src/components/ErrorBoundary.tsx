@@ -1,16 +1,20 @@
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
+import { ApiErrorHandler } from '@admin/validation/withErrorControl';
+import { AxiosResponse } from 'axios';
 import * as H from 'history';
 import React, { createContext } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface ErrorControl {
   setErrorCode: (errorCode: number) => void;
+  handleApiErrors: ApiErrorHandler;
 }
 
 export const ErrorControlContext = createContext<ErrorControl>({
   setErrorCode: () => {},
+  handleApiErrors: response => {},
 });
 
 interface State {
@@ -54,12 +58,24 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
       });
     };
 
+    const handleApiErrors = (error: AxiosResponse) => {
+      this.setState({
+        errorCode: error.status || 500,
+      });
+      throw error;
+    };
+
     const { children } = this.props;
     const { errorCode } = this.state;
 
     if (!errorCode) {
       return (
-        <ErrorControlContext.Provider value={{ setErrorCode }}>
+        <ErrorControlContext.Provider
+          value={{
+            setErrorCode,
+            handleApiErrors,
+          }}
+        >
           {children}
         </ErrorControlContext.Provider>
       );

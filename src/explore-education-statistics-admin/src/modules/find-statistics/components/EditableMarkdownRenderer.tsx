@@ -1,6 +1,7 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import React from 'react';
+import React, { useContext } from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
@@ -24,6 +25,8 @@ const EditableMarkdownRenderer = ({
 
   const editingContext = React.useContext(EditingContentBlockContext);
 
+  const { handleApiErrors } = useContext(ErrorControlContext);
+
   return (
     <>
       <WysiwygEditor
@@ -37,16 +40,16 @@ const EditableMarkdownRenderer = ({
             editingContext.sectionId &&
             contentId
           ) {
-            const {
-              body,
-            } = await releaseContentService.updateContentSectionBlock(
-              editingContext.releaseId,
-              editingContext.sectionId,
-              contentId,
-              {
-                body: ss,
-              },
-            );
+            const { body } = await releaseContentService
+              .updateContentSectionBlock(
+                editingContext.releaseId,
+                editingContext.sectionId,
+                contentId,
+                {
+                  body: ss,
+                },
+              )
+              .catch(handleApiErrors);
 
             setMarkdown(body);
           }

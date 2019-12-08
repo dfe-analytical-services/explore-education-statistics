@@ -1,21 +1,22 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
+import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
+import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
+import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { EditableRelease } from '@admin/services/publicationService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import ContentBlock, {
   ContentBlockProps,
 } from '@common/modules/find-statistics/components/ContentBlock';
-import React from 'react';
 import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
-import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { Dictionary } from '@common/types/util';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import React, { useContext, useState } from 'react';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import ContentBlockDraggable from './ContentBlockDraggable';
+import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 type ContentType = EditableRelease['content'][0]['content'];
 
@@ -61,11 +62,11 @@ const EditableContentBlock = ({
   isReordering = false,
   onReorderHook = undefined,
 }: Props) => {
-  const editingContext = React.useContext(EditingContext);
+  const editingContext = useContext(EditingContext);
 
-  const [contentBlocks, setContentBlocks] = React.useState<ContentType>(
-    content,
-  );
+  const [contentBlocks, setContentBlocks] = useState<ContentType>(content);
+
+  const { handleApiErrors } = useContext(ErrorControlContext);
 
   React.useEffect(() => {
     if (onReorderHook) {
@@ -76,11 +77,13 @@ const EditableContentBlock = ({
             {},
           );
 
-          await releaseContentService.updateContentSectionBlocksOrder(
-            editingContext.releaseId,
-            contentSectionId,
-            newOrder,
-          );
+          await releaseContentService
+            .updateContentSectionBlocksOrder(
+              editingContext.releaseId,
+              contentSectionId,
+              newOrder,
+            )
+            .catch(handleApiErrors);
 
           if (onContentChange) {
             onContentChange(contentBlocks);
@@ -107,7 +110,8 @@ const EditableContentBlock = ({
         .then(section => {
           if (onContentChange) onContentChange(section.content);
           setContentBlocks(section.content);
-        });
+        })
+        .catch(handleApiErrors);
     }
   };
 
@@ -127,11 +131,9 @@ const EditableContentBlock = ({
   const onDeleteContent = async (contentId: string) => {
     const { releaseId } = editingContext;
     if (releaseId && sectionId && contentId) {
-      await releaseContentService.deleteContentSectionBlock(
-        releaseId,
-        sectionId,
-        contentId,
-      );
+      await releaseContentService
+        .deleteContentSectionBlock(releaseId, sectionId, contentId)
+        .catch(handleApiErrors);
 
       const {
         content: newContentBlocks,

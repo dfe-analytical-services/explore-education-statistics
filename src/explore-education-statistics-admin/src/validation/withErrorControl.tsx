@@ -32,16 +32,8 @@ function withErrorControl<
   // eslint-disable-next-line react/display-name
   return (props: O) => (
     <ErrorControlContext.Consumer>
-      {({ setErrorCode }) => {
-        return (
-          <Component
-            {...props}
-            handleApiErrors={(error: AxiosResponse) => {
-              setErrorCode(error.status || 500);
-              throw error;
-            }}
-          />
-        );
+      {({ handleApiErrors }) => {
+        return <Component {...props} handleApiErrors={handleApiErrors} />;
       }}
     </ErrorControlContext.Consumer>
   );

@@ -1,4 +1,7 @@
 import Accordion from '@admin/components/EditableAccordion';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import React from 'react';
 import { AbstractRelease } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
@@ -19,28 +22,33 @@ const ReleaseContentAccordion = ({
   release,
   accordionId,
   sectionName,
-}: ReleaseContentAccordionProps) => {
+  handleApiErrors,
+}: ReleaseContentAccordionProps & ErrorControlProps) => {
   const [content, setContent] = React.useState<ContentType[]>([]);
 
   const onReorder = React.useCallback(
     async (ids: Dictionary<number>) => {
-      const newContent = await releaseContentService.updateContentSectionsOrder(
-        release.id,
-        ids,
-      );
+      const newContent = await releaseContentService
+        .updateContentSectionsOrder(release.id, ids)
+        .catch(handleApiErrors);
       setContent(newContent);
     },
     [release.id],
   );
 
   React.useEffect(() => {
-    releaseContentService.getContentSections(release.id).then(setContent);
+    releaseContentService
+      .getContentSections(release.id)
+      .then(setContent)
+      .catch(handleApiErrors);
   }, [release.id]);
 
   const onAddSection = React.useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
-      await releaseContentService.addContentSection(release.id, content.length),
+      await releaseContentService
+        .addContentSection(release.id, content.length)
+        .catch(handleApiErrors),
     ];
 
     setContent(newContent);
@@ -50,11 +58,9 @@ const ReleaseContentAccordion = ({
     async (block: ContentType, index: number, newTitle: string) => {
       let result;
       if (block.id) {
-        result = await releaseContentService.updateContentSectionHeading(
-          release.id,
-          block.id,
-          newTitle,
-        );
+        result = await releaseContentService
+          .updateContentSectionHeading(release.id, block.id, newTitle)
+          .catch(handleApiErrors);
 
         const newContent = [...content];
         newContent[index].heading = newTitle;
@@ -91,4 +97,4 @@ const ReleaseContentAccordion = ({
   );
 };
 
-export default ReleaseContentAccordion;
+export default withErrorControl(ReleaseContentAccordion);
