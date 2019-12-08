@@ -2,7 +2,10 @@
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -22,7 +25,9 @@ interface DataBlockData {
   dataBlockResponse: DataBlockResponse;
 }
 
-const ReleaseManageDataBlocksPage = () => {
+const ReleaseManageDataBlocksPage = ({
+  handleApiErrors,
+}: ErrorControlProps) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
@@ -38,9 +43,10 @@ const ReleaseManageDataBlocksPage = () => {
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
   const updateDataBlocks = (rId: string) => {
-    return DataBlocksService.getDataBlocks(rId).then(blocks => {
-      setDataBlocks(blocks);
-    });
+    return dataBlocksService
+      .getDataBlocks(rId)
+      .then(setDataBlocks)
+      .catch(handleApiErrors);
   };
 
   React.useEffect(() => {
@@ -59,9 +65,11 @@ const ReleaseManageDataBlocksPage = () => {
   const onDeleteDataBlock = (db: DataBlock) => {
     setDeleteDataBlock(undefined);
     if (db.id) {
-      DataBlocksService.deleteDataBlock(db.id)
+      dataBlocksService
+        .deleteDataBlock(db.id)
         .then(() => updateDataBlocks(releaseId))
-        .then(() => setSelectedDataBlock(''));
+        .then(() => setSelectedDataBlock(''))
+        .catch(handleApiErrors);
     }
   };
 
@@ -149,13 +157,17 @@ const ReleaseManageDataBlocksPage = () => {
       let newDataBlocksList;
 
       if (db.id) {
-        newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+        newDataBlock = await dataBlocksService
+          .putDataBlock(db.id, db)
+          .catch(handleApiErrors);
         newDataBlocksList = [
           ...dataBlocks.filter(db => db.id !== selectedDataBlock),
           newDataBlock,
         ];
       } else {
-        newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+        newDataBlock = await dataBlocksService
+          .postDataBlock(releaseId, db)
+          .catch(handleApiErrors);
         newDataBlocksList = [...dataBlocks, newDataBlock];
       }
       setDataBlocks(newDataBlocksList);
@@ -274,4 +286,4 @@ const ReleaseManageDataBlocksPage = () => {
   );
 };
 
-export default ReleaseManageDataBlocksPage;
+export default withErrorControl(ReleaseManageDataBlocksPage);

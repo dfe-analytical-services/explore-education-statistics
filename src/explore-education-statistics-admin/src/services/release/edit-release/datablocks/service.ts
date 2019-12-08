@@ -8,26 +8,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 
-export interface DataBlockService {
-  getDataBlocks: (releaseId: string) => Promise<DataBlock[]>;
-  postDataBlock: (
-    releaseId: string,
-    dataBlock: DataBlock,
-  ) => Promise<DataBlock>;
-  putDataBlock: (
-    dataBlockId: string,
-    dataBlock: DataBlock,
-  ) => Promise<DataBlock>;
-  deleteDataBlock: (id: string) => Promise<void>;
-}
-
-type AllowedClasses =
-  | typeof CategoryFilter
-  | typeof Indicator
-  | typeof TimePeriodFilter
-  | typeof LocationFilter;
-
-const service: DataBlockService = {
+const service = {
   async getDataBlocks(releaseId: string) {
     return client.get<DataBlock[]>(`/release/${releaseId}/datablocks`, {});
   },
