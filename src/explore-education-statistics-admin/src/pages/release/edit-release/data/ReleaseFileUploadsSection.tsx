@@ -1,16 +1,15 @@
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { Form, FormFieldset, Formik } from '@common/components/form';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -58,7 +57,7 @@ const ReleaseFileUploadsSection = ({
     setFiles(latestFiles);
   };
 
-  const handleServerValidation = handleServerSideValidation(
+  const errorCodeMappings = [
     errorCodeToFieldError(
       'CANNOT_OVERWRITE_FILE',
       'file',
@@ -69,6 +68,21 @@ const ReleaseFileUploadsSection = ({
       'file',
       'Choose a file that is not empty',
     ),
+  ];
+
+  const submitHandler = submitWithFormikValidation<FormValues>(
+    async (values, actions) => {
+      await service
+        .uploadAncillaryFile(releaseId, {
+          name: values.name,
+          file: values.file as File,
+        })
+        .catch(handleApiErrors);
+
+      await resetPage(actions);
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
   );
 
   return (
@@ -78,23 +92,14 @@ const ReleaseFileUploadsSection = ({
         name: '',
         file: null,
       }}
-      onSubmit={async (values: FormValues, actions) => {
-        await service
-          .uploadAncillaryFile(releaseId, {
-            name: values.name,
-            file: values.file as File,
-          })
-          .catch(handleApiErrors);
-
-        resetPage(actions);
-      }}
+      onSubmit={submitHandler}
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
-          <Form id={formId} submitValidationHandler={handleServerValidation}>
+          <Form id={formId}>
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Upload file"

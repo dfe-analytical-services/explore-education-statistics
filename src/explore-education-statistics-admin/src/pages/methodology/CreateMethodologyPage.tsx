@@ -4,6 +4,7 @@ import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import methodologyService from '@admin/services/methodology/service';
 import { CreateMethodologyRequest } from '@admin/services/methodology/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import withErrorControl, {
   ErrorControlProps,
@@ -14,9 +15,7 @@ import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -42,14 +41,6 @@ interface FormValues {
   scheduledPublishDate: DayMonthYearInputs;
 }
 
-const serverSideValidationHandler = handleServerSideValidation(
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'methodologyTitle',
-    'Choose a unique title',
-  ),
-);
-
 interface CreateMethodologyModel {
   contacts: ContactDetails[];
 }
@@ -72,20 +63,6 @@ const CreateMethodologyPage = ({
       .catch(handleApiErrors);
   }, []);
 
-  const submitFormHandler = async (values: FormValues) => {
-    const submission: CreateMethodologyRequest = {
-      title: values.methodologyTitle,
-      publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-      contactId: values.selectedContactId,
-    };
-
-    const createdMethodology = await methodologyService.createMethodology(
-      submission,
-    );
-
-    history.push(`/methodology/${createdMethodology.id}`);
-  };
-
   const cancelHandler = () => history.push('/methodology');
 
   const getSelectedContact = (
@@ -94,6 +71,32 @@ const CreateMethodologyPage = ({
   ) =>
     availableContacts.find(contact => contact.id === contactId) ||
     availableContacts[0];
+
+  const errorCodeMappings = [
+    errorCodeToFieldError(
+      'SLUG_NOT_UNIQUE',
+      'methodologyTitle',
+      'Choose a unique title',
+    ),
+  ];
+
+  const submitHandler = submitWithFormikValidation<FormValues>(
+    async values => {
+      const submission: CreateMethodologyRequest = {
+        title: values.methodologyTitle,
+        publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
+        contactId: values.selectedContactId,
+      };
+
+      const createdMethodology = await methodologyService.createMethodology(
+        submission,
+      );
+
+      history.push(`/methodology/${createdMethodology.id}`);
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
+  );
 
   const formId = 'createMethodologyForm';
 
@@ -148,13 +151,10 @@ const CreateMethodologyPage = ({
             ),
             scheduledPublishDate: validateMandatoryDayMonthYearField,
           })}
-          onSubmit={submitFormHandler}
+          onSubmit={submitHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
-              <Form
-                id={formId}
-                submitValidationHandler={serverSideValidationHandler}
-              >
+              <Form id={formId}>
                 <FormFieldTextInput
                   id={`${formId}-methodologyTitle`}
                   label="Enter methodology title"

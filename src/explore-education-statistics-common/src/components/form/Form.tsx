@@ -16,11 +16,6 @@ interface Props {
   children: ReactNode;
   id: string;
   submitId?: string;
-  submitValidationHandler?: <T extends {}>(
-    errors: ServerValidationErrors,
-    setFieldError: FieldErrorSetter,
-    setGlobalError: GlobalErrorSetter,
-  ) => void;
   displayErrorMessageOnUncaughtErrors?: boolean;
 }
 
@@ -46,7 +41,6 @@ const Form = ({
   id,
   submitId = `${id}-submit`,
   formik,
-  submitValidationHandler,
   displayErrorMessageOnUncaughtErrors = false,
 }: Props & { formik: FormikContext<{}> }) => {
   const { errors, touched } = formik;
@@ -97,20 +91,7 @@ const Form = ({
           await formik.submitForm();
         } catch (error) {
           if (error) {
-            if (
-              submitValidationHandler &&
-              isServerValidationError(error.data)
-            ) {
-              submitValidationHandler(
-                error.data as ServerValidationErrors,
-                formik.setFieldError,
-                message =>
-                  setSubmitError({
-                    id: submitId,
-                    message,
-                  }),
-              );
-            } else if (displayErrorMessageOnUncaughtErrors) {
+            if (displayErrorMessageOnUncaughtErrors) {
               setSubmitError({
                 id: submitId,
                 message: error.message,

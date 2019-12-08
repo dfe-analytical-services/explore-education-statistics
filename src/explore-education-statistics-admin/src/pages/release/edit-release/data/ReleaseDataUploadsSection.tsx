@@ -1,6 +1,9 @@
+import ImporterStatus from '@admin/components/ImporterStatus';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
+import { ImportStatusCode } from '@admin/services/release/imports/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -8,9 +11,7 @@ import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -18,8 +19,6 @@ import Yup from '@common/lib/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import ImporterStatus from '@admin/components/ImporterStatus';
-import { ImportStatusCode } from '@admin/services/release/imports/types';
 
 interface FormValues {
   subjectTitle: string;
@@ -95,7 +94,7 @@ const ReleaseDataUploadsSection = ({
     setDataFiles(updatedDataFiles);
   };
 
-  const handleServerValidation = handleServerSideValidation(
+  const errorCodeMappings = [
     errorCodeToFieldError(
       'CANNOT_OVERWRITE_DATA_FILE',
       'dataFile',
@@ -136,6 +135,22 @@ const ReleaseDataUploadsSection = ({
       'subjectTitle',
       'Subject title must be unique',
     ),
+  ];
+
+  const submitHandler = submitWithFormikValidation<FormValues>(
+    async (values, actions) => {
+      await service
+        .uploadDataFiles(releaseId, {
+          subjectTitle: values.subjectTitle,
+          dataFile: values.dataFile as File,
+          metadataFile: values.metadataFile as File,
+        })
+        .catch(handleApiErrors);
+
+      await resetPage(actions);
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
   );
 
   return (
@@ -146,17 +161,7 @@ const ReleaseDataUploadsSection = ({
         dataFile: null,
         metadataFile: null,
       }}
-      onSubmit={async (values: FormValues, actions) => {
-        await service
-          .uploadDataFiles(releaseId, {
-            subjectTitle: values.subjectTitle,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          })
-          .catch(handleApiErrors);
-
-        await resetPage(actions);
-      }}
+      onSubmit={submitHandler}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')
@@ -177,7 +182,7 @@ const ReleaseDataUploadsSection = ({
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
-          <Form id={formId} submitValidationHandler={handleServerValidation}>
+          <Form id={formId}>
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Add new data to release"
