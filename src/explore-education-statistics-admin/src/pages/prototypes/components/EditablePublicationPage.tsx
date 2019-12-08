@@ -298,14 +298,14 @@ class EditablePublicationPage extends Component<Props, State> {
                 </div>
               </div>
 
-              {reviewing && data && (
+              {reviewing && data && data.keyStatisticsSection.content && (
                 <AddComment
                   initialComments={
                     data.keyStatisticsSection.content[0].comments
                   }
                 />
               )}
-              {resolveComments && data && (
+              {resolveComments && data && data.keyStatisticsSection.content && (
                 <ResolveComment
                   initialComments={
                     data.keyStatisticsSection.content[0].comments
@@ -674,12 +674,12 @@ class EditablePublicationPage extends Component<Props, State> {
           <h2 className="govuk-heading-l">
             Latest headline facts and figures - 2018/19
           </h2>
-          {reviewing && data && (
+          {reviewing && data && data.keyStatisticsSection.content && (
             <AddComment
               initialComments={data.keyStatisticsSection.content[0].comments}
             />
           )}
-          {resolveComments && data && (
+          {resolveComments && data && data.keyStatisticsSection.content && (
             <ResolveComment
               initialComments={data.keyStatisticsSection.content[0].comments}
             />

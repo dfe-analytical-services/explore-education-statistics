@@ -63,7 +63,9 @@ class PublicationReleasePage extends Component<Props> {
       <Page
         title={data.publication.title}
         caption={data.title}
-        description={data.summarySection.content[0].body}
+        description={
+          data.summarySection.content && data.summarySection.content[0].body
+        }
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
@@ -135,7 +137,10 @@ class PublicationReleasePage extends Component<Props> {
 
             <ReactMarkdown
               className="govuk-body"
-              source={data.summarySection.content[0].body}
+              source={
+                data.summarySection.content &&
+                data.summarySection.content[0].body
+              }
             />
             {data.downloadFiles && (
               <Details
@@ -273,13 +278,13 @@ class PublicationReleasePage extends Component<Props> {
                     <Link to={`/methodology/${data.publication.slug}`}>
                       {`${data.publication.title}: methodology`}
                     </Link>
-                    {data.relatedInformation &&
-                      data.relatedInformation.map(link => (
-                        <a key={link.id} href={link.url}>
-                          {link.description}
-                        </a>
-                      ))}
                   </li>
+                  {data.relatedInformation &&
+                    data.relatedInformation.map(link => (
+                      <li key={link.id}>
+                        <a href={link.url}>{link.description}</a>
+                      </li>
+                    ))}
                 </ul>
               </nav>
             </RelatedAside>

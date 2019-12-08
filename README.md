@@ -163,6 +163,29 @@ following in your `.env.local`:
 ESLINT_DISABLE=true
 ```
 
+## Backend development
+
+### Migrations
+
+The backend c# projects use code first migrations to generate the application's database schema.
+The entity framework tool will need to be installed as follows:
+```
+dotnet tool install -g dotnet-ef --version 3.0.0`
+```
+
+#### Content DB migrations
+To generate a migration for the content db:
+```
+cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
+dotnet ef migrations add AdjustFiltersIdsPreSeed --context ContentDbContext --output-dir Migrations/ContentMigrations
+```
+#### Statistics DB migrations
+To generate a migration for the statistics db:
+```
+cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
+dotnet ef migrations add Ees183Test --project ..\GovUk.Education.ExploreEducationStatistics.Data.Model
+```
+
 ## Contributing
 
 
