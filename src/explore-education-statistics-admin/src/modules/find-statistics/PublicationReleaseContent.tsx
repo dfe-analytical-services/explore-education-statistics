@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
@@ -6,17 +7,18 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import service from '@admin/services/release/edit-release/data/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
-import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import service from '@admin/services/release/edit-release/data/service';
-import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
@@ -41,7 +43,8 @@ const PublicationReleaseContent = ({
   content,
   styles,
   logEvent = nullLogEvent,
-}: Props) => {
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const { release } = content;
 
   const accId: string[] = generateIdList(2);
@@ -97,7 +100,11 @@ const PublicationReleaseContent = ({
                     <li key={path}>
                       <Link
                         to="#"
-                        onClick={() => service.downloadFile(path, name)}
+                        onClick={() =>
+                          service
+                            .downloadFile(path, name)
+                            .catch(handleApiErrors)
+                        }
                         className="govuk-link"
                       >
                         {name}
@@ -205,4 +212,4 @@ const PublicationReleaseContent = ({
   );
 };
 
-export default PublicationReleaseContent;
+export default withErrorControl(PublicationReleaseContent);

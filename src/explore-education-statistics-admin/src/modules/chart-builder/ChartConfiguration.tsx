@@ -1,5 +1,7 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import service from '@admin/services/release/edit-release/data/service';
+import { ErrorControlProps } from '@admin/validation/withErrorControl';
+import Button from '@common/components/Button';
 import {
   FormCheckbox,
   FormGroup,
@@ -13,7 +15,6 @@ import {
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
-import Button from '@common/components/Button';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -63,7 +64,8 @@ const InfographicChartOptions = ({
   releaseId,
   fileId,
   onChange,
-}: InfographicChartOptionsProps) => {
+  handleApiErrors,
+}: InfographicChartOptionsProps & ErrorControlProps) => {
   const [chartFileOptions, setChartFileOptions] = React.useState<
     SelectOption[]
   >([]);
@@ -95,6 +97,7 @@ const InfographicChartOptions = ({
           setUploadName('');
           setUploadFile(undefined);
         })
+        .catch(handleApiErrors)
         .finally(() => {
           setUploading(false);
         });
@@ -102,9 +105,9 @@ const InfographicChartOptions = ({
   };
 
   React.useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
-      setChartFileOptions,
-    );
+    loadChartFilesAndMapToSelectOptionAsync(releaseId)
+      .then(setChartFileOptions)
+      .catch(handleApiErrors);
   }, [releaseId]);
 
   return (
@@ -167,7 +170,8 @@ const ChartConfiguration = ({
   meta,
   data,
   onBoundaryLevelChange,
-}: Props) => {
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
   );
@@ -194,6 +198,7 @@ const ChartConfiguration = ({
                 fileId,
               });
             }}
+            handleApiErrors={handleApiErrors}
           />
           <hr />
         </>

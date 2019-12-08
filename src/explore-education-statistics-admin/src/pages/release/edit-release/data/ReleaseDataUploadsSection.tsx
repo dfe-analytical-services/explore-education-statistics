@@ -1,6 +1,9 @@
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
@@ -42,12 +45,19 @@ const emptyDataFile: DataFile = {
   created: new Date(),
 };
 
-const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
+const ReleaseDataUploadsSection = ({
+  publicationId,
+  releaseId,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
 
   useEffect(() => {
-    service.getReleaseDataFiles(releaseId).then(setDataFiles);
+    service
+      .getReleaseDataFiles(releaseId)
+      .then(setDataFiles)
+      .catch(handleApiErrors);
   }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
@@ -60,7 +70,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         fileInput.value = '';
       });
 
-    const files = await service.getReleaseDataFiles(releaseId);
+    const files = await service
+      .getReleaseDataFiles(releaseId)
+      .catch(handleApiErrors);
+
     setDataFiles(files);
   };
 
@@ -134,11 +147,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         metadataFile: null,
       }}
       onSubmit={async (values: FormValues, actions) => {
-        await service.uploadDataFiles(releaseId, {
-          subjectTitle: values.subjectTitle,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        });
+        await service
+          .uploadDataFiles(releaseId, {
+            subjectTitle: values.subjectTitle,
+            dataFile: values.dataFile as File,
+            metadataFile: values.metadataFile as File,
+          })
+          .catch(handleApiErrors);
 
         await resetPage(actions);
       }}
@@ -223,7 +238,9 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <Link
                     to="#"
                     onClick={() =>
-                      service.downloadDataFile(releaseId, dataFile.filename)
+                      service
+                        .downloadDataFile(releaseId, dataFile.filename)
+                        .catch(handleApiErrors)
                     }
                   >
                     {dataFile.filename}
@@ -233,10 +250,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <Link
                     to="#"
                     onClick={() =>
-                      service.downloadDataMetadataFile(
-                        releaseId,
-                        dataFile.metadataFilename,
-                      )
+                      service
+                        .downloadDataMetadataFile(
+                          releaseId,
+                          dataFile.metadataFilename,
+                        )
+                        .catch(handleApiErrors)
                     }
                   >
                     {dataFile.metadataFilename}
@@ -284,6 +303,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               onConfirm={async () => {
                 await service
                   .deleteDataFiles(releaseId, deleteDataFile)
+                  .catch(handleApiErrors)
                   .finally(() => {
                     setDeleteDataFile(emptyDataFile);
                     resetPage(form);
@@ -301,4 +321,4 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   );
 };
 
-export default ReleaseDataUploadsSection;
+export default withErrorControl(ReleaseDataUploadsSection);
