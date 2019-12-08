@@ -72,12 +72,10 @@ const ReleaseFileUploadsSection = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
-      await service
-        .uploadAncillaryFile(releaseId, {
-          name: values.name,
-          file: values.file as File,
-        })
-        .catch(handleApiErrors);
+      await service.uploadAncillaryFile(releaseId, {
+        name: values.name,
+        file: values.file as File,
+      });
 
       await resetPage(actions);
     },

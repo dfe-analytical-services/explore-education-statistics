@@ -139,13 +139,11 @@ const ReleaseDataUploadsSection = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
-      await service
-        .uploadDataFiles(releaseId, {
-          subjectTitle: values.subjectTitle,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        })
-        .catch(handleApiErrors);
+      await service.uploadDataFiles(releaseId, {
+        subjectTitle: values.subjectTitle,
+        dataFile: values.dataFile as File,
+        metadataFile: values.metadataFile as File,
+      });
 
       await resetPage(actions);
     },
