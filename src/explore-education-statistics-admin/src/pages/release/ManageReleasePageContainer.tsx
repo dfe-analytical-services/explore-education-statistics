@@ -32,7 +32,7 @@ const ManageReleasePageContainer = ({
       .getBasicPublicationDetails(publicationId)
       .then(setPublication)
       .catch(handleApiErrors);
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const currentRouteIndex =
     viewRoutes.findIndex(

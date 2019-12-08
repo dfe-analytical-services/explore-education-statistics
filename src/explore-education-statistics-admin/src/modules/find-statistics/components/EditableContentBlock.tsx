@@ -94,7 +94,13 @@ const EditableContentBlock = ({
       };
       onReorderHook(saveOrder);
     }
-  }, [contentBlocks, editingContext.releaseId, onContentChange, onReorderHook]);
+  }, [
+    contentBlocks,
+    editingContext.releaseId,
+    onContentChange,
+    onReorderHook,
+    handleApiErrors,
+  ]);
 
   const onAddContentCallback = (type: string, order: number | undefined) => {
     if (editingContext.releaseId && sectionId) {

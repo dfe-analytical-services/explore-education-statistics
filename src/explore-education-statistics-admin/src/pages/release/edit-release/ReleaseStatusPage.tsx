@@ -34,7 +34,7 @@ const ReleaseStatusPage = ({
       .getReleaseStatus(releaseId)
       .then(setReleaseStatus)
       .catch(handleApiErrors);
-  }, [releaseId]);
+  }, [releaseId, handleApiErrors]);
 
   const formId = 'releaseStatusForm';
 

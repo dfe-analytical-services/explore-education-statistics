@@ -91,7 +91,7 @@ const MyPublicationsTab = ({
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
       )
       .catch(handleApiErrors);
-  }, []);
+  }, [handleApiErrors]);
 
   useEffect(() => {
     if (themes) {

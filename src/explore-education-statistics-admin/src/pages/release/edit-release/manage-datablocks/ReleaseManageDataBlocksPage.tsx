@@ -181,7 +181,7 @@ const ReleaseManageDataBlocksPage = ({
 
       return newDataBlock;
     },
-    [dataBlocks, doLoad, releaseId, selectedDataBlock],
+    [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
   );
 
   React.useEffect(() => {

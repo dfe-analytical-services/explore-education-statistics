@@ -42,7 +42,7 @@ const ReleaseFileUploadsSection = ({
       .getAncillaryFiles(releaseId)
       .then(setFiles)
       .catch(handleApiErrors);
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();

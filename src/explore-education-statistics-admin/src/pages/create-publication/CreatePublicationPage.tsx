@@ -64,7 +64,7 @@ const CreatePublicationPage = ({
         });
       })
       .catch(handleApiErrors);
-  }, [topicId]);
+  }, [topicId, handleApiErrors]);
 
   const submitFormHandler = submitWithFormikValidation(
     async (values: FormValues) => {

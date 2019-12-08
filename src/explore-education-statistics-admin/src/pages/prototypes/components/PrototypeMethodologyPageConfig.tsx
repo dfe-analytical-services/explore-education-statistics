@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import Link from '@admin/components/Link';
 import {
-  FormGroup,
   FormFieldset,
+  FormGroup,
   FormSelect,
   FormTextInput,
-  FormRadioGroup,
 } from '@common/components/form';
-import Link from '@admin/components/Link';
+import React from 'react';
 
 interface Props {
   sectionId?: string;
@@ -15,8 +14,6 @@ interface Props {
 }
 
 const PrototypeMethodologyConfig = ({ sectionId, title }: Props) => {
-  const contactSelection = document.querySelector('#select-lead-statistician');
-
   return (
     <>
       {sectionId === 'setup' && (

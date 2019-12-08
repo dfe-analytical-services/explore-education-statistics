@@ -108,7 +108,7 @@ const InfographicChartOptions = ({
     loadChartFilesAndMapToSelectOptionAsync(releaseId)
       .then(setChartFileOptions)
       .catch(handleApiErrors);
-  }, [releaseId]);
+  }, [releaseId, handleApiErrors]);
 
   return (
     <FormGroup>

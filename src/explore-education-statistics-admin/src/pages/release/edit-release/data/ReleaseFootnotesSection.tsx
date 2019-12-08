@@ -57,7 +57,7 @@ const ReleaseFootnotesSection = ({
   }
   useEffect(() => {
     getFootnoteData();
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const footnoteFormControls = {
     footnoteForm,

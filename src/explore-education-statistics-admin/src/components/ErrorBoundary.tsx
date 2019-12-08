@@ -8,13 +8,11 @@ import React, { createContext } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface ErrorControl {
-  setErrorCode: (errorCode: number) => void;
   handleApiErrors: ApiErrorHandler;
 }
 
 export const ErrorControlContext = createContext<ErrorControl>({
-  setErrorCode: () => {},
-  handleApiErrors: response => {},
+  handleApiErrors: _ => {},
 });
 
 interface State {
@@ -52,12 +50,6 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 
   public render() {
-    const setErrorCode = (errorCode: number) => {
-      this.setState({
-        errorCode,
-      });
-    };
-
     const handleApiErrors = (error: AxiosResponse) => {
       this.setState({
         errorCode: error.status || 500,
@@ -70,12 +62,7 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
 
     if (!errorCode) {
       return (
-        <ErrorControlContext.Provider
-          value={{
-            setErrorCode,
-            handleApiErrors,
-          }}
-        >
+        <ErrorControlContext.Provider value={{ handleApiErrors }}>
           {children}
         </ErrorControlContext.Provider>
       );

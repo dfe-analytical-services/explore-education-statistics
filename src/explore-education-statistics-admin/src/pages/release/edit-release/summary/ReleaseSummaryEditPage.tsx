@@ -42,7 +42,7 @@ const ReleaseSummaryEditPage = ({
         setReleaseSummaryDetails(release);
       })
       .catch(handleApiErrors);
-  }, [releaseId]);
+  }, [releaseId, handleApiErrors]);
 
   const errorCodeMappings = [
     errorCodeToFieldError(

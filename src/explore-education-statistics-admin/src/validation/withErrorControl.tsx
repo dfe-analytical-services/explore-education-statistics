@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { Omit } from 'react-router';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApiErrorHandler = (error: AxiosResponse) => any;
 
 export interface ErrorControlProps {
@@ -25,6 +26,7 @@ export interface ErrorControlProps {
  * @param Component
  */
 function withErrorControl<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   P extends ErrorControlProps & any,
   O extends Omit<P, keyof ErrorControlProps>,
   T

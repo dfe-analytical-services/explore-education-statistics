@@ -57,7 +57,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
         });
       })
       .catch(handleApiErrors);
-  }, [releaseId, publication.themeId, publication]);
+  }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
   return (
     <>

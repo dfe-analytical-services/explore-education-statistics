@@ -77,7 +77,7 @@ const AdminDashboardPage = ({
         },
       )
       .catch(handleApiErrors);
-  }, []);
+  }, [handleApiErrors]);
 
   return (
     <>

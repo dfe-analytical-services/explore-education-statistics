@@ -65,7 +65,7 @@ const CreateReleasePage = ({
         });
       })
       .catch(handleApiErrors);
-  }, [publicationId]);
+  }, [publicationId, handleApiErrors]);
 
   const errorCodeMappings = [
     errorCodeToFieldError(

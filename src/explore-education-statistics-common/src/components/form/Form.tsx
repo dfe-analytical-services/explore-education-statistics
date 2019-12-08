@@ -1,11 +1,6 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import {
-  FieldErrorSetter,
-  GlobalErrorSetter,
-  ServerValidationErrors,
-} from '@common/components/form/util/serverValidationHandler';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -69,15 +64,6 @@ const Form = ({
   const allErrors = submitError
     ? [...summaryErrors, submitError]
     : summaryErrors;
-
-  const isServerValidationError = <T extends {}>(errorData: T) => {
-    const errorDataAsValidationError = (errorData as unknown) as ServerValidationErrors;
-    return (
-      errorDataAsValidationError.errors !== undefined &&
-      errorDataAsValidationError.status !== undefined &&
-      errorDataAsValidationError.title !== undefined
-    );
-  };
 
   return (
     <form

@@ -33,7 +33,7 @@ const ReleaseContentAccordion = ({
         .catch(handleApiErrors);
       setContent(newContent);
     },
-    [release.id],
+    [release.id, handleApiErrors],
   );
 
   React.useEffect(() => {
@@ -41,7 +41,7 @@ const ReleaseContentAccordion = ({
       .getContentSections(release.id)
       .then(setContent)
       .catch(handleApiErrors);
-  }, [release.id]);
+  }, [release.id, handleApiErrors]);
 
   const onAddSection = React.useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
@@ -52,7 +52,7 @@ const ReleaseContentAccordion = ({
     ];
 
     setContent(newContent);
-  }, [content, release.id]);
+  }, [content, release.id, handleApiErrors]);
 
   const onUpdateHeading = React.useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
@@ -68,7 +68,7 @@ const ReleaseContentAccordion = ({
       }
       return result;
     },
-    [content, release.id],
+    [content, release.id, handleApiErrors],
   );
 
   return (

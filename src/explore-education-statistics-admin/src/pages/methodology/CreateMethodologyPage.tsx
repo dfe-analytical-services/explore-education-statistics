@@ -31,10 +31,6 @@ import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
-interface MatchProps {
-  topicId: string;
-}
-
 interface FormValues {
   methodologyTitle: string;
   selectedContactId: string;
@@ -46,10 +42,9 @@ interface CreateMethodologyModel {
 }
 
 const CreateMethodologyPage = ({
-  match,
   history,
   handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {
@@ -61,7 +56,7 @@ const CreateMethodologyPage = ({
         });
       })
       .catch(handleApiErrors);
-  }, []);
+  }, [handleApiErrors]);
 
   const cancelHandler = () => history.push('/methodology');
 

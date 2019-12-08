@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
-import methodologyService from '@admin/services/methodology/service';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import RelatedInformation from '@common/components/RelatedInformation';
+import methodologyService from '@admin/services/methodology/service';
 import { MethodologyStatus } from '@admin/services/methodology/types';
+import RelatedInformation from '@common/components/RelatedInformation';
+import React, { useEffect, useState } from 'react';
 
 interface Model {
   methodologies: MethodologyStatus[];

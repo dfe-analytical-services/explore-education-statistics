@@ -57,7 +57,7 @@ const ReleaseDataUploadsSection = ({
       .getReleaseDataFiles(releaseId)
       .then(setDataFiles)
       .catch(handleApiErrors);
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
