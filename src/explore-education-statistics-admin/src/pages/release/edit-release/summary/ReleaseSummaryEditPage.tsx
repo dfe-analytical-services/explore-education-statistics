@@ -36,9 +36,12 @@ const ReleaseSummaryEditPage = ({
   ) as ManageRelease;
 
   useEffect(() => {
-    service.getReleaseSummaryDetails(releaseId).then(release => {
-      setReleaseSummaryDetails(release);
-    });
+    service
+      .getReleaseSummaryDetails(releaseId)
+      .then(release => {
+        setReleaseSummaryDetails(release);
+      })
+      .catch(handleApiErrors);
   }, [releaseId]);
 
   const errorCodeMappings = [
