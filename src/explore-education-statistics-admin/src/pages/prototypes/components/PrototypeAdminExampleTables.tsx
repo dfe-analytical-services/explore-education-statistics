@@ -30,7 +30,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
   React.useEffect(() => {
     // Temporary for now
     const fetchData = async () => {
-      const newData = await DataBlockService.getDataBlockForSubject({
+      const newData = await dataBlockService.getDataBlockForSubject({
         subjectId: 1,
         startYear: '2012',
         endYear: '2016',

@@ -12,7 +12,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockService, {
+import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -91,7 +91,9 @@ const ReleaseManageDataBlocksPage = ({
     const request = db.dataBlockRequest;
     if (request === undefined) return {};
 
-    const response = await DataBlockService.getDataBlockForSubject(request);
+    const response = await dataBlockService
+      .getDataBlockForSubject(request)
+      .catch(handleApiErrors);
 
     if (response === undefined) return {};
 
