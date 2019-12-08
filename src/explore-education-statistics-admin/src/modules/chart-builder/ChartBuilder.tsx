@@ -2,7 +2,9 @@ import ChartDataSelector, {
   ChartDataSetAndConfiguration,
   SelectedData,
 } from '@admin/modules/chart-builder/ChartDataSelector';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -569,4 +571,4 @@ const ChartBuilder = ({
   );
 };
 
-export default ChartBuilder;
+export default withErrorControl(ChartBuilder);

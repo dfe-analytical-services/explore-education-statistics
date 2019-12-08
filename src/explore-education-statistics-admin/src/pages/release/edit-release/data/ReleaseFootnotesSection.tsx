@@ -7,7 +7,9 @@ import {
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
@@ -157,4 +159,4 @@ const ReleaseFootnotesSection = ({
   );
 };
 
-export default ReleaseFootnotesSection;
+export default withErrorControl(ReleaseFootnotesSection);

@@ -5,7 +5,9 @@ import {
   ImportStatus,
   ImportStatusCode,
 } from '@admin/services/release/imports/types';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -188,4 +190,4 @@ class ImporterStatus extends Component<Props> {
   }
 }
 
-export default ImporterStatus;
+export default withErrorControl(ImporterStatus);
