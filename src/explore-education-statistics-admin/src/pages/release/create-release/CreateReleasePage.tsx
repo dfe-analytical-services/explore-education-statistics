@@ -12,7 +12,15 @@ import {
 } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import {
+  errorCodeAndFieldNameToFieldError,
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
 import {
@@ -20,7 +28,7 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
@@ -39,7 +47,8 @@ interface TemplateReleaseModel {
 const CreateReleasePage = ({
   match,
   history,
-}: RouteComponentProps<MatchProps>) => {
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { publicationId } = match.params;
 
   const [model, setModel] = useState<TemplateReleaseModel>();
@@ -48,23 +57,43 @@ const CreateReleasePage = ({
     Promise.all([
       service.getTemplateRelease(publicationId),
       service.getPublication(publicationId),
-    ]).then(([templateRelease, publication]) => {
-      setModel({
-        templateRelease,
-        publication,
-      });
-    });
-  }, [publicationId]);
+    ])
+      .then(([templateRelease, publication]) => {
+        setModel({
+          templateRelease,
+          publication,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [publicationId, handleApiErrors]);
 
-  const submitHandler = async (values: FormValues) => {
-    const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
-      publicationId,
-      values,
-    );
+  const errorCodeMappings = [
+    errorCodeToFieldError(
+      'SLUG_NOT_UNIQUE',
+      'timePeriodCoverageStartYear',
+      'Choose a unique combination of time period and start year',
+    ),
+    errorCodeAndFieldNameToFieldError(
+      'PARTIAL_DATE_NOT_VALID',
+      'NextReleaseDate',
+      'nextReleaseDate',
+      'Enter a valid date',
+    ),
+  ];
 
-    const createdRelease = await service.createRelease(createReleaseDetails);
-    history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
-  };
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
+    async values => {
+      const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
+        publicationId,
+        values,
+      );
+
+      const createdRelease = await service.createRelease(createReleaseDetails);
+      history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
+  );
 
   const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
 
@@ -125,7 +154,7 @@ const CreateReleasePage = ({
               ? Yup.string().required('Choose a template')
               : Yup.string(),
         })}
-        onSubmitHandler={submitHandler}
+        onSubmitHandler={submitFormHandler}
         onCancelHandler={cancelHandler}
         additionalFields={
           model && (
@@ -152,4 +181,4 @@ const CreateReleasePage = ({
   );
 };
 
-export default CreateReleasePage;
+export default withErrorControl(withRouter(CreateReleasePage));

@@ -2,6 +2,9 @@ import ChartDataSelector, {
   ChartDataSetAndConfiguration,
   SelectedData,
 } from '@admin/modules/chart-builder/ChartDataSelector';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -115,7 +118,8 @@ const ChartBuilder = ({
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
-}: Props) => {
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
@@ -514,6 +518,7 @@ const ChartBuilder = ({
               }}
               meta={metaData}
               data={data}
+              handleApiErrors={handleApiErrors}
             />
           </TabsSection>
 
@@ -566,4 +571,4 @@ const ChartBuilder = ({
   );
 };
 
-export default ChartBuilder;
+export default withErrorControl(ChartBuilder);

@@ -1,10 +1,4 @@
 import React from 'react';
-import Link from '@admin/components/Link';
-
-interface Props {
-  sectionId?: string;
-  action?: string;
-}
 
 const PrototypeMethodologySummary = () => {
   return (

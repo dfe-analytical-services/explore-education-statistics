@@ -14,6 +14,7 @@ import {
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -29,7 +30,7 @@ interface ReleaseSummaryModel {
   releaseTypes: IdTitlePair[];
 }
 
-const ReleaseSummaryPage = () => {
+const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useContext(
@@ -41,16 +42,22 @@ const ReleaseSummaryPage = () => {
       service.getReleaseSummaryDetails(releaseId),
       commonService.getReleaseTypes(),
       commonService.getTimePeriodCoverageGroups(),
-    ]).then(
-      ([releaseSummaryResult, releaseTypesResult, timePeriodGroupsResult]) => {
-        setModel({
-          releaseSummaryDetails: releaseSummaryResult,
-          timePeriodCoverageGroups: timePeriodGroupsResult,
-          releaseTypes: releaseTypesResult,
-        });
-      },
-    );
-  }, [releaseId]);
+    ])
+      .then(
+        ([
+          releaseSummaryResult,
+          releaseTypesResult,
+          timePeriodGroupsResult,
+        ]) => {
+          setModel({
+            releaseSummaryDetails: releaseSummaryResult,
+            timePeriodCoverageGroups: timePeriodGroupsResult,
+            releaseTypes: releaseTypesResult,
+          });
+        },
+      )
+      .catch(handleApiErrors);
+  }, [releaseId, handleApiErrors]);
 
   return (
     <>

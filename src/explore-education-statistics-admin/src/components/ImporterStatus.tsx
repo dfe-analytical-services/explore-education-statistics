@@ -1,15 +1,18 @@
-import React, { Component } from 'react';
+import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 import importStatusService from '@admin/services/release/imports/service';
 import {
   ImportStatus,
   ImportStatusCode,
 } from '@admin/services/release/imports/types';
-import classNames from 'classnames';
-import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
-import SummaryListItem from '@common/components/SummaryListItem';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import SummaryListItem from '@common/components/SummaryListItem';
+import classNames from 'classnames';
+import React, { Component } from 'react';
 
 interface State {
   isFetching: boolean;
@@ -18,7 +21,7 @@ interface State {
   errorMessage: string;
 }
 
-interface Props {
+interface Props extends ErrorControlProps {
   releaseId: string;
   dataFile: DataFile;
   onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
@@ -93,6 +96,8 @@ class ImporterStatus extends Component<Props> {
       this.setState({ isFetching: true });
     }
 
+    const { handleApiErrors } = this.props;
+
     // NOTE: The intervalRef check is because the request may be in progress
     // when the timer is canceled. This prevents setState being called after
     // the component has unmounted.
@@ -119,6 +124,7 @@ class ImporterStatus extends Component<Props> {
             running: false,
           }),
       )
+      .catch(handleApiErrors)
       .finally(() => {
         const { current } = this.state;
         const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
@@ -184,4 +190,4 @@ class ImporterStatus extends Component<Props> {
   }
 }
 
-export default ImporterStatus;
+export default withErrorControl(ImporterStatus);

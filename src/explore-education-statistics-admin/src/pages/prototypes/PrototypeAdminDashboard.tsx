@@ -1,14 +1,13 @@
-import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
+import Link from '@admin/components/Link';
+import { LoginContext } from '@admin/components/Login';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import AdminDashboardReadyForPublication from '@admin/pages/prototypes/components/AdminDashboardReadyForPublication';
+import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { FormGroup, FormSelect } from '@common/components/form';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useState } from 'react';
 import { RouteChildrenProps } from 'react-router';
-import { LoginContext } from '@admin/components/Login';
-import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
 const UserType = () => {

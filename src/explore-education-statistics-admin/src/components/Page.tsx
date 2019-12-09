@@ -1,6 +1,7 @@
 import PageFooter from '@admin/components/PageFooter';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
+import { Helmet } from 'react-helmet';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PrototypePageBanner from './PageBanner';
 import PageHeader from './PageHeader';
@@ -8,11 +9,20 @@ import PageHeader from './PageHeader';
 type Props = {
   children: ReactNode;
   wide?: boolean;
+  pageTitle?: string;
 } & BreadcrumbsProps;
 
-const Page = ({ breadcrumbs = [], children, wide }: Props) => {
+const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
   return (
     <>
+      <Helmet>
+        <title>
+          {pageTitle
+            ? `${pageTitle} - Explore education statistics - GOV.UK`
+            : 'Explore education statistics - GOV.UK'}
+        </title>
+      </Helmet>
+
       <PageHeader wide={wide} />
 
       <div

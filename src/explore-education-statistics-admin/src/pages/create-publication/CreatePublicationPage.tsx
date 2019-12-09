@@ -3,15 +3,18 @@ import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
+import { Topic } from '@admin/services/edit-publication/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -20,7 +23,6 @@ import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Topic } from '@admin/services/edit-publication/types';
 
 interface MatchProps {
   topicId: string;
@@ -33,14 +35,6 @@ interface FormValues {
   selectedContactId: string;
 }
 
-const serverSideValidationHandler = handleServerSideValidation(
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'publicationTitle',
-    'Choose a unique title',
-  ),
-);
-
 interface CreatePublicationModel {
   methodologies: IdTitlePair[];
   contacts: ContactDetails[];
@@ -50,7 +44,8 @@ interface CreatePublicationModel {
 const CreatePublicationPage = ({
   match,
   history,
-}: RouteComponentProps<MatchProps>) => {
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { topicId } = match.params;
 
   const [model, setModel] = useState<CreatePublicationModel>();
@@ -60,23 +55,33 @@ const CreatePublicationPage = ({
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
       service.getTopic(topicId),
-    ]).then(([methodologies, contacts, topic]) => {
-      setModel({
-        methodologies,
-        contacts,
-        topic,
+    ])
+      .then(([methodologies, contacts, topic]) => {
+        setModel({
+          methodologies,
+          contacts,
+          topic,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [topicId, handleApiErrors]);
+
+  const submitFormHandler = submitWithFormikValidation(
+    async (values: FormValues) => {
+      await service.createPublication({
+        topicId,
+        ...values,
       });
-    });
-  }, [topicId]);
 
-  const submitFormHandler = async (values: FormValues) => {
-    await service.createPublication({
-      topicId,
-      ...values,
-    });
-
-    history.push(dashboardRoutes.adminDashboard);
-  };
+      history.push(dashboardRoutes.adminDashboard);
+    },
+    handleApiErrors,
+    errorCodeToFieldError(
+      'SLUG_NOT_UNIQUE',
+      'publicationTitle',
+      'Choose a unique title',
+    ),
+  );
 
   const cancelHandler = () => {
     history.push(dashboardRoutes.adminDashboard);
@@ -153,10 +158,7 @@ const CreatePublicationPage = ({
           onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
-              <Form
-                id={formId}
-                submitValidationHandler={serverSideValidationHandler}
-              >
+              <Form id={formId}>
                 <FormFieldTextInput
                   id={`${formId}-publicationTitle`}
                   label="Enter publication title"
@@ -240,4 +242,4 @@ const CreatePublicationPage = ({
   );
 };
 
-export default CreatePublicationPage;
+export default withErrorControl(CreatePublicationPage);

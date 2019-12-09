@@ -1,11 +1,6 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import {
-  FieldErrorSetter,
-  GlobalErrorSetter,
-  ServerValidationErrors,
-} from '@common/components/form/util/serverValidationHandler';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -16,11 +11,7 @@ interface Props {
   children: ReactNode;
   id: string;
   submitId?: string;
-  submitValidationHandler?: <T extends {}>(
-    errors: ServerValidationErrors,
-    setFieldError: FieldErrorSetter,
-    setGlobalError: GlobalErrorSetter,
-  ) => void;
+  displayErrorMessageOnUncaughtErrors?: boolean;
 }
 
 /**
@@ -45,7 +36,7 @@ const Form = ({
   id,
   submitId = `${id}-submit`,
   formik,
-  submitValidationHandler,
+  displayErrorMessageOnUncaughtErrors = false,
 }: Props & { formik: FormikContext<{}> }) => {
   const { errors, touched } = formik;
 
@@ -74,15 +65,6 @@ const Form = ({
     ? [...summaryErrors, submitError]
     : summaryErrors;
 
-  const isServerValidationError = <T extends {}>(errorData: T) => {
-    const errorDataAsValidationError = (errorData as unknown) as ServerValidationErrors;
-    return (
-      errorDataAsValidationError.errors !== undefined &&
-      errorDataAsValidationError.status !== undefined &&
-      errorDataAsValidationError.title !== undefined
-    );
-  };
-
   return (
     <form
       id={id}
@@ -95,24 +77,13 @@ const Form = ({
           await formik.submitForm();
         } catch (error) {
           if (error) {
-            if (
-              submitValidationHandler &&
-              isServerValidationError(error.data)
-            ) {
-              submitValidationHandler(
-                error.data as ServerValidationErrors,
-                formik.setFieldError,
-                message =>
-                  setSubmitError({
-                    id: submitId,
-                    message,
-                  }),
-              );
-            } else {
+            if (displayErrorMessageOnUncaughtErrors) {
               setSubmitError({
                 id: submitId,
                 message: error.message,
               });
+            } else {
+              throw error;
             }
           }
         }

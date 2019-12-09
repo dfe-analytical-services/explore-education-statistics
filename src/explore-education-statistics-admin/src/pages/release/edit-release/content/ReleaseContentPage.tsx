@@ -1,20 +1,22 @@
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-// eslint-disable-next-line import/no-named-as-default
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
-import FormFieldset from '@common/components/form/FormFieldset';
-import FormRadioGroup from '@common/components/form/FormRadioGroup';
-import WarningMessage from '@common/components/WarningMessage';
-import classNames from 'classnames';
-import React, { useContext, useEffect, useState } from 'react';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import {
   EditableContentBlock,
   ExtendedComment,
 } from '@admin/services/publicationService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
+import FormFieldset from '@common/components/form/FormFieldset';
+import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import WarningMessage from '@common/components/WarningMessage';
 import { ContentSection } from '@common/services/publicationService';
+import classNames from 'classnames';
+import React, { useContext, useEffect, useState } from 'react';
 
 type PageMode = 'edit' | 'preview';
 
@@ -59,7 +61,7 @@ const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
       ),
   ].filter(comment => comment !== undefined && comment.state === 'open');
 
-const ReleaseContentPage = () => {
+const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(
@@ -67,28 +69,34 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService.getContent(releaseId).then(newContent => {
-      // TODO: For testing purposes only
-      if (newContent.release.summarySection.content) {
-        // eslint-disable-next-line no-param-reassign
-        newContent.release.summarySection.content[0].comments = [
-          {
-            time: new Date(),
-            name: 'Jamie',
-            state: 'open',
-            comment: 'test',
-            id: '00000000',
-          },
-        ];
-      }
+    releaseContentService
+      .getContent(releaseId)
+      .then(newContent => {
+        // TODO: For testing purposes only
+        if (
+          newContent.release.summarySection.content &&
+          newContent.release.summarySection.content.length
+        ) {
+          // eslint-disable-next-line no-param-reassign
+          newContent.release.summarySection.content[0].comments = [
+            {
+              time: new Date(),
+              name: 'Jamie',
+              state: 'open',
+              comment: 'test',
+              id: '00000000',
+            },
+          ];
+        }
 
-      setModel({
-        unresolvedComments: getUnresolveComments(newContent.release),
-        pageMode: 'edit',
-        content: newContent,
-      });
-    });
-  }, [releaseId, publication.themeId, publication]);
+        setModel({
+          unresolvedComments: getUnresolveComments(newContent.release),
+          pageMode: 'edit',
+          content: newContent,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
   const onReleaseChange = React.useCallback(
     (newRelease: ManageContentPageViewModel['release']) => {
@@ -165,4 +173,4 @@ const ReleaseContentPage = () => {
   );
 };
 
-export default ReleaseContentPage;
+export default withErrorControl(ReleaseContentPage);

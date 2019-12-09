@@ -7,6 +7,7 @@ import * as serviceWorker from './serviceWorker';
 
 process.env.APP_ROOT_ID = 'root';
 
+// EES-704 - revisit to find a better way to configure Clients used in the common project
 // @ts-ignore
 window.axiosConfigurer = axiosConfigurer;
 

@@ -87,7 +87,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id={formId}>
+          <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
             <FormFieldRadioGroup<FormValues>
               name="subjectId"
               legend={stepHeading}
