@@ -15,25 +15,58 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "appInsightsLocation": {
+    "envNumber": {
       "type": "string",
-      "defaultValue": "West Europe"
+      "defaultValue": ""
     },
+
     "skuPublic": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "B1 Basic",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuData": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuContent": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S3 Standard"
+      "defaultValue": "S3 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -47,12 +80,23 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
+
     "publicAppBasicAuth": {
       "type": "string",
-      "defaultValue": "true"
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
     },
     "publicAppBasicAuthUsername": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "descritpion": "Username protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
     },
     "publicAppBasicAuthPassword": {
       "type": "securestring",
@@ -60,6 +104,7 @@
         "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
+
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -92,10 +137,7 @@
       "type": "securestring",
       "defaultValue": ""
     },
-    "envNumber": {
-      "type": "string",
-      "defaultValue": ""
-    },
+    
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -166,15 +208,18 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-    "adminUri" : {
-      "type": "string"
-    },
+
     "openIdConnectClientId": {
       "type": "string"
     },
     "openIdConnectClientSecret": {
       "type": "string"
     },
+
+    "adminUri" : {
+      "type": "string"
+    },
+
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
@@ -372,7 +417,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('dataAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -541,7 +586,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('contentAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -747,7 +792,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('adminAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -884,7 +929,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('publicAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
