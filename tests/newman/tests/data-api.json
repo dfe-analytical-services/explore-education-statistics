@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "993c2b46-d8bc-4064-ab79-bea934abaec5",
+		"_postman_id": "b4992823-5b1e-4edd-b075-9abe3060740a",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2410,8 +2410,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(13); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(13);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -2681,8 +2680,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -2798,8 +2796,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(10); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(10);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -6447,7 +6444,9 @@
 							"script": {
 								"id": "0eff5d76-4361-43c8-92b1-fcd6f6238f37",
 								"exec": [
-									"if(pm.environment.get(\"env\") != \"local\") {",
+									"",
+									"/*",
+									"// EES-853",
 									"var respJson = pm.response.json();",
 									"",
 									"pm.test(\"Status code is 200\", function () {",
@@ -6521,7 +6520,7 @@
 									"    pm.expect(respJson.query.localAuthority.length).to.equal(1);",
 									"    pm.expect(respJson.query.localAuthority[0]).to.equal(\"E10000007\");",
 									"});",
-									"}"
+									"*/"
 								],
 								"type": "text/javascript"
 							}
@@ -6699,7 +6698,7 @@
 									"});",
 									"",
 									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    pm.expect(respJson.observationCount).to.be.above(1101760);",
+									"    pm.expect(respJson.observationCount).to.be.above(1101149);",
 									"});",
 									"",
 									"pm.test(\"Release count is above the expected count\", function () {",
