@@ -1166,7 +1166,7 @@
           "name": "Default",
           "apiVersion": "2017-03-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
           ],
           "properties": {
             "state": "Enabled",
@@ -1178,8 +1178,8 @@
           "name": "Default",
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
             "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
           ],
           "properties": {
