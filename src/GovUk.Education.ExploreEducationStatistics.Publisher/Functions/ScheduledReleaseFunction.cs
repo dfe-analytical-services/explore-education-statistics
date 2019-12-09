@@ -1,9 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -17,30 +21,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseInfoService = releaseInfoService;
         }
 
+        [FunctionName("ScheduledRelease")]
+        public void ScheduledRelease([TimerTrigger("0 */2 * * * *")] TimerInfo timer,
+            ILogger logger)
+        {
+            logger.LogInformation($"{GetType().Name} function triggered at: {DateTime.Now}");
+            ProcessReleases().Wait();
+            logger.LogInformation(
+                $"{GetType().Name} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+        }
+
         private async Task ProcessReleases()
         {
-            // TODO trigger this method based on time
-            // TODO what is the storage connection string?
-            var _storageConnectionString = "";
+            var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
 
             var scheduledReleases = (await _releaseInfoService.GetScheduledReleasesAsync()).ToList();
             if (scheduledReleases.Any())
             {
+                var generateReleaseContentQueue =
+                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString, "generate-release-content");
                 var publishReleaseDataFilesQueue =
-                    await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "publish-release-data-files");
+                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString, "publish-release-data-files");
                 var publishReleaseDataQueue =
-                    await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "publish-release-data");
-                var publishReleaseContentQueue =
-                    await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "publish-release-content");
+                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString, "publish-release-data");
 
                 scheduledReleases.ForEach(releaseInfo =>
                 {
+                    generateReleaseContentQueue.AddMessage(
+                        ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releaseInfo)));
                     publishReleaseDataFilesQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataFilesMessage(releaseInfo)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseInfo)));
-                    publishReleaseContentQueue.AddMessage(
-                        ToCloudQueueMessage(BuildPublishReleaseContentMessage(releaseInfo)));
                     _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId, releaseInfo.RowKey,
                         ReleaseInfoStatus.InProgress);
                 });
@@ -66,9 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             };
         }
 
-        private static PublishReleaseContentMessage BuildPublishReleaseContentMessage(ReleaseInfo releaseInfo)
+        private static GenerateReleaseContentMessage BuildGenerateReleaseContentMessage(ReleaseInfo releaseInfo)
         {
-            return new PublishReleaseContentMessage
+            return new GenerateReleaseContentMessage
             {
                 ReleaseId = releaseInfo.ReleaseId
             };

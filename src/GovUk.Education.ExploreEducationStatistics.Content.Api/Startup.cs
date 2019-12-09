@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             {
                 app.UseDeveloperExceptionPage();
                 
-                PublishReleaseContent();
+                GenerateReleaseContent();
             }
             else
             {
@@ -101,21 +101,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         }
         
         /**
-         * Add a message to the publish-release-content queue to regenerate all content.
+         * Add a message to the queue to generate all content.
          * TODO EES-861 This should only be used in development!
          */
-        private void PublishReleaseContent()
+        private void GenerateReleaseContent()
         {
+            var queueName = "generate-release-content";
             try
             {
-                var storageConnectionString = Configuration.GetConnectionString("PublicStorage");
-                var queue = QueueUtils.GetQueueReference(storageConnectionString, "publish-release-content");
+                var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
+                var queue = QueueUtils.GetQueueReference(storageConnectionString, queueName);
 
-                var message = new PublishReleaseContentMessage();
+                var message = new GenerateReleaseContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
                 
-                _logger.LogInformation("Message added to content-cache queue.");
-                _logger.LogInformation("Please ensure the publisher function is running");
+                _logger.LogInformation($"Message added to {queueName} queue.");
+                _logger.LogInformation("Please ensure the Publisher function is running");
             }
             catch
             {

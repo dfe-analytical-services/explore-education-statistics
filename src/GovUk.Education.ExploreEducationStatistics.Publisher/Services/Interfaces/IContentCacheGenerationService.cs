@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IContentCacheGenerationService
     {
-        Task<bool> PublishReleaseContent(PublishReleaseContentMessage message);
+        Task<bool> GenerateReleaseContent(GenerateReleaseContentMessage message);
     }
 }

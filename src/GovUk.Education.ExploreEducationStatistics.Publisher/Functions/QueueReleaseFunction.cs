@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _validationService = validationService;
         }
 
+        [FunctionName("QueueRelease")]
         public async Task QueueRelease(
             [QueueTrigger("releases")] QueueReleaseMessage message,
             ILogger logger)

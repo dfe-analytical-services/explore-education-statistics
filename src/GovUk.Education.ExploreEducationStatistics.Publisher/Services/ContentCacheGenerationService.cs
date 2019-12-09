@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 config.GetConnectionString("PublicStorage"), ContainerName);
         }
 
-        public async Task<bool> PublishReleaseContent(PublishReleaseContentMessage message)
+        public async Task<bool> GenerateReleaseContent(GenerateReleaseContentMessage message)
         {
             // TODO EES-861 Switch actions based on message content, for now full rebuild
             return await CleanAndRebuildFullCache();

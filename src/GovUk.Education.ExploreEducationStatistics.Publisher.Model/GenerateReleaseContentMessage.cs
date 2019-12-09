@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class PublishReleaseContentMessage
+    public class GenerateReleaseContentMessage
     {
         public Guid? ReleaseId { get; set; }
     }

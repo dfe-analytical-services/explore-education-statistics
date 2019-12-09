@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -17,17 +18,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _publishingService = publishingService;
         }
 
-        [FunctionName("PublishReleaseContent")]
-        public void PublishReleaseContent(
-            [QueueTrigger("publish-release-content")]
-            PublishReleaseContentMessage message,
+        [FunctionName("GenerateReleaseContent")]
+        public void GenerateReleaseContent(
+            [QueueTrigger("generate-release-content")]
+            GenerateReleaseContentMessage message,
             ILogger logger)
         {
             logger.LogInformation($"{GetType().Name} function triggered: {message}");
-            _contentCacheGenerationService.PublishReleaseContent(message).Wait();
+            _contentCacheGenerationService.GenerateReleaseContent(message).Wait();
             logger.LogInformation($"{GetType().Name} function completed");
         }
 
+        [FunctionName("PublishReleaseContent")]
+        public void PublishReleaseContent([TimerTrigger("0 30 09 * * *")] TimerInfo timer,
+            ILogger logger)
+        {
+            logger.LogInformation($"{GetType().Name} function triggered at: {DateTime.Now}");
+            // TODO EES-865 Move content daily at 09:30
+            logger.LogInformation(
+                $"{GetType().Name} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+        }
+        
         [FunctionName("PublishReleaseDataFiles")]
         public async void PublishReleaseDataFiles(
             [QueueTrigger("publish-release-data-files")]
@@ -40,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseData")]
-        public async void PublishReleaseData(
+        public void PublishReleaseData(
             [QueueTrigger("publish-release-data")] PublishReleaseDataMessage message,
             ILogger logger)
         {
