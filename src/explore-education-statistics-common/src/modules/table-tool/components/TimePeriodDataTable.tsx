@@ -41,7 +41,11 @@ export const createHeadersFromGroups = (
 ): RowHeaderType[][] => {
   groups.flatMap(t => {
     t.flatMap(s => {
-      if (s.level && s.level === 'country' && t.length === 1) {
+      if (
+        s.level &&
+        (s.level === 'country' || s.level === 'localAuthority') &&
+        t.length === 1
+      ) {
         // eslint-disable-next-line no-param-reassign
         s.label = '';
       }
