@@ -856,7 +856,7 @@
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "~"
+              "value": "12.13.0"
             },
             {
               "name": "NODE_ENV",
