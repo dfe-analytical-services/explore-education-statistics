@@ -1093,7 +1093,7 @@
               "emailSubscriptionAdmins": true
             }
           }
-        },
+        }
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
