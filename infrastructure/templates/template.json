@@ -1011,7 +1011,20 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
-          }
+          },
+          "resources": [
+            {
+              "name": "current",
+              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+              "apiVersion": "2014-04-01",
+              "properties": {
+                "status": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+              ]
+            }
+          ]
         },
         {
           "name": "content",
@@ -1039,7 +1052,20 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
             "requestedServiceObjectiveName": "Basic"
-          }
+          },
+          "resources": [
+            {
+              "name": "current",
+              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+              "apiVersion": "2014-04-01",
+              "properties": {
+                "status": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+              ]
+            }
+          ]
         },
         {
           "type": "firewallrules",
@@ -1136,7 +1162,20 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
-          }
+          },
+          "resources": [
+            {
+              "name": "current",
+              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+              "apiVersion": "2014-04-01",
+              "properties": {
+                "status": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+              ]
+            }
+          ]
         },
         {
           "type": "firewallrules",
