@@ -80,6 +80,12 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
+    "sqlAzureAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAzureAdministratorSid": {
+      "type": "string"
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
@@ -1042,6 +1048,17 @@
           }
         },
         {
+          "name": "activeDirectory",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
@@ -1136,6 +1153,17 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
+          }
+        },
+        {
+          "name": "activeDirectory",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
           }
         },
         {
