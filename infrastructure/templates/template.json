@@ -661,6 +661,11 @@
               "type": "Custom"
             },
             {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            },
+            {
               "name": "PublicStorage",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
               "type": "Custom"
