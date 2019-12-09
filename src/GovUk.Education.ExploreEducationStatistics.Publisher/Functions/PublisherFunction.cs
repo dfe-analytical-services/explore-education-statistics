@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseContent")]
-        public void PublishReleaseContent([TimerTrigger("0 30 09 * * *")] TimerInfo timer,
+        public void PublishReleaseContent([TimerTrigger("0 30 9 * * *")] TimerInfo timer,
             ILogger logger)
         {
             logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");

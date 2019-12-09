@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("ScheduledRelease")]
-        public void ScheduledRelease([TimerTrigger("0 */2 * * * *")] TimerInfo timer,
+        public void ScheduledRelease([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
             ILogger logger)
         {
             logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 var publishReleaseDataQueue =
                     await QueueUtils.GetQueueReferenceAsync(storageConnectionString, "publish-release-data");
 
-                scheduledReleases.ForEach(releaseInfo =>
+                foreach (var releaseInfo in scheduledReleases)
                 {
                     generateReleaseContentQueue.AddMessage(
                         ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releaseInfo)));
@@ -53,9 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ToCloudQueueMessage(BuildPublishReleaseDataFilesMessage(releaseInfo)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseInfo)));
-                    _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId, releaseInfo.RowKey,
-                        ReleaseInfoStatus.InProgress);
-                });
+                    await _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId, releaseInfo.RowKey,
+                        ReleaseInfoStatus.InProgress);   
+                }
             }
         }
 
