@@ -12,6 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string ReleaseSlug { get; set; }
         public ReleaseInfoStatus Status { get; set; }
 
+        public ReleaseInfo()
+        {
+        }
+
         public ReleaseInfo(DateTime created,
             string publicationSlug,
             DateTime publishScheduled,
