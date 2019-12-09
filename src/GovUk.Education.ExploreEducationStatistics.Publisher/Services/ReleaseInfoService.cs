@@ -25,8 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task AddReleaseInfoAsync(QueueReleaseMessage message, ReleaseInfoStatus status)
         {
             var releaseInfoTable = await GetReleaseInfoTableAsync();
-            var releaseInfo = _mapper.Map<ReleaseInfo>(message);
-            releaseInfo.Status = status;
+            var releaseInfo = new ReleaseInfo(message.PublicationSlug,
+                message.PublishScheduled,
+                message.ReleaseId,
+                message.ReleaseSlug,
+                status);
             await releaseInfoTable.ExecuteAsync(TableOperation.InsertOrReplace(releaseInfo));
         }
 
@@ -43,9 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var tableQuery = new TableQuery<ReleaseInfo>()
                     .Where(TableQuery.GenerateFilterCondition("Status",
                         QueryComparisons.Equal, ReleaseInfoStatus.Scheduled.ToString()));
-                
+
                 var queryResult = await releaseInfoTable.ExecuteQuerySegmentedAsync(tableQuery, token);
-                
+
                 results.AddRange(queryResult.Results);
                 token = queryResult.ContinuationToken;
             } while (token != null);

@@ -16,14 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         {
         }
 
-        public ReleaseInfo(DateTime created,
-            string publicationSlug,
+        public ReleaseInfo(string publicationSlug,
             DateTime publishScheduled,
             Guid releaseId,
             string releaseSlug,
             ReleaseInfoStatus status)
         {
-            Created = created;
+            Created = DateTime.Now;
             PublicationSlug = publicationSlug;
             PublishScheduled = publishScheduled;
             ReleaseId = releaseId;

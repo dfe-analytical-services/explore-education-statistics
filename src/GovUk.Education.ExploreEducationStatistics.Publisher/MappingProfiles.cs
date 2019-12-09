@@ -13,9 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public MappingProfiles()
         {
-            CreateMap<QueueReleaseMessage, ReleaseInfo>()
-                .ForMember(dest => dest.Created, m => m.UseDestinationValue());
-            
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
