@@ -82,9 +82,10 @@ const Form = ({
                 id: submitId,
                 message: error.message,
               });
+            } else {
+              throw error;
             }
           }
-          throw error;
         }
       }}
     >
