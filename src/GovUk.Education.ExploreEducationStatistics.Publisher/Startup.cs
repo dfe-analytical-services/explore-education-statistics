@@ -28,7 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
-                .AddScoped<ITableStorageService, TableStorageService>()
+                .AddScoped<ITableStorageService, TableStorageService>(s =>
+                    new TableStorageService(ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
