@@ -1542,9 +1542,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
@@ -1686,9 +1684,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
