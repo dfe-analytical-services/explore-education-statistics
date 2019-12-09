@@ -1686,6 +1686,6 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
-    },
+    }
   ]
 }
