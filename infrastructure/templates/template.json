@@ -260,7 +260,9 @@
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
-    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]"
+    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
+    "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]"
   },
   "resources": [
     {
@@ -701,6 +703,11 @@
             {
               "name": "CoreStorage",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
+              "type": "Custom"
+            },
+            {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
               "type": "Custom"
             },
             {
@@ -1602,15 +1609,15 @@
           "appSettings": [
             {
               "name": "AzureWebJobsDashboard",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
@@ -1652,6 +1659,33 @@
           ]
         }
       }
-    }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('publisherStorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GZRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
   ]
 }
