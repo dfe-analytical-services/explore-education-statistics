@@ -1048,7 +1048,7 @@
           }
         },
         {
-          "name": "activeDirectory",
+          "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
           "properties": {
@@ -1156,7 +1156,7 @@
           }
         },
         {
-          "name": "activeDirectory",
+          "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
           "properties": {
