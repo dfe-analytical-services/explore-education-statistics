@@ -1180,11 +1180,11 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
             "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
           ],
           "properties": {
-            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
               "emailSubscriptionAdmins": true
