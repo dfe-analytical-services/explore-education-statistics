@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -26,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
+                .AddScoped<ITableStorageService, TableStorageService>()
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()

@@ -5,6 +5,7 @@
       "default": "None",
       "Function.PublisherFunction": "Information",
       "Function.QueueReleaseFunction": "Information",
+      "Function.QueueReleaseFunction": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }
