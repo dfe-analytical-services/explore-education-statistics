@@ -47,5 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         
         Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request);
+
+        Task<Either<ValidationResult, List<Comment>>> GetCommentsAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId);
     }
 }

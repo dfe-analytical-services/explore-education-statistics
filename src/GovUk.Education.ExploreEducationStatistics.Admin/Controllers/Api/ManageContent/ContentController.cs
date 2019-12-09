@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.GetContentSectionsAsync(releaseId),
                 Ok);
         }
-        
+
         [HttpPut("release/{releaseId}/content/sections/order")]
         public Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.GetContentSectionAsync(releaseId, contentSectionId),
                 Ok);
         }
-        
+
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
         public Task<ActionResult<List<IContentBlock>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -125,6 +125,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return this.HandlingValidationErrorsAsync(
                 () => _contentService.AttachContentBlockAsync(releaseId, contentSectionId, request),
+                Ok);
+        }
+
+        [HttpGet("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments")]
+        public Task<ActionResult<List<Comment>>> GetComments(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.GetCommentsAsync(releaseId, contentSectionId, contentBlockId),
                 Ok);
         }
     }

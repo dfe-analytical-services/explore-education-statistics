@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -74,6 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public int Order { get; set; }
 
         public abstract string Type { get; set; }
+
+        [JsonIgnore] public List<Comment> Comments;
     }
 
     public class MarkDownBlock : IContentBlock
@@ -187,5 +190,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             return enumValue.GetEnumAttribute<ContentBlockClassType>().Type;
         }
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum CommentState
+    {
+        open,
+        resolved
+    }
+
+    public class Comment
+    {
+
+        public Guid Id { get; set; }
+        public Guid? IContentBlockId { get; set; }
+        public string Name { get; set; }
+        public DateTime Time { get; set; }
+        public string CommentText { get; set; }
+        public string? ResolvedBy { get; set; }
+        public DateTime? ResolvedOn { get; set; }
+        public CommentState State { get; set; }
+
     }
 }

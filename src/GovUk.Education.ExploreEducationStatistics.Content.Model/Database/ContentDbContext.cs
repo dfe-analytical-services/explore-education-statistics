@@ -5,6 +5,7 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -1550,6 +1551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
+
             modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
                 new ReleaseSummaryVersion
                 {
@@ -1615,13 +1617,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    RelatedInformation = new List<BasicLink> {
-                        new BasicLink {
+                    RelatedInformation = new List<BasicLink>
+                    {
+                        new BasicLink
+                        {
                             Id = new Guid("f3c67bc9-6132-496e-a848-c39dfcd16f49"),
                             Description = "Additional guidance",
                             Url = "http://example.com"
                         },
-                        new BasicLink {
+                        new BasicLink
+                        {
                             Id = new Guid("45acb50c-8b21-46b4-989f-36f4b0ee37fb"),
                             Description = "Statistics guide",
                             Url = "http://example.com"
@@ -2183,6 +2188,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
+
+
+
+            modelBuilder.Entity<Comment>()    
+                .HasData(
+                    new Comment
+                    {
+                        Id = new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
+                        IContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                        CommentText = "Test Text",
+                        Name = "A Test User",
+                        State = CommentState.open,
+                        Time = new DateTime(2019, 12, 1, 15, 0, 0),
+                        ResolvedBy = null,
+                        ResolvedOn = null
+                    }
+                    
+                );
+            
+            modelBuilder.Entity<IContentBlock>()
+                .HasMany<Comment>();
+            
+
             modelBuilder.Entity<MarkDownBlock>().HasData(
                 // absence
                 new MarkDownBlock
@@ -2369,15 +2397,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
                     Body = SampleMarkDownContent.Content[new Guid("8e10ad6c-9a68-4162-84f9-81fb6dc93ae3")]
                 },
-                
+
                 // Summary sections for each Release
                 new MarkDownBlock
                 {
                     Id = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
                     ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
                     Order = 1,
-                    Body = "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                           "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+                    Body =
+                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
                 },
                 new MarkDownBlock
                 {
@@ -2396,10 +2425,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
-                           "published - [Secondary and primary school applications and offers: methodology]"+
+                           "published - [Secondary and primary school applications and offers: methodology]" +
                            "(../methodology/secondary-and-primary-schools-applications-and-offers)"
                 },
-                
+
                 // Headline section for each Release
                 new MarkDownBlock
                 {
@@ -2431,7 +2460,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                         "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
                 }
-                
             );
 
             modelBuilder.Entity<DataBlock>().HasData(
@@ -2439,7 +2467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
-                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), 
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Name = "Key Stat 1",
                     DataBlockRequest = new DataBlockRequest
@@ -3026,7 +3054,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
                                     }
-                            }, 
+                            },
                             Legend = Legend.top
                         }
                     }
@@ -3246,7 +3274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics tile 2
                 new DataBlock
                 {
@@ -3345,7 +3373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics tile 3
                 new DataBlock
                 {
@@ -3444,7 +3472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics aggregate table
                 new DataBlock
                 {
@@ -3746,7 +3774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions detached Data Block (not yet belonging to any Content Section)
                 new DataBlock
                 {
@@ -4052,7 +4080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // Secondary and primary schools applications offers key statistics tile 3
                 new DataBlock
                 {
@@ -4106,7 +4134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // Secondary and primary schools applications offers key statistics aggregate table
                 new DataBlock
                 {
