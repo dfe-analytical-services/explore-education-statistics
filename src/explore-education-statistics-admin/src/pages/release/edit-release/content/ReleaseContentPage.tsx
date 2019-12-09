@@ -73,7 +73,10 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
       .getContent(releaseId)
       .then(newContent => {
         // TODO: For testing purposes only
-        if (newContent.release.summarySection.content) {
+        if (
+          newContent.release.summarySection.content &&
+          newContent.release.summarySection.content.length
+        ) {
           // eslint-disable-next-line no-param-reassign
           newContent.release.summarySection.content[0].comments = [
             {
