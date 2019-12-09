@@ -80,6 +80,7 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
+
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true"
@@ -93,6 +94,7 @@
         "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
+
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -125,6 +127,7 @@
       "type": "securestring",
       "defaultValue": ""
     },
+    
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -195,15 +198,18 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-    "adminUri" : {
-      "type": "string"
-    },
+
     "openIdConnectClientId": {
       "type": "string"
     },
     "openIdConnectClientSecret": {
       "type": "string"
     },
+
+    "adminUri" : {
+      "type": "string"
+    },
+    
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
