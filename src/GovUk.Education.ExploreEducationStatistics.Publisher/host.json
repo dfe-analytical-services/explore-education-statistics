@@ -3,8 +3,8 @@
   "logging": {
     "logLevel": {
       "default": "None",
-      "Function.Publisher": "Information",
-      "Function.RebuildContentCache": "Information",
+      "Function.PublisherFunction": "Information",
+      "Function.QueueReleaseFunction": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }

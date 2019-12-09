@@ -1,12 +1,11 @@
 using System;
-using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -30,40 +29,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public void PublishReleaseData(Guid releaseId)
+        public async Task<QueueReleaseMessage> QueueReleaseAsync(Guid releaseId)
         {
-            var release = _context.Releases
-                .Where(r => r.Id.Equals(releaseId))
-                .Include(r => r.Publication)
-                .FirstOrDefault();
-            
+            var release = await GetRelease(releaseId);
+
             if (release == null)
             {
                 throw new ArgumentException("Release does not exist", nameof(releaseId));
             }
 
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var client = storageAccount.CreateCloudQueueClient();
-            var queue = client.GetQueueReference("publish-release-data");
-            queue.CreateIfNotExists();
+            var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "releases");
+            var message = BuildQueueReleaseMessage(release);
+            queue.AddMessage(ToCloudQueueMessage(message));
 
-            var message = BuildMessage(release);
-            queue.AddMessage(message);
+            _logger.LogTrace($"Sent queue release message for release: {releaseId}");
 
-            _logger.LogTrace($"Sent publish release data message for release: {releaseId}");
+            return message;
         }
 
-        private static CloudQueueMessage BuildMessage(Release release)
+        private ValueTask<Release> GetRelease(Guid releaseId)
         {
-            var message = new PublishReleaseDataMessage
-            {
-                PublicationSlug = release.Publication.Slug,
-                ReleasePublished = release.Published ?? DateTime.UtcNow,
-                ReleaseSlug = release.Slug,
-                ReleaseId = release.Id
-            };
+            return _context.Releases.FindAsync(releaseId);
+        }
 
-            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
+        private static QueueReleaseMessage BuildQueueReleaseMessage(Release release)
+        {
+            return new QueueReleaseMessage
+            {
+                ReleaseId = release.Id,
+                PublishScheduled = release.PublishScheduled.GetValueOrDefault()
+            };
+        }
+
+        private static CloudQueueMessage ToCloudQueueMessage(object value)
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

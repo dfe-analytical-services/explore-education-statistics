@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message)
+        public async Task CopyReleaseToPublicContainer(PublishReleaseDataFilesMessage message)
         {
             var privateContainer =
                 await FileStorageUtils.GetCloudBlobContainerAsync(_privateStorageConnectionString,
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
-            PublishReleaseDataMessage message)
+            PublishReleaseDataFilesMessage message)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
-            PublishReleaseDataMessage message)
+            PublishReleaseDataFilesMessage message)
         {
             var cloudBlockBlob = CreateBlobForAllFilesZip(directory, message);
             var memoryStream = new MemoryStream();
@@ -157,13 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return cloudBlob.Uri.Segments.Last();
         }
 
-        private static string GetZipFilePath(PublishReleaseDataMessage message)
+        private static string GetZipFilePath(PublishReleaseDataFilesMessage message)
         {
             return $"{Ancillary.GetEnumLabel()}/{message.PublicationSlug}_{message.ReleaseSlug}.zip";
         }
 
         private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory,
-            PublishReleaseDataMessage message)
+            PublishReleaseDataFilesMessage message)
         {
             var blob = directory.GetBlockBlobReference(GetZipFilePath(message));
             blob.Properties.ContentType = "application/x-zip-compressed";

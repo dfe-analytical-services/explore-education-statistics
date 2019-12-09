@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -71,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             {
                 app.UseDeveloperExceptionPage();
                 
-                GenerateContentCache();
+                PublishReleaseContent();
             }
             else
             {
@@ -97,30 +99,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             option.AddRedirect("^$", "docs");
             app.UseRewriter(option);
         }
-
-        // TODO: this should only be used in development, adds the required message to the content-cache queue
-        private void GenerateContentCache()
+        
+        /**
+         * Add a message to the publish-release-content queue to regenerate all content.
+         * TODO EES-861 This should only be used in development!
+         */
+        private void PublishReleaseContent()
         {
-            CloudQueueClient cloudStorageClient = null;
-            
             try
             {
-                var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
-                cloudStorageClient = cloudStorageAccount.CreateCloudQueueClient();
-            }
-            catch 
-            {
-                _logger.LogError("Unable to create content-cache queue client");
-                throw;
-            }
+                var storageConnectionString = Configuration.GetConnectionString("PublicStorage");
+                var queue = QueueUtils.GetQueueReference(storageConnectionString, "publish-release-content");
 
-            try
-            {
-                var queue = cloudStorageClient.GetQueueReference("content-cache");
-                queue.CreateIfNotExists();
-                
-                var message = new CloudQueueMessage("Generation triggered by the Content API Startup");
-                queue.AddMessage(message);
+                var message = new PublishReleaseContentMessage();
+                queue.AddMessage(ToCloudQueueMessage(message));
                 
                 _logger.LogInformation("Message added to content-cache queue.");
                 _logger.LogInformation("Please ensure the publisher function is running");
@@ -130,6 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 _logger.LogError("Unable add message to content-cache queue");
                 throw;
             }
+        }
+        
+        private static CloudQueueMessage ToCloudQueueMessage(object value)
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }
