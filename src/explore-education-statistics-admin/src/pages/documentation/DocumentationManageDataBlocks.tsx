@@ -551,9 +551,9 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+                <Link to="./manage-content">
                   Managing content: step by step
-                </a>
+                </Link>
                 .
               </p>
             </StepNavItem>

@@ -1,19 +1,20 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import Link from '@admin/components/Link';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
+import imageChoosePublication from './images/guidance/guidance-publication-select.jpg';
 import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
-import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.png';
+import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.jpg';
 import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
 import imageCreateReleaseDataTab from './images/guidance/guidance-data-tab.jpg';
 import imageCreateReleaseFootnotesTab from './images/guidance/guidance-footnotes-tab.jpg';
 import imageCreateReleaseFileTab from './images/guidance/guidance-file-tab.jpg';
 import imageCreateReleaseDatablockCreate from './images/guidance/guidance-datablocks-create.png';
 import imageCreateReleaseDatablockSaved from './images/guidance/guidance-datablocks-delete.png';
-import imageCreateReleaseManageContent from './images/guidance/guidance-manage-content.png';
-import imageSelectTheme from './images/guidance/guidance-select-theme.png';
+import imageCreateReleaseManageContent from './images/guidance/guidance-manage-content.jpg';
+import imageSelectTheme from './images/guidance/guidance-publication-select-theme.jpg';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -50,10 +51,10 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
             </li>
             <li>
               content is written and formatted to the standards set out in our{' '}
-              <a href="./content-design-standards-guide">
+              <Link to="./content-design-standards-guide">
                 Content design standards guide
-              </a>{' '}
-              and <a href="style-guide">Content design style guide</a>
+              </Link>{' '}
+              and <Link to="style-guide">Content design style guide</Link>
             </li>
           </ul>
           <StepNav>
@@ -296,7 +297,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to upload data and files and add
                 footnotes to your release -{' '}
-                <a href="./manage-data">Managing data: step by step.</a>
+                <Link to="./manage-data">Managing data: step by step.</Link>
               </p>
             </StepNavItem>
             <StepNavItem
@@ -364,7 +365,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 You can upload more later under the ‘Manage data’ tab. For
                 detailed guidance on how to add data to your release -{' '}
-                <a href="./manage-data">Managing data: step by step</a>.
+                <Link to="./manage-data">Managing data: step by step</Link>.
               </p>
               <h3>Help and support</h3>
               <p>
@@ -382,16 +383,18 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to create data blocks, tables and
                 charts for your release -{' '}
-                <a href="./manage-data-block">
+                <Link to="./manage-data-block">
                   Managing data blocks and creating tables and charts: step by
                   step
-                </a>
+                </Link>
                 .
               </p>
               <p>
                 For detailed guidance on how to configure charts for your
                 release -{' '}
-                <a href="./manage-data-block">Configure charts: step by step</a>
+                <Link to="./manage-data-block">
+                  Configure charts: step by step
+                </Link>
                 .
               </p>
             </StepNavItem>
@@ -403,9 +406,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 Make sure your content is written and formatted to the standards
                 set out in our{' '}
-                <a href="./content-design-standards-guide">
+                <Link to="./content-design-standards-guide">
                   Content design standards guide
-                </a>{' '}
+                </Link>{' '}
                 and <a href="style-guide">Content design style guide</a>{' '}
               </p>
               <p>
@@ -450,8 +453,11 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to view and edit content and add,
-                view and resolve comments-{' '}
-                <a href="./manage-content">Managing content: step by step</a>.
+                view and resolve comments -{' '}
+                <Link to="./manage-content">
+                  Managing content: step by step
+                </Link>
+                .
               </p>
             </StepNavItem>
             <StepNavItem
@@ -472,9 +478,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to update release status -{' '}
-                <a href="./edit-release">
+                <Link to="./edit-release">
                   Editing a release and updating release status: step by step
-                </a>
+                </Link>
                 .
               </p>
             </StepNavItem>

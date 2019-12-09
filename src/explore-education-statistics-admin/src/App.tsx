@@ -30,6 +30,7 @@ import AdminDocumentationContentDesignStandards from './pages/documentation/Docu
 import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
+import AdminDocumentationCreateNewPublication from './pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
@@ -42,7 +43,6 @@ import BauMethodologyPage from './pages/bau/BauMethodologyPage';
 
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
