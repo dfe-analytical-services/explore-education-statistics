@@ -21,19 +21,51 @@
     },
     "skuPublic": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "B1 Basic",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuData": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuContent": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S3 Standard"
+      "defaultValue": "S3 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
     },
     "sqlAdministratorLogin": {
       "type": "string",
