@@ -15,10 +15,11 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "appInsightsLocation": {
+    "envNumber": {
       "type": "string",
-      "defaultValue": "West Europe"
+      "defaultValue": ""
     },
+
     "skuPublic": {
       "type": "string",
       "defaultValue": "B1 Basic",
@@ -122,10 +123,6 @@
     },
     "notifyTokenSecretKey": {
       "type": "securestring",
-      "defaultValue": ""
-    },
-    "envNumber": {
-      "type": "string",
       "defaultValue": ""
     },
     "departmentName": {
@@ -404,7 +401,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('dataAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -573,7 +570,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('contentAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -779,7 +776,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('adminAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -916,7 +913,7 @@
       "type": "Microsoft.Insights/components",
       "name": "[variables('publicAppInsights')]",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
