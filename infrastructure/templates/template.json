@@ -83,10 +83,20 @@
 
     "publicAppBasicAuth": {
       "type": "string",
-      "defaultValue": "true"
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
     },
     "publicAppBasicAuthUsername": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "descritpion": "Username protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
     },
     "publicAppBasicAuthPassword": {
       "type": "securestring",
@@ -209,7 +219,7 @@
     "adminUri" : {
       "type": "string"
     },
-    
+
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
