@@ -39,6 +39,14 @@ const selectFilterGroup = (
 export const createHeadersFromGroups = (
   groups: SortableOptionWithGroup[][],
 ): RowHeaderType[][] => {
+  groups.flatMap(t => {
+    t.flatMap(s => {
+      if (s.level && s.level === 'country' && t.length === 1) {
+        // eslint-disable-next-line no-param-reassign
+        s.label = '';
+      }
+    });
+  });
   return groups.flatMap(rowGroup =>
     rowGroup
       .reduce<[RowHeaderType[], RowHeaderType[]]>(

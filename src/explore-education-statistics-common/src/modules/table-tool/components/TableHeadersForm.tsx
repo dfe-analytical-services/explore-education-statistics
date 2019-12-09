@@ -19,6 +19,7 @@ interface Props {
 }
 
 export interface SortableOptionWithGroup extends SortableOption {
+  level?: string;
   filterGroup?: string;
 }
 
