@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime PublishScheduled { get; set; }
         public Guid ReleaseId { get; set; }
         public string ReleaseSlug { get; set; }
-        public ReleaseInfoStatus Status { get; set; }
+        public string Status { get; set; }
 
         public ReleaseInfo()
         {
@@ -22,12 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             string releaseSlug,
             ReleaseInfoStatus status)
         {
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             PublishScheduled = publishScheduled;
             ReleaseId = releaseId;
             ReleaseSlug = releaseSlug;
-            Status = status;
+            Status = status.ToString();
 
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();

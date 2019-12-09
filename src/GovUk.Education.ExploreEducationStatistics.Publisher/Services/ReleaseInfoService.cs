@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -11,14 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ReleaseInfoService : IReleaseInfoService
     {
-        private readonly IMapper _mapper;
         private readonly ITableStorageService _tableStorageService;
 
         private const string TableName = "releases";
 
-        public ReleaseInfoService(IMapper mapper, ITableStorageService tableStorageService)
+        public ReleaseInfoService(ITableStorageService tableStorageService)
         {
-            _mapper = mapper;
             _tableStorageService = tableStorageService;
         }
 
@@ -64,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (tableResult.Result is ReleaseInfo releaseInfo)
             {
-                releaseInfo.Status = status;
+                releaseInfo.Status = status.ToString();
                 await releaseInfoTable.ExecuteAsync(TableOperation.InsertOrMerge(releaseInfo));
             }
         }
