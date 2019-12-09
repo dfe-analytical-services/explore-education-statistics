@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ILogger _logger;
 
-        public ValidationService(ILogger logger)
+        public ValidationService(ILogger<ValidationService> logger)
         {
             _logger = logger;
         }
