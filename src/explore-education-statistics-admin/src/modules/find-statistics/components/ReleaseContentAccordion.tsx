@@ -9,51 +9,66 @@ import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
-  release: AbstractRelease<EditableContentBlock>;
-  content: ContentType[];
+  releaseId: string;
+  publication: AbstractRelease<EditableContentBlock>['publication'];
   accordionId: string;
   sectionName: string;
+  onContentChange?: (content: ContentType[]) => void;
 }
 
 type ContentBlock = AbstractRelease<EditableContentBlock>['content'];
 
 const ReleaseContentAccordion = ({
-  release,
+  releaseId,
+  publication,
   accordionId,
   sectionName,
+  onContentChange,
 }: ReleaseContentAccordionProps) => {
-  const [content, setContent] = React.useState<ContentType[]>([]);
+  const [content, _setContent] = React.useState<ContentType[]>([]);
+
+  const setContent = React.useCallback(
+    (newContent: ContentType[]) => {
+      if (onContentChange) onContentChange(newContent);
+      _setContent(newContent);
+    },
+    [onContentChange],
+  );
 
   const onReorder = React.useCallback(
     async (ids: Dictionary<number>) => {
       const newContent = await releaseContentService.updateContentSectionsOrder(
-        release.id,
+        releaseId,
         ids,
       );
       setContent(newContent);
     },
-    [release.id],
+    [releaseId, setContent],
   );
 
   React.useEffect(() => {
-    releaseContentService.getContentSections(release.id).then(setContent);
-  }, [release.id]);
+    const f = async (rid: string) => {
+      const newContent = await releaseContentService.getContentSections(rid);
+      if (releaseId === rid) setContent(newContent);
+    };
+    f(releaseId);
+  }, [releaseId]);
 
   const onAddSection = React.useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
-      await releaseContentService.addContentSection(release.id, content.length),
+      await releaseContentService.addContentSection(releaseId, content.length),
     ];
 
     setContent(newContent);
-  }, [content, release.id]);
+  }, [content, releaseId, setContent]);
 
   const onUpdateHeading = React.useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
       let result;
       if (block.id) {
         result = await releaseContentService.updateContentSectionHeading(
-          release.id,
+          releaseId,
           block.id,
           newTitle,
         );
@@ -64,7 +79,16 @@ const ReleaseContentAccordion = ({
       }
       return result;
     },
-    [content, release.id],
+    [content, releaseId, setContent],
+  );
+
+  const updateContentSection = React.useCallback(
+    (index: number, contentBlock?: EditableContentBlock[]) => {
+      const newContent = [...content];
+      newContent[index].content = contentBlock;
+      setContent(newContent);
+    },
+    [content, setContent],
   );
 
   return (
@@ -82,9 +106,12 @@ const ReleaseContentAccordion = ({
             key={contentItem.order}
             contentItem={contentItem}
             index={index}
-            release={release}
+            publication={publication}
             onHeadingChange={title =>
               onUpdateHeading(contentItem, index, title)
+            }
+            onContentChange={newContent =>
+              updateContentSection(index, newContent)
             }
           />
         ))}

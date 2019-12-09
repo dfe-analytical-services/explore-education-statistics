@@ -15,9 +15,10 @@ export interface ReleaseContentAccordionSectionProps {
   id?: string;
   contentItem: ContentType;
   index: number;
-  release: AbstractRelease<EditableContentBlock>;
+  publication: AbstractRelease<EditableContentBlock>['publication'];
   headingButtons?: ReactNode[];
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
+  onContentChange?: (content?: EditableContentBlock[]) => void;
   canToggle?: boolean;
 }
 
@@ -25,10 +26,11 @@ const ReleaseContentAccordionSection = ({
   id,
   index,
   contentItem,
-  release,
+  publication,
   headingButtons,
   canToggle = true,
   onHeadingChange,
+  onContentChange,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading, order } = contentItem;
@@ -53,6 +55,16 @@ const ReleaseContentAccordionSection = ({
       setIsReordering(true);
     }
   };
+
+  const contentChange = React.useCallback(
+    (newContent?: EditableContentBlock[]) => {
+      setContent(newContent);
+      if (onContentChange) {
+        onContentChange(newContent);
+      }
+    },
+    [onContentChange],
+  );
 
   return (
     <AccordionSection
@@ -84,8 +96,8 @@ const ReleaseContentAccordionSection = ({
         sectionId={id}
         content={content}
         id={`content_${order}`}
-        publication={release.publication}
-        onContentChange={newContent => setContent(newContent)}
+        publication={publication}
+        onContentChange={newContent => contentChange(newContent)}
         onReorderHook={s => {
           saveOrder.current = s;
         }}

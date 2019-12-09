@@ -8,15 +8,14 @@ import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
-import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { Dictionary } from '@common/types/util';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 import ContentBlockDraggable from './ContentBlockDraggable';
+import Comments from './Comments';
 
 type ContentType = EditableRelease['content'][0]['content'];
 
@@ -33,7 +32,6 @@ export interface Props extends ContentBlockProps {
   canAddBlocks: boolean;
   canAddSingleBlock?: boolean;
   isReordering?: boolean;
-  reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (content: ContentType) => void;
   onReorderHook?: (callback: ReorderHook) => void;
@@ -47,6 +45,8 @@ export const EditingContentBlockContext = React.createContext<
   EditingContentBlockContext
 >({
   releaseId: undefined,
+  isCommenting: false,
+  isReviewing: false,
   isEditing: false,
   sectionId: undefined,
 });
@@ -57,8 +57,6 @@ const EditableContentBlock = ({
   sectionId,
   editable = true,
   onContentChange,
-  reviewing,
-  resolveComments,
   canAddBlocks = false,
   canAddSingleBlock = false,
   isReordering = false,
@@ -116,18 +114,17 @@ const EditableContentBlock = ({
     }
   };
 
-  if (contentBlocks === undefined || contentBlocks.length === 0) {
-    return (
-      <>
-        <div className="govuk-inset-text">
-          There is no content for this section.
-        </div>
-        {(canAddBlocks || canAddSingleBlock) && (
-          <AddContentButton order={0} onClick={onAddContentCallback} />
-        )}
-      </>
-    );
-  }
+  const onContentBlockChange = React.useCallback(
+    (index: number, newContent: string) => {
+      const newBlocks = [...(contentBlocks || [])];
+      newBlocks[index].body = newContent;
+      setContentBlocks(newBlocks);
+      if (onContentChange) {
+        onContentChange(newBlocks);
+      }
+    },
+    [contentBlocks, onContentChange],
+  );
 
   const onDeleteContent = async (contentId: string) => {
     const { releaseId } = editingContext;
@@ -148,17 +145,33 @@ const EditableContentBlock = ({
     }
   };
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, type } = result;
+  const onDragEnd = React.useCallback(
+    (result: DropResult) => {
+      const { source, destination, type } = result;
 
-    if (type === 'content' && destination) {
-      const newContentBlocks = [...contentBlocks];
-      const [removed] = newContentBlocks.splice(source.index, 1);
-      newContentBlocks.splice(destination.index, 0, removed);
-      setContentBlocks(newContentBlocks);
-      if (onContentChange) onContentChange(newContentBlocks);
-    }
-  };
+      if (type === 'content' && destination) {
+        const newContentBlocks = [...(contentBlocks || [])];
+        const [removed] = newContentBlocks.splice(source.index, 1);
+        newContentBlocks.splice(destination.index, 0, removed);
+        setContentBlocks(newContentBlocks);
+        if (onContentChange) onContentChange(newContentBlocks);
+      }
+    },
+    [contentBlocks, onContentChange],
+  );
+
+  if (contentBlocks === undefined || contentBlocks.length === 0) {
+    return (
+      <>
+        <div className="govuk-inset-text">
+          There is no content for this section.
+        </div>
+        {(canAddBlocks || canAddSingleBlock) && (
+          <AddContentButton order={0} onClick={onAddContentCallback} />
+        )}
+      </>
+    );
+  }
 
   return (
     <EditingContentBlockContext.Provider
@@ -167,7 +180,7 @@ const EditableContentBlock = ({
         sectionId,
       }}
     >
-      <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={result => onDragEnd(result)}>
         <ContentBlockDroppable
           draggable={isReordering}
           droppableId={`${sectionId}`}
@@ -181,14 +194,27 @@ const EditableContentBlock = ({
             >
               {!isReordering && (
                 <>
-                  {reviewing && <AddComment initialComments={block.comments} />}
-                  {resolveComments && (
-                    <ResolveComment initialComments={block.comments} />
-                  )}
                   {canAddBlocks && (
                     <AddContentButton
                       order={index}
                       onClick={onAddContentCallback}
+                    />
+                  )}
+                  {(editingContext.isCommenting ||
+                    editingContext.isReviewing) && (
+                    <Comments
+                      contentBlockId={block.id}
+                      initialComments={block.comments}
+                      canResolve={editingContext.isReviewing}
+                      canComment={editingContext.isCommenting}
+                      onCommentsChange={async comments => {
+                        const newBlocks = [...contentBlocks];
+                        newBlocks[index].comments = comments;
+                        setContentBlocks(newBlocks);
+                        if (onContentChange) {
+                          onContentChange(newBlocks);
+                        }
+                      }}
                     />
                   )}
                 </>
@@ -200,14 +226,9 @@ const EditableContentBlock = ({
                 block={block}
                 id={id}
                 index={index}
-                onContentChange={newContent => {
-                  const newBlocks = [...contentBlocks];
-                  newBlocks[index].body = newContent;
-                  setContentBlocks(newBlocks);
-                  if (onContentChange) {
-                    onContentChange(newBlocks);
-                  }
-                }}
+                onContentChange={(newContent: string) =>
+                  onContentBlockChange(index, newContent)
+                }
                 onDelete={() => onDeleteContent(block.id)}
               />
 

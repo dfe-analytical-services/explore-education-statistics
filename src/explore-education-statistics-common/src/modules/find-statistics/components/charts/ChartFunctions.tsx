@@ -747,7 +747,11 @@ export function generateMajorAxis(
   return { domain, ticks };
 }
 
-export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
+export function parseMetaData(
+  metaData?: DataBlockMetadata,
+): ChartMetaData | undefined {
+  if (metaData === undefined) return undefined;
+
   const allFilters: LabelValueMetadata[] = Object.values(
     metaData.filters,
   ).reduce<LabelValueMetadata[]>((filters, { options }) => {

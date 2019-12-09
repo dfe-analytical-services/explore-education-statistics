@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  FormGroup,
   FormFieldset,
+  FormGroup,
   FormSelect,
   FormTextInput,
-  FormRadioGroup,
 } from '@common/components/form';
 import Link from '@admin/components/Link';
 
