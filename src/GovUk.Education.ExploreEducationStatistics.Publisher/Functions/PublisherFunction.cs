@@ -24,19 +24,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             GenerateReleaseContentMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {message}");
+            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
             _contentCacheGenerationService.GenerateReleaseContent(message).Wait();
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().FullName} function completed");
         }
 
         [FunctionName("PublishReleaseContent")]
         public void PublishReleaseContent([TimerTrigger("0 30 09 * * *")] TimerInfo timer,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered at: {DateTime.Now}");
+            logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");
             // TODO EES-865 Move content daily at 09:30
             logger.LogInformation(
-                $"{GetType().Name} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+                $"{GetType().FullName} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
         }
         
         [FunctionName("PublishReleaseDataFiles")]
@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             PublishReleaseDataFilesMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {message}");
+            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
             await _publishingService.PublishReleaseDataFiles(message);
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().FullName} function completed");
         }
 
         [FunctionName("PublishReleaseData")]
@@ -55,10 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             [QueueTrigger("publish-release-data")] PublishReleaseDataMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {message}");
+            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
             // TODO EES-866 Run the importer or copy the data from the statistics database
             // TODO EES-866 to the publicly available statistics database
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().FullName} function completed");
         }
     }
 }

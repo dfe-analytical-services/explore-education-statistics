@@ -24,9 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             [QueueTrigger("releases")] QueueReleaseMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {message}");
+            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
             await ValidateReleaseAsync(message, async () => await AddReleaseInfo(message, Scheduled));
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().FullName} function completed");
         }
 
         private async Task ValidateReleaseAsync(QueueReleaseMessage message, Func<Task> andThen)

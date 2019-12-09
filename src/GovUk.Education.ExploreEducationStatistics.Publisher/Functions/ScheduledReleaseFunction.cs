@@ -25,10 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         public void ScheduledRelease([TimerTrigger("0 */2 * * * *")] TimerInfo timer,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered at: {DateTime.Now}");
+            logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");
             ProcessReleases().Wait();
             logger.LogInformation(
-                $"{GetType().Name} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+                $"{GetType().FullName} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
         }
 
         private async Task ProcessReleases()
