@@ -137,7 +137,7 @@
       "type": "securestring",
       "defaultValue": ""
     },
-    
+
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -216,7 +216,7 @@
       "type": "string"
     },
 
-    "adminUri" : {
+    "adminUri": {
       "type": "string"
     },
 
@@ -987,21 +987,8 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
+      "apiVersion": "2018-06-01-preview",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "SQL Server",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "apiVersion": "2014-04-01",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
@@ -1066,7 +1053,7 @@
         },
         {
           "type": "firewallrules",
-          "apiVersion": "2014-04-01",
+          "apiVersion": "2018-06-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -1076,8 +1063,51 @@
             "endIpAddress": "0.0.0.0",
             "startIpAddress": "0.0.0.0"
           }
-        }
-      ]
+        },
+        {
+          "type": "securityAlertPolicies",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "emailAccountAdmins": true
+          }
+        },
+        {
+          "type": "vulnerabilityAssessments",
+          "name": "Default",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+          ],
+          "properties": {
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "recurringScans": {
+              "isEnabled": true,
+              "emailSubscriptionAdmins": true
+            }
+          }
+        },
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "SQL Server",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
     },
     {
       "name": "[variables('publicSqlServerName')]",
