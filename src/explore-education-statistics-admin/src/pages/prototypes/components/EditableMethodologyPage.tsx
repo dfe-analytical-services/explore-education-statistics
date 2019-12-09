@@ -4,9 +4,7 @@ import EditableAccordion from '@admin/components/EditableAccordion';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
 import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import { EditableRelease } from '@admin/services/publicationService';
 import RelatedAside from '@common/components/RelatedAside';
-import { ContentBlockType } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import {
   DragDropContext,
@@ -15,6 +13,8 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { EditableRelease } from '@admin/services/publicationService';
+import { ContentBlockType } from '@common/services/publicationService';
 
 interface State {
   reordering: boolean;
@@ -155,7 +155,6 @@ class EditableMethodologyPage extends Component<Props, State> {
               <EditableContentBlock
                 editable={editing}
                 content={content}
-                reviewing={reviewing}
                 resolveComments={resolveComments}
                 id={`editable-block-${index}`}
                 publication={data.publication}

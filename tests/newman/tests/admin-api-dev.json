@@ -27,7 +27,7 @@
 									"}",
 									"",
 									"pm.globals.set('RUN_IDENTIFIER', unique_identifier);",
-									"console.log('RUN_IDENTIIFER: ', pm.globals.get('RUN_IDENTIFIER'));"
+									"console.log('RUN_IDENTIFIER: ', pm.globals.get('RUN_IDENTIFIER'));"
 								],
 								"type": "text/javascript"
 							}
@@ -739,7 +739,9 @@
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"pm.test(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200); ",
+									"});",
 									"",
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
@@ -801,6 +803,240 @@
 							"path": [
 								"data",
 								"footnote"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create data block 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+								"exec": [
+									"const respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200); ",
+									"});",
+									"",
+									"pm.test(\"Store environment variables\", function () {",
+									"    pm.expect(respJson.id).to.not.be.null;",
+									"    pm.globals.set(\"sub1_datablock1_id\", respJson.id);",
+									"});",
+									"",
+									"pm.test(\"heading should be correct\", function () {",
+									"    pm.expect(respJson.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
+									"});",
+									"",
+									"pm.test(\"customFootnotes should be correct\", function () {",
+									"    pm.expect(respJson.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+									"});",
+									"",
+									"pm.test(\"name should be correct\", function () {",
+									"    pm.expect(respJson.name).to.equal(\"Admin API data block 1\"); ",
+									"});",
+									"",
+									"pm.test(\"source should be correct\", function () {",
+									"    pm.expect(respJson.source).to.equal(\"Admin API test source\"); ",
+									"});",
+									"",
+									"pm.test(\"dataBlockRequest should be correct\", function () {",
+									"    const dbReq = respJson.dataBlockRequest;",
+									"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+									"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+									"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+									"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+									"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+									"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+									"    pm.expect(dbReq.indicators.length).to.equal(1);",
+									"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+									"    pm.expect(dbReq.localAuthority).to.have.members([",
+									"        \"E08000016\",",
+									"        \"E08000025\"",
+									"    ]);",
+									"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+									"        \"E06000001\",",
+									"        \"E06000002\"",
+									"    ]);",
+									"});",
+									"",
+									"pm.test(\"charts should be correct\", function () {",
+									"    pm.expect(respJson.charts).to.be.an('array').that.is.empty; ",
+									"});",
+									"",
+									"pm.test(\"tables should be correct\", function () {",
+									"    pm.expect(respJson.tables.length).to.equal(1);",
+									"    const table = respJson.tables[0];",
+									"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+									"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+									"    pm.expect(table.tableHeaders.columns.length).to.equal(11);",
+									"    ",
+									"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+									"    pm.expect(column).to.have.members([",
+									"        \"2007_CY\", \"2008_CY\", \"2009_CY\", \"2010_CY\",",
+									"        \"2011_CY\", \"2012_CY\", \"2013_CY\", \"2014_CY\",",
+									"        \"2015_CY\", \"2016_CY\", \"2017_CY\"",
+									"    ]);",
+									"    ",
+									"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+									"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
+									"    ",
+									"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+									"    pm.expect(row).to.have.members([",
+									"        \"Birmingham\",",
+									"        \"Barnsley\",",
+									"        \"Hartlepool\",",
+									"        \"Middlesbrough\"",
+									"    ]);",
+									"    ",
+									"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+									"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+									"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dataBlockRequest\": {\n        \"localAuthority\": [\n            \"E08000016\",\n            \"E08000025\"\n        ],\n        \"localAuthorityDistrict\": [\n            \"E06000001\",\n            \"E06000002\"\n        ],\n        \"subjectId\": \"{{sub1_id}}\",\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"filters\": [],\n        \"timePeriod\": {\n            \"startYear\": 2007,\n            \"startCode\": \"CY\",\n            \"endYear\": 2017,\n            \"endCode\": \"CY\"\n        }\n    },\n    \"heading\": \"Table showing 'API test subject' from 'API test publication {{RUN_IDENTIFIER}}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017\",\n    \"customFootnotes\": \"Admin API test footnotes\",\n    \"name\": \"Admin API data block 1\",\n    \"source\": \"Admin API test source\",\n    \"tables\": [\n        {\n            \"indicators\": [],\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"value\": \"E08000025\",\n                            \"label\": \"Birmingham\",\n                            \"level\": \"localAuthority\"\n                        },\n                        {\n                            \"value\": \"E08000016\",\n                            \"label\": \"Barnsley\",\n                            \"level\": \"localAuthority\"\n                        },\n                        {\n                            \"value\": \"E06000001\",\n                            \"label\": \"Hartlepool\",\n                            \"level\": \"localAuthorityDistrict\"\n                        },\n                        {\n                            \"value\": \"E06000002\",\n                            \"label\": \"Middlesbrough\",\n                            \"level\": \"localAuthorityDistrict\"\n                        }\n                    ]\n                ],\n                \"columns\": [\n                    {\n                        \"value\": \"2007_CY\",\n                        \"label\": \"2007\",\n                        \"year\": 2007,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2008_CY\",\n                        \"label\": \"2008\",\n                        \"year\": 2008,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2009_CY\",\n                        \"label\": \"2009\",\n                        \"year\": 2009,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2010_CY\",\n                        \"label\": \"2010\",\n                        \"year\": 2010,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2011_CY\",\n                        \"label\": \"2011\",\n                        \"year\": 2011,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2012_CY\",\n                        \"label\": \"2012\",\n                        \"year\": 2012,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2013_CY\",\n                        \"label\": \"2013\",\n                        \"year\": 2013,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2014_CY\",\n                        \"label\": \"2014\",\n                        \"year\": 2014,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2015_CY\",\n                        \"label\": \"2015\",\n                        \"year\": 2015,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2016_CY\",\n                        \"label\": \"2016\",\n                        \"year\": 2016,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2017_CY\",\n                        \"label\": \"2017\",\n                        \"year\": 2017,\n                        \"code\": \"CY\"\n                    }\n                ],\n                \"rows\": [\n                    {\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\",\n                        \"label\": \"Admission Numbers\",\n                        \"unit\": \"\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{release_id}}",
+								"datablocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create data block 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+								"exec": [
+									"const respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200); ",
+									"});",
+									"",
+									"pm.test(\"Store environment variables\", function () {",
+									"    pm.expect(respJson.id).to.not.be.null;",
+									"    pm.globals.set(\"sub1_datablock2_id\", respJson.id);",
+									"});",
+									"",
+									"pm.test(\"heading should be correct\", function () {",
+									"    pm.expect(respJson.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
+									"});",
+									"",
+									"pm.test(\"customFootnotes should be correct\", function () {",
+									"    pm.expect(respJson.customFootnotes).to.equal(\"\"); ",
+									"});",
+									"",
+									"pm.test(\"name should be correct\", function () {",
+									"    pm.expect(respJson.name).to.equal(\"Admin API data block 2\"); ",
+									"});",
+									"",
+									"pm.test(\"source should be correct\", function () {",
+									"    pm.expect(respJson.source).to.equal(\"\"); ",
+									"});",
+									"",
+									"pm.test(\"dataBlockRequest should be correct\", function () {",
+									"    const dbReq = respJson.dataBlockRequest;",
+									"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+									"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+									"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+									"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+									"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+									"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+									"    pm.expect(dbReq.indicators.length).to.equal(1);",
+									"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+									"    pm.expect(dbReq.ward).to.have.members([",
+									"        \"E05010291\",",
+									"        \"E05010450\"",
+									"    ]);",
+									"});",
+									"",
+									"pm.test(\"charts should be correct\", function () {",
+									"    pm.expect(respJson.charts).to.be.an('array').that.is.empty; ",
+									"});",
+									"",
+									"pm.test(\"tables should be correct\", function () {",
+									"    pm.expect(respJson.tables.length).to.equal(1);",
+									"    const table = respJson.tables[0];",
+									"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+									"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+									"    pm.expect(table.tableHeaders.columns.length).to.equal(6);",
+									"    ",
+									"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+									"    pm.expect(column).to.have.members([",
+									"        \"2005_CY\", \"2006_CY\", ",
+									"        \"2007_CY\", \"2008_CY\", ",
+									"        \"2009_CY\", \"2010_CY\"",
+									"    ]);",
+									"    ",
+									"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+									"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
+									"    ",
+									"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+									"    pm.expect(row).to.have.members([",
+									"        \"Nailsea Youngwood\",",
+									"        \"Rural West York\"",
+									"    ]);",
+									"    ",
+									"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+									"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+									"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dataBlockRequest\": {\n        \"ward\": [\n            \"E05010291\",\n            \"E05010450\"\n        ],\n        \"subjectId\": \"{{sub1_id}}\",\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"filters\": [],\n        \"timePeriod\": {\n            \"startYear\": 2005,\n            \"startCode\": \"CY\",\n            \"endYear\": 2010,\n            \"endCode\": \"CY\"\n        }\n    },\n    \"heading\": \"Table showing 'API test subject' from 'API test publication {{RUN_IDENTIFIER}}' in Nailsea Youngwood and Rural West York between 2005 and 2010\",\n    \"customFootnotes\": \"\",\n    \"name\": \"Admin API data block 2\",\n    \"source\": \"\",\n    \"tables\": [\n        {\n            \"indicators\": [],\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"value\": \"E05010291\",\n                            \"label\": \"Nailsea Youngwood\",\n                            \"level\": \"ward\"\n                        },\n                        {\n                            \"value\": \"E05010450\",\n                            \"label\": \"Rural West York\",\n                            \"level\": \"ward\"\n                        }\n                    ]\n                ],\n                \"columns\": [\n                    {\n                        \"value\": \"2005_CY\",\n                        \"label\": \"2005\",\n                        \"year\": 2005,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2006_CY\",\n                        \"label\": \"2006\",\n                        \"year\": 2006,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2007_CY\",\n                        \"label\": \"2007\",\n                        \"year\": 2007,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2008_CY\",\n                        \"label\": \"2008\",\n                        \"year\": 2008,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2009_CY\",\n                        \"label\": \"2009\",\n                        \"year\": 2009,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2010_CY\",\n                        \"label\": \"2010\",\n                        \"year\": 2010,\n                        \"code\": \"CY\"\n                    }\n                ],\n                \"rows\": [\n                    {\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\",\n                        \"label\": \"Admission Numbers\",\n                        \"unit\": \"\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{release_id}}",
+								"datablocks"
 							]
 						}
 					},
@@ -6225,6 +6461,1284 @@
 												"release",
 												"{{release_id}}",
 												"content"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Data Blocks",
+							"item": [
+								{
+									"name": "Get available data blocks 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"});",
+													"",
+													"const datablock1 = respJson.find(db => db.id === pm.globals.get('sub1_datablock1_id'));",
+													"pm.test(\"datablock1 should be within results\", function () {",
+													"    pm.expect(datablock1).to.not.be.undefined;",
+													"});",
+													"",
+													"const datablock2 = respJson.find(db => db.id === pm.globals.get('sub1_datablock2_id'));",
+													"pm.test(\"datablock2 should be within results\", function () {",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"datablock1 heading should be correct\", function () {",
+													"    pm.expect(datablock1.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
+													"});",
+													"",
+													"pm.test(\"datablock1 customFootnotes should be correct\", function () {",
+													"    pm.expect(datablock1.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 name should be correct\", function () {",
+													"    pm.expect(datablock1.name).to.equal(\"Admin API data block 1\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 source should be correct\", function () {",
+													"    pm.expect(datablock1.source).to.equal(\"Admin API test source\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 dataBlockRequest should be correct\", function () {",
+													"    const dbReq = datablock1.dataBlockRequest;",
+													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+													"    pm.expect(dbReq.indicators.length).to.equal(1);",
+													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"    pm.expect(dbReq.localAuthority).to.have.members([",
+													"        \"E08000016\",",
+													"        \"E08000025\"",
+													"    ]);",
+													"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+													"        \"E06000001\",",
+													"        \"E06000002\"",
+													"    ]);",
+													"});",
+													"",
+													"pm.test(\"datablock1 charts should be correct\", function () {",
+													"    pm.expect(datablock1.charts).to.be.an('array').that.is.empty; ",
+													"});",
+													"",
+													"pm.test(\"datablock1 tables should be correct\", function () {",
+													"    pm.expect(datablock1.tables.length).to.equal(1);",
+													"    const table = datablock1.tables[0];",
+													"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columns.length).to.equal(11);",
+													"    ",
+													"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+													"    pm.expect(column).to.have.members([",
+													"        \"2007_CY\", \"2008_CY\", \"2009_CY\", \"2010_CY\",",
+													"        \"2011_CY\", \"2012_CY\", \"2013_CY\", \"2014_CY\",",
+													"        \"2015_CY\", \"2016_CY\", \"2017_CY\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
+													"    ",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    pm.expect(row).to.have.members([",
+													"        \"Birmingham\",",
+													"        \"Barnsley\",",
+													"        \"Hartlepool\",",
+													"        \"Middlesbrough\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"});",
+													"",
+													"pm.test(\"datablock2 heading should be correct\", function () {",
+													"    pm.expect(datablock2.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
+													"});",
+													"",
+													"pm.test(\"datablock2 customFootnotes should be correct\", function () {",
+													"    pm.expect(datablock2.customFootnotes).to.equal(\"\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 name should be correct\", function () {",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 source should be correct\", function () {",
+													"    pm.expect(datablock2.source).to.equal(\"\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 dataBlockRequest should be correct\", function () {",
+													"    const dbReq = datablock2.dataBlockRequest;",
+													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+													"    pm.expect(dbReq.indicators.length).to.equal(1);",
+													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"    pm.expect(dbReq.ward).to.have.members([",
+													"        \"E05010291\",",
+													"        \"E05010450\"",
+													"    ]);",
+													"});",
+													"",
+													"pm.test(\"datablock2 charts should be correct\", function () {",
+													"    pm.expect(datablock2.charts).to.be.an('array').that.is.empty; ",
+													"});",
+													"",
+													"pm.test(\"datablock2 tables should be correct\", function () {",
+													"    pm.expect(datablock2.tables.length).to.equal(1);",
+													"    const table = datablock2.tables[0];",
+													"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columns.length).to.equal(6);",
+													"    ",
+													"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+													"    pm.expect(column).to.have.members([",
+													"        \"2005_CY\", \"2006_CY\", ",
+													"        \"2007_CY\", \"2008_CY\", ",
+													"        \"2009_CY\", \"2010_CY\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
+													"    ",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    pm.expect(row).to.have.members([",
+													"        \"Nailsea Youngwood\",",
+													"        \"Rural West York\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add a Content Section to attach an available Data Block to",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Store environment variables\", function() {",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.globals.set(\"datablock_content_section_id\", respJson.id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 0\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach datablock1 to new content section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Attached datablock should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(respJson.name).to.equal(\"Admin API data block 1\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '{{sub1_datablock1_id}}'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Try to attach same data block twice 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code should be correct\", function () { ",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Error should be correct\", function () {",
+													"    pm.expect(respJson.errors[''][0]).to.equal(\"CONTENT_BLOCK_ALREADY_ATTACHED_TO_CONTENT_SECTION\"); ",
+													"    pm.expect(respJson.title).to.equal(\"One or more validation errors occurred.\");",
+													"    pm.expect(respJson.status).to.equal(400);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '{{sub1_datablock1_id}}'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get available data blocks 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response length should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Response should contain unattached datablocks\", function () {",
+													"    const datablock2 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.exist;",
+													"});",
+													"",
+													"pm.test(\"Response shouldn't contain attached datablocks\", function () {",
+													"    const datablock1 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.be.undefined;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content section details should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('datablock_content_section_id')); ",
+													"    pm.expect(respJson.order).to.equal(0);",
+													"    pm.expect(respJson.heading).to.equal(\"New section\");",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"    const datablock = respJson.content[0];",
+													"    ",
+													"    pm.expect(datablock.id).to.equal(pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock.type).to.equal(\"DataBlock\");",
+													"    pm.expect(datablock.order).to.equal(1);",
+													"    pm.expect(datablock.name).to.equal(\"Admin API data block 1\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach datablock2 to new content section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Attached datablock should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(respJson.name).to.equal(\"Admin API data block 2\");",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '{{sub1_datablock2_id}}'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Try to attach same data block twice 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code should be correct\", function () { ",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Error should be correct\", function () {",
+													"    pm.expect(respJson.errors[''][0]).to.equal(\"CONTENT_BLOCK_ALREADY_ATTACHED_TO_CONTENT_SECTION\"); ",
+													"    pm.expect(respJson.title).to.equal(\"One or more validation errors occurred.\");",
+													"    pm.expect(respJson.status).to.equal(400);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '{{sub1_datablock2_id}}'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get available data blocks 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response should be correct\", function () {",
+													"    pm.expect(respJson).to.be.an('array').that.is.empty;",
+													"});",
+													"",
+													"pm.test(\"Response shouldn't contain attached datablocks\", function () {",
+													"    const datablock1 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.be.undefined;",
+													"    ",
+													"    const datablock2 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.be.undefined;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block  Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content section details should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('datablock_content_section_id')); ",
+													"    pm.expect(respJson.order).to.equal(0);",
+													"    pm.expect(respJson.heading).to.equal(\"New section\");",
+													"    pm.expect(respJson.content.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"content should contain datablock1\", function () {",
+													"    const datablock1 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.not.be.undefined;",
+													"    pm.expect(datablock1.name).to.equal(\"Admin API data block 1\");",
+													"    pm.expect(datablock1.order).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"content should contain datablock2\", function () { ",
+													"    const datablock2 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\");",
+													"    pm.expect(datablock1.order).to.equal(2);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Detach a Data Block from the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response shouldn't contain datablock1\", function () {",
+													"    const datablock1 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Response should contain datablock2\", function () { ",
+													"    const datablock2 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/block/{{sub1_datablock1_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"block",
+												"{{sub1_datablock1_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get available data blocks 4",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response length should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Response should contain unattached datablocks\", function () {",
+													"    const datablock1 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.exist;",
+													"});",
+													"",
+													"pm.test(\"Response shouldn't contain attached datablocks\", function () {",
+													"    const datablock2 = respJson.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.be.undefined;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section attached data blocks are correct",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content section details should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('datablock_content_section_id')); ",
+													"    pm.expect(respJson.order).to.equal(0);",
+													"    pm.expect(respJson.heading).to.equal(\"New section\");",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"content shouldn't contain datablock1\", function () {",
+													"    const datablock1 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"content should contain datablock2\", function () { ",
+													"    const datablock2 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach the newly available Data Block to the Content Section with explicit order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Attached datablock should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(respJson.name).to.equal(\"Admin API data block 1\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '{{sub1_datablock1_id}}',\n\t\torder: 1\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get available data blocks 5",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response length should be correct\", function () {",
+													"    pm.expect(respJson).to.be.an('array').that.is.empty;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content section details should be correct\", function () {",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get('datablock_content_section_id')); ",
+													"    pm.expect(respJson.order).to.equal(0);",
+													"    pm.expect(respJson.heading).to.equal(\"New section\");",
+													"    pm.expect(respJson.content.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"content should contain datablock1\", function () {",
+													"    const datablock1 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock1_id'));",
+													"    pm.expect(datablock1).to.not.be.undefined;",
+													"    pm.expect(datablock1.name).to.equal(\"Admin API data block 1\");",
+													"    pm.expect(datablock1.order).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"content should contain datablock2\", function () { ",
+													"    const datablock2 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\");",
+													"    pm.expect(datablock2.order).to.equal(2);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove the Content Section to verify Data Blocks aren't deleted as well",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"    pm.expect(respJson).to.be.an('array').that.is.empty;",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{datablock_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{datablock_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify that the Data Blocks are available again after deleting the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Response should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"});",
+													"",
+													"const datablock1 = respJson.find(db => db.id === pm.globals.get('sub1_datablock1_id'));",
+													"pm.test(\"datablock1 should be within results\", function () {",
+													"    pm.expect(datablock1).to.not.be.undefined;",
+													"});",
+													"",
+													"const datablock2 = respJson.find(db => db.id === pm.globals.get('sub1_datablock2_id'));",
+													"pm.test(\"datablock2 should be within results\", function () {",
+													"    pm.expect(datablock2).to.not.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"datablock1 heading should be correct\", function () {",
+													"    pm.expect(datablock1.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
+													"});",
+													"",
+													"pm.test(\"datablock1 customFootnotes should be correct\", function () {",
+													"    pm.expect(datablock1.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 name should be correct\", function () {",
+													"    pm.expect(datablock1.name).to.equal(\"Admin API data block 1\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 source should be correct\", function () {",
+													"    pm.expect(datablock1.source).to.equal(\"Admin API test source\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock1 dataBlockRequest should be correct\", function () {",
+													"    const dbReq = datablock1.dataBlockRequest;",
+													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+													"    pm.expect(dbReq.indicators.length).to.equal(1);",
+													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"    pm.expect(dbReq.localAuthority).to.have.members([",
+													"        \"E08000016\",",
+													"        \"E08000025\"",
+													"    ]);",
+													"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+													"        \"E06000001\",",
+													"        \"E06000002\"",
+													"    ]);",
+													"});",
+													"",
+													"pm.test(\"datablock1 charts should be correct\", function () {",
+													"    pm.expect(datablock1.charts).to.be.an('array').that.is.empty; ",
+													"});",
+													"",
+													"pm.test(\"datablock1 tables should be correct\", function () {",
+													"    pm.expect(datablock1.tables.length).to.equal(1);",
+													"    const table = datablock1.tables[0];",
+													"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columns.length).to.equal(11);",
+													"    ",
+													"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+													"    pm.expect(column).to.have.members([",
+													"        \"2007_CY\", \"2008_CY\", \"2009_CY\", \"2010_CY\",",
+													"        \"2011_CY\", \"2012_CY\", \"2013_CY\", \"2014_CY\",",
+													"        \"2015_CY\", \"2016_CY\", \"2017_CY\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
+													"    ",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    pm.expect(row).to.have.members([",
+													"        \"Birmingham\",",
+													"        \"Barnsley\",",
+													"        \"Hartlepool\",",
+													"        \"Middlesbrough\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"});",
+													"",
+													"pm.test(\"datablock2 heading should be correct\", function () {",
+													"    pm.expect(datablock2.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
+													"});",
+													"",
+													"pm.test(\"datablock2 customFootnotes should be correct\", function () {",
+													"    pm.expect(datablock2.customFootnotes).to.equal(\"\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 name should be correct\", function () {",
+													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 source should be correct\", function () {",
+													"    pm.expect(datablock2.source).to.equal(\"\"); ",
+													"});",
+													"",
+													"pm.test(\"datablock2 dataBlockRequest should be correct\", function () {",
+													"    const dbReq = datablock2.dataBlockRequest;",
+													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
+													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
+													"    pm.expect(dbReq.indicators.length).to.equal(1);",
+													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"    pm.expect(dbReq.ward).to.have.members([",
+													"        \"E05010291\",",
+													"        \"E05010450\"",
+													"    ]);",
+													"});",
+													"",
+													"pm.test(\"datablock2 charts should be correct\", function () {",
+													"    pm.expect(datablock2.charts).to.be.an('array').that.is.empty; ",
+													"});",
+													"",
+													"pm.test(\"datablock2 tables should be correct\", function () {",
+													"    pm.expect(datablock2.tables.length).to.equal(1);",
+													"    const table = datablock2.tables[0];",
+													"    pm.expect(table.indicators).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columnGroups).to.be.an('array').that.is.empty;",
+													"    pm.expect(table.tableHeaders.columns.length).to.equal(6);",
+													"    ",
+													"    const column = table.tableHeaders.columns.map(timePeriod => timePeriod.value);",
+													"    pm.expect(column).to.have.members([",
+													"        \"2005_CY\", \"2006_CY\", ",
+													"        \"2007_CY\", \"2008_CY\", ",
+													"        \"2009_CY\", \"2010_CY\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
+													"    ",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    pm.expect(row).to.have.members([",
+													"        \"Nailsea Youngwood\",",
+													"        \"Rural West York\"",
+													"    ]);",
+													"    ",
+													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
+													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"available-datablocks"
 											]
 										}
 									},

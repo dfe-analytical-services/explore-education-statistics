@@ -12,6 +12,7 @@ export type MarkdownRendererProps = RendererProps &
     canDelete: boolean;
     onDelete: () => void;
     editable?: boolean;
+    onContentChange?: (content: string) => void;
   };
 
 const EditableMarkdownRenderer = ({
@@ -20,6 +21,7 @@ const EditableMarkdownRenderer = ({
   canDelete,
   onDelete,
   editable = true,
+  onContentChange,
 }: MarkdownRendererProps) => {
   const [markdown, setMarkdown] = React.useState(source);
 
@@ -51,6 +53,7 @@ const EditableMarkdownRenderer = ({
               )
               .catch(handleApiErrors);
 
+            if (onContentChange) onContentChange(body);
             setMarkdown(body);
           }
         }}

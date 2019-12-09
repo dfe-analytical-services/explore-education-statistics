@@ -11,6 +11,7 @@ export type Props = RendererProps & {
   canDelete: boolean;
   onDelete: () => void;
   editable?: boolean;
+  onContentChange?: (content: string) => void;
 };
 
 const EditableHtmlRenderer = ({
@@ -19,6 +20,7 @@ const EditableHtmlRenderer = ({
   canDelete,
   onDelete,
   editable = true,
+  onContentChange,
 }: Props) => {
   const [html, setHtml] = React.useState(source);
 
@@ -49,6 +51,7 @@ const EditableHtmlRenderer = ({
               )
               .catch(handleApiErrors);
 
+            if (onContentChange) onContentChange(body);
             setHtml(body);
           }
         }}

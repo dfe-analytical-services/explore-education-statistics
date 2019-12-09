@@ -1,11 +1,11 @@
-import Link from '@admin/components/Link';
+import React from 'react';
 import {
   FormFieldset,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import React from 'react';
+import Link from '@admin/components/Link';
 
 interface Props {
   sectionId?: string;

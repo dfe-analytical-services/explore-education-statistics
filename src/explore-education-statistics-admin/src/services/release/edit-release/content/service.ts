@@ -5,6 +5,7 @@ import {
   ReleaseNote,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
+import { ExtendedComment } from '@admin/services/publicationService';
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,
@@ -104,6 +105,51 @@ export const releaseContentService = {
   ): Promise<void> {
     return client.delete(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
+    );
+  },
+
+  getContentSectionComments(
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+  ): Promise<ExtendedComment[]> {
+    return client.get(
+      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments`,
+    );
+  },
+
+  addContentSectionComment(
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+    comment: ExtendedComment,
+  ): Promise<ExtendedComment> {
+    return client.post(
+      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
+      comment,
+    );
+  },
+
+  updateContentSectionComment(
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+    comment: ExtendedComment,
+  ): Promise<ExtendedComment> {
+    return client.put(
+      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${comment.id}`,
+      comment,
+    );
+  },
+
+  deleteContentSectionComment(
+    releaseId: string,
+    sectionId: string,
+    contentBlockId: string,
+    commentId: string,
+  ): Promise<void> {
+    return client.delete(
+      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${commentId}`,
     );
   },
 };
