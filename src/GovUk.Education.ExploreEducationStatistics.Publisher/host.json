@@ -3,9 +3,12 @@
   "logging": {
     "logLevel": {
       "default": "None",
-      "Function.PublisherFunction": "Information",
-      "Function.QueueReleaseFunction": "Information",
-      "Function.ScheduledReleaseFunction": "Information",
+      "Function.GenerateReleaseContent": "Information",
+      "Function.PublishReleaseContent": "Information",
+      "Function.PublishReleaseDataFiles": "Information",
+      "Function.PublishReleaseData": "Information",
+      "Function.ScheduledRelease": "Information",
+      "Function.QueueRelease": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }

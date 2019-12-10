@@ -22,43 +22,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         public void GenerateReleaseContent(
             [QueueTrigger("generate-release-content")]
             GenerateReleaseContentMessage message,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             _contentCacheGenerationService.GenerateReleaseContent(message).Wait();
-            logger.LogInformation($"{GetType().FullName} function completed");
+            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
         [FunctionName("PublishReleaseContent")]
         public void PublishReleaseContent([TimerTrigger("0 30 9 * * *")] TimerInfo timer,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");
+            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
             // TODO EES-865 Move content daily at 09:30
             logger.LogInformation(
-                $"{GetType().FullName} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+                $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
         }
-        
+
         [FunctionName("PublishReleaseDataFiles")]
         public async void PublishReleaseDataFiles(
             [QueueTrigger("publish-release-data-files")]
             PublishReleaseDataFilesMessage message,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await _publishingService.PublishReleaseDataFiles(message);
-            logger.LogInformation($"{GetType().FullName} function completed");
+            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
         [FunctionName("PublishReleaseData")]
         public void PublishReleaseData(
             [QueueTrigger("publish-release-data")] PublishReleaseDataMessage message,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             // TODO EES-866 Run the importer or copy the data from the statistics database
             // TODO EES-866 to the publicly available statistics database
-            logger.LogInformation($"{GetType().FullName} function completed");
+            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
     }
 }

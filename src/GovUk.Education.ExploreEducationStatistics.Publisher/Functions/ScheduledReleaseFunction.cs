@@ -23,15 +23,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         [FunctionName("ScheduledRelease")]
         public void ScheduledRelease([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered at: {DateTime.Now}");
-            ProcessReleases().Wait();
+            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
+            ProcessReleases(logger).Wait();
             logger.LogInformation(
-                $"{GetType().FullName} function completed. Next occurrence at: {timer.FormatNextOccurrences(1)}");
+                $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
         }
 
-        private async Task ProcessReleases()
+        private async Task ProcessReleases(ILogger logger)
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
 
@@ -47,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 foreach (var releaseInfo in scheduledReleases)
                 {
+                    logger.LogInformation($"Adding messages for ReleaseInfo: {releaseInfo.ReleaseId}");
                     generateReleaseContentQueue.AddMessage(
                         ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releaseInfo)));
                     publishReleaseDataFilesQueue.AddMessage(
@@ -54,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseInfo)));
                     await _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId, releaseInfo.RowKey,
-                        ReleaseInfoStatus.InProgress);   
+                        ReleaseInfoStatus.InProgress);
                 }
             }
         }

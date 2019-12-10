@@ -22,11 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("QueueRelease")]
         public async Task QueueRelease(
             [QueueTrigger("releases")] QueueReleaseMessage message,
+            ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().FullName} function triggered: {message}");
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await ValidateReleaseAsync(message, async () => await AddReleaseInfo(message, Scheduled));
-            logger.LogInformation($"{GetType().FullName} function completed");
+            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
         private async Task ValidateReleaseAsync(QueueReleaseMessage message, Func<Task> andThen)
