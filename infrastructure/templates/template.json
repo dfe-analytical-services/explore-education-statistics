@@ -80,6 +80,12 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
+    "sqlAzureAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAzureAdministratorSid": {
+      "type": "string"
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
@@ -656,7 +662,8 @@
           "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
-              "*"
+              "https://localhost:3000",
+              "http://localhost:3000"
             ]
           },
           "appSettings": [
@@ -850,7 +857,7 @@
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "8.11.1"
+              "value": "12.13.0"
             },
             {
               "name": "NODE_ENV",
@@ -1042,6 +1049,20 @@
           }
         },
         {
+          "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
@@ -1136,6 +1157,20 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
+          }
+        },
+        {
+          "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
           }
         },
         {
@@ -1346,7 +1381,10 @@
           "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
-              "*"
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
             ]
           },
           "appSettings": [
@@ -1508,9 +1546,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
@@ -1652,9 +1688,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
