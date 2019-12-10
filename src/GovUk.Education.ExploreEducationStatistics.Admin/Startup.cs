@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.AdminAccessGranted.ToString()));
+                    policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -227,6 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
 
+            // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
             services.AddSwaggerGen(c =>

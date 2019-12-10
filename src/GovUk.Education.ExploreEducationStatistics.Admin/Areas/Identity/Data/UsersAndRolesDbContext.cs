@@ -77,32 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            const string primaryAnalyst1Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04";
-            const string primaryAnalyst2Id = "6620bccf-2433-495e-995d-fc76c59d9c62";
-            const string primaryAnalystRoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7";
             
-            modelBuilder.Entity<ApplicationUser>()
-                .HasData(
-                    CreateApplicationUser(
-                        primaryAnalyst1Id,
-                        "primary.analyst1@example.com",
-                        "Primary1",
-                        "Analyst1"
-                    ),
-                    CreateApplicationUser(
-                        primaryAnalyst2Id,
-                        "primary.analyst2@example.com",
-                        "Primary2",
-                        "Analyst2"
-                    )
-                );
+            const string applicationUserRoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7";
+            const string bauUserRoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3";
 
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
                     CreateRole(
-                        primaryAnalystRoleId,
-                        "Primary Analyst"
+                        applicationUserRoleId,
+                        "Application User"
                     )
                 );
 
@@ -110,36 +93,137 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                 .HasData(
                     new IdentityRoleClaim<string>
                     {
-                        Id = 1,
-                        RoleId = primaryAnalystRoleId,
-                        ClaimType = SecurityClaimTypes.AdminAccessGranted.ToString(),
+                        Id = -1,
+                        RoleId = applicationUserRoleId,
+                        ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
                         ClaimValue = "",
                     }
+                );
+
+            modelBuilder.Entity<IdentityRole>()
+                .HasData(
+                    CreateRole(
+                        bauUserRoleId,
+                        "BAU User"
+                    )
+                );
+
+            modelBuilder.Entity<IdentityRoleClaim<string>>()
+                .HasData(
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -2,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -3,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.AccessAllReleases.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -4,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.AccessAllTopics.ToString(),
+                        ClaimValue = "",
+                    }
+                );
+            
+            const string analyst1Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04";
+            const string analyst2Id = "6620bccf-2433-495e-995d-fc76c59d9c62";
+            const string analyst3Id = "b390b405-ef90-4b9d-8770-22948e53189a";
+
+            const string bauUser1Id = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd";
+            const string bauUser2Id = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63";
+            
+            modelBuilder.Entity<ApplicationUser>()
+                .HasData(
+                    CreateApplicationUser(
+                        analyst1Id,
+                        "analyst1@example.com",
+                        "Analyst1",
+                        "User1"
+                    ),
+                    CreateApplicationUser(
+                        analyst2Id,
+                        "analyst2@example.com",
+                        "Analyst2",
+                        "User2"
+                    ),
+                    CreateApplicationUser(
+                        analyst3Id,
+                        "analyst3@example.com",
+                        "Analyst3",
+                        "User3"
+                    ),
+                    CreateApplicationUser(
+                        bauUser1Id,
+                        "bau1@example.com",
+                        "Bau1",
+                        "User1"
+                    ),
+                    CreateApplicationUser(
+                        bauUser2Id,
+                        "bau2@example.com",
+                        "Bau2",
+                        "User2"
+                    )
                 );
 
             modelBuilder.Entity<IdentityUserRole<string>>()
                 .HasData(
                     new IdentityUserRole<string>
                     {
-                        UserId = primaryAnalyst1Id,
-                        RoleId = primaryAnalystRoleId
+                        UserId = analyst1Id,
+                        RoleId = applicationUserRoleId
                     },
                     new IdentityUserRole<string>
                     {
-                        UserId = primaryAnalyst2Id,
-                        RoleId = primaryAnalystRoleId
+                        UserId = analyst2Id,
+                        RoleId = applicationUserRoleId
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = analyst3Id,
+                        RoleId = applicationUserRoleId
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = bauUser1Id,
+                        RoleId = bauUserRoleId
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = bauUser2Id,
+                        RoleId = bauUserRoleId
                     }
                 );
 
             modelBuilder.Entity<IdentityUserLogin<string>>()
                 .HasData(
                     CreateUserLogin(
-                        primaryAnalyst1Id,
+                        analyst1Id,
                         "5zzTEeAYz71aVPJ1ho1VGW3cYk7_qcQpkDqYYxbH3po"
                     ),
                     CreateUserLogin(
-                        primaryAnalyst2Id,
+                        analyst2Id,
                         "RLdgJMsfN6QVjpCbkaOYIpzh6DA3QpRfnBcfIx46uDM"
+                    ),
+                    CreateUserLogin(
+                        analyst3Id,
+                        "ces_f2I3zCjGZ9HUprWF3RiQgswrKvPFAY1Lwu_KI6M"
+                    ),
+                    CreateUserLogin(
+                        bauUser1Id,
+                        "cb3XrjF6BLuMZ5P3aRo8wBobF7tAshdk2gF0X5Qm68o"
+                    ),                    
+                    CreateUserLogin(
+                        bauUser2Id,
+                        "EKTK7hPGgxGVxRSBjgTv51XVJhtMo91sIcADfjSuJjw"
                     )
                 );
         }

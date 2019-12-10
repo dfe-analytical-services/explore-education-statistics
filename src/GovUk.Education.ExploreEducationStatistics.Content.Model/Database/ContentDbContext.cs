@@ -188,6 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -313,6 +314,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<ReleaseContentBlock>()
                 .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
+
+            modelBuilder.Entity<User>();
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
