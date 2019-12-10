@@ -109,21 +109,23 @@ function App() {
               component={SignedOutPage}
               redirectIfNotLoggedIn={false}
             />
-            <ProtectedRoute
-              exact
-              path="/methodology"
-              component={ListMethodologyPages}
-            />
-            <ProtectedRoute
-              exact
-              path="/methodology/create"
-              component={CreateMethodologyPage}
-            />
-            <ProtectedRoute
-              exact
-              path="/methodology/:methodologyId"
-              component={EditMethodologyPage}
-            />
+            <Switch>
+              <ProtectedRoute
+                exact
+                path="/methodology"
+                component={ListMethodologyPages}
+              />
+              <ProtectedRoute
+                exact
+                path="/methodology/create"
+                component={CreateMethodologyPage}
+              />
+              <ProtectedRoute
+                exact
+                path="/methodology/:methodologyId"
+                component={EditMethodologyPage}
+              />
+            </Switch>
             <ProtectedRoute
               exact
               path={publicationRoutes.createPublication.route}
