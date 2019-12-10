@@ -185,7 +185,11 @@ describe('Form', () => {
           throw new Error('Something went wrong');
         }}
       >
-        {() => <Form id="test-form">The form</Form>}
+        {() => (
+          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
+            The form
+          </Form>
+        )}
       </Formik>,
     );
 
@@ -221,7 +225,11 @@ describe('Form', () => {
         })}
         onSubmit={onSubmit}
       >
-        {() => <Form id="test-form">The form</Form>}
+        {() => (
+          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
+            The form
+          </Form>
+        )}
       </Formik>,
     );
 
@@ -264,7 +272,7 @@ describe('Form', () => {
         onSubmit={onSubmit}
       >
         {formik => (
-          <Form id="test-form">
+          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
             The form
             <button type="button" onClick={formik.handleReset}>
               Reset form

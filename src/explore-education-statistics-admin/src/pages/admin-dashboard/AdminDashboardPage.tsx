@@ -8,6 +8,9 @@ import { UserDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -32,7 +35,10 @@ interface MatchProps {
   topicId: string;
 }
 
-const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const AdminDashboardPage = ({
+  match,
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { user } = useContext(LoginContext);
   const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
@@ -41,35 +47,37 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
       dashboardService.getAvailablePreReleaseContacts(),
-    ]).then(
-      ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
-        const contactResultsByRelease = scheduledReleases.map(release =>
-          dashboardService
-            .getPreReleaseContactsForRelease(release.id)
-            .then(contacts => ({
-              releaseId: release.id,
-              contacts,
-            })),
-        );
+    ])
+      .then(
+        ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+          const contactResultsByRelease = scheduledReleases.map(release =>
+            dashboardService
+              .getPreReleaseContactsForRelease(release.id)
+              .then(contacts => ({
+                releaseId: release.id,
+                contacts,
+              })),
+          );
 
-        Promise.all(contactResultsByRelease).then(contactResults => {
-          const preReleaseContactsByScheduledRelease: Dictionary<
-            UserDetails[]
-          > = {};
-          contactResults.forEach(result => {
-            const { releaseId, contacts } = result;
-            preReleaseContactsByScheduledRelease[releaseId] = contacts;
+          return Promise.all(contactResultsByRelease).then(contactResults => {
+            const preReleaseContactsByScheduledRelease: Dictionary<
+              UserDetails[]
+            > = {};
+            contactResults.forEach(result => {
+              const { releaseId, contacts } = result;
+              preReleaseContactsByScheduledRelease[releaseId] = contacts;
+            });
+            setModel({
+              draftReleases,
+              scheduledReleases,
+              availablePreReleaseContacts,
+              preReleaseContactsByScheduledRelease,
+            });
           });
-          setModel({
-            draftReleases,
-            scheduledReleases,
-            availablePreReleaseContacts,
-            preReleaseContactsByScheduledRelease,
-          });
-        });
-      },
-    );
-  }, []);
+        },
+      )
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
 
   return (
     <>
@@ -131,7 +139,7 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab themePropId={themeId} topicPropId={topicId} />
+              <MyPublicationsTab themeId={themeId} topicId={topicId} />
             </TabsSection>
             <TabsSection
               id="draft-releases"
@@ -201,10 +209,13 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
                         order={[]}
                         className="govuk-!-width-one-third"
                         onChange={async event => {
-                          const updatedContacts = await dashboardService.addPreReleaseContactToRelease(
-                            release.id,
-                            event.target.value,
-                          );
+                          const updatedContacts = await dashboardService
+                            .addPreReleaseContactToRelease(
+                              release.id,
+                              event.target.value,
+                            )
+                            .catch(handleApiErrors);
+
                           setModel({
                             ...model,
                             preReleaseContactsByScheduledRelease: {
@@ -227,10 +238,13 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
                             <Link
                               to=""
                               onClick={async _ => {
-                                const updatedContacts = await dashboardService.removePreReleaseContactFromRelease(
-                                  release.id,
-                                  existingContact.id,
-                                );
+                                const updatedContacts = await dashboardService
+                                  .removePreReleaseContactFromRelease(
+                                    release.id,
+                                    existingContact.id,
+                                  )
+                                  .catch(handleApiErrors);
+
                                 setModel({
                                   ...model,
                                   preReleaseContactsByScheduledRelease: {
@@ -259,4 +273,4 @@ const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
   );
 };
 
-export default AdminDashboardPage;
+export default withErrorControl(AdminDashboardPage);

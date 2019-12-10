@@ -1,17 +1,22 @@
+import Link from '@admin/components/Link';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
+import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
-import { IdTitlePair } from '@admin/services/common/types';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import Link from '@admin/components/Link';
+import { RouteComponentProps, withRouter } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -35,12 +40,17 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-export interface Props {
-  themePropId?: string;
-  topicPropId?: string;
+export interface Props extends RouteComponentProps, ErrorControlProps {
+  themeId?: string;
+  topicId?: string;
 }
 
-const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
+const MyPublicationsTab = ({
+  themeId,
+  topicId,
+  history,
+  handleApiErrors,
+}: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -52,25 +62,25 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
   const onThemeChange = (
-    themeId: string,
+    newThemeId: string,
     availableThemes: ThemeAndTopicsIdsAndTitles[],
   ) => {
     setSelectedThemeAndTopic({
-      theme: findThemeById(themeId, availableThemes),
+      theme: findThemeById(newThemeId, availableThemes),
       topic: orderBy(
-        findThemeById(themeId, availableThemes).topics,
+        findThemeById(newThemeId, availableThemes).topics,
         topic => topic.title,
       )[0],
     });
   };
 
   const onTopicChange = (
-    topicId: string,
+    newTopicId: string,
     selectedTheme: ThemeAndTopicsIdsAndTitles,
   ) => {
     setSelectedThemeAndTopic({
       theme: selectedTheme,
-      topic: findTopicById(topicId, selectedTheme),
+      topic: findTopicById(newTopicId, selectedTheme),
     });
   };
 
@@ -79,8 +89,9 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
       .getMyThemesAndTopics()
       .then(themeList =>
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      );
-  }, []);
+      )
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
 
   useEffect(() => {
     if (themes) {
@@ -90,38 +101,34 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
           topic: orderBy(themes[0].topics, topic => topic.title)[0],
         });
       }
-      if (themePropId && topicPropId) {
-        const theme = themes.find(function findTheme(t) {
-          return t.id === themePropId;
-        });
+      if (themeId && topicId && topicId !== selectedThemeAndTopic.topic.id) {
+        const theme = themes.find(t => t.id === themeId);
 
-        const topic =
-          theme &&
-          theme.topics.find(function findTopic(t) {
-            return t.id === topicPropId;
-          });
+        const topic = theme && theme.topics.find(t => t.id === topicId);
 
         if (theme && topic) {
           setSelectedThemeAndTopic({ theme, topic });
         }
       }
     }
-  }, [themePropId, themes, topicPropId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeId, themes, topicId]);
 
   useEffect(() => {
-    if (selectedThemeAndTopic) {
-      if (selectedThemeAndTopic.topic.id) {
-        dashboardService
-          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-          .then(setMyPublications);
-      }
-
-      window.history.pushState(
-        '',
-        '',
-        `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
+    if (selectedThemeAndTopic.topic.id === topicId) {
+      dashboardService
+        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+        .then(setMyPublications)
+        .catch(handleApiErrors);
+    } else if (selectedThemeAndTopic.topic.id !== '') {
+      history.push(
+        generateAdminDashboardThemeTopicLink(
+          selectedThemeAndTopic.theme.id,
+          selectedThemeAndTopic.topic.id,
+        ),
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThemeAndTopic]);
 
   return (
@@ -210,4 +217,4 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   );
 };
 
-export default MyPublicationsTab;
+export default withErrorControl(withRouter(MyPublicationsTab));

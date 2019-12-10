@@ -1,4 +1,7 @@
 import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
@@ -6,7 +9,7 @@ import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import DataBlockService, {
+import dataBlockService, {
   DataBlock,
   DataBlockRerequest,
   DataBlockResponse,
@@ -27,7 +30,8 @@ const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
   onDataBlockSave,
-}: Props) => {
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
@@ -107,11 +111,14 @@ const ViewDataBlocks = ({
       ...reRequest,
     };
 
-    DataBlockService.getDataBlockForSubject(newRequest).then(response => {
-      if (response) {
-        setChartBuilderData({ ...response });
-      }
-    });
+    dataBlockService
+      .getDataBlockForSubject(newRequest)
+      .then(response => {
+        if (response) {
+          setChartBuilderData({ ...response });
+        }
+      })
+      .catch(handleApiErrors);
   };
 
   return (
@@ -141,4 +148,4 @@ const ViewDataBlocks = ({
   );
 };
 
-export default ViewDataBlocks;
+export default withErrorControl(ViewDataBlocks);

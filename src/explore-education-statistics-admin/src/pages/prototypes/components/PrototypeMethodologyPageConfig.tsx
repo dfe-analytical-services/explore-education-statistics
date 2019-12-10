@@ -14,8 +14,6 @@ interface Props {
 }
 
 const PrototypeMethodologyConfig = ({ sectionId, title }: Props) => {
-  const contactSelection = document.querySelector('#select-lead-statistician');
-
   return (
     <>
       {sectionId === 'setup' && (

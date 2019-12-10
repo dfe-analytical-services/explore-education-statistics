@@ -17,7 +17,8 @@ Navigate to /download-data page
     user checks url contains   %{PUBLIC_URL}/download-latest-data
 
 Validate Pupils and schools contains correct details components
-    [Tags]  HappyPath
+    [Documentation]  EES-562
+    [Tags]  HappyPath   Failing
     user checks page contains accordion   Pupils and schools
     user opens accordion section   Pupils and schools
 

@@ -9,37 +9,6 @@ import {
   UploadDataFilesRequest,
 } from './types';
 
-export interface EditReleaseService {
-  getReleaseDataFiles: (releaseId: string) => Promise<DataFile[]>;
-  uploadDataFiles: (
-    releaseId: string,
-    request: UploadDataFilesRequest,
-  ) => Promise<null>;
-  deleteDataFiles: (releaseId: string, dataFile: DataFile) => Promise<null>;
-  downloadDataFile: (releaseId: string, fileId: string) => Promise<void>;
-  downloadDataMetadataFile: (
-    releaseId: string,
-    fileId: string,
-  ) => Promise<void>;
-  downloadFile: (path: string, fileName: string) => Promise<void>;
-
-  getAncillaryFiles: (releaseId: string) => Promise<AncillaryFile[]>;
-  uploadAncillaryFile: (
-    releaseId: string,
-    request: UploadAncillaryFileRequest,
-  ) => Promise<null>;
-  deleteAncillaryFile: (releaseId: string, fileId: string) => Promise<null>;
-  downloadAncillaryFile: (releaseId: string, fileId: string) => Promise<void>;
-
-  getChartFiles: (releaseId: string) => Promise<ChartFile[]>;
-  uploadChartFile: (
-    releaseId: string,
-    request: UploadChartFileRequest,
-  ) => Promise<null>;
-  downloadChartFile: (releaseId: string, fileName: string) => Promise<void>;
-  createDownloadChartFileLink: (releaseId: string, fileName: string) => string;
-}
-
 interface GetFileResponse {
   extension: string;
   name: string;
@@ -68,7 +37,7 @@ const downloadFile = (blob: Blob, fileName: string) => {
  * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
  */
 
-const service: EditReleaseService = {
+const service = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<GetFileResponse[]>(`/release/${releaseId}/data`)

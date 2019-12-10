@@ -1,16 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
-import { MethodologyStatus } from '@admin/services/methodology/types';
+import Page from '@admin/components/Page';
 import RelatedInformation from '@common/components/RelatedInformation';
-
-interface Model {
-  methodologies: MethodologyStatus[];
-}
+import React from 'react';
 
 const EditMethodologyPage = () => {
-  const [model, setModel] = useState<Model>();
-
   return (
     <Page
       wide

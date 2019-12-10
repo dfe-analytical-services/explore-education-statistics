@@ -1,18 +1,15 @@
-import * as React from 'react';
+import { ThemeAndTopicsIdsAndTitles } from '@admin/components/ThemeAndTopic';
 import { IdTitlePair } from '@admin/services/common/types';
+import { createContext } from 'react';
 
-interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
-  topics: IdTitlePair[];
-}
-
-export interface SetThemeAndTopicsCallbackParameters {
+export interface SetThemeAndTopicCallbackParameters {
   theme: ThemeAndTopicsIdsAndTitles;
   topic: IdTitlePair;
 }
 
-interface ThisIsWhatTheContextHasInIt {
+interface SelectedThemeAndTopic {
   setSelectedThemeAndTopic: (
-    callbackProperties: SetThemeAndTopicsCallbackParameters,
+    callbackProperties: SetThemeAndTopicCallbackParameters,
   ) => void;
   selectedThemeAndTopic: {
     theme: ThemeAndTopicsIdsAndTitles;
@@ -20,7 +17,7 @@ interface ThisIsWhatTheContextHasInIt {
   };
 }
 
-const ThemeAndTopicContext = React.createContext<ThisIsWhatTheContextHasInIt>({
+const ThemeAndTopicContext = createContext<SelectedThemeAndTopic>({
   setSelectedThemeAndTopic: () => {},
   selectedThemeAndTopic: {
     theme: {

@@ -1,4 +1,5 @@
 import Page from '@admin/components/Page';
+import Link from '@admin/components/Link';
 import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
@@ -34,13 +35,13 @@ const DocumentationManageContent = () => {
               <p>
                 Make sure your content is written and formatted to the standards
                 set out in our{' '}
-                <a href="https://drive.google.com/open?id=1Z1D7bxLVXAZEp855LSiR7b40ayWeVWaMOCuixItBVDo">
+                <Link to="/documentation/content-design-standards-guide">
                   Content design standards guide
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
+                <Link to="/documentation/style-guide">
                   Content design style guide
-                </a>
+                </Link>
                 .
               </p>
               <p>
@@ -185,14 +186,14 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1Z1D7bxLVXAZEp855LSiR7b40ayWeVWaMOCuixItBVDo">
+                  <Link to="/documentation/content-design-standards-guide">
                     Content design standards guide
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
+                  <Link to="/documentation/style-guide">
                     Content design style guide
-                  </a>
+                  </Link>
                 </li>
               </ul>
               <h3>Do</h3>
@@ -224,9 +225,9 @@ const DocumentationManageContent = () => {
                 If you're adding or editing content to 'Latest headline facts
                 and figures' section read and refer to the guidance and tips
                 about 'Key indicators' in our{' '}
-                <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
+                <Link to="/documentation/style-guide">
                   Content design style guide
-                </a>
+                </Link>
                 .
               </p>
               <p>
@@ -268,9 +269,9 @@ const DocumentationManageContent = () => {
               <p>
                 Read and refer to the guidance and tips about 'Key indicators'
                 in our{' '}
-                <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
+                <Link to="/documentation/style-guide">
                   Content design style guide
-                </a>
+                </Link>
               </p>
               <p>Select the green 'Save' button when you've finished.</p>
               <ul className="govuk-list govuk-list--bullet">
@@ -333,14 +334,14 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1Z1D7bxLVXAZEp855LSiR7b40ayWeVWaMOCuixItBVDo">
+                  <Link to="/documentation/content-design-standards-guide">
                     Content design standards guide
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
+                  <Link to="/documentation/style-guide">
                     Content design style guide
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </StepNavItem>
@@ -508,9 +509,9 @@ const DocumentationManageContent = () => {
               </p>
               <p>
                 For detailed guidance on how to update a release's status -{' '}
-                <a href="https://drive.google.com/open?id=1oQ1NHGlKthD_erwjmOAlyp6Zd2kTTOjzCSYPkuD67uk">
+                <Link to="./edit-release">
                   Updating release status: step by step.
-                </a>
+                </Link>
               </p>
             </StepNavItem>
           </StepNav>

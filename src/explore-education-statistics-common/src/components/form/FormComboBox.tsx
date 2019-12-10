@@ -213,7 +213,7 @@ const FormComboBox = ({
           : afterInput}
 
         {showOptions && renderedOptions && (
-          <div className={styles.optionsContainer}>
+          <div role="alert" className={styles.optionsContainer}>
             {typeof listBoxLabel === 'function'
               ? listBoxLabel({ selectedOption, value })
               : listBoxLabel}

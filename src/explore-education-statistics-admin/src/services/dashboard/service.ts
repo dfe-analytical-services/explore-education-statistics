@@ -11,26 +11,7 @@ import {
   ThemeAndTopics,
 } from './types';
 
-export interface DashboardService {
-  getMyThemesAndTopics(): Promise<ThemeAndTopics[]>;
-  getMyPublicationsByTopic(
-    topicId: string,
-  ): Promise<AdminDashboardPublication[]>;
-  getDraftReleases(): Promise<AdminDashboardRelease[]>;
-  getScheduledReleases(): Promise<AdminDashboardRelease[]>;
-  getAvailablePreReleaseContacts(): Promise<UserDetails[]>;
-  getPreReleaseContactsForRelease(releaseId: string): Promise<UserDetails[]>;
-  addPreReleaseContactToRelease(
-    releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]>;
-  removePreReleaseContactFromRelease(
-    releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]>;
-}
-
-const service: DashboardService = {
+const service = {
   getMyThemesAndTopics(): Promise<ThemeAndTopics[]> {
     return client.get<ThemeAndTopics[]>('/me/themes');
   },
@@ -57,13 +38,13 @@ const service: DashboardService = {
   getAvailablePreReleaseContacts(): Promise<UserDetails[]> {
     return client.get<UserDetails[]>('/prerelease/contacts');
   },
-  getPreReleaseContactsForRelease(releaseId): Promise<UserDetails[]> {
+  getPreReleaseContactsForRelease(releaseId: string): Promise<UserDetails[]> {
     return client.get<UserDetails[]>(
       `/release/${releaseId}/prerelease-contacts`,
     );
   },
   addPreReleaseContactToRelease(
-    releaseId,
+    releaseId: string,
     preReleaseContactId: string,
   ): Promise<UserDetails[]> {
     return client.post<UserDetails[]>(
@@ -71,7 +52,7 @@ const service: DashboardService = {
     );
   },
   removePreReleaseContactFromRelease(
-    releaseId,
+    releaseId: string,
     preReleaseContactId: string,
   ): Promise<UserDetails[]> {
     return client.delete<UserDetails[]>(

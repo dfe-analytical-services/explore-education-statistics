@@ -1,13 +1,15 @@
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { Form, FormFieldset, Formik } from '@common/components/form';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -27,13 +29,20 @@ interface Props {
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
+const ReleaseFileUploadsSection = ({
+  publicationId,
+  releaseId,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
 
   useEffect(() => {
-    service.getAncillaryFiles(releaseId).then(setFiles);
-  }, [publicationId, releaseId]);
+    service
+      .getAncillaryFiles(releaseId)
+      .then(setFiles)
+      .catch(handleApiErrors);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -48,7 +57,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     setFiles(latestFiles);
   };
 
-  const handleServerValidation = handleServerSideValidation(
+  const errorCodeMappings = [
     errorCodeToFieldError(
       'CANNOT_OVERWRITE_FILE',
       'file',
@@ -59,6 +68,19 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       'file',
       'Choose a file that is not empty',
     ),
+  ];
+
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
+    async (values, actions) => {
+      await service.uploadAncillaryFile(releaseId, {
+        name: values.name,
+        file: values.file as File,
+      });
+
+      await resetPage(actions);
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
   );
 
   return (
@@ -68,21 +90,14 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         name: '',
         file: null,
       }}
-      onSubmit={async (values: FormValues, actions) => {
-        await service.uploadAncillaryFile(releaseId, {
-          name: values.name,
-          file: values.file as File,
-        });
-
-        resetPage(actions);
-      }}
+      onSubmit={submitFormHandler}
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
-          <Form id={formId} submitValidationHandler={handleServerValidation}>
+          <Form id={formId}>
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Upload file"
@@ -133,7 +148,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                     <Link
                       to="#"
                       onClick={() =>
-                        service.downloadAncillaryFile(releaseId, file.filename)
+                        service
+                          .downloadAncillaryFile(releaseId, file.filename)
+                          .catch(handleApiErrors)
                       }
                     >
                       {file.filename}
@@ -162,7 +179,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
               onConfirm={async () => {
-                await service.deleteAncillaryFile(releaseId, deleteFileName);
+                await service
+                  .deleteAncillaryFile(releaseId, deleteFileName)
+                  .catch(handleApiErrors);
                 setDeleteFileName('');
                 resetPage(form);
               }}
@@ -178,4 +197,4 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   );
 };
 
-export default ReleaseFileUploadsSection;
+export default withErrorControl(ReleaseFileUploadsSection);

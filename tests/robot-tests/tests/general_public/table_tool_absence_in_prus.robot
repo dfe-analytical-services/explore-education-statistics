@@ -57,12 +57,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   Pupil Referral Unit
-
-    user checks results table column heading contains  2   1   2013/14
-    user checks results table column heading contains  2   2   2014/15
-    user checks results table column heading contains  2   3   2015/16
-    user checks results table column heading contains  2   4   2016/17
+    user checks results table column heading contains  1   1   2013/14
+    user checks results table column heading contains  1   2   2014/15
+    user checks results table column heading contains  1   3   2015/16
+    user checks results table column heading contains  1   4   2016/17
 
 Validate results table row headings
     [Tags]   HappyPath
@@ -125,10 +123,8 @@ Create table again
 
 Validate table's column headings
     [Tags]   HappyPath
-    user checks results table column heading contains  1   1   Pupil Referral Unit
-
-    user checks results table column heading contains  2   1   2014/15
-    user checks results table column heading contains  2   2   2015/16
+    user checks results table column heading contains  1   1   2014/15
+    user checks results table column heading contains  1   2   2015/16
 
 Validate table's row headings
     [Tags]   HappyPath

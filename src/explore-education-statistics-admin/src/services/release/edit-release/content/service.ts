@@ -14,83 +14,7 @@ import {
   ManageContentPageViewModel,
 } from './types';
 
-export interface ReleaseContentService {
-  getContent: (releaseId: string) => Promise<ManageContentPageViewModel>;
-  getContentSections: (releaseId: string) => Promise<ContentSectionViewModel[]>;
-  addContentSection: (
-    releaseId: string,
-    order: number,
-  ) => Promise<ContentSectionViewModel>;
-  updateContentSectionsOrder: (
-    releaseId: string,
-    order: Dictionary<number>,
-  ) => Promise<ContentSectionViewModel[]>;
-
-  getContentSection: (
-    releaseId: string,
-    sectionId: string,
-  ) => Promise<ContentSectionViewModel>;
-
-  addContentSectionBlock: (
-    releaseId: string,
-    sectionId: string,
-    block: ContentBlockPostModel,
-  ) => Promise<ContentBlockViewModel>;
-
-  updateContentSectionHeading: (
-    releaseId: string,
-    sectionId: string,
-    heading: string,
-  ) => Promise<ContentSectionViewModel>;
-
-  updateContentSectionBlock: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    block: ContentBlockPutModel,
-  ) => Promise<ContentBlockViewModel>;
-
-  updateContentSectionBlocksOrder: (
-    releaseId: string,
-    sectionId: string,
-    order: Dictionary<number>,
-  ) => Promise<ContentBlockViewModel[]>;
-
-  deleteContentSectionBlock: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-  ) => Promise<void>;
-
-  getContentSectionComments: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-  ) => Promise<ExtendedComment[]>;
-
-  addContentSectionComment: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    comment: ExtendedComment,
-  ) => Promise<ExtendedComment>;
-
-  updateContentSectionComment: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    comment: ExtendedComment,
-  ) => Promise<ExtendedComment>;
-
-  deleteContentSectionComment: (
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    commentId: string,
-  ) => Promise<void>;
-}
-
-const service: ReleaseContentService = {
+export const releaseContentService = {
   getContent(releaseId: string): Promise<ManageContentPageViewModel> {
     return client.get<ManageContentPageViewModel>(
       `/release/${releaseId}/content`,
@@ -230,7 +154,7 @@ const service: ReleaseContentService = {
   },
 };
 
-const releaseNoteService = {
+export const releaseNoteService = {
   create: (
     releaseId: string,
     releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>,
@@ -255,7 +179,7 @@ const releaseNoteService = {
   },
 };
 
-const relatedInformationService = {
+export const relatedInformationService = {
   getAll: (
     releaseId: string,
   ): Promise<AbstractRelease<{}>['relatedInformation']> => {
@@ -286,8 +210,4 @@ const relatedInformationService = {
   },
 };
 
-export default {
-  ...service,
-  releaseNote: releaseNoteService,
-  relatedInfo: relatedInformationService,
-};
+export default {};

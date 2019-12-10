@@ -17,14 +17,10 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
-import handleServerSideValidation, {
-  errorCodeAndFieldNameToFieldError,
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
 import { DayMonthYearInputs } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import { FormikProps } from 'formik';
+import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
@@ -44,7 +40,10 @@ interface Props<FormValues extends EditFormValues> {
   validationRulesSupplier?: (
     baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
   ) => ObjectSchemaDefinition<FormValues>;
-  onSubmitHandler: (values: FormValues) => void;
+  onSubmitHandler: (
+    values: FormValues,
+    actions: FormikActions<FormValues>,
+  ) => void;
   onCancelHandler: () => void;
   additionalFields?: React.ReactNode;
 }
@@ -53,20 +52,6 @@ interface ReleaseSummaryFormModel {
   timePeriodCoverageGroups: TimePeriodCoverageGroup[];
   releaseTypes: IdTitlePair[];
 }
-
-const serverSideValidationHandler = handleServerSideValidation(
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'timePeriodCoverageStartYear',
-    'Choose a unique combination of time period and start year',
-  ),
-  errorCodeAndFieldNameToFieldError(
-    'PARTIAL_DATE_NOT_VALID',
-    'NextReleaseDate',
-    'nextReleaseDate',
-    'Enter a valid date',
-  ),
-);
 
 const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   submitButtonText,
@@ -126,10 +111,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
-              <Form
-                id={formId}
-                submitValidationHandler={serverSideValidationHandler}
-              >
+              <Form id={formId}>
                 <FormFieldset
                   id={`${formId}-timePeriodCoverageFieldset`}
                   legend="Select time period coverage"

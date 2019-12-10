@@ -5,6 +5,9 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
@@ -18,14 +21,18 @@ interface MatchProps {
 const ManageReleasePageContainer = ({
   match,
   location,
-}: RouteComponentProps<MatchProps>) => {
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { publicationId, releaseId } = match.params;
 
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   useEffect(() => {
-    service.getBasicPublicationDetails(publicationId).then(setPublication);
-  }, [publicationId, releaseId]);
+    service
+      .getBasicPublicationDetails(publicationId)
+      .then(setPublication)
+      .catch(handleApiErrors);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const currentRouteIndex =
     viewRoutes.findIndex(
@@ -124,4 +131,4 @@ const ManageReleasePageContainer = ({
   );
 };
 
-export default ManageReleasePageContainer;
+export default withErrorControl(ManageReleasePageContainer);

@@ -1,9 +1,12 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import { BasicLink } from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Link from '@admin/components/Link';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
+import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
 import {
@@ -19,7 +22,10 @@ interface Props {
   release: ManageContentPageViewModel['release'];
 }
 
-const RelatedInformationSection = ({ release }: Props) => {
+const RelatedInformationSection = ({
+  release,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
@@ -27,17 +33,21 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      releaseContentService.relatedInfo
+      relatedInformationService
         .create(release.id, link)
         .then(newLinks => {
           setLinks(newLinks);
           resolve();
-        });
+        })
+        .catch(handleApiErrors);
     });
   };
 
   const removeLink = (linkId: string) => {
-    releaseContentService.relatedInfo.delete(release.id, linkId).then(setLinks);
+    relatedInformationService
+      .delete(release.id, linkId)
+      .then(setLinks)
+      .catch(handleApiErrors);
   };
 
   const renderLinkForm = () => {
@@ -126,4 +136,4 @@ const RelatedInformationSection = ({ release }: Props) => {
   );
 };
 
-export default RelatedInformationSection;
+export default withErrorControl(RelatedInformationSection);
