@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
+    [ApiController]
     public class ConfigurationController
     {
         private readonly IConfiguration _configuration;
