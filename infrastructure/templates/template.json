@@ -662,7 +662,8 @@
           "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
-              "*"
+              "https://localhost:3000",
+              "http://localhost:3000"
             ]
           },
           "appSettings": [
