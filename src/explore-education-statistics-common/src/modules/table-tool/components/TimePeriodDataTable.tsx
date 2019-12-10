@@ -43,7 +43,9 @@ export const createHeadersFromGroups = (
     group.flatMap(filter => {
       if (
         filter.level &&
-        (filter.level === 'country' || filter.level === 'localAuthority') &&
+        (filter.level === 'country' ||
+          filter.level === 'localAuthority' ||
+          filter.level === 'localAuthorityDistrict') &&
         group.length === 1
       ) {
         // eslint-disable-next-line no-param-reassign
