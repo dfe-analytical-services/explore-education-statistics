@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -155,15 +156,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             });
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AdminAccessGranted.ToString()));
+            });
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddMvc(options =>
                 {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
