@@ -10,6 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime PublishScheduled { get; set; }
         public Guid ReleaseId { get; set; }
         public string ReleaseSlug { get; set; }
+        public int ReleaseContentStage { get; set; }
+        public int ReleaseFilesStage { get; set; }
+        public int ReleaseDataStage { get; set; }
         public string Status { get; set; }
 
         public ReleaseInfo()

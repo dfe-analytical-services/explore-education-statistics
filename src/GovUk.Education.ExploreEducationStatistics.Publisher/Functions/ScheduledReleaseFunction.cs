@@ -68,7 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 PublicationSlug = releaseInfo.PublicationSlug,
                 ReleasePublished = releaseInfo.PublishScheduled,
                 ReleaseSlug = releaseInfo.ReleaseSlug,
-                ReleaseId = releaseInfo.ReleaseId
+                ReleaseId = releaseInfo.ReleaseId,
+                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
             };
         }
 
@@ -76,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             return new PublishReleaseDataMessage
             {
-                ReleaseId = releaseInfo.ReleaseId
+                ReleaseId = releaseInfo.ReleaseId,
+                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
             };
         }
 
@@ -84,7 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             return new GenerateReleaseContentMessage
             {
-                ReleaseId = releaseInfo.ReleaseId
+                ReleaseId = releaseInfo.ReleaseId,
+                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
             };
         }
 

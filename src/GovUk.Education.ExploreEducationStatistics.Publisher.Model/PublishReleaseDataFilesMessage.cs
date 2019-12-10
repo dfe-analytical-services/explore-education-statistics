@@ -8,5 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime ReleasePublished { get; set; }
         public string ReleaseSlug { get; set; }
         public Guid ReleaseId { get; set; }
+        public Guid ReleaseInfoId { get; set; }
     }
 }

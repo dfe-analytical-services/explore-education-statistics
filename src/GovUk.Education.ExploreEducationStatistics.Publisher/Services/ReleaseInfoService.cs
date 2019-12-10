@@ -53,6 +53,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return results;
         }
 
+        public async Task UpdateReleaseInfoStage(Guid releaseId, Guid releaseInfoId)
+        {
+            var releaseInfoTable = await GetReleaseInfoTableAsync();
+            var tableResult = await releaseInfoTable.ExecuteAsync(
+                TableOperation.Retrieve<ReleaseInfo>(releaseId.ToString(), releaseInfoId.ToString()));
+
+            if (tableResult.Result is ReleaseInfo releaseInfo)
+            {
+                releaseInfo.ReleaseContentStage = 999;
+                await releaseInfoTable.ExecuteAsync(TableOperation.InsertOrMerge(releaseInfo));
+            }
+        }
+
         public async Task UpdateReleaseInfoStatusAsync(Guid releaseId, string rowKey, ReleaseInfoStatus status)
         {
             var releaseInfoTable = await GetReleaseInfoTableAsync();

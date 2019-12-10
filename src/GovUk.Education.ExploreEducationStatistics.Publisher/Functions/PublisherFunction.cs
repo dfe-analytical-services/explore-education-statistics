@@ -10,12 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IContentCacheGenerationService _contentCacheGenerationService;
         private readonly IPublishingService _publishingService;
+        private readonly IReleaseInfoService _releaseInfoService;
 
         public PublisherFunction(IContentCacheGenerationService contentCacheGenerationService,
-            IPublishingService publishingService)
+            IPublishingService publishingService,
+            IReleaseInfoService releaseInfoService)
         {
             _contentCacheGenerationService = contentCacheGenerationService;
             _publishingService = publishingService;
+            _releaseInfoService = releaseInfoService;
         }
 
         [FunctionName("GenerateReleaseContent")]
