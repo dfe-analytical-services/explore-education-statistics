@@ -74,6 +74,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
       .then(newContent => {
         // TODO: For testing purposes only
         if (
+          newContent.release.summarySection &&
           newContent.release.summarySection.content &&
           newContent.release.summarySection.content.length
         ) {
