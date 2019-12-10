@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4bad498a-b87b-4e71-bbf3-3ad39d4fba1a",
+		"_postman_id": "ab4d14eb-2c50-4f75-8c29-f2205491a873",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -650,7 +650,6 @@
 													"pm.test(\"totalValues should be correct\", function () {",
 													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('1F_Char__Total'));",
 													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('1F_SchoolType__Total'));",
-													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
 													"});",
 													"",
 													"pm.test(\"Should be correct number of characteristics\", function () { ",
@@ -1052,9 +1051,8 @@
 											"});",
 											"",
 											"pm.test(\"Number of metaData filters should be correct\", function () {",
-											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
 											"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-											"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
 											"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 											"});",
 											"",
@@ -1071,7 +1069,7 @@
 											"pm.test(\"Number of results should be correct\", function () { ",
 											"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
 											"});",
-											"",
+											" ",
 											"pm.test(\"All results should have correction geographicLevel\", function () {",
 											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
@@ -2138,6 +2136,7 @@
 											"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
 											"});",
 											"",
+											"if(pm.environment.get('env') === 'local') {",
 											"pm.test(\"Related Information section should contain the correct details\", function () { ",
 											"    ",
 											"    var respJson = pm.response.json();",
@@ -2154,6 +2153,7 @@
 											"    pm.expect(relatedInformation[1].description).to.equal(\"Statistics guide\");",
 											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com\");",
 											"});",
+											"}",
 											"",
 											"pm.test(\"Available Data Blocks section should contain the correct details\", function () { ",
 											"    ",
@@ -2758,6 +2758,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.length).to.equal(9);",
 													"",
 													"    // assert that all of our content sections are coming back with details ",
@@ -2767,11 +2768,18 @@
 													"        pm.expect(section.caption).to.not.be.null;",
 													"        pm.expect(section.content.length).to.be.above(0);",
 													"    });",
+													"    }",
 													"    ",
 													"    // assert that all of our sections are coming back in correct order",
+													"    // EES-895",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    respJson.forEach((section, index) => {",
 													"        pm.expect(section.order).to.equal(index + 1);",
+													"        section.forEach((block, index) => {",
+													"            pm.expect(block.order).to.equal(index + 1); ",
+													"        });",
 													"    });",
+													"    }",
 													"    ",
 													"    // assert that the content sections' content blocks are coming back with details",
 													"    respJson.forEach(section => {",
@@ -2906,6 +2914,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -2924,7 +2933,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -2963,6 +2973,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -2981,7 +2992,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3067,6 +3079,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3085,7 +3098,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3128,6 +3142,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3146,7 +3161,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3185,6 +3201,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3203,7 +3220,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3246,6 +3264,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"New Content Section should be removed\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3263,7 +3282,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3300,6 +3320,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3319,10 +3340,7 @@
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
 													"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
 													"});",
-													"",
-													"pm.test(\"Unset variables\", function () {",
-													"    pm.environment.unset(\"added_content_section_id\");",
-													"});"
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3361,6 +3379,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"New Content Section should be present\", function () { ",
 													"",
 													"    const respJson = pm.response.json();",
@@ -3369,6 +3388,7 @@
 													"    pm.expect(respJson.heading).to.equal('New section');",
 													"    pm.expect(respJson.order).to.equal(10);",
 													"});",
+													"}",
 													"",
 													"pm.test(\"Store environment variables for following tests\", function() {",
 													"   pm.globals.set(\"added_content_section_without_order_id\", pm.response.json().id); ",
@@ -3415,6 +3435,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"New Content Section should be removed\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -3433,10 +3454,7 @@
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
 													"});",
-													"",
-													"pm.test(\"Remove temporary environment variables\", function() {",
-													"   pm.environment.unset(\"added_content_section_without_order_id\"); ",
-													"});"
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -3736,7 +3754,9 @@
 													"",
 													"    // assert new block details",
 													"    pm.expect(respJson.id).to.not.be.null;",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.order).to.equal(5);",
+													"    }",
 													"    pm.expect(respJson.type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content).to.be.undefined;",
 													"    ",
@@ -3797,6 +3817,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content.length).to.equal(5);",
 													"    ",
 													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
@@ -3810,6 +3831,7 @@
 													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[2].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    }",
 													"",
 													"    // EES-754",
 													"    if(pm.environment.get('env') === 'local') {",
@@ -3818,9 +3840,11 @@
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
 													"    }",
 													"  ",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content[4].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[4].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[4].order).to.equal(5);",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4025,7 +4049,9 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    }",
 													"    ",
 													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
 													"    pm.expect(respJson.content[0].body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
@@ -4155,7 +4181,9 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    }",
 													"    ",
 													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[0].type).to.equal(\"HtmlBlock\");",
@@ -4300,6 +4328,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.length).to.equal(4);",
 													"    ",
 													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
@@ -4309,6 +4338,7 @@
 													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    }",
 													"    ",
 													"    // EES-754",
 													"    if(pm.environment.get('env') === 'local') {",
@@ -4317,9 +4347,11 @@
 													"    pm.expect(respJson[2].order).to.equal(3);",
 													"    }",
 													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4363,6 +4395,7 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content.length).to.equal(4);",
 													"    ",
 													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
@@ -4372,6 +4405,7 @@
 													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
 													"    ",
 													"    // EES-754",
 													"    if(pm.environment.get('env') === 'local') {",
@@ -4380,9 +4414,11 @@
 													"    pm.expect(respJson.content[2].order).to.equal(3);",
 													"    }",
 													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.content[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4427,11 +4463,13 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
-													"    pm.expect(respJson.length).to.equal(3);",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(3)",
 													"    ",
 													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    }",
 													"    ",
 													"    // EES-754",
 													"    if(pm.environment.get('env') === 'local') {",
@@ -4440,9 +4478,11 @@
 													"    pm.expect(respJson[1].order).to.equal(2);",
 													"    }",
 													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
 													"    pm.expect(respJson[2].type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -4486,7 +4526,9 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.length).to.equal(2);",
+													"    }",
 													"    ",
 													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
 													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
@@ -4541,7 +4583,9 @@
 													"",
 													"    var respJson = pm.response.json();",
 													"",
+													"    if(pm.environment.get('env') === 'local') { ",
 													"    pm.expect(respJson.length).to.equal(1);",
+													"    }",
 													"    ",
 													"    // EES-754",
 													"    if(pm.environment.get('env') === 'local') {",
@@ -5308,6 +5352,7 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
 													"pm.test(\"New Content Section should be removed\", function () { ",
 													"",
 													"    const expectedOrder = [",
@@ -5325,7 +5370,8 @@
 													"    const respJson = pm.response.json();",
 													"",
 													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-													"});"
+													"});",
+													"}"
 												],
 												"type": "text/javascript"
 											}
@@ -11916,26 +11962,25 @@
 					"// Absence by characteristic",
 					"pm.globals.set(\"1FILT_SchoolType\", \"2\");",
 					"pm.globals.set(\"1FG_SchoolType_Default\", \"11\");",
-					"pm.globals.set(\"1F_Char__Total\", \"1\");",
-					"pm.globals.set(\"1F_Char__GenderMale\", \"53\");",
-					"pm.globals.set(\"1F_Char__GenderFemale\", \"52\");",
-					"pm.globals.set(\"1F_SchoolType__Total\", \"58\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"57\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"56\");",
-					"pm.globals.set(\"1F_SchoolType__Special\", \"55\");",
-					"pm.globals.set(\"1F_Char__FSMEligible\", \"18\");",
-					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"10\");",
-					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"8\");",
-					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"50\");",
-					"pm.globals.set(\"1F_YearBreakdown__SixHalfTerms\", \"54\");",
+					"pm.globals.set(\"1F_Char__Total\", \"66\");",
+					"pm.globals.set(\"1F_Char__GenderMale\", \"71\");",
+					"pm.globals.set(\"1F_Char__GenderFemale\", \"72\");",
+					"pm.globals.set(\"1F_SchoolType__Total\", \"70\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"69\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"68\");",
+					"pm.globals.set(\"1F_SchoolType__Special\", \"67\");",
+					"pm.globals.set(\"1F_Char__FSMEligible\", \"11\");",
+					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"18\");",
+					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"10\");",
+					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"48\");",
 					"",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
 					"pm.globals.set(\"1I_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
 					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
 					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
 					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
 					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");",
 					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
 					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
 					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
