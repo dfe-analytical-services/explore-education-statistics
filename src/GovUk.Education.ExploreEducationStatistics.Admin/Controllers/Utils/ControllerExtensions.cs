@@ -1,11 +1,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.ExtensionMethods
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
 {
     public static class ControllerExtensions
     {
@@ -39,6 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Extension
             
             ValidationUtils.AddErrors(controller.ModelState, validationResults.Left);
             return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
+        }
+
+        public static Guid GetUserId(this ControllerBase controller)
+        {
+            var userIdClaim = controller.HttpContext.User.Claims
+                .First(claim => claim.Type == ClaimTypes.NameIdentifier);
+            
+            return new Guid(userIdClaim.Value);
         }
     }
 }

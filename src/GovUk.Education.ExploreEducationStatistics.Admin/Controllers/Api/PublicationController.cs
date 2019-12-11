@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -25,19 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<ActionResult<List<PublicationViewModel>>> GetPublicationsAsync(
+        public async Task<List<PublicationViewModel>> GetPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
-            var userId = Guid.NewGuid(); // TODO get the Guid from AD
-            var result = await _publicationService.GetByTopicAndUserAsync(topicId, userId);
-
-            if (result.Any())
-            {
-                return result;
-            }
-
-            return NoContent();
+            return await _publicationService.GetByTopicAndUserAsync(topicId, this.GetUserId());
         }
 
         // GET api/publications/{publicationId}

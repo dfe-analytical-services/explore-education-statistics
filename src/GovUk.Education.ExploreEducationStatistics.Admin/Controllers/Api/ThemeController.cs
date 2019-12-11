@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ControllerExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -25,18 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/themes/
         [HttpGet("api/me/themes")]
-        public ActionResult<List<Theme>> GetMyThemes()
+        public async Task<ActionResult<List<Theme>>> GetMyThemes()
         {
-            var userId = new Guid(); // TODO get the Guid from AD
-
-            var result = _themeService.GetUserThemes(userId);
-
-            if (result.Any())
-            {
-                return result;
-            }
-
-            return NoContent();
+            return await _themeService.GetUserThemesAsync(this.GetUserId());
         }
 
         // GET api/theme/{themeId}/summary

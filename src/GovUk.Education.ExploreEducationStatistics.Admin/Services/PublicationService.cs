@@ -43,15 +43,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications.ToList();
         }
 
-        // TODO it maybe necessary to add authorisation to this method
         public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(TopicId topicId, UserId userId)
         {
-            var publications = await _context.Publications
-                .Where(p => p.TopicId == topicId)
-                .HydratePublicationForPublicationViewModel()
-                .ToListAsync();
+            var userReleasesForTopic = await GetUserReleasesForTopic(topicId, userId);
+            
+            var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
+            
+            foreach (var publication in userReleasesForTopic.Select(release => release.Publication).Distinct())
+            {
+                var releasesForPublication = userReleasesForTopic.FindAll(release => release.Publication == publication);
+                userReleasesByPublication.Add(publication, releasesForPublication);
+            }
 
-            return _mapper.Map<List<PublicationViewModel>>(publications);
+            return userReleasesByPublication
+                .Select(publicationWithReleases =>
+                {
+                    var (publication, releases) = publicationWithReleases;
+
+                    return new PublicationViewModel
+                    {
+                        Id = publication.Id,
+                        Contact = publication.Contact,
+                        Methodology = _mapper.Map<MethodologyViewModel>(publication.Methodology),
+                        Releases = releases.Select(release => _mapper.Map<ReleaseViewModel>(release)).ToList(),
+                        Title = publication.Title,
+                        NextUpdate = publication.NextUpdate,
+                        ThemeId = publication.Topic.ThemeId
+                    };
+                })
+                .ToList();
+        }
+
+        private async Task<List<Release>> GetUserReleasesForTopic(UserId topicId, UserId userId)
+        {
+            return await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .ThenInclude(release => release.Publication)
+                .ThenInclude(publication => publication.Topic)
+                .Where(r => r.UserId == userId)
+                .Select(r => r.Release)
+                .Where(release => release.Publication.TopicId == topicId)
+                .ToListAsync();
         }
 
         public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
