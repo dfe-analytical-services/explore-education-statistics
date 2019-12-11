@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class FilterItem : IEquatable<FilterItem>
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public string Label { get; set; }
         public FilterGroup FilterGroup { get; set; }
-        public long FilterGroupId { get; set; }
+        public Guid FilterGroupId { get; set; }
         public ICollection<FilterItemFootnote> Footnotes { get; set; }
 
         public FilterItem()

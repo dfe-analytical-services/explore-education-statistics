@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -7,14 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class IndicatorService : AbstractRepository<Indicator, long>, IIndicatorService
+    public class IndicatorService : AbstractRepository<Indicator, Guid>, IIndicatorService
     {
         public IndicatorService(StatisticsDbContext context, ILogger<IndicatorService> logger)
             : base(context, logger)
         {
         }
 
-        public IEnumerable<Indicator> GetIndicators(long subjectId)
+        public IEnumerable<Indicator> GetIndicators(Guid subjectId)
         {
             return DbSet()
                 .AsNoTracking()
@@ -25,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(t => t.indicator);
         }
 
-        public IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds = null)
+        public IEnumerable<Indicator> GetIndicators(Guid subjectId, IEnumerable<Guid> indicatorIds = null)
         {
             if (indicatorIds == null || !indicatorIds.Any())
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -31,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context)
         {
             var release = CreateOrUpdateRelease(message, context);
-            return RemoveAndCreateSubject(subjectData.Name, release, context);
+            return RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
         }
 
-        private Subject RemoveAndCreateSubject(string name, Release release, StatisticsDbContext context)
+        private Subject RemoveAndCreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
         {
             var subject = context.Subject
                 .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
@@ -46,7 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context.Subject.Remove(subject);
             }
 
-            subject = context.Subject.Add(new Subject(name, release)).Entity;
+            subject = context.Subject.Add(new Subject
+                {
+                    Id = subjectId,
+                    Name = name,
+                    Release = release
+                }
+            ).Entity;
 
             return subject;
         }

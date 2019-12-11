@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteFootnote(long id)
+        public ActionResult DeleteFootnote(Guid id)
         {
             return CheckFootnoteExists(id, () =>
             {
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPut("{id}")]
-        public ActionResult<FootnoteViewModel> UpdateFootnote(long id, UpdateFootnoteViewModel footnote)
+        public ActionResult<FootnoteViewModel> UpdateFootnote(Guid id, UpdateFootnoteViewModel footnote)
         {
             var updated = _footnoteService.UpdateFootnote(id,
                 footnote.Content,
@@ -93,12 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return GatherAndBuildFootnoteViewModel(updated);
         }
 
-        private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
+        private ActionResult CheckFootnoteExists(Guid id, Func<ActionResult> andThen)
         {
             return _footnoteService.Exists(id) ? andThen.Invoke() : NotFound();
         }
 
-        private Dictionary<long, FootnotesIndicatorsMetaViewModel> GetIndicators(long subjectId)
+        private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Id,
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             );
         }
 
-        private Dictionary<long, FootnotesFilterMetaViewModel> GetFilters(long subjectId)
+        private Dictionary<Guid, FootnotesFilterMetaViewModel> GetFilters(Guid subjectId)
         {
             return _filterService.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
@@ -213,13 +213,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         private static void AppendFilterGroups(IEnumerable<FilterGroup> filterGroups,
-            IDictionary<long, List<long>> filterGroupsByFilter)
+            IDictionary<Guid, List<Guid>> filterGroupsByFilter)
         {
             foreach (var filterGroup in filterGroups)
             {
                 if (!filterGroupsByFilter.TryGetValue(filterGroup.FilterId, out var idList))
                 {
-                    idList = new List<long>();
+                    idList = new List<Guid>();
                     filterGroupsByFilter.Add(filterGroup.FilterId, idList);
                 }
 
@@ -231,13 +231,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         private static void AppendFilters(IEnumerable<Filter> filters,
-            IDictionary<long, List<long>> filtersBySubject)
+            IDictionary<Guid, List<Guid>> filtersBySubject)
         {
             foreach (var filter in filters)
             {
                 if (!filtersBySubject.TryGetValue(filter.SubjectId, out var idList))
                 {
-                    idList = new List<long>();
+                    idList = new List<Guid>();
                     filtersBySubject.Add(filter.SubjectId, idList);
                 }
 
@@ -249,15 +249,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         private static FootnoteViewModel BuildFootnoteViewModel(Footnote footnote,
-            IEnumerable<long> subjectIds,
-            IReadOnlyDictionary<long, List<long>> filtersBySubject,
-            IReadOnlyDictionary<long, List<long>> filterGroupsByFilter,
-            IReadOnlyDictionary<long, List<long>> filterItemsByFilterGroup,
-            IReadOnlyDictionary<long, List<long>> indicatorGroupsBySubject,
-            IReadOnlyDictionary<long, List<long>> indicatorsByIndicatorGroup,
-            IEnumerable<long> selectedSubjects,
-            IEnumerable<long> selectedFilters,
-            IEnumerable<long> selectedFilterGroups)
+            IEnumerable<Guid> subjectIds,
+            IReadOnlyDictionary<Guid, List<Guid>> filtersBySubject,
+            IReadOnlyDictionary<Guid, List<Guid>> filterGroupsByFilter,
+            IReadOnlyDictionary<Guid, List<Guid>> filterItemsByFilterGroup,
+            IReadOnlyDictionary<Guid, List<Guid>> indicatorGroupsBySubject,
+            IReadOnlyDictionary<Guid, List<Guid>> indicatorsByIndicatorGroup,
+            IEnumerable<Guid> selectedSubjects,
+            IEnumerable<Guid> selectedFilters,
+            IEnumerable<Guid> selectedFilterGroups)
         {
             return new FootnoteViewModel
             {
@@ -282,9 +282,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                                                              filterItemId.ToString()) ??
                                                                      new List<string>(),
                                                                  Selected = selectedFilterGroups.Contains(filterGroupId)
-                                                             }) ?? new Dictionary<long, FootnoteFilterGroupViewModel>(),
+                                                             }) ?? new Dictionary<Guid, FootnoteFilterGroupViewModel>(),
                                           Selected = selectedFilters.Contains(filterId)
-                                      }) ?? new Dictionary<long, FootnoteFilterViewModel>(),
+                                      }) ?? new Dictionary<Guid, FootnoteFilterViewModel>(),
                         IndicatorGroups = indicatorGroupsBySubject.GetValueOrDefault(subjectId)?.ToDictionary(
                                               indicatorGroupId => indicatorGroupId,
                                               indicatorGroupId => new FootnoteIndicatorGroupViewModel
@@ -293,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                                       indicatorsByIndicatorGroup.GetValueOrDefault(indicatorGroupId)
                                                           ?.Select(indicatorId => indicatorId.ToString()) ??
                                                       new List<string>()
-                                              }) ?? new Dictionary<long, FootnoteIndicatorGroupViewModel>(),
+                                              }) ?? new Dictionary<Guid, FootnoteIndicatorGroupViewModel>(),
                         Selected = selectedSubjects.Contains(subjectId)
                     })
             };
