@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
 
-            var scheduledReleases = (await _releaseInfoService.GetScheduledReleasesAsync()).ToList();
+            // TODO EES-863 Currently returns all scheduled releases
+            // TODO EES-863 Only query scheduled releases that are being published today
+            var query = new TableQuery<ReleaseInfo>().Where(
+                TableQuery.GenerateFilterCondition("Status", QueryComparisons.Equal,
+                    ReleaseInfoStatus.Scheduled.ToString()));
+            
+            var scheduledReleases = (await _releaseInfoService.ExecuteQueryAsync(query)).ToList();
             if (scheduledReleases.Any())
             {
                 var generateReleaseContentQueue =

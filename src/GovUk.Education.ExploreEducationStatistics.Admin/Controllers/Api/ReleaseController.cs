@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/queue")]
-        public async Task<ActionResult<QueueReleaseMessage>>  QueueReleaseAsync(ReleaseId releaseId)
+        public async Task<ActionResult<ValidateReleaseMessage>> QueueReleaseAsync(ReleaseId releaseId)
         {
             return Ok(await _publishingService.QueueReleaseAsync(releaseId));
         }

@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public Task<bool> ValidateAsync(QueueReleaseMessage message)
+        public Task<bool> ValidateAsync(ValidateReleaseMessage message)
         {
             _logger.LogTrace($"Validating release: {message.ReleaseId}");
             // TODO EES-869 Validate the release

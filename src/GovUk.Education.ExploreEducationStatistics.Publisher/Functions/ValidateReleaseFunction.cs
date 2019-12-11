@@ -8,20 +8,23 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseI
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    public class QueueReleaseFunction
+    public class ValidateReleaseFunction
     {
         private readonly IReleaseInfoService _releaseInfoService;
         private readonly IValidationService _validationService;
 
-        public QueueReleaseFunction(IReleaseInfoService releaseInfoService, IValidationService validationService)
+        public ValidateReleaseFunction(IReleaseInfoService releaseInfoService, IValidationService validationService)
         {
             _releaseInfoService = releaseInfoService;
             _validationService = validationService;
         }
 
-        [FunctionName("QueueRelease")]
-        public async Task QueueRelease(
-            [QueueTrigger("releases")] QueueReleaseMessage message,
+        /**
+         * Azure function which validates that a Release is in a state to be published and if so creates a ReleaseInfo entry scheduling its publication.
+         */
+        [FunctionName("ValidateRelease")]
+        public async Task ValidateRelease(
+            [QueueTrigger("releases")] ValidateReleaseMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -30,13 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task ValidateReleaseAsync(QueueReleaseMessage message, Func<Task> andThen)
+        private async Task ValidateReleaseAsync(ValidateReleaseMessage message, Func<Task> andThen)
         {
             var valid = await _validationService.ValidateAsync(message);
             await (valid ? andThen.Invoke() : AddReleaseInfo(message, FailedValidation));
         }
 
-        private async Task AddReleaseInfo(QueueReleaseMessage message, ReleaseInfoStatus status)
+        private async Task AddReleaseInfo(ValidateReleaseMessage message, ReleaseInfoStatus status)
         {
             await _releaseInfoService.AddReleaseInfoAsync(message, status);
         }

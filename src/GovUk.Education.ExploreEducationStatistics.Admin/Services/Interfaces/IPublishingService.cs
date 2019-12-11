@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublishingService
     {
-        Task<QueueReleaseMessage> QueueReleaseAsync(Guid releaseId);
+        Task<ValidateReleaseMessage> QueueReleaseAsync(Guid releaseId);
     }
 }

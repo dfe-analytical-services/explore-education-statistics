@@ -8,6 +8,9 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
+    /**
+     * Service to manage ReleaseInfo entries
+     */
     public class ReleaseInfoService : IReleaseInfoService
     {
         private readonly ITableStorageService _tableStorageService;
@@ -19,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task AddReleaseInfoAsync(QueueReleaseMessage message, ReleaseInfoStatus status)
+        public async Task AddReleaseInfoAsync(ValidateReleaseMessage message, ReleaseInfoStatus status)
         {
             var releaseInfoTable = await GetReleaseInfoTableAsync();
             var releaseInfo = new ReleaseInfo(message.PublicationSlug,
@@ -30,22 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await releaseInfoTable.ExecuteAsync(TableOperation.InsertOrReplace(releaseInfo));
         }
 
-        public async Task<IEnumerable<ReleaseInfo>> GetScheduledReleasesAsync()
+        public async Task<IEnumerable<ReleaseInfo>> ExecuteQueryAsync(TableQuery<ReleaseInfo> query)
         {
             var results = new List<ReleaseInfo>();
-
             var releaseInfoTable = await GetReleaseInfoTableAsync();
             TableContinuationToken token = null;
             do
             {
-                // TODO EES-863 Currently returns all scheduled releases
-                // TODO EES-863 Only query scheduled releases that are being published today
-                var tableQuery = new TableQuery<ReleaseInfo>()
-                    .Where(TableQuery.GenerateFilterCondition("Status",
-                        QueryComparisons.Equal, ReleaseInfoStatus.Scheduled.ToString()));
-
-                var queryResult = await releaseInfoTable.ExecuteQuerySegmentedAsync(tableQuery, token);
-
+                var queryResult = await releaseInfoTable.ExecuteQuerySegmentedAsync(query, token);
                 results.AddRange(queryResult.Results);
                 token = queryResult.ContinuationToken;
             } while (token != null);

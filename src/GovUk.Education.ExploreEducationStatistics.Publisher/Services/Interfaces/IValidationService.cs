@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IValidationService
     {
-        Task<bool> ValidateAsync(QueueReleaseMessage message);
+        Task<bool> ValidateAsync(ValidateReleaseMessage message);
     }
 }

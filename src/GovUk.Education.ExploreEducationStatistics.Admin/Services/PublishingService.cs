@@ -31,14 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task<QueueReleaseMessage> QueueReleaseAsync(Guid releaseId)
+        public async Task<ValidateReleaseMessage> QueueReleaseAsync(Guid releaseId)
         {
             var release = await GetRelease(releaseId);
             var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "releases");
-            var message = BuildQueueReleaseMessage(release);
+            var message = BuildValidateReleaseMessage(release);
             queue.AddMessage(ToCloudQueueMessage(message));
 
-            _logger.LogTrace($"Sent queue release message for release: {releaseId}");
+            _logger.LogTrace($"Sent validate release message for release: {releaseId}");
 
             return message;
         }
@@ -51,9 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync();
         }
 
-        private static QueueReleaseMessage BuildQueueReleaseMessage(Release release)
+        private static ValidateReleaseMessage BuildValidateReleaseMessage(Release release)
         {
-            return new QueueReleaseMessage
+            return new ValidateReleaseMessage
             {
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled ?? DateTime.UtcNow,
