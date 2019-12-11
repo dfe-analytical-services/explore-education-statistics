@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
          */
         private void GenerateReleaseContent()
         {
-            var queueName = "generate-release-content";
+            const string queueName = "generate-release-content";
             try
             {
                 var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
@@ -115,12 +115,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 var message = new GenerateReleaseContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
                 
-                _logger.LogInformation($"Message added to {queueName} queue.");
+                _logger.LogInformation($"Message added to {queueName} queue");
                 _logger.LogInformation("Please ensure the Publisher function is running");
             }
             catch
             {
-                _logger.LogError("Unable add message to content-cache queue");
+                _logger.LogError($"Unable add message to {queueName} queue");
                 throw;
             }
         }

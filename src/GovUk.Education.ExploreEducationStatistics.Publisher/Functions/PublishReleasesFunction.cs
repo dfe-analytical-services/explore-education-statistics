@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             // TODO EES-863 Currently returns all scheduled releases
             // TODO EES-863 Only query scheduled releases that are being published today
             var query = new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition("Status", QueryComparisons.Equal, Scheduled.ToString()));
+                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString()));
 
             var scheduled = (await _releaseStatusService.ExecuteQueryAsync(query)).ToList();
             if (scheduled.Any())
