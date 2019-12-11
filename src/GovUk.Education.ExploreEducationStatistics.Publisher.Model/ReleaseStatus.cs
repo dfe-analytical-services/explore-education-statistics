@@ -8,7 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
         public DateTime Publish { get; set; }
-        public Guid ReleaseId { get; set; }
         public string ReleaseSlug { get; set; }
         public string? ContentStage { get; set; }
         public string? FilesStage { get; set; }
@@ -28,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
-            ReleaseId = releaseId;
             ReleaseSlug = releaseSlug;
             Stage = stage.ToString();
 
@@ -37,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public Guid Id => Guid.Parse(RowKey);
+        public Guid ReleaseId => Guid.Parse(PartitionKey);
     }
 
     public enum Stage
