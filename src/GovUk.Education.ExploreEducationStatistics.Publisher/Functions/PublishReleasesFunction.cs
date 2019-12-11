@@ -22,7 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             _releaseStatusService = releaseStatusService;
         }
-
+        
+        /**
+         * Azure function which publishes all Releases that are scheduled to be published during the day.
+         */
         [FunctionName("PublishReleases")]
         public void PublishReleases([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
             ExecutionContext executionContext,
