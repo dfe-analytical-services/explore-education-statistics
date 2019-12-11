@@ -81,6 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var iMessage = new ImportMessage
                 {
+                    SubjectId = message.SubjectId,
                     DataFileName = fileName,
                     OrigDataFileName = message.DataFileName,
                     Release = message.Release,
