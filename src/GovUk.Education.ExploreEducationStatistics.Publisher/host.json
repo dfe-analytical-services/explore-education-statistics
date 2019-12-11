@@ -4,10 +4,10 @@
     "logLevel": {
       "default": "None",
       "Function.GenerateReleaseContent": "Information",
+      "Function.PublishReleases": "Information",
       "Function.PublishReleaseContent": "Information",
-      "Function.PublishReleaseDataFiles": "Information",
       "Function.PublishReleaseData": "Information",
-      "Function.ScheduledRelease": "Information",
+      "Function.PublishReleaseFiles": "Information",
       "Function.ValidateRelease": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }

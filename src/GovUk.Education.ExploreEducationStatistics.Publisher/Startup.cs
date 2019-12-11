@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
-                .AddScoped<IReleaseInfoService, ReleaseInfoService>()
+                .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .BuildServiceProvider();
         }

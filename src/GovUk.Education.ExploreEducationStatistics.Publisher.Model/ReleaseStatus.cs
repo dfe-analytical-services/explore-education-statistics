@@ -3,39 +3,48 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class ReleaseInfo : TableEntity
+    public class ReleaseStatus : TableEntity
     {
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
-        public DateTime PublishScheduled { get; set; }
+        public DateTime Publish { get; set; }
         public Guid ReleaseId { get; set; }
         public string ReleaseSlug { get; set; }
-        public string? ReleaseContentStatus { get; set; }
-        public string? ReleaseFilesStatus { get; set; }
-        public string? ReleaseDataStatus { get; set; }
-        public string Status { get; set; }
+        public string? ContentStage { get; set; }
+        public string? FilesStage { get; set; }
+        public string? DataStage { get; set; }
+        public string Stage { get; set; }
 
-        public ReleaseInfo()
+        public ReleaseStatus()
         {
         }
 
-        public ReleaseInfo(string publicationSlug,
-            DateTime publishScheduled,
+        public ReleaseStatus(string publicationSlug,
+            DateTime publish,
             Guid releaseId,
             string releaseSlug,
-            ReleaseInfoStatus status)
+            Stage stage)
         {
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
-            PublishScheduled = publishScheduled;
+            Publish = publish;
             ReleaseId = releaseId;
             ReleaseSlug = releaseSlug;
-            Status = status.ToString();
+            Stage = stage.ToString();
 
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();
         }
 
-        public Guid ReleaseInfoId => Guid.Parse(RowKey);
+        public Guid Id => Guid.Parse(RowKey);
+    }
+
+    public enum Stage
+    {
+        Invalid,
+        Started,
+        Scheduled,
+        Complete,
+        Failed
     }
 }
