@@ -9,7 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task AddReleaseInfoAsync(QueueReleaseMessage message, ReleaseInfoStatus status);
         Task<IEnumerable<ReleaseInfo>> GetScheduledReleasesAsync();
-        Task UpdateReleaseInfoStage(Guid releaseId, Guid releaseInfoId);
-        Task UpdateReleaseInfoStatusAsync(Guid releaseId, string rowKey, ReleaseInfoStatus status);
+        Task UpdateContentStatusAsync(Guid releaseId, Guid releaseInfoId, ReleaseInfoTaskStatus status);
+        Task UpdateDataStatusAsync(Guid releaseId, Guid releaseInfoId, ReleaseInfoTaskStatus status);
+        Task UpdateFilesStatusAsync(Guid releaseId, Guid releaseInfoId, ReleaseInfoTaskStatus status);
+        Task UpdateReleaseInfoStatusAsync(Guid releaseId, Guid releaseInfoId, ReleaseInfoStatus status);
     }
 }

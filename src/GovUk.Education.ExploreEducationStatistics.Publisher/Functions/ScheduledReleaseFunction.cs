@@ -55,8 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ToCloudQueueMessage(BuildPublishReleaseDataFilesMessage(releaseInfo)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseInfo)));
-                    await _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId, releaseInfo.RowKey,
-                        ReleaseInfoStatus.InProgress);
+                    await _releaseInfoService.UpdateReleaseInfoStatusAsync(releaseInfo.ReleaseId,
+                        releaseInfo.ReleaseInfoId, ReleaseInfoStatus.InProgress);
                 }
             }
         }
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 ReleasePublished = releaseInfo.PublishScheduled,
                 ReleaseSlug = releaseInfo.ReleaseSlug,
                 ReleaseId = releaseInfo.ReleaseId,
-                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
+                ReleaseInfoId = releaseInfo.ReleaseInfoId
             };
         }
 
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new PublishReleaseDataMessage
             {
                 ReleaseId = releaseInfo.ReleaseId,
-                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
+                ReleaseInfoId = releaseInfo.ReleaseInfoId
             };
         }
 
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new GenerateReleaseContentMessage
             {
                 ReleaseId = releaseInfo.ReleaseId,
-                ReleaseInfoId = Guid.Parse(releaseInfo.RowKey)
+                ReleaseInfoId = releaseInfo.ReleaseInfoId
             };
         }
 

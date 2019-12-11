@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime PublishScheduled { get; set; }
         public Guid ReleaseId { get; set; }
         public string ReleaseSlug { get; set; }
-        public int ReleaseContentStage { get; set; }
-        public int ReleaseFilesStage { get; set; }
-        public int ReleaseDataStage { get; set; }
+        public string? ReleaseContentStatus { get; set; }
+        public string? ReleaseFilesStatus { get; set; }
+        public string? ReleaseDataStatus { get; set; }
         public string Status { get; set; }
 
         public ReleaseInfo()
@@ -35,5 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();
         }
+
+        public Guid ReleaseInfoId => Guid.Parse(RowKey);
     }
 }
