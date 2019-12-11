@@ -110,6 +110,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
         }
 
+#pragma warning disable 1998
+        private static async Task<bool> ShouldOverwriteCallbackAsync(object source, object destination)
+#pragma warning restore 1998
+        {
+            return true;
+        }
+
         private static async Task<bool> ShouldTransferCallbackAsync(object source, object destination)
         {
             if (source is CloudBlockBlob blob)
@@ -138,6 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var context = new SingleTransferContext();
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
+            context.ShouldOverwriteCallbackAsync += ShouldOverwriteCallbackAsync;  
 
             zipOutputStream.Finish();
             await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
