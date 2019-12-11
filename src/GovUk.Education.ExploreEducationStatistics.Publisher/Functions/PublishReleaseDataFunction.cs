@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             // TODO EES-866 Run the importer or copy the data from the statistics database
             // TODO EES-866 to the publicly available statistics database
-            await _releaseStatusService.UpdateStageAsync(message.ReleaseId, message.ReleaseStatusId, Failed);
+            await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, Failed);
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
     }
