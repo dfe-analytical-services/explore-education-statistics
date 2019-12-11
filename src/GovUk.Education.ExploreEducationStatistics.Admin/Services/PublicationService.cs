@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, ClaimsPrincipal user)
         {
-            var canAccessAllReleases = _authorizationService.MatchesPolicy(
+            var canAccessAllReleases = await _authorizationService.MatchesPolicy(
                 user, SecurityPolicies.CanViewAllReleases);
 
             if (canAccessAllReleases)

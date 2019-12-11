@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -23,11 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper)
+        public ReleaseService(ContentDbContext context, IMapper mapper, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapper = mapper;
+            _authorizationService = authorizationService;
         }
 
         public Release Get(ReleaseId id)
@@ -65,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id)
         {
             var release = await _context.Releases
-                .Where(x => x.Id == id)
                 .HydrateReleaseForReleaseViewModel()
+                .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
             return _mapper.Map<ReleaseViewModel>(release);
         }
@@ -165,20 +170,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
         {
             var release = await _context.Releases
-                .Where(r => r.Publication.Id == publicationId)
                 .HydrateReleaseForReleaseViewModel()
+                .Where(r => r.Publication.Id == publicationId)
                 .ToListAsync();
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
         
-        // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses)
+        public async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(
+            ClaimsPrincipal user, params ReleaseStatus[] releaseStatuses)
         {
-            var release = await _context.Releases
-                .Where(r => releaseStatuses.Contains(r.Status))
+            var canViewAllReleases = 
+                await _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllReleases);
+            
+            if (canViewAllReleases)
+            {
+                return await GetAllReleasesForReleaseStatusesAsync(releaseStatuses);
+            }
+
+            return await GetReleasesForReleaseStatusRelatedToUser(releaseStatuses, SecurityUtils.GetUserId(user));
+        }
+        
+        private async Task<List<ReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
+            ReleaseStatus[] releaseStatuses)
+        {
+            var releases = await _context
+                .Releases
                 .HydrateReleaseForReleaseViewModel()
+                .Where(r => releaseStatuses.Contains(r.Status))
                 .ToListAsync();
-            return _mapper.Map<List<ReleaseViewModel>>(release);
+            
+            return _mapper.Map<List<ReleaseViewModel>>(releases);
+        }
+
+        private async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUser(
+            ReleaseStatus[] releaseStatuses, Guid userId)
+        {
+            var userReleaseIds = await _context
+                .UserReleaseRoles
+                .Where(r => r.UserId == userId)
+                .Select(r => r.ReleaseId)
+                .ToListAsync();
+            
+            var releases = await _context
+                .Releases
+                .HydrateReleaseForReleaseViewModel()
+                .Where(r => userReleaseIds.Contains(r.Id) && releaseStatuses.Contains(r.Status))
+                .ToListAsync();
+            
+            return _mapper.Map<List<ReleaseViewModel>>(releases);
         }
 
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,

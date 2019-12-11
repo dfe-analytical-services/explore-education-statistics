@@ -206,14 +206,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/draft")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
-            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview));
+            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(User, ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview));
         }
         
         // GET api/releases/scheduled
         [HttpGet("releases/scheduled")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
-            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
+            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(User, ReleaseStatus.Approved));
         }
         
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]

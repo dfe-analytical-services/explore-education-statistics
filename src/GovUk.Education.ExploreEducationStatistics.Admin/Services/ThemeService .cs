@@ -27,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<Theme>> GetUserThemesAsync(ClaimsPrincipal user)
         {
-            var canAccessAllTopics = _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllTopics);
+            var canAccessAllTopics = await 
+                _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllTopics);
 
             if (canAccessAllTopics)
             {

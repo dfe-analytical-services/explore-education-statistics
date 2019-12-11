@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId);
 
-        Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses);
+        Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(ClaimsPrincipal user, params ReleaseStatus[] releaseStatuses);
 
         Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(Guid releaseId, ReleaseStatus status, string internalReleaseNote);
     }

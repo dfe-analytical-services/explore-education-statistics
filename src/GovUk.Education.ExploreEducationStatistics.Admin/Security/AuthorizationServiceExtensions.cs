@@ -1,17 +1,19 @@
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
     public static class AuthorizationServiceExtensions
     {
-        public static bool MatchesPolicy(
+        public static async Task<bool> MatchesPolicy(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user, 
             SecurityPolicies policy
         )
         {
-            return authorizationService.AuthorizeAsync(user, policy.ToString()).Result.Succeeded;
+            var result = await authorizationService.AuthorizeAsync(user, policy.ToString());
+            return result.Succeeded;
         }
     }
 }
