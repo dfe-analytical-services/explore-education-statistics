@@ -119,9 +119,11 @@
 									"});",
 									"",
 									"// @NotCreatedData",
+									"// NOTE(mark): If this test fails, you'll need to create this methodology manually and set it to have",
+									"//             the correct GUID.",
 									"pm.test(\"methodology should be correct\", function () {",
-									"    pm.expect(respJson.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be an empty array\", function () {",
@@ -154,7 +156,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"caa8e56f-41d2-4129-a5c3-53b051134bd7\"\n}",
+							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"b4886b45-53c2-4d6f-e6bc-08d77d76f342\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -335,7 +337,7 @@
 									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
 									"",
-									"    if(pm.environment.get(\"admin_api_url\") != \"https://localhost:5021/api\") {",
+									"    if(pm.environment.get(\"env\") != \"local\") {",
 									"        pm.expect(respJson[1].userName).to.equal(\"EESADMIN.User1@azurehiveitco.onmicrosoft.com\");    ",
 									"    }",
 									"});"
@@ -408,7 +410,11 @@
 								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
-									"setTimeout(function () {}, 10000);"
+									"if(pm.environment.get('env') === 'local') {",
+									"    setTimeout(function () {}, 10000);",
+									"} else {",
+									"    setTimeout(function () {}, 100000);    ",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -1607,8 +1613,8 @@
 									"    pm.expect(testPub.title).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`); ",
 									"",
 									"    // @NotCreatedData",
-									"    pm.expect(testPub.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(testPub.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(testPub.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(testPub.methodology.title).to.equal(\"API Test Methodology\");",
 									"",
 									"    pm.expect(testPub.releases.length).to.equal(1);",
 									"    pm.expect(testPub.releases[0].id).to.equal(pm.globals.get('release_id'));",
@@ -1707,8 +1713,8 @@
 									"",
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
-									"    pm.expect(respJson.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be correct\", function () {",
