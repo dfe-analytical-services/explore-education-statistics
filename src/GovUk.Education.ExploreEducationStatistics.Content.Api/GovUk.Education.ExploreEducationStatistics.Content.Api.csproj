@@ -16,6 +16,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+      
+      <!-- Only added for development to use the required type of message to send to the generate-release-content queue -->
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
     </ItemGroup>
 
 </Project>

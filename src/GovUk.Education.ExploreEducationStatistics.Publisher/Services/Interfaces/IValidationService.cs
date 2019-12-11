@@ -1,10 +1,10 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
-    public interface IContentCacheGenerationService
+    public interface IValidationService
     {
-        Task<bool> GenerateReleaseContent(GenerateReleaseContentMessage message);
+        Task<bool> ValidateAsync(ValidateReleaseMessage message);
     }
 }
