@@ -107,7 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 #pragma warning restore 1998
         {
             var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
-            (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
+            if (destination is CloudBlockBlob cloudBlockBlob)
+            {
+                cloudBlockBlob.Metadata["releasedatetime"] = releasePublishedString;
+            }
         }
 
 #pragma warning disable 1998
