@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+﻿using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -28,9 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            await UpdateStage(message, Started);
             _publishingService.PublishReleaseFiles(message).Wait();
-            await _releaseStatusService.UpdateFilesStageAsync(message.ReleaseId, message.ReleaseStatusId, Complete);
+            await UpdateStage(message, Complete);
             logger.LogInformation($"{executionContext.FunctionName} completed");
+        }
+        
+        private async Task UpdateStage(PublishReleaseFilesMessage message, Stage stage)
+        {
+            await _releaseStatusService.UpdateFilesStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
     }
 }
