@@ -48,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, ClaimsPrincipal user)
         {
-            var canAccessAllReleases = _authorizationService
-                .AuthorizeAsync(user, SecurityPolicies.CanViewAllReleases.ToString()).Result.Succeeded;
+            var canAccessAllReleases = _authorizationService.MatchesPolicy(
+                user, SecurityPolicies.CanViewAllReleases);
 
             if (canAccessAllReleases)
             {

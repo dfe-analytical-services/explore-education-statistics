@@ -8,9 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 
@@ -29,8 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<Theme>> GetUserThemesAsync(ClaimsPrincipal user)
         {
-            var canAccessAllTopics = _authorizationService.AuthorizeAsync(
-                user, SecurityPolicies.CanViewAllTopics.ToString()).Result.Succeeded;
+            var canAccessAllTopics = _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllTopics);
 
             if (canAccessAllTopics)
             {
