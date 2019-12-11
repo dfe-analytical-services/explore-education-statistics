@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.ContentStage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row, stage);
             });
         }
 
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.DataStage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row, stage);
             });
         }
 
@@ -67,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.FilesStage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row, stage);
             });
         }
 
@@ -91,6 +92,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 await table.ExecuteAsync(TableOperation.InsertOrMerge(updateFunction.Invoke(releaseStatus)));
             }
+        }
+
+        private ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus, Stage stage)
+        {
+            if (stage == Failed)
+            {
+                releaseStatus.Stage = Failed.ToString();
+            }
+
+            return releaseStatus;
         }
 
         private async Task<CloudTable> GetTableAsync()
