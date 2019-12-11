@@ -1,5 +1,5 @@
 begin
-    declare @subjectId int = 1
+    declare @subjectId NVARCHAR(max) = '803fbf56-600f-490f-8409-6413a891720d'
 
     declare @filterItemList IdListIntegerType
     insert @filterItemList values (29), (45)
