@@ -27,11 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<List<PublicationViewModel>> GetPublicationsAsync(
+        public async Task<List<PublicationViewModel>> GetMyPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
-            return await _publicationService.GetByTopicAndUserAsync(topicId, this.GetUserId());
+            return await _publicationService.GetByTopicAndUserAsync(topicId, User);
         }
 
         // GET api/publications/{publicationId}

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils.ControllerExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -27,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/me/themes")]
         public async Task<ActionResult<List<Theme>>> GetMyThemes()
         {
-            return await _themeService.GetUserThemesAsync(this.GetUserId());
+            return await _themeService.GetUserThemesAsync(User);
         }
 
         // GET api/theme/{themeId}/summary

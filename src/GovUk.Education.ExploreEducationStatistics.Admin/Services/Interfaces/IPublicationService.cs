@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Publication Get(string slug);
 
-        Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, Guid userId);
+        Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, ClaimsPrincipal user);
 
         Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(
             CreatePublicationViewModel publication);

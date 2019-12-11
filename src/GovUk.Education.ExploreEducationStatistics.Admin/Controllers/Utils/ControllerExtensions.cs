@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
@@ -46,10 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
 
         public static Guid GetUserId(this ControllerBase controller)
         {
-            var userIdClaim = controller.HttpContext.User.Claims
-                .First(claim => claim.Type == ClaimTypes.NameIdentifier);
-            
-            return new Guid(userIdClaim.Value);
+            return SecurityUtils.GetUserId(controller.HttpContext.User);
         }
     }
 }

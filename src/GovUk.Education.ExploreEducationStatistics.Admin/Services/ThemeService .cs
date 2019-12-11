@@ -1,26 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _context;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ThemeService(ContentDbContext context)
+        public ThemeService(ContentDbContext context, IAuthorizationService authorizationService)
         {
             _context = context;
+            _authorizationService = authorizationService;
         }
 
-        public async Task<List<Theme>> GetUserThemesAsync(Guid userId)
+        public async Task<List<Theme>> GetUserThemesAsync(ClaimsPrincipal user)
+        {
+            var canAccessAllTopics = _authorizationService.AuthorizeAsync(
+                user, SecurityPolicies.CanViewAllTopics.ToString()).Result.Succeeded;
+
+            if (canAccessAllTopics)
+            {
+                return await GetAllThemesAsync();
+            }
+
+            return await GetThemesRelatedToUserAsync(GetUserId(user));
+        }
+
+        private async Task<List<Theme>> GetAllThemesAsync()
+        {
+            return await _context.Themes.Select(th => new Theme
+            {
+                Id = th.Id,
+                Title = th.Title,
+                Topics = th.Topics.Select(to => new Topic {Id = to.Id, Title = to.Title}).ToList()
+            }).ToListAsync();
+        }
+
+        private async Task<List<Theme>> GetThemesRelatedToUserAsync(Guid userId)
         {
             var userTopics = await _context
                 .UserReleaseRoles
@@ -58,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     })
                 .ToList();
         }
-        
+
         public Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id)
         { 
             return _context

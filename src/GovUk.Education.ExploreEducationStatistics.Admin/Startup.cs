@@ -160,6 +160,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
+                
+                options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
+                
+                options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -229,6 +235,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
+            
+            // This service allows us to check our Policies within Controllers and Services
+            services.AddSingleton<IAuthorizationService, DefaultAuthorizationService>();
 
             services.AddSwaggerGen(c =>
             {
