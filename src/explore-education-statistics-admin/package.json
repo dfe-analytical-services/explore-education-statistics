@@ -183,7 +183,6 @@
     "last 1 version"
   ],
   "dependencies": {
-    "@microsoft/applicationinsights-web": "^2.3.1",
     "history": "^4.10.1",
     "i": "^0.3.6",
     "lodash": "^4.17.13",
