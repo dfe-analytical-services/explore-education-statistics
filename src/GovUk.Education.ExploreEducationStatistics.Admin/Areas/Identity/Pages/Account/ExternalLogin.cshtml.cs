@@ -159,15 +159,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-//                    _contentDbContext.Users.Add(new User
-//                    {
-//                        FirstName = user.FirstName,
-//                        LastName = user.LastName,
-//                        Email = user.Email,
-//                        UserId = new Guid(user.Id)
-//                    });
-//
-//                    await _contentDbContext.SaveChangesAsync();
+                    _contentDbContext.Users.Add(new User
+                    {
+                        Id = new Guid(user.Id),
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
+                    });
+
+                    await _contentDbContext.SaveChangesAsync();
                     
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)

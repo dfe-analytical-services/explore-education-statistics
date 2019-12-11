@@ -133,9 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     }
                 );
             
-            const string analyst1Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04";
-            const string analyst2Id = "6620bccf-2433-495e-995d-fc76c59d9c62";
-            const string analyst3Id = "b390b405-ef90-4b9d-8770-22948e53189a";
+            const string analystUser1Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04";
+            const string analystUser2Id = "6620bccf-2433-495e-995d-fc76c59d9c62";
+            const string analystUser3Id = "b390b405-ef90-4b9d-8770-22948e53189a";
 
             const string bauUser1Id = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd";
             const string bauUser2Id = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63";
@@ -143,19 +143,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             modelBuilder.Entity<ApplicationUser>()
                 .HasData(
                     CreateApplicationUser(
-                        analyst1Id,
+                        analystUser1Id,
                         "analyst1@example.com",
                         "Analyst1",
                         "User1"
                     ),
                     CreateApplicationUser(
-                        analyst2Id,
+                        analystUser2Id,
                         "analyst2@example.com",
                         "Analyst2",
                         "User2"
                     ),
                     CreateApplicationUser(
-                        analyst3Id,
+                        analystUser3Id,
                         "analyst3@example.com",
                         "Analyst3",
                         "User3"
@@ -178,17 +178,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                 .HasData(
                     new IdentityUserRole<string>
                     {
-                        UserId = analyst1Id,
+                        UserId = analystUser1Id,
                         RoleId = applicationUserRoleId
                     },
                     new IdentityUserRole<string>
                     {
-                        UserId = analyst2Id,
+                        UserId = analystUser2Id,
                         RoleId = applicationUserRoleId
                     },
                     new IdentityUserRole<string>
                     {
-                        UserId = analyst3Id,
+                        UserId = analystUser3Id,
                         RoleId = applicationUserRoleId
                     },
                     new IdentityUserRole<string>
@@ -206,15 +206,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             modelBuilder.Entity<IdentityUserLogin<string>>()
                 .HasData(
                     CreateUserLogin(
-                        analyst1Id,
+                        analystUser1Id,
                         "5zzTEeAYz71aVPJ1ho1VGW3cYk7_qcQpkDqYYxbH3po"
                     ),
                     CreateUserLogin(
-                        analyst2Id,
+                        analystUser2Id,
                         "RLdgJMsfN6QVjpCbkaOYIpzh6DA3QpRfnBcfIx46uDM"
                     ),
                     CreateUserLogin(
-                        analyst3Id,
+                        analystUser3Id,
                         "ces_f2I3zCjGZ9HUprWF3RiQgswrKvPFAY1Lwu_KI6M"
                     ),
                     CreateUserLogin(
