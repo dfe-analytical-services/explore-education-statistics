@@ -1,8 +1,8 @@
 CREATE OR ALTER PROCEDURE InsertSubjectFootnote
     @subjectName NVARCHAR(max),
-    @footnoteId NVARCHAR(max)
+    @footnoteId uniqueidentifier
 AS
-DECLARE @subjectId NVARCHAR(max) = (SELECT S.Id FROM Subject S WHERE S.Name = @subjectName);
+DECLARE @subjectId uniqueidentifier = (SELECT S.Id FROM Subject S WHERE S.Name = @subjectName);
 BEGIN TRY
     INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subjectId, @footnoteId);
 END TRY
@@ -11,17 +11,18 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @footnoteId, @errorMessage);
+    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %uniq) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @KEY, @errorMessage);
 END CATCH
 GO;
 
 CREATE OR ALTER PROCEDURE InsertIndicatorFootnote
     @subjectName NVARCHAR(max),
     @indicatorName NVARCHAR(max),
-    @footnoteId NVARCHAR(max)
+    @footnoteId uniqueidentifier
 AS
 DECLARE
-    @indicatorId NVARCHAR(max) = (SELECT I.Id FROM Indicator I JOIN IndicatorGroup IG on I.IndicatorGroupId = IG.Id JOIN Subject S on IG.SubjectId = S.Id WHERE S.Name = @subjectName AND I.Name = @indicatorName);
+    @indicatorId uniqueidentifier = (SELECT I.Id FROM Indicator I JOIN IndicatorGroup IG on I.IndicatorGroupId = IG.Id JOIN Subject S on IG.SubjectId = S.Id WHERE S.Name = @subjectName AND I.Name = @indicatorName);
 BEGIN TRY
     INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (@indicatorId, @footnoteId);
 END TRY
@@ -30,17 +31,18 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @indicatorName, @footnoteId, @errorMessage);
+    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @indicatorName, @KEY, @errorMessage);
 END CATCH
 GO;
 
 CREATE OR ALTER PROCEDURE InsertFilterFootnote
     @subjectName NVARCHAR(max),
     @filterName NVARCHAR(max),
-    @footnoteId NVARCHAR(max)
+    @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterId NVARCHAR(max) = (SELECT F.Id FROM Filter F JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND F.Name = @filterName);
+    @filterId uniqueidentifier = (SELECT F.Id FROM Filter F JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND F.Name = @filterName);
 BEGIN TRY
     INSERT INTO FilterFootnote (FilterId, FootnoteId) VALUES (@filterId, @footnoteId);
 END TRY
@@ -49,17 +51,18 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterName, @footnoteId, @errorMessage);
+    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterName, @KEY, @errorMessage);
 END CATCH
 GO;
 
 CREATE OR ALTER PROCEDURE InsertFilterGroupFootnote
     @subjectName NVARCHAR(max),
     @filterGroupName NVARCHAR(max),
-    @footnoteId NVARCHAR(max)
+    @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterGroupId NVARCHAR(max) = (SELECT FG.Id FROM FilterGroup FG JOIN Filter F ON FG.FilterId = F.Id JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FG.Label = @filterGroupName);
+    @filterGroupId uniqueidentifier = (SELECT FG.Id FROM FilterGroup FG JOIN Filter F ON FG.FilterId = F.Id JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FG.Label = @filterGroupName);
 BEGIN TRY
     INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (@filterGroupId, @footnoteId);
 END TRY
@@ -68,17 +71,18 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterGroupName, @footnoteId, @errorMessage);
+    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterGroupName, @KEY, @errorMessage);
 END CATCH
 GO;
 
 CREATE OR ALTER PROCEDURE InsertFilterItemFootnote
     @subjectName NVARCHAR(max),
     @filterItemName NVARCHAR(max),
-    @footnoteId NVARCHAR(max)
+    @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterItemId NVARCHAR(max) = (SELECT FI.Id FROM FilterItem FI JOIN FilterGroup FG ON FI.FilterGroupId = FG.Id JOIN Filter F on FG.FilterId = F.Id  JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FI.Label = @filterItemName);
+    @filterItemId uniqueidentifier = (SELECT FI.Id FROM FilterItem FI JOIN FilterGroup FG ON FI.FilterGroupId = FG.Id JOIN Filter F on FG.FilterId = F.Id  JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FI.Label = @filterItemName);
 BEGIN TRY
     INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (@filterItemId, @footnoteId);
 END TRY
@@ -87,7 +91,8 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterItemName, @footnoteId, @errorMessage);
+    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterItemName, @KEY, @errorMessage);
 END CATCH
 GO;
 
@@ -103,28 +108,28 @@ DELETE FROM Footnote WHERE 1=1;
 --
 -- Footnotes
 --
-DECLARE @footnote_id_1 NVARCHAR(max) = 'fbb6262f-213a-453a-98ca-b832d6ae1c16';
-DECLARE @footnote_id_2 NVARCHAR(max) = 'e9076bab-6ff7-4c92-8972-2fb4affbe977';
-DECLARE @footnote_id_3 NVARCHAR(max) = '128c6153-4937-40da-a99f-e137fc8c41e5';
-DECLARE @footnote_id_4 NVARCHAR(max) = '41c1eb5a-8415-45eb-bc49-cfa42382ebba';
-DECLARE @footnote_id_5 NVARCHAR(max) = '6c06f733-c30b-45e1-980a-b587e923f73b';
-DECLARE @footnote_id_6 NVARCHAR(max) = 'b678373f-dfa2-41ad-817e-3f011d1b5173';
-DECLARE @footnote_id_7 NVARCHAR(max) = '7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2';
-DECLARE @footnote_id_8 NVARCHAR(max) = '78c78049-22b3-4ec8-bc2a-7f47a6f7c74c';
-DECLARE @footnote_id_9 NVARCHAR(max) = '7b18666a-ff4a-43a9-9639-8f324374db0c';
-DECLARE @footnote_id_10 NVARCHAR(max) = '507b05b0-4015-4330-9901-20b47c5b154d';
-DECLARE @footnote_id_11 NVARCHAR(max) = '82aa9459-2ff3-45b6-ba98-6d8819cea9f6';
-DECLARE @footnote_id_12 NVARCHAR(max) = '86ec4e28-0f68-42f3-b153-d67e611aa6f1';
-DECLARE @footnote_id_13 NVARCHAR(max) = '55f10d5a-792b-4065-9e32-446d29f43c7f';
-DECLARE @footnote_id_14 NVARCHAR(max) = '7b32b523-e6c0-4091-91d1-b515550689d1';
-DECLARE @footnote_id_15 NVARCHAR(max) = 'e03c3b82-75df-4dee-b3ed-dac39378a9b5';
-DECLARE @footnote_id_16 NVARCHAR(max) = '96641ff5-d33b-495d-8691-8045c148a595';
-DECLARE @footnote_id_17 NVARCHAR(max) = '6176a831-fdc9-4645-915e-4051a93ba05a';
-DECLARE @footnote_id_18 NVARCHAR(max) = 'e8ebee03-dc9d-4ae8-8b5e-a7ff831611f0';
-DECLARE @footnote_id_19 NVARCHAR(max) = '65fcb08f-e70a-4cf1-920b-5e326fbaa8b4';
-DECLARE @footnote_id_20 NVARCHAR(max) = 'a9045d29-7c84-491d-918c-3885f11597d3';
-DECLARE @footnote_id_21 NVARCHAR(max) = '2268f97a-5107-464f-ade6-30debc36519a';
-DECLARE @footnote_id_22 NVARCHAR(max) = '8a79e8c6-3552-496a-8790-d072cec8c43f';
+DECLARE @footnote_id_1 uniqueidentifier = 'fbb6262f-213a-453a-98ca-b832d6ae1c16';
+DECLARE @footnote_id_2 uniqueidentifier = 'e9076bab-6ff7-4c92-8972-2fb4affbe977';
+DECLARE @footnote_id_3 uniqueidentifier = '128c6153-4937-40da-a99f-e137fc8c41e5';
+DECLARE @footnote_id_4 uniqueidentifier = '41c1eb5a-8415-45eb-bc49-cfa42382ebba';
+DECLARE @footnote_id_5 uniqueidentifier = '6c06f733-c30b-45e1-980a-b587e923f73b';
+DECLARE @footnote_id_6 uniqueidentifier = 'b678373f-dfa2-41ad-817e-3f011d1b5173';
+DECLARE @footnote_id_7 uniqueidentifier = '7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2';
+DECLARE @footnote_id_8 uniqueidentifier = '78c78049-22b3-4ec8-bc2a-7f47a6f7c74c';
+DECLARE @footnote_id_9 uniqueidentifier = '7b18666a-ff4a-43a9-9639-8f324374db0c';
+DECLARE @footnote_id_10 uniqueidentifier = '507b05b0-4015-4330-9901-20b47c5b154d';
+DECLARE @footnote_id_11 uniqueidentifier = '82aa9459-2ff3-45b6-ba98-6d8819cea9f6';
+DECLARE @footnote_id_12 uniqueidentifier = '86ec4e28-0f68-42f3-b153-d67e611aa6f1';
+DECLARE @footnote_id_13 uniqueidentifier = '55f10d5a-792b-4065-9e32-446d29f43c7f';
+DECLARE @footnote_id_14 uniqueidentifier = '7b32b523-e6c0-4091-91d1-b515550689d1';
+DECLARE @footnote_id_15 uniqueidentifier = 'e03c3b82-75df-4dee-b3ed-dac39378a9b5';
+DECLARE @footnote_id_16 uniqueidentifier = '96641ff5-d33b-495d-8691-8045c148a595';
+DECLARE @footnote_id_17 uniqueidentifier = '6176a831-fdc9-4645-915e-4051a93ba05a';
+DECLARE @footnote_id_18 uniqueidentifier = 'e8ebee03-dc9d-4ae8-8b5e-a7ff831611f0';
+DECLARE @footnote_id_19 uniqueidentifier = '65fcb08f-e70a-4cf1-920b-5e326fbaa8b4';
+DECLARE @footnote_id_20 uniqueidentifier = 'a9045d29-7c84-491d-918c-3885f11597d3';
+DECLARE @footnote_id_21 uniqueidentifier = '2268f97a-5107-464f-ade6-30debc36519a';
+DECLARE @footnote_id_22 uniqueidentifier = '8a79e8c6-3552-496a-8790-d072cec8c43f';
 
 INSERT INTO Footnote (Id, Content)
 VALUES (@footnote_id_1, 'State-funded primary schools include all primary academies, including free schools.');

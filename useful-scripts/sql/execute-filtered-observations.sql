@@ -33,7 +33,7 @@ begin
 
 	declare @wardsList IdListVarcharType
 
-	declare @filterItemList IdListIntegerType
+	declare @filterItemList IdListGuidType
 	insert @filterItemList values (83), (86)
 
 	declare @result int
