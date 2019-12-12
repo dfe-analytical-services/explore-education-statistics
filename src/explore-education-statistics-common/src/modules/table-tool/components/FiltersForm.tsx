@@ -8,21 +8,21 @@ import {
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import {
-  PublicationSubjectMeta,
   FilterOption,
+  PublicationSubjectMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
+import SummaryListItem from '@common/components/SummaryListItem';
+import SummaryList from '@common/components/SummaryList';
+import {Dictionary} from "@common/types";
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
-import { Dictionary } from 'src/types';
 
 export interface FormValues {
   indicators: string[];
