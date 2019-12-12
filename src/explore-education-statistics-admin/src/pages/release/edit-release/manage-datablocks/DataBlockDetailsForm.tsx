@@ -19,7 +19,7 @@ import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
   children?: ReactNode;
-  initialValues: { title?: string };
+  initialValues?: DataBlockDetailsFormValues;
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
@@ -27,7 +27,7 @@ interface Props {
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
-interface FormValues {
+export interface DataBlockDetailsFormValues {
   title: string;
   source: string;
   customFootnotes: string;
@@ -36,14 +36,14 @@ interface FormValues {
 
 const DataBlockDetailsForm = ({
   children,
-  initialValues,
+  initialValues = { title: '', name: '', source: '', customFootnotes: '' },
   query,
   tableHeaders,
   releaseId,
   initialDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const formikRef = React.useRef<Formik<FormValues>>(null);
+  const formikRef = React.useRef<Formik<DataBlockDetailsFormValues>>(null);
 
   const [currentDataBlock, setCurrentDataBlock] = React.useState<
     DataBlock | undefined
@@ -73,10 +73,8 @@ const DataBlockDetailsForm = ({
     setBlockState({ saved: false, error: false });
   }, [query, tableHeaders, releaseId]);
 
-  const saveDataBlock = async (values: FormValues) => {
+  const saveDataBlock = async (values: DataBlockDetailsFormValues) => {
     const dataBlock: DataBlock = {
-      id: currentDataBlock && currentDataBlock.id,
-
       dataBlockRequest: {
         ...query,
         geographicLevel: query.geographicLevel as GeographicLevel,
@@ -109,39 +107,30 @@ const DataBlockDetailsForm = ({
     }
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<FormValues> = {
+  const baseValidationRules: ObjectSchemaDefinition<
+    DataBlockDetailsFormValues
+  > = {
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),
     customFootnotes: Yup.string(),
   };
 
-  const usedInitialValues = React.useMemo(() => {
-    return {
-      title:
-        (currentDataBlock && currentDataBlock.heading) ||
-        initialValues.title ||
-        '',
-      customFootnotes:
-        (currentDataBlock && currentDataBlock.customFootnotes) || '',
-      name: (currentDataBlock && currentDataBlock.name) || '',
-      source: (currentDataBlock && currentDataBlock.source) || '',
-    };
-  }, [currentDataBlock, initialValues.title]);
-
   return (
-    <Formik<FormValues>
+    <Formik<DataBlockDetailsFormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={usedInitialValues}
-      validationSchema={Yup.object<FormValues>(baseValidationRules)}
+      initialValues={initialValues}
+      validationSchema={Yup.object<DataBlockDetailsFormValues>(
+        baseValidationRules,
+      )}
       onSubmit={saveDataBlock}
-      render={(form: FormikProps<FormValues>) => {
+      render={(form: FormikProps<DataBlockDetailsFormValues>) => {
         return (
           <div>
             <Form {...form} id="dataBlockDetails">
               <FormGroup>
-                <FormFieldTextInput<FormValues>
+                <FormFieldTextInput<DataBlockDetailsFormValues>
                   id="data-block-name"
                   name="name"
                   label="Data block name"
@@ -153,7 +142,7 @@ const DataBlockDetailsForm = ({
                 <hr />
                 {children}
 
-                <FormFieldTextArea<FormValues>
+                <FormFieldTextArea<DataBlockDetailsFormValues>
                   id="data-block-title"
                   name="title"
                   label="Table title"
@@ -161,14 +150,14 @@ const DataBlockDetailsForm = ({
                   rows={2}
                 />
 
-                <FormFieldTextInput<FormValues>
+                <FormFieldTextInput<DataBlockDetailsFormValues>
                   id="data-block-source"
                   name="source"
                   label="Source"
                   percentageWidth="two-thirds"
                 />
 
-                <FormFieldTextArea<FormValues>
+                <FormFieldTextArea<DataBlockDetailsFormValues>
                   id="data-block-footnotes"
                   name="customFootnotes"
                   label="Footnotes"
