@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1f5e91f0-6275-431d-b011-02b5064d17c9",
+		"_postman_id": "86fed618-679d-439d-9ec9-c99fe636a23d",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -370,12 +370,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+									"src": "files/admin-api-test.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+									"src": "files/admin-api-test.meta.csv"
 								}
 							]
 						},
@@ -8831,12 +8831,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+											"src": "files/admin-api-test.csv"
 										},
 										{
 											"key": "metaFile",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+											"src": "files/admin-api-test.meta.csv"
 										}
 									]
 								},
@@ -8896,12 +8896,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+											"src": "files/admin-api-test.csv"
 										},
 										{
 											"key": "metaFile",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+											"src": "files/admin-api-test.meta.csv"
 										}
 									]
 								},
