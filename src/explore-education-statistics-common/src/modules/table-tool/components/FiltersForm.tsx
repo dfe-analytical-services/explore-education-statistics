@@ -95,6 +95,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     buildInitialFormValue(subjectMeta, initialValues),
   );
 
+  const initialFormValues = React.useMemo(() => {
+    return buildInitialFormValue(subjectMeta, initialValues);
+  }, [initialValues, subjectMeta]);
+
   React.useEffect(() => {
     if (formikRef.current) {
       const newFormValue = buildInitialFormValue(subjectMeta, initialValues);
@@ -107,7 +111,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={initialFormValue}
+      initialValues={initialFormValues}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
