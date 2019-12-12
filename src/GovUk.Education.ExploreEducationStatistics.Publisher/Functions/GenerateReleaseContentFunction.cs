@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -29,8 +30,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await UpdateStage(message, Started);
-            _contentCacheGenerationService.GenerateReleaseContent(message).Wait();
-            await UpdateStage(message, Complete);
+            try
+            {
+                var result = await _contentCacheGenerationService.GenerateReleaseContent(message);
+                await UpdateStage(message, result ? Complete : Failed);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                await UpdateStage(message, Failed);
+            }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

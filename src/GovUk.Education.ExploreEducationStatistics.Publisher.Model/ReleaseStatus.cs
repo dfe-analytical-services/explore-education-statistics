@@ -40,10 +40,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
     public enum Stage
     {
-        Invalid,
-        Started,
-        Scheduled,
         Complete,
-        Failed
+        Failed,
+        Invalid,
+        Queued,
+        Scheduled,
+        Started
     }
 }

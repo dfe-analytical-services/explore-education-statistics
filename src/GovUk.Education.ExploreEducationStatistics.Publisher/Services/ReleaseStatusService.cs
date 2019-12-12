@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.ContentStage = stage.ToString();
-                return FailReleaseIfTaskStageFailed(row, stage);
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.DataStage = stage.ToString();
-                return FailReleaseIfTaskStageFailed(row, stage);
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.FilesStage = stage.ToString();
-                return FailReleaseIfTaskStageFailed(row, stage);
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -86,7 +86,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var table = await GetTableAsync();
             var tableResult = await table.ExecuteAsync(
-                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString()));
+                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString(),
+                    new List<string>
+                    {
+                        "Created",
+                        "PublicationSlug",
+                        "Publish",
+                        "ReleaseSlug",
+                        "ContentStage",
+                        "FilesStage",
+                        "DataStage",
+                        "Stage"
+                    }));
 
             if (tableResult.Result is ReleaseStatus releaseStatus)
             {
@@ -94,11 +105,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus, Stage stage)
+        private ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus)
         {
-            if (stage == Failed)
+            if (Enum.TryParse<Stage>(releaseStatus.Stage, out var stage) && stage != Failed)
             {
-                releaseStatus.Stage = Failed.ToString();
+                if (Enum.TryParse<Stage>(releaseStatus.ContentStage, out var contentStage) && contentStage == Failed ||
+                    Enum.TryParse<Stage>(releaseStatus.DataStage, out var dataStage) && dataStage == Failed ||
+                    Enum.TryParse<Stage>(releaseStatus.FilesStage, out var filesStage) && filesStage == Failed)
+                {
+                    releaseStatus.Stage = Failed.ToString();
+                }
             }
 
             return releaseStatus;
