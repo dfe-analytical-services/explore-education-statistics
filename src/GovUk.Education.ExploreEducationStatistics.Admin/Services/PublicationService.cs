@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return await GetAllPublicationsForTopicAsync(topicId);
             }
             
-            return await GetPublicationsForTopicRelatedToUserAsync(topicId);
+            return await GetPublicationsForTopicRelatedToMeAsync(topicId);
         }
 
         public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        private async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId)
+        private async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToMeAsync(Guid topicId)
         {
             var userId = GetUserId(GetUser());
             

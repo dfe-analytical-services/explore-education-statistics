@@ -15,11 +15,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using ContentSectionId = System.Guid;
-using PublicationId = System.Guid;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -39,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Release Get(ReleaseId id)
+        public Release Get(Guid id)
         {
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
@@ -49,12 +47,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
         }
 
-        public async Task<Release> GetAsync(ReleaseId id)
+        public async Task<Release> GetAsync(Guid id)
         {
             return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
         }
         
-        public async Task<List<ContentSection>> GetContentAsync(ReleaseId id)
+        public async Task<List<ContentSection>> GetContentAsync(Guid id)
         {
             return await _context
                 .ReleaseContentSections
@@ -71,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id)
+        public async Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id)
         {
             var release = await _context.Releases
                 .HydrateReleaseForReleaseViewModel()
@@ -120,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId)
         {
             var release = await _context.Releases
                 .Where(r => r.Id == releaseId)
@@ -133,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            ContentSectionId releaseId, UpdateReleaseSummaryRequest request)
+            Guid releaseId, UpdateReleaseSummaryRequest request)
         {
             var publication = await GetAsync(releaseId);
             return await ValidateReleaseSlugUniqueToPublication(request.Slug, publication.Id, releaseId)
@@ -171,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId)
         {
             var release = await _context.Releases
                 .HydrateReleaseForReleaseViewModel()
@@ -191,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return await GetAllReleasesForReleaseStatusesAsync(releaseStatuses);
             }
 
-            return await GetReleasesForReleaseStatusRelatedToUser(releaseStatuses, SecurityUtils.GetUserId(GetUser()));
+            return await GetReleasesForReleaseStatusRelatedToMeAsync(releaseStatuses);
         }
 
         private async Task<List<ReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
@@ -206,9 +204,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<ReleaseViewModel>>(releases);
         }
 
-        private async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUser(
-            ReleaseStatus[] releaseStatuses, ContentSectionId userId)
+        private async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusRelatedToMeAsync(
+            ReleaseStatus[] releaseStatuses)
         {
+            var userId = GetUserId(GetUser());
+            
             var userReleaseIds = await _context
                 .UserReleaseRoles
                 .Where(r => r.UserId == userId)
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
-            PublicationId publicationId, ReleaseId? releaseId = null)
+            Guid publicationId, Guid? releaseId = null)
         {
             if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
             {
@@ -235,14 +235,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private int OrderForNextReleaseOnPublication(PublicationId publicationId)
+        private int OrderForNextReleaseOnPublication(Guid publicationId)
         {
             var publication = _context.Publications.Include(p => p.Releases)
                 .Single(p => p.Id == publicationId);
             return publication.Releases.Select(r => r.Order).DefaultIfEmpty().Max() + 1;
         }
 
-        private async Task<List<ContentSection>> TemplateFromRelease(ReleaseId? releaseId)
+        private async Task<List<ContentSection>> TemplateFromRelease(Guid? releaseId)
         {
             if (releaseId.HasValue)
             {
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return templateContent.Select(c => new ContentSection
                     {
-                        Id = new ContentSectionId(),
+                        Id = new Guid(),
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,
@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            ReleaseId releaseId, ReleaseStatus status, string internalReleaseNote)
+            Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
             var release = await GetAsync(releaseId);
             release.Status = status;
