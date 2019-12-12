@@ -45,6 +45,10 @@ const DataBlockDetailsForm = ({
 }: Props) => {
   const formikRef = React.useRef<Formik<FormValues>>(null);
 
+  const [currentDataBlock, setCurrentDataBlock] = React.useState<
+    DataBlock | undefined
+  >(initialDataBlock);
+
   const [blockState, setBlockState] = React.useReducer(
     (
       state,
@@ -71,7 +75,7 @@ const DataBlockDetailsForm = ({
 
   const saveDataBlock = async (values: FormValues) => {
     const dataBlock: DataBlock = {
-      id: initialDataBlock && initialDataBlock.id,
+      id: currentDataBlock && currentDataBlock.id,
 
       dataBlockRequest: {
         ...query,
@@ -97,8 +101,9 @@ const DataBlockDetailsForm = ({
     };
 
     try {
-      await onDataBlockSave(dataBlock);
-      setBlockState({ saved: true, updated: initialDataBlock !== undefined });
+      const savedDataBlock = await onDataBlockSave(dataBlock);
+      setCurrentDataBlock(savedDataBlock);
+      setBlockState({ saved: true, updated: currentDataBlock !== undefined });
     } catch (error) {
       setBlockState({ error: true });
     }
@@ -111,33 +116,24 @@ const DataBlockDetailsForm = ({
     customFootnotes: Yup.string(),
   };
 
-  React.useEffect(() => {
-    const newInitialValues = {
+  const usedInitialValues = React.useMemo(() => {
+    return {
       title:
-        (initialDataBlock && initialDataBlock.heading) ||
+        (currentDataBlock && currentDataBlock.heading) ||
         initialValues.title ||
         '',
       customFootnotes:
-        (initialDataBlock && initialDataBlock.customFootnotes) || '',
-      name: (initialDataBlock && initialDataBlock.name) || '',
-      source: (initialDataBlock && initialDataBlock.source) || '',
+        (currentDataBlock && currentDataBlock.customFootnotes) || '',
+      name: (currentDataBlock && currentDataBlock.name) || '',
+      source: (currentDataBlock && currentDataBlock.source) || '',
     };
-
-    if (formikRef.current) {
-      formikRef.current.setValues(newInitialValues);
-    }
-  }, [initialDataBlock, initialValues]);
+  }, [currentDataBlock, initialValues.title]);
 
   return (
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={{
-        customFootnotes: '',
-        source: '',
-        name: '',
-        title: '',
-      }}
+      initialValues={usedInitialValues}
       validationSchema={Yup.object<FormValues>(baseValidationRules)}
       onSubmit={saveDataBlock}
       render={(form: FormikProps<FormValues>) => {
@@ -184,7 +180,7 @@ const DataBlockDetailsForm = ({
                   type="submit"
                   className="govuk-!-margin-top-6"
                 >
-                  {initialDataBlock ? 'Update data block' : 'Save data block'}
+                  {currentDataBlock ? 'Update data block' : 'Save data block'}
                 </Button>
               </FormGroup>
 

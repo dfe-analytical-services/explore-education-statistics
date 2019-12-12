@@ -69,7 +69,6 @@ const CreateDataBlocks = ({
         );
       }
     }
-    if (onTableToolLoaded) onTableToolLoaded();
   }, [dataBlock, dataBlockResponse]);
 
   const getInitialValues = () => {
@@ -94,6 +93,9 @@ const CreateDataBlocks = ({
         releaseId={releaseId}
         themeMeta={[]}
         initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
+        onInitialQueryLoaded={() => {
+          if (onTableToolLoaded) onTableToolLoaded();
+        }}
         onTableCreated={response => {
           setQuery(response.query);
           setTable(response.table);
