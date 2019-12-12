@@ -1,4 +1,6 @@
-import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import DataBlockDetailsForm, {
+  DataBlockDetailsFormValues,
+} from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -48,6 +50,10 @@ const CreateDataBlocks = ({
     TableHeadersFormValues | undefined
   >();
 
+  const [initialValues, setInitialValues] = useState<
+    DataBlockDetailsFormValues
+  >();
+
   useEffect(() => {
     if (dataBlock && dataBlockResponse) {
       setQuery(dataBlock.dataBlockRequest);
@@ -71,21 +77,31 @@ const CreateDataBlocks = ({
     }
   }, [dataBlock, dataBlockResponse]);
 
-  const getInitialValues = () => {
+  useEffect(() => {
     if (!dataBlock) {
-      return {
-        title: table ? generateTableTitle(table.subjectMeta) : undefined,
-      };
+      setInitialValues({
+        title: table ? generateTableTitle(table.subjectMeta) : '',
+        name: '',
+        source: '',
+        customFootnotes: '',
+      });
+      return;
     }
 
-    const { heading: title, name, source, customFootnotes } = dataBlock;
-    return {
+    const {
+      heading: title = '',
+      name = '',
+      source = '',
+      customFootnotes = '',
+    } = dataBlock;
+
+    setInitialValues({
       title,
       name,
       source,
       customFootnotes,
-    };
-  };
+    });
+  }, [dataBlock, table]);
 
   return (
     <div>
@@ -111,7 +127,7 @@ const CreateDataBlocks = ({
 
                 {query && tableHeaders && (
                   <DataBlockDetailsForm
-                    initialValues={getInitialValues()}
+                    initialValues={initialValues}
                     query={query}
                     tableHeaders={tableHeaders || tableHeaders}
                     initialDataBlock={dataBlock}
