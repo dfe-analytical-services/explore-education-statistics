@@ -20,14 +20,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task AddAsync(string publicationSlug, DateTime publish, Guid releaseId, string releaseSlug,
-            Stage stage)
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
         {
             var table = await GetTableAsync();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(new ReleaseStatus(publicationSlug,
                 publish,
                 releaseId,
                 releaseSlug,
-                stage)));
+                stage.Content,
+                stage.Files,
+                stage.Data,
+                stage.Overall)));
         }
 
         public async Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
@@ -43,6 +46,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             } while (token != null);
 
             return results;
+        }
+
+        public async Task UpdateAsync(Guid releaseId, Guid releaseStatusId,
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
+        {
+            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            {
+                row.ContentStage = stage.Content.ToString();
+                row.DataStage = stage.Data.ToString();
+                row.FilesStage = stage.Files.ToString();
+                row.Stage = stage.Overall.ToString();
+                return row;
+            });
         }
 
         public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
@@ -69,15 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 row.FilesStage = stage.ToString();
                 return FailReleaseIfTaskStageFailed(row);
-            });
-        }
-
-        public async Task UpdateStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
-        {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
-            {
-                row.Stage = stage.ToString();
-                return row;
             });
         }
 

@@ -18,16 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IReleaseStatusService _releaseStatusService;
 
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) StartedStage =
+            (Content: Queued, Files: Queued, Data: Queued, Overall: Started);
+
         public PublishReleasesFunction(IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
         }
-        
+
         /**
          * Azure function which publishes all Releases that are scheduled to be published during the day.
          */
         [FunctionName("PublishReleases")]
-        public void PublishReleases([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
+        public void PublishReleases([TimerTrigger("0 * * * * *")] TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -44,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             // TODO EES-863 Currently returns all scheduled releases
             // TODO EES-863 Only query scheduled releases that are being published today
             var query = new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString()));
+                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
+                    Scheduled.ToString()));
 
             var scheduled = (await _releaseStatusService.ExecuteQueryAsync(query)).ToList();
             if (scheduled.Any())
@@ -68,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releaseStatus)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseStatus)));
-                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, Started);
+                    
+                    await _releaseStatusService.UpdateAsync(releaseStatus.ReleaseId, releaseStatus.Id, StartedStage);
                 }
             }
         }
