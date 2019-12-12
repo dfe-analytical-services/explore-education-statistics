@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
@@ -37,18 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 ? successAction.Invoke(validationResult.Right) 
                 : validationResult.Left;
         }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, R> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
+        
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<R>> successAction)
@@ -63,6 +53,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<Either<ValidationResult, R>>> successAction)
+        {
+            var validationResult = await validationErrorAction.Invoke();
+
+            if (validationResult.IsLeft)
+            {
+                return validationResult.Left;
+            }
+
+            return await successAction.Invoke(validationResult.Right);
+        }
+        
+        public static async Task<ActionResult<T>> HandleErrorsAsync<T>(
+            Func<Task<Either<ActionResult, T>>> errorsRaisingAction,
+            Func<T, ActionResult> onSuccessAction) 
+        {
+            var result = await errorsRaisingAction.Invoke();
+
+            return result.IsRight ? onSuccessAction.Invoke(result.Right) : result.Left;
+        }
+        
+        public static async Task<Either<ActionResult, R>> HandleErrorsAsync<T, R>(
+            Func<Task<Either<ActionResult, T>>> validationErrorAction,
+            Func<T, Task<Either<ActionResult, R>>> successAction)
         {
             var validationResult = await validationErrorAction.Invoke();
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -25,6 +26,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             _entitySet = entitySet;
             _notFoundErrorMessage = notFoundErrorMessage;
         }
+        
+        public Task<Either<ActionResult, T>> CheckEntityExistsActionResult<T>(
+            TEntityId id, 
+            Func<TEntity, Task<Either<ActionResult, T>>> successAction,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)   
+        {
+            return HandleErrorsAsync(
+                async () =>
+                {
+                    var queryableEntities = _entitySet
+                        .FindByPrimaryKey(_context, id);
+
+                    var hydratedEntities = hydrateEntityFn != null
+                        ? hydrateEntityFn.Invoke(queryableEntities)
+                        : queryableEntities;
+                    
+                    var entity = await hydratedEntities
+                        .FirstOrDefaultAsync();
+
+                    return entity == null
+                        ? new NotFoundResult()
+                        : new Either<ActionResult, TEntity>(entity);
+                },
+                successAction.Invoke);
+        } 
         
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 

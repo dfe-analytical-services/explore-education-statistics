@@ -7,17 +7,25 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
-    public class HasRoleOnReleaseAuthorizationHandler : AuthorizationHandler<HasRoleOnThisReleaseRequirement, Release>
+    public class ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
+            ViewSpecificReleaseRequirement>
+    {
+        public ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler() 
+            : base(SecurityClaimTypes.AccessAllReleases) {}
+    }
+    
+    public class ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler 
+        : AuthorizationHandler<ViewSpecificReleaseRequirement, Release>
     {
         private readonly ContentDbContext _context;
 
-        public HasRoleOnReleaseAuthorizationHandler(ContentDbContext context)
+        public ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler(ContentDbContext context)
         {
             _context = context;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
-            HasRoleOnThisReleaseRequirement requirement,
+            ViewSpecificReleaseRequirement requirement,
             Release release)
         {
             var userId = GetUserId(authContext.User);
@@ -25,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             var connectedToRelease = _context
                 .UserReleaseRoles
                 .Any(r => r.ReleaseId == release.Id && r.UserId == userId);
-            
+        
             if (connectedToRelease)
             {
                 authContext.Succeed(requirement);

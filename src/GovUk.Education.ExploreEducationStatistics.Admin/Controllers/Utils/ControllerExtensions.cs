@@ -42,6 +42,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
         }
         
+        public static async Task<ActionResult<T>> HandlingErrorsAsync<T>(
+            Func<Task<Either<ActionResult, T>>> errorsRaisingAction,
+            Func<T, ActionResult> onSuccessAction) 
+        {
+            var result = await errorsRaisingAction.Invoke();
+
+            return result.IsRight ? onSuccessAction.Invoke(result.Right) : result.Left;
+        }
+        
         public static async Task<ActionResult> HandlingValidationErrorsAsyncNoReturn<T>(
             this ControllerBase controller,
             Func<Task<Either<ValidationResult, T>>> validationErrorsRaisingAction,

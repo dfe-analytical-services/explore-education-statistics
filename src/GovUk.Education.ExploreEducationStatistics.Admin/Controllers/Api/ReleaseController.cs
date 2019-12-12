@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -15,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using DataBlockId = System.Guid;
 using ContentSectionId = System.Guid;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
@@ -184,9 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/summary")]
         public Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
-            return this.HandlingValidationErrorsAsync(async () => 
-                await _releaseService.GetReleaseSummaryAsync(releaseId), 
-                Ok);
+            return HandleErrorsAsync(() => _releaseService.GetReleaseSummaryAsync(releaseId), Ok);
         }
 
         [HttpPut("releases/{releaseId}/summary")]
@@ -256,13 +253,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseId}/status")]
-        public async Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+        public Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             UpdateReleaseStatusRequest updateRequest, ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(
-                releaseId, 
-                () => _releaseService.UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
-            );
+            return HandleErrorsAsync(
+                () => _releaseService.UpdateReleaseStatusAsync(
+                    releaseId, 
+                    updateRequest.ReleaseStatus, 
+                    updateRequest.InternalReleaseNote),
+                Ok);
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
@@ -288,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var result = await andThen.Invoke();
             if (result.IsLeft)
             {
-                ValidationUtils.AddErrors(ModelState, result.Left);
+                AddErrors(ModelState, result.Left);
                 return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
@@ -307,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var result = await andThen.Invoke();
             if (result.IsLeft)
             {
-                ValidationUtils.AddErrors(ModelState, result.Left);
+                AddErrors(ModelState, result.Left);
                 return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
@@ -327,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var result = await andThen.Invoke();
             if (result.IsLeft)
             {
-                ValidationUtils.AddErrors(ModelState, result.Left);
+                AddErrors(ModelState, result.Left);
                 return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 

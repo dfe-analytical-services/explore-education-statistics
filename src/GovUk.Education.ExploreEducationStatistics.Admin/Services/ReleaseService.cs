@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
@@ -116,16 +117,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO Authorisation will be required when users are introduced
-        public Task<Either<ValidationResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
+        public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
+            return _releaseHelper.CheckEntityExistsActionResult(releaseId, async release =>
             {
                 var canView = await _authorizationService.MatchesPolicy(GetUser(), release, CanViewSpecificRelease);
 
                 if (!canView)
                 {
-                    return ValidationResult<ReleaseSummaryViewModel>(ForbiddenToAccessRelease);
+                    return new Either<ActionResult, ReleaseSummaryViewModel>(new ForbidResult());
                 }
                 
                 var releaseForSummary = await _context.Releases
@@ -273,15 +273,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+        public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
-            var release = _context.Releases.First(r => r.Id == releaseId);
-            release.Status = status;
-            release.InternalReleaseNote = internalReleaseNote;
-            _context.Releases.Update(release);
-            await _context.SaveChangesAsync();
-            return await GetReleaseSummaryAsync(releaseId);
+            return _releaseHelper.CheckEntityExistsActionResult(releaseId, async release =>
+            {
+                release.Status = status;
+                release.InternalReleaseNote = internalReleaseNote;
+                _context.Releases.Update(release);
+                await _context.SaveChangesAsync();
+                return await GetReleaseSummaryAsync(releaseId);
+            });
         }
         
         private ClaimsPrincipal GetUser()

@@ -171,8 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
                 
                 // does this user have permission to view a specific Release (on a case-by-case basis)?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy => 
-                    policy.Requirements.Add(new HasRoleOnThisReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -247,7 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
             
             // These handlers enforce Resource-based access control
-            services.AddTransient<IAuthorizationHandler, HasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {
