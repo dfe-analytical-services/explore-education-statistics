@@ -2,14 +2,14 @@ import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import client from '@admin/services/util/service';
 
 const service = {
-  GetInsightsKey(): Promise<string> {
+  getInsightsKey(): Promise<string> {
     return client.get<string>('/configuration/application-insights');
   },
 };
 
 // eslint-disable-next-line import/prefer-default-export
 export const initApplicationInsights = async () => {
-  const key = await service.GetInsightsKey();
+  const key = await service.getInsightsKey();
   if (key) {
     const appInsights = new ApplicationInsights({
       config: {

@@ -3,7 +3,7 @@ import axiosConfigurer from '@admin/services/util/axios-configurer';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { initApplicationInsights } from '@admin/services/ApplicationInsightsService';
+import { initApplicationInsights } from '@admin/services/applicationInsightsService';
 import * as serviceWorker from './serviceWorker';
 
 process.env.APP_ROOT_ID = 'root';

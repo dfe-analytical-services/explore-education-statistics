@@ -1,11 +1,11 @@
-﻿using System;
+﻿using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [ApiController]
-    public class ConfigurationController
+    public class ConfigurationController : ControllerBase
     {
         private readonly IConfiguration _configuration;
         public ConfigurationController(IConfiguration configuration)
@@ -15,10 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/configuration/application-insights/
         [HttpGet("api/configuration/application-insights")]
-        public string GetInsightsKey()
+        public ActionResult<string> GetInsightsKey()
         {
-            var instrumentationKey = _configuration.GetSection("ApplicationInsights").GetValue("InstrumentationKey", "Instrumentation key not found");
-            return instrumentationKey;
+            var instrumentationKey = _configuration.GetSection("ApplicationInsights").GetValue<string>("InstrumentationKey");
+            if (instrumentationKey.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            return Ok(instrumentationKey);
         }
     }
 } 
