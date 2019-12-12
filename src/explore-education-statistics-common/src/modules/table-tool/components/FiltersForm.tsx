@@ -18,7 +18,7 @@ import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
 import SummaryListItem from '@common/components/SummaryListItem';
 import SummaryList from '@common/components/SummaryList';
-import {Dictionary} from "@common/types";
+import { Dictionary } from '@common/types';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
