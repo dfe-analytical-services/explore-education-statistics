@@ -1,6 +1,9 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -14,10 +17,7 @@ import {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { createRef, useState, useEffect } from 'react';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import React, { createRef, useEffect, useState } from 'react';
 
 interface CreateDataBlockProps {
   releaseId: string;
@@ -129,7 +129,7 @@ const CreateDataBlocks = ({
                   <DataBlockDetailsForm
                     initialValues={initialValues}
                     query={query}
-                    tableHeaders={tableHeaders || tableHeaders}
+                    tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
                     onDataBlockSave={db => onDataBlockSave(db)}
