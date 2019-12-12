@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IFileStorageService
     {
-        Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message);
+        Task CopyReleaseToPublicContainer(PublishReleaseFilesMessage message);
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
     }
 }

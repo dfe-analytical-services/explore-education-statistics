@@ -132,8 +132,8 @@ const ReleaseManageDataBlocksPage = ({
 
         load(dataBlocks, releaseId, selectedDataBlockId).then(
           ({ dataBlock, response: dataBlockResponse }) => {
-            if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-              if (dataBlock && dataBlockResponse) {
+            if (dataBlock && dataBlockResponse) {
+              if (dataBlock.id === selectedDataBlockId) {
                 setDataBlockData({
                   dataBlock,
                   dataBlockResponse,
