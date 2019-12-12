@@ -7,8 +7,7 @@ const service = {
   },
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export const initApplicationInsights = async () => {
+const initApplicationInsights = async () => {
   const key = await service.getInsightsKey();
   if (key) {
     const appInsights = new ApplicationInsights({
@@ -23,3 +22,5 @@ export const initApplicationInsights = async () => {
     console.log('Application Insights initialised');
   }
 };
+
+export { initApplicationInsights as default };
