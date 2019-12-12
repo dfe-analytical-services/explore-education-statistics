@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Publication Get(string slug);
 
-        Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, ClaimsPrincipal user);
+        Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId);
 
         Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(
             CreatePublicationViewModel publication);

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 
@@ -18,24 +19,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ThemeService(ContentDbContext context, IAuthorizationService authorizationService)
+        public ThemeService(ContentDbContext context, IAuthorizationService authorizationService, 
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _authorizationService = authorizationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<Theme>> GetUserThemesAsync(ClaimsPrincipal user)
+        public async Task<List<Theme>> GetMyThemesAsync()
         {
             var canAccessAllTopics = await 
-                _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllTopics);
+                _authorizationService.MatchesPolicy(GetUser(), SecurityPolicies.CanViewAllTopics);
 
             if (canAccessAllTopics)
             {
                 return await GetAllThemesAsync();
             }
 
-            return await GetThemesRelatedToUserAsync(GetUserId(user));
+            return await GetThemesRelatedToUserAsync(GetUserId(GetUser()));
         }
 
         private async Task<List<Theme>> GetAllThemesAsync()
@@ -98,6 +102,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Title = th.Title
             })
                 .FirstOrDefaultAsync();
+        }
+        
+        private ClaimsPrincipal GetUser()
+        {
+            return _httpContextAccessor.HttpContext.User;
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using IdentityServer4.EntityFramework.Options;

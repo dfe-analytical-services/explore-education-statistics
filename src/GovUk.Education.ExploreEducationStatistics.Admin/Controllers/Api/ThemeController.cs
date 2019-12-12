@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/me/themes")]
         public async Task<ActionResult<List<Theme>>> GetMyThemes()
         {
-            return await _themeService.GetUserThemesAsync(User);
+            return await _themeService.GetMyThemesAsync();
         }
 
         // GET api/theme/{themeId}/summary

@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -27,12 +28,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper, IAuthorizationService authorizationService)
+        public ReleaseService(ContentDbContext context, IMapper mapper, 
+            IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
             _authorizationService = authorizationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Release Get(ReleaseId id)
@@ -129,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            Guid releaseId, UpdateReleaseSummaryRequest request)
+            ContentSectionId releaseId, UpdateReleaseSummaryRequest request)
         {
             var publication = await GetAsync(releaseId);
             return await ValidateReleaseSlugUniqueToPublication(request.Slug, publication.Id, releaseId)
@@ -176,20 +180,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
         
-        public async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(
-            ClaimsPrincipal user, params ReleaseStatus[] releaseStatuses)
+        public async Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(
+            params ReleaseStatus[] releaseStatuses)
         {
             var canViewAllReleases = 
-                await _authorizationService.MatchesPolicy(user, SecurityPolicies.CanViewAllReleases);
+                await _authorizationService.MatchesPolicy(GetUser(), SecurityPolicies.CanViewAllReleases);
             
             if (canViewAllReleases)
             {
                 return await GetAllReleasesForReleaseStatusesAsync(releaseStatuses);
             }
 
-            return await GetReleasesForReleaseStatusRelatedToUser(releaseStatuses, SecurityUtils.GetUserId(user));
+            return await GetReleasesForReleaseStatusRelatedToUser(releaseStatuses, SecurityUtils.GetUserId(GetUser()));
         }
-        
+
         private async Task<List<ReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
             ReleaseStatus[] releaseStatuses)
         {
@@ -203,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUser(
-            ReleaseStatus[] releaseStatuses, Guid userId)
+            ReleaseStatus[] releaseStatuses, ContentSectionId userId)
         {
             var userReleaseIds = await _context
                 .UserReleaseRoles
@@ -269,6 +273,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
             return await GetReleaseSummaryAsync(releaseId);
+        }
+        
+        private ClaimsPrincipal GetUser()
+        {
+            return _httpContextAccessor.HttpContext.User;
         }
     }
 

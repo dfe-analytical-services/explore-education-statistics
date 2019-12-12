@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IThemeService
     {
-        Task<List<Theme>> GetUserThemesAsync(ClaimsPrincipal user);
+        Task<List<Theme>> GetMyThemesAsync();
 
         Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id);
     }

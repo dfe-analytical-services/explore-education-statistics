@@ -12,7 +12,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -23,12 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PublicationService(ContentDbContext context, IMapper mapper, IAuthorizationService authorizationService)
+        public PublicationService(ContentDbContext context, IMapper mapper, 
+            IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
             _authorizationService = authorizationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Publication> GetAsync(Guid id)
@@ -46,18 +51,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications.ToList();
         }
 
-        public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(Guid topicId, ClaimsPrincipal user)
+        public async Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
             var canAccessAllReleases = await _authorizationService.MatchesPolicy(
-                user, SecurityPolicies.CanViewAllReleases);
+                GetUser(), SecurityPolicies.CanViewAllReleases);
 
             if (canAccessAllReleases)
             {
                 return await GetAllPublicationsForTopicAsync(topicId);
             }
             
-            var userId = SecurityUtils.GetUserId(user);
-            return await GetPublicationsForTopicRelatedToUserAsync(topicId, userId);
+            return await GetPublicationsForTopicRelatedToUserAsync(topicId);
         }
 
         public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
@@ -100,9 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        private async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(
-            Guid topicId, Guid userId)
+        private async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId)
         {
+            var userId = GetUserId(GetUser());
+            
             var userReleasesForTopic = await _context
                 .UserReleaseRoles
                 .Include(r => r.Release)
@@ -138,6 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                 })
                 .ToList();
+        }
+        
+        private ClaimsPrincipal GetUser()
+        {
+            return _httpContextAccessor.HttpContext.User;
         }
     }
     

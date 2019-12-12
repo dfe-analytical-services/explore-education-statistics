@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId);
 
-        Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(ClaimsPrincipal user, params ReleaseStatus[] releaseStatuses);
+        Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses);
 
         Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(Guid releaseId, ReleaseStatus status, string internalReleaseNote);
     }

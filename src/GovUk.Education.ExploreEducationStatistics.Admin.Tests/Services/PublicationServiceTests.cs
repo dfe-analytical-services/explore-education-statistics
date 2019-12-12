@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test - this return a list of publication for a user. The releases in the publication
                 // should correctly report whether they are the latest or not. Note that this is dependent on the mapper
                 // that we are passing in.
-                var publications = await new PublicationService(context, MapperForProfile<MappingProfiles>()).GetByTopicAndUserAsync(topicId, new Guid() /*currently not used*/);
+                var publications = await new PublicationService(context, MapperForProfile<MappingProfiles>()).GetMyPublicationsAndReleasesByTopicAsync(topicId, new Guid() /*currently not used*/);
                 var releases = publications.Single().Releases;
                 Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease)); 
                 Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));

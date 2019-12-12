@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
-            return await _publicationService.GetByTopicAndUserAsync(topicId, User);
+            return await _publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
         }
 
         // GET api/publications/{publicationId}
