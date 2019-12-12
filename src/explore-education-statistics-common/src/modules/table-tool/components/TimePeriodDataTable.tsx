@@ -51,7 +51,12 @@ export const createHeadersFromGroups = (
             ),
           ]) ||
             b,
-          [...c, group.label],
+          [
+            ...c,
+            group instanceof LocationFilter && rowGroup.length === 1
+              ? ''
+              : group.label,
+          ],
         ],
         [[], []],
       )
