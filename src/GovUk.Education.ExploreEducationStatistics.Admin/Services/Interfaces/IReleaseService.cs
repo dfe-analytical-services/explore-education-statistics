@@ -12,19 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        List<Release> List();
-
-        Release Get(Guid id);
-        
-        Task<Release> GetAsync(Guid id);
-
-        Release Get(string slug);
+        Task<Either<ValidationResult, Release>> GetAsync(Guid id);
 
         Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
 
         Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id);
         
-        Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId);
+        Task<Either<ValidationResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId);
         
         Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(Guid releaseId, UpdateReleaseSummaryRequest request);
 

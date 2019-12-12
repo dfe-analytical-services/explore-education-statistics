@@ -158,14 +158,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddAuthorization(options =>
             {
+                // does this user have minimal permissions to access any admin APIs?
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
                 
+                // does this user have permission to view all Topics across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
                 
+                // does this user have permission to view all Releases across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
+                
+                // does this user have permission to view a specific Release (on a case-by-case basis)?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy => 
+                    policy.Requirements.Add(new HasRoleOnThisReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -237,7 +244,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
             
             // This service allows us to check our Policies within Controllers and Services
-            services.AddSingleton<IAuthorizationService, DefaultAuthorizationService>();
+            services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
+            
+            // These handlers enforce Resource-based access control
+            services.AddTransient<IAuthorizationHandler, HasRoleOnReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {

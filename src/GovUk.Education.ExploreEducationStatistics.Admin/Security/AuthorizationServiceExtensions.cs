@@ -15,5 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             var result = await authorizationService.AuthorizeAsync(user, policy.ToString());
             return result.Succeeded;
         }
+        
+        public static async Task<bool> MatchesPolicy(
+            this IAuthorizationService authorizationService,
+            ClaimsPrincipal user, 
+            object resource,
+            SecurityPolicies policy
+        )
+        {
+            var result = await authorizationService.AuthorizeAsync(user, resource, policy.ToString());
+            return result.Succeeded;
+        }
     }
 }
