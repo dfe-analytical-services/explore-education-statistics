@@ -1,10 +1,10 @@
-CREATE OR ALTER PROCEDURE FilteredFootnotes @subjectId nvarchar(MAX),
-                                            @indicatorList IdListVarcharType READONLY,
-                                            @filterItemList IdListVarcharType READONLY
+CREATE OR ALTER PROCEDURE FilteredFootnotes @subjectId uniqueidentifier,
+                                            @indicatorList IdListGuidType READONLY,
+                                            @filterItemList IdListGuidType READONLY
 AS
 
-DECLARE @filterGroupList TABLE (Id nvarchar(MAX));
-DECLARE @filterList TABLE (Id nvarchar(MAX));
+DECLARE @filterGroupList TABLE (Id uniqueidentifier);
+DECLARE @filterList TABLE (Id uniqueidentifier);
 
 INSERT INTO @filterGroupList (Id)
 SELECT FI.FilterGroupId

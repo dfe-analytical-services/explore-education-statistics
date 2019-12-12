@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<Guid> values)
         {
-            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListGuidType");
         }
 
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)

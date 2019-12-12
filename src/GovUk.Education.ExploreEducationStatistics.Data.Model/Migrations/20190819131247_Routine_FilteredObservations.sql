@@ -1,5 +1,5 @@
 CREATE OR ALTER PROCEDURE FilteredObservations
-    @subjectId nvarchar(MAX),
+    @subjectId uniqueidentifier,
     @geographicLevel nvarchar(6) = NULL,
     @timePeriodList TimePeriodListType READONLY,
     @countriesList IdListVarcharType READONLY,
@@ -16,7 +16,7 @@ CREATE OR ALTER PROCEDURE FilteredObservations
     @rscRegionsList IdListVarcharType READONLY,
     @sponsorList IdListVarcharType READONLY,
     @wardsList IdListVarcharType READONLY,
-    @filterItemList IdListVarcharType READONLY
+    @filterItemList IdListGuidType READONLY
 AS
 DECLARE
     @timePeriodCount INT = (SELECT count(year) FROM @timePeriodList),
@@ -89,7 +89,7 @@ DECLARE
                      '    WHERE fi.Id IN (SELECT id FROM @filterItemList)' +
                      ') ' +
                      'ORDER BY o.Id;'
-    SET @paramDefinition = N'@subjectId nvarchar,
+    SET @paramDefinition = N'@subjectId uniqueidentifier,
                            @geographicLevel nvarchar(6) = NULL,
                            @timePeriodList TimePeriodListType READONLY,
                            @countriesList IdListVarcharType READONLY,
@@ -106,7 +106,7 @@ DECLARE
                            @rscRegionsList IdListVarcharType READONLY,
                            @sponsorList IdListVarcharType READONLY,
                            @wardsList IdListVarcharType READONLY,
-                           @filterItemList IdListVarcharType READONLY'
+                           @filterItemList IdListGuidType READONLY'
     EXEC sp_executesql @sqlString, @paramDefinition,
          @subjectId = @subjectId,
          @geographicLevel = @geographicLevel,

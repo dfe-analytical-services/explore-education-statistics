@@ -1,5 +1,5 @@
 begin
-	declare @subjectId NVARCHAR(max) = '568576e5-d386-450e-a8db-307b7061d0d8'
+	declare @subjectId uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8'
 
 	declare @geographicLevel nvarchar(6) = 'SCH'
 
