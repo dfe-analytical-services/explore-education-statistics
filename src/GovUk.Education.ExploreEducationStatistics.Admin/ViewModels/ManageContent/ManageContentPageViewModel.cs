@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new ContentSectionViewModel();
 
-        public IEnumerable<Common.Model.FileInfo> DownloadFiles { get; set; }
+        public IEnumerable<FileInfo> DownloadFiles { get; set; }
         
         public DateTime? PublishScheduled { get; set; }
 
