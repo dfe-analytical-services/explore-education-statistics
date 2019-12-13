@@ -76,8 +76,8 @@ type GroupedDictionary = Dictionary<{
   options: { label: string; value: string }[];
 }>;
 
-const reduceGroupedDictionary = (dictionary: GroupedDictionary) => {
-  return Object.values(dictionary).reduce(
+const reduceGroupedDictionary = (dictionary: GroupedDictionary) =>
+  Object.values(dictionary).reduce(
     (result, group) => ({
       ...result,
       ...group.options.reduce(
@@ -90,19 +90,23 @@ const reduceGroupedDictionary = (dictionary: GroupedDictionary) => {
     }),
     {},
   );
-};
 
 const reduceGroupedGroupDictionary = (
   dictionary: Dictionary<{ options: GroupedDictionary }>,
-) => {
-  return Object.keys(dictionary).reduce(
+) =>
+  Object.keys(dictionary).reduce(
     (result, indicatorGroup) => ({
       ...result,
       ...reduceGroupedDictionary(dictionary[indicatorGroup].options),
     }),
     {},
   );
-};
+
+const reduceFiltersKeyLegend = (dictionary: Dictionary<{ legend: string }>) =>
+  Object.entries(dictionary).reduce(
+    (filters, [key, { legend }]) => ({ ...filters, [key]: legend }),
+    {},
+  );
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -123,12 +127,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   const parsedMeta: {
     indicators: Dictionary<string>;
     filters: Dictionary<string>;
-  } = React.useMemo(() => {
-    return {
+  } = React.useMemo(
+    () => ({
       indicators: reduceGroupedDictionary(subjectMeta.indicators),
-      filters: reduceGroupedGroupDictionary(subjectMeta.filters),
-    };
-  }, [subjectMeta]);
+      filters: {
+        ...reduceFiltersKeyLegend(subjectMeta.filters),
+        ...reduceGroupedGroupDictionary(subjectMeta.filters),
+      },
+    }),
+    [subjectMeta],
+  );
 
   useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
@@ -267,7 +275,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 {Object.entries(form.values.filters).map(
                   ([filterGroupId, filterItemIds]) => (
                     <SummaryListItem
-                      term={filterGroupId}
+                      term={parsedMeta.filters[filterGroupId]}
                       shouldCollapse
                       key={filterGroupId}
                     >
