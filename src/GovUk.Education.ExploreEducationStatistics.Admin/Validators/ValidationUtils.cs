@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
             }
         }
 
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static Either<ValidationResult, R> HandleValidationErrors<T, R>(
             Func<Either<ValidationResult, T>> validationErrorAction,
             Func<T, Either<ValidationResult, R>> successAction)
@@ -39,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 : validationResult.Left;
         }
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<R>> successAction)
@@ -50,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 : validationResult.Left;
         }
 
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<Either<ValidationResult, R>>> successAction)
@@ -126,7 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
-        ContentBlockNotAttachedToThisContentSection,
-        ForbiddenToAccessRelease
+        ContentBlockNotAttachedToThisContentSection
     }
 }

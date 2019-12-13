@@ -42,15 +42,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<Either<ValidationResult, Release>> GetAsync(Guid id)
+        public Task<Either<ActionResult, Release>> GetAsync(Guid id)
         {
-            return _releaseHelper.CheckEntityExists(id, async release =>
+            return _releaseHelper.CheckEntityExistsActionResult(id, async release =>
             {
                 var canView = await _authorizationService.MatchesPolicy(GetUser(), release, CanViewSpecificRelease);
 
                 if (!canView)
                 {
-                    return ValidationResult<Release>(ForbiddenToAccessRelease);
+                    return new Either<ActionResult, Release>(new ForbidResult());
                 }
 
                 return release;

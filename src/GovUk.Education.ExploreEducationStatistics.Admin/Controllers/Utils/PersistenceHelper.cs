@@ -27,6 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             _notFoundErrorMessage = notFoundErrorMessage;
         }
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        // Rename this to "CheckEntityExists" when other methods below are removed
         public Task<Either<ActionResult, T>> CheckEntityExistsActionResult<T>(
             TEntityId id, 
             Func<TEntity, Task<Either<ActionResult, T>>> successAction,
@@ -52,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                 successAction.Invoke);
         } 
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 
             Func<TEntity, Task<Either<ValidationResult, T>>> successAction,
@@ -77,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                 successAction.Invoke);
         } 
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 
             Func<TEntity, Either<ValidationResult, T>> successAction,
@@ -93,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                 hydrateEntityFn);
         } 
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 
             Func<TEntity, T> successAction,
@@ -106,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                 hydrateEntityFn);
         } 
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 
             Func<TEntity, Task<T>> successAction,

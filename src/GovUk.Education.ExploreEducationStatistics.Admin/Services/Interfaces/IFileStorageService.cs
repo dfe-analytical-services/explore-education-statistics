@@ -9,6 +9,8 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
+
+    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IFileStorageService
     {
         Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,

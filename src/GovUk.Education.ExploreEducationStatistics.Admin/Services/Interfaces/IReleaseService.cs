@@ -11,9 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
+    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IReleaseService
     {
-        Task<Either<ValidationResult, Release>> GetAsync(Guid id);
+        Task<Either<ActionResult, Release>> GetAsync(Guid id);
 
         Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
 

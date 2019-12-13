@@ -264,24 +264,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 Ok);
         }
 
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            if (release == null)
+            if (release.IsLeft)
             {
-                return NotFound();
+                return release.Left;
             }
 
             return await andThen.Invoke();
         }
 
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId,
             Func<Task<Either<ValidationResult, T>>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            if (release == null)
+            if (release.IsLeft)
             {
-                return NotFound();
+                return release.Left;
             }
 
             var result = await andThen.Invoke();
@@ -294,13 +296,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(result.Right);
         }
 
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private async Task<ActionResult> CheckReleaseExistsStreamAsync(ReleaseId releaseId,
             Func<Task<Either<ValidationResult, FileStreamResult>>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            if (release == null)
+            if (release.IsLeft)
             {
-                return NotFound();
+                return release.Left;
             }
 
             var result = await andThen.Invoke();
@@ -313,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return result.Right;
         }
 
-
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
             Func<Task<Either<ValidationResult, T>>> andThen)
         {
