@@ -356,16 +356,9 @@ export const validateAndPopulateDateRange = (
 export const validateAndPopulateFiltersAndIndicators = (
   initialQuery: TableDataQuery,
 ): OptionalTableDataQuery => {
-  if (
-    initialQuery.filters.length === 0 ||
-    initialQuery.indicators.length === 0
-  ) {
-    return undefined;
-  }
-
   return {
-    filters: [...initialQuery.filters],
-    indicators: [...initialQuery.indicators],
+    filters: [...(initialQuery.filters || [])],
+    indicators: [...(initialQuery.indicators || [])],
   };
 };
 

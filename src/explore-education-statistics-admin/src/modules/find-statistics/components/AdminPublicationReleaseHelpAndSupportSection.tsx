@@ -23,11 +23,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         Help and support
       </h2>
 
-      <Accordion
-        // publicationTitle={publication.title}
-        id="static-content-section"
-        canReorder={false}
-      >
+      <Accordion id="static-content-section" canReorder={false}>
         <AccordionSection
           heading={`${publication.title}: methodology`}
           caption="Find out how and why we collect, process and publish these statistics"
@@ -35,7 +31,13 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         >
           <p>
             Read our{' '}
-            <Link to={`/methodology/${release.publication.methodology.id}`}>
+            <Link
+              to={`/methodology/${
+                release.publication.methodology
+                  ? release.publication.methodology.id
+                  : 'no-methodology'
+              }`}
+            >
               {`${publication.title}: methodology`}
             </Link>{' '}
             guidance.

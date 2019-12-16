@@ -13,6 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
 
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) InvalidStage =
+            (Content: Cancelled, Files: Cancelled, Data: Cancelled, Overall: Invalid);
+
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) ValidStage =
+            (Content: Scheduled, Files: Scheduled, Data: Scheduled, Overall: Scheduled);
+
         public ValidateReleaseFunction(IReleaseStatusService releaseStatusService, IValidationService validationService)
         {
             _releaseStatusService = releaseStatusService;
@@ -29,17 +35,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await ValidateReleaseAsync(message, async () => await AddReleaseStatus(message, Scheduled));
+            await ValidateReleaseAsync(message, async () => await AddReleaseStatus(message, ValidStage));
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
         private async Task ValidateReleaseAsync(ValidateReleaseMessage message, Func<Task> andThen)
         {
             var valid = await _validationService.ValidateAsync(message);
-            await (valid ? andThen.Invoke() : AddReleaseStatus(message, Invalid));
+            await (valid ? andThen.Invoke() : AddReleaseStatus(message, InvalidStage));
         }
 
-        private async Task AddReleaseStatus(ValidateReleaseMessage message, Stage stage)
+        private async Task AddReleaseStatus(ValidateReleaseMessage message,
+            (Stage, Stage, Stage, Stage) stage)
         {
             await _releaseStatusService.AddAsync(message.PublicationSlug,
                 message.PublishScheduled,
