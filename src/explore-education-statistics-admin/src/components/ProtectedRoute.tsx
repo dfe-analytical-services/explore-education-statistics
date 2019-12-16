@@ -2,6 +2,7 @@ import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
 import React, { useContext } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
+import ProtectedRoutes from './ProtectedRoutes';
 
 interface ProtectedRouteProps extends RouteProps {
   redirectIfNotLoggedIn?: boolean;
@@ -9,7 +10,7 @@ interface ProtectedRouteProps extends RouteProps {
 
 const AuthenticationCheckingComponent = ({
   component,
-  redirectIfNotLoggedIn,
+  redirectIfNotLoggedIn = true,
   ...props
 }: ProtectedRouteProps) => {
   const { user } = useContext(LoginContext);
@@ -46,11 +47,13 @@ const ProtectedRoute = ({
   ...rest
 }: ProtectedRouteProps) => {
   const routeComponent = (props: any) => (
-    <AuthenticationCheckingComponent
-      component={component}
-      redirectIfNotLoggedIn={redirectIfNotLoggedIn}
-      {...props}
-    />
+    <ProtectedRoutes>
+      <AuthenticationCheckingComponent
+        component={component}
+        redirectIfNotLoggedIn={redirectIfNotLoggedIn}
+        {...props}
+      />
+    </ProtectedRoutes>
   );
 
   return <Route {...rest} component={routeComponent} />;

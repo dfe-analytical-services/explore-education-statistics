@@ -1,8 +1,6 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
-import LoginContext from '@admin/components/Login';
+import ApiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
-import ProtectedRoutes from '@admin/components/ProtectedRoutes';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
@@ -16,10 +14,9 @@ import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
 import React from 'react';
-import { Redirect, Route, Switch } from 'react-router';
+import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
-import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import BauDashboardPage from './pages/bau/BauDashboardPage';
 import BauMethodologyPage from './pages/bau/BauMethodologyPage';
@@ -59,29 +56,33 @@ import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageRe
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
+import PageNotFoundPage from './pages/errors/PageNotFoundPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
+  const authRoutes = Object.entries(ApiAuthorizationRouteList).map(
+    ([key, authRoute]) => {
+      return <Route exact key={`authRoute-${key}`} {...authRoute} />;
+    },
+  );
+
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <AriaLiveAnnouncer>
-          <ThemeAndTopic>
-            <ApiAuthorizationRoutes />
-
-            <ProtectedRoutes>
-              <Switch>
-                <ProtectedRoute
-                  exact
-                  path={dashboardRoutes.adminDashboard}
-                  component={AdminDashboardPage}
-                />
-                <ProtectedRoute
-                  path={dashboardRoutes.adminDashboardThemeTopic}
-                  component={AdminDashboardPage}
-                />
-
-                <Redirect exact strict from="/" to="/dashboard" />
-              </Switch>
+    <AriaLiveAnnouncer>
+      <ThemeAndTopic>
+        <BrowserRouter>
+          <ErrorBoundary>
+            <Switch>
+              {authRoutes}
+              <ProtectedRoute exact path="/" component={AdminDashboardPage} />
+              <ProtectedRoute
+                exact
+                path="/dashboard"
+                component={AdminDashboardPage}
+              />
+              <ProtectedRoute
+                path={dashboardRoutes.adminDashboardThemeTopic}
+                component={AdminDashboardPage}
+              />
 
               <ProtectedRoute
                 exact
@@ -185,149 +186,156 @@ function App() {
                 path="/documentation/manage-data-block"
                 component={AdminDocumentationManageDataBlocks}
               />
-            </ProtectedRoutes>
-          </ThemeAndTopic>
-          {/* Prototype Routes */}
-          <Route exact path="/index" component={IndexPage} />
+              {/* Prototype Routes */}
+              <Route exact path="/index" component={IndexPage} />
 
-          <Route exact path="/prototypes/" component={PrototypesIndexPage} />
+              <Route
+                exact
+                path="/prototypes/"
+                component={PrototypesIndexPage}
+              />
 
-          <Route
-            exact
-            path="/prototypes/admin-dashboard"
-            component={PrototypeAdminDashboard}
-          />
+              <Route
+                exact
+                path="/prototypes/admin-dashboard"
+                component={PrototypeAdminDashboard}
+              />
 
-          <Route
-            exact
-            path="/prototypes/charts"
-            component={PrototypeChartTest}
-          />
-          <Route
-            exact
-            path="/prototypes/table-tool"
-            component={PrototypeTableTool}
-          />
+              <Route
+                exact
+                path="/prototypes/charts"
+                component={PrototypeChartTest}
+              />
+              <Route
+                exact
+                path="/prototypes/table-tool"
+                component={PrototypeTableTool}
+              />
 
-          <Route
-            exact
-            path="/prototypes/publication-edit"
-            component={PublicationEditPage}
-          />
-          <Route
-            exact
-            path="/prototypes/methodology-edit"
-            component={MethodologyEditPage}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-unresolved-comments"
-            component={PublicationEditUnresolvedComments}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-review"
-            render={() => <PublicationEditUnresolvedComments reviewing />}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-higher-review"
-            component={PublicationReviewPage}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-preview"
-            component={PublicationReviewPage}
-            render={() => <PublicationReviewPage />}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new"
-            component={PublicationCreateNew}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-assign-methodology"
-            component={PublicationAssignMethodology}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-confirm-new"
-            component={PublicationConfirmNew}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-edit-new"
-            component={PublicationEditNew}
-          />
-          <Route
-            exact
-            path="/prototypes/release-create-new"
-            component={ReleaseCreateNew}
-          />
-          <Route
-            exact
-            path="/prototypes/methodology-create-new"
-            component={MethodologyCreateNew}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence"
-            render={() => <PublicationEditUnresolvedComments newBlankRelease />}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-config"
-            component={PublicationCreateNewAbsenceConfig}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-methodology-config"
-            component={MethodologyCreateNewConfig}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-config-edit"
-            component={PublicationCreateNewAbsenceConfigEdit}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-data"
-            component={PublicationCreateNewAbsenceData}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-table"
-            component={PublicationCreateNewAbsenceTable}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-view-table"
-            component={PublicationCreateNewAbsenceViewTables}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-schedule"
-            component={PublicationCreateNewAbsenceSchedule}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-schedule-edit"
-            component={PublicationCreateNewAbsenceScheduleEdit}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-absence-status"
-            component={PublicationCreateNewAbsenceStatus}
-          />
-          <Route
-            exact
-            path="/prototypes/publication-create-new-methodology-status"
-            component={MethodologyCreateNewStatus}
-          />
-        </AriaLiveAnnouncer>
-      </ErrorBoundary>
-    </BrowserRouter>
+              <Route
+                exact
+                path="/prototypes/publication-edit"
+                component={PublicationEditPage}
+              />
+              <Route
+                exact
+                path="/prototypes/methodology-edit"
+                component={MethodologyEditPage}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-unresolved-comments"
+                component={PublicationEditUnresolvedComments}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-review"
+                render={() => <PublicationEditUnresolvedComments reviewing />}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-higher-review"
+                component={PublicationReviewPage}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-preview"
+                component={PublicationReviewPage}
+                render={() => <PublicationReviewPage />}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new"
+                component={PublicationCreateNew}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-assign-methodology"
+                component={PublicationAssignMethodology}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-confirm-new"
+                component={PublicationConfirmNew}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-edit-new"
+                component={PublicationEditNew}
+              />
+              <Route
+                exact
+                path="/prototypes/release-create-new"
+                component={ReleaseCreateNew}
+              />
+              <Route
+                exact
+                path="/prototypes/methodology-create-new"
+                component={MethodologyCreateNew}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence"
+                render={() => (
+                  <PublicationEditUnresolvedComments newBlankRelease />
+                )}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-config"
+                component={PublicationCreateNewAbsenceConfig}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-methodology-config"
+                component={MethodologyCreateNewConfig}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-config-edit"
+                component={PublicationCreateNewAbsenceConfigEdit}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-data"
+                component={PublicationCreateNewAbsenceData}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-table"
+                component={PublicationCreateNewAbsenceTable}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-view-table"
+                component={PublicationCreateNewAbsenceViewTables}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-schedule"
+                component={PublicationCreateNewAbsenceSchedule}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-schedule-edit"
+                component={PublicationCreateNewAbsenceScheduleEdit}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-absence-status"
+                component={PublicationCreateNewAbsenceStatus}
+              />
+              <Route
+                exact
+                path="/prototypes/publication-create-new-methodology-status"
+                component={MethodologyCreateNewStatus}
+              />
+              <Route component={PageNotFoundPage} />
+            </Switch>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </ThemeAndTopic>
+    </AriaLiveAnnouncer>
   );
 }
 

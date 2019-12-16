@@ -13,6 +13,7 @@ import {
   LogoutActions,
   ApplicationPaths,
 } from './ApiAuthorizationConstants';
+import { Redirect } from 'react-router';
 
 // The main responsibility of this component is to handle the user's logout process.
 // This is the starting point for the logout process, which is usually initiated when a
@@ -82,7 +83,16 @@ export class Logout extends Component {
     //       throw new Error(`Invalid action '${action}'`);
     //   }
     // }
-    return null;
+
+    // HIVE
+    // Added a redirect to app root on was logged out
+    const action = this.props.action;
+    switch (action) {
+      case LogoutActions.LoggedOut:
+        return <Redirect to="" />;
+      default:
+        return null;
+    }
   }
 
   async logout(returnUrl) {

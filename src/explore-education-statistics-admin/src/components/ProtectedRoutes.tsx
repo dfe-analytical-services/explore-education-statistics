@@ -87,14 +87,10 @@ const ProtectedRoutes = ({ children }: Props) => {
   };
 
   return authState.ready ? (
-    <>
-      <LoginContext.Provider value={authenticationContext}>
-        {children}
-      </LoginContext.Provider>
-    </>
-  ) : (
-    <></>
-  );
+    <LoginContext.Provider value={authenticationContext}>
+      {children}
+    </LoginContext.Provider>
+  ) : null;
 };
 
 export default ProtectedRoutes;
