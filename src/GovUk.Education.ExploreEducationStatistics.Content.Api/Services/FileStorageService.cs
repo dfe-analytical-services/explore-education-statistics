@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private const string ContainerName = "cache";
+        private const string PublicContentContainerName = "cache";
         private readonly string _storageConnectionString;
 
         public FileStorageService(IConfiguration config)
@@ -17,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<string> DownloadTextAsync(string blobName)
         {
-            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, ContainerName, blobName);
+            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, PublicContentContainerName,
+                blobName);
         }
     }
 }

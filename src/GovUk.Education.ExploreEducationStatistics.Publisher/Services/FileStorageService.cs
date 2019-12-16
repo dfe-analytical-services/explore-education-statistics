@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private const string PrivateContainerName = "releases";
         private const string PublicContainerName = "downloads";
+        private const string PublicContentContainerName = "cache";
 
         public FileStorageService(ILogger<FileStorageService> logger)
         {
@@ -46,10 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContainerName);
 
             var sourceDirectoryPath = AdminReleaseDirectoryPath(message.ReleaseId);
-            var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug); 
-            
+            var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
+
             await DeleteFilesAsync(publicContainer, destinationDirectoryPath);
-            
+
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
                 publicContainer, message);
         }
@@ -60,9 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 release);
         }
 
-        public async Task UploadFromStreamAsync(string storageConnectionString, string containerName, string blobName, string contentType, string content)
+        public async Task UploadFromStreamAsync(string blobName, string contentType, string content)
         {
-            await FileStorageUtils.UploadFromStreamAsync(storageConnectionString, containerName, blobName, contentType, content);
+            await FileStorageUtils.UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
+                blobName, contentType, content);
         }
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
@@ -139,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return true;
         }
 
-        private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
+        private static async Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
             PublishReleaseFilesMessage message)
         {
             var cloudBlockBlob = CreateBlobForAllFilesZip(directory, message);
@@ -195,15 +197,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var token = new BlobContinuationToken();
             do
             {
-                var result = await container.ListBlobsSegmentedAsync(directoryPath, 
+                var result = await container.ListBlobsSegmentedAsync(directoryPath,
                     true,
                     BlobListingDetails.None,
                     null,
-                    token, null, 
+                    token, null,
                     null);
-                
+
                 token = result.ContinuationToken;
-                
+
                 await Task.WhenAll(result.Results
                     .Select(item =>
                     {

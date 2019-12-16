@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("GenerateReleaseContent")]
-        public async void GenerateReleaseContent(
+        public async Task GenerateReleaseContent(
             [QueueTrigger(QueueName)] GenerateReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)

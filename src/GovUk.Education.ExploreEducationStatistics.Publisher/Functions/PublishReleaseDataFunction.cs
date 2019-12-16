@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseData")]
-        public async void PublishReleaseData(
+        public async Task PublishReleaseData(
             [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
             ILogger logger)

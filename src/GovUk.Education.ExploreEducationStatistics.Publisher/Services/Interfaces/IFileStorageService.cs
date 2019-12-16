@@ -11,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
 
-        Task UploadFromStreamAsync(string storageConnectionString, string containerName, string blobName,
-            string contentType, string content);
+        Task UploadFromStreamAsync(string blobName, string contentType, string content);
     }
 }
