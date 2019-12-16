@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetDownloadTree()
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentDownloadTreePath()));
+                _fileStorageService.DownloadTextAsync(PublicContentDownloadTreePath()), NoContent());
         }
     }
 }

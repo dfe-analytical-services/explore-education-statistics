@@ -13,42 +13,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     public class ContentControllerTests
     {
         [Fact]
-        public void Get_ContentTree_Returns_Ok()
+        public void Get_PublicationsTree_Returns_Ok()
         {
-            var cache = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/tree.json")).ReturnsAsync(
                 JsonConvert.SerializeObject(new List<ThemeTree>
-                {
-                    new ThemeTree
                     {
-                        Title = "Theme A"
+                        new ThemeTree
+                        {
+                            Title = "Theme A"
+                        }
                     }
-                }
-            ));
+                ));
 
-            var controller = new ContentController(cache.Object);
+            var controller = new ContentController(fileStorageService.Object);
 
-            var result = controller.GetContentTree();
+            var result = controller.GetPublicationsTree();
             var content = result.Result.Result as ContentResult;
-            
+
             Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
-            Assert.Contains("Theme A", content.Content);     
+            Assert.Contains("Theme A", content.Content);
             Assert.Equal("application/json", content.ContentType);
         }
 
         [Fact]
-        public void Get_ContentTree_Returns_NoContent()
+        public void Get_PublicationsTree_Returns_NoContent()
         {
-            var cache = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
-                 (string)null
-            );
+            var controller = new ContentController(fileStorageService.Object);
 
-            var controller = new ContentController(cache.Object);
-
-            var result = controller.GetContentTree();
+            var result = controller.GetPublicationsTree();
 
             Assert.IsAssignableFrom<NoContentResult>(result.Result.Result);
         }
@@ -56,21 +52,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Publication_Returns_Ok()
         {
-            var cache = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetPublicationAsync("publication-a")).ReturnsAsync(
-                JsonConvert.SerializeObject(new PublicationViewModel
+            fileStorageService.Setup(s => s.DownloadTextAsync($"publications/publication-a/publication.json"))
+                .ReturnsAsync(JsonConvert.SerializeObject(new PublicationViewModel
                 {
                     Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
                     Title = "Publication A"
                 }));
 
-            var controller = new ContentController(cache.Object);
+            var controller = new ContentController(fileStorageService.Object);
 
             var result = controller.GetPublication("publication-a");
             var content = result.Result.Result as ContentResult;
 
-            Assert.IsAssignableFrom<PublicationViewModel>(JsonConvert.DeserializeObject<PublicationViewModel>(content.Content));
+            Assert.IsAssignableFrom<PublicationViewModel>(
+                JsonConvert.DeserializeObject<PublicationViewModel>(content.Content));
             Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", content.Content);
             Assert.Contains("Publication A", content.Content);
         }
@@ -78,12 +75,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Publication_Returns_NotFound()
         {
-            var cache = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetPublicationAsync("test-publication")).ReturnsAsync(
-                (string) null);
-
-            var controller = new ContentController(cache.Object);
+            var controller = new ContentController(fileStorageService.Object);
 
             var result = controller.GetPublication("missing-publication");
 
@@ -91,75 +85,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
 
-         [Fact]
-         public void Get_LatestRelease_Returns_Ok()
-         {
-             var cache = new Mock<IFileStorageService>();
+        [Fact]
+        public void Get_LatestRelease_Returns_Ok()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
 
-             cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync(
-                 JsonConvert.SerializeObject(new ReleaseViewModel
-                 {
-                     Title = "Publication A",
-                     Slug = "publication-a"
-                 }));
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/latest-release.json"))
+                .ReturnsAsync(JsonConvert.SerializeObject(new ReleaseViewModel
+                {
+                    Title = "Publication A",
+                    Slug = "publication-a"
+                }));
 
-             var controller =
-                 new ContentController(cache.Object);
+            var controller = new ContentController(fileStorageService.Object);
 
-             var result = controller.GetLatestRelease("publication-a");
-             var content = result.Result.Result as ContentResult;
+            var result = controller.GetLatestRelease("publication-a");
+            var content = result.Result.Result as ContentResult;
 
-             Assert.Contains("Publication A", content.Content);
-         }
+            Assert.Contains("Publication A", content.Content);
+        }
 
-         [Fact]
-         public void Get_LatestRelease_Returns_NotFound()
-         {
-             var cache = new Mock<IFileStorageService>();
+        [Fact]
+        public void Get_LatestRelease_Returns_NotFound()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
 
-             cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync((string) null);
+            var controller = new ContentController(fileStorageService.Object);
 
-             var controller =
-                 new ContentController(cache.Object);
+            var result = controller.GetLatestRelease("publication-a");
 
-             var result = controller.GetLatestRelease("publication-a");
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
+        }
 
-             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
-         }
+        [Fact]
+        public void Get_Release_Returns_Ok()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
 
-         [Fact]
-         public void Get_Release_Returns_Ok()
-         {
-             var cache = new Mock<IFileStorageService>();
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/releases/2016.json"))
+                .ReturnsAsync(JsonConvert.SerializeObject(new ReleaseViewModel()
+                {
+                    Slug = "publication-a"
+                }));
 
-             cache.Setup(s => s.GetReleaseAsync("publication-a", "2016")).ReturnsAsync(
-                 JsonConvert.SerializeObject(new ReleaseViewModel()
-                 {
-                     Slug = "publication-a"
-                 }));
+            var controller = new ContentController(fileStorageService.Object);
 
-             var controller =
-                 new ContentController(cache.Object);
+            var result = controller.GetRelease("publication-a", "2016");
+            var content = result.Result.Result as ContentResult;
 
-             var result = controller.GetRelease("publication-a", "2016");
-             var content = result.Result.Result as ContentResult;
-             
-             Assert.Contains("publication-a", content.Content);
-         }
+            Assert.Contains("publication-a", content.Content);
+        }
 
-         [Fact]
-         public void Get_Release_Returns_NotFound()
-         {
-             var cache = new Mock<IFileStorageService>();
+        [Fact]
+        public void Get_Release_Returns_NotFound()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
 
-             cache.Setup(s => s.GetReleaseAsync("publication-a", "2000")).ReturnsAsync((string) null);
+            var controller = new ContentController(fileStorageService.Object);
 
-             var controller =
-                 new ContentController(cache.Object);
+            var result = controller.GetRelease("publication-a", "2000");
 
-             var result = controller.GetRelease("publication-a", "2000");
-             
-             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
-         }
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
+        }
     }
 }

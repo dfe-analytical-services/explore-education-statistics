@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetMethodologyTree()
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentMethodologyTreePath()));
+                _fileStorageService.DownloadTextAsync(PublicContentMethodologyTreePath()), NoContent());
         }
         
         // GET api/methodology/name-of-content
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> Get(string slug)
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentMethodologyPath(slug)));
+                _fileStorageService.DownloadTextAsync(PublicContentMethodologyPath(slug)), NotFound());
         }
     }
 }

@@ -266,6 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             );
         }
 
+        // TODO EES-927 This can be removed once the queue release service call is made when a Release is approved in the UI
         [HttpGet("releases/{releaseId}/queue")]
         public async Task<ActionResult<ValidateReleaseMessage>> QueueReleaseAsync(ReleaseId releaseId)
         {

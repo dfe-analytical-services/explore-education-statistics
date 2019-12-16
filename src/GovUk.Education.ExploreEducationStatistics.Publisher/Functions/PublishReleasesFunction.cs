@@ -44,8 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
 
-            // TODO EES-863 Currently returns all scheduled releases
-            // TODO EES-863 Only query scheduled releases that are being published today
+            // TODO EES-926 Currently returns all scheduled releases
+            // TODO EES-926 Only query scheduled releases that are being published today
             var query = new TableQuery<ReleaseStatus>().Where(
                 TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
                     Scheduled.ToString()));

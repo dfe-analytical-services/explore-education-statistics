@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetPublicationsTree()
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentPublicationsTreePath()));
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationsTreePath()), NoContent());
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetPublication(string slug)
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)));
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)), NotFound());
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetLatestRelease(string slug)
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentLatestReleasePath(slug)));
+                _fileStorageService.DownloadTextAsync(PublicContentLatestReleasePath(slug)), NotFound());
         }
 
         // TODO: this looks like it needs refactoring to return the release view model
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<string>> GetRelease(string publicationSlug, string releaseSlug)
         {
             return await this.JsonContentResultAsync(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentReleasePath(publicationSlug, releaseSlug)));
+                _fileStorageService.DownloadTextAsync(PublicContentReleasePath(publicationSlug, releaseSlug)), NotFound());
         }
     }
 }
