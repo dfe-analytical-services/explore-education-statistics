@@ -73,12 +73,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   England
-
-    user checks results table column heading contains  2   1   2012/13
-    user checks results table column heading contains  2   2   2013/14
-    user checks results table column heading contains  2   3   2014/15
-    user checks results table column heading contains  2   4   2015/16
+    user checks results table column heading contains  1   1   2012/13
+    user checks results table column heading contains  1   2   2013/14
+    user checks results table column heading contains  1   3   2014/15
+    user checks results table column heading contains  1   4   2015/16
 
 Validate results table row headings
     [Tags]  HappyPath
@@ -149,12 +147,10 @@ User validates permanent link works correctly
 
 User validates permalink table columns
     [Tags]   HappyPath
-    user checks results table column heading contains  1   1   England
-
-    user checks results table column heading contains  2   1   2012/13
-    user checks results table column heading contains  2   2   2013/14
-    user checks results table column heading contains  2   3   2014/15
-    user checks results table column heading contains  2   4   2015/16
+    user checks results table column heading contains  1   1   2012/13
+    user checks results table column heading contains  1   2   2013/14
+    user checks results table column heading contains  1   3   2014/15
+    user checks results table column heading contains  1   4   2015/16
 
 User validates permalink table rows
     [Tags]   HappyPath
