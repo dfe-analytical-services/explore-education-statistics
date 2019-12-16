@@ -1,4 +1,4 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';

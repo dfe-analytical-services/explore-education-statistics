@@ -1,5 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 

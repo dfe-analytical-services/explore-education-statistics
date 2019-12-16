@@ -1,4 +1,4 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
 import React, { useContext } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';

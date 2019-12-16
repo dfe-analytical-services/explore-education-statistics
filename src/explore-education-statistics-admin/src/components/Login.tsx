@@ -1,7 +1,8 @@
 import { Authentication } from '@admin/services/sign-in/types';
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import * as React from 'react';
 
-export const LoginContext = React.createContext<Authentication>({
+const LoginContext = React.createContext<Authentication>({
   user: {
     id: 'guest',
     name: 'logged out',
@@ -9,6 +10,8 @@ export const LoginContext = React.createContext<Authentication>({
   },
 });
 
-export default function() {
-  // no-op at the moment
-}
+export const PrototypeLoginContext = React.createContext<Authentication>(
+  PrototypeLoginService.login(),
+);
+
+export default LoginContext;
