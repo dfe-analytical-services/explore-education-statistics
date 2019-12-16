@@ -28,8 +28,7 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
-    if __name__ == '__main__':
-        chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
@@ -77,9 +76,9 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
         driver.find_element_by_css_selector('#Input_LastName').clear()
         driver.find_element_by_css_selector('#Input_LastName').send_keys('EESADMIN')
         driver.find_element_by_css_selector('#Input_Email').clear()
-        driver.find_element_by_css_selector('#Input_Email').send_keys(args.email)
+        driver.find_element_by_css_selector('#Input_Email').send_keys(email)
         driver.find_element_by_xpath('//button[contains(text(), "Register")]').click()
-    except:
+    except Exception as e:
         pass
 
     wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')
