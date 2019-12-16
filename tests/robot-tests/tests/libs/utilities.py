@@ -3,6 +3,11 @@ from robot.libraries.BuiltIn import BuiltIn
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 from datetime import datetime
+import json
+
+def set_cookie_from_json(cookie_json):
+  cookie_dict = json.loads(cookie_json)
+  sl.driver.add_cookie(cookie_dict)
 
 def get_datetime(strf):
   now = datetime.now()
