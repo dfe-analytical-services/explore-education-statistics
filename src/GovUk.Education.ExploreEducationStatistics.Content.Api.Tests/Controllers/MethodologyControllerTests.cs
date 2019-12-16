@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_MethodologyTree_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
 
             cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_MethodologyTree_Returns_NoContent()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
 
             cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Methodology_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
 
             cache.Setup(s => s.GetMethodologyAsync("test-slug")).ReturnsAsync(
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Methodology_Returns_NotFound()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetMethodologyAsync("unknown-slug")).ReturnsAsync((string) null);
 

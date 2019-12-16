@@ -1,4 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+﻿using System;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -8,15 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class GenerateReleaseContentFunction
     {
-        private readonly IContentCacheGenerationService _contentCacheGenerationService;
+        private readonly IContentService _contentService;
         private readonly IReleaseStatusService _releaseStatusService;
 
         public const string QueueName = "generate-release-content";
 
-        public GenerateReleaseContentFunction(IContentCacheGenerationService contentCacheGenerationService,
+        public GenerateReleaseContentFunction(IContentService contentService,
             IReleaseStatusService releaseStatusService)
         {
-            _contentCacheGenerationService = contentCacheGenerationService;
+            _contentService = contentService;
             _releaseStatusService = releaseStatusService;
         }
 
@@ -27,16 +29,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            _contentCacheGenerationService.GenerateReleaseContent(message).Wait();
+            await UpdateStage(message, Started);
+            try
+            {
+                await _contentService.UpdateDownloadTree();
+                await _contentService.UpdatePublicationTree();
+                await _contentService.UpdateMethodologyTree();
+                await _contentService.UpdatePublicationsAndReleases();
+                await _contentService.UpdateMethodologies();
+                await UpdateStage(message, Complete);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                await UpdateStage(message, Failed);
+            }
 
+            logger.LogInformation($"{executionContext.FunctionName} completed");
+        }
+
+        private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage)
+        {
             // TODO EES-861 ReleaseId is currently optional because we allow using the message to initiate a full content refresh
             if (message.ReleaseId.HasValue && message.ReleaseStatusId.HasValue)
             {
                 await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId.Value,
-                    message.ReleaseStatusId.Value, Complete);
+                    message.ReleaseStatusId.Value, stage);
             }
-
-            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
     }
 }

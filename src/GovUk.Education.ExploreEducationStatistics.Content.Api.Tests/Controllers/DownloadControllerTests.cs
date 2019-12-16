@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_DownloadTree_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
                 JsonConvert.SerializeObject(new List<ThemeTree>
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_DownloadTree_Returns_NoContent()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
                 (string) null

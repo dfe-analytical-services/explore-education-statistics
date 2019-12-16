@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IPublishingService, PublishingService>()
-                .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
                 .AddScoped<ITableStorageService, TableStorageService>(s =>

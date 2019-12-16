@@ -1,19 +1,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
     public class ContentController : ControllerBase
     {
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ContentController(IContentCacheService contentCacheService)
+        public ContentController(IFileStorageService fileStorageService)
         {
-            _contentCacheService = contentCacheService;
+            _fileStorageService = fileStorageService;
         }
 
         // GET api/content/tree
@@ -22,16 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(List<ThemeTree>), 200)]
         [Produces("application/json")]
-        public async Task<ActionResult<string>> GetContentTree()
+        public async Task<ActionResult<string>> GetPublicationsTree()
         {
-            var tree = await _contentCacheService.GetContentTreeAsync();
-
-            if (string.IsNullOrWhiteSpace(tree))
-            {
-                return NoContent();
-            }
-
-            return Content(tree, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationsTreePath()));
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
@@ -41,14 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetPublication(string slug)
         {
-            var publication = await _contentCacheService.GetPublicationAsync(slug);
-
-            if (string.IsNullOrWhiteSpace(publication))
-            {
-                return NotFound();
-            }
-
-            return Content(publication, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)));
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
@@ -56,16 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(ReleaseViewModel), 200)]
         [Produces("application/json")]
-        public async Task<ActionResult<string>> GetLatestRelease(string publicationSlug)
+        public async Task<ActionResult<string>> GetLatestRelease(string slug)
         {
-            var release = await _contentCacheService.GetLatestReleaseAsync(publicationSlug);
-
-            if (string.IsNullOrWhiteSpace(release))
-            {
-                return NotFound();
-            }
-
-            return Content(release, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentLatestReleasePath(slug)));
         }
 
         // TODO: this looks like it needs refactoring to return the release view model
@@ -76,14 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            var release = await _contentCacheService.GetReleaseAsync(publicationSlug, releaseSlug);
-
-            if (string.IsNullOrWhiteSpace(release))
-            {
-                return NotFound();
-            }
-
-            return Content(release, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentReleasePath(publicationSlug, releaseSlug)));
         }
     }
 }

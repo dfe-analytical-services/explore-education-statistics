@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -10,28 +12,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public DownloadController(IContentCacheService contentCacheService)
+        public DownloadController(IFileStorageService fileStorageService)
         {
-            _contentCacheService = contentCacheService;
+            _fileStorageService = fileStorageService;
         }
 
         /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        [ProducesResponseType(typeof(List<ThemeTree>),200)]
+        [ProducesResponseType(typeof(List<ThemeTree>), 200)]
         [ProducesResponseType(204)]
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetDownloadTree()
         {
-            var tree = await _contentCacheService.GetDownloadTreeAsync();
-
-            if (string.IsNullOrWhiteSpace(tree))
-            {
-                return NoContent();
-            }
-            
-            return Content(tree, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentDownloadTreePath()));
         }
     }
 }

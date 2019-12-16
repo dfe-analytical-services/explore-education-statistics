@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_ContentTree_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
                 JsonConvert.SerializeObject(new List<ThemeTree>
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_ContentTree_Returns_NoContent()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
                  (string)null
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Publication_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetPublicationAsync("publication-a")).ReturnsAsync(
                 JsonConvert.SerializeObject(new PublicationViewModel
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Publication_Returns_NotFound()
         {
-            var cache = new Mock<IContentCacheService>();
+            var cache = new Mock<IFileStorageService>();
 
             cache.Setup(s => s.GetPublicationAsync("test-publication")).ReturnsAsync(
                 (string) null);
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          [Fact]
          public void Get_LatestRelease_Returns_Ok()
          {
-             var cache = new Mock<IContentCacheService>();
+             var cache = new Mock<IFileStorageService>();
 
              cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync(
                  JsonConvert.SerializeObject(new ReleaseViewModel
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          [Fact]
          public void Get_LatestRelease_Returns_NotFound()
          {
-             var cache = new Mock<IContentCacheService>();
+             var cache = new Mock<IFileStorageService>();
 
              cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync((string) null);
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          [Fact]
          public void Get_Release_Returns_Ok()
          {
-             var cache = new Mock<IContentCacheService>();
+             var cache = new Mock<IFileStorageService>();
 
              cache.Setup(s => s.GetReleaseAsync("publication-a", "2016")).ReturnsAsync(
                  JsonConvert.SerializeObject(new ReleaseViewModel()
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          [Fact]
          public void Get_Release_Returns_NotFound()
          {
-             var cache = new Mock<IContentCacheService>();
+             var cache = new Mock<IFileStorageService>();
 
              cache.Setup(s => s.GetReleaseAsync("publication-a", "2000")).ReturnsAsync((string) null);
 

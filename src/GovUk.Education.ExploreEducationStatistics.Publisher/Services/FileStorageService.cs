@@ -58,6 +58,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 release);
         }
 
+        public async Task UploadFromStreamAsync(string storageConnectionString, string containerName, string blobName, string contentType, string content)
+        {
+            await FileStorageUtils.UploadFromStreamAsync(storageConnectionString, containerName, blobName, contentType, content);
+        }
+
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
             PublishReleaseFilesMessage message)
