@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -19,14 +20,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task AddAsync(string publicationSlug, DateTime publish, Guid releaseId, string releaseSlug,
-            Stage stage)
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
         {
             var table = await GetTableAsync();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(new ReleaseStatus(publicationSlug,
                 publish,
                 releaseId,
                 releaseSlug,
-                stage)));
+                stage.Content,
+                stage.Files,
+                stage.Data,
+                stage.Overall)));
         }
 
         public async Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
@@ -44,12 +48,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return results;
         }
 
+        public async Task UpdateAsync(Guid releaseId, Guid releaseStatusId,
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
+        {
+            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            {
+                row.ContentStage = stage.Content.ToString();
+                row.DataStage = stage.Data.ToString();
+                row.FilesStage = stage.Files.ToString();
+                row.Stage = stage.Overall.ToString();
+                return row;
+            });
+        }
+
         public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.ContentStage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -58,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.DataStage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -67,16 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.FilesStage = stage.ToString();
-                return row;
-            });
-        }
-
-        public async Task UpdateStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
-        {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
-            {
-                row.Stage = stage.ToString();
-                return row;
+                return FailReleaseIfTaskStageFailed(row);
             });
         }
 
@@ -85,12 +93,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var table = await GetTableAsync();
             var tableResult = await table.ExecuteAsync(
-                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString()));
+                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString(),
+                    new List<string>
+                    {
+                        "Created",
+                        "PublicationSlug",
+                        "Publish",
+                        "ReleaseSlug",
+                        "ContentStage",
+                        "FilesStage",
+                        "DataStage",
+                        "Stage"
+                    }));
 
             if (tableResult.Result is ReleaseStatus releaseStatus)
             {
                 await table.ExecuteAsync(TableOperation.InsertOrMerge(updateFunction.Invoke(releaseStatus)));
             }
+        }
+
+        private ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus)
+        {
+            if (Enum.TryParse<Stage>(releaseStatus.Stage, out var stage) && stage != Failed)
+            {
+                if (Enum.TryParse<Stage>(releaseStatus.ContentStage, out var contentStage) && contentStage == Failed ||
+                    Enum.TryParse<Stage>(releaseStatus.DataStage, out var dataStage) && dataStage == Failed ||
+                    Enum.TryParse<Stage>(releaseStatus.FilesStage, out var filesStage) && filesStage == Failed)
+                {
+                    releaseStatus.Stage = Failed.ToString();
+                }
+            }
+
+            return releaseStatus;
         }
 
         private async Task<CloudTable> GetTableAsync()
