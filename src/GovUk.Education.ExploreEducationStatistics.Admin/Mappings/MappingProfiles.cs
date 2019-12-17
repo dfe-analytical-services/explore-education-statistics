@@ -4,6 +4,8 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
 using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
@@ -146,6 +148,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
             
             CreateMap<Update, ReleaseNoteViewModel>();
+
+            CreateMap<Comment, CommentViewModel>()
+                .ForMember(
+                    dest => dest.State,
+                    m => m.MapFrom(c => c.State.GetEnumValue())
+                );
+            
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.ExtensionMethods;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -129,11 +130,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments")]
-        public Task<ActionResult<List<Comment>>> GetComments(
+        public Task<ActionResult<List<CommentViewModel>>> GetComments(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
             return this.HandlingValidationErrorsAsync(
                 () => _contentService.GetCommentsAsync(releaseId, contentSectionId, contentBlockId),
+                Ok);
+        }
+        
+        
+        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
+        public Task<ActionResult<CommentViewModel>> AddComment(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment),
                 Ok);
         }
     }

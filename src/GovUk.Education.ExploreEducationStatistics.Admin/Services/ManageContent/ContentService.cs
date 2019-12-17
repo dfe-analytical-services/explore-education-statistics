@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
@@ -20,11 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ContentService : IContentService
     {
+        private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
         private readonly PersistenceHelper<Release, Guid> _releaseHelper;
 
-        public ContentService(ContentDbContext context)
+        public ContentService(ContentDbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
             _releaseHelper = new PersistenceHelper<Release, Guid>(
                 _context,
@@ -420,7 +425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
                 ;
-
         }
 
         private Task<Either<ValidationResult, T>> CheckContentSectionExists<T>(
@@ -485,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             }, HydrateContentSectionsAndBlocks);
         }
 
-        public Task<Either<ValidationResult, List<Comment>>> GetCommentsAsync(
+        public Task<Either<ValidationResult, List<CommentViewModel>>> GetCommentsAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId
         )
         {
@@ -497,10 +501,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     if (contentBlock == null)
                     {
-                        return ValidationResult<List<Comment>>(ValidationErrorMessages.ContentBlockNotFound);
+                        return ValidationResult<List<CommentViewModel>>(ValidationErrorMessages.ContentBlockNotFound);
                     }
 
-                    return contentBlock.Comments;
+                    return _mapper.Map<List<CommentViewModel>>(_context.Comment
+                            .Select(comment => comment)
+                            .Where(comment => comment.IContentBlockId == contentBlock.Id)
+                            .ToList())
+                        ;
+                }
+            );
+        }
+
+        public Task<Either<ValidationResult, CommentViewModel>> AddCommentAsync(Guid releaseId, Guid contentSectionId,
+            Guid contentBlockId, AddCommentRequest comment)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (contentBlock == null)
+                    {
+                        return ValidationResult<CommentViewModel>(ValidationErrorMessages.ContentBlockNotFound);
+                    }
+
+                    var newComment = _context.Comment.Add(new Comment
+                    {
+                        Id = new Guid(),
+                        IContentBlockId = contentBlock.Id,
+                        Name = comment.Name,
+                        State = EnumUtil.GetFromString<CommentState>(comment.State),
+                        Time = comment.Time,
+                        CommentText = comment.CommentText,
+                        ResolvedBy = comment.ResolvedBy,
+                        ResolvedOn = comment.ResolvedOn,
+                    });
+
+                    await _context.SaveChangesAsync();
+                    return _mapper.Map<CommentViewModel>(newComment.Entity);
                 }
             );
         }
