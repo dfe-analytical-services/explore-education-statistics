@@ -74,11 +74,7 @@ public class Either<Tl, Tr> {
                 return new Either<Tl, T>(firstResult.Left);
             }
 
-            var next = await func();
-
-            return next.IsLeft 
-                ? new Either<Tl, T>(firstResult.Left) 
-                : new Either<Tl, T>(next.Right);
+            return await func.Invoke();
         }
         
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<T>> func)

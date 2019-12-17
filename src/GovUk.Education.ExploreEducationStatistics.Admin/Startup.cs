@@ -243,8 +243,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
             ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
-            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.EntityNotFound);
+            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.ReleaseNoteNotFound);
             ServicesAddPersistenceHelper(services, c => c.DataBlocks, ValidationErrorMessages.ContentBlockNotFound);
+            ServicesAddPersistenceHelper(services, c => c.Publications, ValidationErrorMessages.PublicationNotFound);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();

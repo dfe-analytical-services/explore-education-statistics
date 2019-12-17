@@ -140,6 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
-        ContentBlockNotAttachedToThisContentSection
+        ContentBlockNotAttachedToThisContentSection,
+        PublicationNotFound
     }
 }
