@@ -691,7 +691,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "ipSecurityRestrictions": "[variables('ipSecurityRestrictions']",
+          "ipSecurityRestrictions": "[variables('ipSecurityRestrictions')]",
           "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
