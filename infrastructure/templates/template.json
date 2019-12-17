@@ -1021,7 +1021,7 @@
           },
           "resources": [
             {
-              "name": "[concat(string(variables('sqlserverName')), '/statistics/transparent-data-encryption')]",
+              "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
               "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
               "apiVersion": "2014-04-01",
               "properties": {
@@ -1062,7 +1062,7 @@
           },
           "resources": [
             {
-              "name": "[concat(string(variables('sqlserverName')), '/content/transparent-data-encryption')]",
+              "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
               "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
               "apiVersion": "2014-04-01",
               "properties": {
@@ -1186,7 +1186,7 @@
           },
           "resources": [
             {
-              "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/transparent-data-encryption')]",
+              "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
               "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
               "apiVersion": "2014-04-01",
               "properties": {
