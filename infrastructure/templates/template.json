@@ -298,12 +298,14 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "ipSecurityRestrictions": [
       {
-        "ipAddress": "[copyIndex()].Address)",
-        "subnetMask": "255.255.255.255",
-        "name": "[copyIndex()].Name)",
         "copy": {
           "name": "ipRestrictionLoop",
-          "count": "[length(parameters('adminFirewallRules'))]"
+          "count": "[length(parameters('adminFirewallRules'))]",
+          "input": {
+            "ipAddress": "[copyIndex()].Address)",
+            "subnetMask": "255.255.255.0",
+            "name": "[copyIndex()].Name)"
+          }
         }
       }
     ]
@@ -695,7 +697,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          
+
           "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
@@ -1930,8 +1932,8 @@
   ],
   "outputs": {
     "ipSecurityRestrictions": {
-        "type": "array",
-        "value": "[variables('ipSecurityRestrictions')]"
+      "type": "array",
+      "value": "[variables('ipSecurityRestrictions')]"
     }
-  } 
+  }
 }
