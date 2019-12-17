@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
     {
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
-        public DateTime Publish { get; set; }
+        public DateTime? Publish { get; set; }
         public string ReleaseSlug { get; set; }
         public string ContentStage { get; set; }
         public string FilesStage { get; set; }
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public ReleaseStatus(string publicationSlug,
-            DateTime publish,
+            DateTime? publish,
             Guid releaseId,
             string releaseSlug,
             Stage contentStage,

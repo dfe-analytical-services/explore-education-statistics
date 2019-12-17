@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseStatus)));
                     
-                    await _releaseStatusService.UpdateAsync(releaseStatus.ReleaseId, releaseStatus.Id, StartedStage);
+                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, StartedStage);
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new PublishReleaseFilesMessage
             {
                 PublicationSlug = releaseStatus.PublicationSlug,
-                ReleasePublished = releaseStatus.Publish,
+                ReleasePublished = releaseStatus.Publish.Value,
                 ReleaseSlug = releaseStatus.ReleaseSlug,
                 ReleaseId = releaseStatus.ReleaseId,
                 ReleaseStatusId = releaseStatus.Id

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -31,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task<ValidateReleaseMessage> QueueReleaseAsync(Guid releaseId)
+        public async Task<ReleaseStatusMessage> QueueReleaseStatusAsync(Guid releaseId)
         {
             var release = await GetRelease(releaseId);
             var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "releases");
-            var message = BuildValidateReleaseMessage(release);
-            queue.AddMessage(ToCloudQueueMessage(message));
+            var message = BuildReleaseStatusMessage(release);
+            await queue.AddMessageAsync(ToCloudQueueMessage(message));
 
-            _logger.LogTrace($"Sent validate release message for release: {releaseId}");
+            _logger.LogTrace($"Sent release status message for release: {releaseId}");
 
             return message;
         }
@@ -46,19 +45,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private Task<Release> GetRelease(Guid releaseId)
         {
             return _context.Releases
-                .Where(release => release.Id == releaseId)
-                .Include(release => release.Publication)
-                .SingleAsync();
+                .AsNoTracking()
+                .SingleAsync(release => release.Id == releaseId);
         }
 
-        private static ValidateReleaseMessage BuildValidateReleaseMessage(Release release)
+        private static ReleaseStatusMessage BuildReleaseStatusMessage(Release release)
         {
-            return new ValidateReleaseMessage
+            return new ReleaseStatusMessage
             {
-                PublicationSlug = release.Publication.Slug,
-                PublishScheduled = release.PublishScheduled ?? DateTime.UtcNow,
-                ReleaseId = release.Id,
-                ReleaseSlug = release.Slug
+                ReleaseId = release.Id
             };
         }
 

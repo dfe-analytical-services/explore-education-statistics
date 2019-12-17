@@ -30,29 +30,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
          */
         [FunctionName("ValidateRelease")]
         public async Task ValidateRelease(
-            [QueueTrigger("releases")] ValidateReleaseMessage message,
+            [QueueTrigger("releases")] ReleaseStatusMessage statusMessage,
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await ValidateReleaseAsync(message, async () => await AddReleaseStatus(message, ValidStage));
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {statusMessage}");
+            await ValidateReleaseAsync(statusMessage, async () => await AddReleaseStatus(statusMessage, ValidStage));
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task ValidateReleaseAsync(ValidateReleaseMessage message, Func<Task> andThen)
+        private async Task ValidateReleaseAsync(ReleaseStatusMessage statusMessage, Func<Task> andThen)
         {
-            var valid = await _validationService.ValidateAsync(message);
-            await (valid ? andThen.Invoke() : AddReleaseStatus(message, InvalidStage));
+            var valid = await _validationService.ValidateAsync(statusMessage);
+            await (valid ? andThen.Invoke() : AddReleaseStatus(statusMessage, InvalidStage));
         }
 
-        private async Task AddReleaseStatus(ValidateReleaseMessage message,
+        private async Task AddReleaseStatus(ReleaseStatusMessage statusMessage,
             (Stage, Stage, Stage, Stage) stage)
         {
-            await _releaseStatusService.AddAsync(message.PublicationSlug,
-                message.PublishScheduled,
-                message.ReleaseId,
-                message.ReleaseSlug,
-                stage);
+            await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage);
         }
     }
 }
