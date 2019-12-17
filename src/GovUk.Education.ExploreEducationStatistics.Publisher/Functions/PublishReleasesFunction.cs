@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
          * Azure function which publishes all Releases that are scheduled to be published during the day.
          */
         [FunctionName("PublishReleases")]
-        public void PublishReleases([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
+        public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")] TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {
