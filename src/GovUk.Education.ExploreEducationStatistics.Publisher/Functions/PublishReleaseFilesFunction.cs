@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseFiles")]
-        public async void PublishReleaseFiles(
+        public async Task PublishReleaseFiles(
             [QueueTrigger(QueueName)] PublishReleaseFilesMessage message,
             ExecutionContext executionContext,
             ILogger logger)

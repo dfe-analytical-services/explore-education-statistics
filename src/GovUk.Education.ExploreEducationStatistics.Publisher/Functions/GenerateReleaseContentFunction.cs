@@ -10,20 +10,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class GenerateReleaseContentFunction
     {
-        private readonly IContentCacheGenerationService _contentCacheGenerationService;
+        private readonly IContentService _contentService;
         private readonly IReleaseStatusService _releaseStatusService;
 
         public const string QueueName = "generate-release-content";
 
-        public GenerateReleaseContentFunction(IContentCacheGenerationService contentCacheGenerationService,
+        public GenerateReleaseContentFunction(IContentService contentService,
             IReleaseStatusService releaseStatusService)
         {
-            _contentCacheGenerationService = contentCacheGenerationService;
+            _contentService = contentService;
             _releaseStatusService = releaseStatusService;
         }
 
         [FunctionName("GenerateReleaseContent")]
-        public async void GenerateReleaseContent(
+        public async Task GenerateReleaseContent(
             [QueueTrigger(QueueName)] GenerateReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
@@ -32,8 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                var result = await _contentCacheGenerationService.GenerateReleaseContent(message);
-                await UpdateStage(message, result ? Complete : Failed);
+                await _contentService.UpdateDownloadTree();
+                await _contentService.UpdatePublicationTree();
+                await _contentService.UpdateMethodologyTree();
+                await _contentService.UpdatePublicationsAndReleases();
+                await _contentService.UpdateMethodologies();
+                await UpdateStage(message, Complete);
             }
             catch (Exception e)
             {
