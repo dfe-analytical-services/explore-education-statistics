@@ -385,7 +385,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
