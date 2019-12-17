@@ -1018,20 +1018,7 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
-          },
-          "resources": [
-            {
-              "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
-              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-              "apiVersion": "2014-04-01",
-              "properties": {
-                "status": "Enabled"
-              },
-              "dependsOn": [
-                "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
-              ]
-            }
-          ]
+          }
         },
         {
           "name": "content",
@@ -1059,20 +1046,7 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
             "requestedServiceObjectiveName": "Basic"
-          },
-          "resources": [
-            {
-              "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
-              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-              "apiVersion": "2014-04-01",
-              "properties": {
-                "status": "Enabled"
-              },
-              "dependsOn": [
-                "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
-              ]
-            }
-          ]
+          }
         },
         {
           "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
@@ -1101,6 +1075,30 @@
             "startIpAddress": "0.0.0.0"
           }
         },
+
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
+          ]
+        },
+
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -1183,20 +1181,7 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "requestedServiceObjectiveName": "S3"
-          },
-          "resources": [
-            {
-              "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
-              "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-              "apiVersion": "2014-04-01",
-              "properties": {
-                "status": "Enabled"
-              },
-              "dependsOn": [
-                "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
-              ]
-            }
-          ]
+          }
         },
         {
           "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
@@ -1225,6 +1210,19 @@
             "startIpAddress": "0.0.0.0"
           }
         },
+
+        {
+          "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
+          ]
+        },
+
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -1585,7 +1583,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
@@ -1728,7 +1727,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
