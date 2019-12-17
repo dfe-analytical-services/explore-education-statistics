@@ -107,7 +107,7 @@
     },
     "sqlAuditing": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
 
     "publicAppBasicAuth": {
