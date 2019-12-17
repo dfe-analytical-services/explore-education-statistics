@@ -43,12 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task PublishReleases(ILogger logger)
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
-
-            // TODO EES-926 Currently returns all scheduled releases
-            // TODO EES-926 Only query scheduled releases that are being published today
-            var query = new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
-                    Scheduled.ToString()));
+            
+            var dateQuery = TableQuery.GenerateFilterConditionForDate("Publish", QueryComparisons.LessThan, DateTime.Today.AddDays(1));
+            var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString());
+            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And, statusQuery));
 
             var scheduled = (await _releaseStatusService.ExecuteQueryAsync(query)).ToList();
             if (scheduled.Any())
