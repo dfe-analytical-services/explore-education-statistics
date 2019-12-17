@@ -26,30 +26,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
         }
     }
-
-    public static class EitherTaskExtensions
-    {
-        public static async Task<ActionResult> HandleFailures<Tr>(
-            this Task<Either<ValidationResult, Tr>> validationErrorsRaisingAction,
-            ControllerBase controller) where Tr : ActionResult
-        {
-            var result = await validationErrorsRaisingAction;
-            
-            if (result.IsRight)
-            {
-                return result.Right;
-            }
-
-            ValidationUtils.AddErrors(controller.ModelState, result.Left);
-            return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
-        }
-        
-        public static async Task<ActionResult> HandleFailures<Tr>(
-            this Task<Either<ActionResult, Tr>> validationErrorsRaisingAction) where Tr : ActionResult
-        {
-            var result = await validationErrorsRaisingAction;
-            
-            return result.IsRight ? result.Right : result.Left;
-        }
-    }
 }
