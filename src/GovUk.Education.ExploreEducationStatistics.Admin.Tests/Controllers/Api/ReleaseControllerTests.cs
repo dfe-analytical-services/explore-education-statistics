@@ -452,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainableActionResult(_releaseId, null))
+                    .CheckEntityExistsActionResult(_releaseId, null))
                 .Returns(_releaseExistsResult);
         }
         
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainableActionResult(_releaseId, null))
+                    .CheckEntityExistsActionResult(_releaseId, null))
                 .Returns(_releaseNotFoundResult);
         }
 
@@ -468,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             publicationHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainableActionResult(_publicationId, null))
+                    .CheckEntityExistsActionResult(_publicationId, null))
                 .Returns(_publicationExistsResult);
         }
 

@@ -37,17 +37,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public Task<Either<ActionResult, Release>> GetAsync(Guid id)
         {
-            return _releaseHelper.CheckEntityExistsActionResult(id, async release =>
-            {
-                var canView = await _userService.MatchesPolicy(release, CanViewSpecificRelease);
+            return _releaseHelper
+                .CheckEntityExistsActionResult(id)
+                .OnSuccess(async release =>
+                    {
+                        var canView = await _userService.MatchesPolicy(release, CanViewSpecificRelease);
 
-                if (!canView)
-                {
-                    return new Either<ActionResult, Release>(new ForbidResult());
-                }
+                        if (!canView)
+                        {
+                            return new Either<ActionResult, Release>(new ForbidResult());
+                        }
 
-                return release;
-            });
+                        return release;
+                    });
         }
         
         private async Task<List<ContentSection>> GetContentAsync(Guid id)
@@ -113,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(async release =>
                     {
                         var canView = await _userService.MatchesPolicy(release, CanViewSpecificRelease);
@@ -285,14 +287,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
-            return _releaseHelper.CheckEntityExistsActionResult(releaseId, async release =>
-            {
-                release.Status = status;
-                release.InternalReleaseNote = internalReleaseNote;
-                _context.Releases.Update(release);
-                await _context.SaveChangesAsync();
-                return await GetReleaseSummaryAsync(releaseId);
-            });
+            return _releaseHelper
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(async release =>
+                    {
+                        release.Status = status;
+                        release.InternalReleaseNote = internalReleaseNote;
+                        _context.Releases.Update(release);
+                        await _context.SaveChangesAsync();
+                        return await GetReleaseSummaryAsync(releaseId);
+                    });
         }
     }
 

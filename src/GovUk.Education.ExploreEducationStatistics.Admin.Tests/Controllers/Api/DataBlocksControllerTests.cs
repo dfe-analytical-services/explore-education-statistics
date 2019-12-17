@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainable(_releaseId, null))
+                    .CheckEntityExists(_releaseId, null))
                 .Returns(_releaseExistsResult);
 
             dataBlockService.Setup(s => s.CreateAsync(_releaseId, dataBlock))
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             dataBlockHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainableActionResult(id, null))
+                    .CheckEntityExistsActionResult(id, null))
                 .Returns(_dataBlockExistsResult);
 
             dataBlockService.Setup(s => s.GetAsync(id)).Returns(Task.FromResult(new DataBlockViewModel()));
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             dataBlockHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainableActionResult(id, null))
+                    .CheckEntityExistsActionResult(id, null))
                 .Returns(_dataBlockNotFoundResult);
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsChainable(_releaseId, null))
+                    .CheckEntityExists(_releaseId, null))
                 .Returns(_releaseExistsResult);
 
             dataBlockService.Setup(s => s.ListAsync(_releaseId)).Returns(Task.FromResult(sampleRes));

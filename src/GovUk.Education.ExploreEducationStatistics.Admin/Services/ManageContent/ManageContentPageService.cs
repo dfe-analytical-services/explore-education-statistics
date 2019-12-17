@@ -35,35 +35,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
-            {
-                var availableDataBlocks =
-                    await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
+            return _releaseHelper
+                .CheckEntityExists(releaseId, HydrateReleaseForReleaseViewModel)
+                .OnSuccess(async release =>
+                    {
+                        var availableDataBlocks =
+                            await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
 
-                return availableDataBlocks.Map(blocks =>
-                {
-                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                    releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
-                    
-                    // TODO EES-147 Every release needs an update
-                    if (releaseViewModel.Updates.Count == 0)
-                    {
-                        releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                        return availableDataBlocks.Map(blocks =>
                         {
-                            Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
-                            On = new DateTime(2019, 12, 01),           
-                            Reason = "First published"
+                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                            
+                            // TODO EES-147 Every release needs an update
+                            if (releaseViewModel.Updates.Count == 0)
+                            {
+                                releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                                {
+                                    Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
+                                    On = new DateTime(2019, 12, 01),           
+                                    Reason = "First published"
+                                });
+                            }
+                            
+                            return new ManageContentPageViewModel
+                            {
+                                Release = releaseViewModel,
+                                AvailableDataBlocks = blocks
+                            };
                         });
-                    }
-                    
-                    return new ManageContentPageViewModel
-                    {
-                        Release = releaseViewModel,
-                        AvailableDataBlocks = blocks
-                    };
-                });
-                
-            }, HydrateReleaseForReleaseViewModel);
+                        
+                    });
         }
         
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

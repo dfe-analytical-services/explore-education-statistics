@@ -29,30 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         }
 
         // TODO EES-919 - return ActionResults rather than ValidationResults
-        public static Either<ValidationResult, R> HandleValidationErrors<T, R>(
-            Func<Either<ValidationResult, T>> validationErrorAction,
-            Func<T, Either<ValidationResult, R>> successAction)
-        {
-            var validationResult = validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? successAction.Invoke(validationResult.Right) 
-                : validationResult.Left;
-        }
-        
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, Task<R>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(await successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<Either<ValidationResult, R>>> successAction)

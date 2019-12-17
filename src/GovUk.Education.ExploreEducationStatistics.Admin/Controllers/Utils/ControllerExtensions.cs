@@ -25,23 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             ValidationUtils.AddErrors(controller.ModelState, validationResults.Left);
             return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
         }
-        
-        // TODO EES-935 - replace with method chaining
-        public static async Task<ActionResult> HandlingValidationErrorsAsyncNoReturn<T>(
-            this ControllerBase controller,
-            Func<Task<Either<ValidationResult, T>>> validationErrorsRaisingAction,
-            Func<ActionResult> onSuccessAction) 
-        {
-            var validationResults = await validationErrorsRaisingAction.Invoke();
-
-            if (validationResults.IsRight)
-            {
-                return onSuccessAction.Invoke();
-            }
-            
-            ValidationUtils.AddErrors(controller.ModelState, validationResults.Left);
-            return controller.ValidationProblem(new ValidationProblemDetails(controller.ModelState));
-        }
     }
 
     public static class EitherTaskExtensions

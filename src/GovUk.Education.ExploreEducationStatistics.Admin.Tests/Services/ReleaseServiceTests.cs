@@ -468,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
 
             releaseHelper
-                .Setup(s => s.CheckEntityExistsChainableActionResult(It.IsAny<Guid>(), null))
+                .Setup(s => s.CheckEntityExistsActionResult(It.IsAny<Guid>(), null))
                 .ReturnsAsync(new Either<ActionResult, Release>(new Release()));
             
             return (userService, releaseHelper);

@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             PublicationId publicationId)
         {
             return await _publicationHelper
-                .CheckEntityExistsChainableActionResult(publicationId)
+                .CheckEntityExistsActionResult(publicationId)
                 .OnSuccess(() =>
                 {
                     release.PublicationId = publicationId;
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name,
                     ReleaseFileTypes.Ancillary, false))
                 .OnSuccess(Ok)
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 // upload the files
                 .OnSuccess(async _ =>
                 {
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _releaseService.EditReleaseSummaryAsync(releaseId, request))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(async _ =>
                 {
                     await _tableStorageService.DeleteEntityAsync("imports",
@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId, string fileName)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
                 .OnSuccess(Ok)
                 .HandleFailures();
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId, string fileName)
         {
             return await _releaseHelper
-                .CheckEntityExistsChainableActionResult(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ =>  _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
                 .OnSuccess(Ok)
                 .HandleFailures();

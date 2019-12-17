@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return await _releaseHelper
-                .CheckEntityExistsChainable(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _dataBlockService.CreateAsync(releaseId, dataBlock))
                 .OnSuccess(Ok)
                 .HandleFailures(this);
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return _dataBlockHelper
-                .CheckEntityExistsChainableActionResult(id)
+                .CheckEntityExistsActionResult(id)
                 .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
                 .OnSuccess(_ => new NoContentResult())
                 .HandleFailures();
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return await _releaseHelper
-                .CheckEntityExistsChainable(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(release => _dataBlockService.ListAsync(releaseId))
                 .OnSuccess(Ok)
                 .HandleFailures(this);

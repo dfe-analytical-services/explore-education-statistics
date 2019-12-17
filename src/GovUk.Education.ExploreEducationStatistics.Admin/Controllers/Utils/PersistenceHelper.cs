@@ -29,10 +29,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             _notFoundErrorMessage = notFoundErrorMessage;
         }
         
-        public Task<Either<ActionResult, T>> CheckEntityExistsActionResult<T>(
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        public Task<Either<ValidationResult, TEntity>> CheckEntityExists(
             TEntityId id, 
-            Func<TEntity, Task<Either<ActionResult, T>>> successAction,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)   
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+        {
+            return HandleValidationErrorsAsync(
+                async () =>
+                {
+                    var queryableEntities = _entitySet
+                        .FindByPrimaryKey(_context, id);
+
+                    var hydratedEntities = hydrateEntityFn != null
+                        ? hydrateEntityFn.Invoke(queryableEntities)
+                        : queryableEntities;
+                    
+                    var entity = await hydratedEntities
+                        .FirstOrDefaultAsync();
+
+                    return entity == null
+                        ? ValidationResult(_notFoundErrorMessage)
+                        : new Either<ValidationResult, TEntity>(entity);
+                }, 
+                entity => Task.FromResult(new Either<ValidationResult, TEntity>(entity)));
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        // When the work for EES-919 is complete, rename this to "CheckEntityExists"
+        public Task<Either<ActionResult, TEntity>> CheckEntityExistsActionResult(
+            TEntityId id, 
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
         {
             return HandleErrorsAsync(
                 async () =>
@@ -51,83 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                         ? new NotFoundResult()
                         : new Either<ActionResult, TEntity>(entity);
                 },
-                successAction.Invoke);
-        } 
-        
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
-            TEntityId id, 
-            Func<TEntity, Task<Either<ValidationResult, T>>> successAction,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)   
-        {
-            return HandleValidationErrorsAsync(
-                async () =>
-                {
-                    var queryableEntities = _entitySet
-                        .FindByPrimaryKey(_context, id);
-
-                    var hydratedEntities = hydrateEntityFn != null
-                        ? hydrateEntityFn.Invoke(queryableEntities)
-                        : queryableEntities;
-                    
-                    var entity = await hydratedEntities
-                        .FirstOrDefaultAsync();
-
-                    return entity == null
-                        ? ValidationResult(_notFoundErrorMessage)
-                        : new Either<ValidationResult, TEntity>(entity);
-                },
-                successAction.Invoke);
-        } 
-        
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
-            TEntityId id, 
-            Func<TEntity, T> successAction,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            Task<T> Success(TEntity entity) => Task.FromResult(successAction.Invoke(entity));
-
-            return CheckEntityExists(
-                id, 
-                Success,
-                hydrateEntityFn);
-        } 
-        
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
-            TEntityId id, 
-            Func<TEntity, Task<T>> successAction,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            async Task<Either<ValidationResult, T>> Success(TEntity entity)
-            {
-                var result = await successAction.Invoke(entity);
-                return new Either<ValidationResult, T>(result);
-            }
-
-            return CheckEntityExists(
-                id, 
-                Success,
-                hydrateEntityFn);
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, TEntity>> CheckEntityExistsChainable(
-            TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            return CheckEntityExists(id, entity => entity, hydrateEntityFn);
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ActionResult, TEntity>> CheckEntityExistsChainableActionResult(
-            TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            return CheckEntityExistsActionResult(id, 
-                entity => Task.FromResult(new Either<ActionResult, TEntity>(entity)), 
-                hydrateEntityFn);
+                entity => Task.FromResult(new Either<ActionResult, TEntity>(entity)));
         }
     }
 }
