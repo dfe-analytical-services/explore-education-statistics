@@ -1117,6 +1117,8 @@
           ],
           "properties": {
             "state": "Enabled",
+            "disabledAlerts": "",
+            // "emailAddresses": "[variables('emailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1262,6 +1264,8 @@
           ],
           "properties": {
             "state": "Enabled",
+            "disabledAlerts": "",
+            // "emailAddresses": "[variables('emailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1283,7 +1287,6 @@
             }
           }
         },
-
         {
           "type": "auditingSettings",
           "name": "DefaultAuditingSettings",
@@ -1295,7 +1298,7 @@
             "storageAccountSubscriptionId": "[subscription().Id]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true
+            "isAzureMonitorTargetEnabled": true,
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
