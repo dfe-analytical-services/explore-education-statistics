@@ -1098,24 +1098,6 @@
         },
 
         {
-          "type": "Microsoft.Sql/servers/firewallRules",
-          "name": "[concat(variables('sqlserverName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
-          "apiVersion": "2015-05-01-preview",
-          "scale": null,
-          "properties": {
-            "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
-            "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
-          ],
-          "copy": {
-            "name": "firewallloop",
-            "count": "[length(parameters('sqlFirewallRules'))]"
-          }
-        },
-
-        {
           "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
@@ -1208,6 +1190,23 @@
       }
     },
     {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('sqlserverName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "apiVersion": "2018-06-01-preview",
@@ -1271,24 +1270,6 @@
           "properties": {
             "endIpAddress": "0.0.0.0",
             "startIpAddress": "0.0.0.0"
-          }
-        },
-
-        {
-          "type": "Microsoft.Sql/servers/firewallRules",
-          "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
-          "apiVersion": "2015-05-01-preview",
-          "scale": null,
-          "properties": {
-            "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
-            "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
-          ],
-          "copy": {
-            "name": "firewallloop",
-            "count": "[length(parameters('sqlFirewallRules'))]"
           }
         },
 
@@ -1368,6 +1349,23 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
       }
     },
     {
