@@ -23,6 +23,10 @@ Verify correct data is shown when theme and topic is shown
     user clicks element   css:#my-publications-tab
     user waits until page contains element  css:#selectTheme
     user selects from list by label  css:#selectTheme  Finance and funding
+
+    # EES-892 - Selecting theme or topic refreshes the page, so must wait
+    user waits until page contains element   css:#selectTopic
+
     user selects from list by label  css:#selectTopic  Local authority and school finance
     user checks page contains accordion  Income and expenditure in academies in England
     user checks accordion section contains text  Income and expenditure in academies in England    Methodology

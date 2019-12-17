@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 config.GetConnectionString("PublicStorage"), ContainerName);
         }
 
-        public async Task<bool> CleanAndRebuildFullCache()
+        public async Task<bool> GenerateReleaseContent(GenerateReleaseContentMessage message)
+        {
+            // TODO EES-861 Switch actions based on message content, for now full rebuild
+            return await CleanAndRebuildFullCache();
+        }
+        
+        private async Task<bool> CleanAndRebuildFullCache()
         {
             try
             {

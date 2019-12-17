@@ -76,6 +76,7 @@ export interface TableToolWizardProps {
     query: TableDataQuery;
     tableHeaders: TableHeadersConfig;
   }) => void;
+  onInitialQueryLoaded?: () => void;
 }
 
 const TableToolWizard = ({
@@ -85,6 +86,7 @@ const TableToolWizard = ({
   initialQuery,
   finalStep,
   onTableCreated,
+  onInitialQueryLoaded,
 }: TableToolWizardProps) => {
   const [publication, setPublication] = React.useState<Publication>();
   const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
@@ -143,6 +145,8 @@ const TableToolWizard = ({
         setInitialStep(initialStep);
 
         setTableToolState(state);
+
+        if (onInitialQueryLoaded) onInitialQueryLoaded();
       }
     });
   }, [initialQuery, releaseId]);

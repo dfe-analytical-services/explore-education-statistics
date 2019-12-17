@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message)
+        public async Task CopyReleaseToPublicContainer(PublishReleaseFilesMessage message)
         {
             var privateContainer =
                 await FileStorageUtils.GetCloudBlobContainerAsync(_privateStorageConnectionString,
@@ -46,8 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContainerName);
 
             var sourceDirectoryPath = AdminReleaseDirectoryPath(message.ReleaseId);
-            var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
-
+            var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug); 
+            
+            await DeleteFilesAsync(publicContainer, destinationDirectoryPath);
+            
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
                 publicContainer, message);
         }
@@ -60,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
-            PublishReleaseDataMessage message)
+            PublishReleaseFilesMessage message)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
@@ -79,9 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
             context.ShouldTransferCallbackAsync += ShouldTransferCallbackAsync;
-            
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, CopyMethod.ServiceSideAsyncCopy, options, context);
-            
+
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
+                CopyMethod.ServiceSideAsyncCopy, options, context);
+
             ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
         }
 
@@ -107,7 +110,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 #pragma warning restore 1998
         {
             var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
-            (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
+            if (destination is CloudBlockBlob cloudBlockBlob)
+            {
+                cloudBlockBlob.Metadata["releasedatetime"] = releasePublishedString;
+            }
+        }
+
+#pragma warning disable 1998
+        private static async Task<bool> ShouldOverwriteCallbackAsync(object source, object destination)
+#pragma warning restore 1998
+        {
+            return false;
         }
 
         private static async Task<bool> ShouldTransferCallbackAsync(object source, object destination)
@@ -122,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
-            PublishReleaseDataMessage message)
+            PublishReleaseFilesMessage message)
         {
             var cloudBlockBlob = CreateBlobForAllFilesZip(directory, message);
             var memoryStream = new MemoryStream();
@@ -138,6 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var context = new SingleTransferContext();
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
+            context.ShouldOverwriteCallbackAsync += ShouldOverwriteCallbackAsync;
 
             zipOutputStream.Finish();
             await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
@@ -157,18 +171,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return cloudBlob.Uri.Segments.Last();
         }
 
-        private static string GetZipFilePath(PublishReleaseDataMessage message)
+        private static string GetZipFilePath(PublishReleaseFilesMessage message)
         {
             return $"{Ancillary.GetEnumLabel()}/{message.PublicationSlug}_{message.ReleaseSlug}.zip";
         }
 
         private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory,
-            PublishReleaseDataMessage message)
+            PublishReleaseFilesMessage message)
         {
             var blob = directory.GetBlockBlobReference(GetZipFilePath(message));
             blob.Properties.ContentType = "application/x-zip-compressed";
             blob.Metadata.Add("name", "All files");
             return blob;
+        }
+
+        private async Task DeleteFilesAsync(CloudBlobContainer container, string directoryPath)
+        {
+            var token = new BlobContinuationToken();
+            do
+            {
+                var result = await container.ListBlobsSegmentedAsync(directoryPath, 
+                    true,
+                    BlobListingDetails.None,
+                    null,
+                    token, null, 
+                    null);
+                
+                token = result.ContinuationToken;
+                
+                await Task.WhenAll(result.Results
+                    .Select(item =>
+                    {
+                        _logger.LogInformation($"Deleting {item.StorageUri}");
+                        return (item as CloudBlob)?.DeleteIfExistsAsync();
+                    })
+                    .Where(task => task != null)
+                );
+            } while (token != null);
         }
     }
 }
