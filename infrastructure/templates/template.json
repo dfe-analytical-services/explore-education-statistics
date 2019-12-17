@@ -691,6 +691,8 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "ipSecurityRestrictions": "[variables('ipSecurityRestrictions']",
+          "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
