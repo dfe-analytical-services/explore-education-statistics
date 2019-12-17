@@ -4,6 +4,7 @@
 
   Amendments to the original file are marked within this file with the word "HIVE".
 */
+import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import React from 'react';
 import { Component } from 'react';
 import authService from './AuthorizeService';
@@ -13,7 +14,6 @@ import {
   LogoutActions,
   ApplicationPaths,
 } from './ApiAuthorizationConstants';
-import { Redirect } from 'react-router';
 
 // The main responsibility of this component is to handle the user's logout process.
 // This is the starting point for the logout process, which is usually initiated when a
@@ -85,11 +85,11 @@ export class Logout extends Component {
     // }
 
     // HIVE
-    // Added a redirect to app root on was logged out
+    // Added a SignoutPage on was logged out
     const action = this.props.action;
     switch (action) {
       case LogoutActions.LoggedOut:
-        return <Redirect to="" />;
+        return <SignedOutPage />;
       default:
         return null;
     }

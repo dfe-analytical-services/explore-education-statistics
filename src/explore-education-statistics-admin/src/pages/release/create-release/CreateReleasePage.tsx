@@ -4,7 +4,7 @@ import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
-import dashboardRoutes from '@admin/routes/dashboard/routes';
+import appRouteList from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import {
   IdTitlePair,
@@ -95,7 +95,8 @@ const CreateReleasePage = ({
     ...errorCodeMappings,
   );
 
-  const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
+  const cancelHandler = () =>
+    history.push(appRouteList.adminDashboard.path as string);
 
   return (
     <Page

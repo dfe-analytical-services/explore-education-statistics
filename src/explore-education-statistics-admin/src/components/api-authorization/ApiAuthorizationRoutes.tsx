@@ -20,7 +20,7 @@ function logoutAction(name: string) {
   return <Logout action={name} />;
 }
 
-const ApiAuthorizationRouteList: Dictionary<RouteProps> = {
+const apiAuthorizationRouteList: Dictionary<RouteProps> = {
   login: {
     path: ApplicationPaths.Login,
     render: () => loginAction(LoginActions.Login),
@@ -55,4 +55,4 @@ const ApiAuthorizationRouteList: Dictionary<RouteProps> = {
   },
 };
 
-export default ApiAuthorizationRouteList;
+export default apiAuthorizationRouteList;

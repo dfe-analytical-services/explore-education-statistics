@@ -1,68 +1,55 @@
-import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ApiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
+import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
-import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
-import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
-import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
-import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
-import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
-import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
-import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
-import dashboardRoutes from '@admin/routes/dashboard/routes';
-import publicationRoutes from '@admin/routes/edit-publication/routes';
-import releaseRoutes from '@admin/routes/edit-release/routes';
+import IndexPage from '@admin/pages/IndexPage';
+import PrototypeAdminDashboard from '@admin/pages/prototypes/PrototypeAdminDashboard';
+import PrototypeChartTest from '@admin/pages/prototypes/PrototypeChartTest';
+import MethodologyCreateNewConfig from '@admin/pages/prototypes/PrototypeMethodologyConfig';
+import MethodologyEditPage from '@admin/pages/prototypes/PrototypeMethodologyEdit';
+import MethodologyCreateNew from '@admin/pages/prototypes/PrototypeMethodologyPageCreateNew';
+import MethodologyCreateNewStatus from '@admin/pages/prototypes/PrototypeMethodologyStatus';
+import PublicationAssignMethodology from '@admin/pages/prototypes/PrototypePublicationPageAssignMethodology';
+import PublicationConfirmNew from '@admin/pages/prototypes/PrototypePublicationPageConfirmNew';
+import PublicationCreateNew from '@admin/pages/prototypes/PrototypePublicationPageCreateNew';
+import PublicationEditPage from '@admin/pages/prototypes/PrototypePublicationPageEditAbsence';
+import PublicationEditUnresolvedComments from '@admin/pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditNew from '@admin/pages/prototypes/PrototypePublicationPageEditNew';
+import PublicationCreateNewAbsenceConfig from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
+import PublicationCreateNewAbsenceConfigEdit from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
+import PublicationCreateNewAbsenceData from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceData';
+import PublicationCreateNewAbsenceSchedule from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
+import PublicationCreateNewAbsenceScheduleEdit from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
+import PublicationCreateNewAbsenceStatus from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
+import PublicationCreateNewAbsenceTable from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceTable';
+import PublicationCreateNewAbsenceViewTables from '@admin/pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
+import PublicationReviewPage from '@admin/pages/prototypes/PrototypePublicationPageReviewAbsence';
+import ReleaseCreateNew from '@admin/pages/prototypes/PrototypeReleasePageCreateNew';
+import PrototypesIndexPage from '@admin/pages/prototypes/PrototypesIndexPage';
+import PrototypeTableTool from '@admin/pages/prototypes/PrototypeTableTool';
 import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
 import React from 'react';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
-import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
-import BauDashboardPage from './pages/bau/BauDashboardPage';
-import BauMethodologyPage from './pages/bau/BauMethodologyPage';
-import AdminDocumentationCreateNewPublication from './pages/documentation/DocumentationCreateNewPublication';
-import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
-import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
-import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
-import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
-import AdminDocumentationHome from './pages/documentation/DocumentationHome';
-import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
-import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
-import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
-import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
-import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
-import IndexPage from './pages/IndexPage';
-import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
-import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-import MethodologyCreateNewConfig from './pages/prototypes/PrototypeMethodologyConfig';
-import MethodologyEditPage from './pages/prototypes/PrototypeMethodologyEdit';
-import MethodologyCreateNew from './pages/prototypes/PrototypeMethodologyPageCreateNew';
-import MethodologyCreateNewStatus from './pages/prototypes/PrototypeMethodologyStatus';
-import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
-import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
-import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
-import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
-import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
-import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
-import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
-import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
-import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
-import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
-import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
-import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
-import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
-import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
-import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
-import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
-import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
-import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import PageNotFoundPage from './pages/errors/PageNotFoundPage';
+import appRouteList from './routes/dashboard/routes';
+import prototypeRouteList from './routes/prototypeRoutes';
 
 function App() {
-  const authRoutes = Object.entries(ApiAuthorizationRouteList).map(
+  const authRoutes = Object.entries(apiAuthorizationRouteList).map(
     ([key, authRoute]) => {
       return <Route exact key={`authRoute-${key}`} {...authRoute} />;
+    },
+  );
+
+  const appRoutes = Object.entries(appRouteList).map(([key, appRoute]) => {
+    return <ProtectedRoute key={`appRoute-${key}`} {...appRoute} />;
+  });
+
+  const prototypeRoutes = Object.entries(prototypeRouteList).map(
+    ([key, prototypeRoute]) => {
+      return <Route key={`authRoute-${key}`} {...prototypeRoute} />;
     },
   );
 
@@ -73,120 +60,9 @@ function App() {
           <ErrorBoundary>
             <Switch>
               {authRoutes}
-              <ProtectedRoute exact path="/" component={AdminDashboardPage} />
-              <ProtectedRoute
-                exact
-                path="/dashboard"
-                component={AdminDashboardPage}
-              />
-              <ProtectedRoute
-                path={dashboardRoutes.adminDashboardThemeTopic}
-                component={AdminDashboardPage}
-              />
+              {appRoutes}
+              {prototypeRoutes}
 
-              <ProtectedRoute
-                exact
-                path="/administration"
-                component={BauDashboardPage}
-              />
-
-              <ProtectedRoute
-                exact
-                path="/administration/methodology"
-                component={BauMethodologyPage}
-              />
-
-              <ProtectedRoute
-                exact
-                path={ApplicationPaths.LoggedOut}
-                component={SignedOutPage}
-                redirectIfNotLoggedIn={false}
-              />
-              <ProtectedRoute
-                exact
-                path="/methodology"
-                component={ListMethodologyPages}
-              />
-              <ProtectedRoute
-                exact
-                path="/methodology/create"
-                component={CreateMethodologyPage}
-              />
-              <ProtectedRoute
-                exact
-                path="/methodology/:methodologyId"
-                component={EditMethodologyPage}
-              />
-              <ProtectedRoute
-                exact
-                path={publicationRoutes.createPublication.route}
-                component={CreatePublicationPage}
-              />
-              <ProtectedRoute
-                exact
-                path={releaseRoutes.createReleaseRoute.route}
-                component={CreateReleasePage}
-              />
-              <ProtectedRoute
-                path="/publication/:publicationId/release/:releaseId"
-                component={ManageReleasePageContainer}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/"
-                component={AdminDocumentationHome}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/content-design-standards-guide"
-                component={AdminDocumentationContentDesignStandards}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/glossary"
-                component={AdminDocumentationGlossary}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/style-guide"
-                component={AdminDocumentationStyle}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/using-dashboard"
-                component={AdminDocumentationUsingDashboard}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/create-new-release"
-                component={AdminDocumentationCreateNewRelease}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/create-new-publication"
-                component={AdminDocumentationCreateNewPublication}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/edit-release"
-                component={AdminDocumentationEditRelease}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/manage-content"
-                component={AdminDocumentationManageContent}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/manage-data"
-                component={AdminDocumentationManageData}
-              />
-              <ProtectedRoute
-                exact
-                path="/documentation/manage-data-block"
-                component={AdminDocumentationManageDataBlocks}
-              />
-              {/* Prototype Routes */}
               <Route exact path="/index" component={IndexPage} />
 
               <Route
@@ -330,6 +206,7 @@ function App() {
                 path="/prototypes/publication-create-new-methodology-status"
                 component={MethodologyCreateNewStatus}
               />
+
               <Route component={PageNotFoundPage} />
             </Switch>
           </ErrorBoundary>
