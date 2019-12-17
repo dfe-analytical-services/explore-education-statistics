@@ -105,6 +105,10 @@
         "description": "Number of days to retain the security alerts for"
       }
     },
+    "sqlAuditing": {
+      "type": "bool",
+      "defaultValue": true
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
@@ -1161,6 +1165,7 @@
         },
 
         {
+          "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
           "name": "DefaultAuditingSettings",
           "apiVersion": "2017-03-01-preview",
@@ -1320,6 +1325,7 @@
           }
         },
         {
+          "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
           "name": "DefaultAuditingSettings",
           "apiVersion": "2017-03-01-preview",
