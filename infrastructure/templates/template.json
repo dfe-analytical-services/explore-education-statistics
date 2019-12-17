@@ -1152,8 +1152,8 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
           ]
         }
       ],
