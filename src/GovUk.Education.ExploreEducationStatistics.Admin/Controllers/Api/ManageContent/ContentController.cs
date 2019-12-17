@@ -147,5 +147,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment),
                 Ok);
         }
+        
+                
+        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
+        public Task<ActionResult<CommentViewModel>> AddComment(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, comment),
+                Ok);
+        }
+        
+        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
+        public Task<ActionResult<CommentViewModel>> DeleteComment(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId),
+                Ok);
+        }
+
     }
 }

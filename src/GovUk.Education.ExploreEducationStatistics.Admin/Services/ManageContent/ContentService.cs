@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
@@ -541,6 +542,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _context.SaveChangesAsync();
                     return _mapper.Map<CommentViewModel>(newComment.Entity);
+                }
+            );
+        }
+
+        public Task<Either<ValidationResult, CommentViewModel>> UpdateCommentAsync(Guid releaseId,
+            Guid contentSectionId, Guid contentBlockId, Guid commentId,
+            UpdateCommentRequest commentRequest)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (contentBlock == null)
+                    {
+                        return ValidationResult<CommentViewModel>(ValidationErrorMessages.ContentBlockNotFound);
+                    }
+
+                    var comment = _context.Comment
+                        .FirstOrDefault(c => c.Id == commentId);
+
+
+                    if (comment == null)
+                    {
+                        return ValidationResult<CommentViewModel>(ValidationErrorMessages.CommentNotFound);
+                    }
+
+                    comment.Name = commentRequest.Name;
+                    comment.State = EnumUtil.GetFromString<CommentState>(commentRequest.State);
+                    comment.Time = commentRequest.Time;
+                    comment.CommentText = commentRequest.CommentText;
+                    comment.ResolvedBy = commentRequest.ResolvedBy;
+                    comment.ResolvedOn = commentRequest.ResolvedOn;
+
+                    _context.Comment.Update(comment);
+                    await _context.SaveChangesAsync();
+
+                    return _mapper.Map<CommentViewModel>(comment);
+                }
+            );
+        }
+
+        public Task<Either<ValidationResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId, async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (contentBlock == null)
+                    {
+                        return ValidationResult<CommentViewModel>(ValidationErrorMessages.ContentBlockNotFound);
+                    }
+
+                    var comment = _context.Comment
+                        .FirstOrDefault(c => c.Id == commentId);
+
+
+                    if (comment == null)
+                    {
+                        return ValidationResult<CommentViewModel>(ValidationErrorMessages.CommentNotFound);
+                    }
+
+                    _context.Comment.Remove(comment);
+                    await _context.SaveChangesAsync();
+
+                    return _mapper.Map<CommentViewModel>(comment);
+
                 }
             );
         }
