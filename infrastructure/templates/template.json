@@ -1282,6 +1282,25 @@
               "emailSubscriptionAdmins": true
             }
           }
+        },
+
+        {
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().Id]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+          ]
         }
       ],
       "tags": {
