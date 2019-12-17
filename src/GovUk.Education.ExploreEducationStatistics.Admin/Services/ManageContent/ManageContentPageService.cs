@@ -6,11 +6,9 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -20,19 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IContentService _contentService;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
 
         public ManageContentPageService(
-            ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageService, IContentService contentService)
+            IMapper mapper,
+            IFileStorageService fileStorageService, 
+            IContentService contentService, 
+            IPersistenceHelper<Release, Guid> releaseHelper)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
             _contentService = contentService;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(
-                context,
-                context.Releases,
-                ValidationErrorMessages.ReleaseNotFound);
+            _releaseHelper = releaseHelper;
         }
 
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(

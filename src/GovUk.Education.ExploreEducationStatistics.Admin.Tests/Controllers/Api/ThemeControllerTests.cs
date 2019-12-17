@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -15,10 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public void Get_UserTheme_Returns_Ok()
         {
             var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.GetUserThemes(It.IsAny<Guid>() /* TODO User Id */)).Returns(
-                new List<Theme>
+            themeService.Setup(s => s.GetMyThemesAsync()).Returns(
+                Task.FromResult(new List<Theme>
                 {
-                    new Theme()
+                    new Theme
                     {
                         Title = "Theme A",
                         Topics = new List<Topic>
@@ -30,13 +30,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         }
                         
                     }
-                }
+                })
             );
             var controller = new ThemeController(themeService.Object);
             
             // Method under test
             var result = controller.GetMyThemes();
-            Assert.IsAssignableFrom<List<Theme>>(result.Value);
+            Assert.IsAssignableFrom<List<Theme>>(result.Result.Value);
         }
     }
 }

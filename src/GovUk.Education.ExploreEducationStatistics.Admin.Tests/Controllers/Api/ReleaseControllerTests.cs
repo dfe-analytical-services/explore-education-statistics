@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper.Configuration.Annotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -37,6 +36,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
         };
 
+        private readonly Guid _releaseId = Guid.NewGuid();
+        private readonly Guid _publicationId = Guid.NewGuid();
+        
+        private readonly Task<Either<ActionResult, Release>> _releaseExistsResult 
+            = Task.FromResult(new Either<ActionResult, Release>(new Release()));
+        
+        private readonly Task<Either<ActionResult, Publication>> _publicationExistsResult 
+            = Task.FromResult(new Either<ActionResult, Publication>(new Publication()));
+        
+        private readonly Task<Either<ActionResult, Release>> _releaseNotFoundResult 
+            = Task.FromResult(new Either<ActionResult, Release>(new NotFoundResult()));
+
         public ReleaseControllerTests()
         {
             SetupUser();
@@ -45,35 +56,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void Create_Release_Returns_Ok()
         {
-            var publicationId = Guid.NewGuid();
             var mocks = Mocks();
-            mocks.PublicationService.Setup(s => s.GetAsync(It.Is<Guid>(id => id == publicationId)))
-                .Returns(Task.FromResult(new Publication()));
+            SetupPublicationExistsResult(mocks.PublicationHelper);
+            
             mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
-                .Returns(Task.FromResult(new Either<ValidationResult, ReleaseViewModel>(new ReleaseViewModel())));
+                .Returns(Task.FromResult(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel())));
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), publicationId);
+            var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), _publicationId);
             AssertOkResult<ReleaseViewModel>(result);
         }
 
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var releaseId = Guid.NewGuid();
             var mocks = Mocks();
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            
             var ancillaryFile = MockFile("ancillaryFile.doc");
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                    service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
+                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(releaseId, "File name", ancillaryFile);
+            var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
             var unboxed = AssertOkResult(actionResult);
             Assert.NotNull(unboxed);
         }
@@ -82,18 +91,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
             var mocks = Mocks();
+            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            
             var ancillaryFile = MockFile("ancillaryFile.doc");
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(Guid.NewGuid(), "File name", ancillaryFile);
+            var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
             AssertNotFound(actionResult);
         }
 
         [Fact]
         public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
         {
-            var releaseId = Guid.NewGuid();
             IEnumerable<FileInfo> testFiles = new[]
             {
                 new FileInfo
@@ -112,14 +122,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             };
             var mocks = Mocks();
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
                 .Returns(Task.FromResult(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var result = await controller.GetAncillaryFilesAsync(releaseId);
+            var result = await controller.GetAncillaryFilesAsync(_releaseId);
             var unboxed = AssertOkResult<IEnumerable<FileInfo>>(result);
             Assert.NotNull(unboxed);
         }
@@ -128,30 +137,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task GetAncillaryFilesAsync_Returns_NotFound()
         {
             var mocks = Mocks();
+            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test 
-            var result = await controller.GetAncillaryFilesAsync(Guid.NewGuid());
+            var result = await controller.GetAncillaryFilesAsync(_releaseId);
             AssertNotFound(result);
         }
         
         [Fact(Skip="Needs principal setting")]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var releaseId = Guid.NewGuid();
             var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
 
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false, "test user"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, "test user"))
+                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
-            var result = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }
@@ -160,42 +170,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
             var mocks = Mocks();
+            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var result = await controller.AddDataFilesAsync(Guid.NewGuid(), "Subject name", dataFile, metaFile);
+            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
             AssertNotFound(result);
         }
 
         [Fact(Skip="Needs principal setting")]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
         {
-            var releaseId = Guid.NewGuid();
             var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
 
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false, 
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, 
                     "test user"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
-                    ValidationResult(CannotOverwriteFile)));
+                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(
+                    new BadRequestObjectResult(CannotOverwriteFile)));
 
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var result = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
             AssertValidationProblem(result, CannotOverwriteFile);
         }
 
         [Fact]
         public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
-            var releaseId = Guid.NewGuid();
             IEnumerable<FileInfo> testFiles = new[]
             {
                 new FileInfo
@@ -215,14 +225,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             var mocks = Mocks();
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
                 .Returns(Task.FromResult(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.GetDataFilesAsync(releaseId);
+            var result = await controller.GetDataFilesAsync(_releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Contains(unboxed, f => f.Name == "Release a file 1");
             Assert.Contains(unboxed, f => f.Name == "Release a file 2");
@@ -232,27 +243,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task GetDataFilesAsync_Returns_NotFound()
         {
             var mocks = Mocks();
+            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
-            var result = await controller.GetDataFilesAsync(Guid.NewGuid());
+            var result = await controller.GetDataFilesAsync(_releaseId);
             AssertNotFound(result);
         }
 
         [Fact]
         public async Task DeleteDataFilesAsync_Returns_OK()
         {
-            var releaseId = Guid.NewGuid();
             var mocks = Mocks();
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(releaseId, "datafilename","subject title");
+            var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }
@@ -260,18 +273,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
         {
-            var releaseId = Guid.NewGuid();
             var mocks = Mocks();
-            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
-                    ValidationResult(UnableToFindMetadataFileToDelete)));
+                .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(
+                    ValidationActionResult(UnableToFindMetadataFileToDelete)));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(releaseId, "datafilename","subject title");
+            var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
             AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
         }
 
@@ -279,53 +292,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void Edit_Release_Summary_Returns_Ok()
         {
             var mocks = Mocks();
-            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
+            
+            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            
             mocks.ReleaseService
                 .Setup(s => s.EditReleaseSummaryAsync(
-                    It.Is<Guid>(id => id.Equals(releaseId)), 
+                    It.Is<Guid>(id => id.Equals(_releaseId)), 
                     It.IsAny<UpdateReleaseSummaryRequest>())
                 )
                 .Returns(Task.FromResult(
-                    new Either<ValidationResult, ReleaseViewModel>(new ReleaseViewModel {Id = releaseId})));
-            mocks.ReleaseService
-                .Setup(s => s.GetAsync(releaseId))
-                .Returns(Task.FromResult(new Release()));
+                    new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel {Id = _releaseId})));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.UpdateReleaseSummaryAsync(new UpdateReleaseSummaryRequest(), releaseId);
+            var result = await controller.UpdateReleaseSummaryAsync(new UpdateReleaseSummaryRequest(), _releaseId);
             var unboxed = AssertOkResult(result);
-            Assert.Equal(releaseId, unboxed.Id);
+            Assert.Equal(_releaseId, unboxed.Id);
         }
 
         [Fact]
         public async void Get_Release_Summary_Returns_Ok()
         {
             var mocks = Mocks();
-            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
             mocks.ReleaseService
                 .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(new ReleaseSummaryViewModel {Id = id}));
+                .Returns<Guid>(id => Task.FromResult(new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel {Id = id})));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.GetReleaseSummaryAsync(releaseId);
+            var result = await controller.GetReleaseSummaryAsync(_releaseId);
             var unboxed = AssertOkResult(result);
-            Assert.Equal(unboxed.Id, releaseId);
+            Assert.Equal(unboxed.Id, _releaseId);
         }
 
         [Fact]
         public async void Get_Releases_For_Publication_Returns_Ok()
         {
             var mocks = Mocks();
-            var releaseId = new Guid("fc570a6c-d230-40ae-a5e5-febab330fb12");
             mocks.ReleaseService
-                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == releaseId)))
+                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == _releaseId)))
                 .Returns<Guid>(x => Task.FromResult(new List<ReleaseViewModel>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.GetReleaseForPublicationAsync(releaseId);
+            var result = await controller.GetReleaseForPublicationAsync(_releaseId);
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }
@@ -381,21 +391,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static (Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IPublicationService> PublicationService,
             Mock<IImportStatusService> ImportStatusService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
-            Mock<UserManager<ApplicationUser>> UserManager
-            ) Mocks()
+            Mock<UserManager<ApplicationUser>> UserManager,
+            Mock<IPersistenceHelper<Release, Guid>> ReleaseHelper,
+            Mock<IPersistenceHelper<Publication, Guid>> PublicationHelper) Mocks()
         {
             return (new Mock<IImportService>(),
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
-                    new Mock<IPublicationService>(),
                     new Mock<IImportStatusService>(),
                     new Mock<ISubjectService>(),
                     new Mock<ITableStorageService>(),
-                    MockUserManager<ApplicationUser>(Users)
+                    MockUserManager<ApplicationUser>(Users),
+                    new Mock<IPersistenceHelper<Release, Guid>>(),
+                    new Mock<IPersistenceHelper<Publication, Guid>>()
                 );
         }
 
@@ -403,21 +414,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IPublicationService> PublicationService,
             Mock<IImportStatusService> ImportStatusService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
-            Mock<UserManager<ApplicationUser>> UserManager
-            ) mocks)
+            Mock<UserManager<ApplicationUser>> UserManager,
+            Mock<IPersistenceHelper<Release, Guid>> ReleaseHelper,
+            Mock<IPersistenceHelper<Publication, Guid>> PublicationHelper) mocks)
         {
-            return new ReleasesController(mocks.ImportService.Object,
+            return new ReleasesController(
+                mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
-                mocks.PublicationService.Object,
                 mocks.ImportStatusService.Object,
                 mocks.SubjectService.Object,
                 mocks.TableStorageService.Object,
-                mocks.UserManager.Object
+                mocks.UserManager.Object,
+                mocks.ReleaseHelper.Object,
+                mocks.PublicationHelper.Object
                 );
         }
         
@@ -433,6 +446,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mgr.Setup(x => x.UpdateAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
 
             return mgr;
+        }
+        
+        private void SetupReleaseExistsResult(Mock<IPersistenceHelper<Release, Guid>> releaseHelper)
+        {
+            releaseHelper
+                .Setup(s => s
+                    .CheckEntityExistsChainableActionResult(_releaseId, null))
+                .Returns(_releaseExistsResult);
+        }
+        
+        private void SetupReleaseNotFoundResult(Mock<IPersistenceHelper<Release, Guid>> releaseHelper)
+        {
+            releaseHelper
+                .Setup(s => s
+                    .CheckEntityExistsChainableActionResult(_releaseId, null))
+                .Returns(_releaseNotFoundResult);
+        }
+
+        private void SetupPublicationExistsResult(Mock<IPersistenceHelper<Publication, Guid>> publicationHelper)
+        {
+            publicationHelper
+                .Setup(s => s
+                    .CheckEntityExistsChainableActionResult(_publicationId, null))
+                .Returns(_publicationExistsResult);
         }
 
         private void SetupUser()

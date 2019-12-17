@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -18,41 +19,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class DataBlocksController : ControllerBase
     {
         private readonly IDataBlockService _dataBlockService;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
-        private readonly PersistenceHelper<DataBlock, Guid> _dataBlockHelper;
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<DataBlock, Guid> _dataBlockHelper;
 
-        public DataBlocksController(ContentDbContext context, IDataBlockService dataBlockService)
+        public DataBlocksController(
+            IDataBlockService dataBlockService, 
+            IPersistenceHelper<Release, Guid> releaseHelper, 
+            IPersistenceHelper<DataBlock, Guid> dataBlockHelper)
         {
             _dataBlockService = dataBlockService;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(context, context.Releases, ReleaseNotFound);
-            _dataBlockHelper = new PersistenceHelper<DataBlock, Guid>(context, context.DataBlocks, ContentBlockNotFound);
+            _releaseHelper = releaseHelper;
+            _dataBlockHelper = dataBlockHelper;
         }
 
         [HttpPost("release/{releaseId}/datablocks")]
-        public Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(Guid releaseId,
+        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(Guid releaseId,
             CreateDataBlockViewModel dataBlock)
         {
-            return this.HandlingValidationErrorsAsync(() => 
-                _releaseHelper.CheckEntityExists(releaseId, release =>
-                    _dataBlockService.CreateAsync(releaseId, dataBlock))
-                , Ok);
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return await _releaseHelper
+                .CheckEntityExistsChainable(releaseId)
+                .OnSuccess(_ => _dataBlockService.CreateAsync(releaseId, dataBlock))
+                .OnSuccess(Ok)
+                .HandleFailures(this);
         }
 
         [HttpDelete("datablocks/{id}")]
         public Task<ActionResult> DeleteDataBlockAsync(Guid id)
         {
-            return this.HandlingValidationErrorsAsyncNoReturn(() => 
-                _dataBlockHelper.CheckEntityExists(id, _ => _dataBlockService.DeleteAsync(id)),
-                () => new NoContentResult());
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return _dataBlockHelper
+                .CheckEntityExistsChainableActionResult(id)
+                .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
+                .OnSuccess(_ => new NoContentResult())
+                .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
-        public Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(Guid releaseId)
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(() => 
-                _releaseHelper.CheckEntityExists(releaseId, release =>
-                    _dataBlockService.ListAsync(releaseId))
-                , Ok);
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return await _releaseHelper
+                .CheckEntityExistsChainable(releaseId)
+                .OnSuccess(release => _dataBlockService.ListAsync(releaseId))
+                .OnSuccess(Ok)
+                .HandleFailures(this);
         }
 
         [HttpGet("datablocks/{id}")]

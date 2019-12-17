@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
@@ -41,7 +42,7 @@ public class Either<Tl, Tr> {
 
     public static class EitherTaskExtensions 
     {
-        public static async Task<Either<Tl, Tr>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
+        public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
         {
             var firstResult = await task;
             if (firstResult.IsLeft)
@@ -65,6 +66,45 @@ public class Either<Tl, Tr> {
             return new Either<Tl, T>(next);
         }
         
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<Either<Tl, T>>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = await func();
+
+            return next.IsLeft 
+                ? new Either<Tl, T>(firstResult.Left) 
+                : new Either<Tl, T>(next.Right);
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<T>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = await func(firstResult.Right);
+            return new Either<Tl, T>(next);
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, T> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = func(firstResult.Right);
+            return new Either<Tl, T>(next);
+        }
+        
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
         {
             var firstResult = await task;
@@ -75,6 +115,29 @@ public class Either<Tl, Tr> {
 
             var next = await func(firstResult.Right);
             return next;
+        }
+        
+        public static async Task<Either<T, Tr>> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<T>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return new Either<T, Tr>(firstResult.Right);
+            }
+
+            var next = await func(firstResult.Left);
+            return new Either<T, Tr>(next);
+        }
+        
+        public static async Task<T> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, T> func) where Tr : T
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            return func(firstResult.Left);
         }
     }
 }

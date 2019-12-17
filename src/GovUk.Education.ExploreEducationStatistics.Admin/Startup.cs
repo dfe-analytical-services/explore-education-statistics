@@ -1,13 +1,16 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -239,12 +242,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+            ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
+            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.EntityNotFound);
+            ServicesAddPersistenceHelper(services, c => c.DataBlocks, ValidationErrorMessages.ContentBlockNotFound);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
             
-            // This service allows us to check our Policies within Controllers and Services
+            // These services allow us to check our Policies within Controllers and Services
             services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
+            services.AddTransient<IUserService, UserService>();
             
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
@@ -274,6 +281,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     }
                 });
             });
+        }
+
+        private static void ServicesAddPersistenceHelper<TEntity>(
+            IServiceCollection services, 
+            Func<ContentDbContext, DbSet<TEntity>> entitySetFn,
+            ValidationErrorMessages notFoundMessage)
+            where TEntity : class 
+        {
+            services.AddTransient<
+                IPersistenceHelper<TEntity, Guid>,
+                PersistenceHelper<TEntity, Guid, ContentDbContext>>(
+                s =>
+                {
+                    var dbContext = s.GetService<ContentDbContext>();
+                    return new PersistenceHelper<TEntity, Guid, ContentDbContext>(
+                        dbContext,
+                        entitySetFn.Invoke(dbContext),
+                        notFoundMessage);
+                });
         }
 
 

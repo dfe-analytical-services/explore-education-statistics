@@ -1,11 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Moq;
 using Xunit;
+using Xunit.Sdk;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -18,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithoutMethodology()
         {
+            var userService = Mocks();
+            
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 context.Add(new Topic {Id = new Guid("861517a2-5055-486c-b362-f971d9791943")});
@@ -27,8 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
+                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                    userService.Object);
+                
                 // Service method under test
-                var result = await new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublicationAsync(new CreatePublicationViewModel()
+                var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942"),
@@ -46,6 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithMethodology()
         {
+            var userService = Mocks();
+            
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
                 context.Add(new Topic {Id = new Guid("b9ce9ddc-efdc-4853-b709-054dc7eed6e4")});
@@ -63,8 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
+                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                    userService.Object);
+                
                 // Service method under test
-                var result = await new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublicationAsync(new CreatePublicationViewModel()
+                var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("cd6c265b-7fbc-4c15-ab36-7c3e0ea216d5"),
@@ -89,11 +106,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationFailsWithNonUniqueSlug()
         {
+            var userService = Mocks();
+
             const string titleToBeDuplicated = "A title to be duplicated";
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var result = await new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublicationAsync(
+                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                    userService.Object);
+                
+                var result = await publicationService.CreatePublicationAsync(
                     new CreatePublicationViewModel
                     {
                         Title = titleToBeDuplicated
@@ -103,8 +125,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
+                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                    userService.Object);
+                
                 // Service method under test
-                var result = await new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublicationAsync(
+                var result = await publicationService.CreatePublicationAsync(
                     new CreatePublicationViewModel()
                     {
                         Title = titleToBeDuplicated,
@@ -120,6 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void LatestReleaseCorrectlyReportedInPublication()
         {
+            var userService = Mocks();
 
             var latestReleaseId = new Guid("4a01ee05-55b8-4764-83eb-6559108fac7e");
             var notLatestReleaseId = new Guid("e3aa5543-7993-4ea5-9827-730671a7729f");
@@ -161,14 +187,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReportedInPublication"))
             {
+                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                    userService.Object);
+                
                 // Method under test - this return a list of publication for a user. The releases in the publication
                 // should correctly report whether they are the latest or not. Note that this is dependent on the mapper
                 // that we are passing in.
-                var publications = await new PublicationService(context, MapperForProfile<MappingProfiles>()).GetMyPublicationsAndReleasesByTopicAsync(topicId, new Guid() /*currently not used*/);
+                var publications = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
                 var releases = publications.Single().Releases;
                 Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease)); 
                 Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
             }
+        }
+
+        private Mock<IUserService> Mocks()
+        {
+            var userService = new Mock<IUserService>();
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(true);
+
+            return userService;
         }
     }
 }

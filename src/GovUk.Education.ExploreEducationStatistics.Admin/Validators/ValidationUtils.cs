@@ -90,14 +90,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
             return await successAction.Invoke(validationResult.Right);
         }
 
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
         {
             return new ValidationResult(message.ToString().ScreamingSnakeCase());
         }
         
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static Either<ValidationResult, T> ValidationResult<T>(ValidationErrorMessages message)
         {
             return ValidationResult(message);
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
+        // rename this to "ValidationResult"
+        public static BadRequestObjectResult ValidationActionResult(ValidationErrorMessages message)
+        {
+            ModelStateDictionary errors = new ModelStateDictionary();
+            errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            return new BadRequestObjectResult(new ValidationProblemDetails(errors));
         }
     }
 

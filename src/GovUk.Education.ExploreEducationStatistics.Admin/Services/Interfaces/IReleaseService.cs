@@ -16,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, Release>> GetAsync(Guid id);
 
-        Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
 
         Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id);
         
         Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId);
         
-        Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(Guid releaseId, UpdateReleaseSummaryRequest request);
+        Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(Guid releaseId, UpdateReleaseSummaryRequest request);
 
         Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId);
 

@@ -16,15 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class RelatedInformationService : IRelatedInformationService
     {
         private readonly ContentDbContext _context;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public RelatedInformationService(ContentDbContext context)
+        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper)
         {
             _context = context;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(
-                _context, 
-                context.Releases, 
-                ValidationErrorMessages.ReleaseNotFound);
+            _releaseHelper = releaseHelper;
         }
         
         public Task<Either<ValidationResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)

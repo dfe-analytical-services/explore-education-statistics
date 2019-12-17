@@ -11,14 +11,16 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
 {
-    public class PersistenceHelper<TEntity, TEntityId> where TEntity : class
+    public class PersistenceHelper<TEntity, TEntityId, TDbContext> : IPersistenceHelper<TEntity, TEntityId> 
+        where TEntity : class 
+        where TDbContext : DbContext
     {
-        private readonly DbContext _context;
+        private readonly TDbContext _context;
         private readonly DbSet<TEntity> _entitySet;
         private readonly ValidationErrorMessages _notFoundErrorMessage;
             
         public PersistenceHelper(
-            DbContext context,
+            TDbContext context,
             DbSet<TEntity> entitySet,
             ValidationErrorMessages notFoundErrorMessage = ValidationErrorMessages.EntityNotFound)
         {
@@ -27,8 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             _notFoundErrorMessage = notFoundErrorMessage;
         }
         
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        // Rename this to "CheckEntityExists" when other methods below are removed
         public Task<Either<ActionResult, T>> CheckEntityExistsActionResult<T>(
             TEntityId id, 
             Func<TEntity, Task<Either<ActionResult, T>>> successAction,
@@ -83,23 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
         // TODO EES-919 - return ActionResults rather than ValidationResults
         public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
             TEntityId id, 
-            Func<TEntity, Either<ValidationResult, T>> successAction,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            Task<Either<ValidationResult, T>> Success(TEntity entity)
-            {
-                return Task.FromResult(successAction.Invoke(entity));
-            }
-            
-            return CheckEntityExists(
-                id,
-                Success,
-                hydrateEntityFn);
-        } 
-        
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, T>> CheckEntityExists<T>(
-            TEntityId id, 
             Func<TEntity, T> successAction,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
         {
@@ -127,6 +110,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                 id, 
                 Success,
                 hydrateEntityFn);
-        } 
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        public Task<Either<ValidationResult, TEntity>> CheckEntityExistsChainable(
+            TEntityId id, 
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+        {
+            return CheckEntityExists(id, entity => entity, hydrateEntityFn);
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        public Task<Either<ActionResult, TEntity>> CheckEntityExistsChainableActionResult(
+            TEntityId id, 
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+        {
+            return CheckEntityExistsActionResult(id, 
+                entity => Task.FromResult(new Either<ActionResult, TEntity>(entity)), 
+                hydrateEntityFn);
+        }
     }
 }

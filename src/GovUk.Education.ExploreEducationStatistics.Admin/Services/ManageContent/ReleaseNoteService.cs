@@ -7,7 +7,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,18 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
-        private readonly PersistenceHelper<Update, Guid> _updateHelper;
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<Update, Guid> _updateHelper;
 
-        public ReleaseNoteService(IMapper mapper, ContentDbContext context)
+        public ReleaseNoteService(
+            IMapper mapper, 
+            ContentDbContext context, 
+            IPersistenceHelper<Release, Guid> releaseHelper, 
+            IPersistenceHelper<Update, Guid> updateHelper)
         {
             _mapper = mapper;
             _context = context;
-            _releaseHelper =
-                new PersistenceHelper<Release, Guid>(_context, context.Releases,
-                    ValidationErrorMessages.ReleaseNotFound);
-            _updateHelper = new PersistenceHelper<Update, Guid>(_context, context.Update,
-                ValidationErrorMessages.ReleaseNoteNotFound);
+            _releaseHelper = releaseHelper;
+            _updateHelper = updateHelper;
         }
 
         public Task<Either<ValidationResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId,

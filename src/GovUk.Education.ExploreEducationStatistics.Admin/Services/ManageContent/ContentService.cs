@@ -21,15 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class ContentService : IContentService
     {
         private readonly ContentDbContext _context;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper; 
 
-        public ContentService(ContentDbContext context)
+        public ContentService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper)
         {
             _context = context;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(
-                _context, 
-                context.Releases, 
-                ValidationErrorMessages.ReleaseNotFound);
+            _releaseHelper = releaseHelper;
         }
 
         public Task<Either<ValidationResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(

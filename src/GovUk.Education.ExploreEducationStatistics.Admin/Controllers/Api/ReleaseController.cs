@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -32,51 +32,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IPublicationService _publicationService;
         private readonly IImportStatusService _importStatusService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly UserManager<ApplicationUser> _userManager;
+        // TODO EES-918 - remove in favour of checking for release inside service calls
+        private readonly IPersistenceHelper<Release, DataBlockId> _releaseHelper;
+        // TODO EES-918 - remove in favour of checking for release inside service calls
+        private readonly IPersistenceHelper<Publication, DataBlockId> _publicationHelper;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
-            IPublicationService publicationService,
             IImportStatusService importStatusService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IPersistenceHelper<Release, DataBlockId> releaseHelper,
+            IPersistenceHelper<Publication, DataBlockId> publicationHelper
             )
         {
             _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
-            _publicationService = publicationService;
             _importStatusService = importStatusService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _userManager = userManager;
+            _releaseHelper = releaseHelper;
+            _publicationHelper = publicationHelper;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
         public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
         {
-            return await CheckReleaseExistsStreamAsync(releaseId,
-                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
         {
-            return await CheckReleaseExistsStreamAsync(releaseId,
-                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
         public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
         {
-            return await CheckReleaseExistsStreamAsync(releaseId,
-                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // POST api/publication/{publicationId}/releases
@@ -84,11 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
             PublicationId publicationId)
         {
-            return await CheckPublicationExistsAsync(publicationId, () =>
-            {
-                release.PublicationId = publicationId;
-                return _releaseService.CreateReleaseAsync(release);
-            });
+            return await _publicationHelper
+                .CheckEntityExistsChainableActionResult(publicationId)
+                .OnSuccess(() =>
+                {
+                    release.PublicationId = publicationId;
+                    return _releaseService.CreateReleaseAsync(release);
+                })
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
         
         // GET api/release/{releaseId}/data
@@ -98,8 +116,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // GET api/release/{releaseId}/ancillary
@@ -109,8 +130,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // GET api/release/{releaseId}/chart
@@ -120,8 +144,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart)));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // POST api/release/{releaseId}/ancillary
@@ -134,9 +161,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.UploadFilesAsync(releaseId, file, name,
-                    ReleaseFileTypes.Ancillary, false));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name,
+                    ReleaseFileTypes.Ancillary, false))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // POST api/release/{releaseId}/chart
@@ -149,8 +179,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddChartFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // POST api/release/{releaseId}/data
@@ -163,15 +196,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
-            return await CheckReleaseExistsAsync(releaseId, async () =>
-            {
-                var user = await _userManager.GetUserAsync(User);
-                
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
                 // upload the files
-                return await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
-                    // add message to queue to process these files
-                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
-            });
+                .OnSuccess(async _ =>
+                {
+                    var user = await _userManager.GetUserAsync(User);
+
+                    return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false,
+                            user.Email);
+                })
+                // add message to queue to process these files
+                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpGet("releases/{releaseId}")]
@@ -190,8 +228,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
             ReleaseId releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId, 
-                () => _releaseService.EditReleaseSummaryAsync(releaseId, request));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _releaseService.EditReleaseSummaryAsync(releaseId, request))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // GET api/publications/{publicationId}/releases
@@ -225,13 +266,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
         {
-            return await CheckReleaseExistsAsync(releaseId, async () =>
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(async _ =>
                 {
                     await _tableStorageService.DeleteEntityAsync("imports",
                         new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
-                });
+                })
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // DELETE api/release/{releaseId}/ancillary/{fileName}
@@ -239,8 +284,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
             ReleaseId releaseId, string fileName)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         // DELETE api/release/{releaseId}/chart/{fileName}
@@ -248,8 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
             ReleaseId releaseId, string fileName)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
+            return await _releaseHelper
+                .CheckEntityExistsChainableActionResult(releaseId)
+                .OnSuccess(_ =>  _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpPut("releases/{releaseId}/status")]
@@ -262,78 +313,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     updateRequest.ReleaseStatus, 
                     updateRequest.InternalReleaseNote),
                 Ok);
-        }
-
-        // TODO EES-918 - remove in favour of checking for release inside service calls
-        private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
-        {
-            var release = await _releaseService.GetAsync(releaseId);
-            if (release.IsLeft)
-            {
-                return release.Left;
-            }
-
-            return await andThen.Invoke();
-        }
-
-        // TODO EES-918 - remove in favour of checking for release inside service calls
-        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId,
-            Func<Task<Either<ValidationResult, T>>> andThen)
-        {
-            var release = await _releaseService.GetAsync(releaseId);
-            if (release.IsLeft)
-            {
-                return release.Left;
-            }
-
-            var result = await andThen.Invoke();
-            if (result.IsLeft)
-            {
-                AddErrors(ModelState, result.Left);
-                return ValidationProblem(new ValidationProblemDetails(ModelState));
-            }
-
-            return Ok(result.Right);
-        }
-
-        // TODO EES-918 - remove in favour of checking for release inside service calls
-        private async Task<ActionResult> CheckReleaseExistsStreamAsync(ReleaseId releaseId,
-            Func<Task<Either<ValidationResult, FileStreamResult>>> andThen)
-        {
-            var release = await _releaseService.GetAsync(releaseId);
-            if (release.IsLeft)
-            {
-                return release.Left;
-            }
-
-            var result = await andThen.Invoke();
-            if (result.IsLeft)
-            {
-                AddErrors(ModelState, result.Left);
-                return ValidationProblem(new ValidationProblemDetails(ModelState));
-            }
-
-            return result.Right;
-        }
-
-        // TODO EES-918 - remove in favour of checking for release inside service calls
-        private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
-            Func<Task<Either<ValidationResult, T>>> andThen)
-        {
-            var publication = await _publicationService.GetAsync(publicationId);
-            if (publication == null)
-            {
-                return NotFound();
-            }
-
-            var result = await andThen.Invoke();
-            if (result.IsLeft)
-            {
-                AddErrors(ModelState, result.Left);
-                return ValidationProblem(new ValidationProblemDetails(ModelState));
-            }
-
-            return Ok(result.Right);
         }
     }
 }

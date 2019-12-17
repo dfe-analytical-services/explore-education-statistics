@@ -18,28 +18,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _context;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserService _userService;
 
-        public ThemeService(ContentDbContext context, IAuthorizationService authorizationService, 
-            IHttpContextAccessor httpContextAccessor)
+        public ThemeService(ContentDbContext context, IUserService userService)
         {
             _context = context;
-            _authorizationService = authorizationService;
-            _httpContextAccessor = httpContextAccessor;
+            _userService = userService;
         }
 
         public async Task<List<Theme>> GetMyThemesAsync()
         {
             var canAccessAllTopics = await 
-                _authorizationService.MatchesPolicy(GetUser(), SecurityPolicies.CanViewAllTopics);
+                _userService.MatchesPolicy(SecurityPolicies.CanViewAllTopics);
 
             if (canAccessAllTopics)
             {
                 return await GetAllThemesAsync();
             }
 
-            return await GetThemesRelatedToUserAsync(GetUserId(GetUser()));
+            var userId = _userService.GetUserId();
+
+            return await GetThemesRelatedToUserAsync(userId);
         }
 
         private async Task<List<Theme>> GetAllThemesAsync()
@@ -102,11 +101,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Title = th.Title
             })
                 .FirstOrDefaultAsync();
-        }
-        
-        private ClaimsPrincipal GetUser()
-        {
-            return _httpContextAccessor.HttpContext.User;
         }
     }
 }
