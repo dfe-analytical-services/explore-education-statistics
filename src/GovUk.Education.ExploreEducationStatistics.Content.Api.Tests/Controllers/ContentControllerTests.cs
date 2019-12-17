@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var fileStorageService = new Mock<IFileStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync($"publications/publication-a/publication.json"))
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
                 .ReturnsAsync(JsonConvert.SerializeObject(new PublicationViewModel
                 {
                     Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
