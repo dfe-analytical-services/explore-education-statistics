@@ -295,7 +295,7 @@
     "ipSecurityRestrictions": [
       {
         "ipAddress": "[copyIndex()].Address)",
-        "subnetMask": "255.255.255.0",
+        "subnetMask": "255.255.255.255",
         "name": "[copyIndex()].Name)",
         "copy": {
           "name": "ipRestrictionLoop",
@@ -1921,5 +1921,11 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "ipSecurityRestrictions": {
+        "type": "array",
+        "value": "[variables('ipSecurityRestrictions')]"
+    }
+  } 
 }
