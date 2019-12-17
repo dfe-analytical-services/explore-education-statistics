@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public abstract string Type { get; set; }
 
-        [JsonIgnore] public List<Comment> Comments;
+        public List<Comment> Comments { get; set; }
     }
 
     public class MarkDownBlock : IContentBlock
@@ -193,6 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<CommentState>))]
     public enum CommentState
     {
         open,

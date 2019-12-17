@@ -72,24 +72,6 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     releaseContentService
       .getContent(releaseId)
       .then(newContent => {
-        // TODO: For testing purposes only
-        if (
-          newContent.release.summarySection &&
-          newContent.release.summarySection.content &&
-          newContent.release.summarySection.content.length
-        ) {
-          // eslint-disable-next-line no-param-reassign
-          newContent.release.summarySection.content[0].comments = [
-            {
-              time: new Date(),
-              name: 'Jamie',
-              state: 'open',
-              comment: 'test',
-              id: '00000000',
-            },
-          ];
-        }
-
         setModel({
           unresolvedComments: getUnresolveComments(newContent.release),
           pageMode: 'edit',

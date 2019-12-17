@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 columns: new[] { "Id", "CommentText", "IContentBlockId", "Name", "ResolvedBy", "ResolvedOn", "State", "Time" },
                 values: new object[] { new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"), "Test Text", new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"), "A Test User", null, null, 0, new DateTime(2019, 12, 1, 15, 0, 0, 0, DateTimeKind.Unspecified) });
 
+
             migrationBuilder.CreateIndex(
                 name: "IX_Comment_IContentBlockId",
                 table: "Comment",

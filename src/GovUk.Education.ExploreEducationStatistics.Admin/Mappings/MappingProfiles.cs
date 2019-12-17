@@ -78,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Topic, ApiTopicViewModel>();
 
+            CreateMap<CommentState, string>().ConvertUsing(s => s.GetEnumValue());
+
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content, 
                     m => m.MapFrom(r => 

@@ -425,6 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .Include(r => r.Content)
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
+                    .ThenInclude(content => content.Comments)
                 ;
         }
 
@@ -505,10 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationResult<List<CommentViewModel>>(ValidationErrorMessages.ContentBlockNotFound);
                     }
 
-                    return _mapper.Map<List<CommentViewModel>>(_context.Comment
-                            .Select(comment => comment)
-                            .Where(comment => comment.IContentBlockId == contentBlock.Id)
-                            .ToList())
+                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments)
                         ;
                 }
             );
@@ -531,7 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     var newComment = _context.Comment.Add(new Comment
                     {
                         Id = new Guid(),
-                        IContentBlockId = contentBlock.Id,
+                        IContentBlockId = contentBlockId,
                         Name = comment.Name,
                         State = EnumUtil.GetFromString<CommentState>(comment.State),
                         Time = comment.Time,

@@ -3509,7 +3509,7 @@ Find out how and why these statistics are collected and published - [Secondary a
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Comment", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock", null)
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("IContentBlockId");
                 });
 

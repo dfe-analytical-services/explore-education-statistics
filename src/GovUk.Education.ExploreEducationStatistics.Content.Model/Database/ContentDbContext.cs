@@ -2190,9 +2190,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
-
-
-
             modelBuilder.Entity<Comment>()    
                 .HasData(
                     new Comment
@@ -2209,10 +2206,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     
                 );
             
-            modelBuilder.Entity<IContentBlock>()
-                .HasMany<Comment>();
-            
-
             modelBuilder.Entity<MarkDownBlock>().HasData(
                 // absence
                 new MarkDownBlock
