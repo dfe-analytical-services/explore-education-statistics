@@ -151,6 +151,17 @@
       "defaultValue": ""
     },
 
+    "teamEmailAddresses": {
+      "type": "array",
+      "defaultValue": [
+        "dfeteam@hiveit.co.uk",
+        "explore.statistics@education.gov.uk"
+      ],
+      "metadata": {
+        "description": "Email addresses for receiving alerts"
+      }
+    },
+
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -1118,7 +1129,7 @@
           "properties": {
             "state": "Enabled",
             "disabledAlerts": "",
-            // "emailAddresses": "[variables('emailAddresses')]",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1265,7 +1276,7 @@
           "properties": {
             "state": "Enabled",
             "disabledAlerts": "",
-            // "emailAddresses": "[variables('emailAddresses')]",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1298,7 +1309,7 @@
             "storageAccountSubscriptionId": "[subscription().Id]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true,
+            "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
