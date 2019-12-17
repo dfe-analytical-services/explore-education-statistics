@@ -1,10 +1,13 @@
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
     public interface IContentService
     {
-        List<ThemeTree> GetContentTree();
+        Task UpdateDownloadTree();
+        Task UpdatePublicationTree();
+        Task UpdateMethodologyTree();
+        Task UpdatePublicationsAndReleases();
+        Task UpdateMethodologies();
     }
 }

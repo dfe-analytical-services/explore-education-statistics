@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
@@ -40,6 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          * Property key on a data file to point at the metadata file
          */
         public const string MetaFileKey = "metafile";
+        
+        public static Task<string> DownloadTextAsync(string storageConnectionString, string containerName, string blobName)
+        {
+            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
+            var blob = blobContainer.GetBlockBlobReference(blobName);
+            return blob.DownloadTextAsync();
+        }
         
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
             string containerName, BlobContainerPermissions permissions = null)
@@ -117,6 +125,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 })
                 .OrderBy(info => info.Name).ToList();
             return result;
+        }
+        
+        public static async Task UploadFromStreamAsync(string storageConnectionString, string containerName,
+            string blobName, string contentType, string content)
+        {
+            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
+            
+            var blob = blobContainer.GetBlockBlobReference(blobName);
+            blob.Properties.ContentType = contentType;
+
+            using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+            {
+                await blob.UploadFromStreamAsync(stream);
+            }
         }
         
         public static string GetExtension(CloudBlob blob)

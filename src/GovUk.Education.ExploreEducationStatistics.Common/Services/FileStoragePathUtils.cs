@@ -8,10 +8,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         public const string BatchesDir = "batches";
 
+        private static string PublicContentDownloadPath()
+        {
+            return "download";
+        }
+        
+        private static string PublicContentMethodologyPath()
+        {
+            return "methodology";
+        }
+        
+        private static string PublicContentPublicationsPath()
+        {
+            return "publications";
+        }
+
+        public static string PublicContentDownloadTreePath()
+        {
+            return $"{PublicContentDownloadPath()}/tree.json";
+        }
+
+        public static string PublicContentMethodologyTreePath()
+        {
+            return $"{PublicContentMethodologyPath()}/tree.json";
+        }
+
+        public static string PublicContentPublicationsTreePath()
+        {
+            return $"{PublicContentPublicationsPath()}/tree.json";
+        }
+
+        public static string PublicContentMethodologyPath(string slug)
+        {
+            return $"{PublicContentMethodologyPath()}/methodologies/{slug}.json";
+        }
+
+        public static string PublicContentPublicationPath(string slug)
+        {
+            return $"{PublicContentPublicationsPath()}/{slug}/publication.json";
+        }
+
+        public static string PublicContentLatestReleasePath(string slug)
+        {
+            return $"{PublicContentPublicationsPath()}/{slug}/latest-release.json";
+        }
+        
+        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug)
+        {
+            return $"{PublicContentPublicationsPath()}/{publicationSlug}/releases/{releaseSlug}.json";
+        }
+
         /**
          * The top level admin directory path where files on a release are stored.
          */
-        public static string AdminReleaseDirectoryPath(string releaseId)
+        private static string AdminReleaseDirectoryPath(string releaseId)
         {
             return $"{releaseId}/";
         }
@@ -21,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseDirectoryPath(string releaseId, ReleaseFileTypes type)
         {
-            return AdminReleaseDirectoryPath(releaseId) + $"{type.GetEnumLabel()}/";
+            return $"{AdminReleaseDirectoryPath(releaseId)}{type.GetEnumLabel()}/";
         }
 
         /**
@@ -37,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseBatchesDirectoryPath(string releaseId)
         {
-            return AdminReleaseDirectoryPath(releaseId) + $"{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}/";
+            return $"{AdminReleaseDirectoryPath(releaseId)}{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}/";
         }
 
         /**
@@ -45,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleasePath(string releaseId, ReleaseFileTypes type, string fileName)
         {
-            return AdminReleaseDirectoryPath(releaseId, type) + $"{fileName}";
+            return $"{AdminReleaseDirectoryPath(releaseId, type)}{fileName}";
         }
 
         /**
@@ -73,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,
             string fileName)
         {
-            return PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type) + $"{fileName}";
+            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileName}";
         }
 
         /**
@@ -82,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug,
             ReleaseFileTypes type)
         {
-            return PublicReleaseDirectoryPath(publicationSlug, releaseSlug) + $"{type.GetEnumLabel()}/";
+            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug)}{type.GetEnumLabel()}/";
         }
 
         /**

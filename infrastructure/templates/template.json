@@ -1659,7 +1659,8 @@
         "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1700,6 +1701,14 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "PublishReleasesCronSchedule",
+              "value": "0 0 0 * * *"
+            },
+            {
+              "name": "PublishReleaseContentCronSchedule",
+              "value": "0 30 9 * * *"
+            },
+            {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
@@ -1734,6 +1743,11 @@
               "name": "PublicStorage",
               "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
             },
             {
               "name": "ContentDb",

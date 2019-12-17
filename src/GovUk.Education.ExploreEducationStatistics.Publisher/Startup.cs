@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -23,12 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IPublishingService, PublishingService>()
-                .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
+                .AddScoped<ITableStorageService, TableStorageService>(s =>
+                    new TableStorageService(ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
+                .AddScoped<IReleaseStatusService, ReleaseStatusService>()
+                .AddScoped<IValidationService, ValidationService>()
                 .BuildServiceProvider();
         }
     }

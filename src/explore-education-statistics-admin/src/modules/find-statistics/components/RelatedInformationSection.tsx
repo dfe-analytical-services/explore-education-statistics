@@ -114,10 +114,16 @@ const RelatedInformationSection = ({
         <ul className="govuk-list">
           <li>
             <Link
-              to={`/methodology/${release.publication.methodology.id}`}
+              to={`/methodology/${
+                release.publication.methodology
+                  ? release.publication.methodology.id
+                  : 'no-methodology'
+              }`}
               target="_blank"
             >
-              {release.publication.methodology.title}
+              {release.publication.methodology
+                ? release.publication.methodology.title
+                : 'Methodology title'}
             </Link>
           </li>
           {isEditing && <hr />}

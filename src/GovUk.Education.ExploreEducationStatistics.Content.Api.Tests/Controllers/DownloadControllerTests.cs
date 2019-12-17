@@ -14,22 +14,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_DownloadTree_Returns_Ok()
         {
-            var cache = new Mock<IContentCacheService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
+            fileStorageService.Setup(s => s.DownloadTextAsync("download/tree.json")).ReturnsAsync(
                 JsonConvert.SerializeObject(new List<ThemeTree>
-                {
-                    new ThemeTree
                     {
-                        Title = "Theme A"
-                    }, 
-                    new ThemeTree {
-                        Title = "Theme B"
-                    }, 
-                }
-            ));
+                        new ThemeTree
+                        {
+                            Title = "Theme A"
+                        },
+                        new ThemeTree
+                        {
+                            Title = "Theme B"
+                        },
+                    }
+                ));
 
-            var controller = new DownloadController(cache.Object);
+            var controller = new DownloadController(fileStorageService.Object);
 
             var result = controller.GetDownloadTree();
 
@@ -38,19 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
             Assert.Contains("Theme A", content.Content);
             Assert.Contains("Theme B", content.Content);
-
         }
 
         [Fact]
         public void Get_DownloadTree_Returns_NoContent()
         {
-            var cache = new Mock<IContentCacheService>();
+            var fileStorageService = new Mock<IFileStorageService>();
 
-            cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
-                (string) null
-            );
-
-            var controller = new DownloadController(cache.Object);
+            var controller = new DownloadController(fileStorageService.Object);
 
             var result = controller.GetDownloadTree();
 

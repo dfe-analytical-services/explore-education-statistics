@@ -18,6 +18,7 @@ import {
   SortableOptionWithGroup,
   TableHeadersFormValues,
 } from './TableHeadersForm';
+import { reverseMapTableHeadersConfig } from './utils/tableToolHelpers';
 
 interface Props {
   fullTable: FullTable;
@@ -50,7 +51,12 @@ export const createHeadersFromGroups = (
             ),
           ]) ||
             b,
-          [...c, group.label],
+          [
+            ...c,
+            group instanceof LocationFilter && rowGroup.length === 1
+              ? ''
+              : group.label,
+          ],
         ],
         [[], []],
       )
@@ -85,8 +91,13 @@ export const createHeaderIgnoreFromGroups = (
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { fullTable, tableHeadersConfig } = props;
+    const { fullTable, tableHeadersConfig: unmappedHeaderConfig } = props;
     const { subjectMeta, results } = fullTable;
+
+    const tableHeadersConfig = reverseMapTableHeadersConfig(
+      unmappedHeaderConfig,
+      fullTable.subjectMeta,
+    ) as TableHeadersFormValues;
 
     if (results.length === 0) {
       return (

@@ -4569,8 +4569,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4587,8 +4587,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6bf20dd4-a7d6-4bc6-a13a-9f574935c9af"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4605,8 +4605,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("63a318d9-05fa-40eb-9808-b825a6deb54a"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4623,8 +4623,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7714efb9-cc82-4895-ba27-bf5464541e38"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4641,8 +4641,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6f81ab70-5730-4cf1-a513-669f5c4bef09"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4659,8 +4659,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a40d6c9e-fe61-48c0-b907-9757148beb0d"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4677,8 +4677,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("f620a229-21b7-4c6e-afd4-e9feb111f09a"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4698,8 +4698,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8b90b3b2-f63d-4499-91aa-41ccae74e1c7"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4716,8 +4716,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("47f3e500-ec9f-4a00-96f8-c488f76b06e6"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4734,8 +4734,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a00a7765-aa81-43f2-afe1-fead7f070291"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4752,8 +4752,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7cc516d4-fc79-4e22-b35b-a042d5b14d35"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4770,8 +4770,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8ddc6877-acd2-479d-a86f-1139c1bd429f"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexE.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexE.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4788,8 +4788,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("0fd71cfd-cfdd-42c5-86e7-9e311beee646"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexF.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexF.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4819,9 +4819,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("ff7b34e3-58ba-4578-849a-e5044fc14b8d"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -4840,9 +4840,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("d7f310d7-e917-47e2-9e05-065c8bcab891"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -4861,9 +4861,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("a89226ef-1d6a-48ba-a795-0dbc334a9198"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -4882,9 +4882,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("16898320-cf69-45c4-8dbb-2486901759b1"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -4912,8 +4912,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("9a034a5f-7cdb-4895-b205-864e7f834ebf"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section1.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4930,8 +4930,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("f745893e-68a6-4813-ba8b-35d44c0935aa"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section2.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4948,8 +4948,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4c88cbdd-e0e2-4019-a656-31e4b97d19d5"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section3.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4966,8 +4966,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("085ba061-918b-4e6e-9a02-3a8b12671587"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section4.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4984,8 +4984,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("29f138eb-070e-41fe-95c6-e271cdf4eaf4"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section5.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5002,8 +5002,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8263cdc1-a2e8-4db6-a581-44043a6add64"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section6.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5020,8 +5020,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("e1eb03d9-25e4-4247-b3de-49805cce7889"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section7.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5041,8 +5041,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("c2d4d345-59b6-443b-bcb0-67c1f1dd9732"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexA.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5059,8 +5059,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("e4e4f98b-cbeb-451f-bd17-8e2d572b83f4"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexB.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5077,8 +5077,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("94246f85-e43a-4b6c-97a0-b045701dc077"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexC.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5095,8 +5095,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("b05ae1f7-b2d1-4ae3-9db6-28fb0edf98ae"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexD.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
