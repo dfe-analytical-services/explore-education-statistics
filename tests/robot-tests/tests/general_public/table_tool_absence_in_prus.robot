@@ -64,8 +64,7 @@ Validate results table column headings
 
 Validate results table row headings
     [Tags]   HappyPath
-    user checks results table row heading contains  1     1     England
-    user checks results table row heading contains  1     2     Number of schools
+    user checks results table row heading contains  1     1     Number of schools
 
 Validate Number of schools row results
     [Tags]  HappyPath
