@@ -1079,7 +1079,7 @@
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
           "dependsOn": [
-            "[variables('sqlserverName')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
           ],
           "properties": {
             "administratorType": "ActiveDirectory",
@@ -1203,7 +1203,7 @@
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
           "dependsOn": [
-            "[variables('publicSqlServerName')]"
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
           ],
           "properties": {
             "administratorType": "ActiveDirectory",
