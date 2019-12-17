@@ -15,21 +15,28 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import Link from '@frontend/components/Link';
 import React, { createRef, useEffect, useState } from 'react';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 
 const TableToolFinalStep = ({
   table,
-  tableHeaders: initialTableHeaders,
+  tableHeaders,
   publication,
   query,
 }: FinalStepProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
   const [permalinkId, setPermalinkId] = useState<string>('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
-  const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>();
+  const [currentTable, setCurrentTable] = useState<FullTable>();
+  const [currentTableHeaders, setCurrentTableHeaders] = useState<
+    TableHeadersFormValues
+  >();
 
   useEffect(() => {
-    setTableHeaders(initialTableHeaders);
-  }, [initialTableHeaders]);
+    // The current table is stored to ensure the headers
+    // and table only render together as a matching pair
+    setCurrentTable(table);
+    setCurrentTableHeaders(tableHeaders);
+  }, [tableHeaders, table]);
 
   const handlePermalinkClick = async () => {
     if (!tableHeaders || !query) {
@@ -58,9 +65,9 @@ const TableToolFinalStep = ({
 
           <div className="govuk-!-margin-bottom-4">
             <TableHeadersForm
-              initialValues={initialTableHeaders}
+              initialValues={currentTableHeaders}
               onSubmit={tableHeaderConfig => {
-                setTableHeaders(tableHeaderConfig);
+                setCurrentTableHeaders(tableHeaderConfig);
                 setPermalinkId('');
                 if (dataTableRef.current) {
                   dataTableRef.current.scrollIntoView({
@@ -70,11 +77,11 @@ const TableToolFinalStep = ({
                 }
               }}
             />
-            {table && tableHeaders && (
+            {currentTable && currentTableHeaders && (
               <TimePeriodDataTable
                 ref={dataTableRef}
-                fullTable={table}
-                tableHeadersConfig={tableHeaders}
+                fullTable={currentTable}
+                tableHeadersConfig={currentTableHeaders}
               />
             )}
 
