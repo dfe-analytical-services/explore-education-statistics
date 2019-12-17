@@ -35,17 +35,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {statusMessage}");
-            await ValidateReleaseAsync(statusMessage, async () => await AddReleaseStatus(statusMessage, ValidStage));
+            await ValidateReleaseAsync(statusMessage, async () =>
+                await CreateOrUpdateReleaseStatusAsync(statusMessage, ValidStage));
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
         private async Task ValidateReleaseAsync(ReleaseStatusMessage statusMessage, Func<Task> andThen)
         {
             var valid = await _validationService.ValidateAsync(statusMessage);
-            await (valid ? andThen.Invoke() : AddReleaseStatus(statusMessage, InvalidStage));
+            await (valid ? andThen.Invoke() : CreateOrUpdateReleaseStatusAsync(statusMessage, InvalidStage));
         }
 
-        private async Task AddReleaseStatus(ReleaseStatusMessage statusMessage,
+        private async Task CreateOrUpdateReleaseStatusAsync(ReleaseStatusMessage statusMessage,
             (Stage, Stage, Stage, Stage) stage)
         {
             await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage);
