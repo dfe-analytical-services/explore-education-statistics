@@ -1701,6 +1701,14 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "PublishReleasesCronSchedule",
+              "value": "0 0 0 * * *"
+            },
+            {
+              "name": "PublishReleaseContentCronSchedule",
+              "value": "0 30 9 * * *"
+            },
+            {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
