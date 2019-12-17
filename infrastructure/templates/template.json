@@ -1091,6 +1091,7 @@
             "status": "Enabled"
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
             "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
           ]
         },
@@ -1102,6 +1103,7 @@
             "status": "Enabled"
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
             "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
           ]
         },
@@ -1246,6 +1248,7 @@
             "status": "Enabled"
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
             "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
           ]
         },
