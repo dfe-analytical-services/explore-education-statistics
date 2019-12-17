@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
-        [HttpGet("publication/{publicationSlug}/latest")]
+        [HttpGet("publication/{slug}/latest")]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(ReleaseViewModel), 200)]
         [Produces("application/json")]
