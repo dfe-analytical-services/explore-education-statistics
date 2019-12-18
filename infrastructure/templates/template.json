@@ -113,7 +113,10 @@
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
-      "allowedValues": ["true", "false"],
+      "allowedValues": [
+        "true",
+        "false"
+      ],
       "metadata": {
         "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
@@ -260,7 +263,11 @@
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
-      "allowedValues": ["-1.0", "1.1", "1.2"]
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
     }
   },
   "variables": {
@@ -295,7 +302,20 @@
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
-    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]"
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "ipWhiteList": {
+      "copy": [
+        {
+          "name": "addresses",
+          "count": "[length(parameters('adminFirewallRules'))]",
+          "input": {
+            "ipAddress": "[concat(parameters('adminFirewallRules')[copyIndex('Address')], '/32')]",
+            "action": "Allow",
+            "name": "[copyIndex('Name')]"
+          }
+        }
+      ]
+    }
   },
   "resources": [
     {
@@ -324,7 +344,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -496,7 +517,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -664,7 +686,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -684,16 +707,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "copy": [
-            {
-              "name": "ipSecurityRestrictions",
-              "count": "[length(parameters('adminFirewallRules'))]",
-              "input": {
-                "ipAddress": "[concat(copyIndex().Address, '/24')]",
-                "name": "[copyIndex().Name]"
-              }
-            }
-          ],
+          "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
@@ -1009,7 +1023,8 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "sku": {
         "name": "Standard_RAGRS"
       },
@@ -1044,7 +1059,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1070,7 +1087,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Basic",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1095,7 +1114,9 @@
         {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1243,7 +1264,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('publicSqlServerName')]"],
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1268,7 +1291,9 @@
         {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": ["[variables('publicSqlServerName')]"],
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1430,7 +1455,9 @@
           "name": "default/downloads",
           "type": "blobServices/containers",
           "apiVersion": "2018-07-01",
-          "dependsOn": ["[variables('publicStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
         }
       ]
     },
@@ -1686,7 +1713,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
@@ -1829,7 +1857,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
