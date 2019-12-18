@@ -689,8 +689,7 @@
               "name": "ipSecurityRestrictions",
               "count": "[length(parameters('adminFirewallRules'))]",
               "input": {
-                "ipAddress": "[copyIndex()].Address)",
-                "subnetMask": "255.255.255.0",
+                "ipAddress": "[concat(copyIndex()].Address, '/32')",
                 "name": "[copyIndex()].Name)"
               }
             }
