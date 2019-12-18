@@ -365,6 +365,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -494,7 +495,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('contentAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -538,6 +539,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -867,7 +869,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -899,6 +901,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1510,7 +1513,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('notificationsAppName')]",
       "location": "[resourceGroup().location]",
@@ -1546,6 +1549,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -1675,7 +1679,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('importerAppName')]",
       "location": "[resourceGroup().location]",
@@ -1712,6 +1716,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
@@ -1818,7 +1823,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('publisherAppName')]",
       "location": "[resourceGroup().location]",
@@ -1856,6 +1861,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
