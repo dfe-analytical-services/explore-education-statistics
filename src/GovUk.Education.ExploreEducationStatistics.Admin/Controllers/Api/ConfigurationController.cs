@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/configuration/application-insights")]
         public ActionResult<string> GetInsightsKey()
         {
-            var instrumentationKey = _configuration.GetSection("ApplicationInsights").GetValue<string>("InstrumentationKey");
+            var instrumentationKey = _configuration.GetSection("AppInsights").GetValue<string>("InstrumentationKey");
             if (instrumentationKey.IsNullOrEmpty())
             {
                 return NotFound();
