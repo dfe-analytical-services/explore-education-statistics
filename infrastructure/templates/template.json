@@ -309,9 +309,10 @@
           "name": "addresses",
           "count": "[length(parameters('adminFirewallRules'))]",
           "input": {
-            "ipAddress": "[concat(parameters('adminFirewallRules')[copyIndex('Address')], '/32')]",
-            "action": "Allow",
-            "name": "[copyIndex('Name')]"
+            "ipAddress": "[parameters('adminFirewallRules')[copyIndex()].Address]",
+            "subnetMask": "255.255.255.255",
+            "name": "[parameters('adminFirewallRules')[copyIndex()].Name]",
+            "action": "Allow"
           }
         }
       ]
