@@ -309,7 +309,7 @@
           "name": "addresses",
           "count": "[length(parameters('adminFirewallRules'))]",
           "input": {
-            "ipAddress": "[concat(parameters('adminFirewallRules')[copyIndex('addresses')].Address,'/32')]",
+            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
             "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
             "action": "Allow"
           }
