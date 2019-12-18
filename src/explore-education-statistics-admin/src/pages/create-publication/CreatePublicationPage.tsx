@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import dashboardRoutes from '@admin/routes/dashboard/routes';
+import appRouteList from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import { Topic } from '@admin/services/edit-publication/types';
@@ -73,7 +73,7 @@ const CreatePublicationPage = ({
         ...values,
       });
 
-      history.push(dashboardRoutes.adminDashboard);
+      history.push(appRouteList.adminDashboard.path as string);
     },
     handleApiErrors,
     errorCodeToFieldError(
@@ -84,7 +84,7 @@ const CreatePublicationPage = ({
   );
 
   const cancelHandler = () => {
-    history.push(dashboardRoutes.adminDashboard);
+    history.push(appRouteList.adminDashboard.path as string);
   };
 
   const getSelectedContact = (

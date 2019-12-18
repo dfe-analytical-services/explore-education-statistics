@@ -2,7 +2,7 @@
 import React from 'react';
 import Details from '@common/components/Details';
 
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 
 import { ExtendedComment } from '@admin/services/publicationService';
 import styles from './PrototypeEditableContentAddComment.module.scss';

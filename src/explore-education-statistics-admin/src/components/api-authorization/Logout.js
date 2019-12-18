@@ -4,6 +4,7 @@
 
   Amendments to the original file are marked within this file with the word "HIVE".
 */
+import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import React from 'react';
 import { Component } from 'react';
 import authService from './AuthorizeService';
@@ -82,7 +83,16 @@ export class Logout extends Component {
     //       throw new Error(`Invalid action '${action}'`);
     //   }
     // }
-    return null;
+
+    // HIVE
+    // Added a SignoutPage on was logged out
+    const action = this.props.action;
+    switch (action) {
+      case LogoutActions.LoggedOut:
+        return <SignedOutPage />;
+      default:
+        return null;
+    }
   }
 
   async logout(returnUrl) {
