@@ -18,15 +18,11 @@ const AuthenticationCheckingComponent = ({
     return null;
   }
 
-  if (redirectIfNotLoggedIn && !user) {
+  if (redirectIfNotLoggedIn && (!user || user.validToken === false)) {
     return <Redirect to={signInService.getSignInLink()} />;
   }
 
-  return (
-    <LoginContext.Provider value={{ user }}>
-      {React.createElement(component, props)}
-    </LoginContext.Provider>
-  );
+  return React.createElement(component, props);
 };
 
 /**

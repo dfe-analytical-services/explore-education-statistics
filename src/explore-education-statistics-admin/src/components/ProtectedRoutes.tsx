@@ -31,12 +31,14 @@ const ProtectedRoutes = ({ children }: Props) => {
       await authService
         .getUser()
         .then(userProfile => {
+          const { profile } = userProfile;
           const user: User = {
-            id: userProfile.sub,
-            name: userProfile.given_name,
-            permissions: userProfile.role
-              ? (userProfile.role as string).split(',')
+            id: profile.sub,
+            name: profile.given_name,
+            permissions: profile.role
+              ? (profile.role as string).split(',')
               : [],
+            validToken: new Date() < new Date(userProfile.expires_at * 1000),
           };
 
           setAuthState({
