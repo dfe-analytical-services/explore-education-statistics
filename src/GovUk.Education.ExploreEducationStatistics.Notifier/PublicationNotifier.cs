@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
         [FunctionName("RemoveNonVerifiedSubscriptions")]
         // ReSharper disable once UnusedMember.Global
-        public async void RemoveNonVerifiedSubscriptionsFunc(
+        public async Task RemoveNonVerifiedSubscriptionsFunc(
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             ExecutionContext context,
             ILogger logger)
