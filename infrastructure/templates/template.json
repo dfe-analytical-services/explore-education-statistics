@@ -295,22 +295,7 @@
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
-    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
-    "ipSecurityRestrictions": [
-      {
-        "copy": [
-          {
-            "name": "ipRestrictionLoop",
-            "count": "[length(parameters('adminFirewallRules'))]",
-            "input": {
-              "ipAddress": "[copyIndex()].Address)",
-              "subnetMask": "255.255.255.0",
-              "name": "[copyIndex()].Name)"
-            }
-          }
-        ]
-      }
-    ]
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]"
   },
   "resources": [
     {
@@ -699,7 +684,17 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-
+          "copy": [
+            {
+              "name": "ipSecurityRestrictions",
+              "count": "[length(parameters('adminFirewallRules'))]",
+              "input": {
+                "ipAddress": "[copyIndex()].Address)",
+                "subnetMask": "255.255.255.0",
+                "name": "[copyIndex()].Name)"
+              }
+            }
+          ],
           "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
