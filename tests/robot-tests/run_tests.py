@@ -93,6 +93,7 @@ os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
+             "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction"]
 if args.tags:
@@ -135,8 +136,8 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
         body = {'title': f'UI test topic {run_identifier}'}
         r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
         assert r.status_code == 200
-        os.environ['ADMIN_TOPIC'] = r.json()['title']
-        assert os.getenv('ADMIN_TOPIC') is not None
+        os.environ['RUN_IDENTIFIER'] = str(run_identifier)
+        assert os.getenv('RUN_IDENTIFIER') is not None
 
 if args.env == 'local':
     robotArgs += ['--include', 'Local']
