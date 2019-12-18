@@ -22,11 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper)
+        public ReleaseService(ContentDbContext context, 
+            IPublishingService publishingService,
+            IMapper mapper)
         {
             _context = context;
+            _publishingService = publishingService;
             _mapper = mapper;
         }
 
@@ -229,6 +233,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             release.InternalReleaseNote = internalReleaseNote;
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
+
+            await _publishingService.QueueReleaseStatusAsync(releaseId);
+
             return await GetReleaseSummaryAsync(releaseId);
         }
     }
