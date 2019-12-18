@@ -506,8 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationResult<List<CommentViewModel>>(ValidationErrorMessages.ContentBlockNotFound);
                     }
 
-                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments)
-                        ;
+                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
                 }
             );
         }
@@ -559,9 +558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationResult<CommentViewModel>(ValidationErrorMessages.ContentBlockNotFound);
                     }
 
-                    var comment = _context.Comment
-                        .FirstOrDefault(c => c.Id == commentId);
-
+                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
 
                     if (comment == null)
                     {
@@ -596,9 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationResult<CommentViewModel>(ValidationErrorMessages.ContentBlockNotFound);
                     }
 
-                    var comment = _context.Comment
-                        .FirstOrDefault(c => c.Id == commentId);
-
+                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
 
                     if (comment == null)
                     {
