@@ -1915,6 +1915,11 @@
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "NotificationStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            },
+            {
               "name": "PublicStorage",
               "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
