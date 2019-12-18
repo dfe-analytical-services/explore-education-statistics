@@ -126,7 +126,7 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
     if args.env in ['local', 'dev']:
         requests.packages.urllib3.disable_warnings()  # To prevent InsecureRequestWarning
         # Create topic to be used by UI tests
-        run_identifier = time.time()
+        run_identifier = str(time.time()).split('.')[0]
         create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE'])['access_token']
         headers = {
@@ -136,7 +136,7 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
         body = {'title': f'UI test topic {run_identifier}'}
         r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
         assert r.status_code == 200
-        os.environ['RUN_IDENTIFIER'] = str(run_identifier)
+        os.environ['RUN_IDENTIFIER'] = run_identifier
         assert os.getenv('RUN_IDENTIFIER') is not None
 
 if args.env == 'local':

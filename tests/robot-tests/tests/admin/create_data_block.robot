@@ -1,19 +1,31 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  Local
+Force Tags  Admin  Local  Dev
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify correct data is shown when theme and topic is shown
+Create Datablock test publication
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "UI tests topic" from the admin dashboard
-    user checks page contains accordion  UI tests - data block
-    user opens accordion section  UI tests - data block
-    user checks accordion section contains text  UI tests - data block    Methodology
-    user checks accordion section contains text  UI tests - data block    Releases
+    environment variable should be set   RUN_IDENTIFIER
+    user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
+    user waits until page contains element    xpath://a[text()="Create new publication"]     60
+    user clicks link  Create new publication
+    user creates publication  Datablock test %{RUN_IDENTIFIER}   API Test Methodology    Sean Gibson
+
+Verify Datablock test publication is created
+    [Tags]  HappyPath
+    user checks page contains accordion  Datablock test %{RUN_IDENTIFIER}
+    user opens accordion section  Datablock test %{RUN_IDENTIFIER}
+    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Methodology
+    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Releases
+
+Create release
+    [Tags]  HappyPath
+    user creates a new release for publication "Datablock test %{RUN_IDENTIFIER}" for start year "2025"
+    sleep   1000000
 
 User clicks edit release
     [Tags]  HappyPath

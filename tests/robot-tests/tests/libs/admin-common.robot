@@ -13,6 +13,17 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element  xpath://h2[text()="${theme}"]
     user waits until page contains element  xpath://h3[text()="${topic}"]
 
+user creates publication
+    [Arguments]   ${title}   ${methodology}   ${contact}
+    user waits until page contains heading    Create new publication
+    user enters text into element  css:#createPublicationForm-publicationTitle   ${title}
+    user clicks element          xpath://label[text()="Add existing methodology"]
+    user checks element is visible    xpath://label[text()="Select methodology"]
+    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   ${methodology}
+    user selects from list by label  css:#createPublicationForm-selectedContactId   ${contact}
+    user clicks button   Create publication
+    user waits until page contains element   xpath://span[text()="Welcome"]
+
 User creates a new release for publication "${publication}" for start year "${startYear}"
     ${startYearNumber} =  Convert to Integer  ${startYear}
     ${nextYearNumber} =    Evaluate    ${startYearNumber} + 1

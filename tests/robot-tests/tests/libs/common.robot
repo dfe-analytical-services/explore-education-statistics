@@ -249,6 +249,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 user checks summary list item "${dtText}" should be "${ddText}"
   user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
+user checks summary list item "${}" should contain link "${link}"
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
