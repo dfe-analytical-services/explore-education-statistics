@@ -365,7 +365,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -539,7 +539,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -709,8 +709,8 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-          "scmIpSecurityRestrictionsUseMain": true,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
@@ -901,7 +901,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1549,7 +1549,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -1716,7 +1716,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
@@ -1861,7 +1861,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
