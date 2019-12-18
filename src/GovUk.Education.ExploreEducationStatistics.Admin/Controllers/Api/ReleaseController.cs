@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInf
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -33,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
+        private readonly IPublishingService _publishingService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -45,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
+            IPublishingService publishingService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             UserManager<ApplicationUser> userManager,
@@ -56,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
+            _publishingService = publishingService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _userManager = userManager;
@@ -303,6 +308,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
+        // TODO EES-927 This can be removed once the queue release service call is made when a Release is approved in the UI
+        [HttpGet("releases/{releaseId}/queue")]
+        public async Task<ActionResult<ValidateReleaseMessage>> QueueReleaseAsync(ReleaseId releaseId)
+        {
+            return Ok(await _publishingService.QueueReleaseAsync(releaseId));
+        }
+        
         [HttpPut("releases/{releaseId}/status")]
         public Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             UpdateReleaseStatusRequest updateRequest, ReleaseId releaseId)

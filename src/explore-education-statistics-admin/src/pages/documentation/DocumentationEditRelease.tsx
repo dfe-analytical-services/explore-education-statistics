@@ -1,6 +1,7 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import Link from '@admin/components/Link';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageReleaseFind from './images/guidance/guidance-edit-release-find.png';
@@ -168,26 +169,23 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <p>
                   For detailed guidance on how to upload data and files and add
                   footnotes to your release -{' '}
-                  <a href="https://drive.google.com/open?id=1If5HD6zj-JZ62g-BDtJHxQPQTNnjp_6qb8y-2aqaM8o">
-                    Managing data: step by step
-                  </a>
-                  .
+                  <Link to="./manage-data">Managing data: step by step</Link>.
                 </p>
                 <p>
                   For detailed guidance on how to create data blocks, tables and
                   charts for your release -{' '}
-                  <a href="https://drive.google.com/open?id=1InzVL0xOHS8-VFVb_H_tFU6l4KJMMH3FWJNRV2aAab0">
+                  <Link to="./manage-data-block">
                     Managing data blocks and creating tables and charts: step by
                     step
-                  </a>
+                  </Link>
                   .
                 </p>
                 <p>
                   For detailed guidance on how to view and edit content and add,
                   view and review comments -{' '}
-                  <a href="https://drive.google.com/open?id=1iKPB_uEITG3J3Lwl1rto4gYKg0Wr20gP6NGEPJ1DBCo">
+                  <Link to="./manage-content">
                     Managing content: step by step
-                  </a>
+                  </Link>
                   .
                 </p>
               </ul>
@@ -214,14 +212,11 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   <p>
                     Make sure your content is written and formatted to the
                     standards set out in our{' '}
-                    <a href="https://drive.google.com/open?id=1Z1D7bxLVXAZEp855LSiR7b40ayWeVWaMOCuixItBVDo">
+                    <Link to="./content-design-standards-guide">
                       Content design standards guide
-                    </a>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
-                      Content design style guide
-                    </a>
-                    .
+                    <Link to="./style-guide">Content design style guide</Link>.
                   </p>
                   <p>
                     These guides will help you create clear and consistent
@@ -263,9 +258,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <a href="https://drive.google.com/open?id=1iKPB_uEITG3J3Lwl1rto4gYKg0Wr20gP6NGEPJ1DBCo">
+                <Link to="./manage-content">
                   Managing content: step by step
-                </a>
+                </Link>
                 .
               </p>
             </StepNavItem>

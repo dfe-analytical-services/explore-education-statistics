@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1f5e91f0-6275-431d-b011-02b5064d17c9",
+		"_postman_id": "86fed618-679d-439d-9ec9-c99fe636a23d",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -120,8 +120,8 @@
 									"",
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
-									"    pm.expect(respJson.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be an empty array\", function () {",
@@ -154,7 +154,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"caa8e56f-41d2-4129-a5c3-53b051134bd7\"\n}",
+							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"b4886b45-53c2-4d6f-e6bc-08d77d76f342\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -370,12 +370,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+									"src": "files/admin-api-test.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+									"src": "files/admin-api-test.meta.csv"
 								}
 							]
 						},
@@ -408,7 +408,7 @@
 								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
-									"setTimeout(function () {}, 10000);"
+									"setTimeout(function () {}, 100000);"
 								],
 								"type": "text/javascript"
 							}
@@ -545,8 +545,6 @@
 									"        ]);  ",
 									"});",
 									"",
-									"/*",
-									"// EES-639",
 									"pm.test(\"wards should be correct\", function () {",
 									"    pm.expect(respJson.locations.ward.options.length).to.equal(4);",
 									"    wardLabels = respJson.locations.ward.options.map(ward => ward.label);",
@@ -558,7 +556,6 @@
 									"            \"Nailsea Youngwood\",",
 									"        ]);   ",
 									"});",
-									"*/",
 									"",
 									"pm.test(\"parliamentaryConstituency should be correct\", function () {",
 									"    pm.expect(respJson.locations.parliamentaryConstituency.options.length).to.equal(4);",
@@ -1607,8 +1604,8 @@
 									"    pm.expect(testPub.title).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`); ",
 									"",
 									"    // @NotCreatedData",
-									"    pm.expect(testPub.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(testPub.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(testPub.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(testPub.methodology.title).to.equal(\"API Test Methodology\");",
 									"",
 									"    pm.expect(testPub.releases.length).to.equal(1);",
 									"    pm.expect(testPub.releases[0].id).to.equal(pm.globals.get('release_id'));",
@@ -1707,8 +1704,8 @@
 									"",
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
-									"    pm.expect(respJson.methodology.id).to.equal(\"caa8e56f-41d2-4129-a5c3-53b051134bd7\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\");",
+									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be correct\", function () {",
@@ -1892,7 +1889,6 @@
 													"pm.test(\"Subject 'API test subject' should exist\", function () {",
 													"    var subject = respJson.subjects.find(subject => subject.label === \"API test subject\");",
 													"    pm.expect(subject, 'Couldn\\'t find subject \"API test subject\"!').to.not.be.undefined;",
-													"    //pm.globals.set('sub1_id', subject.id);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2017,8 +2013,6 @@
 													"        ]);  ",
 													"});",
 													"",
-													"/*",
-													"// EES-639",
 													"pm.test(\"wards should be correct\", function () {",
 													"    pm.expect(respJson.locations.ward.options.length).to.equal(4);",
 													"    wardLabels = respJson.locations.ward.options.map(ward => ward.label);",
@@ -2030,7 +2024,6 @@
 													"            \"Nailsea Youngwood\",",
 													"        ]);   ",
 													"});",
-													"*/",
 													"",
 													"pm.test(\"parliamentaryConstituency should be correct\", function () {",
 													"    pm.expect(respJson.locations.parliamentaryConstituency.options.length).to.equal(4);",
@@ -3237,7 +3230,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"releaseNote\": \"Update from Postman\"\n}"
+									"raw": "{\n    \"reason\": \"Update from Postman\"\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/{{release_id}}/content/release-note",
@@ -3294,7 +3287,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"reason\": \"Release Note updated by Postman\"\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/{{release_id}}/content/release-note/{{release_note_id}}",
@@ -3349,7 +3342,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+									"raw": ""
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/{{release_id}}/content/release-note/{{release_note_id}}",
@@ -7135,7 +7128,7 @@
 													"    const datablock2 = respJson.content.find(datablock => datablock.id === pm.globals.get('sub1_datablock2_id'));",
 													"    pm.expect(datablock2).to.not.be.undefined;",
 													"    pm.expect(datablock2.name).to.equal(\"Admin API data block 2\");",
-													"    pm.expect(datablock1.order).to.equal(2);",
+													"    pm.expect(datablock2.order).to.equal(2);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -7523,7 +7516,8 @@
 													"});",
 													"",
 													"pm.test(\"New Content Section should be removed\", function () { ",
-													"    pm.expect(respJson).to.be.an('array').that.is.empty;",
+													"    const section = respJson.find(section => section.id === pm.globals.get('datablock_content_section_id'));",
+													"    pm.expect(section).to.be.undefined;",
 													"});"
 												],
 												"type": "text/javascript"
@@ -8831,12 +8825,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+											"src": "files/admin-api-test.csv"
 										},
 										{
 											"key": "metaFile",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+											"src": "files/admin-api-test.meta.csv"
 										}
 									]
 								},
@@ -8896,12 +8890,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+											"src": "files/admin-api-test.csv"
 										},
 										{
 											"key": "metaFile",
 											"type": "file",
-											"src": "/C:/Users/mark/projects/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+											"src": "files/admin-api-test.meta.csv"
 										}
 									]
 								},
@@ -15938,6 +15932,31 @@
 								"year_identifier_missing_columns.csv",
 								"import",
 								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Queue",
+			"item": [
+				{
+					"name": "Queue release for publication",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/3b7532b9-df54-4d9c-ade4-08d782fd031e/queue",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"3b7532b9-df54-4d9c-ade4-08d782fd031e",
+								"queue"
 							]
 						}
 					},

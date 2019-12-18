@@ -1,4 +1,9 @@
-import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import DataBlockDetailsForm, {
+  DataBlockDetailsFormValues,
+} from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -12,10 +17,7 @@ import {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { createRef, useState, useEffect } from 'react';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import React, { createRef, useEffect, useState } from 'react';
 
 interface CreateDataBlockProps {
   releaseId: string;
@@ -48,6 +50,10 @@ const CreateDataBlocks = ({
     TableHeadersFormValues | undefined
   >();
 
+  const [initialValues, setInitialValues] = useState<
+    DataBlockDetailsFormValues
+  >();
+
   useEffect(() => {
     if (dataBlock && dataBlockResponse) {
       setQuery(dataBlock.dataBlockRequest);
@@ -69,24 +75,33 @@ const CreateDataBlocks = ({
         );
       }
     }
-    if (onTableToolLoaded) onTableToolLoaded();
   }, [dataBlock, dataBlockResponse]);
 
-  const getInitialValues = () => {
+  useEffect(() => {
     if (!dataBlock) {
-      return {
-        title: table ? generateTableTitle(table.subjectMeta) : undefined,
-      };
+      setInitialValues({
+        title: table ? generateTableTitle(table.subjectMeta) : '',
+        name: '',
+        source: '',
+        customFootnotes: '',
+      });
+      return;
     }
 
-    const { heading: title, name, source, customFootnotes } = dataBlock;
-    return {
+    const {
+      heading: title = '',
+      name = '',
+      source = '',
+      customFootnotes = '',
+    } = dataBlock;
+
+    setInitialValues({
       title,
       name,
       source,
       customFootnotes,
-    };
-  };
+    });
+  }, [dataBlock, table]);
 
   return (
     <div>
@@ -94,7 +109,11 @@ const CreateDataBlocks = ({
         releaseId={releaseId}
         themeMeta={[]}
         initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
+        onInitialQueryLoaded={() => {
+          if (onTableToolLoaded) onTableToolLoaded();
+        }}
         onTableCreated={response => {
+          setTableHeaders(undefined);
           setQuery(response.query);
           setTable(response.table);
           setTableHeaders(response.tableHeaders);
@@ -109,9 +128,9 @@ const CreateDataBlocks = ({
 
                 {query && tableHeaders && (
                   <DataBlockDetailsForm
-                    initialValues={getInitialValues()}
+                    initialValues={initialValues}
                     query={query}
-                    tableHeaders={tableHeaders || tableHeaders}
+                    tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
                     onDataBlockSave={db => onDataBlockSave(db)}

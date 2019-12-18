@@ -162,7 +162,6 @@ const FormComboBox = ({
         aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
         aria-owns={`${id}-options`}
         aria-haspopup="listbox"
-        aria-live="assertive"
         className="govuk-form-group"
       >
         <label
@@ -214,7 +213,7 @@ const FormComboBox = ({
           : afterInput}
 
         {showOptions && renderedOptions && (
-          <div aria-live="polite" className={styles.optionsContainer}>
+          <div role="alert" className={styles.optionsContainer}>
             {typeof listBoxLabel === 'function'
               ? listBoxLabel({ selectedOption, value })
               : listBoxLabel}

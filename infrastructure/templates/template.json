@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "subscription": {
@@ -68,6 +68,18 @@
         "S3 Standard"
       ]
     },
+    "adminFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for the admin application"
+      }
+    },
+    "sqlFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for sql databases"
+      }
+    },
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
@@ -80,14 +92,28 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
+    "sqlAzureAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAzureAdministratorSid": {
+      "type": "string"
+    },
+    "secAlertRetentionDays": {
+      "defaultValue": "14",
+      "type": "string",
+      "metadata": {
+        "description": "Number of days to retain the security alerts for"
+      }
+    },
+    "sqlAuditing": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
+      "allowedValues": ["true", "false"],
       "metadata": {
         "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
@@ -136,6 +162,17 @@
     "notifyTokenSecretKey": {
       "type": "securestring",
       "defaultValue": ""
+    },
+
+    "teamEmailAddresses": {
+      "type": "array",
+      "defaultValue": [
+        "dfeteam@hiveit.co.uk",
+        "explore.statistics@education.gov.uk"
+      ],
+      "metadata": {
+        "description": "Email addresses for receiving alerts"
+      }
     },
 
     "departmentName": {
@@ -223,11 +260,7 @@
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
-      "allowedValues": [
-        "-1.0",
-        "1.1",
-        "1.2"
-      ]
+      "allowedValues": ["-1.0", "1.1", "1.2"]
     }
   },
   "variables": {
@@ -268,7 +301,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('dataAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -291,8 +324,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
           ],
-          "properties": {
-          }
+          "properties": {}
         }
       ],
       "properties": {
@@ -464,8 +496,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
           ],
-          "properties": {
-          }
+          "properties": {}
         }
       ],
       "properties": {
@@ -610,7 +641,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('adminAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -633,8 +664,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
           ],
-          "properties": {
-          }
+          "properties": {}
         }
       ],
       "properties": {
@@ -654,9 +684,21 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "copy": [
+            {
+              "name": "ipSecurityRestrictions",
+              "count": "[length(parameters('adminFirewallRules'))]",
+              "input": {
+                "ipAddress": "[concat(copyIndex()].Address, '/32')",
+                "name": "[copyIndex()].Name)"
+              }
+            }
+          ],
+          "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
-              "*"
+              "https://localhost:3000",
+              "http://localhost:3000"
             ]
           },
           "appSettings": [
@@ -850,7 +892,7 @@
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "8.11.1"
+              "value": "12.13.0"
             },
             {
               "name": "NODE_ENV",
@@ -967,8 +1009,7 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": [
-      ],
+      "dependsOn": [],
       "sku": {
         "name": "Standard_RAGRS"
       },
@@ -1003,9 +1044,7 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
+          "dependsOn": ["[variables('sqlserverName')]"],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1031,9 +1070,7 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
+          "dependsOn": ["[variables('sqlserverName')]"],
           "properties": {
             "edition": "Basic",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1042,11 +1079,23 @@
           }
         },
         {
+          "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
+          "dependsOn": ["[variables('sqlserverName')]"],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1054,6 +1103,32 @@
             "startIpAddress": "0.0.0.0"
           }
         },
+
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
+          ]
+        },
+
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -1063,6 +1138,8 @@
           ],
           "properties": {
             "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1083,6 +1160,27 @@
               "emailSubscriptionAdmins": true
             }
           }
+        },
+
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+          ]
         }
       ],
       "tags": {
@@ -1097,6 +1195,23 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('sqlserverName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
       }
     },
     {
@@ -1128,9 +1243,7 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": [
-            "[variables('publicSqlServerName')]"
-          ],
+          "dependsOn": ["[variables('publicSqlServerName')]"],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1139,11 +1252,23 @@
           }
         },
         {
+          "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": [
-            "[variables('publicSqlServerName')]"
-          ],
+          "dependsOn": ["[variables('publicSqlServerName')]"],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1151,6 +1276,20 @@
             "startIpAddress": "0.0.0.0"
           }
         },
+
+        {
+          "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
+          ]
+        },
+
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -1160,6 +1299,8 @@
           ],
           "properties": {
             "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
             "emailAccountAdmins": true
           }
         },
@@ -1180,6 +1321,25 @@
               "emailSubscriptionAdmins": true
             }
           }
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+          ]
         }
       ],
       "tags": {
@@ -1194,6 +1354,23 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
       }
     },
     {
@@ -1253,9 +1430,7 @@
           "name": "default/downloads",
           "type": "blobServices/containers",
           "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('publicStorageAccountName')]"]
         }
       ]
     },
@@ -1346,7 +1521,10 @@
           "requestTracingEnabled": true,
           "cors": {
             "allowedOrigins": [
-              "*"
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
             ]
           },
           "appSettings": [
@@ -1508,9 +1686,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
@@ -1623,7 +1799,8 @@
         "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1652,9 +1829,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
+            "allowedOrigins": []
           },
           "appSettings": [
             {
@@ -1664,6 +1839,14 @@
             {
               "name": "AzureWebJobsStorage",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "PublishReleasesCronSchedule",
+              "value": "0 0 0 * * *"
+            },
+            {
+              "name": "PublishReleaseContentCronSchedule",
+              "value": "0 30 9 * * *"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
@@ -1700,6 +1883,11 @@
               "name": "PublicStorage",
               "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
             },
             {
               "name": "ContentDb",
