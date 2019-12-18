@@ -1,5 +1,6 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { AbstractRelease } from '@common/services/publicationService';
+import { DataBlock } from '@common/services/dataBlockService';
 
 export interface ContentSectionViewModel {
   id: string;
@@ -11,6 +12,7 @@ export interface ContentSectionViewModel {
 
 export interface ManageContentPageViewModel {
   release: AbstractRelease<EditableContentBlock>;
+  availableDataBlocks: DataBlock[];
 }
 
 export interface ContentBlockViewModel {

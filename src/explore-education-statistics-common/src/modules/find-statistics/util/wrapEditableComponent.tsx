@@ -1,10 +1,12 @@
 import React, { ComponentType, useContext } from 'react';
+import {DataBlock} from "@common/services/dataBlockService";
 
 export interface ReleaseContentContext {
   isEditing: boolean;
   isCommenting: boolean;
   isReviewing: boolean;
   releaseId: string | undefined;
+  availableDataBlocks: DataBlock[];
 }
 
 export const EditingContext = React.createContext<ReleaseContentContext>({
@@ -12,6 +14,7 @@ export const EditingContext = React.createContext<ReleaseContentContext>({
   isCommenting: false,
   isReviewing: false,
   releaseId: undefined,
+  availableDataBlocks: []
 });
 
 const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(

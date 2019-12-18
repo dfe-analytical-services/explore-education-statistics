@@ -17,6 +17,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import { DataBlock } from '@common/services/dataBlockService';
 
 type PageMode = 'edit' | 'preview';
 
@@ -24,6 +25,7 @@ interface Model {
   unresolvedComments: ExtendedComment[];
   pageMode: PageMode;
   content: ManageContentPageViewModel;
+  availableDataBlocks: DataBlock[];
 }
 
 const contentSectionComments = (
@@ -94,6 +96,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
           unresolvedComments: getUnresolveComments(newContent.release),
           pageMode: 'edit',
           content: newContent,
+          availableDataBlocks: newContent.availableDataBlocks
         });
       })
       .catch(handleApiErrors);
@@ -165,6 +168,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                 content={model.content}
                 styles={{}}
                 onReleaseChange={c => onReleaseChange(c)}
+                availableDataBlocks={model.availableDataBlocks}
               />
             </div>
           </div>

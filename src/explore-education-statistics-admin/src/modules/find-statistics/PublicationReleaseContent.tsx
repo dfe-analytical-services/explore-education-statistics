@@ -19,6 +19,7 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
+import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
@@ -36,6 +37,8 @@ interface Props {
   logEvent?: (...params: string[]) => void;
 
   onReleaseChange?: (content: ManageContentPageViewModel['release']) => void;
+
+  availableDataBlocks: DataBlockModel[];
 }
 
 const nullLogEvent = () => {};
@@ -47,6 +50,7 @@ const PublicationReleaseContent = ({
   logEvent = nullLogEvent,
   onReleaseChange,
   handleApiErrors,
+  availableDataBlocks
 }: Props & ErrorControlProps) => {
   const [release, _setRelease] = React.useState(content.release);
 
@@ -102,6 +106,7 @@ const PublicationReleaseContent = ({
         releaseId: release.id,
         isReviewing: false,
         isCommenting: true,
+        availableDataBlocks
       }}
     >
       <h1 className="govuk-heading-l">

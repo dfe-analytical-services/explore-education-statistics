@@ -13,6 +13,7 @@ import wrapEditableComponent, {
 import { Dictionary } from '@common/types/util';
 import React, { useContext, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DataBlock } from '@common/services/dataBlockService';
 import Comments from './Comments';
 import ContentBlockDraggable from './ContentBlockDraggable';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -49,6 +50,7 @@ export const EditingContentBlockContext = React.createContext<
   isReviewing: false,
   isEditing: false,
   sectionId: undefined,
+  availableDataBlocks: []
 });
 
 const EditableContentBlock = ({
@@ -174,7 +176,11 @@ const EditableContentBlock = ({
           There is no content for this section.
         </div>
         {(canAddBlocks || canAddSingleBlock) && (
-          <AddContentButton order={0} onClick={onAddContentCallback} />
+          <AddContentButton
+            order={0}
+            onClick={onAddContentCallback}
+            availableDataBlocks={editingContext.availableDataBlocks}
+          />
         )}
       </>
     );
@@ -205,6 +211,7 @@ const EditableContentBlock = ({
                     <AddContentButton
                       order={index}
                       onClick={onAddContentCallback}
+                      availableDataBlocks={editingContext.availableDataBlocks}
                     />
                   )}
                   {(editingContext.isCommenting ||
@@ -242,7 +249,10 @@ const EditableContentBlock = ({
               {!isReordering &&
                 canAddBlocks &&
                 index === contentBlocks.length - 1 && (
-                  <AddContentButton onClick={onAddContentCallback} />
+                  <AddContentButton
+                    onClick={onAddContentCallback}
+                    availableDataBlocks={editingContext.availableDataBlocks}
+                  />
                 )}
             </ContentBlockDraggable>
           ))}

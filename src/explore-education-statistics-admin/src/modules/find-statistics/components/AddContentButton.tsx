@@ -1,9 +1,11 @@
 import React from 'react';
 import Button from '@common/components/Button';
+import { DataBlock } from '@common/services/dataBlockService';
 
 interface AddContentButtonProps {
   order?: number;
   onClick: (type: string, order: number | undefined) => void;
+  availableDataBlocks: DataBlock[];
 }
 
 const AddContentButton = ({ order, onClick }: AddContentButtonProps) => {
