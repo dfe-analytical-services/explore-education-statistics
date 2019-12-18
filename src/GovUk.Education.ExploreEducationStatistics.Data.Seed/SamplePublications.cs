@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .SelectMany(release => release.Subjects);
 
             return subjects.Where(subject => !IgnoredSubjectFiles.Contains(
-                GetSubjectFile(subject.Id))).OrderBy(subject => subject.Id).ToList();
+                GetSubjectFile(subject.Id))).ToList();
         }
 
         private static Guid GetSubjectKey(int i)
@@ -105,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
         
         private static DataCsvFile GetSubjectFile(Guid key)
         {
-            return SubjectFiles[key];
+            SubjectFiles.TryGetValue(key, out DataCsvFile file);
+            return file;
         }
         
         private static IEnumerable<Theme> GetThemes()
