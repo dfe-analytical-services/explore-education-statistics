@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
             
-            var dateQuery = TableQuery.GenerateFilterConditionForDate("Publish", QueryComparisons.LessThan, DateTime.Today.AddDays(1));
+            var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish), QueryComparisons.LessThan, DateTime.Today.AddDays(1));
             var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString());
             var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And, statusQuery));
 

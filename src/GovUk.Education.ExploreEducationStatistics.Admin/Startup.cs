@@ -182,6 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
+            services.AddTransient<IReleaseStatusService, ReleaseStatusService>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task CreateOrUpdateAsync(Guid releaseId,
             (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
         {
-            var release = await GetRelease(releaseId);
+            var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(new ReleaseStatus(release.Publication.Slug,
                 release.PublishScheduled,
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseStatus;
         }
 
-        private Task<Release> GetRelease(Guid releaseId)
+        private Task<Release> GetReleaseAsync(Guid releaseId)
         {
             return _context.Releases
                 .AsNoTracking()
