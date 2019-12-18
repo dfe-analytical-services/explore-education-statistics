@@ -1926,11 +1926,5 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     }
-  ],
-  "outputs": {
-    "ipSecurityRestrictions": {
-      "type": "array",
-      "value": "[variables('ipSecurityRestrictions')]"
-    }
-  }
+  ]
 }
