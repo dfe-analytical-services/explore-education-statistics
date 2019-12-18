@@ -672,6 +672,10 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
+              "name": "AppInsights__InstrumentationKey",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
             },
