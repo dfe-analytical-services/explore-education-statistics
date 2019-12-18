@@ -8,6 +8,7 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element   css:#selectTheme
     user checks element contains  css:#my-publications-tab  Manage publications and releases
     user selects from list by label  css:#selectTheme  ${theme}
+    user waits until page contains element   css:#selectTopic
     user selects from list by label  css:#selectTopic  ${topic}
     user waits until page contains element  xpath://h2[text()="${theme}"]
     user waits until page contains element  xpath://h3[text()="${topic}"]
