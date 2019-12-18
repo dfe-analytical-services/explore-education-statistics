@@ -2,7 +2,7 @@ import PrototypeDashboardRelease from '@admin/pages/prototypes/components/Protot
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { FormGroup, FormSelect } from '@common/components/form';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import React from 'react';
 import useToggle from '@common/hooks/useToggle';
 import ModalConfirm from '@common/components/ModalConfirm';

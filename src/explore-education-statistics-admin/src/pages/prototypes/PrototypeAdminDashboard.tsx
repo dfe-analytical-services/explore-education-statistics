@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
+import { PrototypeLoginContext } from '@admin/components/Login';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import AdminDashboardReadyForPublication from '@admin/pages/prototypes/components/AdminDashboardReadyForPublication';
 import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
@@ -11,7 +11,7 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 
 const UserType = () => {
-  const userContext = React.useContext(LoginContext);
+  const userContext = React.useContext(PrototypeLoginContext);
 
   return (
     <>
@@ -32,7 +32,7 @@ const UserType = () => {
 };
 
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
-  const userContext = React.useContext(LoginContext);
+  const userContext = React.useContext(PrototypeLoginContext);
   const task = location.search.includes('?status=readyApproval')
     ? 'readyApproval'
     : 'readyHigherReview';

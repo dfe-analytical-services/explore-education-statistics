@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import dashboardRoutes from '@admin/routes/dashboard/routes';
+import appRouteList from '@admin/routes/dashboard/routes';
 import service from '@admin/services/release/edit-release/status/service';
 import withErrorControl, {
   ErrorControlProps,
@@ -55,7 +55,7 @@ const ReleaseStatusPage = ({
               .updateReleaseStatus(releaseId, values)
               .catch(handleApiErrors);
 
-            history.push(dashboardRoutes.adminDashboard);
+            history.push(appRouteList.adminDashboard.path as string);
           }}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
