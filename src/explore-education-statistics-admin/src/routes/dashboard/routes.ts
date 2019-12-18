@@ -80,7 +80,6 @@ const appRouteList: Dictionary<RouteProps> = {
   manageRelease: {
     path: '/publication/:publicationId/release/:releaseId',
     component: ManageReleasePageContainer,
-    exact: true,
   },
   documentation: {
     path: '/documentation',
