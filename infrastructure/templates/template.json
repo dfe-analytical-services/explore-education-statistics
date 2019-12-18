@@ -689,8 +689,8 @@
               "name": "ipSecurityRestrictions",
               "count": "[length(parameters('adminFirewallRules'))]",
               "input": {
-                "ipAddress": "[concat(copyIndex()].Address, '/32')",
-                "name": "[copyIndex()].Name)"
+                "ipAddress": "[concat(copyIndex().Address, '/24')]",
+                "name": "[copyIndex().Name]"
               }
             }
           ],
