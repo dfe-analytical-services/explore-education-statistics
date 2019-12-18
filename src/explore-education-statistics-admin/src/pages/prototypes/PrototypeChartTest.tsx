@@ -3,7 +3,6 @@
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import DataBlockService, {
   DataBlockRequest,

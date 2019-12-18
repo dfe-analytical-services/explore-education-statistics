@@ -1,5 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
@@ -87,14 +87,10 @@ const ProtectedRoutes = ({ children }: Props) => {
   };
 
   return authState.ready ? (
-    <>
-      <LoginContext.Provider value={authenticationContext}>
-        {children}
-      </LoginContext.Provider>
-    </>
-  ) : (
-    <></>
-  );
+    <LoginContext.Provider value={authenticationContext}>
+      {children}
+    </LoginContext.Provider>
+  ) : null;
 };
 
 export default ProtectedRoutes;
