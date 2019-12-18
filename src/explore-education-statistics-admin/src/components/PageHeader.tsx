@@ -11,7 +11,9 @@ interface Props {
 }
 
 const PageHeader = ({ wide }: Props) => {
-  const authentication = useContext(LoginContext);
+  const { user } = useContext(LoginContext);
+  // eslint-disable-next-line no-debugger
+  debugger;
 
   return (
     <>
@@ -71,11 +73,7 @@ const PageHeader = ({ wide }: Props) => {
                     Administrators' guide
                   </a>
                 </li>
-                {authentication.user ? (
-                  <LoggedInLinks user={authentication.user} />
-                ) : (
-                  <NotLoggedInLinks />
-                )}
+                {user ? <LoggedInLinks user={user} /> : <NotLoggedInLinks />}
               </ul>
             </nav>
           </div>
