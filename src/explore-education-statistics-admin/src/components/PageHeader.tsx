@@ -12,8 +12,6 @@ interface Props {
 
 const PageHeader = ({ wide }: Props) => {
   const { user } = useContext(LoginContext);
-  // eslint-disable-next-line no-debugger
-  debugger;
 
   return (
     <>
