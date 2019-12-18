@@ -87,7 +87,7 @@ const appRouteList: Dictionary<RouteProps> = {
     component: AdminDocumentationHome,
     exact: true,
   },
-  documentatetionContentStandards: {
+  documentationContentStandards: {
     path: '/documentation/content-design-standards-guide',
     component: AdminDocumentationContentDesignStandards,
     exact: true,

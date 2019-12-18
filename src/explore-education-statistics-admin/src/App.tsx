@@ -6,7 +6,6 @@ import React from 'react';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
-import ErrorBoundary from './components/ErrorBoundary';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import appRouteList from './routes/dashboard/routes';
 import prototypeRouteList from './routes/prototypeRoutes';
@@ -32,14 +31,15 @@ function App() {
     <AriaLiveAnnouncer>
       <ThemeAndTopic>
         <BrowserRouter>
-          <ErrorBoundary>
-            <Switch>
-              {authRoutes}
-              {appRoutes}
-              {prototypeRoutes}
-              <Route component={PageNotFoundPage} />
-            </Switch>
-          </ErrorBoundary>
+          <Switch>
+            {authRoutes}
+            {appRoutes}
+            {prototypeRoutes}
+            <ProtectedRoute
+              redirectIfNotLoggedIn={false}
+              component={PageNotFoundPage}
+            />
+          </Switch>
         </BrowserRouter>
       </ThemeAndTopic>
     </AriaLiveAnnouncer>
