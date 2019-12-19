@@ -7,39 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class SampleGuids
     {
-        public static readonly string Absence_By_Characteristic = "803fbf56-600f-490f-8409-6413a891720d";
-        public static readonly string Absence_By_Geographic_Level = "568576e5-d386-450e-a8db-307b7061d0d8";
-        public static readonly string Absence_By_Term = "b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a";
-        public static readonly string Absence_For_Four_Years_Olds = "353db5ea-befd-488b-ad16-2ce7963c9bc9";
-        public static readonly string Absence_In_Prus = "95c7f584-907e-4756-bbf0-4905ceae57df";
-        public static readonly string Absence_Number_Missing_At_Least_One_Session_By_Reason = "faf2152e-0a6c-4e97-af02-e9a89d48c47a";
-        public static readonly string Absence_Rate_Percent_Bands = "666cd878-87bb-4f77-9a3f-f5c75078e112";
-        public static readonly string EYFSP_ELG_Underlying_Data_2013_2018 = "01ebdcfc-979a-4fe7-8d39-e5f8a6546e95"; 
-        public static readonly string EYFSP_Areas_Of_Learning_Underlying_Data_2013_2018 = "55759ccd-da8f-4a27-9f4a-ca669f4218e0";
-        public static readonly string EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018 = "8e3d1bc0-2beb-4dc6-9db7-3d27d0608042";
-        public static readonly string Exclusions_By_Characteristic = "92039f68-a894-46a9-bd44-4482728698b0";
-        public static readonly string Exclusions_By_Geographic_Level = "3c0fbe56-0a4b-4caa-82f2-ab696cd96090";
-        public static readonly string Exclusions_By_Reason = "8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7";
-        public static readonly string Exclusions_Duration_Of_Fixed_Exclusions = "926e33e4-b3ce-41aa-9ed2-e04106068ffb";
-        public static readonly string Exclusions_Number_Of_Fixed_Exclusions = "048a6276-1df1-487a-a501-fbd5e64d4b79";
-        public static readonly string Exclusions_Total_Days_Missed_Fixed_Exclusions = "28feb263-4bf9-4dd7-9440-48e2685f6954";
-        public static readonly string School_Applications_And_Offers = "fa0d7f1d-d181-43fb-955b-fc327da86f2c";
-        public static readonly string SEN2_AGE_NEW = "685104a5-1424-40ab-bf4e-bf0515a4fd7b";
-        public static readonly string SEN2_AGE_STOCK = "8074c6a2-0fb5-4732-8c82-82ec8dccf7e6";
-        public static readonly string SEN2_ESTAB_NEW = "d64069e1-f97e-4a9b-afc1-a5f121cae921";
-        public static readonly string SEN2_ESTAB_STOCK = "eaad58a4-3f80-4703-b2af-3de4b678fa77";
-        public static readonly string SEN2_MI = "3e36d5f0-668d-4d9b-bfa1-8585b5223769";
-        public static readonly string Skeleton_Dashboard_Tidy_Fata_NARTS = "0339cd60-f0f1-4b27-a9cc-c2066d21293a";
-        public static readonly string Skeleton_Dashboard_Tidy_Data_Annual_v4 = "46602e6d-f725-46eb-bb34-8473565f43a8";
-        public static readonly string Level_2_3_National = "357b7e2c-7e65-477b-a576-16b8011da7d9";
-        public static readonly string Level_2_3_SF = "59db9158-a168-4fcb-a2ba-c46146960b1a";
-        public static readonly string Level_2_3_SFLA = "13faaf84-0a54-470f-bfd9-ebd8b090ed1d";
-        public static readonly string KS2_2016_Test_UD = "25ea589f-660a-46ec-83c3-b60647baea3d";
-        public static readonly string KS4_2018_LA_Char_Testdata = "0c7a7a5d-9520-4ca1-b01e-fe061ebeb122";
-        public static readonly string KS4_2018_Nat_Char_Testdata = "ce5cc950-ccf6-4423-817a-48eb6a411fcc";
-        public static readonly string KS4_2018_Subject_Tables_S1_TestData = "6b81ee8c-95d2-4603-8f71-ad03686cfbe1";
-        public static readonly string KS4_2018_Subject_Tables_S3_TestData = "3d46479c-0adc-49c7-baf9-250e4b86ee4b";
-        public static readonly string Clean_Data_FE = "7a9a3afc-e751-4f64-a3fa-edff5a5f9417";
+        private static readonly string Absence_By_Characteristic = "803fbf56-600f-490f-8409-6413a891720d";
+        private static readonly string Absence_By_Geographic_Level = "568576e5-d386-450e-a8db-307b7061d0d8";
+        private static readonly string Absence_By_Term = "b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a";
+        private static readonly string Absence_For_Four_Years_Olds = "353db5ea-befd-488b-ad16-2ce7963c9bc9";
+        private static readonly string Absence_In_Prus = "95c7f584-907e-4756-bbf0-4905ceae57df";
+        private static readonly string Absence_Number_Missing_At_Least_One_Session_By_Reason = "faf2152e-0a6c-4e97-af02-e9a89d48c47a";
+        private static readonly string Absence_Rate_Percent_Bands = "666cd878-87bb-4f77-9a3f-f5c75078e112";
+        private static readonly string EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018 = "8e3d1bc0-2beb-4dc6-9db7-3d27d0608042";
+        private static readonly string School_Applications_And_Offers = "fa0d7f1d-d181-43fb-955b-fc327da86f2c";
 
         private static readonly Dictionary<string, Guid> FilterItemGuids =
             new Dictionary<string, Guid>
@@ -151,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 }
             }
         }
-        
         public static void GenerateFilterItemGuids(StatisticsDbContext dbContext)
         {
             foreach (var filterItem in dbContext.FilterItem.Local.ToList())
@@ -164,7 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 }
             }
         }
-
         private static Guid GetGuid(Dictionary<string, Guid> d, string key)
         {
             d.TryGetValue(key, out Guid id);
