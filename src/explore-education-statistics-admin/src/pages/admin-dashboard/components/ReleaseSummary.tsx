@@ -1,4 +1,4 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import {
   getReleaseStatusLabel,
   getReleaseSummaryLabel,

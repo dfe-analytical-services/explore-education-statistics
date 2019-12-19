@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const PageHeader = ({ wide }: Props) => {
-  const authentication = useContext(LoginContext);
+  const { user } = useContext(LoginContext);
 
   return (
     <>
@@ -71,11 +71,7 @@ const PageHeader = ({ wide }: Props) => {
                     Administrators' guide
                   </a>
                 </li>
-                {authentication.user ? (
-                  <LoggedInLinks user={authentication.user} />
-                ) : (
-                  <NotLoggedInLinks />
-                )}
+                {user ? <LoggedInLinks user={user} /> : <NotLoggedInLinks />}
               </ul>
             </nav>
           </div>

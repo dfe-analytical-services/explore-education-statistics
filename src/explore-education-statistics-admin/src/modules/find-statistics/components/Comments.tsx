@@ -1,11 +1,12 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
 import classNames from 'classnames';
 import React from 'react';
-import service from '@admin/services/release/edit-release/content/fake-comments-service';
+import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
+import FormattedDate from '@common/components/FormattedDate';
 import styles from './Comments.module.scss';
 
 interface Props {
@@ -42,7 +43,7 @@ const Comments = ({
       id: '0',
       name: user.name,
       time: new Date(),
-      comment,
+      commentText: comment,
       state: 'open',
     };
 
@@ -146,7 +147,7 @@ const Comments = ({
               <form>
                 <textarea
                   name="comment"
-                  id="comment"
+                  id={`new_comment_${contentBlockId}`}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
@@ -168,15 +169,25 @@ const Comments = ({
             {comments &&
               comments.map(
                 (
-                  { id, name, time, comment, state, resolvedOn, resolvedBy },
+                  {
+                    id,
+                    name,
+                    time,
+                    commentText,
+                    state,
+                    resolvedOn,
+                    resolvedBy,
+                  },
                   index,
                 ) => (
                   <div key={id}>
                     <h2 className="govuk-body-xs govuk-!-margin-0">
-                      <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
+                      <strong>
+                        {name} <FormattedDate>{time}</FormattedDate>
+                      </strong>
                     </h2>
                     <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                      {comment}
+                      {commentText}
                     </p>
                     {state === 'open' &&
                       (canResolve ? (
@@ -196,8 +207,10 @@ const Comments = ({
                       <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
                         <em>
                           Resolved{' '}
-                          {resolvedOn && resolvedOn.toLocaleDateString()} by{' '}
-                          {resolvedBy}
+                          {resolvedOn && (
+                            <FormattedDate>resolvedOn</FormattedDate>
+                          )}{' '}
+                          by {resolvedBy}
                         </em>
                       </p>
                     )}

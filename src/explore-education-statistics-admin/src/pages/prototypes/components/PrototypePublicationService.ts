@@ -27,7 +27,7 @@ export default class PrototypePublicationService {
             comments: [
               {
                 id: '',
-                comment: LOREM.substring(0, 120),
+                commentText: LOREM.substring(0, 120),
                 name: 'John Smith',
                 time: new Date(),
                 state: 'open',
@@ -48,7 +48,7 @@ export default class PrototypePublicationService {
             comments: [
               {
                 id: '',
-                comment: LOREM.substring(0, 120),
+                commentText: LOREM.substring(0, 120),
                 name: 'John Smith',
                 time: new Date(),
                 state: 'open',
@@ -105,7 +105,7 @@ export default class PrototypePublicationService {
               comments: [
                 {
                   id: '',
-                  comment: LOREM.substring(0, 120),
+                  commentText: LOREM.substring(0, 120),
                   name: 'John Smith',
                   time: new Date(),
                   state: 'open',
@@ -126,7 +126,7 @@ export default class PrototypePublicationService {
               comments: [
                 {
                   id: '',
-                  comment: LOREM.substring(0, 120),
+                  commentText: LOREM.substring(0, 120),
                   name: 'John Smith',
                   time: new Date(),
                   state: 'open',
@@ -213,7 +213,7 @@ export default class PrototypePublicationService {
             comments: [
               {
                 id: '',
-                comment: LOREM.substring(0, 120),
+                commentText: LOREM.substring(0, 120),
                 name: 'John Smith',
                 time: new Date(),
                 state: 'open',

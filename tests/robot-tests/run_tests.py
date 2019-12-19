@@ -100,14 +100,14 @@ else:
     assert os.getenv('ADMIN_EMAIL') is not None
     assert os.getenv('ADMIN_PASSWORD') is not None
 
-    if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-        # NOTE(mark): Because you cannot import from a parent dir, we do this...
-        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
-        get_auth_tokens_script = f.read()
-        globals()['__name__'] = '__test_runner__'
-        exec(get_auth_tokens_script, globals(), locals())
-        assert callable(get_identity_info)
-        os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
+if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
+    # NOTE(mark): Because you cannot import from a parent dir, we do this...
+    f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+    get_auth_tokens_script = f.read()
+    globals()['__name__'] = '__test_runner__'
+    exec(get_auth_tokens_script, globals(), locals())
+    assert callable(get_identity_info)
+    os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
 
 if args.env == 'local':
     robotArgs += ['--include', 'Local']

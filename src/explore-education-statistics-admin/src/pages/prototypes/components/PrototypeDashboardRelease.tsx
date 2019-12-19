@@ -3,7 +3,7 @@ import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import useToggle from '@common/hooks/useToggle';
 import ModalConfirm from '@common/components/ModalConfirm';
 

@@ -22,14 +22,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
         private readonly IUserService _userService;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper, 
+        public ReleaseService(ContentDbContext context, IMapper mapper, IPublishingService publishingService,
             IPersistenceHelper<Release, Guid> releaseHelper, IUserService userService)
         {
             _context = context;
+            _publishingService = publishingService;
             _mapper = mapper;
             _releaseHelper = releaseHelper;
             _userService = userService;
@@ -63,6 +65,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
         
+        public List<Release> List()
+        {
+            return _context.Releases.ToList();
+        }
+
         // TODO Authorisation will be required when users are introduced
         public async Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id)
         {
@@ -77,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(
             CreateReleaseViewModel createRelease)
         {
-            return await ValidateReleaseSlugUniqueToPublicationActionResult(createRelease.Slug, createRelease.PublicationId)
+            return await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId)
                 .OnSuccess(async () =>
                 {
                     var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);
@@ -140,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
-            return await ValidateReleaseSlugUniqueToPublicationActionResult(request.Slug, releaseId, releaseId)
+            return await ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId)
                 .OnSuccess(async () =>
                 {
                     var release = await _context.Releases
@@ -229,22 +236,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             return _mapper.Map<List<ReleaseViewModel>>(releases);
         }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
-            Guid publicationId, Guid? releaseId = null)
-        {
-            if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
-            {
-                return ValidationResult(SlugNotUnique);
-            }
-
-            return true;
-        }
         
         // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
         // rename this to "ValidateReleaseSlugUniqueToPublication"
-        private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublicationActionResult(string slug,
+        private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
             if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
@@ -295,6 +290,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         release.InternalReleaseNote = internalReleaseNote;
                         _context.Releases.Update(release);
                         await _context.SaveChangesAsync();
+
+                        await _publishingService.QueueReleaseStatusAsync(releaseId);
+
                         return await GetReleaseSummaryAsync(releaseId);
                     });
         }

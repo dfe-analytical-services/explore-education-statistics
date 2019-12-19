@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -392,7 +391,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
-            Mock<IPublishingService> PublishingService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
@@ -403,7 +401,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
                     new Mock<IImportStatusService>(),
-                    new Mock<IPublishingService>(),
                     new Mock<ISubjectService>(),
                     new Mock<ITableStorageService>(),
                     MockUserManager<ApplicationUser>(Users),
@@ -417,7 +414,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
-            Mock<IPublishingService> PublishingService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
@@ -429,7 +425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ImportStatusService.Object,
-                mocks.PublishingService.Object,
                 mocks.SubjectService.Object,
                 mocks.TableStorageService.Object,
                 mocks.UserManager.Object,

@@ -113,7 +113,10 @@
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
-      "allowedValues": ["true", "false"],
+      "allowedValues": [
+        "true",
+        "false"
+      ],
       "metadata": {
         "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
@@ -245,7 +248,9 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-
+    "openIdConnectTenant": {
+      "type": "string"
+    },
     "openIdConnectClientId": {
       "type": "string"
     },
@@ -260,7 +265,11 @@
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
-      "allowedValues": ["-1.0", "1.1", "1.2"]
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
     }
   },
   "variables": {
@@ -295,7 +304,20 @@
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
-    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]"
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "ipWhiteList": {
+      "copy": [
+        {
+          "name": "addresses",
+          "count": "[length(parameters('adminFirewallRules'))]",
+          "input": {
+            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
+            "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
+            "action": "Allow"
+          }
+        }
+      ]
+    }
   },
   "resources": [
     {
@@ -324,7 +346,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -344,6 +367,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -473,7 +497,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('contentAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -496,7 +520,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -516,6 +541,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -664,7 +690,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -684,17 +711,8 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "copy": [
-            {
-              "name": "ipSecurityRestrictions",
-              "count": "[length(parameters('adminFirewallRules'))]",
-              "input": {
-                "ipAddress": "[concat(copyIndex()].Address, '/32')",
-                "name": "[copyIndex()].Name)"
-              }
-            }
-          ],
-          "scmIpSecurityRestrictionsUseMain": true,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
@@ -704,6 +722,10 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "AppInsights__InstrumentationKey",
               "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
@@ -731,7 +753,10 @@
               "name": "IdentityServer:Key:Name",
               "value": "[concat('CN=', parameters('adminUri'))]"
             },
-
+            {
+              "name": "OpenIdConnect:Authority",
+              "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"
+            },
             {
               "name": "OpenIdConnect:ClientId",
               "value": "[parameters('openIdConnectClientId')]"
@@ -853,7 +878,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -885,6 +910,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -1009,7 +1035,8 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "sku": {
         "name": "Standard_RAGRS"
       },
@@ -1044,7 +1071,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1070,7 +1099,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Basic",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1095,7 +1126,9 @@
         {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1243,7 +1276,9 @@
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('publicSqlServerName')]"],
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -1268,7 +1303,9 @@
         {
           "type": "firewallrules",
           "apiVersion": "2018-06-01-preview",
-          "dependsOn": ["[variables('publicSqlServerName')]"],
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -1430,7 +1467,9 @@
           "name": "default/downloads",
           "type": "blobServices/containers",
           "apiVersion": "2018-07-01",
-          "dependsOn": ["[variables('publicStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
         }
       ]
     },
@@ -1483,7 +1522,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('notificationsAppName')]",
       "location": "[resourceGroup().location]",
@@ -1519,6 +1558,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -1648,7 +1688,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('importerAppName')]",
       "location": "[resourceGroup().location]",
@@ -1685,8 +1725,10 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
@@ -1790,7 +1832,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2019-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('publisherAppName')]",
       "location": "[resourceGroup().location]",
@@ -1828,8 +1870,10 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
-            "allowedOrigins": []
+            "allowedOrigins": [
+            ]
           },
           "appSettings": [
             {
