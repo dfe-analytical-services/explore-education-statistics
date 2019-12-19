@@ -112,15 +112,32 @@ else:
     assert os.getenv('ADMIN_PASSWORD') is not None
 
 if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    print('Getting authentication information...', end='', flush=True)
-    # NOTE(mark): Because you cannot import from a parent dir, we do this...
-    f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
-    get_auth_tokens_script = f.read()
-    globals()['__name__'] = '__test_runner__'
-    exec(get_auth_tokens_script, globals(), locals())
-    assert callable(get_identity_info)
-    os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
-    print(' done!')
+    if os.path.exists('IDENTITY_LOCAL_STORAGE.txt') and os.path.exists('IDENTITY_COOKIE.txt'):
+        print('Getting authentication information from local files...', end='')
+        with open('IDENTITY_LOCAL_STORAGE.txt', 'r') as ls_file:
+            os.environ['IDENTITY_LOCAL_STORAGE'] = ls_file.read()
+        with open('IDENTITY_COOKIE.txt', 'r') as cookie_file:
+            os.environ['IDENTITY_COOKIE'] = cookie_file.read()
+        print('done!')
+    else:
+        print('Logging in to obtain authentication information...', end='', flush=True)
+        # NOTE(mark): Because you cannot import from a parent dir, we do this...
+        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+        get_auth_tokens_script = f.read()
+        globals()['__name__'] = '__test_runner__'
+        exec(get_auth_tokens_script, globals(), locals())
+        assert callable(get_identity_info)
+        os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
+
+        # Save auth info to files for efficiency
+        with open('IDENTITY_LOCAL_STORAGE.txt', 'w') as ls_file:
+            ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE'])
+        with open('IDENTITY_COOKIE.txt', 'w') as cookie_file:
+            cookie_file.write(os.environ['IDENTITY_COOKIE'])
+        print(' done!')
+
+    assert os.getenv('IDENTITY_LOCAL_STORAGE') is not None
+    assert os.getenv('IDENTITY_COOKIE') is not None
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments
     if args.env in ['local', 'dev']:
