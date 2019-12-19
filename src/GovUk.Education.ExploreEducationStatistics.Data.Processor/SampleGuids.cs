@@ -103,6 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {"fa0d7f1d-d181-43fb-955b-fc327da86f2c:Applications:applications_received", new Guid("020a4da6-1111-443d-af80-3a425c558d14")},
                 {"fa0d7f1d-d181-43fb-955b-fc327da86f2c:Applications:online_applications", new Guid("f472e6cc-9e25-401b-9fca-9dc3755bab2d")},
                 {"fa0d7f1d-d181-43fb-955b-fc327da86f2c:Applications:online_apps_percent", new Guid("0af5ea39-828f-4afe-9a9f-643dce0112cf")},
+                
+                {"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042:Overall rating:point_score", new Guid("7d250efe-afad-4117-8ccf-debf689c4efc")},
+                {"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042:Overall rating:average_point_score", new Guid("37faaef4-5b5e-473e-9585-8580c1df967a")},
             };
         public static void GenerateIndicatorGuids(StatisticsDbContext dbContext)
         {
