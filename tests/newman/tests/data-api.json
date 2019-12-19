@@ -5971,7 +5971,7 @@
 													"    pm.expect(respJson.result.length).to.equal(24); ",
 													"});",
 													"",
-													"pm.test(\"All results have filter 884 or 885\", function () {",
+													"pm.test(\"All results have filter Characteristic Gender:Female or Gender:Male\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderMale\")) {",
 													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
@@ -6018,8 +6018,8 @@
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_Char__Total\", \"beeaa217-3233-48df-bc1d-11f066a26efe\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"2cf47ea3-1891-4bba-9381-81a0305a7581\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"edcc7822-d88e-490d-8446-baca8b6ccca4\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"2cf47ea3-1891-4bba-9381-81a0305a7581\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"edcc7822-d88e-490d-8446-baca8b6ccca4\");",
 											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"7d250efe-afad-4117-8ccf-debf689c4efc\");",
 											"pm.globals.set(\"INDI_AveragePointScore\", \"37faaef4-5b5e-473e-9585-8580c1df967a\");"
 										]
