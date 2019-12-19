@@ -8,8 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +20,6 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInf
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -35,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IImportStatusService _importStatusService;
-        private readonly IPublishingService _publishingService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -45,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
             IImportStatusService importStatusService,
-            IPublishingService publishingService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             UserManager<ApplicationUser> userManager
@@ -56,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _importStatusService = importStatusService;
-            _publishingService = publishingService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _userManager = userManager;
@@ -261,17 +257,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UpdateReleaseStatusRequest updateRequest, ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(
-                releaseId, 
+                releaseId,
                 () => _releaseService.UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
             );
         }
 
-        [HttpGet("releases/{releaseId}/queue")]
-        public async Task<ActionResult<ValidateReleaseMessage>> QueueReleaseAsync(ReleaseId releaseId)
-        {
-            return Ok(await _publishingService.QueueReleaseAsync(releaseId));
-        }
-        
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);

@@ -1,5 +1,5 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import React from 'react';
 
 interface Props {

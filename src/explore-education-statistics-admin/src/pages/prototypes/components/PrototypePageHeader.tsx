@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 
 interface Props {
   wide?: boolean;

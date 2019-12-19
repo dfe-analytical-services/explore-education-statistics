@@ -18,16 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IReleaseStatusService _releaseStatusService;
 
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) StartedStage =
+            (Content: Queued, Files: Queued, Data: Queued, Overall: Started);
+
         public PublishReleasesFunction(IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
         }
-        
+
         /**
          * Azure function which publishes all Releases that are scheduled to be published during the day.
          */
         [FunctionName("PublishReleases")]
-        public void PublishReleases([TimerTrigger("0 0 0 * * *")] TimerInfo timer,
+        public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")] TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -40,11 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task PublishReleases(ILogger logger)
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
-
-            // TODO EES-863 Currently returns all scheduled releases
-            // TODO EES-863 Only query scheduled releases that are being published today
-            var query = new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString()));
+            
+            var dateQuery = TableQuery.GenerateFilterConditionForDate("Publish", QueryComparisons.LessThan, DateTime.Today.AddDays(1));
+            var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString());
+            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And, statusQuery));
 
             var scheduled = (await _releaseStatusService.ExecuteQueryAsync(query)).ToList();
             if (scheduled.Any())
@@ -68,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releaseStatus)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseStatus)));
-                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, Started);
+                    
+                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, StartedStage);
                 }
             }
         }
@@ -78,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new PublishReleaseFilesMessage
             {
                 PublicationSlug = releaseStatus.PublicationSlug,
-                ReleasePublished = releaseStatus.Publish,
+                ReleasePublished = releaseStatus.Publish.Value,
                 ReleaseSlug = releaseStatus.ReleaseSlug,
                 ReleaseId = releaseStatus.ReleaseId,
                 ReleaseStatusId = releaseStatus.Id

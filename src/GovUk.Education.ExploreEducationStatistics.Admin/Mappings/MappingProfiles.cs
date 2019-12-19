@@ -133,11 +133,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Url = legacy.Url
                             })
                             .ToList(),
-                        Methodology = new MethodologyViewModel
-                        {
-                            Id = r.Publication.Methodology.Id,
-                            Title = r.Publication.Methodology.Title
-                        }
+                        Methodology = r.Publication.Methodology != null 
+                            ? new MethodologyViewModel
+                                {
+                                    Id = r.Publication.Methodology.Id,
+                                    Title = r.Publication.Methodology.Title
+                                } 
+                            : null
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,

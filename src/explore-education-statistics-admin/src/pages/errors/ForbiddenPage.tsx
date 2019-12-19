@@ -1,4 +1,4 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import loginService from '@admin/services/sign-in/service';
 import React, { useContext } from 'react';

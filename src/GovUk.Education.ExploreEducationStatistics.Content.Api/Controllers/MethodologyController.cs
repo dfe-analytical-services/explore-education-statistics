@@ -1,21 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
     public class MethodologyController : ControllerBase
     {
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IFileStorageService _fileStorageService;
 
         
-        public MethodologyController(IContentCacheService contentCacheService)
+        public MethodologyController(IFileStorageService fileStorageService)
         {
-            _contentCacheService = contentCacheService;
+            _fileStorageService = fileStorageService;
         }
 
         // GET
@@ -26,14 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetMethodologyTree()
         {
-            var tree = await _contentCacheService.GetMethodologyTreeAsync();
-
-            if (string.IsNullOrWhiteSpace(tree))
-            {
-                return NoContent();
-            }
-            
-            return Content(tree, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentMethodologyTreePath()), NoContent());
         }
         
         // GET api/methodology/name-of-content
@@ -43,14 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<string>> Get(string slug)
         {
-            var methodology = await _contentCacheService.GetMethodologyAsync(slug);
-            
-            if (string.IsNullOrWhiteSpace(methodology))
-            {
-                return NotFound();
-            }
-            
-            return Content(methodology, "application/json");
+            return await this.JsonContentResultAsync(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentMethodologyPath(slug)), NotFound());
         }
     }
 }

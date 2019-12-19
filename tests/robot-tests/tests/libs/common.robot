@@ -19,19 +19,25 @@ do this on failure
   capture large screenshot
   set selenium timeout  3
 
+set to local storage
+  [Arguments]    ${key}   ${value}
+  execute javascript  localStorage.setItem('${key}', '${value}');
+
 user signs in
   user opens the browser
+
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading     Sign-in
-  user clicks button   Sign-in
 
-  environment variable should be set   ADMIN_EMAIL
-  environment variable should be set   ADMIN_PASSWORD
-  user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
+  environment variable should be set   IDENTITY_LOCAL_STORAGE
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE}
+  environment variable should be set   IDENTITY_COOKIE
+  set cookie from json   %{IDENTITY_COOKIE}
 
-  user checks url contains  %{ADMIN_URL}
+  user goes to url  %{ADMIN_URL}
   user waits until page contains heading   User1
+  user waits until page contains element   css:#selectTheme
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
@@ -60,7 +66,7 @@ user opens chrome headless
 
 user opens chrome with xvfb
   start virtual display   1920    1080
-  ${options}=    evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+  ${options}=    evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 
   # --no-sandbox allows chrome to run in a docker container: https://github.com/jessfraz/dockerfiles/issues/149
   run keyword if    ${docker} == 1     Call Method   ${options}   add_argument  --no-sandbox
@@ -69,7 +75,12 @@ user opens chrome with xvfb
   set window size    1920    1080
 
 user opens chrome without xvfb
-  open browser   about:blank   Chrome
+  ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+  Call Method    ${c_opts}   add_argument    no-sandbox
+  Call Method    ${c_opts}   add_argument    disable-gpu
+  Call Method    ${c_opts}   add_argument    disable-extensions
+  Call Method    ${c_opts}   add_argument    window-size\=1920,1080
+  Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
   maximize browser window
 
 user opens firefox headless

@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseContent")]
-        public void PublishReleaseContent([TimerTrigger("0 30 9 * * *")] TimerInfo timer,
+        public void PublishReleaseContent([TimerTrigger("%PublishReleaseContentCronSchedule%")]
+            TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {

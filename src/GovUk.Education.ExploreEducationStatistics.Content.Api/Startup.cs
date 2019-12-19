@@ -59,11 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            
-            var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
-            services.AddSingleton(a => cloudStorageAccount.CreateCloudBlobClient());
-            
-            services.AddTransient<IContentCacheService, ContentCacheService>();
+            services.AddSingleton<IFileStorageService, FileStorageService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
