@@ -28,4 +28,11 @@ export type ContentBlockPostModel = Pick<
   'order' | 'type' | 'body'
 >;
 
+export interface ContentBlockAttachRequest {
+  contentBlockId: string;
+  order: number;
+}
+
+export type ContentBlockAttachResponse =Pick<ContentBlockViewModel, 'id' | 'type' | 'order'>;
+
 export default {};

@@ -50,7 +50,7 @@ export const EditingContentBlockContext = React.createContext<
   isReviewing: false,
   isEditing: false,
   sectionId: undefined,
-  availableDataBlocks: []
+  availableDataBlocks: [],
 });
 
 const EditableContentBlock = ({
@@ -104,16 +104,38 @@ const EditableContentBlock = ({
     handleApiErrors,
   ]);
 
-  const onAddContentCallback = (type: string, order: number | undefined) => {
+  const onAddContentCallback = (
+    type: string,
+    data: string,
+    order: number | undefined,
+  ) => {
     if (editingContext.releaseId && sectionId) {
       const { releaseId } = editingContext;
 
-      releaseContentService
-        .addContentSectionBlock(releaseId, sectionId, {
-          body: 'Click to edit',
-          type,
-          order,
-        })
+      let addPromise;
+
+      if (type === 'DataBlock') {
+        addPromise = releaseContentService.attachContentSectionBlock(
+          releaseId,
+          sectionId,
+          {
+            contentBlockId: data,
+            order: order || 0
+          }
+        )
+      } else {
+        addPromise = releaseContentService.addContentSectionBlock(
+          releaseId,
+          sectionId,
+          {
+            body: data,
+            type,
+            order,
+          },
+        );
+      }
+
+      addPromise
         .then(() =>
           releaseContentService.getContentSection(releaseId, sectionId),
         )
@@ -177,8 +199,7 @@ const EditableContentBlock = ({
         </div>
         {(canAddBlocks || canAddSingleBlock) && (
           <AddContentButton
-            order={0}
-            onClick={onAddContentCallback}
+            onClick={(type, data) => onAddContentCallback(type, data, 0)}
             availableDataBlocks={editingContext.availableDataBlocks}
           />
         )}
@@ -209,8 +230,9 @@ const EditableContentBlock = ({
                 <>
                   {canAddBlocks && (
                     <AddContentButton
-                      order={index}
-                      onClick={onAddContentCallback}
+                      onClick={(type, data) =>
+                        onAddContentCallback(type, data, index)
+                      }
                       availableDataBlocks={editingContext.availableDataBlocks}
                     />
                   )}
@@ -250,7 +272,9 @@ const EditableContentBlock = ({
                 canAddBlocks &&
                 index === contentBlocks.length - 1 && (
                   <AddContentButton
-                    onClick={onAddContentCallback}
+                    onClick={(type, data) =>
+                      onAddContentCallback(type, data, contentBlocks.length)
+                    }
                     availableDataBlocks={editingContext.availableDataBlocks}
                   />
                 )}

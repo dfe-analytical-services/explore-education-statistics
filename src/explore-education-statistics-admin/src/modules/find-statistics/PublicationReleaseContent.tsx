@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
+// import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -22,6 +22,7 @@ import React from 'react';
 import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 
 export interface RendererProps {
   contentId?: string;

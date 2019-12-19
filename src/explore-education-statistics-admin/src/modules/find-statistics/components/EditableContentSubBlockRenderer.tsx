@@ -5,6 +5,7 @@ import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
 import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 
 interface Props {
   block: EditableContentBlock;
@@ -59,9 +60,10 @@ function EditableContentSubBlockRenderer({
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
-          <DataBlock
+          <EditableDataBlock
+            canDelete={canDelete}
+            onDelete={onDelete}
             {...block}
-            id={`${id}_datablock`}
             additionalTabContent={
               <>
                 <h2 className="govuk-heading-m govuk-!-margin-top-9">

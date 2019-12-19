@@ -7,6 +7,8 @@ import {
 import { Dictionary } from '@common/types/util';
 import { ExtendedComment } from '@admin/services/publicationService';
 import {
+  ContentBlockAttachRequest,
+  ContentBlockAttachResponse,
   ContentBlockPostModel,
   ContentBlockPutModel,
   ContentBlockViewModel,
@@ -152,6 +154,17 @@ export const releaseContentService = {
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${commentId}`,
     );
   },
+
+  attachContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockAttachRequest,
+  ): Promise<ContentBlockAttachResponse> {
+    return client.post<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
+      block,
+    );
+  },
 };
 
 export const releaseNoteService = {
@@ -177,6 +190,8 @@ export const releaseNoteService = {
       releaseNote,
     );
   },
+
+
 };
 
 export const relatedInformationService = {

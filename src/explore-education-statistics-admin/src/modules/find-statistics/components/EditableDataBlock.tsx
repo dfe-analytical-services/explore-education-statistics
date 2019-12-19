@@ -2,12 +2,22 @@ import React from 'react';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import Button from '@common/components/Button';
 
-type Props = DataBlockProps;
+type Props = {
+  canDelete?: boolean;
+  onDelete?: () => void;
+} & DataBlockProps;
 
-const EditableDataBlock = ({ id }: Props) => {
-  return <div id={id}>Select a data block to use</div>;
+const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
+  return (
+    <div>
+      <DataBlock id={id} {...restOfProps} />
+      <Button onClick={() => onDelete && onDelete()}>Delete</Button>
+    </div>
+  );
 };
 
-export default wrapEditableComponent(EditableDataBlock, DataBlock);
+export default EditableDataBlock;
+
+// export default wrapEditableComponent(EditableDataBlock, DataBlock);
