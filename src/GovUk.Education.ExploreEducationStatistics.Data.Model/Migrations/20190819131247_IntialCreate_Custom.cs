@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredObservations.sql");
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredFootnotes.sql");
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_geometry2json.sql");
+            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_ReleaseCopyRows.sql");
             // Views
             ExecuteFile(migrationBuilder, $"{MigrationId}_Views.sql");
             // Indexes
@@ -40,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             // Views
             migrationBuilder.Sql("DROP VIEW dbo.geojson");
             // Routines
+            migrationBuilder.Sql("DROP FUNCTION dbo.ReleaseCopyRows;");
             migrationBuilder.Sql("DROP FUNCTION dbo.geometry2json;");
             migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredFootnotes");
             migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredObservations");

@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             if (isSeeding)
             {
-                GuidGenerator.GenerateIndicatorGuids(dbContext);
+                SampleGuids.GenerateIndicatorGuids(dbContext);
             }
 
             await dbContext.SaveChangesAsync();
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             
             if (isSeeding)
             {
-                GuidGenerator.GenerateFilterItemGuids(dbContext);
+                SampleGuids.GenerateFilterItemGuids(dbContext);
             }
 
             await dbContext.SaveChangesAsync();

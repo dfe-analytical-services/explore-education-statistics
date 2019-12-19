@@ -5,15 +5,15 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
-    public static class GuidGenerator
+    public static class SampleGuids
     {
         private static readonly Dictionary<string, Guid> FilterItemGuids =
             new Dictionary<string, Guid>
             {
                 {"803fbf56-600f-490f-8409-6413a891720d:school_type:Default:Total", new Guid("cb9b57e8-9965-4cb6-b61a-acc6d34b32be")},
                 {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Total:Total", new Guid("183f94c3-b5d7-4868-892d-c948e256744d")},
-                {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Gender:Male", new Guid("eb6013a7-6e69-4ab6-b51e-b7a3e68256ae")},
-                {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Gender:Female", new Guid("ab381336-5e81-4caa-9e59-6e9067e8fb04")},
+                {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Gender:Gender male", new Guid("eb6013a7-6e69-4ab6-b51e-b7a3e68256ae")},
+                {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Gender:Gender female", new Guid("ab381336-5e81-4caa-9e59-6e9067e8fb04")},
                 {"803fbf56-600f-490f-8409-6413a891720d:school_type:Default:State-funded primary", new Guid("d7e7e412-f462-444f-84ac-3454fa471cb8")},
                 {"803fbf56-600f-490f-8409-6413a891720d:school_type:Default:State-funded secondary", new Guid("a9fe9fa6-e91f-460b-a0b1-66877b97c581")},
                 {"803fbf56-600f-490f-8409-6413a891720d:school_type:Default:Special", new Guid("b3207d77-143b-43d5-8b48-32d29727e96f")},
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {"803fbf56-600f-490f-8409-6413a891720d:characteristic:Ethnic group minor:Ethnicity Minor Irish", new Guid("5a18e770-73b9-4b4f-8c3c-b3130b810422")},
                 
                 {"568576e5-d386-450e-a8db-307b7061d0d8:school_type:Default:Total", new Guid("0b0daf53-3dd5-4b9b-913e-f4518f4afb96")},
-                {"568576e5-d386-450e-a8db-307b7061d0d8:school_type:DefaultState-funded primary", new Guid("006b1702-3d16-4d64-8d57-9336fbb7c4da")},
+                {"568576e5-d386-450e-a8db-307b7061d0d8:school_type:Default:State-funded primary", new Guid("006b1702-3d16-4d64-8d57-9336fbb7c4da")},
                 {"568576e5-d386-450e-a8db-307b7061d0d8:school_type:Default:State-funded secondary", new Guid("5c175038-297f-4b0d-89dd-2f6e9e22db29")},
                 {"568576e5-d386-450e-a8db-307b7061d0d8:school_type:Default:Special", new Guid("c62fd826-00b0-4933-995c-0739fa7cd1fe")},
                 
