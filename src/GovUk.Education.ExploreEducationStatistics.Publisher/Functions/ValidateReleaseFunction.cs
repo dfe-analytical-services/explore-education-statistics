@@ -43,14 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task ValidateReleaseAsync(ReleaseStatusMessage statusMessage, Func<Task> andThen)
         {
-            var valid = await _validationService.ValidateAsync(statusMessage);
-            await (valid ? andThen.Invoke() : CreateOrUpdateReleaseStatusAsync(statusMessage, InvalidStage));
+            var (valid, logMessages) = await _validationService.ValidateAsync(statusMessage);
+            await (valid
+                ? andThen.Invoke()
+                : CreateOrUpdateReleaseStatusAsync(statusMessage, InvalidStage, logMessages));
         }
 
         private async Task CreateOrUpdateReleaseStatusAsync(ReleaseStatusMessage statusMessage,
-            (Stage, Stage, Stage, Stage) stage)
+            (Stage, Stage, Stage, Stage) stage, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
-            await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage);
+            await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage, logMessages);
         }
     }
 }

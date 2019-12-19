@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Guid releaseId,
             string releaseSlug,
             (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
-            IEnumerable<string> messages)
+            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
@@ -36,15 +37,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             FilesStage = stage.Files.ToString();
             DataStage = stage.Data.ToString();
             Stage = stage.Overall.ToString();
-            Messages = JsonConvert.SerializeObject(messages);
+            Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
 
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();
         }
-        
+
         public Guid Id => Guid.Parse(RowKey);
         public Guid ReleaseId => Guid.Parse(PartitionKey);
-        public IEnumerable<string> MessageList => JsonConvert.DeserializeObject<IEnumerable<string>>(Messages);
+
+        public IEnumerable<ReleaseStatusLogMessage> LogMessages => Messages == null
+            ? new List<ReleaseStatusLogMessage>()
+            : JsonConvert.DeserializeObject<IEnumerable<ReleaseStatusLogMessage>>(Messages);
+
+        public void AppendLogMessages(IEnumerable<ReleaseStatusLogMessage> logMessages)
+        {
+            Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
+        }
     }
 
     public enum Stage

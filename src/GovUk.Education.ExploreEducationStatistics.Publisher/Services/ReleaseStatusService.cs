@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
@@ -30,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task CreateOrUpdateAsync(Guid releaseId,
             (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
-            IEnumerable<string> messages = null)
+            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
@@ -39,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (releaseStatus == null)
             {
                 releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
-                    release.Slug, stage, messages);
+                    release.Slug, stage, logMessages);
             }
             else
             {
@@ -50,8 +49,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 releaseStatus.FilesStage = stage.Files.ToString();
                 releaseStatus.DataStage = stage.Data.ToString();
                 releaseStatus.Stage = stage.Overall.ToString();
-                // TODO need to concat the messages
-                releaseStatus.Messages = JsonConvert.SerializeObject(messages);
+
+                if (logMessages != null)
+                {
+                    releaseStatus.AppendLogMessages(logMessages);
+                }
             }
 
             await table.ExecuteAsync(TableOperation.InsertOrReplace(releaseStatus));
@@ -140,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var table = await GetTableAsync();
             var queryResults = table.ExecuteQuery(new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus), QueryComparisons.Equal,
+                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey), QueryComparisons.Equal,
                     releaseId.ToString())));
             return queryResults.SingleOrDefault();
         }
