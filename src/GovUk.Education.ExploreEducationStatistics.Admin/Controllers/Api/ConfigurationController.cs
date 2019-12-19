@@ -25,4 +25,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(instrumentationKey);
         }
     }
-} 
+}
