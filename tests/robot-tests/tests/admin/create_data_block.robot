@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  Local  Dev
+Force Tags  Admin  Local  Dev  AltersData
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
@@ -36,9 +36,15 @@ Upload subject
     user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
     choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user clicks element   xpath://button[text()="Upload data files"]
+    
+    user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
+    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]
 
 Navigate to Manage data tab, check subjects are there
     [Tags]  HappyPath
+    sleep   1000000
     user clicks element  xpath://li/a[text()="Manage data"]
     user waits until page contains element   xpath://legend[text()="Add new data to release"]
     data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="Absence in PRUs"]
