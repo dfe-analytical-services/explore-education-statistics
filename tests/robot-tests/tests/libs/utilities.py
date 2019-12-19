@@ -80,17 +80,7 @@ def user_opens_accordion_section(exact_section_text):
   except:
     raise AssertionError(f'Cannot click accordion section header {exact_section_text}')
 
-  try:
-    sl.driver \
-      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')\
-      .click()
-  except NoSuchElementException:
-    raise AssertionError(f'Cannot find accordion with header {exact_section_text}')
-
-  try:
-    sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
-  except NoSuchElementException:
-    raise AssertionError(f'Accordion "{exact_section_text}" not expanded!')
+  sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
 
 def user_closes_accordion_section(exact_section_text):
   try:

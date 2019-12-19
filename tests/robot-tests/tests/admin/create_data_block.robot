@@ -24,26 +24,18 @@ Verify Datablock test publication is created
 
 Create release
     [Tags]  HappyPath
+    user clicks element  css:[data-testid="Create new release link for Datablock test %{RUN_IDENTIFIER}"]
     user creates a new release for publication "Datablock test %{RUN_IDENTIFIER}" for start year "2025"
-    sleep   1000000
+    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
 
-User clicks edit release
-    [Tags]  HappyPath
-    user checks page contains details section  Financial Year, 2030 to 2031 (not Live)
-    user opens details section  Financial Year, 2030 to 2031 (not Live)
-    user waits until page contains element  css:[data-testid="Edit release link for UI tests - data block, Financial Year, 2030 to 2031 (not Live)"]
-    user clicks element  css:[data-testid="Edit release link for UI tests - data block, Financial Year, 2030 to 2031 (not Live)"]
-
-Validate release summary tab has correct details
+Upload subject
     [Tags]  HappyPath
     user waits until page contains element    xpath://h2[text()="Release summary"]
-    user checks summary list item "Publication title" should be "UI tests - data block"
-    user checks summary list item "Time period" should be "Financial Year"
-    user checks summary list item "Release period" should be "2030 to 2031"
-    user checks summary list item "Lead statistician" should be "Mark Pearson"
-    user checks summary list item "Scheduled release" should be "03 March 2030"
-    user checks summary list item "Next release expected" should be "04 April 2031"
-    user checks summary list item "Release type" should be "Ad Hoc"
+    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
+    user clicks element  xpath://li/a[text()="Manage data"]
+    user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
+    choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
+    choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
 
 Navigate to Manage data tab, check subjects are there
     [Tags]  HappyPath

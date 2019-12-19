@@ -25,12 +25,11 @@ user creates publication
     user waits until page contains element   xpath://span[text()="Welcome"]
 
 User creates a new release for publication "${publication}" for start year "${startYear}"
+    user waits until page contains heading   Create new release
+    user waits until page contains element   xpath://h1/span[text()="${publication}"]
     ${startYearNumber} =  Convert to Integer  ${startYear}
     ${nextYearNumber} =    Evaluate    ${startYearNumber} + 1
     ${nextYear} =    Convert to String  ${nextYearNumber}
-    user checks page contains accordion  ${publication}
-    user opens accordion section  ${publication}
-    user clicks element  css:[data-testid="Create new release link for ${publication}"]
     user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
     user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year Q1-Q4
     user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  ${startYear}
