@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
@@ -13,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string FilesStage { get; set; }
         public string DataStage { get; set; }
         public string Stage { get; set; }
+        public string Messages { get; set; }
 
         public ReleaseStatus()
         {
@@ -22,26 +25,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             DateTime? publish,
             Guid releaseId,
             string releaseSlug,
-            Stage contentStage,
-            Stage filesStage,
-            Stage dataStage,
-            Stage stage)
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
+            IEnumerable<string> messages)
         {
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
             ReleaseSlug = releaseSlug;
-            ContentStage = contentStage.ToString();
-            FilesStage = filesStage.ToString();
-            DataStage = dataStage.ToString();
-            Stage = stage.ToString();
+            ContentStage = stage.Content.ToString();
+            FilesStage = stage.Files.ToString();
+            DataStage = stage.Data.ToString();
+            Stage = stage.Overall.ToString();
+            Messages = JsonConvert.SerializeObject(messages);
 
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();
         }
-
+        
         public Guid Id => Guid.Parse(RowKey);
         public Guid ReleaseId => Guid.Parse(PartitionKey);
+        public IEnumerable<string> MessageList => JsonConvert.DeserializeObject<IEnumerable<string>>(Messages);
     }
 
     public enum Stage

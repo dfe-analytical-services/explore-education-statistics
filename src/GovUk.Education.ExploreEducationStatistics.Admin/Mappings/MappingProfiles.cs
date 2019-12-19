@@ -52,9 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
-            
+
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
-                .ForMember(model => model.LastUpdated, m  => m.MapFrom(status => status.Timestamp));
+                .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp))
+                .ForMember(model => model.Messages, m => m.MapFrom(status => status.MessageList));
             
             CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
             CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
