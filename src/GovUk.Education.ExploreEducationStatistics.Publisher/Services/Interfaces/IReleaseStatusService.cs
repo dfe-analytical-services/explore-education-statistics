@@ -8,7 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleaseStatusService
     {
-        Task CreateOrUpdateAsync(Guid releaseId, (Stage Content, Stage Files, Stage Data, Stage Overall) stage);
+        Task CreateOrUpdateAsync(Guid releaseId, (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
+            IEnumerable<ReleaseStatusLogMessage> logMessages = null);
 
         Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query);
 
