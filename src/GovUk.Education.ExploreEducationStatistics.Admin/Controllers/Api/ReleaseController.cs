@@ -74,7 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
-                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
@@ -84,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
-                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
@@ -94,7 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
-                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
