@@ -74,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
+                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
@@ -83,6 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
+                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
@@ -92,6 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
+                .OnSuccess(Ok)
                 .HandleFailures();
         }
 
@@ -205,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 {
                     var user = await _userManager.GetUserAsync(User);
 
-                    return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false,
+                    return await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false,
                             user.Email);
                 })
                 // add message to queue to process these files
