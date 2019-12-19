@@ -5,9 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -29,15 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
-                var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
-                    new CreateReleaseViewModel
-                    {
-                        PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-                        ReleaseName = "2018",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
-                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
-                    });
+                var result =
+                    new ReleaseService(context, MockPublishingService().Object, MapperForProfile<MappingProfiles>())
+                        .CreateReleaseAsync(
+                            new CreateReleaseViewModel
+                            {
+                                PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
+                                ReleaseName = "2018",
+                                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                                PublishScheduled = DateTime.Parse("2050/01/01"),
+                                TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
+                            });
 
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
                 Assert.Null(result.Result.Right.Published);
@@ -45,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
         }
-        
+
         [Fact]
         public void CreateReleaseWithTemplate()
         {
@@ -85,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         }
                                     }
                                 },
-                    
+
                                 new ReleaseContentSection
                                 {
                                     ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
@@ -118,16 +122,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
-                    new CreateReleaseViewModel
-                    {
-                        PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
-                        TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
-                        ReleaseName = "2018",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
-                        TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
-                    });
+                var result =
+                    new ReleaseService(context, MockPublishingService().Object, MapperForProfile<MappingProfiles>())
+                        .CreateReleaseAsync(
+                            new CreateReleaseViewModel
+                            {
+                                PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
+                                TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
+                                ReleaseName = "2018",
+                                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                                PublishScheduled = DateTime.Parse("2050/01/01"),
+                                TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
+                            });
 
                 // Do an in depth check of the saved release
                 var release = context.Releases
@@ -137,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Single(r => r.Id == result.Result.Right.Id);
 
                 var contentSections = release.GenericContent.ToList();
-                
+
                 Assert.Equal(2, contentSections.Count);
                 Assert.Equal("Template caption index 0", release.Content[0].ContentSection.Caption);
                 Assert.Equal("Template heading index 0", release.Content[0].ContentSection.Heading);
@@ -148,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Template heading index 1", release.Content[1].ContentSection.Heading);
                 Assert.Equal(2, release.Content[1].ContentSection.Order);
                 Assert.Empty(contentSections[1].Content); // TODO currently is not copied - should it be?
-                
+
                 Assert.Equal(ContentSectionType.ReleaseSummary, release.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, release.HeadlinesSection.Type);
                 Assert.Equal(ContentSectionType.KeyStatistics, release.KeyStatisticsSection.Type);
@@ -186,21 +192,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
             }
+
             // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
             // loading of the entity graph as we go.
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 // Method under test
                 var notLatest =
-                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
+                    await new ReleaseService(context, MockPublishingService().Object,
+                        MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
                         notLatestReleaseId);
                 Assert.False(notLatest.LatestRelease);
             }
+
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 // Method under test
                 var notLatest =
-                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
+                    await new ReleaseService(context, MockPublishingService().Object,
+                        MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
                         notLatestReleaseId);
                 Assert.False(notLatest.LatestRelease);
             }
@@ -237,12 +247,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Id = releaseId,
                             TypeId = addHocReleaseTypeId,
-                            ReleaseSummary = new ReleaseSummary()
+                            ReleaseSummary = new ReleaseSummary
                             {
                                 Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
-                                Versions = new List<ReleaseSummaryVersion>() {
-                                    new ReleaseSummaryVersion()
-                                    {    
+                                Versions = new List<ReleaseSummaryVersion>
+                                {
+                                    new ReleaseSummaryVersion
+                                    {
                                         Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
                                         Created = DateTime.Now,
                                         TypeId = addHocReleaseTypeId,
@@ -254,27 +265,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
                 context.SaveChanges();
             }
-            
+
             var publishScheduledEdited = DateTime.Now.AddDays(1);
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
             const TimeIdentifier timePeriodCoverageEdited = TimeIdentifier.March;
-            
+
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 // Method under test 
-                var edited = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
-                    .EditReleaseSummaryAsync(
-                        releaseId,
-                        new UpdateReleaseSummaryRequest
-                        {
-                            PublishScheduled = publishScheduledEdited,
-                            NextReleaseDate = nextReleaseDateEdited,
-                            TypeId = typeEdited.Id,
-                            ReleaseName = releaseNameEdited,
-                            TimePeriodCoverage = timePeriodCoverageEdited
-                        });
+                var edited = await new ReleaseService(context, MockPublishingService().Object,
+                    MapperForProfile<MappingProfiles>()).EditReleaseSummaryAsync(
+                    releaseId,
+                    new UpdateReleaseSummaryRequest
+                    {
+                        PublishScheduled = publishScheduledEdited,
+                        NextReleaseDate = nextReleaseDateEdited,
+                        TypeId = typeEdited.Id,
+                        ReleaseName = releaseNameEdited,
+                        TimePeriodCoverage = timePeriodCoverageEdited
+                    });
 
                 Assert.Equal(publishScheduledEdited, edited.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
@@ -283,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverageEdited, edited.Right.TimePeriodCoverage);
             }
         }
-        
+
         [Fact]
         public async void GetReleaseSummaryAsync()
         {
@@ -321,9 +332,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseSummary = new ReleaseSummary()
                             {
                                 Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
-                                Versions = new List<ReleaseSummaryVersion>() {
-                                    new ReleaseSummaryVersion()
-                                    {    
+                                Versions = new List<ReleaseSummaryVersion>
+                                {
+                                    new ReleaseSummaryVersion
+                                    {
                                         Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
                                         Created = DateTime.Now,
                                         TypeId = adhocReleaseType.Id,
@@ -344,8 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
                 // Method under test 
-                var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
-                    .GetReleaseSummaryAsync(releaseId);
+                var summary = await new ReleaseService(context, MockPublishingService().Object,
+                    MapperForProfile<MappingProfiles>()).GetReleaseSummaryAsync(releaseId);
 
                 Assert.Equal(publishScheduled, summary.PublishScheduled);
                 Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
@@ -354,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
             }
         }
-        
+
         [Fact]
         public async void GetReleasesForPublicationAsync()
         {
@@ -364,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publishScheduledForSecondRelease = DateTime.Now.AddDays(2);
             var firstReleaseId = new Guid("8781ebf8-790c-484b-8a34-19ea501c9c74");
             var secondReleaseId = new Guid("cace48cf-9f08-4471-815c-b3703aade096");
-                
+
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
                 context.AddRange(new List<ReleaseType>
@@ -386,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = addHocReleaseTypeId,
                             TimePeriodCoverage = TimeIdentifier.February,
                             PublishScheduled = publishScheduledForFirstRelease,
-                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2040"},
+                            NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2040"},
                             ReleaseName = "2035",
                         },
                         new Release
@@ -395,7 +407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = addHocReleaseTypeId,
                             TimePeriodCoverage = TimeIdentifier.January,
                             PublishScheduled = publishScheduledForSecondRelease,
-                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2041"},
+                            NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2041"},
                             ReleaseName = "2036"
                         }
                     }
@@ -406,14 +418,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
                 // Method under test 
-                var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
-                    .GetReleasesForPublicationAsync(publicationId);
+                var summary = await new ReleaseService(context, MockPublishingService().Object,
+                    MapperForProfile<MappingProfiles>()).GetReleasesForPublicationAsync(publicationId);
                 Assert.Equal(2, summary.Count);
                 Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TypeId == addHocReleaseTypeId));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TimePeriodCoverage== TimeIdentifier.February));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
+                Assert.True(summary.Exists(r =>
+                    r.Id == firstReleaseId && r.TimePeriodCoverage == TimeIdentifier.February));
+                Assert.True(summary.Exists(r =>
+                    r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
+                Assert.True(summary.Exists(r =>
+                    r.Id == firstReleaseId && r.TimePeriodCoverage == TimeIdentifier.February));
+                Assert.True(summary.Exists(r =>
+                    r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
                 Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.ReleaseName == "2035"));
             }
+        }
+
+        private static Mock<IPublishingService> MockPublishingService()
+        {
+            return new Mock<IPublishingService>();
         }
     }
 }
