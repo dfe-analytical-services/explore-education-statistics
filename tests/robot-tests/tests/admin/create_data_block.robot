@@ -37,7 +37,7 @@ Upload subject
     choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
     user clicks element   xpath://button[text()="Upload data files"]
-    
+
     user waits until page contains element   xpath://h2[text()="Uploaded data files"]
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
     user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]
