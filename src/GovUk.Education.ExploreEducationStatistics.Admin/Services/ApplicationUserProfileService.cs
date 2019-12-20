@@ -12,10 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ApplicationUserProfileService : IProfileService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ApplicationUserProfileService(UserManager<ApplicationUser> userManager)
+        public ApplicationUserProfileService(
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         async Task IProfileService.GetProfileDataAsync(ProfileDataRequestContext context)
@@ -26,11 +29,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 claim.Type == JwtClaimTypes.Subject || 
                 claim.Type == ClaimTypes.NameIdentifier).Value;
             
+            // Grab the user's direct Claims
             var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
-            var roleClaims = roles.Select(role => new Claim(JwtClaimTypes.Role, role));
+            var userClaims = await _userManager.GetClaimsAsync(user);
             
-            // add role and profile info to JWT claims
+            // Grab the user's Claims via Roles
+            var roleNames = await _userManager.GetRolesAsync(user);
+            var roleClaims = roleNames
+                .Select(async roleName => await _roleManager.FindByNameAsync(roleName))
+                .Select(role => _roleManager.GetClaimsAsync(role.Result))
+                .SelectMany(claim => claim.Result);
+            
+            // Add user claims, role claims and profile information to JWT claims
+            context.IssuedClaims.AddRange(userClaims);
             context.IssuedClaims.AddRange(roleClaims);
             context.IssuedClaims.Add(new Claim(JwtClaimTypes.GivenName, user.FirstName));
             context.IssuedClaims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));

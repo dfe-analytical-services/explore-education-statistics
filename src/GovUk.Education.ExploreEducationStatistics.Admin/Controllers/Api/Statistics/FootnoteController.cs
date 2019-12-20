@@ -93,6 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return GatherAndBuildFootnoteViewModel(updated);
         }
 
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
         {
             return _footnoteService.Exists(id) ? andThen.Invoke() : NotFound();

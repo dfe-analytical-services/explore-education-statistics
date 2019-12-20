@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,18 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/themes/
         [HttpGet("api/me/themes")]
-        public ActionResult<List<Theme>> GetMyThemes()
+        public async Task<ActionResult<List<Theme>>> GetMyThemes()
         {
-            var userId = new Guid(); // TODO get the Guid from AD
-
-            var result = _themeService.GetUserThemes(userId);
-
-            if (result.Any())
-            {
-                return result;
-            }
-
-            return NoContent();
+            return await _themeService.GetMyThemesAsync();
         }
 
         // GET api/theme/{themeId}/summary

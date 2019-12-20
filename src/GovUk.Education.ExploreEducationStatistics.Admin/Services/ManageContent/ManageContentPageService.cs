@@ -6,11 +6,9 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -20,53 +18,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IContentService _contentService;
-        private readonly PersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
 
         public ManageContentPageService(
-            ContentDbContext context, IMapper mapper,
-            IFileStorageService fileStorageService, IContentService contentService)
+            IMapper mapper,
+            IFileStorageService fileStorageService, 
+            IContentService contentService, 
+            IPersistenceHelper<Release, Guid> releaseHelper)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
             _contentService = contentService;
-            _releaseHelper = new PersistenceHelper<Release, Guid>(
-                context,
-                context.Releases,
-                ValidationErrorMessages.ReleaseNotFound);
+            _releaseHelper = releaseHelper;
         }
 
         public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId, async release =>
-            {
-                var availableDataBlocks =
-                    await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
+            return _releaseHelper
+                .CheckEntityExists(releaseId, HydrateReleaseForReleaseViewModel)
+                .OnSuccess(async release =>
+                    {
+                        var availableDataBlocks =
+                            await _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId);
 
-                return availableDataBlocks.Map(blocks =>
-                {
-                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                    releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
-                    
-                    // TODO EES-147 Every release needs an update
-                    if (releaseViewModel.Updates.Count == 0)
-                    {
-                        releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                        return availableDataBlocks.Map(blocks =>
                         {
-                            Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
-                            On = new DateTime(2019, 12, 01),           
-                            Reason = "First published"
+                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFilesPreview(releaseId);
+                            
+                            // TODO EES-147 Every release needs an update
+                            if (releaseViewModel.Updates.Count == 0)
+                            {
+                                releaseViewModel.Updates.Add(new ReleaseNoteViewModel
+                                {
+                                    Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
+                                    On = new DateTime(2019, 12, 01),           
+                                    Reason = "First published"
+                                });
+                            }
+                            
+                            return new ManageContentPageViewModel
+                            {
+                                Release = releaseViewModel,
+                                AvailableDataBlocks = blocks
+                            };
                         });
-                    }
-                    
-                    return new ManageContentPageViewModel
-                    {
-                        Release = releaseViewModel,
-                        AvailableDataBlocks = blocks
-                    };
-                });
-                
-            }, HydrateReleaseForReleaseViewModel);
+                        
+                    });
         }
         
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

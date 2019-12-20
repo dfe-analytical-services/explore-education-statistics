@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.ExtensionMethods;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.GetContentSectionsAsync(releaseId),
                 Ok);
         }
-
+        
         [HttpPut("release/{releaseId}/content/sections/order")]
         public Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.GetContentSectionAsync(releaseId, contentSectionId),
                 Ok);
         }
-
+        
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
         public Task<ActionResult<List<IContentBlock>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -166,6 +166,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId),
                 Ok);
         }
-
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
@@ -41,16 +42,16 @@ public class Either<Tl, Tr> {
 
     public static class EitherTaskExtensions 
     {
-        public static async Task<Either<Tl, Tr>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
+        public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
         {
             var firstResult = await task;
             if (firstResult.IsLeft)
             {
-                return firstResult;
+                return firstResult.Left;
             }
 
             func();
-            return firstResult;
+            return firstResult.Right;
         }
         
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
@@ -58,11 +59,58 @@ public class Either<Tl, Tr> {
             var firstResult = await task;
             if (firstResult.IsLeft)
             {
-                return new Either<Tl, T>(firstResult.Left);
+                return firstResult.Left;
             }
 
             var next = await func();
-            return new Either<Tl, T>(next);
+            return next;
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<Either<Tl, T>>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            return await func.Invoke();
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<T>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            var next = await func(firstResult.Right);
+            return next;
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, T> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            var next = func(firstResult.Right);
+            return next;
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Either<Tl, T>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            var next = func(firstResult.Right);
+            return next;
         }
         
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
@@ -70,11 +118,34 @@ public class Either<Tl, Tr> {
             var firstResult = await task;
             if (firstResult.IsLeft)
             {
-                return new Either<Tl, T>(firstResult.Left);
+                return firstResult.Left;
             }
 
             var next = await func(firstResult.Right);
             return next;
+        }
+        
+        public static async Task<Either<T, Tr>> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<T>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            var next = await func(firstResult.Left);
+            return next;
+        }
+        
+        public static async Task<T> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, T> func) where Tr : T
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            return func(firstResult.Left);
         }
     }
 }
