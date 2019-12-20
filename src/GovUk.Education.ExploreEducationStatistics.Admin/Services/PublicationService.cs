@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -45,16 +44,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications.ToList();
         }
 
-        public async Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
+        public Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
-            var canAccessAllReleases = await _userService.CheckCanViewAllReleases();
-
-            if (canAccessAllReleases.IsRight)
-            {
-                return await GetAllPublicationsForTopicAsync(topicId);
-            }
-            
-            return await GetPublicationsForTopicRelatedToMeAsync(topicId);
+            return _userService
+                .CheckCanViewAllReleases()
+                .OnSuccess(() => GetAllPublicationsForTopicAsync(topicId))
+                .OrElse(() => GetPublicationsForTopicRelatedToMeAsync(topicId));
         }
 
         public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)

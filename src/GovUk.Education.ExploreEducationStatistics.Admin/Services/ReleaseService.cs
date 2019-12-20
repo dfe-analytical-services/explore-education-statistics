@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -159,18 +158,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
         
-        public async Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(
+        public Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses)
         {
-            var canViewAllReleases = 
-                await _userService.CheckCanViewAllReleases();
-            
-            if (canViewAllReleases.IsRight)
-            {
-                return await GetAllReleasesForReleaseStatusesAsync(releaseStatuses);
-            }
-
-            return await GetReleasesForReleaseStatusRelatedToMeAsync(releaseStatuses);
+            return _userService
+                .CheckCanViewAllReleases()
+                .OnSuccess(() => GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
+                .OrElse(() => GetReleasesForReleaseStatusRelatedToMeAsync(releaseStatuses));
         }
 
         private async Task<List<ReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,19 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<List<Theme>> GetMyThemesAsync()
+        public Task<List<Theme>> GetMyThemesAsync()
         {
-            var canAccessAllTopics = await 
-                _userService.CheckCanViewAllTopics();
-
-            if (canAccessAllTopics.IsRight)
-            {
-                return await GetAllThemesAsync();
-            }
-
-            var userId = _userService.GetUserId();
-
-            return await GetThemesRelatedToUserAsync(userId);
+            return _userService
+                .CheckCanViewAllTopics()
+                .OnSuccess(GetAllThemesAsync)
+                .OrElse(GetThemesRelatedToUserAsync);
         }
 
         private async Task<List<Theme>> GetAllThemesAsync()
@@ -47,8 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }).ToListAsync();
         }
 
-        private async Task<List<Theme>> GetThemesRelatedToUserAsync(Guid userId)
+        private async Task<List<Theme>> GetThemesRelatedToUserAsync()
         {
+            var userId = _userService.GetUserId();
+            
             var userTopics = await _context
                 .UserReleaseRoles
                 .Include(r => r.Release)
