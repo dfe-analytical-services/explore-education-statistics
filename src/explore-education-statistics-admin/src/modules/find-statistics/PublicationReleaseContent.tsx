@@ -185,48 +185,50 @@ const PublicationReleaseContent = ({
               <dd data-testid="release-name">
                 <strong>{release.yearTitle}</strong>
               </dd>
-              <dd>
-                <Details
-                  summary={`See previous ${releaseCount} releases`}
-                  onToggle={(open: boolean) =>
-                    open &&
-                    logEvent(
-                      'Previous Releases',
-                      'Release page previous releases dropdown opened',
-                      window.location.pathname,
-                    )
-                  }
-                >
-                  <ul className="govuk-list">
-                    {[
-                      ...release.publication.releases.map(
-                        ({ id, slug, releaseName }) => [
-                          releaseName,
-                          <li key={id} data-testid="previous-release-item">
-                            <Link
-                              to={`/find-statistics/${release.publication.slug}/${slug}`}
-                            >
-                              {releaseName}
-                            </Link>
-                          </li>,
-                        ],
-                      ),
-                      ...release.publication.legacyReleases.map(
-                        ({ id, description, url }) => [
-                          description,
-                          <li key={id} data-testid="previous-release-item">
-                            <a href={url}>{description}</a>
-                          </li>,
-                        ],
-                      ),
-                    ]
-                      .sort((a, b) =>
-                        b[0].toString().localeCompare(a[0].toString()),
+              {releaseCount > 0 && (
+                <dd>
+                  <Details
+                    summary={`See previous ${releaseCount} releases`}
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Releases',
+                        'Release page previous releases dropdown opened',
+                        window.location.pathname,
                       )
-                      .map(items => items[1])}
-                  </ul>
-                </Details>
-              </dd>
+                    }
+                  >
+                    <ul className="govuk-list">
+                      {[
+                        ...release.publication.releases.map(
+                          ({ id, slug, releaseName }) => [
+                            releaseName,
+                            <li key={id} data-testid="previous-release-item">
+                              <Link
+                                to={`/find-statistics/${release.publication.slug}/${slug}`}
+                              >
+                                {releaseName}
+                              </Link>
+                            </li>,
+                          ],
+                        ),
+                        ...release.publication.legacyReleases.map(
+                          ({ id, description, url }) => [
+                            description,
+                            <li key={id} data-testid="previous-release-item">
+                              <a href={url}>{description}</a>
+                            </li>,
+                          ],
+                        ),
+                      ]
+                        .sort((a, b) =>
+                          b[0].toString().localeCompare(a[0].toString()),
+                        )
+                        .map(([, link]) => link)}
+                    </ul>
+                  </Details>
+                </dd>
+              )}
             </dl>
             <ReleaseNotesSection release={release} />
             <RelatedInformationSection release={release} />
