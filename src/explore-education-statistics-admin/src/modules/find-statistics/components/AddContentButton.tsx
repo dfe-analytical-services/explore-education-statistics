@@ -12,7 +12,7 @@ interface AddContentButtonProps {
 const AddContentButton = ({ onClick }: AddContentButtonProps) => {
   const editingContext = React.useContext(EditingContext);
 
-  const availableDataBlocks = editingContext.availableDataBlocks || [];
+  const { availableDataBlocks } = editingContext;
   const [selectedDataBlockId, setSelectedDataBlockId] = React.useState();
   const [showDataBlocks, setShowDataBlocks] = React.useState(false);
 
@@ -20,7 +20,7 @@ const AddContentButton = ({ onClick }: AddContentButtonProps) => {
     <>
       <Button
         className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => onClick('HtmlBlock', 'Click to edit' )}
+        onClick={() => onClick('HtmlBlock', 'Click to edit')}
       >
         Add HTML
       </Button>
@@ -52,7 +52,7 @@ const AddContentButton = ({ onClick }: AddContentButtonProps) => {
           />
           <Button
             onClick={() => {
-              onClick('DataBlock',  selectedDataBlockId );
+              onClick('DataBlock', selectedDataBlockId);
               setShowDataBlocks(false);
             }}
           >
@@ -60,7 +60,7 @@ const AddContentButton = ({ onClick }: AddContentButtonProps) => {
           </Button>
           <Button
             className="govuk-button--secondary"
-            onClick={e => setShowDataBlocks(false)}
+            onClick={() => setShowDataBlocks(false)}
           >
             Cancel
           </Button>

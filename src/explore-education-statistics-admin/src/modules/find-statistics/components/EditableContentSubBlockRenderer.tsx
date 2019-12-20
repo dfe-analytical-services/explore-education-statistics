@@ -1,7 +1,6 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import marked from 'marked';
 import React from 'react';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
 import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
@@ -21,7 +20,6 @@ function EditableContentSubBlockRenderer({
   block,
   editable,
   onContentChange,
-  id,
   canDelete = false,
   onDelete,
 }: Props) {

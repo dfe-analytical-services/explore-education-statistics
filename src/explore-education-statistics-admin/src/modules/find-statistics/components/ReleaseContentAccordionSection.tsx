@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import styles from '@admin/modules/find-statistics/components/ReleaseContentAccordion.module.scss';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { AbstractRelease } from '@common/services/publicationService';
-import { DataBlock } from '@common/services/dataBlockService';
 
 export interface ReleaseContentAccordionSectionProps {
   id?: string;

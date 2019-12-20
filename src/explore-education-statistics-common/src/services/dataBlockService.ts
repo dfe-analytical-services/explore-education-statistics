@@ -130,7 +130,7 @@ export interface DataBlockRerequest {
 export interface DataBlock {
   id?: string;
   order?: number;
-  type?: "DataBlock";
+  type?: 'DataBlock';
 
   heading?: string;
   customFootnotes?: string;

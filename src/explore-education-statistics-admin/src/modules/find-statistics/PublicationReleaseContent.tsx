@@ -2,7 +2,6 @@ import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-// import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -20,9 +19,10 @@ import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
 import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 
 export interface RendererProps {
   contentId?: string;
@@ -51,7 +51,7 @@ const PublicationReleaseContent = ({
   logEvent = nullLogEvent,
   onReleaseChange,
   handleApiErrors,
-  availableDataBlocks
+  availableDataBlocks: initialAvailableDataBlocks,
 }: Props & ErrorControlProps) => {
   const [release, _setRelease] = React.useState(content.release);
 
@@ -64,6 +64,18 @@ const PublicationReleaseContent = ({
   );
 
   const accId: string[] = generateIdList(2);
+
+  const [availableDataBlocks, setAvailableDataBlocks] = React.useState(
+    initialAvailableDataBlocks,
+  );
+
+  const updateAvailableDataBlocks = () => {
+    releaseContentService
+      .getAvailableDataBlocks(release.id)
+      .then(newAvailableDataBlocks => {
+        setAvailableDataBlocks(newAvailableDataBlocks);
+      });
+  };
 
   const releaseCount = React.useMemo(
     () =>
@@ -107,7 +119,8 @@ const PublicationReleaseContent = ({
         releaseId: release.id,
         isReviewing: false,
         isCommenting: true,
-        availableDataBlocks
+        availableDataBlocks,
+        updateAvailableDataBlocks,
       }}
     >
       <h1 className="govuk-heading-l">

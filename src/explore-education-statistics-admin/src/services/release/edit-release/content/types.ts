@@ -33,6 +33,9 @@ export interface ContentBlockAttachRequest {
   order: number;
 }
 
-export type ContentBlockAttachResponse =Pick<ContentBlockViewModel, 'id' | 'type' | 'order'>;
+export type ContentBlockAttachResponse = Pick<
+  ContentBlockViewModel,
+  'id' | 'type' | 'order'
+>;
 
 export default {};

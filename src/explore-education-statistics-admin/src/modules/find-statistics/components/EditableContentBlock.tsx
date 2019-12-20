@@ -13,7 +13,6 @@ import wrapEditableComponent, {
 import { Dictionary } from '@common/types/util';
 import React, { useContext, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { DataBlock } from '@common/services/dataBlockService';
 import Comments from './Comments';
 import ContentBlockDraggable from './ContentBlockDraggable';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -112,17 +111,20 @@ const EditableContentBlock = ({
     if (editingContext.releaseId && sectionId) {
       const { releaseId } = editingContext;
 
-      let addPromise;
+      let addPromise: Promise<unknown>;
 
       if (type === 'DataBlock') {
-        addPromise = releaseContentService.attachContentSectionBlock(
-          releaseId,
-          sectionId,
-          {
+        addPromise = releaseContentService
+          .attachContentSectionBlock(releaseId, sectionId, {
             contentBlockId: data,
-            order: order || 0
-          }
-        )
+            order: order || 0,
+          })
+          .then(v => {
+            if (editingContext.updateAvailableDataBlocks) {
+              editingContext.updateAvailableDataBlocks();
+            }
+            return v;
+          });
       } else {
         addPromise = releaseContentService.addContentSectionBlock(
           releaseId,
@@ -165,6 +167,10 @@ const EditableContentBlock = ({
       await releaseContentService
         .deleteContentSectionBlock(releaseId, sectionId, contentId)
         .catch(handleApiErrors);
+
+      if (editingContext.updateAvailableDataBlocks) {
+        editingContext.updateAvailableDataBlocks();
+      }
 
       const {
         content: newContentBlocks,

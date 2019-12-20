@@ -6,6 +6,7 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import { ExtendedComment } from '@admin/services/publicationService';
+import { DataBlock } from '@common/services/dataBlockService';
 import {
   ContentBlockAttachRequest,
   ContentBlockAttachResponse,
@@ -155,6 +156,10 @@ export const releaseContentService = {
     );
   },
 
+  getAvailableDataBlocks(releaseId: string): Promise<DataBlock[]> {
+    return client.get(`/release/${releaseId}/content/available-datablocks`);
+  },
+
   attachContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -190,8 +195,6 @@ export const releaseNoteService = {
       releaseNote,
     );
   },
-
-
 };
 
 export const relatedInformationService = {

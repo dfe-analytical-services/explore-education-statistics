@@ -96,7 +96,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
           unresolvedComments: getUnresolveComments(newContent.release),
           pageMode: 'edit',
           content: newContent,
-          availableDataBlocks: newContent.availableDataBlocks
+          availableDataBlocks: newContent.availableDataBlocks,
         });
       })
       .catch(handleApiErrors);
