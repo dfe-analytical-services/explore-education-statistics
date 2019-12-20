@@ -62,11 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
-                QueryComparisons.Equal,
-                Scheduled.ToString());
+            var contentStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.ContentStage),
+                QueryComparisons.Equal, Complete.ToString());
+            var publishingStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
+                QueryComparisons.Equal, Scheduled.ToString());
+            var stageQuery = TableQuery.CombineFilters(contentStageQuery, TableOperators.And, publishingStageQuery);
             var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
-                statusQuery));
+                stageQuery));
 
             return await _releaseStatusService.ExecuteQueryAsync(query);
         }

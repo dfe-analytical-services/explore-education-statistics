@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleaseStatusService _releaseStatusService;
 
         private static readonly (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) StartedStage =
-            (Content: Queued, Files: Queued, Data: Queued, Publishing: Queued, Overall: Started);
+            (Content: Queued, Files: Queued, Data: Queued, Publishing: Scheduled, Overall: Started);
 
         public PublishReleasesFunction(IReleaseStatusService releaseStatusService)
         {
@@ -78,10 +78,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
+            var stageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
                 Scheduled.ToString());
             var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
-                statusQuery));
+                stageQuery));
 
             return await _releaseStatusService.ExecuteQueryAsync(query);
         }
