@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(policyCheck.Invoke)
                 .OnSuccess(_ => new OkObjectResult(true))
-                .HandleFailures();
+                .OrElse(() => new OkObjectResult(false));
         }
     }
 }

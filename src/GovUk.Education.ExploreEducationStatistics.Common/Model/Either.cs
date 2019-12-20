@@ -135,5 +135,16 @@ public class Either<Tl, Tr> {
             var next = await func();
             return next;
         }
+        
+        public static async Task<Tr> OrElse<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            return func();
+        }
     }
 }

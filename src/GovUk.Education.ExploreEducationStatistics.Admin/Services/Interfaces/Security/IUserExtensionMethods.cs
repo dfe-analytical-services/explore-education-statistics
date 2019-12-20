@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Release>> CheckCanApproveRelease(
             this IUserService userService, Release release)
         {
-            return userService.DoCheck(release, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);
+            return userService.DoCheck(release, SecurityPolicies.CanApproveSpecificRelease);
         }
         
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 
