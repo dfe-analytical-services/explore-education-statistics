@@ -7,6 +7,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -278,7 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new List<ContentSection>();
         }
 
-        // TODO Authorisation will be required when users are introduced
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
@@ -286,6 +286,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(async release =>
                     {
+                        if (status == ReleaseStatus.HigherLevelReview)
+                        {
+                            var canSubmit = await _userService.MatchesPolicy(release, CanSubmitSpecificReleaseToHigherReview);
+
+                            if (!canSubmit)
+                            {
+                                return new ForbidResult();
+                            }
+                        } else if (status == ReleaseStatus.Approved)
+                        {
+                            var canApprove = await _userService.MatchesPolicy(release, CanSubmitSpecificReleaseToHigherReview);
+
+                            if (!canApprove)
+                            {
+                                return new ForbidResult();
+                            }
+                        }
+                        
                         release.Status = status;
                         release.InternalReleaseNote = internalReleaseNote;
                         _context.Releases.Update(release);

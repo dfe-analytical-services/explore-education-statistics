@@ -173,9 +173,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
                 
-                // does this user have permission to view a specific Release (on a case-by-case basis)?
+                // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
+
+                // does this user have permission to submit a specific Release to Higher Review?
+                options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
+                    policy.Requirements.Add(new SubmitSpecificReleaseToHigherReviewRequirement()));
+
+                // does this user have permission to approve a specific Release?
+                options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -257,6 +265,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {

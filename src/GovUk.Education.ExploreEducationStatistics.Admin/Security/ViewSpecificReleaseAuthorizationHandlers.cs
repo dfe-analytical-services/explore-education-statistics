@@ -7,6 +7,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
+    public class ViewSpecificReleaseRequirement : IAuthorizationRequirement
+    {}
+    
     public class ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
             ViewSpecificReleaseRequirement>
     {
@@ -14,32 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             : base(SecurityClaimTypes.AccessAllReleases) {}
     }
     
-    public class ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler 
-        : AuthorizationHandler<ViewSpecificReleaseRequirement, Release>
+    public class ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler
+        : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
     {
-        private readonly ContentDbContext _context;
-
-        public ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler(ContentDbContext context)
-        {
-            _context = context;
-        }
-
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
-            ViewSpecificReleaseRequirement requirement,
-            Release release)
-        {
-            var userId = GetUserId(authContext.User);
-
-            var connectedToRelease = _context
-                .UserReleaseRoles
-                .Any(r => r.ReleaseId == release.Id && r.UserId == userId);
-        
-            if (connectedToRelease)
-            {
-                authContext.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
-        }
+        public ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler(ContentDbContext context) : base(context)
+        {}
     }
 }
