@@ -270,6 +270,22 @@
         "1.1",
         "1.2"
       ]
+    },
+
+    "publishReleasesCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 0 0 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+      }
+    },
+
+    "publishReleaseContentCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 30 9 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+      }
     }
   },
   "variables": {
@@ -1886,11 +1902,11 @@
             },
             {
               "name": "PublishReleasesCronSchedule",
-              "value": "0 0 0 * * *"
+              "value": "[parameters('publishReleasesCronSchedule')]"
             },
             {
               "name": "PublishReleaseContentCronSchedule",
-              "value": "0 30 9 * * *"
+              "value": "[parameters('publishReleaseContentCronSchedule')]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",

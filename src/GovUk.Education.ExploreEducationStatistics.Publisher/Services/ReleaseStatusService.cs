@@ -138,8 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         "Publish",
                         "ReleaseSlug",
                         "ContentStage",
-                        "FilesStage",
                         "DataStage",
+                        "FilesStage",
+                        "PublishingStage",
                         "Stage"
                     }));
 
