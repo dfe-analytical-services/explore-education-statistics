@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
+Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -42,52 +43,49 @@ Upload subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
     user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]
 
-Navigate to Manage data tab, check subjects are there
-    [Tags]  HappyPath
-    sleep   1000000
-    user clicks element  xpath://li/a[text()="Manage data"]
-    user waits until page contains element   xpath://legend[text()="Add new data to release"]
-    data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="Absence in PRUs"]
-    data csv number contains xpath  2   //dt[text()="Subject title"]/../dd/h4[text()="Absence rate percent bands"]
-
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
     user clicks element  xpath://li/a[text()="Manage data blocks"]
-    user waits until page contains element  css:#publicationSubjectForm
+    user waits until page contains element   xpath://h2[text()="Choose a subject"]
 
-Select Subject "Absence in PRUs"
+Select subject "UI test subject"
     [Tags]  HappyPath
-    user selects radio    Absence in PRUs
+    user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains   Choose locations
-    user checks previous table tool step contains  1   Subject   Absence in PRUs
+    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user checks previous table tool step contains  1    Subject     UI test subject
 
-Select Location LAs Barnet, Barnsley, and Bedford
-    [Tags]  HappyPath
-    user opens details dropdown  Local Authority
-    user clicks checkbox   Barnet
-    user clicks checkbox   Barnsley
-    user clicks checkbox   Bedford
-    user clicks element  css:#locationFiltersForm-submit
-    user waits until page contains   Choose time period
-    user checks previous table tool step contains  2  Local Authority   Barnet
-    user checks previous table tool step contains  2  Local Authority   Barnsley
-    user checks previous table tool step contains  2  Local Authority   Bedford
+Select locations
+    [Tags]   HappyPath
+    user opens details dropdown   Opportunity Area
+    user clicks checkbox   Bolton 001 (E02000984)
+    user clicks checkbox   Bolton 001 (E05000364)
+    user clicks checkbox   Bolton 004 (E02000987)
+    user clicks checkbox   Bolton 004 (E05010450)
+    user opens details dropdown   Ward
+    user clicks checkbox   Nailsea Youngwood
+    user clicks checkbox   Syon
+    user clicks element     css:#locationFiltersForm-submit
+    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
 
-Select Time Period 2014/15 - 2014/15
-    [Tags]  HappyPath
-    user selects start date    2014/15
-    user selects end date    2014/15
-    user clicks element  css:#timePeriodForm-submit
-    user waits until page contains   Choose your filters
-    user checks previous table tool step contains  3   Start date   2014/15
-    user checks previous table tool step contains  3   End date     2014/15
+Select time period
+    [Tags]   HappyPath
+    ${timePeriodStartList}=   get list items  css:#timePeriodForm-start
+    ${timePeriodEndList}=   get list items  css:#timePeriodForm-end
+    ${expectedList}=   create list   Please select  2005  2007  2008  2009  2010  2011  2012  2016  2017  2018  2019  2020
+    lists should be equal  ${timePeriodStartList}   ${expectedList}
+    lists should be equal  ${timePeriodEndList}   ${expectedList}
+
+    user selects start date    2005
+    user selects end date      2020
+    user clicks element     css:#timePeriodForm-submit
+    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user checks previous table tool step contains  3    Start date    2005
+    user checks previous table tool step contains  3    End date      2020
 
 Select indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox  Absence fields   Authorised absence rate
-    user clicks subheaded indicator checkbox  Absence fields   Overall absence rate
-    user clicks subheaded indicator checkbox  Absence fields   Unauthorised absence rate
+    user clicks indicator checkbox    Admission Numbers
 
 Create table
     [Tags]  HappyPath
@@ -96,25 +94,37 @@ Create table
 
 Validate table's column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1  1  Pupil Referral Unit
-    user checks results table column heading contains  2  1  2014/15
+    user checks results table column heading contains  1  1  2005
+    user checks results table column heading contains  1  2  2006
+    user checks results table column heading contains  1  2  2007
+    user checks results table column heading contains  1  2  2008
+    user checks results table column heading contains  1  2  2009
+    user checks results table column heading contains  1  2  2010
+    user checks results table column heading contains  1  2  2011
+    user checks results table column heading contains  1  2  2012
+    user checks results table column heading contains  1  2  2013
+    user checks results table column heading contains  1  2  2014
+    user checks results table column heading contains  1  2  2015
+    user checks results table column heading contains  1  2  2016
+    user checks results table column heading contains  1  2  2017
+    user checks results table column heading contains  1  2  2018
+    user checks results table column heading contains  1  2  2019
+    user checks results table column heading contains  1  2  2020
 
 Validate table's row headings
     [Tags]  HappyPath
-    user checks results table row heading contains   1   1   Barnet
-    user checks results table row heading contains   1   2   Unauthorised absence rate
-    user checks results table row heading contains   2   1   Authorised absence rate
-    user checks results table row heading contains   3   1   Overall absence rate
+    sleep   1000000
+    user checks results table row heading contains   1   1   Bolton 001 (E02000984)
+    user checks results table row heading contains   1   2   Admission Numbers
 
-    user checks results table row heading contains   4   1   Barnsley
-    user checks results table row heading contains   4   2   Unauthorised absence rate
-    user checks results table row heading contains   5   1   Authorised absence rate
-    user checks results table row heading contains   6   1   Overall absence rate
+    user checks results table row heading contains   2   1   Bolton 004 (E02000987)
+    user checks results table row heading contains   2   2   Admission Numbers
 
-    user checks results table row heading contains   7   1   Bedford
-    user checks results table row heading contains   7   2   Unauthorised absence rate
-    user checks results table row heading contains   8   1   Authorised absence rate
-    user checks results table row heading contains   9   1   Overall absence rate
+    user checks results table row heading contains   3   1   Bolton 001 (E05000364)
+    user checks results table row heading contains   3   2   Admission Numbers
+
+    user checks results table row heading contains   2   1   Bolton 001 (E05000364)
+    user checks results table row heading contains   2   2   Admission Numbers
 
 Validate table results
     [Tags]  HappyPath
