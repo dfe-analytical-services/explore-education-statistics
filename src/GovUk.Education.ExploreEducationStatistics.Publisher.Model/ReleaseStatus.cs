@@ -13,8 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime? Publish { get; set; }
         public string ReleaseSlug { get; set; }
         public string ContentStage { get; set; }
-        public string FilesStage { get; set; }
         public string DataStage { get; set; }
+        public string FilesStage { get; set; }
+        public string PublishingStage { get; set; }
         public string Stage { get; set; }
         public string Messages { get; set; }
 
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             DateTime? publish,
             Guid releaseId,
             string releaseSlug,
-            (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
+            (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) stage,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             Created = DateTime.UtcNow;
@@ -34,8 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Publish = publish;
             ReleaseSlug = releaseSlug;
             ContentStage = stage.Content.ToString();
-            FilesStage = stage.Files.ToString();
             DataStage = stage.Data.ToString();
+            FilesStage = stage.Files.ToString();
+            PublishingStage = stage.Publishing.ToString();
             Stage = stage.Overall.ToString();
             Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
 

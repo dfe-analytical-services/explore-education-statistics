@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task CreateOrUpdateAsync(Guid releaseId,
-            (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
+            (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) stage,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
@@ -46,8 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 releaseStatus.Publish = release.PublishScheduled;
                 releaseStatus.ReleaseSlug = release.Slug;
                 releaseStatus.ContentStage = stage.Content.ToString();
-                releaseStatus.FilesStage = stage.Files.ToString();
                 releaseStatus.DataStage = stage.Data.ToString();
+                releaseStatus.FilesStage = stage.Files.ToString();
+                releaseStatus.PublishingStage = stage.Publishing.ToString();
                 releaseStatus.Stage = stage.Overall.ToString();
 
                 if (logMessages != null)
@@ -75,13 +76,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdateStageAsync(Guid releaseId, Guid releaseStatusId,
-            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
+            (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) stage)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.ContentStage = stage.Content.ToString();
                 row.DataStage = stage.Data.ToString();
                 row.FilesStage = stage.Files.ToString();
+                row.PublishingStage = stage.Publishing.ToString();
                 row.Stage = stage.Overall.ToString();
                 return row;
             });
@@ -110,6 +112,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.FilesStage = stage.ToString();
+                return FailReleaseIfTaskStageFailed(row);
+            });
+        }
+
+        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
+        {
+            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            {
+                row.PublishingStage = stage.ToString();
                 return FailReleaseIfTaskStageFailed(row);
             });
         }
@@ -153,7 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 if (Enum.TryParse<Stage>(releaseStatus.ContentStage, out var contentStage) && contentStage == Failed ||
                     Enum.TryParse<Stage>(releaseStatus.DataStage, out var dataStage) && dataStage == Failed ||
-                    Enum.TryParse<Stage>(releaseStatus.FilesStage, out var filesStage) && filesStage == Failed)
+                    Enum.TryParse<Stage>(releaseStatus.FilesStage, out var filesStage) && filesStage == Failed ||
+                    Enum.TryParse<Stage>(releaseStatus.PublishingStage, out var publishingStage) && publishingStage == Failed)
                 {
                     releaseStatus.Stage = Failed.ToString();
                 }

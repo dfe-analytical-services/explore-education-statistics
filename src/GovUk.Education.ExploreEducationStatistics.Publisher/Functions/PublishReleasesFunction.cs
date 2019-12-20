@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -18,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IReleaseStatusService _releaseStatusService;
 
-        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) StartedStage =
-            (Content: Queued, Files: Queued, Data: Queued, Overall: Started);
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) StartedStage =
+            (Content: Queued, Files: Queued, Data: Queued, Publishing: Scheduled, Overall: Started);
 
         public PublishReleasesFunction(IReleaseStatusService releaseStatusService)
         {
@@ -30,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
          * Azure function which publishes all Releases that are scheduled to be published during the day.
          */
         [FunctionName("PublishReleases")]
-        public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")] TimerInfo timer,
+        public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
+            TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -43,12 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task PublishReleases(ILogger logger)
         {
             var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
-            
-            var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish), QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var statusQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal, Scheduled.ToString());
-            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And, statusQuery));
-
-            var scheduled = (await _releaseStatusService.ExecuteQueryAsync(query)).ToList();
+            var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
             {
                 var generateReleaseContentQueue =
@@ -70,10 +67,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releaseStatus)));
                     publishReleaseDataQueue.AddMessage(
                         ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseStatus)));
-                    
-                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, StartedStage);
+
+                    await _releaseStatusService.UpdateStageAsync(releaseStatus.ReleaseId, releaseStatus.Id,
+                        StartedStage);
                 }
             }
+        }
+
+        private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
+        {
+            var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
+                QueryComparisons.LessThan, DateTime.Today.AddDays(1));
+            var stageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.Stage), QueryComparisons.Equal,
+                Scheduled.ToString());
+            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
+                stageQuery));
+
+            return await _releaseStatusService.ExecuteQueryAsync(query);
         }
 
         private static PublishReleaseFilesMessage BuildPublishReleaseFilesMessage(ReleaseStatus releaseStatus)
