@@ -46,8 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 releaseStatus.Publish = release.PublishScheduled;
                 releaseStatus.ReleaseSlug = release.Slug;
                 releaseStatus.ContentStage = stage.Content.ToString();
-                releaseStatus.FilesStage = stage.Files.ToString();
                 releaseStatus.DataStage = stage.Data.ToString();
+                releaseStatus.FilesStage = stage.Files.ToString();
+                releaseStatus.PublishingStage = stage.Publishing.ToString();
                 releaseStatus.Stage = stage.Overall.ToString();
 
                 if (logMessages != null)
