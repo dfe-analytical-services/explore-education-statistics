@@ -1,6 +1,7 @@
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
+import ContactUsPage from '@admin/pages/ContactUsPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
@@ -134,6 +135,11 @@ const appRouteList: Dictionary<RouteProps> = {
   documentationManageDataBlock: {
     path: '/documentation/manage-data-block',
     component: AdminDocumentationManageDataBlocks,
+    exact: true,
+  },
+  contactUs: {
+    path: '/contact-us',
+    component: ContactUsPage,
     exact: true,
   },
 };
