@@ -55,6 +55,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId.Value,
                     message.ReleaseStatusId.Value, stage);
+
+                if (stage == Complete)
+                {
+                    await _releaseStatusService.UpdatePublishingStageAsync(message.ReleaseId.Value,
+                        message.ReleaseStatusId.Value, Scheduled);
+                }
             }
         }
     }
