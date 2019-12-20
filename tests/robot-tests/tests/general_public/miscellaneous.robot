@@ -132,7 +132,8 @@ Validate Help and support page
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Help and support
 
 Validate Feedback page
-    [Tags]  HappyPath
+    [Documentation]  EES-942
+    [Tags]  HappyPath   Failing
     user clicks link  feedback
     user selects newly opened window
     user waits until page contains      Explore Education Statistics - Beta banner feedback survey

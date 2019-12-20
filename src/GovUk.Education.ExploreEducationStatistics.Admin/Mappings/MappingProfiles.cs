@@ -4,10 +4,13 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
 using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -51,6 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
+
+            CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
+                .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
             
             CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
             CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
@@ -75,6 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
             CreateMap<Topic, ApiTopicViewModel>();
+
+            CreateMap<CommentState, string>().ConvertUsing(s => s.GetEnumValue());
 
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content, 
@@ -146,6 +154,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
             
             CreateMap<Update, ReleaseNoteViewModel>();
+
+            CreateMap<Comment, CommentViewModel>()
+                .ForMember(
+                    dest => dest.State,
+                    m => m.MapFrom(c => c.State.GetEnumValue())
+                );
+            
         }
     }
 }

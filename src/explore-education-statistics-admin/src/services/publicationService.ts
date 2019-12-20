@@ -14,7 +14,7 @@ export interface ExtendedComment {
   id: string;
   name: string;
   time: Date;
-  comment: string;
+  commentText: string;
   state?: CommentState;
   resolvedBy?: string;
   resolvedOn?: Date;

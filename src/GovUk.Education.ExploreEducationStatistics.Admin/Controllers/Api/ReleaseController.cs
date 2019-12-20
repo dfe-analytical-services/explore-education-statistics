@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IImportStatusService _importStatusService;
+        private readonly IReleaseStatusService _releaseStatusService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -43,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
             IImportStatusService importStatusService,
+            IReleaseStatusService releaseStatusService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             UserManager<ApplicationUser> userManager
@@ -53,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _importStatusService = importStatusService;
+            _releaseStatusService = releaseStatusService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _userManager = userManager;
@@ -250,6 +253,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId,
                 () => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
+        }
+        
+        [HttpGet("releases/{releaseId}/status")]
+        public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(ReleaseId releaseId)
+        {
+            return Ok(await _releaseStatusService.GetReleaseStatusesAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/status")]

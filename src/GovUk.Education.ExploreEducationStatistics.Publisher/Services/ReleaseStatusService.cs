@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -27,18 +28,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task CreateOrUpdateAsync(Guid releaseId,
-            (Stage Content, Stage Files, Stage Data, Stage Overall) stage)
+            (Stage Content, Stage Files, Stage Data, Stage Overall) stage,
+            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
-            var release = await GetRelease(releaseId);
+            var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
-            await table.ExecuteAsync(TableOperation.InsertOrReplace(new ReleaseStatus(release.Publication.Slug,
-                release.PublishScheduled,
-                release.Id,
-                release.Slug,
-                stage.Content,
-                stage.Files,
-                stage.Data,
-                stage.Overall)));
+
+            var releaseStatus = await GetReleaseStatus(releaseId);
+            if (releaseStatus == null)
+            {
+                releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
+                    release.Slug, stage, logMessages);
+            }
+            else
+            {
+                releaseStatus.PublicationSlug = release.Publication.Slug;
+                releaseStatus.Publish = release.PublishScheduled;
+                releaseStatus.ReleaseSlug = release.Slug;
+                releaseStatus.ContentStage = stage.Content.ToString();
+                releaseStatus.FilesStage = stage.Files.ToString();
+                releaseStatus.DataStage = stage.Data.ToString();
+                releaseStatus.Stage = stage.Overall.ToString();
+
+                if (logMessages != null)
+                {
+                    releaseStatus.AppendLogMessages(logMessages);
+                }
+            }
+
+            await table.ExecuteAsync(TableOperation.InsertOrReplace(releaseStatus));
         }
 
         public async Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
@@ -120,7 +138,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus)
+        private async Task<ReleaseStatus> GetReleaseStatus(Guid releaseId)
+        {
+            var table = await GetTableAsync();
+            var queryResults = table.ExecuteQuery(new TableQuery<ReleaseStatus>().Where(
+                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey), QueryComparisons.Equal,
+                    releaseId.ToString())));
+            return queryResults.SingleOrDefault();
+        }
+
+        private static ReleaseStatus FailReleaseIfTaskStageFailed(ReleaseStatus releaseStatus)
         {
             if (Enum.TryParse<Stage>(releaseStatus.Stage, out var stage) && stage != Failed)
             {
@@ -135,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseStatus;
         }
 
-        private Task<Release> GetRelease(Guid releaseId)
+        private Task<Release> GetReleaseAsync(Guid releaseId)
         {
             return _context.Releases
                 .AsNoTracking()
