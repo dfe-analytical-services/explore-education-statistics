@@ -29,6 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             switch (status)
             {
+                case ReleaseStatus.Draft:
+                {
+                    return userService.CheckCanMarkReleaseAsDraft(release);
+                }
                 case ReleaseStatus.HigherLevelReview:
                 {
                     return userService.CheckCanSubmitReleaseToHigherApproval(release);
@@ -42,6 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
                     return Task.FromResult(new Either<ActionResult, Release>(release));
                 }
             }
+        }
+
+        public static Task<Either<ActionResult, Release>> CheckCanMarkReleaseAsDraft(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanMarkSpecificReleaseAsDraft);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanSubmitReleaseToHigherApproval(

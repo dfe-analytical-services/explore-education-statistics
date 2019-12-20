@@ -180,6 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
 
+                // does this user have permission to mark a specific Release as a Draft?
+                options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
+                    policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
+
                 // does this user have permission to submit a specific Release to Higher Review?
                 options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
                     policy.Requirements.Add(new SubmitSpecificReleaseToHigherReviewRequirement()));
@@ -272,6 +276,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {
