@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -29,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<Theme>> GetMyThemesAsync()
         {
             var canAccessAllTopics = await 
-                _userService.MatchesPolicy(SecurityPolicies.CanViewAllTopics);
+                _userService.CheckCanViewAllTopics();
 
-            if (canAccessAllTopics)
+            if (canAccessAllTopics.IsRight)
             {
                 return await GetAllThemesAsync();
             }
