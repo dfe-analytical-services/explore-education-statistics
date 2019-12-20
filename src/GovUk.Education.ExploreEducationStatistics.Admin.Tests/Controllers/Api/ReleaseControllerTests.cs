@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     {
         private static readonly List<ApplicationUser> Users = new List<ApplicationUser>
         {
-            new ApplicationUser()
+            new ApplicationUser
             {
                 Id = "1",
                 Email = "test@example.com"
@@ -391,6 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
+            Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
@@ -401,6 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
                     new Mock<IImportStatusService>(),
+                    new Mock<IReleaseStatusService>(),
                     new Mock<ISubjectService>(),
                     new Mock<ITableStorageService>(),
                     MockUserManager<ApplicationUser>(Users),
@@ -414,6 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
+            Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
@@ -425,6 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ImportStatusService.Object,
+                mocks.ReleaseStatusService.Object,
                 mocks.SubjectService.Object,
                 mocks.TableStorageService.Object,
                 mocks.UserManager.Object,

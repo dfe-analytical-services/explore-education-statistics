@@ -49,6 +49,7 @@ export const EditingContentBlockContext = React.createContext<
   isReviewing: false,
   isEditing: false,
   sectionId: undefined,
+  availableDataBlocks: [],
 });
 
 const EditableContentBlock = ({
@@ -102,16 +103,41 @@ const EditableContentBlock = ({
     handleApiErrors,
   ]);
 
-  const onAddContentCallback = (type: string, order: number | undefined) => {
+  const onAddContentCallback = (
+    type: string,
+    data: string,
+    order: number | undefined,
+  ) => {
     if (editingContext.releaseId && sectionId) {
       const { releaseId } = editingContext;
 
-      releaseContentService
-        .addContentSectionBlock(releaseId, sectionId, {
-          body: 'Click to edit',
-          type,
-          order,
-        })
+      let addPromise: Promise<unknown>;
+
+      if (type === 'DataBlock') {
+        addPromise = releaseContentService
+          .attachContentSectionBlock(releaseId, sectionId, {
+            contentBlockId: data,
+            order: order || 0,
+          })
+          .then(v => {
+            if (editingContext.updateAvailableDataBlocks) {
+              editingContext.updateAvailableDataBlocks();
+            }
+            return v;
+          });
+      } else {
+        addPromise = releaseContentService.addContentSectionBlock(
+          releaseId,
+          sectionId,
+          {
+            body: data,
+            type,
+            order,
+          },
+        );
+      }
+
+      addPromise
         .then(() =>
           releaseContentService.getContentSection(releaseId, sectionId),
         )
@@ -141,6 +167,10 @@ const EditableContentBlock = ({
       await releaseContentService
         .deleteContentSectionBlock(releaseId, sectionId, contentId)
         .catch(handleApiErrors);
+
+      if (editingContext.updateAvailableDataBlocks) {
+        editingContext.updateAvailableDataBlocks();
+      }
 
       const {
         content: newContentBlocks,
@@ -174,7 +204,10 @@ const EditableContentBlock = ({
           There is no content for this section.
         </div>
         {(canAddBlocks || canAddSingleBlock) && (
-          <AddContentButton order={0} onClick={onAddContentCallback} />
+          <AddContentButton
+            onClick={(type, data) => onAddContentCallback(type, data, 0)}
+            availableDataBlocks={editingContext.availableDataBlocks}
+          />
         )}
       </>
     );
@@ -203,8 +236,10 @@ const EditableContentBlock = ({
                 <>
                   {canAddBlocks && (
                     <AddContentButton
-                      order={index}
-                      onClick={onAddContentCallback}
+                      onClick={(type, data) =>
+                        onAddContentCallback(type, data, index)
+                      }
+                      availableDataBlocks={editingContext.availableDataBlocks}
                     />
                   )}
                   {(editingContext.isCommenting ||
@@ -242,7 +277,12 @@ const EditableContentBlock = ({
               {!isReordering &&
                 canAddBlocks &&
                 index === contentBlocks.length - 1 && (
-                  <AddContentButton onClick={onAddContentCallback} />
+                  <AddContentButton
+                    onClick={(type, data) =>
+                      onAddContentCallback(type, data, contentBlocks.length)
+                    }
+                    availableDataBlocks={editingContext.availableDataBlocks}
+                  />
                 )}
             </ContentBlockDraggable>
           ))}

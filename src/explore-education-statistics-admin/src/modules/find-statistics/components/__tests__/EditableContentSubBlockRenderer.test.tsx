@@ -12,6 +12,7 @@ describe('EditableContentSubBlockRenderer', () => {
           releaseId: '',
           isReviewing: false,
           isCommenting: false,
+          availableDataBlocks: [],
         }}
       >
         <EditableContentSubBlockRenderer
@@ -38,6 +39,7 @@ describe('EditableContentSubBlockRenderer', () => {
           releaseId: '',
           isReviewing: false,
           isCommenting: false,
+          availableDataBlocks: [],
         }}
       >
         <EditableContentSubBlockRenderer

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
@@ -10,9 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime? Publish { get; set; }
         public string ReleaseSlug { get; set; }
         public string ContentStage { get; set; }
-        public string FilesStage { get; set; }
         public string DataStage { get; set; }
+        public string FilesStage { get; set; }
+        public string PublishingStage { get; set; }
         public string Stage { get; set; }
+        public string Messages { get; set; }
 
         public ReleaseStatus()
         {
@@ -22,19 +27,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             DateTime? publish,
             Guid releaseId,
             string releaseSlug,
-            Stage contentStage,
-            Stage filesStage,
-            Stage dataStage,
-            Stage stage)
+            (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) stage,
+            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
             ReleaseSlug = releaseSlug;
-            ContentStage = contentStage.ToString();
-            FilesStage = filesStage.ToString();
-            DataStage = dataStage.ToString();
-            Stage = stage.ToString();
+            ContentStage = stage.Content.ToString();
+            DataStage = stage.Data.ToString();
+            FilesStage = stage.Files.ToString();
+            PublishingStage = stage.Publishing.ToString();
+            Stage = stage.Overall.ToString();
+            Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
 
             RowKey = Guid.NewGuid().ToString();
             PartitionKey = releaseId.ToString();
@@ -42,6 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
         public Guid Id => Guid.Parse(RowKey);
         public Guid ReleaseId => Guid.Parse(PartitionKey);
+
+        public IEnumerable<ReleaseStatusLogMessage> LogMessages => Messages == null
+            ? new List<ReleaseStatusLogMessage>()
+            : JsonConvert.DeserializeObject<IEnumerable<ReleaseStatusLogMessage>>(Messages);
+
+        public void AppendLogMessages(IEnumerable<ReleaseStatusLogMessage> logMessages)
+        {
+            Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
+        }
     }
 
     public enum Stage
