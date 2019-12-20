@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                         } else if (status == ReleaseStatus.Approved)
                         {
-                            var canApprove = await _userService.MatchesPolicy(release, CanSubmitSpecificReleaseToHigherReview);
+                            var canApprove = await _userService.MatchesPolicy(release, CanApproveSpecificRelease);
 
                             if (!canApprove)
                             {
