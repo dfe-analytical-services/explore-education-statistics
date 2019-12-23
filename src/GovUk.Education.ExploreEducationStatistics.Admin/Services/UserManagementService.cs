@@ -20,11 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<UserViewModel>> ListAsync()
         {
             var users = await _context.Users.Select(u => new UserViewModel
-            {
-                Id = u.Id,
-                Name = u.FirstName + " " + u.LastName,
-                Email = u.Email
-            }).ToListAsync();
+                {
+                    Id = u.Id,
+                    Name = u.FirstName + " " + u.LastName,
+                    Email = u.Email
+                }).OrderBy(x => x.Name)
+                .ToListAsync();
 
             return users;
         }
