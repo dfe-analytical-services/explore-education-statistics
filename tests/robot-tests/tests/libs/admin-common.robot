@@ -42,3 +42,4 @@ User creates a new release for publication "${publication}" for start year "${st
     user clicks element  xpath://label[text()="National Statistics"]
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]
+    user waits until page contains element  xpath://h2[text()="Release summary"]

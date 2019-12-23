@@ -41,7 +41,7 @@ Upload subject
 
     user waits until page contains element   xpath://h2[text()="Uploaded data files"]
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]
+    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     90
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
@@ -106,15 +106,12 @@ Validate table's column headings
     user checks results table column heading contains  1  10  2014
     user checks results table column heading contains  1  11  2015
     user checks results table column heading contains  1  12  2016
-    #sleep   1000000
 
-Fails 1
+    scroll element into view   xpath://table/thead/tr[1]/th[16]
+
     user checks results table column heading contains  1  13  2017
-Fails 2
     user checks results table column heading contains  1  14  2018
-Fails 3
     user checks results table column heading contains  1  15  2019
-Fails 4
     user checks results table column heading contains  1  16  2020
 
 Validate table's row headings
@@ -128,7 +125,7 @@ Validate table's row headings
     user checks results table row heading contains   3   1   Bolton 001 (E05000364)
     user checks results table row heading contains   3   2   Admission Numbers
 
-    user checks results table row heading contains   4   1   Bolton 004 (E05000450)
+    user checks results table row heading contains   4   1   Bolton 004 (E05010450)
     user checks results table row heading contains   4   2   Admission Numbers
 
     user checks results table row heading contains   5   1   Syon
