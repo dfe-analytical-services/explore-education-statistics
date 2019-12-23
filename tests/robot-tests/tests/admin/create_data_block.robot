@@ -94,22 +94,23 @@ Create table
 
 Validate table's column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1  1  2005
-    user checks results table column heading contains  1  2  2006
-    user checks results table column heading contains  1  2  2007
-    user checks results table column heading contains  1  2  2008
-    user checks results table column heading contains  1  2  2009
-    user checks results table column heading contains  1  2  2010
-    user checks results table column heading contains  1  2  2011
-    user checks results table column heading contains  1  2  2012
-    user checks results table column heading contains  1  2  2013
-    user checks results table column heading contains  1  2  2014
-    user checks results table column heading contains  1  2  2015
-    user checks results table column heading contains  1  2  2016
-    user checks results table column heading contains  1  2  2017
-    user checks results table column heading contains  1  2  2018
-    user checks results table column heading contains  1  2  2019
-    user checks results table column heading contains  1  2  2020
+    user checks results table column heading contains  1  1   2005
+    user checks results table column heading contains  1  2   2006
+    user checks results table column heading contains  1  3   2007
+    user checks results table column heading contains  1  4   2008
+    user checks results table column heading contains  1  5   2009
+    user checks results table column heading contains  1  6   2010
+    user checks results table column heading contains  1  7   2011
+    user checks results table column heading contains  1  8   2012
+    user checks results table column heading contains  1  9   2013
+    user checks results table column heading contains  1  10  2014
+    user checks results table column heading contains  1  11  2015
+    user checks results table column heading contains  1  12  2016
+    sleep   10
+    user checks results table column heading contains  1  13  2017
+    user checks results table column heading contains  1  14  2018
+    user checks results table column heading contains  1  15  2019
+    user checks results table column heading contains  1  16  2020
 
 Validate table's row headings
     [Tags]  HappyPath
