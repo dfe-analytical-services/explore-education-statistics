@@ -12,7 +12,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ThemeServiceTests
+    public class ThemeServicePermissionTests
     {
         [Fact]
         public async void GetMyThemes_CanViewAllTopics()
