@@ -72,7 +72,7 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
     try:
         wait_until_page_contains_xpath(driver, '//span[contains(text(),"Register")]')
         driver.find_element_by_css_selector('#Input_FirstName').clear()
-        driver.find_element_by_css_selector('#Input_FirstName').send_keys('User1')
+        driver.find_element_by_css_selector('#Input_FirstName').send_keys('Bau1')
         driver.find_element_by_css_selector('#Input_LastName').clear()
         driver.find_element_by_css_selector('#Input_LastName').send_keys('EESADMIN')
         driver.find_element_by_css_selector('#Input_Email').clear()
