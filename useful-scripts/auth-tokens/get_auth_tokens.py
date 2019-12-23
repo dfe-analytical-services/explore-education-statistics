@@ -76,7 +76,7 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
         driver.find_element_by_css_selector('#Input_LastName').clear()
         driver.find_element_by_css_selector('#Input_LastName').send_keys('EESADMIN')
         driver.find_element_by_css_selector('#Input_Email').clear()
-        driver.find_element_by_css_selector('#Input_Email').send_keys(email)
+        driver.find_element_by_css_selector('#Input_Email').send_keys('bau1@example.com')
         driver.find_element_by_xpath('//button[contains(text(), "Register")]').click()
     except Exception as e:
         pass

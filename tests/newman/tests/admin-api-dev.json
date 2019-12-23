@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "86fed618-679d-439d-9ec9-c99fe636a23d",
+		"_postman_id": "93a47c96-317d-436d-8299-8cb57e86adf7",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -107,7 +107,7 @@
 									"pm.test(\"Expect correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    //pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
@@ -317,9 +317,7 @@
 									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
 									"    ",
-									"    if(pm.environment.get(\"env\") != \"local\") {",
-									"        pm.expect(respJson[0].userName).to.equal(\"EESADMIN.User1@azurehiveitco.onmicrosoft.com\");    ",
-									"    }",
+									"    pm.expect(respJson[0].userName).to.equal(\"bau1@example.com\");",
 									"});",
 									"",
 									"pm.test(\"Data file details should be correct\", function () { ",
@@ -334,10 +332,8 @@
 									"    var now = new Date();",
 									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
-									"",
-									"    if(pm.environment.get(\"admin_api_url\") != \"https://localhost:5021/api\") {",
-									"        pm.expect(respJson[1].userName).to.equal(\"EESADMIN.User1@azurehiveitco.onmicrosoft.com\");    ",
-									"    }",
+									"    ",
+									"    pm.expect(respJson[1].userName).to.equal(\"bau1@example.com\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1690,7 +1686,7 @@
 									"pm.test(\"Expect correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    //pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
