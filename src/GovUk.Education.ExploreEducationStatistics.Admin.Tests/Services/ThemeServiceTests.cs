@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
-                .Returns(Task.FromResult(true));
+                .ReturnsAsync(true);
 
             repository
                 .Setup(s => s.GetAllThemesAsync())
-                .Returns(Task.FromResult(themeList));
+                .ReturnsAsync(themeList);
             
             var service = new ThemeService(context.Object, userService.Object, repository.Object);
 
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
-                .Returns(Task.FromResult(false));
+                .ReturnsAsync(false);
 
             userService
                 .Setup(s => s.GetUserId())
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             repository
                 .Setup(s => s.GetThemesRelatedToUserAsync(userId))
-                .Returns(Task.FromResult(themeList));
+                .ReturnsAsync(themeList);
             
             var service = new ThemeService(context.Object, userService.Object, repository.Object);
 

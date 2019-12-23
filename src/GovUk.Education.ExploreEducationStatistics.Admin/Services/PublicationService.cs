@@ -21,12 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
+        private readonly IPublicationRepository _publicationRepository;
 
-        public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService)
+        public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService, 
+            IPublicationRepository publicationRepository)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
+            _publicationRepository = publicationRepository;
         }
 
         public async Task<Publication> GetAsync(Guid id)
@@ -48,8 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _userService
                 .CheckCanViewAllReleases()
-                .OnSuccess(() => GetAllPublicationsForTopicAsync(topicId))
-                .OrElse(() => GetPublicationsForTopicRelatedToMeAsync(topicId));
+                .OnSuccess(() => 
+                    _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
+                .OrElse(() => _publicationRepository.
+                    GetPublicationsForTopicRelatedToUserAsync(topicId, _userService.GetUserId()));
         }
 
         public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
@@ -80,57 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .HydratePublicationForPublicationViewModel()
                 .FirstOrDefaultAsync();
             return _mapper.Map<PublicationViewModel>(publication);
-        }
-
-        private Task<List<PublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
-        {
-            return _context
-                .Publications
-                .HydratePublicationForPublicationViewModel()
-                .Where(publication => publication.TopicId == topicId)
-                .Select(publication => _mapper.Map<PublicationViewModel>(publication))
-                .ToListAsync();
-        }
-
-        private async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToMeAsync(Guid topicId)
-        {
-            var userId = _userService.GetUserId();
-            
-            var userReleasesForTopic = await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .ThenInclude(release => release.Publication)
-                .ThenInclude(publication => publication.Topic)
-                .Where(r => r.UserId == userId)
-                .Select(r => r.Release)
-                .Where(release => release.Publication.TopicId == topicId)
-                .ToListAsync();
-
-            var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
-
-            foreach (var publication in userReleasesForTopic.Select(release => release.Publication).Distinct())
-            {
-                var releasesForPublication = userReleasesForTopic.FindAll(release => release.Publication == publication);
-                userReleasesByPublication.Add(publication, releasesForPublication);
-            }
-
-            return userReleasesByPublication
-                .Select(publicationWithReleases =>
-                {
-                    var (publication, releases) = publicationWithReleases;
-
-                    return new PublicationViewModel
-                    {
-                        Id = publication.Id,
-                        Contact = publication.Contact,
-                        Methodology = _mapper.Map<MethodologyViewModel>(publication.Methodology),
-                        Releases = releases.Select(release => _mapper.Map<ReleaseViewModel>(release)).ToList(),
-                        Title = publication.Title,
-                        NextUpdate = publication.NextUpdate,
-                        ThemeId = publication.Topic.ThemeId
-                    };
-                })
-                .ToList();
         }
     }
     

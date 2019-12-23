@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService
                 .Setup(s => s.MatchesPolicy(_release, policy))
-                .Returns(Task.FromResult(false));
+                .ReturnsAsync(false);
             
             var releaseService = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
                 publishingService.Object, releaseHelper.Object, userService.Object);

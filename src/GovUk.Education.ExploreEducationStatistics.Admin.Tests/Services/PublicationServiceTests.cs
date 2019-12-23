@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -21,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithoutMethodology()
         {
-            var userService = Mocks();
+            var (_, userService, repository) = Mocks();
             
             using (var context = InMemoryApplicationDbContext("Create"))
             {
@@ -33,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
-                    userService.Object);
+                    userService.Object, repository.Object);
                 
                 // Service method under test
                 var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
@@ -54,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithMethodology()
         {
-            var userService = Mocks();
+            var (_, userService, repository) = Mocks();
             
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
@@ -74,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
                 var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
-                    userService.Object);
+                    userService.Object, repository.Object);
                 
                 // Service method under test
                 var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
@@ -102,14 +105,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationFailsWithNonUniqueSlug()
         {
-            var userService = Mocks();
+            var (_, userService, repository) = Mocks();
 
             const string titleToBeDuplicated = "A title to be duplicated";
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
-                    userService.Object);
+                    userService.Object, repository.Object);
                 
                 var result = await publicationService.CreatePublicationAsync(
                     new CreatePublicationViewModel
@@ -122,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
-                    userService.Object);
+                    userService.Object, repository.Object);
                 
                 // Service method under test
                 var result = await publicationService.CreatePublicationAsync(
@@ -136,67 +139,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     result.Left.ErrorMessage);
             }
         }
-        
+
+        [Fact]
+        public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
+        {
+            var (context, userService, repository) = Mocks();
+
+            var topicId = Guid.NewGuid();
+            
+            var publicationService = new PublicationService(context.Object, MapperForProfile<MappingProfiles>(), 
+                userService.Object, repository.Object);
+
+            userService.
+                Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
+                ReturnsAsync(true);
+
+            var list = new List<PublicationViewModel>()
+            {
+                new PublicationViewModel
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            repository.
+                Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).
+                ReturnsAsync(list);
+            
+            var result = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
+            Assert.Equal(list, result);
+            
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.VerifyNoOtherCalls();
+
+            repository.Verify(s => s.GetAllPublicationsForTopicAsync(topicId));
+            repository.VerifyNoOtherCalls();
+        }
         
         [Fact]
-        public async void LatestReleaseCorrectlyReportedInPublication()
+        public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
         {
-            var userService = Mocks();
+            var (context, userService, repository) = Mocks();
 
-            var latestReleaseId = new Guid("4a01ee05-55b8-4764-83eb-6559108fac7e");
-            var notLatestReleaseId = new Guid("e3aa5543-7993-4ea5-9827-730671a7729f");
-            var topicId = new Guid("f63a51b3-fa86-4077-a3e5-3a2114ad006f");
-            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReportedInPublication"))
+            var topicId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            
+            var publicationService = new PublicationService(context.Object, MapperForProfile<MappingProfiles>(), 
+                userService.Object, repository.Object);
+
+            userService.
+                Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
+                ReturnsAsync(false);
+
+            userService.
+                Setup(s => s.GetUserId()).
+                Returns(userId);
+
+            var list = new List<PublicationViewModel>()
             {
-                context.Add(new Topic
+                new PublicationViewModel
                 {
-                    Id = topicId,
-                    Publications = new List<Publication>
-                    {
+                    Id = Guid.NewGuid()
+                }
+            };
 
-                        new Publication
-                        {
-                            Id = new Guid("a61c8bd8-8b7b-4de8-b17c-caf21d7799b0"),
-                            Title = "Publication",
-                            TopicId = topicId,
-                            Releases = new List<Release>
-                            {
-                                new Release
-                                {
-                                    Id = notLatestReleaseId,
-                                    Order = 0,
-                                    Published = DateTime.Now.AddDays(-2) // Is published but not the latest by order
+            repository.
+                Setup(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId)).
+                ReturnsAsync(list);
+            
+            var result = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
+            Assert.Equal(list, result);
+            
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.Verify(s => s.GetUserId());
+            userService.VerifyNoOtherCalls();
 
-                                },
-                                new Release
-                                {
-                                    Id = latestReleaseId,
-                                    Order = 1,
-                                    Published = DateTime.Now.AddDays(-1) // Is published and the the latest by order
-                                }
-                            }
-                        }
-                    }
-                });
-                context.SaveChanges();
-            }
-
-            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReportedInPublication"))
-            {
-                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
-                    userService.Object);
-                
-                // Method under test - this return a list of publication for a user. The releases in the publication
-                // should correctly report whether they are the latest or not. Note that this is dependent on the mapper
-                // that we are passing in.
-                var publications = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
-                var releases = publications.Single().Releases;
-                Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease)); 
-                Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
-            }
+            repository.Verify(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId));
+            repository.VerifyNoOtherCalls();
         }
-
-        private Mock<IUserService> Mocks()
+        
+        private (Mock<ContentDbContext>, Mock<IUserService>, Mock<IPublicationRepository>) Mocks()
         {
             var userService = new Mock<IUserService>();
 
@@ -204,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
                 .ReturnsAsync(true);
 
-            return userService;
+            return (new Mock<ContentDbContext>(), userService, new Mock<IPublicationRepository>());
         }
     }
 }
