@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 
@@ -12,64 +14,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ThemeServiceTests
     {
-        // TODO this test will need to change when we have users in the system
         [Fact]
-        public void GetThemes()
+        public async void GetMyThemes_CanViewAllTopics()
         {
-            using (var context = DbUtils.InMemoryApplicationDbContext("Find"))
+            var (context, userService, repository) = Mocks();
+
+            var themeList = new List<Theme>
             {
-                var userService = Mocks();
-                
-                var themeToSave =
-                    new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Summary = "Summary A",
-                        Title = "Title A",
-                        Topics = new List<Topic>
-                        {
-                            new Topic
-                            {
-                                Id = Guid.NewGuid(),
-                                Description = "Description A",
-                                Slug = "Slug A",
-                                Summary = "Summary A",
-                                Title = "Title A"
-                            },
-                            new Topic
-                            {
-                                Id = Guid.NewGuid(),
-                                Description = "Description B",
-                                Slug = "Slug B",
-                                Summary = "Summary B",
-                                Title = "Title B"
-                            }
-                        }
-                    };
+                new Theme
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
 
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
+                .Returns(Task.FromResult(true));
 
-                context.Add(themeToSave);
-                context.SaveChanges();
+            repository
+                .Setup(s => s.GetAllThemesAsync())
+                .Returns(Task.FromResult(themeList));
+            
+            var service = new ThemeService(context.Object, userService.Object, repository.Object);
 
-                var service = new ThemeService(context, userService.Object);
-                // Method under test
-                var retrievedUserTheme = service.GetMyThemesAsync().Result;
-                Assert.True(retrievedUserTheme.Exists(t => t.Title == "Title A"));
-                var themeA = retrievedUserTheme.Single(t => t.Title == "Title A");
-                Assert.True(themeA.Topics.Exists(t => t.Title == "Title A"));
-                Assert.True(themeA.Topics.Exists(t => t.Title == "Title B"));
-            }
+            var result = await service.GetMyThemesAsync();
+            Assert.Equal(themeList, result);
+            
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics));
+            userService.VerifyNoOtherCalls();
+
+            repository.Verify(s => s.GetAllThemesAsync());
+            repository.VerifyNoOtherCalls();
         }
-
-        private Mock<IUserService> Mocks()
+        
+        [Fact]
+        public async void GetMyThemes_CanViewLinkedTopics()
         {
+            var (context, userService, repository) = Mocks();
+
+            var userId = Guid.NewGuid();
+
+            var themeList = new List<Theme>
+            {
+                new Theme
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
+                .Returns(Task.FromResult(false));
+
+            userService
+                .Setup(s => s.GetUserId())
+                .Returns(userId);
+
+            repository
+                .Setup(s => s.GetThemesRelatedToUserAsync(userId))
+                .Returns(Task.FromResult(themeList));
+            
+            var service = new ThemeService(context.Object, userService.Object, repository.Object);
+
+            var result = await service.GetMyThemesAsync();
+            Assert.Equal(themeList, result);
+            
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics));
+            userService.Verify(s => s.GetUserId());
+            userService.VerifyNoOtherCalls();
+
+            repository.Verify(s => s.GetThemesRelatedToUserAsync(userId));
+            repository.VerifyNoOtherCalls();
+        }
+        
+        private (Mock<ContentDbContext>, Mock<IUserService>, Mock<IThemeRepository>) Mocks()
+        {
+            var context = new Mock<ContentDbContext>();
             var userService = new Mock<IUserService>();
+            var repository = new Mock<IThemeRepository>();
 
             userService
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
                 .ReturnsAsync(true);
 
-            return userService;
+            return (context, userService, repository);
         }
     }
 }

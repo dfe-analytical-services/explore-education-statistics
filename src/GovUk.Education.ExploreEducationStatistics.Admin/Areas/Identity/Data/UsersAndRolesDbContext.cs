@@ -134,12 +134,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     {
                         Id = -5,
                         RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.SubmitAllReleasesToHigherReview.ToString(),
+                        ClaimType = SecurityClaimTypes.MarkAllReleasesAsDraft.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -6,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.SubmitAllReleasesToHigherReview.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -7,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.ApproveAllReleases.ToString(),
                         ClaimValue = "",

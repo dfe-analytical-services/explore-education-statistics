@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IThemeService
+    public interface IThemeRepository
     {
-        Task<List<Theme>> GetMyThemesAsync();
+        Task<List<Theme>> GetAllThemesAsync();
 
-        Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id);
+        Task<List<Theme>> GetThemesRelatedToUserAsync(Guid userId);
     }
 }

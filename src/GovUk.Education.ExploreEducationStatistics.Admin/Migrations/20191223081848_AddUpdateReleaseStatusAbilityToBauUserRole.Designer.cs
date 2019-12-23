@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20191220111003_AddSubmitAndApprovalAbilityToBauUserRole")]
-    partial class AddSubmitAndApprovalAbilityToBauUserRole
+    [Migration("20191223081848_AddUpdateReleaseStatusAbilityToBauUserRole")]
+    partial class AddUpdateReleaseStatusAbilityToBauUserRole
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -359,13 +359,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         new
                         {
                             Id = -5,
-                            ClaimType = "SubmitAllReleasesToHigherReview",
+                            ClaimType = "MarkAllReleasesAsDraft",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         },
                         new
                         {
                             Id = -6,
+                            ClaimType = "SubmitAllReleasesToHigherReview",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -7,
                             ClaimType = "ApproveAllReleases",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
