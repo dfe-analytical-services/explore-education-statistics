@@ -225,6 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
