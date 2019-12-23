@@ -22,7 +22,6 @@ DROP TABLE Topic;
 DROP TABLE Theme;
 DROP PROCEDURE FilteredObservations;
 DROP PROCEDURE FilteredFootnotes;
-DROP PROCEDURE ReleaseCopyRows;
 DROP TYPE IdListIntegerType;
 DROP TYPE IdListVarcharType;
 DROP TYPE IdListGuidType;
