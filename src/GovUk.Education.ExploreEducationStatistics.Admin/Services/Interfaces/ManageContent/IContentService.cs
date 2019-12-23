@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
 {
+    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IContentService
     {
         Task<Either<ValidationResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
@@ -47,5 +49,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         
         Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request);
+
+        Task<Either<ValidationResult, List<CommentViewModel>>> GetCommentsAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId);
+        
+        Task<Either<ValidationResult, CommentViewModel>> AddCommentAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment);
+        
+        Task<Either<ValidationResult, CommentViewModel>> UpdateCommentAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment);
+        
+        Task<Either<ValidationResult, CommentViewModel>> DeleteCommentAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId);
+        
     }
 }

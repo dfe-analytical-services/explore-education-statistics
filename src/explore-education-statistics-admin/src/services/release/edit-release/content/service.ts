@@ -6,7 +6,10 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import { ExtendedComment } from '@admin/services/publicationService';
+import { DataBlock } from '@common/services/dataBlockService';
 import {
+  ContentBlockAttachRequest,
+  ContentBlockAttachResponse,
   ContentBlockPostModel,
   ContentBlockPutModel,
   ContentBlockViewModel,
@@ -150,6 +153,21 @@ export const releaseContentService = {
   ): Promise<void> {
     return client.delete(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${commentId}`,
+    );
+  },
+
+  getAvailableDataBlocks(releaseId: string): Promise<DataBlock[]> {
+    return client.get(`/release/${releaseId}/content/available-datablocks`);
+  },
+
+  attachContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    block: ContentBlockAttachRequest,
+  ): Promise<ContentBlockAttachResponse> {
+    return client.post<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
+      block,
     );
   },
 };

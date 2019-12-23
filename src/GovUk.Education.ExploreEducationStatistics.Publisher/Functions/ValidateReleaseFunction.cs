@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -13,11 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
 
-        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) InvalidStage =
-            (Content: Cancelled, Files: Cancelled, Data: Cancelled, Overall: Invalid);
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) InvalidStage =
+            (Content: Cancelled, Files: Cancelled, Data: Cancelled, Publishing: Cancelled, Overall: Invalid);
 
-        private static readonly (Stage Content, Stage Files, Stage Data, Stage Overall) ValidStage =
-            (Content: Scheduled, Files: Scheduled, Data: Scheduled, Overall: Scheduled);
+        private static readonly (Stage Content, Stage Files, Stage Data, Stage Publishing, Stage Overall) ValidStage =
+            (Content: Scheduled, Files: Scheduled, Data: Scheduled, Publishing: Scheduled, Overall: Scheduled);
 
         public ValidateReleaseFunction(IReleaseStatusService releaseStatusService, IValidationService validationService)
         {
@@ -42,14 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task ValidateReleaseAsync(ReleaseStatusMessage statusMessage, Func<Task> andThen)
         {
-            var valid = await _validationService.ValidateAsync(statusMessage);
-            await (valid ? andThen.Invoke() : CreateOrUpdateReleaseStatusAsync(statusMessage, InvalidStage));
+            var (valid, logMessages) = await _validationService.ValidateAsync(statusMessage);
+            await (valid
+                ? andThen.Invoke()
+                : CreateOrUpdateReleaseStatusAsync(statusMessage, InvalidStage, logMessages));
         }
 
         private async Task CreateOrUpdateReleaseStatusAsync(ReleaseStatusMessage statusMessage,
-            (Stage, Stage, Stage, Stage) stage)
+            (Stage, Stage, Stage, Stage, Stage) stage, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
-            await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage);
+            await _releaseStatusService.CreateOrUpdateAsync(statusMessage.ReleaseId, stage, logMessages);
         }
     }
 }

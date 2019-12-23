@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
 {
+    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IRelatedInformationService
     {
         Task<Either<ValidationResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId);

@@ -5,6 +5,7 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -188,6 +189,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+
+        public DbSet<Comment> Comment { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -313,6 +318,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<ReleaseContentBlock>()
                 .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
+
+            modelBuilder.Entity<User>();
+
+            modelBuilder.Entity<UserReleaseRole>()
+                .Property(r => r.Role)
+                .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
@@ -1527,10 +1538,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
+            var absenceReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5");
+            var exclusionsReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278");
+            var applicationOffersReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717");
+
             modelBuilder.Entity<ReleaseSummary>().HasData(
                 new ReleaseSummary
                 {
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                     Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
                 },
                 new ReleaseSummary
@@ -1540,15 +1555,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new ReleaseSummary
                 {
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                     Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
                 },
                 new ReleaseSummary
                 {
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                     Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
                 }
             );
+
 
             modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
                 new ReleaseSummaryVersion
@@ -1597,7 +1613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 //absence
                 new Release
                 {
-                    Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    Id = absenceReleaseId,
                     ReleaseName = "2016",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2018, 3, 22),
@@ -1609,19 +1625,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 // exclusions
                 new Release
                 {
-                    Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    Id = exclusionsReleaseId,
                     ReleaseName = "2016",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    RelatedInformation = new List<BasicLink> {
-                        new BasicLink {
+                    RelatedInformation = new List<BasicLink>
+                    {
+                        new BasicLink
+                        {
                             Id = new Guid("f3c67bc9-6132-496e-a848-c39dfcd16f49"),
                             Description = "Additional guidance",
                             Url = "http://example.com"
                         },
-                        new BasicLink {
+                        new BasicLink
+                        {
                             Id = new Guid("45acb50c-8b21-46b4-989f-36f4b0ee37fb"),
                             Description = "Statistics guide",
                             Url = "http://example.com"
@@ -1633,7 +1652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 // Secondary and primary schools applications offers
                 new Release
                 {
-                    Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    Id = applicationOffersReleaseId,
                     ReleaseName = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     Published = new DateTime(2018, 6, 14),
@@ -1874,189 +1893,189 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
 
                 // exclusions
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
 
                 // Secondary and primary schools applications offers
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
 
                 // Summary sections for each Release
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
 
                 // Key Statistics sections for each Release
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
 
                 // Key Statistics secondary sections for each Release
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
 
                 // Headline sections for each Release
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 new ReleaseContentSection
                 {
                     ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 }
             );
 
@@ -2065,124 +2084,140 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // absence key stats tile 2 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // absence key stats tile 3 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // absence key stats aggregate table data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // absence generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // absence generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                 },
                 // exclusions key stats tile 1 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions key stats tile 2 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions key stats tile 3 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions aggregate table data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("038093a2-0be3-440b-8b22-8116e34aa616"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions detached data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // exclusions detached data block 2
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("0b4c43cd-fc12-4159-88b9-0c8646424555"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                 },
                 // Secondary and primary schools applications key stats tile 1 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 // Secondary and primary schools applications key stats tile 2 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 // Secondary and primary schools applications key stats tile 3 data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 // Secondary and primary schools applications aggregate table data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 // Secondary and primary schools applications generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 },
                 // Secondary and primary schools applications generic content data block
                 new ReleaseContentBlock
                 {
                     ContentBlockId = new Guid("a8c408ed-45d8-4690-a9f3-2fb0e86377bf"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                 }
             );
 
+            modelBuilder.Entity<Comment>()    
+                .HasData(
+                    new Comment
+                    {
+                        Id = new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
+                        IContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                        CommentText = "Test Text",
+                        Name = "A Test User",
+                        State = CommentState.open,
+                        Time = new DateTime(2019, 12, 1, 15, 0, 0),
+                        ResolvedBy = null,
+                        ResolvedOn = null
+                    }
+                    
+                );
+            
             modelBuilder.Entity<MarkDownBlock>().HasData(
                 // absence
                 new MarkDownBlock
@@ -2369,15 +2404,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
                     Body = SampleMarkDownContent.Content[new Guid("8e10ad6c-9a68-4162-84f9-81fb6dc93ae3")]
                 },
-                
+
                 // Summary sections for each Release
                 new MarkDownBlock
                 {
                     Id = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
                     ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
                     Order = 1,
-                    Body = "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                           "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+                    Body =
+                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
                 },
                 new MarkDownBlock
                 {
@@ -2396,10 +2432,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
-                           "published - [Secondary and primary school applications and offers: methodology]"+
+                           "published - [Secondary and primary school applications and offers: methodology]" +
                            "(../methodology/secondary-and-primary-schools-applications-and-offers)"
                 },
-                
+
                 // Headline section for each Release
                 new MarkDownBlock
                 {
@@ -2431,7 +2467,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                         "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
                 }
-                
             );
 
             modelBuilder.Entity<DataBlock>().HasData(
@@ -2439,7 +2474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
-                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"), 
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Name = "Key Stat 1",
                     DataBlockRequest = new DataBlockRequest
@@ -3026,7 +3061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
                                     }
-                            }, 
+                            },
                             Legend = Legend.top
                         }
                     }
@@ -3246,7 +3281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics tile 2
                 new DataBlock
                 {
@@ -3345,7 +3380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics tile 3
                 new DataBlock
                 {
@@ -3444,7 +3479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions key statistics aggregate table
                 new DataBlock
                 {
@@ -3746,7 +3781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // exclusions detached Data Block (not yet belonging to any Content Section)
                 new DataBlock
                 {
@@ -4052,7 +4087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // Secondary and primary schools applications offers key statistics tile 3
                 new DataBlock
                 {
@@ -4106,7 +4141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                
+
                 // Secondary and primary schools applications offers key statistics aggregate table
                 new DataBlock
                 {
@@ -4288,7 +4323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                     On = new DateTime(2018, 4, 19),
                     Reason =
                         "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
@@ -4296,7 +4331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                     On = new DateTime(2018, 3, 22),
                     Reason = "First published."
                 },
@@ -4310,14 +4345,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                     On = new DateTime(2018, 7, 19),
                     Reason = "First published."
                 },
                 new Update
                 {
                     Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                     On = new DateTime(2018, 8, 25),
                     Reason =
                         "Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma)."
@@ -4363,7 +4398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("448ca9ea-0cd2-4e6d-b85b-76c3ef7d3bf9"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                     On = new DateTime(2018, 6, 14),
                     Reason = "First published."
                 }
@@ -5105,6 +5140,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 }
             );
+            
+            var analystMvcUser1Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04");
+            var analystMvcUser2Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62");
+            var analystMvcUser3Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a");
+            var bauMvcUser1Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd");
+            var bauMvcUser2Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63");
+
+            modelBuilder.Entity<User>()
+                .HasData(
+                    new User
+                    {
+                        Id = analystMvcUser1Id,
+                        FirstName = "Analyst1",
+                        LastName = "User1",
+                        Email = "analyst1@example.com"
+                    },
+                    new User
+                    {
+                        Id = analystMvcUser2Id,
+                        FirstName = "Analyst2",
+                        LastName = "User2",
+                        Email = "analyst2@example.com"
+                    },
+                    new User
+                    {
+                        Id = analystMvcUser3Id,
+                        FirstName = "Analyst3",
+                        LastName = "User3",
+                        Email = "analyst3@example.com"
+                    },
+                    new User
+                    {
+                        Id = bauMvcUser1Id,
+                        FirstName = "Bau1",
+                        LastName = "User1",
+                        Email = "bau1@example.com"
+                    },
+                    new User
+                    {
+                        Id = bauMvcUser2Id,
+                        FirstName = "Bau2",
+                        LastName = "User2",
+                        Email = "bau2@example.com"
+                    }
+                );
+            
+            modelBuilder.Entity<UserReleaseRole>()
+                .HasData(
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("1501265c-979b-4cd4-8a55-00bfe909a2da"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser1Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("086b1354-473c-48bb-9d30-0ac1963dc4cb"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser1Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("f7884899-baf9-4009-8561-f0c5df0d0a69"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("77ff439d-e1cd-4e50-9c25-24a5207953a5"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("b00fd7c0-226f-474d-8cec-820a1a789182"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Lead
+                    }
+                );
         }
 
         private static string FItem(int subjectId, FilterItemName filterItemName)

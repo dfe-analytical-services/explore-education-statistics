@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId);
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -59,22 +59,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        private async Task<Either<ValidationResult, bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer,
+        private async Task<Either<ActionResult, bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name, bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
-                return ValidationResult(DataAndMetadataFilesCannotHaveTheSameName);
+                return ValidationActionResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
 
             if (dataFile.Length == 0)
             {
-                return ValidationResult(DataFileCannotBeEmpty);
+                return ValidationActionResult(DataFileCannotBeEmpty);
             }
 
             if (metaFile.Length == 0)
             {
-                return ValidationResult(MetadataFileCannotBeEmpty);
+                return ValidationActionResult(MetadataFileCannotBeEmpty);
             }
 
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
@@ -82,33 +82,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
             {
-                return ValidationResult(DataFileMustBeCsvFile);
+                return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
             if (!IsCsvFile(metadataFilePath, metaFile.OpenReadStream()))
             {
-                return ValidationResult(MetaFileMustBeCsvFile);
+                return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteDataFile);
+                return ValidationActionResult(CannotOverwriteDataFile);
             }
 
             if (!overwrite && blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteMetadataFile);
+                return ValidationActionResult(CannotOverwriteMetadataFile);
             }
 
             if (_subjectService.Exists(releaseId, name))
             {
-                return ValidationResult(SubjectTitleMustBeUnique);
+                return ValidationActionResult(SubjectTitleMustBeUnique);
             }
 
             return true;
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
             string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -125,20 +125,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async static Task<Either<ValidationResult, (string dataFilePath, string metadataFilePath)>>
+        private async static Task<Either<ActionResult, (string dataFilePath, string metadataFilePath)>>
             DataPathsForDeletion(CloudBlobContainer blobContainer, Guid releaseId, string fileName)
         {
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName);
             var dataBlob = blobContainer.GetBlockBlobReference(dataFilePath);
             if (!dataBlob.Exists())
             {
-                return ValidationResult(FileNotFound);
+                return ValidationActionResult(FileNotFound);
             }
 
             dataBlob.FetchAttributes();
             if (!dataBlob.Metadata.ContainsKey(MetaFileKey))
             {
-                return ValidationResult(UnableToFindMetadataFileToDelete);
+                return ValidationActionResult(UnableToFindMetadataFileToDelete);
             }
 
             var metaFileName = dataBlob.Metadata[MetaFileKey];
@@ -146,18 +146,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var metaBlob = blobContainer.GetBlockBlobReference(metadataFilePath);
             if (!metaBlob.Exists())
             {
-                return ValidationResult(UnableToFindMetadataFileToDelete);
+                return ValidationActionResult(UnableToFindMetadataFileToDelete);
             }
 
             return (dataFilePath: dataFilePath, metadataFilePath: metadataFilePath);
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId,
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             if (type == ReleaseFileTypes.Data)
             {
-                return ValidationResult(CannotUseGenericFunctionToAddDataFile);
+                return ValidationActionResult(CannotUseGenericFunctionToAddDataFile);
             }
 
             var blobContainer = await GetCloudBlobContainer();
@@ -166,13 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
             // TODO Are there conditions in which we would not allow deletion?
             if (type == ReleaseFileTypes.Data)
             {
-                return ValidationResult(CannotUseGenericFunctionToDeleteDataFile);
+                return ValidationActionResult(CannotUseGenericFunctionToDeleteDataFile);
             }
 
             return await DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
@@ -201,20 +201,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrderBy(info => info.Name);
         }
 
-        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
+        private static async Task<Either<ActionResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues,
             bool overwrite)
         {
             var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
             if (!overwrite && blob.Exists())
             {
-                return ValidationResult(CannotOverwriteFile);
+                return ValidationActionResult(CannotOverwriteFile);
             }
 
             // Check that it is not an empty file because this causes issues downstream
             if (file.Length == 0)
             {
-                return ValidationResult(FileCannotBeEmpty);
+                return ValidationActionResult(FileCannotBeEmpty);
             }
 
             blob.Properties.ContentType = file.ContentType;
@@ -227,13 +227,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private static async Task<Either<ValidationResult, bool>> DeleteFileAsync(CloudBlobContainer blobContainer,
+        private static async Task<Either<ActionResult, bool>> DeleteFileAsync(CloudBlobContainer blobContainer,
             string path)
         {
             var blob = blobContainer.GetBlockBlobReference(path);
             if (!blob.Exists())
             {
-                return ValidationResult(FileNotFound);
+                return ValidationActionResult(FileNotFound);
             }
 
             await blob.DeleteAsync();
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await blob.SetMetadataAsync();
         }
 
-        public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(Guid releaseId,
+        public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (!blob.Exists())
             {
-                return ValidationResult(FileNotFound);
+                return ValidationActionResult(FileNotFound);
             }
 
             var stream = new MemoryStream();

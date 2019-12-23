@@ -1,12 +1,16 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -155,15 +159,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             });
 
+            services.AddAuthorization(options =>
+            {
+                // does this user have minimal permissions to access any admin APIs?
+                options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
+                
+                // does this user have permission to view all Topics across the application?
+                options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
+                
+                // does this user have permission to view all Releases across the application?
+                options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
+                
+                // does this user have permission to view a specific Release (on a case-by-case basis)?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
+            });
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddMvc(options =>
                 {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
@@ -180,8 +200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
-            services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
+            services.AddTransient<IReleaseStatusService, ReleaseStatusService>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
@@ -222,8 +242,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+            ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
+            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.ReleaseNoteNotFound);
+            ServicesAddPersistenceHelper(services, c => c.DataBlocks, ValidationErrorMessages.ContentBlockNotFound);
+            ServicesAddPersistenceHelper(services, c => c.Publications, ValidationErrorMessages.PublicationNotFound);
 
+            // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
+            
+            // These services allow us to check our Policies within Controllers and Services
+            services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
+            services.AddTransient<IUserService, UserService>();
+            
+            // These handlers enforce Resource-based access control
+            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {
@@ -249,6 +282,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     }
                 });
             });
+        }
+
+        private static void ServicesAddPersistenceHelper<TEntity>(
+            IServiceCollection services, 
+            Func<ContentDbContext, DbSet<TEntity>> entitySetFn,
+            ValidationErrorMessages notFoundMessage)
+            where TEntity : class 
+        {
+            services.AddTransient<
+                IPersistenceHelper<TEntity, Guid>,
+                PersistenceHelper<TEntity, Guid, ContentDbContext>>(
+                s =>
+                {
+                    var dbContext = s.GetService<ContentDbContext>();
+                    return new PersistenceHelper<TEntity, Guid, ContentDbContext>(
+                        dbContext,
+                        entitySetFn.Invoke(dbContext),
+                        notFoundMessage);
+                });
         }
 
 

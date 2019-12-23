@@ -2,7 +2,6 @@ import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -19,6 +18,9 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
+import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
@@ -36,6 +38,8 @@ interface Props {
   logEvent?: (...params: string[]) => void;
 
   onReleaseChange?: (content: ManageContentPageViewModel['release']) => void;
+
+  availableDataBlocks: DataBlockModel[];
 }
 
 const nullLogEvent = () => {};
@@ -47,6 +51,7 @@ const PublicationReleaseContent = ({
   logEvent = nullLogEvent,
   onReleaseChange,
   handleApiErrors,
+  availableDataBlocks: initialAvailableDataBlocks,
 }: Props & ErrorControlProps) => {
   const [release, _setRelease] = React.useState(content.release);
 
@@ -59,6 +64,18 @@ const PublicationReleaseContent = ({
   );
 
   const accId: string[] = generateIdList(2);
+
+  const [availableDataBlocks, setAvailableDataBlocks] = React.useState(
+    initialAvailableDataBlocks,
+  );
+
+  const updateAvailableDataBlocks = () => {
+    releaseContentService
+      .getAvailableDataBlocks(release.id)
+      .then(newAvailableDataBlocks => {
+        setAvailableDataBlocks(newAvailableDataBlocks);
+      });
+  };
 
   const releaseCount = React.useMemo(
     () =>
@@ -102,6 +119,8 @@ const PublicationReleaseContent = ({
         releaseId: release.id,
         isReviewing: false,
         isCommenting: true,
+        availableDataBlocks,
+        updateAvailableDataBlocks,
       }}
     >
       <h1 className="govuk-heading-l">
@@ -185,48 +204,50 @@ const PublicationReleaseContent = ({
               <dd data-testid="release-name">
                 <strong>{release.yearTitle}</strong>
               </dd>
-              <dd>
-                <Details
-                  summary={`See previous ${releaseCount} releases`}
-                  onToggle={(open: boolean) =>
-                    open &&
-                    logEvent(
-                      'Previous Releases',
-                      'Release page previous releases dropdown opened',
-                      window.location.pathname,
-                    )
-                  }
-                >
-                  <ul className="govuk-list">
-                    {[
-                      ...release.publication.releases.map(
-                        ({ id, slug, releaseName }) => [
-                          releaseName,
-                          <li key={id} data-testid="previous-release-item">
-                            <Link
-                              to={`/find-statistics/${release.publication.slug}/${slug}`}
-                            >
-                              {releaseName}
-                            </Link>
-                          </li>,
-                        ],
-                      ),
-                      ...release.publication.legacyReleases.map(
-                        ({ id, description, url }) => [
-                          description,
-                          <li key={id} data-testid="previous-release-item">
-                            <a href={url}>{description}</a>
-                          </li>,
-                        ],
-                      ),
-                    ]
-                      .sort((a, b) =>
-                        b[0].toString().localeCompare(a[0].toString()),
+              {releaseCount > 0 && (
+                <dd>
+                  <Details
+                    summary={`See previous ${releaseCount} releases`}
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Releases',
+                        'Release page previous releases dropdown opened',
+                        window.location.pathname,
                       )
-                      .map(items => items[1])}
-                  </ul>
-                </Details>
-              </dd>
+                    }
+                  >
+                    <ul className="govuk-list">
+                      {[
+                        ...release.publication.releases.map(
+                          ({ id, slug, releaseName }) => [
+                            releaseName,
+                            <li key={id} data-testid="previous-release-item">
+                              <Link
+                                to={`/find-statistics/${release.publication.slug}/${slug}`}
+                              >
+                                {releaseName}
+                              </Link>
+                            </li>,
+                          ],
+                        ),
+                        ...release.publication.legacyReleases.map(
+                          ({ id, description, url }) => [
+                            description,
+                            <li key={id} data-testid="previous-release-item">
+                              <a href={url}>{description}</a>
+                            </li>,
+                          ],
+                        ),
+                      ]
+                        .sort((a, b) =>
+                          b[0].toString().localeCompare(a[0].toString()),
+                        )
+                        .map(([, link]) => link)}
+                    </ul>
+                  </Details>
+                </dd>
+              )}
             </dl>
             <ReleaseNotesSection release={release} />
             <RelatedInformationSection release={release} />

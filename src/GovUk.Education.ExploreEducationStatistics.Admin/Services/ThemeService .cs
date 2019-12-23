@@ -1,38 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _context;
+        private readonly IUserService _userService;
 
-        public ThemeService(ContentDbContext context)
+        public ThemeService(ContentDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
-        public List<Theme> GetUserThemes(Guid userId)
+        public async Task<List<Theme>> GetMyThemesAsync()
         {
-            // TODO This method simply returns all Themes as we currently do not have a concept of how a user
-            // TODO is connected to Themes for the purpose of administration. Once this has been modelled then
-            // TODO this method will need altered reflect this.
-            return _context.Themes.Select(th => new Theme
+            var canAccessAllTopics = await 
+                _userService.MatchesPolicy(SecurityPolicies.CanViewAllTopics);
+
+            if (canAccessAllTopics)
+            {
+                return await GetAllThemesAsync();
+            }
+
+            var userId = _userService.GetUserId();
+
+            return await GetThemesRelatedToUserAsync(userId);
+        }
+
+        private async Task<List<Theme>> GetAllThemesAsync()
+        {
+            return await _context.Themes.Select(th => new Theme
             {
                 Id = th.Id,
                 Title = th.Title,
                 Topics = th.Topics.Select(to => new Topic {Id = to.Id, Title = to.Title}).ToList()
-            }).ToList();
+            }).ToListAsync();
         }
-        
+
+        private async Task<List<Theme>> GetThemesRelatedToUserAsync(Guid userId)
+        {
+            var userTopics = await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .ThenInclude(release => release.Publication)
+                .ThenInclude(publication => publication.Topic)
+                .ThenInclude(topic => topic.Theme)
+                .Where(r => r.UserId == userId)
+                .Select(r => r.Release.Publication.Topic)
+                .ToListAsync();
+
+            var userTopicsByTheme = new Dictionary<Theme, List<Topic>>();
+            
+            foreach (var theme in userTopics.Select(topic => topic.Theme).Distinct())
+            {
+                var topicsForTheme = userTopics.FindAll(topic => topic.Theme == theme);
+                userTopicsByTheme.Add(theme, topicsForTheme);
+            }
+            
+            return userTopicsByTheme
+                .Select(themeAndTopics => 
+                    new Theme
+                    {
+                        Id = themeAndTopics.Key.Id,
+                        Title = themeAndTopics.Key.Title,
+                        Topics = themeAndTopics
+                            .Value
+                            .Select(to => 
+                                new Topic
+                                {
+                                    Id = to.Id, 
+                                    Title = to.Title
+                                })
+                            .ToList()
+                    })
+                .ToList();
+        }
+
         public Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id)
         { 
             return _context

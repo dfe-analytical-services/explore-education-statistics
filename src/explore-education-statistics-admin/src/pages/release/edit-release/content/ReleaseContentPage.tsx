@@ -17,6 +17,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import { DataBlock } from '@common/services/dataBlockService';
 
 type PageMode = 'edit' | 'preview';
 
@@ -24,6 +25,7 @@ interface Model {
   unresolvedComments: ExtendedComment[];
   pageMode: PageMode;
   content: ManageContentPageViewModel;
+  availableDataBlocks: DataBlock[];
 }
 
 const contentSectionComments = (
@@ -72,28 +74,11 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     releaseContentService
       .getContent(releaseId)
       .then(newContent => {
-        // TODO: For testing purposes only
-        if (
-          newContent.release.summarySection &&
-          newContent.release.summarySection.content &&
-          newContent.release.summarySection.content.length
-        ) {
-          // eslint-disable-next-line no-param-reassign
-          newContent.release.summarySection.content[0].comments = [
-            {
-              time: new Date(),
-              name: 'Jamie',
-              state: 'open',
-              comment: 'test',
-              id: '00000000',
-            },
-          ];
-        }
-
         setModel({
           unresolvedComments: getUnresolveComments(newContent.release),
           pageMode: 'edit',
           content: newContent,
+          availableDataBlocks: newContent.availableDataBlocks,
         });
       })
       .catch(handleApiErrors);
@@ -165,6 +150,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                 content={model.content}
                 styles={{}}
                 onReleaseChange={c => onReleaseChange(c)}
+                availableDataBlocks={model.availableDataBlocks}
               />
             </div>
           </div>
