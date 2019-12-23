@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -14,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/configuration/application-insights/
+        [AllowAnonymous]
         [HttpGet("api/configuration/application-insights")]
         public ActionResult<string> GetInsightsKey()
         {
