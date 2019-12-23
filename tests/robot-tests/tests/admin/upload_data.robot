@@ -7,9 +7,11 @@ Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify correct data is shown when theme and topic is shown
+Create publication and release for upload data testing
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "UI tests topic" from the admin dashboard
+    user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
+    # Create publication
+    # Create release
     user checks page contains accordion  UI tests - upload
     user opens accordion section  UI tests - upload
     user checks accordion section contains text  UI tests - upload    Methodology
@@ -22,17 +24,6 @@ User clicks edit release
     user waits until page contains element  css:[data-testid="Edit release link for UI tests - upload, Tax Year, 2030 to 2031 (not Live)"]
     user clicks element  css:[data-testid="Edit release link for UI tests - upload, Tax Year, 2030 to 2031 (not Live)"]
 
-Validate release summary tab has correct details
-    [Tags]  HappyPath
-    user waits until page contains element    xpath://h2[text()="Release summary"]
-    user checks summary list item "Publication title" should be "UI tests - upload"
-    user checks summary list item "Time period" should be "Tax Year"
-    user checks summary list item "Release period" should be "2030 to 2031"
-    user checks summary list item "Lead statistician" should be "Mark Pearson"
-    user checks summary list item "Scheduled release" should be "01 January 2030"
-    user checks summary list item "Next release expected" should be "01 January 2031"
-    user checks summary list item "Release type" should be "Ad Hoc"
-
 Navigate to Manage data tab
     [Tags]  HappyPath
     user clicks element  xpath://li/a[text()="Manage data"]
@@ -42,6 +33,9 @@ Navigate to Manage data tab
     choose file  css:#dataFileUploadForm-dataFile  ${CURDIR}${/}files${/}upload-file-test.csv
     choose file  css:#dataFileUploadForm-metadataFile  ${CURDIR}${/}files${/}upload-file-test.meta.csv
     user clicks button  Upload data files
+
+# Upload data csvs
+# Upload ancillary files
 
 Verify file uploaded details
     [Tags]  HappyPath

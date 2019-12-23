@@ -172,6 +172,9 @@ Refresh page, select new data block, verify selections
     user checks results table cell contains   2     1     26.9%
     user checks results table cell contains   3     1     40.1%
 
+Edit data block
+    [Tags]  HappyPath  UnderConstruction
+
 Delete data block
     [Tags]  HappyPath   UnderConstruction
     user clicks button   Delete this data block
