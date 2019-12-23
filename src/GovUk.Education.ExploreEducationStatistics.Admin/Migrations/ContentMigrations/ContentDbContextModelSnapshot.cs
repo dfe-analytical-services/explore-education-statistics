@@ -2487,6 +2487,139 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         });
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04"),
+                            Email = "analyst1@example.com",
+                            FirstName = "Analyst1",
+                            LastName = "User1"
+                        },
+                        new
+                        {
+                            Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62"),
+                            Email = "analyst2@example.com",
+                            FirstName = "Analyst2",
+                            LastName = "User2"
+                        },
+                        new
+                        {
+                            Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a"),
+                            Email = "analyst3@example.com",
+                            FirstName = "Analyst3",
+                            LastName = "User3"
+                        },
+                        new
+                        {
+                            Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                            Email = "bau1@example.com",
+                            FirstName = "Bau1",
+                            LastName = "User1"
+                        },
+                        new
+                        {
+                            Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63"),
+                            Email = "bau2@example.com",
+                            FirstName = "Bau2",
+                            LastName = "User2"
+                        });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserReleaseRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserReleaseRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1501265c-979b-4cd4-8a55-00bfe909a2da"),
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            Role = "Contributor",
+                            UserId = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04")
+                        },
+                        new
+                        {
+                            Id = new Guid("086b1354-473c-48bb-9d30-0ac1963dc4cb"),
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            Role = "Lead",
+                            UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
+                        },
+                        new
+                        {
+                            Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            Role = "Contributor",
+                            UserId = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04")
+                        },
+                        new
+                        {
+                            Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            Role = "Contributor",
+                            UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
+                        },
+                        new
+                        {
+                            Id = new Guid("f7884899-baf9-4009-8561-f0c5df0d0a69"),
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            Role = "Lead",
+                            UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
+                        },
+                        new
+                        {
+                            Id = new Guid("77ff439d-e1cd-4e50-9c25-24a5207953a5"),
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            Role = "Contributor",
+                            UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
+                        },
+                        new
+                        {
+                            Id = new Guid("b00fd7c0-226f-474d-8cec-820a1a789182"),
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            Role = "Lead",
+                            UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
+                        });
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", b =>
                 {
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
@@ -3627,6 +3760,21 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("Updates")
                         .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserReleaseRole", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

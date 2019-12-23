@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
 {
+    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IContentService
     {
         Task<Either<ValidationResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(

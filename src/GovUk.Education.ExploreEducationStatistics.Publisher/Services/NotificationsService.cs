@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -25,19 +27,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _storageConnectionString = config.GetConnectionString("NotificationStorage");
         }
 
-        public async Task NotifySubscribersAsync(Guid publicationId)
+        public async Task NotifySubscribersAsync(IEnumerable<Guid> releaseIds)
         {
-            var publication = await GetPublicationAsync(publicationId);
+            var publications = GetPublications(releaseIds);
             var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, QueueName);
-            await queue.AddMessageAsync(
-                ToCloudQueueMessage(BuildPublicationNotificationMessage(publication)));
+            var messages = publications.Select(BuildPublicationNotificationMessage);
+
+            foreach (var message in messages)
+            {
+                await queue.AddMessageAsync(ToCloudQueueMessage(message));
+            }
         }
 
-        private Task<Publication> GetPublicationAsync(Guid publicationId)
+        private IEnumerable<Publication> GetPublications(IEnumerable<Guid> releaseIds)
         {
-            return _context.Publications
+            return _context.Releases
                 .AsNoTracking()
-                .SingleAsync(publication => publication.Id == publicationId);
+                .Where(release => releaseIds.Contains(release.Id))
+                .Select(release => release.Publication)
+                .Distinct();
         }
 
         private static PublicationNotificationMessage BuildPublicationNotificationMessage(Publication publication)

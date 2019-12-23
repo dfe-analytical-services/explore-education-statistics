@@ -14,7 +14,9 @@ import {
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -116,4 +118,4 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default ReleaseSummaryPage;
+export default withErrorControl(ReleaseSummaryPage);

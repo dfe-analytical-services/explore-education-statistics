@@ -6,6 +6,7 @@
 Run 'python run_tests.py -h' to see argument options
 """
 
+import sys
 import os
 import argparse
 from robot import run_cli as robot_run_cli
@@ -122,7 +123,11 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
     else:
         print('Logging in to obtain authentication information...', end='', flush=True)
         # NOTE(mark): Because you cannot import from a parent dir, we do this...
-        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+        if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
+            f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+        elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):  # For pipeline
+            f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
+        assert f is not None, 'Failed to open file get_auth_tokens.py!'
         get_auth_tokens_script = f.read()
         globals()['__name__'] = '__test_runner__'
         exec(get_auth_tokens_script, globals(), locals())

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public string Title { get; set; }
 
-        public DateTime NextUpdate { get; set; }
+        public DateTime? NextUpdate { get; set; }
 
         public List<ReleaseViewModel> Releases { get; set; }
         

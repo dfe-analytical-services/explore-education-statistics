@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
                 CopyMethod.ServiceSideAsyncCopy, options, context);
 
-            ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
+            await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
