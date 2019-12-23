@@ -5,16 +5,47 @@ CREATE TYPE IdListIntegerType AS TABLE
 
 CREATE TYPE IdListVarcharType AS TABLE
 (
-    id varchar(max)
+    id VARCHAR(max)
 );
 
 CREATE TYPE TimePeriodListType AS TABLE
 (
     year INT,
-    timeIdentifier varchar(6)
+    timeIdentifier VARCHAR(6)
 );
 
 CREATE TYPE IdListGuidType AS TABLE
 (
-    id uniqueidentifier
+    id UNIQUEIDENTIFIER
 );
+
+CREATE TYPE ThemeType AS TABLE(
+  Id UNIQUEIDENTIFIER NOT NULL,
+  Title VARCHAR (MAX) NOT NULL,
+  Slug VARCHAR(MAX) NOT NULL
+);
+
+CREATE TYPE dbo.TopicType AS TABLE(
+  Id UNIQUEIDENTIFIER NOT NULL,
+  Title VARCHAR(MAX) NOT NULL,
+  Slug VARCHAR(MAX) NOT NULL,
+  ThemeId UNIQUEIDENTIFIER NOT NULL
+);
+
+CREATE TYPE dbo.PublicationType AS TABLE(
+  Id UNIQUEIDENTIFIER NOT NULL,
+  Title VARCHAR(MAX) NOT NULL,
+  Slug VARCHAR(MAX) NOT NULL,
+  TopicId UNIQUEIDENTIFIER NOT NULL
+);
+
+CREATE TYPE dbo.ReleaseType AS TABLE(
+    Id UNIQUEIDENTIFIER NOT NULL,
+    Title VARCHAR(MAX) NOT NULL,
+    ReleaseDate DATETIME2 NOT NULL,
+    Slug VARCHAR(MAX) NOT NULL,
+    PublicationId UNIQUEIDENTIFIER NOT NULL
+);
+
+
+
