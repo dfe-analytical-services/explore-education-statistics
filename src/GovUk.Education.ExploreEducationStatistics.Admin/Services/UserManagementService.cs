@@ -33,9 +33,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<bool> InviteAsync(string email)
         {
-            if (_context.Users.Any(u => u.Email == email)) return false;
-            
-            return true;
+            if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
+
+            try
+            {
+                // TODO: add user to user invite table
+                
+                // TODO: send invite email via notify
+                
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

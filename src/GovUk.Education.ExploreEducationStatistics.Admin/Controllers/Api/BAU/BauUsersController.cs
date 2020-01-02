@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,11 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
         [HttpPost("bau/users/invite")]
-        public async Task<ActionResult> GetUserList(string email)
+        public async Task<ActionResult> GetUserList(UserInvite userInvite)
         {
-            var invite = await _userManagementService.InviteAsync(email);
+            var invite = await _userManagementService.InviteAsync(userInvite.Email);
 
             if (invite)
             {

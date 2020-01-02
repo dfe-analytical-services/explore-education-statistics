@@ -4,4 +4,7 @@ export interface UserStatus {
   email: string;
 }
 
+export interface UserInvite {
+  email: string;
+}
 export default {};

@@ -2,6 +2,8 @@ import React from 'react';
 import Page from '@admin/components/Page';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@admin/components/Link';
+import userService from '@admin/services/users/service';
+import { UserInvite } from '@admin/services/users/types';
 import { RouteComponentProps } from 'react-router';
 import withErrorControl, {
   ErrorControlProps,
@@ -36,7 +38,13 @@ const UserInvitePage = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
-      //history.push(`/methodology/${createdMethodology.id}`);
+      const submission: UserInvite = {
+        email: values.userEmail,
+      };
+
+      const invite = await userService.inviteUser(submission);
+
+      history.push(`/administration/users`);
     },
     handleApiErrors,
     ...errorCodeMappings,
