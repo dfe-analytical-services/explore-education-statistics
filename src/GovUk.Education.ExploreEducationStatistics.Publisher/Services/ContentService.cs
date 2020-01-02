@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // TODO delete all existing publications and methodologies?
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
-                .Select(publication => publication.MethodologyId.Value);
+                .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
@@ -55,7 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 }
             }
 
-            // TODO remove dups?
             foreach (var methodologyId in methodologyIds)
             {
                 await UpdateMethodology(methodologyId);
