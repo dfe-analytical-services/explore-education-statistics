@@ -65,6 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Note that if we allow users to update profile details like First Name / Last Name etc, we'll need to 
+            // make updates to the "User" entity that bears this User's Id as well (this entity is initially created
+            // with a copy of a set of profile information in "ExternalLogin.cshtml.cs".
+            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

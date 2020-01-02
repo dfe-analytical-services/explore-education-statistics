@@ -146,6 +146,16 @@ const ChartAxisConfiguration = ({
     });
   };
 
+  const getTickSpacing = (): number => {
+    if (axisConfiguration) {
+      const { tickSpacing } = axisConfiguration;
+      if (tickSpacing) {
+        return Number(tickSpacing);
+      }
+    }
+    return 1;
+  };
+
   React.useEffect(() => {
     setAxisConfiguration(configuration);
     setSortOptions(getSortOptions(labels));
@@ -348,18 +358,12 @@ const ChartAxisConfiguration = ({
                           type="number"
                           width={10}
                           label="Every nth value"
-                          defaultValue="1"
+                          defaultValue={`${getTickSpacing()}`}
                           onChange={e => {
-                            if (
-                              parseInt(e.target.value, 10) > 0 &&
-                              e.target.value !== ''
-                            ) {
+                            const theValue = parseInt(e.target.value, 10);
+                            if (theValue > 0 && e.target.value !== '') {
                               updateAxisConfiguration({
-                                tickSpacing: e.target.value,
-                              });
-                            } else if (e.target.value === '') {
-                              updateAxisConfiguration({
-                                tickSpacing: '1',
+                                tickSpacing: `${theValue}`,
                               });
                             }
                           }}

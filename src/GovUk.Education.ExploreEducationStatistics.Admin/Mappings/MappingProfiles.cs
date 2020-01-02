@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
+using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -51,6 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
+
+            CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
+                .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
             
             CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
             CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
@@ -62,7 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(summary => summary.Release.Status));
 
             CreateMap<Methodology, MethodologyViewModel>();
-
+            CreateMap<Methodology, MethodologyStatusViewModel>();
+            CreateMap<Publication, MethodologyStatusPublications>();
+            
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.ThemeId,
@@ -72,13 +80,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
-            CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
-                .ForMember(dest => dest.Contact, 
-                    m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(
-                    dest => dest.PublicationTitle,
-                    m => m.MapFrom(r => r.Publication.Title));
+            CreateMap<Topic, ApiTopicViewModel>();
 
+            CreateMap<CommentState, string>().ConvertUsing(s => s.GetEnumValue());
+
+            CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
+                .ForMember(dest => dest.Content, 
+                    m => m.MapFrom(r => 
+                        r.GenericContent
+                            .Select(ContentSectionViewModel.ToViewModel)
+                            .OrderBy(s => s.Order)))
+                .ForMember(dest => dest.SummarySection, 
+                    m => m.MapFrom(r => 
+                        ContentSectionViewModel.ToViewModel(r.SummarySection)))
+                .ForMember(dest => dest.HeadlinesSection, 
+                    m => m.MapFrom(r => 
+                        ContentSectionViewModel.ToViewModel(r.HeadlinesSection)))
+                .ForMember(dest => dest.KeyStatisticsSection, 
+                    m => m.MapFrom(r => 
+                        ContentSectionViewModel.ToViewModel(r.KeyStatisticsSection)))
+                .ForMember(dest => dest.KeyStatisticsSecondarySection, 
+                    m => m.MapFrom(r => 
+                        ContentSectionViewModel.ToViewModel(r.KeyStatisticsSecondarySection)))
+                .ForMember(
+                    dest => dest.Updates,
+                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
+                .ForMember(dest => dest.Publication,
+                    m => m.MapFrom(r => new ViewModels.ManageContent.PublicationViewModel
+                    {
+                        Id = r.Publication.Id,
+                        Description = r.Publication.Description,
+                        Title = r.Publication.Title,
+                        Slug = r.Publication.Slug,
+                        Summary = r.Publication.Summary,
+                        DataSource = r.Publication.DataSource,
+                        Contact = r.Publication.Contact,
+                        NextUpdate = r.Publication.NextUpdate,
+                        Topic = new ManageContentTopicViewModel
+                        {
+                            Theme = new ThemeViewModel
+                            {
+                                Title = r.Publication.Topic.Theme.Title
+                            } 
+                        },
+                        Releases = r.Publication.Releases
+                            .FindAll(otherRelease => otherRelease.Id != r.Id)    
+                            .Select(otherRelease => new PreviousReleaseViewModel
+                            {
+                                Id = otherRelease.Id,
+                                Slug = otherRelease.Slug,
+                                Title = otherRelease.Title,
+                                ReleaseName = otherRelease.ReleaseName
+                            })
+                            .ToList(),
+                        LegacyReleases = r.Publication.LegacyReleases
+                            .Select(legacy => new BasicLink
+                            {
+                                Id = legacy.Id,
+                                Description = legacy.Description,
+                                Url = legacy.Url
+                            })
+                            .ToList(),
+                        Methodology = r.Publication.Methodology != null 
+                            ? new MethodologyViewModel
+                                {
+                                    Id = r.Publication.Methodology.Id,
+                                    Title = r.Publication.Methodology.Title
+                                } 
+                            : null
+                    }))
+                .ForMember(
+                    dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+            
+            CreateMap<Update, ReleaseNoteViewModel>();
+
+            CreateMap<Comment, CommentViewModel>()
+                .ForMember(
+                    dest => dest.State,
+                    m => m.MapFrom(c => c.State.GetEnumValue())
+                );
+            
         }
     }
 }

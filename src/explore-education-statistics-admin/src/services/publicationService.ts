@@ -8,11 +8,14 @@ import {
 
 import { DataBlockRequest } from '@common/services/dataBlockService';
 
+export type CommentState = 'open' | 'resolved';
+
 export interface ExtendedComment {
+  id: string;
   name: string;
   time: Date;
-  comment: string;
-  state?: 'open' | 'resolved';
+  commentText: string;
+  state?: CommentState;
   resolvedBy?: string;
   resolvedOn?: Date;
 }

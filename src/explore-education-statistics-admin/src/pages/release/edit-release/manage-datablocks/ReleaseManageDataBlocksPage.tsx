@@ -2,14 +2,17 @@
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockService, {
+import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -22,7 +25,9 @@ interface DataBlockData {
   dataBlockResponse: DataBlockResponse;
 }
 
-const ReleaseManageDataBlocksPage = () => {
+const ReleaseManageDataBlocksPage = ({
+  handleApiErrors,
+}: ErrorControlProps) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
@@ -38,9 +43,10 @@ const ReleaseManageDataBlocksPage = () => {
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
   const updateDataBlocks = (rId: string) => {
-    return DataBlocksService.getDataBlocks(rId).then(blocks => {
-      setDataBlocks(blocks);
-    });
+    return dataBlocksService
+      .getDataBlocks(rId)
+      .then(setDataBlocks)
+      .catch(handleApiErrors);
   };
 
   React.useEffect(() => {
@@ -59,9 +65,11 @@ const ReleaseManageDataBlocksPage = () => {
   const onDeleteDataBlock = (db: DataBlock) => {
     setDeleteDataBlock(undefined);
     if (db.id) {
-      DataBlocksService.deleteDataBlock(db.id)
+      dataBlocksService
+        .deleteDataBlock(db.id)
         .then(() => updateDataBlocks(releaseId))
-        .then(() => setSelectedDataBlock(''));
+        .then(() => setSelectedDataBlock(''))
+        .catch(handleApiErrors);
     }
   };
 
@@ -70,6 +78,8 @@ const ReleaseManageDataBlocksPage = () => {
     releaseId: string,
     selectedDataBlockId: string,
   ) => {
+    // Load's the datablock of 'selectedDataBlockId' in datablock form
+
     setIsLoading(true);
 
     if (!selectedDataBlockId) return {};
@@ -81,7 +91,9 @@ const ReleaseManageDataBlocksPage = () => {
     const request = db.dataBlockRequest;
     if (request === undefined) return {};
 
-    const response = await DataBlockService.getDataBlockForSubject(request);
+    const response = await dataBlockService
+      .getDataBlockForSubject(request)
+      .catch(handleApiErrors);
 
     if (response === undefined) return {};
 
@@ -120,8 +132,8 @@ const ReleaseManageDataBlocksPage = () => {
 
         load(dataBlocks, releaseId, selectedDataBlockId).then(
           ({ dataBlock, response: dataBlockResponse }) => {
-            if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-              if (dataBlock && dataBlockResponse) {
+            if (dataBlock && dataBlockResponse) {
+              if (dataBlock.id === selectedDataBlockId) {
                 setDataBlockData({
                   dataBlock,
                   dataBlockResponse,
@@ -147,13 +159,17 @@ const ReleaseManageDataBlocksPage = () => {
       let newDataBlocksList;
 
       if (db.id) {
-        newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+        newDataBlock = await dataBlocksService
+          .putDataBlock(db.id, db)
+          .catch(handleApiErrors);
         newDataBlocksList = [
           ...dataBlocks.filter(db => db.id !== selectedDataBlock),
           newDataBlock,
         ];
       } else {
-        newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+        newDataBlock = await dataBlocksService
+          .postDataBlock(releaseId, db)
+          .catch(handleApiErrors);
         newDataBlocksList = [...dataBlocks, newDataBlock];
       }
       setDataBlocks(newDataBlocksList);
@@ -165,7 +181,7 @@ const ReleaseManageDataBlocksPage = () => {
 
       return newDataBlock;
     },
-    [dataBlocks, doLoad, releaseId, selectedDataBlock],
+    [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
   );
 
   React.useEffect(() => {
@@ -272,4 +288,4 @@ const ReleaseManageDataBlocksPage = () => {
   );
 };
 
-export default ReleaseManageDataBlocksPage;
+export default withErrorControl(ReleaseManageDataBlocksPage);

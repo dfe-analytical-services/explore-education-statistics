@@ -1,13 +1,17 @@
+import ImporterStatus from '@admin/components/ImporterStatus';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
+import { ImportStatusCode } from '@admin/services/release/imports/types';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -15,8 +19,6 @@ import Yup from '@common/lib/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import ImporterStatus from '@admin/components/ImporterStatus';
-import { ImportStatusCode } from '@admin/services/release/imports/types';
 
 interface FormValues {
   subjectTitle: string;
@@ -42,13 +44,20 @@ const emptyDataFile: DataFile = {
   created: new Date(),
 };
 
-const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
+const ReleaseDataUploadsSection = ({
+  publicationId,
+  releaseId,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
 
   useEffect(() => {
-    service.getReleaseDataFiles(releaseId).then(setDataFiles);
-  }, [publicationId, releaseId]);
+    service
+      .getReleaseDataFiles(releaseId)
+      .then(setDataFiles)
+      .catch(handleApiErrors);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -60,7 +69,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         fileInput.value = '';
       });
 
-    const files = await service.getReleaseDataFiles(releaseId);
+    const files = await service
+      .getReleaseDataFiles(releaseId)
+      .catch(handleApiErrors);
+
     setDataFiles(files);
   };
 
@@ -82,7 +94,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     setDataFiles(updatedDataFiles);
   };
 
-  const handleServerValidation = handleServerSideValidation(
+  const errorCodeMappings = [
     errorCodeToFieldError(
       'CANNOT_OVERWRITE_DATA_FILE',
       'dataFile',
@@ -99,22 +111,22 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'Choose a different file name for data and metadata files',
     ),
     errorCodeToFieldError(
-      'DATA_FILE_CAN_NOT_BE_EMPTY',
+      'DATA_FILE_CANNOT_BE_EMPTY',
       'dataFile',
       'Choose a data file that is not empty',
     ),
     errorCodeToFieldError(
-      'METADATA_FILE_CAN_NOT_BE_EMPTY',
+      'METADATA_FILE_CANNOT_BE_EMPTY',
       'metadataFile',
       'Choose a metadata file that is not empty',
     ),
     errorCodeToFieldError(
-      'DATA_FILE_MUST_BE_A_CSV_FILE',
+      'DATA_FILE_MUST_BE_CSV_FILE',
       'dataFile',
       'Data file must be a csv file',
     ),
     errorCodeToFieldError(
-      'META_FILE_MUST_BE_A_CSV_FILE',
+      'META_FILE_MUST_BE_CSV_FILE',
       'metadataFile',
       'Meta file must be a csv file',
     ),
@@ -123,6 +135,20 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'subjectTitle',
       'Subject title must be unique',
     ),
+  ];
+
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
+    async (values, actions) => {
+      await service.uploadDataFiles(releaseId, {
+        subjectTitle: values.subjectTitle,
+        dataFile: values.dataFile as File,
+        metadataFile: values.metadataFile as File,
+      });
+
+      await resetPage(actions);
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
   );
 
   return (
@@ -133,15 +159,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         dataFile: null,
         metadataFile: null,
       }}
-      onSubmit={async (values: FormValues, actions) => {
-        await service.uploadDataFiles(releaseId, {
-          subjectTitle: values.subjectTitle,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        });
-
-        await resetPage(actions);
-      }}
+      onSubmit={submitFormHandler}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')
@@ -162,7 +180,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
-          <Form id={formId} submitValidationHandler={handleServerValidation}>
+          <Form id={formId}>
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Add new data to release"
@@ -220,24 +238,31 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <h4 className="govuk-heading-m">{dataFile.title}</h4>
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  <a
-                    href={service.createDownloadDataFileLink(
-                      releaseId,
-                      dataFile.filename,
-                    )}
+                  <Link
+                    to="#"
+                    onClick={() =>
+                      service
+                        .downloadDataFile(releaseId, dataFile.filename)
+                        .catch(handleApiErrors)
+                    }
                   >
                     {dataFile.filename}
-                  </a>
+                  </Link>
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  <a
-                    href={service.createDownloadDataMetadataFileLink(
-                      releaseId,
-                      dataFile.metadataFilename,
-                    )}
+                  <Link
+                    to="#"
+                    onClick={() =>
+                      service
+                        .downloadDataMetadataFile(
+                          releaseId,
+                          dataFile.metadataFilename,
+                        )
+                        .catch(handleApiErrors)
+                    }
                   >
                     {dataFile.metadataFilename}
-                  </a>
+                  </Link>
                 </SummaryListItem>
                 <SummaryListItem term="Data file size">
                   {dataFile.fileSize.size.toLocaleString()}{' '}
@@ -281,6 +306,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               onConfirm={async () => {
                 await service
                   .deleteDataFiles(releaseId, deleteDataFile)
+                  .catch(handleApiErrors)
                   .finally(() => {
                     setDeleteDataFile(emptyDataFile);
                     resetPage(form);
@@ -298,4 +324,4 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   );
 };
 
-export default ReleaseDataUploadsSection;
+export default withErrorControl(ReleaseDataUploadsSection);

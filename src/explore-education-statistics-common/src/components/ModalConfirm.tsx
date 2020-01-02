@@ -27,10 +27,10 @@ const ModalConfirm = ({
     <Modal focusDialog title={title} onExit={onExit} mounted={mounted}>
       {children}
 
-      <Button onClick={onConfirm}>{confirmText}</Button>
       <Button variant="secondary" onClick={onCancel}>
         {cancelText}
       </Button>
+      <Button onClick={onConfirm}>{confirmText}</Button>
     </Modal>
   );
 };

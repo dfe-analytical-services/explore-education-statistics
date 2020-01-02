@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using TopicId = System.Guid;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -20,15 +25,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
             _mapper = mapper;
         }
-        
+
+        public async Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(
+            CreateMethodologyViewModel methodology)
+        {
+            return await ValidateMethodologySlugUnique(methodology.Slug)
+                .OnSuccess(async () =>
+                {
+            var model = new Methodology
+            {
+                Title = methodology.Title,
+                Slug = methodology.Slug,
+                PublishScheduled = methodology.PublishScheduled
+            };
+
+            var saved = _context.Methodologies.Add(model);
+            await _context.SaveChangesAsync();
+
+            return await GetAsync(saved.Entity.Id);
+                });
+
+        }
+
+        public async Task<MethodologyViewModel> GetAsync(Guid id)
+        {
+            var result = await _context.Methodologies.FirstOrDefaultAsync(m => m.Id == id);
+            return _mapper.Map<MethodologyViewModel>(result);
+        }
+
         public async Task<List<MethodologyViewModel>> ListAsync()
         {
             var result = await _context.Methodologies.ToListAsync();
             return _mapper.Map<List<MethodologyViewModel>>(result);
-            
         }
-        
-        public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId)
+
+        public async Task<List<MethodologyStatusViewModel>> ListStatusAsync()
+        {
+            var result = await _context.Methodologies
+                .Include(m => m.Publications)
+                .OrderBy(m => m.Title)
+                .ToListAsync();
+
+            return _mapper.Map<List<MethodologyStatusViewModel>>(result);
+        }
+
+        public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId)
         {
             var methodologies = await _context.Publications
                 .Where(p => p.TopicId == topicId)
@@ -37,6 +78,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Distinct()
                 .ToListAsync();
             return _mapper.Map<List<MethodologyViewModel>>(methodologies);
+        }
+        
+        private async Task<Either<ValidationResult, bool>> ValidateMethodologySlugUnique(string slug)
+        {
+            if (await _context.Methodologies.AnyAsync(r => r.Slug == slug))
+            {
+                return new ValidationResult(ValidationErrorMessages.SlugNotUnique.ToString());
+            }
+
+            return true;
         }
     }
 }

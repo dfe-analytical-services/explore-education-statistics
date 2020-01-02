@@ -155,7 +155,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form id={formId}>
+          <Form id={formId} displayErrorMessageOnUncaughtErrors>
             <FormFieldset id={`${formId}-timePeriod`} legend={stepHeading}>
               <FormFieldSelect
                 name="start"

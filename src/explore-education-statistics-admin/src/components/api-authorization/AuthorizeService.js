@@ -16,18 +16,26 @@ export class AuthorizeService {
   _popUpDisabled = true;
 
   async isAuthenticated() {
-    const user = await this.getUser();
-    return !!user;
+    await this.ensureUserManagerInitialized();
+    const user = await this.userManager.getUser();
+    if (user) {
+      const expired =
+        new Date(
+          `${user.expires_at}${user.expires_at.length === 10 && '000'}`,
+        ) < new Date();
+      return !expired;
+    }
+    return false;
   }
 
   async getUser() {
-    if (this._user && this._user.profile) {
-      return this._user.profile;
+    if (this._user) {
+      return this._user;
     }
 
     await this.ensureUserManagerInitialized();
     const user = await this.userManager.getUser();
-    return user && user.profile;
+    return user;
   }
 
   async getAccessToken() {

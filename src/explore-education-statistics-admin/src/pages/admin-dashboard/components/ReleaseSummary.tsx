@@ -1,12 +1,8 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import {
   getReleaseStatusLabel,
   getReleaseSummaryLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
-import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
-} from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   Comment,
@@ -15,6 +11,10 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/services/publicationService';
 import { format } from 'date-fns';
 import React, { ReactNode, useContext } from 'react';
 

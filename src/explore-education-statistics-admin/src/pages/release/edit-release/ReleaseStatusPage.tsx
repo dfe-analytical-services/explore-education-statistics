@@ -2,13 +2,16 @@ import Link from '@admin/components/Link';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import dashboardRoutes from '@admin/routes/dashboard/routes';
-import { ReleaseStatus } from '@admin/services/dashboard/types';
+import appRouteList from '@admin/routes/dashboard/routes';
 import service from '@admin/services/release/edit-release/status/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/lib/validation/yup';
+import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -18,14 +21,20 @@ interface FormValues {
   internalReleaseNote: string;
 }
 
-const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
+const ReleaseStatusPage = ({
+  history,
+  handleApiErrors,
+}: RouteComponentProps & ErrorControlProps) => {
   const [releaseStatus, setReleaseStatus] = useState<ReleaseStatus>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   useEffect(() => {
-    service.getReleaseStatus(releaseId).then(setReleaseStatus);
-  }, [releaseId]);
+    service
+      .getReleaseStatus(releaseId)
+      .then(setReleaseStatus)
+      .catch(handleApiErrors);
+  }, [releaseId, handleApiErrors]);
 
   const formId = 'releaseStatusForm';
 
@@ -42,8 +51,11 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
             internalReleaseNote: '',
           }}
           onSubmit={async (values: FormValues) => {
-            await service.updateReleaseStatus(releaseId, values);
-            history.push(dashboardRoutes.adminDashboard);
+            await service
+              .updateReleaseStatus(releaseId, values)
+              .catch(handleApiErrors);
+
+            history.push(appRouteList.adminDashboard.path as string);
           }}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
@@ -98,4 +110,4 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
   );
 };
 
-export default ReleaseStatusPage;
+export default withErrorControl(ReleaseStatusPage);

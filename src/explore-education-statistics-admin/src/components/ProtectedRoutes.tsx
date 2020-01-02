@@ -1,5 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
@@ -31,12 +31,14 @@ const ProtectedRoutes = ({ children }: Props) => {
       await authService
         .getUser()
         .then(userProfile => {
+          const { profile } = userProfile;
           const user: User = {
-            id: userProfile.sub,
-            name: userProfile.given_name,
-            permissions: userProfile.role
-              ? (userProfile.role as string).split(',')
+            id: profile.sub,
+            name: profile.given_name,
+            permissions: profile.role
+              ? (profile.role as string).split(',')
               : [],
+            validToken: new Date() < new Date(userProfile.expires_at * 1000),
           };
 
           setAuthState({
@@ -87,14 +89,10 @@ const ProtectedRoutes = ({ children }: Props) => {
   };
 
   return authState.ready ? (
-    <>
-      <LoginContext.Provider value={authenticationContext}>
-        {children}
-      </LoginContext.Provider>
-    </>
-  ) : (
-    <></>
-  );
+    <LoginContext.Provider value={authenticationContext}>
+      {children}
+    </LoginContext.Provider>
+  ) : null;
 };
 
 export default ProtectedRoutes;

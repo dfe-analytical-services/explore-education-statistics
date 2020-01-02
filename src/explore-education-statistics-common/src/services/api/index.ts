@@ -10,6 +10,7 @@ export const baseUrl = {
   function: process.env.FUNCTION_API_BASE_URL,
 };
 
+// EES-704 - revisit to find a better way to configure Clients used in the common project
 const configureAxios = (axiosInstance: AxiosInstance) => {
   // @ts-ignore
   if (typeof window !== 'undefined' && window.axiosConfigurer) {

@@ -2,7 +2,7 @@ import PrototypeDashboardRelease from '@admin/pages/prototypes/components/Protot
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { FormGroup, FormSelect } from '@common/components/form';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import React from 'react';
 import useToggle from '@common/hooks/useToggle';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -227,7 +227,7 @@ const PrototypeAdminDashboardPublications = () => {
                 to="/prototypes/publication-assign-methodology"
                 className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
               >
-                Manage methodology
+                Assign methodology
               </Link>
             </div>
             {userContext.user && userContext.user.permissions.includes('bau') && (
@@ -309,7 +309,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/publication-assign-methodology"
             className="govuk-button govuk-button--secondary"
           >
-            Manage methodology
+            Assign methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -380,7 +380,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/publication-assign-methodology"
             className="govuk-button govuk-button--secondary"
           >
-            Manage methodology
+            Assign methodology
           </Link>
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (

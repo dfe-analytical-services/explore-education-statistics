@@ -125,7 +125,7 @@ const FootnoteForm = ({
                 >
                   <p>Select either one or multiple subject areas from below</p>
                   {Object.entries(footnoteMeta)
-                    .sort(function(a, b) {
+                    .sort((a, b) => {
                       const textA = a[1].subjectName.toUpperCase();
                       const textB = b[1].subjectName.toUpperCase();
                       return textA < textB ? -1 : 1;

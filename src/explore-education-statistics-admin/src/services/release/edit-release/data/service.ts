@@ -1,45 +1,13 @@
-import client, { baseURL } from '@admin/services/util/service';
+import client from '@admin/services/util/service';
 
 import {
   AncillaryFile,
-  DataFile,
   ChartFile,
+  DataFile,
   UploadAncillaryFileRequest,
-  UploadDataFilesRequest,
   UploadChartFileRequest,
+  UploadDataFilesRequest,
 } from './types';
-
-export interface EditReleaseService {
-  getReleaseDataFiles: (releaseId: string) => Promise<DataFile[]>;
-  uploadDataFiles: (
-    releaseId: string,
-    request: UploadDataFilesRequest,
-  ) => Promise<null>;
-  deleteDataFiles: (releaseId: string, dataFile: DataFile) => Promise<null>;
-  createDownloadDataFileLink: (releaseId: string, fileId: string) => string;
-  createDownloadDataMetadataFileLink: (
-    releaseId: string,
-    fileId: string,
-  ) => string;
-  getAncillaryFiles: (releaseId: string) => Promise<AncillaryFile[]>;
-  uploadAncillaryFile: (
-    releaseId: string,
-    request: UploadAncillaryFileRequest,
-  ) => Promise<null>;
-  deleteAncillaryFile: (releaseId: string, fileId: string) => Promise<null>;
-  createDownloadAncillaryFileLink: (
-    releaseId: string,
-    fileId: string,
-  ) => string;
-
-  getChartFiles: (releaseId: string) => Promise<ChartFile[]>;
-  uploadChartFile: (
-    releaseId: string,
-    request: UploadChartFileRequest,
-  ) => Promise<null>;
-
-  createDownloadChartFileLink: (releaseId: string, fileName: string) => string;
-}
 
 interface GetFileResponse {
   extension: string;
@@ -55,11 +23,21 @@ interface GetFileResponse {
 const getFileNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1);
 
+const downloadFile = (blob: Blob, fileName: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
 /**
  * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
  */
 
-const service: EditReleaseService = {
+const service = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<GetFileResponse[]>(`/release/${releaseId}/data`)
@@ -104,14 +82,26 @@ const service: EditReleaseService = {
       `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}`,
     );
   },
-  createDownloadDataFileLink(releaseId: string, fileName: string): string {
-    return `${baseURL}release/${releaseId}/data/${fileName}`;
+  downloadDataFile(releaseId: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
   },
-  createDownloadDataMetadataFileLink(
-    releaseId: string,
-    fileName: string,
-  ): string {
-    return `${baseURL}release/${releaseId}/data/${fileName}`;
+  downloadDataMetadataFile(releaseId: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
+  },
+  downloadFile(path: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${path}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
   },
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
@@ -141,8 +131,12 @@ const service: EditReleaseService = {
   deleteAncillaryFile(releaseId: string, fileName: string): Promise<null> {
     return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
   },
-  createDownloadAncillaryFileLink(releaseId: string, fileName: string): string {
-    return `${baseURL}release/${releaseId}/ancillary/${fileName}`;
+  downloadAncillaryFile(releaseId: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${releaseId}/ancillary/${fileName}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
   },
 
   async getChartFiles(releaseId: string) {
@@ -168,7 +162,13 @@ const service: EditReleaseService = {
       data,
     );
   },
-
+  downloadChartFile(releaseId: string, fileName: string): Promise<void> {
+    return client
+      .get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
+        responseType: 'blob',
+      })
+      .then(response => downloadFile(response, fileName));
+  },
   createDownloadChartFileLink(releaseId: string, fileName: string): string {
     return `/api/release/${releaseId}/chart/${fileName}`;
   },

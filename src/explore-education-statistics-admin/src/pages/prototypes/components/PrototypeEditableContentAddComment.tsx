@@ -1,4 +1,4 @@
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
@@ -27,7 +27,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
 
   const context = React.useContext(LoginContext);
 
-  const addComment = (comment: string) => {
+  const addComment = (commentText: string) => {
     const user: User = context.user || {
       name: 'guest',
       id: 'guest',
@@ -35,7 +35,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
     };
 
     setComments([
-      { name: user.name, time: new Date(), comment, state: 'open' },
+      { id: '', name: user.name, time: new Date(), commentText, state: 'open' },
       ...comments,
     ]);
     setCurrentComment('');
@@ -82,7 +82,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
           <div className={styles.commentsContainer}>
             {comments.map(
               (
-                { name, time, comment, state, resolvedOn, resolvedBy },
+                { name, time, commentText, state, resolvedOn, resolvedBy },
                 index,
               ) => (
                 <div key={key()}>
@@ -90,7 +90,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
                     <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
                   </h2>
                   <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                    {comment}
+                    {commentText}
                   </p>
                   {state === 'open' && (
                     <button

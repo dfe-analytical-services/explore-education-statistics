@@ -67,12 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
 
             const string separator = "_";
-
-            // TODO avoid possibility of a collision between different types of codes
-
+            
             return string.Join(separator, observationalUnits
                 .Where(unit => unit != null)
-                .Select(unit => unit.Code));
+                .Select(unit => $"{unit.GetType()}:{(unit is LocalAuthority la ? la.GetCodeOrOldCodeIfEmpty() : unit.Code )}"));
         }
 
         private Location LookupOrCreate(
@@ -155,10 +153,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 location.Institution.Code ==
                 (institution != null ? institution.Code : null));
 
-            predicateBuilder = predicateBuilder.And(location =>
-                location.LocalAuthority.Code ==
-                (localAuthority != null ? localAuthority.Code : null));
-
+            // If no LA code then try using the old code
+            if (localAuthority != null && localAuthority.Code == null)
+            {
+                predicateBuilder = predicateBuilder.And(location =>
+                    location.LocalAuthority.OldCode ==
+                    (localAuthority != null && localAuthority.OldCode != null ? localAuthority.OldCode : null));
+            }
+            else
+            {
+                predicateBuilder = predicateBuilder.And(location =>
+                    location.LocalAuthority.Code ==
+                    (localAuthority != null && localAuthority.Code != null ? localAuthority.Code : null)); 
+            }
+        
             predicateBuilder = predicateBuilder.And(location =>
                 location.LocalAuthorityDistrict.Code ==
                 (localAuthorityDistrict != null ? localAuthorityDistrict.Code : null));

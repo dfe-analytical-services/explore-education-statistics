@@ -1,0 +1,1994 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscription": {
+      "type": "string",
+      "metadata": {
+        "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "ees",
+      "metadata": {
+        "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+      }
+    },
+    "envNumber": {
+      "type": "string",
+      "defaultValue": ""
+    },
+
+    "skuPublic": {
+      "type": "string",
+      "defaultValue": "B1 Basic",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
+    },
+    "skuData": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
+    },
+    "skuContent": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
+    },
+    "skuAdmin": {
+      "type": "string",
+      "defaultValue": "S3 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
+    },
+    "adminFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for the admin application"
+      }
+    },
+    "sqlFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for sql databases"
+      }
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The admin user of the SQL Server"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin user of the SQL Server"
+      }
+    },
+    "sqlAzureAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAzureAdministratorSid": {
+      "type": "string"
+    },
+    "secAlertRetentionDays": {
+      "defaultValue": "14",
+      "type": "string",
+      "metadata": {
+        "description": "Number of days to retain the security alerts for"
+      }
+    },
+    "sqlAuditing": {
+      "type": "bool",
+      "defaultValue": false
+    },
+
+    "publicAppBasicAuth": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppBasicAuthUsername": {
+      "type": "string",
+      "metadata": {
+        "descritpion": "Username protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppBasicAuthPassword": {
+      "type": "securestring",
+      "metadata": {
+        "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+
+    "verificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for verifing subscription"
+      }
+    },
+    "publicationNotificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new release notification"
+      }
+    },
+    "subscriptionConfirmationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for subscription confirmation"
+      }
+    },
+    "notifyApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service API key"
+      }
+    },
+    "notifyTokenSecretKey": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+
+    "teamEmailAddresses": {
+      "type": "array",
+      "defaultValue": [
+        "dfeteam@hiveit.co.uk",
+        "explore.statistics@education.gov.uk"
+      ],
+      "metadata": {
+        "description": "Email addresses for receiving alerts"
+      }
+    },
+
+    "departmentName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the Department name tag value e.g. Data Directorate"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production"
+      }
+    },
+    "subscriptionName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production"
+      }
+    },
+    "solutionName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES"
+      }
+    },
+    "costCentre": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown."
+      }
+    },
+    "serviceOwnerName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura"
+      }
+    },
+    "dateProvisioned": {
+      "type": "string",
+      "defaultValue": "[utcNow('u')]",
+      "metadata": {
+        "description": "Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value."
+      }
+    },
+    "createdBy": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul"
+      }
+    },
+    "deploymentRepo": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A"
+      }
+    },
+    "deploymentScript": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
+      }
+    },
+    "openIdConnectTenant": {
+      "type": "string"
+    },
+    "openIdConnectClientId": {
+      "type": "string"
+    },
+    "openIdConnectClientSecret": {
+      "type": "string"
+    },
+
+    "adminUri": {
+      "type": "string"
+    },
+
+    "minTlsVersion": {
+      "type": "string",
+      "defaultValue": "1.2",
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
+    },
+
+    "publishReleasesCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 0 0 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+      }
+    },
+
+    "publishReleaseContentCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 30 9 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+      }
+    }
+  },
+  "variables": {
+    "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
+    "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
+    "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
+    "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
+    "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-content')]",
+    "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
+    "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
+    "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
+    "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
+    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
+    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
+    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
+    "storageEnv": "[concat('ees', parameters('envNumber'))]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
+    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
+    "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
+    "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
+    "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
+    "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
+    "importerAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-importer')]",
+    "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
+    "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
+    "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
+    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
+    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+    "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
+    "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
+    "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
+    "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
+    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
+    "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "ipWhiteList": {
+      "copy": [
+        {
+          "name": "addresses",
+          "count": "[length(parameters('adminFirewallRules'))]",
+          "input": {
+            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
+            "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
+            "action": "Allow"
+          }
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('dataAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "type": "siteextensions",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+          ],
+          "properties": {
+          }
+        }
+      ],
+      "properties": {
+        "name": "[variables('dataAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "SeedConfig:BatchSize",
+              "value": "50"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            },
+            {
+              "name": "PublicStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
+              "type": "Custom"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
+      ]
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('dataAppName'), '/deploy')]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuData'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuData'), ' '))]"
+      },
+      "name": "[variables('dataPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('dataPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('dataAppInsights')]",
+      "apiVersion": "2014-04-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('dataAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('contentAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "type": "siteextensions",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
+          ],
+          "properties": {
+          }
+        }
+      ],
+      "properties": {
+        "name": "[variables('contentAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            },
+            {
+              "name": "PublicStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
+              "type": "Custom"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('contentAppInsights'))]"
+      ]
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('contentAppName'), '/deploy')]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuContent'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuContent'), ' '))]"
+      },
+      "name": "[variables('contentPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('contentPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('contentAppInsights')]",
+      "apiVersion": "2014-04-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('contentAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('adminAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "type": "siteextensions",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2016-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+          ],
+          "properties": {
+          }
+        }
+      ],
+      "properties": {
+        "name": "[variables('adminAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "AppInsights__InstrumentationKey",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "WEBSITE_LOAD_CERTIFICATES",
+              "value": "*"
+            },
+            {
+              "name": "ASPNETCORE_DETAILEDERRORS",
+              "value": "true"
+            },
+
+            {
+              "name": "IdentityServer:IssuerUri",
+              "value": "[concat('urn=', parameters('adminUri'))]"
+            },
+            {
+              "name": "IdentityServer:Key:Name",
+              "value": "[concat('CN=', parameters('adminUri'))]"
+            },
+            {
+              "name": "OpenIdConnect:Authority",
+              "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"
+            },
+            {
+              "name": "OpenIdConnect:ClientId",
+              "value": "[parameters('openIdConnectClientId')]"
+            },
+            {
+              "name": "OpenIdConnect:ClientSecret",
+              "value": "[parameters('openIdConnectClientSecret')]"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "CoreStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
+              "type": "Custom"
+            },
+            {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
+      ]
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('adminAppName'), '/deploy')]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuAdmin'), ' '))]"
+      },
+      "name": "[variables('adminPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('adminPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('adminAppInsights')]",
+      "apiVersion": "2014-04-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('adminAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publicAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('publicAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "12.13.0"
+            },
+            {
+              "name": "NODE_ENV",
+              "value": "production"
+            },
+            {
+              "name": "CONTENT_API_BASE_URL",
+              "value": "[concat('https://', variables('contentAppName'),'.azurewebsites.net/api')]"
+            },
+            {
+              "name": "DATA_API_BASE_URL",
+              "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/api')]"
+            },
+            {
+              "name": "FUNCTION_API_BASE_URL",
+              "value": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]"
+            },
+            {
+              "name": "BASIC_AUTH",
+              "value": "[parameters('publicAppBasicAuth')]"
+            },
+            {
+              "name": "BASIC_AUTH_USERNAME",
+              "value": "[parameters('publicAppBasicAuthUsername')]"
+            },
+            {
+              "name": "BASIC_AUTH_PASSWORD",
+              "value": "[parameters('publicAppBasicAuthPassword')]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuPublic'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuPublic'), ' '))]"
+      },
+      "name": "[variables('publicPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('publicPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('publicAppInsights')]",
+      "apiVersion": "2014-04-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('publicAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "name": "[variables('coreStorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "location": "westeurope",
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "dependsOn": [
+      ],
+      "sku": {
+        "name": "Standard_RAGRS"
+      },
+      "kind": "StorageV2"
+    },
+    {
+      "name": "[variables('sqlserverName')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2018-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "statistics",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "apiVersion": "2015-01-01",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "properties": {
+            "edition": "Standard",
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "268435456000",
+            "requestedServiceObjectiveName": "S3"
+          }
+        },
+        {
+          "name": "content",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "apiVersion": "2015-01-01",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "properties": {
+            "edition": "Basic",
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "Basic"
+          }
+        },
+        {
+          "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
+          ]
+        },
+
+        {
+          "type": "securityAlertPolicies",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
+            "emailAccountAdmins": true
+          }
+        },
+        {
+          "type": "vulnerabilityAssessments",
+          "name": "Default",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+          ],
+          "properties": {
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "recurringScans": {
+              "isEnabled": true,
+              "emailSubscriptionAdmins": true
+            }
+          }
+        },
+
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "SQL Server",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('sqlserverName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
+      "name": "[variables('publicSqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2018-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "public-statistics",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "apiVersion": "2015-01-01",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
+          "properties": {
+            "edition": "Standard",
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "268435456000",
+            "requestedServiceObjectiveName": "S3"
+          }
+        },
+        {
+          "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+
+        {
+          "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
+          ]
+        },
+
+        {
+          "type": "securityAlertPolicies",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
+            "emailAccountAdmins": true
+          }
+        },
+        {
+          "type": "vulnerabilityAssessments",
+          "name": "Default",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+          ],
+          "properties": {
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "recurringScans": {
+              "isEnabled": true,
+              "emailSubscriptionAdmins": true
+            }
+          }
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "SQL Server",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('notificationsstorageAccountName')]",
+      "apiVersion": "2016-12-01",
+      "location": "[resourceGroup().location]",
+      "kind": "Storage",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "name": "[variables('publicStorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "name": "default/downloads",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('notificationsAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('notificationsAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-04-01",
+      "name": "[variables('notificationsPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('notificationsPlanName')]",
+        "computeMode": "Dynamic",
+        "sku": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('notificationsAppName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "AzureWebJobsDashboard",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('notificationsAppName'))]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "BaseUrl",
+              "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
+            },
+            {
+              "name": "WebApplicationBaseUrl",
+              "value": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]"
+            },
+            {
+              "name": "NotifyApiKey",
+              "value": "[parameters('notifyApiKey')]"
+            },
+            {
+              "name": "TokenSecretKey",
+              "value": "[parameters('notifyTokenSecretKey')]"
+            },
+            {
+              "name": "VerificationEmailTemplateId",
+              "value": "[parameters('verificationEmailTemplateId')]"
+            },
+            {
+              "name": "PublicationNotificationEmailTemplateId",
+              "value": "[parameters('publicationNotificationEmailTemplateId')]"
+            },
+            {
+              "name": "SubscriptionConfirmationEmailTemplateId",
+              "value": "[parameters('subscriptionConfirmationEmailTemplateId')]"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "TableStorageConnString",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('importerAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('importerAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-04-01",
+      "name": "[variables('importerPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('importerPlanName')]",
+        "computeMode": "Dynamic",
+        "sku": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('importerAppName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "AzureWebJobsDashboard",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('importerAppName'))]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "RowsPerBatch",
+              "value": "10000"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "CoreStorage",
+              "type": "Custom",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('publisherAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('publisherAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-04-01",
+      "name": "[variables('publisherPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('publisherPlanName')]",
+        "computeMode": "Dynamic",
+        "sku": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publisherAppName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v4.7",
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+            ]
+          },
+          "appSettings": [
+            {
+              "name": "AzureWebJobsDashboard",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "PublishReleasesCronSchedule",
+              "value": "[parameters('publishReleasesCronSchedule')]"
+            },
+            {
+              "name": "PublishReleaseContentCronSchedule",
+              "value": "[parameters('publishReleaseContentCronSchedule')]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('publisherAppName'))]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2015-05-01').InstrumentationKey]"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "CoreStorage",
+              "type": "Custom",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "NotificationStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            },
+            {
+              "name": "PublicStorage",
+              "type": "Custom",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "PublisherStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('publisherStorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GZRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    }
+  ]
+}

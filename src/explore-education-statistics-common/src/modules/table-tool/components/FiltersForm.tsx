@@ -8,14 +8,17 @@ import {
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import {
-  PublicationSubjectMeta,
   FilterOption,
+  PublicationSubjectMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
+import SummaryListItem from '@common/components/SummaryListItem';
+import SummaryList from '@common/components/SummaryList';
+import { Dictionary } from '@common/types';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -69,6 +72,42 @@ export const buildInitialFormValue = (
   };
 };
 
+type GroupedDictionary = Dictionary<{
+  options: { label: string; value: string }[];
+}>;
+
+const reduceGroupedDictionary = (dictionary: GroupedDictionary) =>
+  Object.values(dictionary).reduce(
+    (result, group) => ({
+      ...result,
+      ...group.options.reduce(
+        (optionResults, option) => ({
+          ...optionResults,
+          [option.value]: option.label,
+        }),
+        {},
+      ),
+    }),
+    {},
+  );
+
+const reduceGroupedGroupDictionary = (
+  dictionary: Dictionary<{ options: GroupedDictionary }>,
+) =>
+  Object.keys(dictionary).reduce(
+    (result, indicatorGroup) => ({
+      ...result,
+      ...reduceGroupedDictionary(dictionary[indicatorGroup].options),
+    }),
+    {},
+  );
+
+const reduceFiltersKeyLegend = (dictionary: Dictionary<{ legend: string }>) =>
+  Object.entries(dictionary).reduce(
+    (filters, [key, { legend }]) => ({ ...filters, [key]: legend }),
+    {},
+  );
+
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     onSubmit,
@@ -77,6 +116,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     currentStep,
     stepNumber,
     initialValues,
+    isActive,
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -84,29 +124,35 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'filtersForm';
 
+  const parsedMeta: {
+    indicators: Dictionary<string>;
+    filters: Dictionary<string>;
+  } = React.useMemo(
+    () => ({
+      indicators: reduceGroupedDictionary(subjectMeta.indicators),
+      filters: {
+        ...reduceFiltersKeyLegend(subjectMeta.filters),
+        ...reduceGroupedGroupDictionary(subjectMeta.filters),
+      },
+    }),
+    [subjectMeta],
+  );
+
   useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
-  const [initialFormValue, setInitialFormValue] = React.useState(() =>
-    buildInitialFormValue(subjectMeta, initialValues),
-  );
-
-  React.useEffect(() => {
-    if (formikRef.current) {
-      const newFormValue = buildInitialFormValue(subjectMeta, initialValues);
-      setInitialFormValue(newFormValue);
-      formikRef.current.setValues(newFormValue);
-    }
-  }, [initialValues, subjectMeta, subjectMeta.filters]);
+  const initialFormValues = React.useMemo(() => {
+    return buildInitialFormValue(subjectMeta, initialValues);
+  }, [initialValues, subjectMeta]);
 
   return (
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={initialFormValue}
+      initialValues={initialFormValues}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
@@ -129,9 +175,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       render={(form: FormikProps<FormValues>) => {
         const { getError } = createErrorHelper(form);
 
-        return (
+        return isActive ? (
           <div ref={ref}>
-            <Form {...form} id={formId}>
+            <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
               {stepHeading}
 
               <FormGroup>
@@ -214,6 +260,36 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               />
             </Form>
           </div>
+        ) : (
+          <>
+            {stepHeading}
+            {
+              <SummaryList noBorder>
+                <SummaryListItem term="Indicators" shouldCollapse>
+                  {form.values.indicators.map(indicator => (
+                    <div key={indicator}>
+                      {parsedMeta.indicators[indicator]}
+                    </div>
+                  ))}
+                </SummaryListItem>
+                {Object.entries(form.values.filters).map(
+                  ([filterGroupId, filterItemIds]) => (
+                    <SummaryListItem
+                      term={parsedMeta.filters[filterGroupId]}
+                      shouldCollapse
+                      key={filterGroupId}
+                    >
+                      {filterItemIds.map(filterItemId => (
+                        <div key={filterItemId}>
+                          {parsedMeta.filters[filterItemId]}
+                        </div>
+                      ))}
+                    </SummaryListItem>
+                  ),
+                )}
+              </SummaryList>
+            }
+          </>
         );
       }}
     />

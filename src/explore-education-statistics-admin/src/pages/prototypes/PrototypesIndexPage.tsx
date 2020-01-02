@@ -2,10 +2,13 @@ import React from 'react';
 
 import { FormSelect, FormGroup } from '@common/components/form';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
+import { PrototypeLoginContext } from '@admin/components/Login';
 import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
 function PrototypesIndexPage() {
+  const { user: prototypeUser } = React.useContext(PrototypeLoginContext);
+
   return (
     <PrototypePage>
       <h1>Index page for administrative application</h1>
@@ -22,7 +25,9 @@ function PrototypesIndexPage() {
           }))}
           onChange={e => {
             PrototypeLoginService.setActiveUser(e.target.value);
+            window.location.reload();
           }}
+          value={prototypeUser && prototypeUser.id}
         />
       </FormGroup>
       <ul>

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -18,11 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
-        public Task<string> DownloadTextAsync(string containerName, string blobName)
+        public async Task<string> DownloadTextAsync(string containerName, string blobName)
         {
-            var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, containerName);
-            var blob = blobContainer.GetBlockBlobReference(blobName);
-            return blob.DownloadTextAsync();
+            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, containerName, blobName);
         }
 
         public bool FileExistsAndIsReleased(string containerName, string blobName)
@@ -56,16 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
             string content)
         {
-            var blobContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, containerName);
-            
-            var blob = blobContainer.GetBlockBlobReference(blobName);
-            blob.Properties.ContentType = contentType;
-
-            using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
-            {
-                await blob.UploadFromStreamAsync(stream);
-            }
+            await FileStorageUtils.UploadFromStreamAsync(_storageConnectionString, containerName, blobName,
+                contentType, content);
         }
     }
 }

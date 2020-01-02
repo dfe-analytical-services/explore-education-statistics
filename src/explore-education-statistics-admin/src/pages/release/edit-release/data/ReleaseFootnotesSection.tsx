@@ -7,6 +7,9 @@ import {
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
@@ -20,7 +23,11 @@ interface Props {
   releaseId: string;
 }
 
-const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
+const ReleaseFootnotesSection = ({
+  publicationId,
+  releaseId,
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [footnoteMeta, setFootnoteMeta] = useState<FootnoteMeta>();
   const [footnotes, setFootnotes] = useState<Footnote[]>([]);
@@ -45,11 +52,12 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
         setFootnotes(footnotesList);
         setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
         setLoading(false);
-      });
+      })
+      .catch(handleApiErrors);
   }
   useEffect(() => {
     getFootnoteData();
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseId, handleApiErrors]);
 
   const footnoteFormControls = {
     footnoteForm,
@@ -76,7 +84,8 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
               setFootnotes(updatedFootnotes);
               setLoading(false);
             }
-          });
+          })
+          .catch(handleApiErrors);
       } else {
         setLoading(true);
         footnotesService
@@ -84,7 +93,8 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
           .then((newFootnote: Footnote) => {
             setFootnotes([...footnotes, newFootnote]);
             setLoading(false);
-          });
+          })
+          .catch(handleApiErrors);
       }
       _setFootnoteForm({ state: 'cancel' });
     },
@@ -131,7 +141,8 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
                     footnotesService
                       .deleteFootnote((footnoteToBeDeleted as Footnote).id)
                       .then(() => setFootnoteToBeDeleted(undefined))
-                      .then(getFootnoteData);
+                      .then(getFootnoteData)
+                      .catch(handleApiErrors);
                   }}
                 >
                   The footnote:
@@ -148,4 +159,4 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   );
 };
 
-export default ReleaseFootnotesSection;
+export default withErrorControl(ReleaseFootnotesSection);

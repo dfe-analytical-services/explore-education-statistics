@@ -1,6 +1,8 @@
 import PageFooter from '@admin/components/PageFooter';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
+import { Helmet } from 'react-helmet';
+import ErrorBoundary from '@admin/components/ErrorBoundary';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PrototypePageBanner from './PageBanner';
 import PageHeader from './PageHeader';
@@ -8,32 +10,43 @@ import PageHeader from './PageHeader';
 type Props = {
   children: ReactNode;
   wide?: boolean;
+  pageTitle?: string;
 } & BreadcrumbsProps;
 
-const Page = ({ breadcrumbs = [], children, wide }: Props) => {
+const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
   return (
     <>
-      <PageHeader wide={wide} />
+      <ErrorBoundary>
+        <Helmet>
+          <title>
+            {pageTitle
+              ? `${pageTitle} - Explore education statistics - GOV.UK`
+              : 'Explore education statistics - GOV.UK'}
+          </title>
+        </Helmet>
 
-      <div
-        className={classNames('govuk-width-container', {
-          'dfe-width-container--wide': wide,
-        })}
-      >
-        <PrototypePageBanner />
+        <PageHeader wide={wide} />
 
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-
-        <main
-          className="app-main-class govuk-main-wrapper"
-          id="main-content"
-          role="main"
+        <div
+          className={classNames('govuk-width-container', {
+            'dfe-width-container--wide': wide,
+          })}
         >
-          {children}
-        </main>
-      </div>
+          <PrototypePageBanner />
 
-      <PageFooter wide={wide} />
+          <Breadcrumbs breadcrumbs={breadcrumbs} />
+
+          <main
+            className="app-main-class govuk-main-wrapper"
+            id="main-content"
+            role="main"
+          >
+            {children}
+          </main>
+        </div>
+
+        <PageFooter wide={wide} />
+      </ErrorBoundary>
     </>
   );
 };

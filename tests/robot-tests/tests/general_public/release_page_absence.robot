@@ -81,17 +81,18 @@ Validate absence_in_prus.csv file can be downloaded
     user closes details dropdown     Download data files
 
 Validate Key Statistics data block -- Summary tab
-    [Documentation]  DFE-915
+    [Documentation]  DFE-915   EES-806
     [Tags]  HappyPath
     user waits until page contains element   css:#keystats-summary    90
     user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
-    user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
-    user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
+    # EES-806
+    #user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
+    #user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
-    user checks key stat bullet exists   pupils missed on average 8.2 school days
-    user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
-    user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
-    user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
+    #user checks key stat bullet exists   pupils missed on average 8.2 school days
+    #user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
+    #user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
+    #user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
 
 Validate accordion sections order
     [Tags]  HappyPath

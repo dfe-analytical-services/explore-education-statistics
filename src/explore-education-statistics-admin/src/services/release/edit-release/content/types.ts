@@ -1,13 +1,6 @@
-import { ReleaseContentService } from '@admin/services/release/edit-release/content/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
-import { ContactDetails } from '@admin/services/common/types';
-
-export interface BasicLink {
-  id: string;
-  title: string;
-  url: string;
-}
+import { AbstractRelease } from '@common/services/publicationService';
+import { DataBlock } from '@common/services/dataBlockService';
 
 export interface ContentSectionViewModel {
   id: string;
@@ -17,39 +10,32 @@ export interface ContentSectionViewModel {
   content: EditableContentBlock[];
 }
 
-export interface ReleaseViewModel {
-  id: string;
-  typeId?: string;
-  timePeriodCoverage: TimeIdentifier;
-  publishScheduled?: Date;
-  nextReleaseDate: {
-    day: string;
-    month: string;
-    year: string;
-  };
-  title: string;
-  yearTitle: string;
-  coverageTitle: string;
-  releaseName: string;
-  slug: string;
-  publicationTitle: string;
-  publicationId: string;
-  contact: ContactDetails;
-}
-
 export interface ManageContentPageViewModel {
-  release: ReleaseViewModel;
-
-  previousReleases: BasicLink[];
-
-  releaseNotes: {
-    content: string;
-    publishedDate: Date;
-  }[];
-
-  relatedInformation: BasicLink[];
-
-  introductionSection: ContentSectionViewModel;
+  release: AbstractRelease<EditableContentBlock>;
+  availableDataBlocks: DataBlock[];
 }
+
+export interface ContentBlockViewModel {
+  id: string;
+  order?: number;
+  type: string;
+  body: string;
+}
+
+export type ContentBlockPutModel = Pick<ContentBlockViewModel, 'body'>;
+export type ContentBlockPostModel = Pick<
+  ContentBlockViewModel,
+  'order' | 'type' | 'body'
+>;
+
+export interface ContentBlockAttachRequest {
+  contentBlockId: string;
+  order: number;
+}
+
+export type ContentBlockAttachResponse = Pick<
+  ContentBlockViewModel,
+  'id' | 'type' | 'order'
+>;
 
 export default {};

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoginContext } from '@admin/components/Login';
+import { PrototypeLoginContext } from '@admin/components/Login';
 import { FormGroup, FormRadioGroup } from '@common/components/form';
 import Link from '@admin/components/Link';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
@@ -12,7 +12,7 @@ interface Props {
 
 const PublicationPage = ({ task }: Props) => {
   const [status, setStatus] = React.useState('');
-  const userContext = React.useContext(LoginContext);
+  const userContext = React.useContext(PrototypeLoginContext);
 
   const reviewType =
     userContext.user &&

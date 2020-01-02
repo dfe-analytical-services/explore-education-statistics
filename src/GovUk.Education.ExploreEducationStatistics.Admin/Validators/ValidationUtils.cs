@@ -2,9 +2,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 {
@@ -27,39 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
             }
         }
 
-        public static Either<ValidationResult, R> HandleValidationErrors<T, R>(
-            Func<Either<ValidationResult, T>> validationErrorAction,
-            Func<T, Either<ValidationResult, R>> successAction)
-        {
-            var validationResult = validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? successAction.Invoke(validationResult.Right) 
-                : validationResult.Left;
-        }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, R> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, Task<R>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(await successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
             Func<Task<Either<ValidationResult, T>>> validationErrorAction,
             Func<T, Task<Either<ValidationResult, R>>> successAction)
@@ -73,52 +42,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
             return await successAction.Invoke(validationResult.Right);
         }
+        
+        public static async Task<ActionResult<T>> HandleErrorsAsync<T>(
+            Func<Task<Either<ActionResult, T>>> errorsRaisingAction,
+            Func<T, ActionResult> onSuccessAction) 
+        {
+            var result = await errorsRaisingAction.Invoke();
 
+            return result.IsRight ? onSuccessAction.Invoke(result.Right) : result.Left;
+        }
+        
+        public static async Task<Either<ActionResult, R>> HandleErrorsAsync<T, R>(
+            Func<Task<Either<ActionResult, T>>> validationErrorAction,
+            Func<T, Task<Either<ActionResult, R>>> successAction)
+        {
+            var validationResult = await validationErrorAction.Invoke();
+
+            if (validationResult.IsLeft)
+            {
+                return validationResult.Left;
+            }
+
+            return await successAction.Invoke(validationResult.Right);
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
         {
-            switch (message)
-            {
-                case CannotOverwriteFile:
-                    return new ValidationResult("CANNOT_OVERWRITE_FILE");
-                case SlugNotUnique:
-                    return new ValidationResult("SLUG_NOT_UNIQUE");
-                case PartialDateNotValid:
-                    return new ValidationResult("PARTIAL_DATE_NOT_VALID");
-                case CannotUseGenericFunctionToDeleteDataFile:
-                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_DELETE_DATA_FILE");
-                case UnableToFindMetadataFileToDelete:
-                    return new ValidationResult("UNABLE_TO_FIND_METADATA_FILE_TO_DELETE");
-                case FileNotFound:
-                    return new ValidationResult("FILE_NOT_FOUND");
-                case FileCannotBeEmpty: 
-                    return new ValidationResult("FILE_CAN_NOT_BE_EMPTY");
-                case DataFileCannotBeEmpty: 
-                    return new ValidationResult("DATA_FILE_CAN_NOT_BE_EMPTY");
-                case MetadataFileCannotBeEmpty: 
-                    return new ValidationResult("METADATA_FILE_CAN_NOT_BE_EMPTY");
-                case CannotUseGenericFunctionToAddDataFile: 
-                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_ADD_DATA_FILE");
-                case CannotOverwriteDataFile: 
-                    return new ValidationResult("CANNOT_OVERWRITE_DATA_FILE");
-                case CannotOverwriteMetadataFile: 
-                    return new ValidationResult("CANNOT_OVERWRITE_METADATA_FILE");
-                case DataAndMetadataFilesCannotHaveTheSameName: 
-                    return new ValidationResult("DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME");
-                case DataFileMustBeCsvFile: 
-                    return new ValidationResult("DATA_FILE_MUST_BE_A_CSV_FILE");
-                case MetaFileMustBeCsvFile: 
-                    return new ValidationResult("META_FILE_MUST_BE_A_CSV_FILE");
-                case SubjectTitleMustBeUnique: 
-                    return new ValidationResult("SUBJECT_TITLE_MUST_BE_UNIQUE");
-                case ReleaseNotFound:
-                    return new ValidationResult("RELEASE_NOT_FOUND");
-                case RelatedInformationItemNotFound:
-                    return new ValidationResult("RELATED_INFORMATION_ITEM_NOT_FOUND");
-                case EntityNotFound:
-                    return new ValidationResult("NOT_FOUND");
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(message), message, null);
-            }
+            return new ValidationResult(message.ToString().ScreamingSnakeCase());
+        }
+        
+        // TODO EES-919 - return ActionResults rather than ValidationResults
+        public static Either<ValidationResult, T> ValidationResult<T>(ValidationErrorMessages message)
+        {
+            return ValidationResult(message);
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
+        // rename this to "ValidationResult"
+        public static BadRequestObjectResult ValidationActionResult(ValidationErrorMessages message)
+        {
+            ModelStateDictionary errors = new ModelStateDictionary();
+            errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            return new BadRequestObjectResult(new ValidationProblemDetails(errors));
         }
     }
 
@@ -142,7 +108,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         SubjectTitleMustBeUnique,
         EntityNotFound,
         ReleaseNotFound,
+        ReleaseNoteNotFound,
         RelatedInformationItemNotFound,
         ContentSectionNotFound,
+        ContentBlockNotFound,
+        IncorrectContentBlockTypeForUpdate,
+        ContentBlockAlreadyAttachedToContentSection,
+        IncorrectContentBlockTypeForAttach,
+        ContentBlockAlreadyDetached,
+        ContentBlockNotAttachedToThisContentSection,
+        PublicationNotFound,
+        CommentNotFound
     }
 }

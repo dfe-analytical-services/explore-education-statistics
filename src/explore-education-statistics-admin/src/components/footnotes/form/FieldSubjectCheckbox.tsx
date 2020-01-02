@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Field, FieldProps } from 'formik';
 import { get } from 'lodash';
 import { FormCheckbox } from '@common/components/form';

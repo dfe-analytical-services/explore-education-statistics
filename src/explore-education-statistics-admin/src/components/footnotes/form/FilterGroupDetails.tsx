@@ -81,7 +81,7 @@ const FilterGroupDetails = ({
                 }
               >
                 {Object.entries(filterGroup.options)
-                  .sort(function(a, b) {
+                  .sort((a, b) => {
                     const textA = a[1].label.toUpperCase();
                     const textB = b[1].label.toUpperCase();
                     return textA < textB ? -1 : 1;

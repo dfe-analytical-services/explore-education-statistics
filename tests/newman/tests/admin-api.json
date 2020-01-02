@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "42cebec7-4835-4df8-8bde-72029b0ffcdf",
+		"_postman_id": "ab4d14eb-2c50-4f75-8c29-f2205491a873",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -650,7 +650,6 @@
 													"pm.test(\"totalValues should be correct\", function () {",
 													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('1F_Char__Total'));",
 													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('1F_SchoolType__Total'));",
-													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
 													"});",
 													"",
 													"pm.test(\"Should be correct number of characteristics\", function () { ",
@@ -910,6 +909,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
 											"});",
 											"",
+											"// EES-756",
+											"if(pm.environment.get('env') === \"local\") {",
 											"pm.test(\"Validate footnotes\", function () {",
 											"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
 											"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
@@ -957,6 +958,7 @@
 											"        }",
 											"    }",
 											"});",
+											"}",
 											"",
 											"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(8); });",
 											"",
@@ -1049,9 +1051,8 @@
 											"});",
 											"",
 											"pm.test(\"Number of metaData filters should be correct\", function () {",
-											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
 											"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-											"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
 											"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 											"});",
 											"",
@@ -1068,7 +1069,7 @@
 											"pm.test(\"Number of results should be correct\", function () { ",
 											"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
 											"});",
-											"",
+											" ",
 											"pm.test(\"All results should have correction geographicLevel\", function () {",
 											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
@@ -1975,6 +1976,424 @@
 			"name": "Manage Content",
 			"item": [
 				{
+					"name": "Manage Content Page",
+					"item": [
+						{
+							"name": "Get Manage Content Page data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Manage Content Page response should include all expected top level items\", function () {",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    pm.expect(respJson.release).to.exist;",
+											"    pm.expect(respJson.availableDataBlocks).to.exist;",
+											"});",
+											"",
+											"// EES-754",
+											"if(pm.environment.get('env') === 'local') {",
+											"pm.test(\"Release section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const release = respJson.release;",
+											"    ",
+											"    pm.expect(release.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+											"    ",
+											"    pm.expect(release.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\");",
+											"    pm.expect(release.type.title).to.equal(\"Official Statistics\");",
+											"    ",
+											"    pm.expect(release.yearTitle).to.equal(\"2016/17\");",
+											"    pm.expect(release.coverageTitle).to.equal(\"Academic Year\");",
+											"    ",
+											"    pm.expect(release.published).to.equal(\"2018-07-19T00:00:00\");",
+											"    pm.expect(release.releaseName).to.equal(\"2016\");",
+											"    pm.expect(release.slug).to.equal(\"2016-17\");",
+											"    ",
+											"    pm.expect(release.latestRelease).to.be.true;",
+											"    ",
+											"    pm.expect(release.updates.length).to.equal(2);    ",
+											"    pm.expect(release.updates[0].id).to.equal(\"df18b1f6-9f24-4e87-9275-31a0c78b1dad\");",
+											"    pm.expect(release.updates[0].reason).to.equal(\"Release note 1\");",
+											"    pm.expect(release.updates[0].on).to.equal(\"2019-06-02T00:00:00\");",
+											"    ",
+											"    pm.expect(release.updates[1].id).to.equal(\"c9948cde-01ce-4315-87af-eaa6cd7c6879\");",
+											"    pm.expect(release.updates[1].reason).to.equal(\"Release note 2\");",
+											"    pm.expect(release.updates[1].on).to.equal(\"2019-08-10T00:00:00\");",
+											"",
+											"    pm.expect(release.publicationId).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.id).to.equal(\"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\");",
+											"    pm.expect(release.publication.title).to.equal(\"Permanent and fixed-period exclusions in England\");",
+											"    pm.expect(release.publication.slug).to.equal(\"permanent-and-fixed-period-exclusions-in-england\");",
+											"    pm.expect(release.publication.summary).to.equal(\"\");",
+											"    pm.expect(release.publication.nextUpdate).to.equal(\"2019-07-19T00:00:00\");",
+											"    ",
+											"    // TODO add some data so we can pull back some alternative releases",
+											"    pm.expect(release.publication.releases.length).to.equal(0);",
+											"    ",
+											"    pm.expect(release.publication.legacyReleases.length).to.equal(8);",
+											"    pm.expect(release.publication.legacyReleases[0].id).to.equal(\"08134c1d-8a58-49a4-8d8b-22e586ffd5ae\");",
+											"    pm.expect(release.publication.legacyReleases[0].description).to.equal(\"2008 to 2009\");",
+											"    pm.expect(release.publication.legacyReleases[0].url).to.equal(\"https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009\");",
+											"    ",
+											"    pm.expect(release.publication.topic.theme.title).to.equal(\"Pupils and schools\");",
+											"   ",
+											"    pm.expect(release.publication.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
+											"    pm.expect(release.publication.contact.teamName).to.equal(\"School absence and exclusions team\");",
+											"    pm.expect(release.publication.contact.teamEmail).to.equal(\"schools.statistics@education.gov.uk\");",
+											"    pm.expect(release.publication.contact.contactName).to.equal(\"Mark Pearson\");",
+											"    pm.expect(release.publication.contact.contactTelNo).to.equal(\"01142742585\");",
+											"    ",
+											"    pm.expect(release.publication.methodology.id).to.equal(\"c8c911e3-39c1-452b-801f-25bb79d1deb7\");",
+											"    pm.expect(release.publication.methodology.title).to.equal(\"Pupil exclusion statistics: methodology\");",
+											"    ",
+											"    pm.expect(release.content.length).to.equal(9);",
+											"    ",
+											"    pm.expect(release.content[0].order).to.equal(1);",
+											"    pm.expect(release.content[0].heading).to.equal(\"About this release\");",
+											"    pm.expect(release.content[0].caption).to.equal(\"\");",
+											"    pm.expect(release.content[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+											"});",
+											"}",
+											"",
+											"pm.test(\"Summary section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const summarySection = respJson.release.summarySection;",
+											"    ",
+											"    pm.expect(summarySection.id).to.equal(\"f599c2e2-f215-423a-beab-c5c6a0c2e5a9\");",
+											"    pm.expect(summarySection.order).to.equal(1);",
+											"    pm.expect(summarySection.heading).to.equal(\"\");",
+											"    pm.expect(summarySection.caption).to.equal(\"\");",
+											"",
+											"    pm.expect(summarySection.content.length).to.equal(1);",
+											"    pm.expect(summarySection.content[0].id).to.equal(\"7934e93d-2e11-478d-ab0e-f799f15164bb\");",
+											"    pm.expect(summarySection.content[0].type).to.equal(\"MarkDownBlock\");",
+											"    pm.expect(summarySection.content[0].body.startsWith(\"Read national statistical summaries, view charts and tables and download data files.\")).to.be.true;",
+											"    pm.expect(summarySection.content[0].order).to.equal(1);",
+											"});",
+											"",
+											"pm.test(\"Key Statistics section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const section = respJson.release.keyStatisticsSection;",
+											"    ",
+											"    pm.expect(section.id).to.equal(\"991a436a-9c7a-418b-ab06-60f2610b4bc6\");",
+											"    pm.expect(section.order).to.equal(1);",
+											"    pm.expect(section.heading).to.equal(\"\");",
+											"    pm.expect(section.caption).to.equal(\"\");",
+											"",
+											"    pm.expect(section.content.length).to.equal(3);",
+											"    ",
+											"    section.content.forEach((block, index) => {",
+											"        pm.expect(block.type).to.equal('DataBlock');",
+											"        pm.expect(block.order).to.equal(index + 1);",
+											"    })",
+											"});",
+											"",
+											"pm.test(\"Key Statistics secondary section should contain tables and charts included as part of the Key Statistics section\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const section = respJson.release.keyStatisticsSecondarySection;",
+											"    ",
+											"    pm.expect(section.id).to.equal(\"e8a813ce-c68a-417b-af31-91db19377b10\");",
+											"    pm.expect(section.order).to.equal(1);",
+											"    pm.expect(section.heading).to.equal(\"\");",
+											"    pm.expect(section.caption).to.equal(\"\");",
+											"",
+											"    pm.expect(section.content.length).to.equal(1);",
+											"    pm.expect(section.content[0].id).to.equal(\"17a0272b-318d-41f6-bda9-3bd88f78cd3d\");",
+											"    pm.expect(section.content[0].type).to.equal(\"DataBlock\");",
+											"    pm.expect(section.content[0].order).to.equal(1);",
+											"});",
+											"",
+											"pm.test(\"Headlines section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const headlinesSection = respJson.release.headlinesSection;",
+											"    ",
+											"    pm.expect(headlinesSection.id).to.equal(\"601aadcc-be7d-4d3e-9154-c9eb64144692\");",
+											"    pm.expect(headlinesSection.order).to.equal(1);",
+											"    pm.expect(headlinesSection.heading).to.equal(\"\");",
+											"    pm.expect(headlinesSection.caption).to.equal(\"\");",
+											"",
+											"    pm.expect(headlinesSection.content.length).to.equal(1);",
+											"    pm.expect(headlinesSection.content[0].id).to.equal(\"db00f19a-96b7-47c9-84eb-92d6ace41434\");",
+											"    pm.expect(headlinesSection.content[0].type).to.equal(\"MarkDownBlock\");",
+											"    pm.expect(headlinesSection.content[0].body.startsWith(\"* majority of applicants received a preferred offer\")).to.be.true;",
+											"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
+											"});",
+											"",
+											"if(pm.environment.get('env') === 'local') {",
+											"pm.test(\"Related Information section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const relatedInformation = respJson.release.relatedInformation;",
+											"    ",
+											"    pm.expect(relatedInformation.length).to.equal(2);",
+											"    ",
+											"    pm.expect(relatedInformation[0].id).to.equal(\"f3c67bc9-6132-496e-a848-c39dfcd16f49\");",
+											"    pm.expect(relatedInformation[0].description).to.equal(\"Additional guidance\");",
+											"    pm.expect(relatedInformation[0].url).to.equal(\"http://example.com\");",
+											"    ",
+											"    pm.expect(relatedInformation[1].id).to.equal(\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\");",
+											"    pm.expect(relatedInformation[1].description).to.equal(\"Statistics guide\");",
+											"    pm.expect(relatedInformation[1].url).to.equal(\"http://example.com\");",
+											"});",
+											"}",
+											"",
+											"pm.test(\"Available Data Blocks section should contain the correct details\", function () { ",
+											"    ",
+											"    var respJson = pm.response.json();",
+											"",
+											"    const availableDataBlocks = respJson.availableDataBlocks;",
+											"    ",
+											"    pm.expect(availableDataBlocks.length).to.equal(2);",
+											"    ",
+											"    pm.expect(availableDataBlocks[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+											"    pm.expect(availableDataBlocks[0].name).to.equal(\"Available Data Block\");",
+											"    pm.expect(availableDataBlocks[0].order).to.equal(0);",
+											"",
+											"    pm.expect(availableDataBlocks[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+											"    pm.expect(availableDataBlocks[1].name).to.equal(\"Available Data Block 2\");",
+											"    pm.expect(availableDataBlocks[1].order).to.equal(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Release Notes",
+					"item": [
+						{
+							"name": "Add Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Release Notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"const latestItem = respJson[0];",
+											"",
+											"pm.test(\"Latest Release note entry should contain the correct details\", function () {",
+											"    pm.expect(latestItem.id).to.not.be.empty;",
+											"    pm.expect(latestItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(latestItem.on).to.not.be.empty;",
+											"    pm.expect(latestItem.reason).to.equal(\"Release note created by Postman\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () {",
+											"    pm.globals.set(\"latest_release_note_id\", latestItem.id);",
+											"    pm.globals.set(\"number_of_release_notes\", respJson.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"reason\": \"Release note created by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Release notes array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Release notes entry should contain the correct details\", function () {",
+											"    const updatedItem = respJson.find(item => item.id === pm.globals.get(\"latest_release_note_id\"));",
+											"    pm.expect(updatedItem).to.not.be.empty;",
+											"    pm.expect(updatedItem.on).to.equal(\"2019-07-25T00:00:00\");",
+											"    pm.expect(updatedItem.reason).to.equal(\"Release note updated by Postman\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"reason\": \"Release note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Release Note",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Release notes array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_release_notes\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Release notes array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_release_note_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"unset variables\", function() {",
+											"   pm.globals.unset(\"number_of_release_notes\"); ",
+											"   pm.globals.unset(\"latest_release_note_id\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"on\": \"2019-07-25T00:00:00\",\n    \"releaseNote\": \"Release Note updated by Postman\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/release-note/{{latest_release_note_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"release-note",
+										"{{latest_release_note_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Related Information",
 					"item": [
 						{
@@ -1997,7 +2416,7 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
 											"    pm.expect(lastItem.id).to.not.be.empty;",
 											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
@@ -2005,8 +2424,8 @@
 											"",
 											"pm.test(\"Store variables for upcoming tests\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.environment.set(\"latest_related_information_id\", lastItem.id);",
-											"    pm.environment.set(\"number_of_related_information_items\", respJson.length);",
+											"    pm.globals.set(\"latest_related_information_id\", lastItem.id);",
+											"    pm.globals.set(\"number_of_related_information_items\", respJson.length);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2024,7 +2443,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"title\": \"Related Information 1\",\n}"
+									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"description\": \"Related Information 1\",\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
@@ -2056,14 +2475,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information 1\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2110,14 +2529,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2135,7 +2554,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\"\n}\n"
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"description\": \"Related Information updated\"\n}\n"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
@@ -2168,14 +2587,14 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains values\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\"));",
 											"});",
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.description).to.equal(\"Related Information updated\");",
 											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
-											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"    pm.expect(lastItem.id).to.equal(pm.globals.get(\"latest_related_information_id\"));",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2222,16 +2641,11 @@
 											"});",
 											"",
 											"pm.test(\"Related Information array contains one less value than before\", function () {",
-											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\") - 1);",
 											"});",
 											"",
 											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
-											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
-											"});",
-											"",
-											"pm.test(\"Unset variables\", function () {",
-											"    pm.environment.unset(\"latest_related_information_id\");",
-											"    pm.environment.unset(\"number_of_related_information_items\");",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_related_information_id\"))).to.be.false;",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2260,6 +2674,62 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Verify Related Information entry deleted",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.globals.get(\"number_of_related_information_items\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.globals.get(\"latest_related_information_id\"))).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"Unset variables\", function () {",
+											"    pm.globals.unset(\"latest_related_information_id\");",
+											"    pm.globals.unset(\"number_of_related_information_items\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -2269,595 +2739,2733 @@
 					"name": "Content",
 					"item": [
 						{
-							"name": "Get Content Sections",
-							"event": [
+							"name": "Content Sections",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200); ",
-											"});",
-											"",
-											"pm.test(\"Content Sections should contain the correct information\", function () { ",
-											"",
-											"    var respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.length).to.equal(9);",
-											"",
-											"    // assert that all of our content sections are coming back with details ",
-											"    respJson.forEach(section => {",
-											"        pm.expect(section.id).to.not.be.null;",
-											"        pm.expect(section.heading).to.not.be.null;",
-											"        pm.expect(section.caption).to.not.be.null;",
-											"        pm.expect(section.content.length).to.be.above(0);",
-											"    });",
-											"    ",
-											"    // assert that all of our sections are coming back in correct order",
-											"    respJson.forEach((section, index) => {",
-											"        pm.expect(section.order).to.equal(index + 1);",
-											"    });",
-											"    ",
-											"    // assert that the content sections' content blocks are coming back with details",
-											"    respJson.forEach(section => {",
-											"        section.content.forEach(contentBlock => {",
-											"            pm.expect(contentBlock.id).to.not.be.null;",
-											"            pm.expect(contentBlock.type).to.not.be.null;",
-											"        }); ",
-											"    });",
-											"    ",
-											"    // assert that the deliberately blanked out fields are undefined",
-											"    respJson.forEach(section => {",
-											"        section.content.forEach(contentBlock => {",
-											"            pm.expect(contentBlock.contentSection).to.be.undefined;",
-											"            pm.expect(contentBlock.contentSectionId).to.be.undefined;",
-											"       }); ",
-											"    });",
-											"    ",
-											"    // test a specific content section's content",
-											"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
-											"    pm.expect(respJson[0].order).to.equal(1);",
-											"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
-											"    pm.expect(respJson[0].caption).to.equal(\"\");",
-											"    ",
-											"    // test a MarkDownBlock's content",
-											"    pm.expect(respJson[0].content.length).to.equal(1);",
-											"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
-											"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
-											"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
-											"",
-											"    // test a DataBlock's content",
-											"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
-											"    pm.expect(respJson[1].content[2].type).to.equal(\"DataBlock\");",
-											"    pm.expect(respJson[1].content[2].heading).to.equal(\"Chart showing permanent exclusions in England\");",
-											"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
-											"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
-											"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
-											"});"
+									"name": "Get Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"Content Sections should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(9);",
+													"",
+													"    // assert that all of our content sections are coming back with details ",
+													"    respJson.forEach(section => {",
+													"        pm.expect(section.id).to.not.be.null;",
+													"        pm.expect(section.heading).to.not.be.null;",
+													"        pm.expect(section.caption).to.not.be.null;",
+													"        pm.expect(section.content.length).to.be.above(0);",
+													"    });",
+													"    }",
+													"    ",
+													"    // assert that all of our sections are coming back in correct order",
+													"    // EES-895",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    respJson.forEach((section, index) => {",
+													"        pm.expect(section.order).to.equal(index + 1);",
+													"        section.forEach((block, index) => {",
+													"            pm.expect(block.order).to.equal(index + 1); ",
+													"        });",
+													"    });",
+													"    }",
+													"    ",
+													"    // assert that the content sections' content blocks are coming back with details",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.id).to.not.be.null;",
+													"            pm.expect(contentBlock.type).to.not.be.null;",
+													"        }); ",
+													"    });",
+													"    ",
+													"    // assert that the deliberately blanked out fields are undefined",
+													"    respJson.forEach(section => {",
+													"        section.content.forEach(contentBlock => {",
+													"            pm.expect(contentBlock.contentSection).to.be.undefined;",
+													"            pm.expect(contentBlock.contentSectionId).to.be.undefined;",
+													"       }); ",
+													"    });",
+													"    ",
+													"    // test a specific content section's content",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson[0].caption).to.equal(\"\");",
+													"    }",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {  ",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson[0].content.length).to.equal(1);",
+													"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"    pm.expect(respJson[0].content[0].order).to.equal(1);",
+													"",
+													"    // test a DataBlock's content",
+													"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
+													"    pm.expect(respJson[1].content[2].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[1].content[2].heading).to.equal(\"Chart showing permanent exclusions in England\");",
+													"    pm.expect(respJson[1].content[2].dataBlockRequest).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].charts).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].tables).to.not.be.null;",
+													"    pm.expect(respJson[1].content[2].order).to.equal(3);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Store environment variables\", function() {",
+													"    pm.globals.set(\"added_content_section_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 2\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify new Content Section added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'New section',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section Order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'New section',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Content Section heading",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should have an updated heading\", function () { ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.heading).to.equal('Updated heading');",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\theading: 'Updated heading'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"heading"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Content Sections",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 4,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 1,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 2,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 3,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 7,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 5,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 6,\n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n    '{{added_content_section_id}}': 8,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Sections Order updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'About this release',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Reasons for exclusions',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Restore Content Sections order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Updated heading',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 1,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 2,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 3,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 4,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 5,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 6,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 7,\n    '{{added_content_section_id}}': 8, \n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section removed",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Content Section without specifying order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(10);",
+													"});",
+													"}",
+													"",
+													"pm.test(\"Store environment variables for following tests\", function() {",
+													"   pm.globals.set(\"added_content_section_without_order_id\", pm.response.json().id); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Content Section added without order specified",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown'",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_without_order_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_without_order_id}}"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Add Content Section",
-							"event": [
+							"name": "Content Blocks",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be present\", function () { ",
-											"",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.id).to.not.be.null;",
-											"    pm.expect(respJson.heading).to.equal('New section');",
-											"    pm.expect(respJson.order).to.equal(10);",
-											"});"
+									"name": "Get Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the correct information\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.heading).to.equal(\"About this release\");",
+													"    pm.expect(respJson.caption).to.equal(\"\");",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    // test a MarkDownBlock's content",
+													"    pm.expect(respJson.content.length).to.equal(1);",
+													"    pm.expect(respJson.content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New HTMLBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.globals.set(\"added_html_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 1,\n\ttype: 'HtmlBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New MarkDownBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.globals.set(\"added_markdown_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 1,\n\ttype: 'MarkDownBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add InsetText Block (in the middle)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New MarkDownBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.globals.set(\"added_inset_text_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 2,\n\ttype: 'InsetTextBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Data Block (without specifying order)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New DataBlock should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.order).to.equal(5);",
+													"    }",
+													"    pm.expect(respJson.type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    ",
+													"    pm.globals.set(\"added_data_block_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\ttype: 'DataBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks added",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should contain the 4 newly added Content Blocks\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    }",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson.content[3].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[3].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    }",
+													"  ",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content[4].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[4].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[4].order).to.equal(5);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The HTML Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.order).to.equal(3);",
+													"    pm.expect(respJson.body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tbody: '<h1>Update!></h1><p>This is the new body for the HTML Block.<p>'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_html_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The MarkDown Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tbody: '*Update!*\\n\\nThis is the new body for the _MarkDown Block._'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_markdown_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_markdown_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update InsetText Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"The Inset Text Block should show the updated details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"    ",
+													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.order).to.equal(2);",
+													"    pm.expect(respJson.heading).to.equal(\"Update!\");",
+													"    pm.expect(respJson.body).to.equal(\"This is the new body for the Inset Text Block.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\theading: 'Update!',\n\tbody: 'This is the new body for the Inset Text Block.'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_inset_text_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_inset_text_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Content Section should contain the updated Content Block details\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    }",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
+													"    ",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[1].heading).to.equal(\"Update!\");",
+													"    pm.expect(respJson.content[1].body).to.equal(\"This is the new body for the Inset Text Block.\");",
+													"    ",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[2].body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Content Blocks",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"// EES-754",
+													"if(pm.environment.get('env') === 'local') {",
+													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[4].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[4].order).to.equal(5);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_html_block_id}}': 1,\n\t'{{added_markdown_block_id}}': 2,\n\t'{{added_inset_text_block_id}}': 3,\n\t'{{added_data_block_id}}': 4,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Blocks order updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"// EES-754",
+													"if(pm.environment.get('env') === 'local') {",
+													"pm.test(\"Content Blocks should be in the newly specified order\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content.length).to.equal(5);",
+													"    }",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"    ",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"",
+													"    pm.expect(respJson.content[2].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson.content[2].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson.content[4].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[4].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[4].order).to.equal(5);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_html_block_id}}': 1,\n\t'{{added_html_block_id}}': 2,\n\t'{{added_html_block_id}}': 3,\n\t'{{added_html_block_id}}': 4,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Restore Content Blocks order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"// EES-754",
+													"if(pm.environment.get('env') === 'local') {",
+													"pm.test(\"Content Blocks should be in previous order again\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(5);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_inset_text_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"InsetTextBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    ",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    ",
+													"    pm.expect(respJson[3].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[3].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[4].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[4].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[4].order).to.equal(5);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{    \n\t'{{added_markdown_block_id}}': 1,\n\t'{{added_inset_text_block_id}}': 2,\n\t'{{added_html_block_id}}': 3,\n\t'97d414f4-1a27-4ed7-85ea-c4c903e1d8cb': 4,\n\t'{{added_data_block_id}}': 5,\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/blocks/order",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"blocks",
+												"order"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete InsetText Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"InsetText Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[1].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    }",
+													"    ",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[2].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    }",
+													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[3].order).to.equal(4);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_inset_text_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_inset_text_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify InsetText Block deleted",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"InsetText Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content.length).to.equal(4);",
+													"    ",
+													"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get(\"added_markdown_block_id\"));",
+													"    pm.expect(respJson.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[0].order).to.equal(1);",
+													"",
+													"    pm.expect(respJson.content[1].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson.content[1].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
+													"    ",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson.content[2].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson.content[2].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.content[2].order).to.equal(3);",
+													"    }",
+													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.content[3].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson.content[3].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson.content[3].order).to.equal(4);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete MarkDown Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"MarkDown Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(3)",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    }",
+													"    ",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    }",
+													"    ",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson[2].id).to.equal(pm.globals.get(\"added_data_block_id\"));",
+													"    pm.expect(respJson[2].type).to.equal(\"DataBlock\");",
+													"    pm.expect(respJson[2].order).to.equal(3);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_markdown_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_markdown_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Data Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"    }",
+													"    ",
+													"    pm.expect(respJson[0].id).to.equal(pm.globals.get(\"added_html_block_id\"));",
+													"    pm.expect(respJson[0].type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    ",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson[1].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[1].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[1].order).to.equal(2);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_data_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_data_block_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete HTML Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"HTML Block should be deleted\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    if(pm.environment.get('env') === 'local') { ",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"    }",
+													"    ",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"    pm.expect(respJson[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
+													"    pm.expect(respJson[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Remove temporary environment variables\", function() {",
+													"   pm.globals.unset(\"added_html_block_id\"); ",
+													"   pm.globals.unset(\"added_markdown_block_id\"); ",
+													"   pm.globals.unset(\"added_inset_text_block_id\"); ",
+													"   pm.globals.unset(\"added_data_block_id\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/b7a968ab-eb49-4100-b133-3d9d94f23d60/block/{{added_html_block_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"b7a968ab-eb49-4100-b133-3d9d94f23d60",
+												"block",
+												"{{added_html_block_id}}"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "POST",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"add"
-									]
-								}
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Verify new Content Section added",
-							"event": [
+							"name": "Data Blocks",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be in the last position of the Content Section list\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"        'New section'",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"",
-											"    pm.environment.set(\"added_content_section_id\", respJson[respJson.length - 1].id);",
-											"});"
+									"name": "Get Available Data Blocks",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should be two available Data Blocks (that have not yet been included in any Content Section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[1].name).to.equal(\"Available Data Block 2\");",
+													"    pm.expect(respJson[1].order).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add a Content Section to attach an available Data Block to",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Store environment variables\", function() {",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.globals.set(\"added_content_section_id\", respJson.id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 2\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach available Data Block to new Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '1869d10a-ca3f-450c-9685-780b11d916f5'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(1);",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify available Data Blocks no longer shows attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should now only be one available Data Block (as the other is attached to a content section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach another available Data Block to new Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block 2\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '0b4c43cd-fc12-4159-88b9-0c8646424555'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(2);",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[1].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[1].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify available Data Blocks is empty",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"There should be no available Data Blocks now\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Detach a Data Block from the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"The detatched Data Block should no longer be on the Content Section\", function() {",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if (pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.length).to.equal(1);",
+													"",
+													"        pm.expect(respJson[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson[0].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/block/1869d10a-ca3f-450c-9685-780b11d916f5",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"block",
+												"1869d10a-ca3f-450c-9685-780b11d916f5"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify the detached Data Block is no longer on the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should no longer contain the detached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        pm.expect(respJson.content.length).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[0].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify the detached Data Block is available again",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"The detached Data Block should be available again\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(1);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Attach the newly available Data Block to the Content Section with explicit order",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200);",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"    pm.expect(respJson.id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson.name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\tcontentBlockId: '1869d10a-ca3f-450c-9685-780b11d916f5',\n\t\torder: 1\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/blocks/attach",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}",
+												"blocks",
+												"attach"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify Content Section contains newly attached Data Block",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"pm.test(\"Content Section should contain the newly attached Data Block\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    // EES-754",
+													"    if(pm.environment.get('env') === 'local') {",
+													"        ",
+													"        pm.expect(respJson.content.length).to.equal(2);",
+													"        ",
+													"        pm.expect(respJson.content[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"        pm.expect(respJson.content[0].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[0].name).to.equal(\"Available Data Block\");",
+													"        pm.expect(respJson.content[0].order).to.equal(1);",
+													"        ",
+													"        pm.expect(respJson.content[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"        pm.expect(respJson.content[1].type).to.equal(\"DataBlock\");",
+													"        pm.expect(respJson.content[1].name).to.equal(\"Available Data Block 2\");",
+													"        pm.expect(respJson.content[1].order).to.equal(2);",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove the Content Section to verify Data Blocks aren't deleted as well",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"if(pm.environment.get('env') === 'local') { ",
+													"pm.test(\"New Content Section should be removed\", function () { ",
+													"",
+													"    const expectedOrder = [",
+													"        'About this release',",
+													"        'Permanent exclusions',",
+													"        'Fixed-period exclusions',",
+													"        'Number and length of fixed-period exclusions',",
+													"        'Reasons for exclusions',",
+													"        'Exclusions by pupil characteristics',",
+													"        'Independent exclusion reviews',",
+													"        'Pupil referral units exclusions',",
+													"        'Regional and local authority (LA) breakdown',",
+													"    ];",
+													"    ",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
+													"});",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"section",
+												"{{added_content_section_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify that the Data Blocks are available again after deleting the Content Section",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"});",
+													"",
+													"",
+													"pm.test(\"The 2 Data Blocks should be available again (rather than being deleted along with the removed Content Section)\", function () { ",
+													"",
+													"    var respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.length).to.equal(2);",
+													"",
+													"    pm.expect(respJson[0].id).to.equal(\"1869d10a-ca3f-450c-9685-780b11d916f5\");",
+													"    pm.expect(respJson[0].name).to.equal(\"Available Data Block\");",
+													"    pm.expect(respJson[0].order).to.equal(0);",
+													"",
+													"    pm.expect(respJson[1].id).to.equal(\"0b4c43cd-fc12-4159-88b9-0c8646424555\");",
+													"    pm.expect(respJson[1].name).to.equal(\"Available Data Block 2\");",
+													"    pm.expect(respJson[1].order).to.equal(0);",
+													"});",
+													"",
+													"pm.test(\"Clear up variables\", function () { ",
+													"    pm.globals.unset(\"added_content_section_id\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/available-datablocks",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+												"content",
+												"available-datablocks"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Section Order",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"        'New section',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Content Section heading",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Section should have an updated heading\", function () { ",
-											"    const respJson = pm.response.json();",
-											"    pm.expect(respJson.heading).to.equal('Updated heading');",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\theading: 'Updated heading'\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}/heading",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"section",
-										"{{added_content_section_id}}",
-										"heading"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Reorder Content Sections",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'About this release',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Reasons for exclusions',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 4,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 1,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 2,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 3,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 7,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 5,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 6,\n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n    '{{added_content_section_id}}': 8,\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"order"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Sections Order updated",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'About this release',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Reasons for exclusions',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Restore Content Sections order",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected starting order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Updated heading',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{    \n\t'b7a968ab-eb49-4100-b133-3d9d94f23d60': 1,\n    '6ed87fd1-81a5-46dc-8841-4598bdae7fee': 2,\n    '7981db34-afdb-4f84-99e8-bfd43e58f16d': 3,\n    '50e7ca4c-e6c7-4ccd-afc1-93ee4298f358': 4,\n    '015d0cdd-6630-4b57-9ef3-7341fc3d573e': 5,\n    '5600ca55-6800-418a-94a5-2f3c3310304e': 6,\n    '68f8b290-4b7c-4cac-b0d9-0263609c341b': 7,\n    '{{added_content_section_id}}': 8, \n    '5708d443-7669-47d8-b6a3-6ad851090710': 9,\n    '3960ab94-0fad-442c-8aaa-6233eff3bc32': 10,\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections/order",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections",
-										"order"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Remove Content Section",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"New Content Section should be removed\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/section/{{added_content_section_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"section",
-										"{{added_content_section_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verify Content Section removed",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-										"exec": [
-											"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
-											"",
-											"    const expectedOrder = [",
-											"        'About this release',",
-											"        'Permanent exclusions',",
-											"        'Fixed-period exclusions',",
-											"        'Number and length of fixed-period exclusions',",
-											"        'Reasons for exclusions',",
-											"        'Exclusions by pupil characteristics',",
-											"        'Independent exclusion reviews',",
-											"        'Pupil referral units exclusions',",
-											"        'Regional and local authority (LA) breakdown',",
-											"    ];",
-											"    ",
-											"    const respJson = pm.response.json();",
-											"",
-											"    pm.expect(respJson.map(section => section.heading)).to.eql(expectedOrder);",
-											"    pm.expect(respJson.map(section => section.order)).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);",
-											"});",
-											"",
-											"pm.test(\"Unset variables\", function () {",
-											"    pm.environment.unset(\"added_content_section_id\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/sections",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"release",
-										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-										"content",
-										"sections"
-									]
-								}
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -9356,26 +11964,25 @@
 					"// Absence by characteristic",
 					"pm.globals.set(\"1FILT_SchoolType\", \"2\");",
 					"pm.globals.set(\"1FG_SchoolType_Default\", \"11\");",
-					"pm.globals.set(\"1F_Char__Total\", \"1\");",
-					"pm.globals.set(\"1F_Char__GenderMale\", \"53\");",
-					"pm.globals.set(\"1F_Char__GenderFemale\", \"52\");",
-					"pm.globals.set(\"1F_SchoolType__Total\", \"58\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"57\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"56\");",
-					"pm.globals.set(\"1F_SchoolType__Special\", \"55\");",
-					"pm.globals.set(\"1F_Char__FSMEligible\", \"18\");",
-					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"10\");",
-					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"8\");",
-					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"50\");",
-					"pm.globals.set(\"1F_YearBreakdown__SixHalfTerms\", \"54\");",
+					"pm.globals.set(\"1F_Char__Total\", \"66\");",
+					"pm.globals.set(\"1F_Char__GenderMale\", \"71\");",
+					"pm.globals.set(\"1F_Char__GenderFemale\", \"72\");",
+					"pm.globals.set(\"1F_SchoolType__Total\", \"70\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"69\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"68\");",
+					"pm.globals.set(\"1F_SchoolType__Special\", \"67\");",
+					"pm.globals.set(\"1F_Char__FSMEligible\", \"11\");",
+					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"18\");",
+					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"10\");",
+					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"48\");",
 					"",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
 					"pm.globals.set(\"1I_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
 					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
 					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
 					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
 					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");",
 					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
 					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
 					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",

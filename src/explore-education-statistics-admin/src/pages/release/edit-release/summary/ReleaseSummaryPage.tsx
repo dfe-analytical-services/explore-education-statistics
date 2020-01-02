@@ -9,16 +9,21 @@ import {
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
@@ -27,7 +32,7 @@ interface ReleaseSummaryModel {
   releaseTypes: IdTitlePair[];
 }
 
-const ReleaseSummaryPage = () => {
+const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useContext(
@@ -39,16 +44,22 @@ const ReleaseSummaryPage = () => {
       service.getReleaseSummaryDetails(releaseId),
       commonService.getReleaseTypes(),
       commonService.getTimePeriodCoverageGroups(),
-    ]).then(
-      ([releaseSummaryResult, releaseTypesResult, timePeriodGroupsResult]) => {
-        setModel({
-          releaseSummaryDetails: releaseSummaryResult,
-          timePeriodCoverageGroups: timePeriodGroupsResult,
-          releaseTypes: releaseTypesResult,
-        });
-      },
-    );
-  }, [releaseId]);
+    ])
+      .then(
+        ([
+          releaseSummaryResult,
+          releaseTypesResult,
+          timePeriodGroupsResult,
+        ]) => {
+          setModel({
+            releaseSummaryDetails: releaseSummaryResult,
+            timePeriodCoverageGroups: timePeriodGroupsResult,
+            releaseTypes: releaseTypesResult,
+          });
+        },
+      )
+      .catch(handleApiErrors);
+  }, [releaseId, handleApiErrors]);
 
   return (
     <>
@@ -107,4 +118,4 @@ const ReleaseSummaryPage = () => {
   );
 };
 
-export default ReleaseSummaryPage;
+export default withErrorControl(ReleaseSummaryPage);

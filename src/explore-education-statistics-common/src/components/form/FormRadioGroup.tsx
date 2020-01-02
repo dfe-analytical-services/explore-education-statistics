@@ -41,11 +41,17 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/govuk/components/radios/radios').then(
-        ({ default: GovUkRadios }) => {
-          new GovUkRadios(this.ref.current).init();
-        },
-      );
+      try {
+        import('govuk-frontend/govuk/components/radios/radios').then(
+          ({ default: GovUkRadios }) => {
+            new GovUkRadios(this.ref.current).init();
+          },
+        );
+      } catch (e) {
+        // if an error occurs during the import it breaks the entire page
+        // eslint-disable-next-line no-console
+        console.error('An error occured importing radios', e);
+      }
     }
   }
 

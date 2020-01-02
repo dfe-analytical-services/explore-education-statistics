@@ -5,16 +5,7 @@ import {
 } from '@admin/services/common/types';
 import client from '@admin/services/util/service';
 
-export interface CommonService {
-  getBasicPublicationDetails(
-    publicationId: string,
-  ): Promise<BasicPublicationDetails>;
-  getBasicThemeDetails(themeId: string): Promise<IdTitlePair>;
-  getReleaseTypes(): Promise<IdTitlePair[]>;
-  getTimePeriodCoverageGroups(): Promise<TimePeriodCoverageGroup[]>;
-}
-
-const service: CommonService = {
+const service = {
   getBasicPublicationDetails(
     publicationId: string,
   ): Promise<BasicPublicationDetails> {

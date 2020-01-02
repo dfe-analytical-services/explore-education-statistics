@@ -1,33 +1,69 @@
-// eslint-disable-next-line import/no-named-as-default
+import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import commonService from '@admin/services/common/service';
-import { IdTitlePair } from '@admin/services/common/types';
-import { Comment } from '@admin/services/dashboard/types';
-import releaseContentService from '@admin/services/release/edit-release/content/service';
-import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import {
+  EditableContentBlock,
+  ExtendedComment,
+} from '@admin/services/publicationService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import { AbstractRelease } from '@common/services/publicationService';
+import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { DataBlock } from '@common/services/dataBlockService';
 
 type PageMode = 'edit' | 'preview';
 
 interface Model {
-  unresolvedComments: Comment[];
+  unresolvedComments: ExtendedComment[];
   pageMode: PageMode;
-  releaseSummary: ReleaseSummaryDetails;
-  theme: IdTitlePair;
-  release: AbstractRelease<EditableContentBlock>;
+  content: ManageContentPageViewModel;
+  availableDataBlocks: DataBlock[];
 }
 
-const ReleaseContentPage = () => {
+const contentSectionComments = (
+  contentSection?: ContentSection<EditableContentBlock>,
+) => {
+  if (
+    contentSection &&
+    contentSection.content &&
+    contentSection.content.length > 0
+  ) {
+    return contentSection.content.reduce<ExtendedComment[]>(
+      (allCommentsForSection, content) =>
+        content.comments
+          ? [...allCommentsForSection, ...content.comments]
+          : allCommentsForSection,
+      [],
+    );
+  }
+
+  return [];
+};
+
+const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
+  [
+    ...contentSectionComments(release.summarySection),
+    ...contentSectionComments(release.keyStatisticsSection),
+    ...release.content
+      .filter(_ => _.content !== undefined)
+      .reduce<ExtendedComment[]>(
+        (allComments, contentSection) => [
+          ...allComments,
+          ...contentSectionComments(contentSection),
+        ],
+        [],
+      ),
+  ].filter(comment => comment !== undefined && comment.state === 'open');
+
+const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(
@@ -35,110 +71,30 @@ const ReleaseContentPage = () => {
   ) as ManageRelease;
 
   useEffect(() => {
-    Promise.all([
-      releaseSummaryService.getReleaseSummaryDetails(releaseId),
-      commonService.getBasicThemeDetails(publication.themeId),
-      releaseContentService.getRelease(releaseId),
-      releaseContentService.getContent(releaseId),
-    ]).then(([releaseSummary, theme, releaseData, releaseContent]) => {
-      // <editor-fold desc="TODO - content population">
+    releaseContentService
+      .getContent(releaseId)
+      .then(newContent => {
+        setModel({
+          unresolvedComments: getUnresolveComments(newContent.release),
+          pageMode: 'edit',
+          content: newContent,
+          availableDataBlocks: newContent.availableDataBlocks,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
-      const unresolvedComments: Comment[] = [
-        {
-          message: 'Please resolve this.\nThank you.',
-          authorName: 'Amy Newton',
-          createdDate: new Date('2019-08-10 10:15').toISOString(),
-        },
-        {
-          message: 'And this too.\nThank you.',
-          authorName: 'Dave Matthews',
-          createdDate: new Date('2019-06-13 10:15').toISOString(),
-        },
-      ];
-
-      const contentBlock = {
-        order: 0,
-        heading: 'test',
-        caption: 'test',
-        content: [
-          {
-            type: 'HtmlBlock',
-            body: 'This is a test',
-            comments: [
-              {
-                name: 'A user',
-                time: new Date(),
-                comment: 'A comment',
-                state: 'open',
-              },
-            ],
-          },
-        ],
-      };
-
-      const contentBlocks = [contentBlock, { ...contentBlock, order: 1 }];
-
-      const releaseDataAsEditable = {
-        ...releaseData,
-        keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content:
-          (releaseData.content &&
-            releaseData.content.map(section => ({
-              ...section,
-              content: section.content.map<EditableContentBlock>(
-                (block, index) => ({
-                  ...block,
-                  id: `${index}`,
-                  comments: [],
-                }),
-              ),
-            }))) ||
-          contentBlocks,
-      };
-
-      const release: AbstractRelease<EditableContentBlock> = {
-        ...releaseDataAsEditable,
-        summary: 'This is the summary ..... ',
-        updates: [
-          {
-            id: '',
-            on: '',
-            reason: '',
-            releaseId: '',
-          },
-        ],
-        publication: {
-          ...publication,
-          slug: '',
-          description: '',
-          dataSource: '',
-          summary: '',
-          releases: [],
-          legacyReleases: [],
-          topic: {
-            theme,
-          },
-          nextUpdate: '',
-          contact: {
-            contactName: '',
-            contactTelNo: '',
-            teamEmail: '',
-            teamName: '',
-          },
-        },
-      };
-
-      // </editor-fold>
-
-      setModel({
-        unresolvedComments,
-        pageMode: 'edit',
-        releaseSummary,
-        theme,
-        release,
-      });
-    });
-  }, [releaseId, publication.themeId, publication]);
+  const onReleaseChange = React.useCallback(
+    (newRelease: ManageContentPageViewModel['release']) => {
+      if (model) {
+        setModel({
+          ...model,
+          unresolvedComments: getUnresolveComments(newRelease),
+        });
+      }
+    },
+    [model],
+  );
 
   return (
     <>
@@ -191,10 +147,10 @@ const ReleaseContentPage = () => {
             <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
               <PublicationReleaseContent
                 editing={model.pageMode === 'edit'}
-                basicPublication={publication}
-                release={model.release}
-                releaseSummary={model.releaseSummary}
+                content={model.content}
                 styles={{}}
+                onReleaseChange={c => onReleaseChange(c)}
+                availableDataBlocks={model.availableDataBlocks}
               />
             </div>
           </div>
@@ -204,4 +160,4 @@ const ReleaseContentPage = () => {
   );
 };
 
-export default ReleaseContentPage;
+export default withErrorControl(ReleaseContentPage);

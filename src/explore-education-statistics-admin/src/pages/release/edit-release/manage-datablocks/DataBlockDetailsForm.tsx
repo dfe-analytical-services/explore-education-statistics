@@ -1,7 +1,6 @@
 import Button from '@common/components/Button';
 import {
   Form,
-  FormFieldset,
   FormFieldTextInput,
   FormGroup,
   Formik,
@@ -15,11 +14,12 @@ import {
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
-  initialValues: { title?: string };
+  children?: ReactNode;
+  initialValues?: DataBlockDetailsFormValues;
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
@@ -27,7 +27,7 @@ interface Props {
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
-interface FormValues {
+export interface DataBlockDetailsFormValues {
   title: string;
   source: string;
   customFootnotes: string;
@@ -35,14 +35,19 @@ interface FormValues {
 }
 
 const DataBlockDetailsForm = ({
-  initialValues,
+  children,
+  initialValues = { title: '', name: '', source: '', customFootnotes: '' },
   query,
   tableHeaders,
   releaseId,
   initialDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const formikRef = React.useRef<Formik<FormValues>>(null);
+  const formikRef = React.useRef<Formik<DataBlockDetailsFormValues>>(null);
+
+  const [currentDataBlock, setCurrentDataBlock] = React.useState<
+    DataBlock | undefined
+  >(initialDataBlock);
 
   const [blockState, setBlockState] = React.useReducer(
     (
@@ -68,10 +73,8 @@ const DataBlockDetailsForm = ({
     setBlockState({ saved: false, error: false });
   }, [query, tableHeaders, releaseId]);
 
-  const saveDataBlock = async (values: FormValues) => {
+  const saveDataBlock = async (values: DataBlockDetailsFormValues) => {
     const dataBlock: DataBlock = {
-      id: initialDataBlock && initialDataBlock.id,
-
       dataBlockRequest: {
         ...query,
         geographicLevel: query.geographicLevel as GeographicLevel,
@@ -96,96 +99,78 @@ const DataBlockDetailsForm = ({
     };
 
     try {
-      await onDataBlockSave(dataBlock);
-      setBlockState({ saved: true, updated: initialDataBlock !== undefined });
+      const savedDataBlock = await onDataBlockSave(dataBlock);
+      setCurrentDataBlock(savedDataBlock);
+      setBlockState({ saved: true, updated: currentDataBlock !== undefined });
     } catch (error) {
       setBlockState({ error: true });
     }
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<FormValues> = {
+  const baseValidationRules: ObjectSchemaDefinition<
+    DataBlockDetailsFormValues
+  > = {
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),
     customFootnotes: Yup.string(),
   };
 
-  React.useEffect(() => {
-    const newInitialValues = {
-      title:
-        (initialDataBlock && initialDataBlock.heading) ||
-        initialValues.title ||
-        '',
-      customFootnotes:
-        (initialDataBlock && initialDataBlock.customFootnotes) || '',
-      name: (initialDataBlock && initialDataBlock.name) || '',
-      source: (initialDataBlock && initialDataBlock.source) || '',
-    };
-
-    if (formikRef.current) {
-      formikRef.current.setValues(newInitialValues);
-    }
-  }, [initialDataBlock, initialValues]);
-
   return (
-    <Formik<FormValues>
+    <Formik<DataBlockDetailsFormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={{
-        customFootnotes: '',
-        source: '',
-        name: '',
-        title: '',
-      }}
-      validationSchema={Yup.object<FormValues>(baseValidationRules)}
+      initialValues={initialValues}
+      validationSchema={Yup.object<DataBlockDetailsFormValues>(
+        baseValidationRules,
+      )}
       onSubmit={saveDataBlock}
-      render={(form: FormikProps<FormValues>) => {
+      render={(form: FormikProps<DataBlockDetailsFormValues>) => {
         return (
           <div>
             <Form {...form} id="dataBlockDetails">
               <FormGroup>
-                <FormFieldset id="details" legend="Data block details">
-                  <FormFieldTextInput<FormValues>
-                    id="data-block-name"
-                    name="name"
-                    label="Data block name"
-                    hint=" Name and save your datablock before viewing it under the
+                <FormFieldTextInput<DataBlockDetailsFormValues>
+                  id="data-block-name"
+                  name="name"
+                  label="Data block name"
+                  hint=" Name and save your datablock before viewing it under the
                     'View data blocks' tab at the top of this page."
-                    percentageWidth="one-half"
-                  />
+                  percentageWidth="one-half"
+                />
 
-                  <hr />
+                <hr />
+                {children}
 
-                  <FormFieldTextArea<FormValues>
-                    id="data-block-title"
-                    name="title"
-                    label="Table title"
-                    additionalClass="govuk-!-width-two-thirds"
-                    rows={2}
-                  />
+                <FormFieldTextArea<DataBlockDetailsFormValues>
+                  id="data-block-title"
+                  name="title"
+                  label="Table title"
+                  additionalClass="govuk-!-width-two-thirds"
+                  rows={2}
+                />
 
-                  <FormFieldTextInput<FormValues>
-                    id="data-block-source"
-                    name="source"
-                    label="Source"
-                    percentageWidth="two-thirds"
-                  />
+                <FormFieldTextInput<DataBlockDetailsFormValues>
+                  id="data-block-source"
+                  name="source"
+                  label="Source"
+                  percentageWidth="two-thirds"
+                />
 
-                  <FormFieldTextArea<FormValues>
-                    id="data-block-footnotes"
-                    name="customFootnotes"
-                    label="Footnotes"
-                    additionalClass="govuk-!-width-two-thirds"
-                  />
+                <FormFieldTextArea<DataBlockDetailsFormValues>
+                  id="data-block-footnotes"
+                  name="customFootnotes"
+                  label="Footnotes"
+                  additionalClass="govuk-!-width-two-thirds"
+                />
 
-                  <Button
-                    disabled={!form.isValid}
-                    type="submit"
-                    className="govuk-!-margin-top-6"
-                  >
-                    {initialDataBlock ? 'Update data block' : 'Save data block'}
-                  </Button>
-                </FormFieldset>
+                <Button
+                  disabled={!form.isValid}
+                  type="submit"
+                  className="govuk-!-margin-top-6"
+                >
+                  {currentDataBlock ? 'Update data block' : 'Save data block'}
+                </Button>
               </FormGroup>
 
               {blockState.error && (

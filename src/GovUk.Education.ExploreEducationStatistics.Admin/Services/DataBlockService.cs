@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.EntityFrameworkCore;
 using ContentSectionId = System.Guid;
 using DataBlockId = System.Guid;
@@ -16,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DataBlockService : IDataBlockService
     {
         private readonly ContentDbContext _context;
-        private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public DataBlockService(
             ContentDbContext context,
-            IReleaseService releaseService,
             IMapper mapper)
         {
             _context = context;
-            _releaseService = releaseService;
             _mapper = mapper;
         }
 
@@ -34,7 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
             dataBlock.Id = DataBlockId.NewGuid();
 
+            var release = _context
+                .Releases
+                .FindByPrimaryKey(_context, releaseId)
+                .First();
+
             await _context.DataBlocks.AddAsync(dataBlock);
+            
+            release.AddContentBlock(dataBlock);
+            _context.Releases.Update(release);
+            
             await _context.SaveChangesAsync();
 
             return await GetAsync(dataBlock.Id);
@@ -58,11 +65,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
         {
-            var release = await _releaseService.GetAsync(releaseId);
-            
-            var dataBlocks = await _context.DataBlocks.Where(block =>
-                block.ContentSection.ReleaseId.Equals(releaseId) || 
-                block.Id.Equals(release.KeyStatisticsId)).ToListAsync();
+            var dataBlocks = await _context
+                .ReleaseContentBlocks
+                .Where(join => join.ReleaseId == releaseId 
+                               && join.ContentBlock.Type == ContentBlockType.DataBlock.ToString())
+                .Select(join => join.ContentBlock)
+                .OrderBy(dataBlock => ((DataBlock)dataBlock).Name)
+                .ToListAsync();
             
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }

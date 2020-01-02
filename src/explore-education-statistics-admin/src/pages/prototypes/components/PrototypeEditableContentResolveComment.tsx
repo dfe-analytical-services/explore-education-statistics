@@ -2,7 +2,7 @@
 import React from 'react';
 import Details from '@common/components/Details';
 
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 
 import { ExtendedComment } from '@admin/services/publicationService';
 import styles from './PrototypeEditableContentAddComment.module.scss';
@@ -42,13 +42,16 @@ const ContentResolveComment = ({ initialComments }: Props) => {
           className="govuk-!-margin-bottom-1"
         >
           {comments.map(
-            ({ name, time, comment, state, resolvedOn, resolvedBy }, index) => (
+            (
+              { name, time, commentText, state, resolvedOn, resolvedBy },
+              index,
+            ) => (
               <div key={key()}>
                 <h2 className="govuk-body-xs govuk-!-margin-0">
                   <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
                 </h2>
                 <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
-                  {comment}
+                  {commentText}
                 </p>
                 {state === 'open' && (
                   <button

@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  Dev  Test
+Force Tags  Admin  Dev  Test   Failing
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
-    user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
+    user selects theme "Test theme" and topic "UI test topic" from the admin dashboard
 
     user checks page contains accordion  Automated Test Publication for Create Release
     user opens accordion section  Automated Test Publication for Create Release

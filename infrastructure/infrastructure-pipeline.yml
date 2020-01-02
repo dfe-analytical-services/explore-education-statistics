@@ -1,0 +1,26 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infrastructure/*
+    exclude:
+    - README.md
+pr: none
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: AzSKARMTemplateChecker@4
+  enabled: false
+  inputs:
+    ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
+    ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'arm-template'
+    targetPath: 'infrastructure'

@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         IQueryable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null);
 
+        bool Exists(TKey id);
+        
         TEntity Find(TKey id);
 
         Task<TEntity> FindAsync(TKey id);

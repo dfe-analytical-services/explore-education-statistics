@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
+import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -8,6 +8,9 @@ import { UserDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -17,6 +20,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import React, { useContext, useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -26,45 +30,54 @@ interface Model {
   preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
-const AdminDashboardPage = () => {
+interface MatchProps {
+  themeId: string;
+  topicId: string;
+}
+
+const AdminDashboardPage = ({
+  match,
+  handleApiErrors,
+}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { user } = useContext(LoginContext);
-
+  const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
-
   useEffect(() => {
     Promise.all([
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
       dashboardService.getAvailablePreReleaseContacts(),
-    ]).then(
-      ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
-        const contactResultsByRelease = scheduledReleases.map(release =>
-          dashboardService
-            .getPreReleaseContactsForRelease(release.id)
-            .then(contacts => ({
-              releaseId: release.id,
-              contacts,
-            })),
-        );
+    ])
+      .then(
+        ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+          const contactResultsByRelease = scheduledReleases.map(release =>
+            dashboardService
+              .getPreReleaseContactsForRelease(release.id)
+              .then(contacts => ({
+                releaseId: release.id,
+                contacts,
+              })),
+          );
 
-        Promise.all(contactResultsByRelease).then(contactResults => {
-          const preReleaseContactsByScheduledRelease: Dictionary<
-            UserDetails[]
-          > = {};
-          contactResults.forEach(result => {
-            const { releaseId, contacts } = result;
-            preReleaseContactsByScheduledRelease[releaseId] = contacts;
+          return Promise.all(contactResultsByRelease).then(contactResults => {
+            const preReleaseContactsByScheduledRelease: Dictionary<
+              UserDetails[]
+            > = {};
+            contactResults.forEach(result => {
+              const { releaseId, contacts } = result;
+              preReleaseContactsByScheduledRelease[releaseId] = contacts;
+            });
+            setModel({
+              draftReleases,
+              scheduledReleases,
+              availablePreReleaseContacts,
+              preReleaseContactsByScheduledRelease,
+            });
           });
-          setModel({
-            draftReleases,
-            scheduledReleases,
-            availablePreReleaseContacts,
-            preReleaseContactsByScheduledRelease,
-          });
-        });
-      },
-    );
-  }, []);
+        },
+      )
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
 
   return (
     <>
@@ -87,7 +100,19 @@ const AdminDashboardPage = () => {
                   </li>
                 </span>
               </h1>
+
+              <p>This is your administration dashboard - here you can:</p>
+
+              <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
+                <li>
+                  <Link to="/dashboard">manage publications and releases</Link>
+                </li>
+                <li>
+                  <Link to="/methodology">manage methodology</Link>
+                </li>
+              </ul>
             </div>
+
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
@@ -108,12 +133,13 @@ const AdminDashboardPage = () => {
               </RelatedInformation>
             </div>
           </div>
+
           <Tabs id="publicationTabs">
             <TabsSection
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab />
+              <MyPublicationsTab themeId={themeId} topicId={topicId} />
             </TabsSection>
             <TabsSection
               id="draft-releases"
@@ -183,10 +209,13 @@ const AdminDashboardPage = () => {
                         order={[]}
                         className="govuk-!-width-one-third"
                         onChange={async event => {
-                          const updatedContacts = await dashboardService.addPreReleaseContactToRelease(
-                            release.id,
-                            event.target.value,
-                          );
+                          const updatedContacts = await dashboardService
+                            .addPreReleaseContactToRelease(
+                              release.id,
+                              event.target.value,
+                            )
+                            .catch(handleApiErrors);
+
                           setModel({
                             ...model,
                             preReleaseContactsByScheduledRelease: {
@@ -209,10 +238,13 @@ const AdminDashboardPage = () => {
                             <Link
                               to=""
                               onClick={async _ => {
-                                const updatedContacts = await dashboardService.removePreReleaseContactFromRelease(
-                                  release.id,
-                                  existingContact.id,
-                                );
+                                const updatedContacts = await dashboardService
+                                  .removePreReleaseContactFromRelease(
+                                    release.id,
+                                    existingContact.id,
+                                  )
+                                  .catch(handleApiErrors);
+
                                 setModel({
                                   ...model,
                                   preReleaseContactsByScheduledRelease: {
@@ -241,4 +273,4 @@ const AdminDashboardPage = () => {
   );
 };
 
-export default AdminDashboardPage;
+export default withErrorControl(AdminDashboardPage);

@@ -265,16 +265,10 @@ export const tableGeneration = async (
   locations: Dictionary<LocationFilter[]>,
   releaseId: string | undefined,
 ): Promise<{
-  table?: FullTable;
-  tableHeaders?: TableHeadersConfig;
-  query?: TableDataQuery;
+  table: FullTable;
+  tableHeaders: TableHeadersConfig;
+  query: TableDataQuery;
 }> => {
-  const { startYear, startCode, endYear, endCode } = dateRange;
-
-  if (!startYear || !startCode || !endYear || !endCode) {
-    return {};
-  }
-
   const query: TableDataQuery = createQuery(
     getFiltersForTableGeneration(subjectMeta, values),
     getIndicatorsForTableGeneration(subjectMeta, values),
@@ -362,16 +356,9 @@ export const validateAndPopulateDateRange = (
 export const validateAndPopulateFiltersAndIndicators = (
   initialQuery: TableDataQuery,
 ): OptionalTableDataQuery => {
-  if (
-    initialQuery.filters.length === 0 ||
-    initialQuery.indicators.length === 0
-  ) {
-    return undefined;
-  }
-
   return {
-    filters: [...initialQuery.filters],
-    indicators: [...initialQuery.indicators],
+    filters: [...(initialQuery.filters || [])],
+    indicators: [...(initialQuery.indicators || [])],
   };
 };
 

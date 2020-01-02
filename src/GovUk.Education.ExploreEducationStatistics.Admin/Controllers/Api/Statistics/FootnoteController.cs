@@ -93,10 +93,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return GatherAndBuildFootnoteViewModel(updated);
         }
 
+        // TODO EES-918 - remove in favour of checking for release inside service calls
         private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
         {
-            var footnote = _footnoteService.GetFootnote(id);
-            return footnote == null ? NotFound() : andThen.Invoke();
+            return _footnoteService.Exists(id) ? andThen.Invoke() : NotFound();
         }
 
         private Dictionary<long, FootnotesIndicatorsMetaViewModel> GetIndicators(long subjectId)
@@ -277,8 +277,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                                              filterGroupId => new FootnoteFilterGroupViewModel
                                                              {
                                                                  FilterItems =
-                                                                     filterItemsByFilterGroup.GetValueOrDefault(
-                                                                         filterGroupId) ?? new List<long>(),
+                                                                     filterItemsByFilterGroup
+                                                                         .GetValueOrDefault(filterGroupId)
+                                                                         ?.Select(filterItemId =>
+                                                                             filterItemId.ToString()) ??
+                                                                     new List<string>(),
                                                                  Selected = selectedFilterGroups.Contains(filterGroupId)
                                                              }) ?? new Dictionary<long, FootnoteFilterGroupViewModel>(),
                                           Selected = selectedFilters.Contains(filterId)
@@ -288,8 +291,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                               indicatorGroupId => new FootnoteIndicatorGroupViewModel
                                               {
                                                   Indicators =
-                                                      indicatorsByIndicatorGroup.GetValueOrDefault(indicatorGroupId) ??
-                                                      new List<long>()
+                                                      indicatorsByIndicatorGroup.GetValueOrDefault(indicatorGroupId)
+                                                          ?.Select(indicatorId => indicatorId.ToString()) ??
+                                                      new List<string>()
                                               }) ?? new Dictionary<long, FootnoteIndicatorGroupViewModel>(),
                         Selected = selectedSubjects.Contains(subjectId)
                     })

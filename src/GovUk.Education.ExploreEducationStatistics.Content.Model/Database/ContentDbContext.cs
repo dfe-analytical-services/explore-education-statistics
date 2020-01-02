@@ -5,6 +5,7 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -62,10 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     1, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Characteristic__Total, 1
+                            FilterItemName.Characteristic__Total, 66
                         },
                         {
-                            FilterItemName.School_Type__Total, 58
+                            FilterItemName.School_Type__Total, 70
                         }
                     }
                 },
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.School_Type__Total, 461
+                            FilterItemName.School_Type__Total, 456
                         }
                     }
                 },
@@ -81,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_All_primary, 575
+                            FilterItemName.Year_of_admission__Primary_All_primary, 574
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_All_secondary, 577
+                            FilterItemName.Year_of_admission__Secondary_All_secondary, 572
                         }
                     }
                 }
@@ -185,6 +186,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseSummaryVersion> ReleaseSummaryVersions { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
+        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public DbSet<Update> Update { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+
+        public DbSet<Comment> Comment { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -204,12 +212,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     p => p.ToString(),
                     p => new Uri(p));
-            
+
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<Release>()
                 .Property<List<BasicLink>>("RelatedInformation")
                 .HasConversion(
@@ -219,6 +227,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
+
+            modelBuilder.Entity<ContentSection>()
+                .Property(b => b.Type)
+                .HasConversion(new EnumToStringConverter<ContentSectionType>());
 
             modelBuilder.Entity<Release>()
                 .Property(b => b.NextReleaseDate)
@@ -238,22 +250,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rsv => rsv.ReleaseSummary)
                 .WithMany(rs => rs.Versions)
                 .HasForeignKey(rsv => rsv.ReleaseSummaryId);
-            
+
             modelBuilder.Entity<ReleaseSummaryVersion>()
                 .Property(b => b.NextReleaseDate)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<PartialDate>(v));
-            
+
             modelBuilder.Entity<ReleaseSummaryVersion>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
-                        
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasColumnName("DataBlock_Request");
@@ -271,14 +283,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Summary>(v));
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Tables)
                 .HasColumnName("DataBlock_Tables")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<Table>>(v));
-            
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasConversion(
@@ -288,18 +300,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("HtmlBlock_Body");
- 
+
             modelBuilder.Entity<InsetTextBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("InsetTextBlock_Body");
-            
+
             modelBuilder.Entity<InsetTextBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("InsetTextBlock_Heading");
-            
+
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("MarkDownBlock_Body");
+
+            modelBuilder.Entity<ReleaseContentSection>()
+                .HasKey(item => new {item.ReleaseId, item.ContentSectionId});
+
+            modelBuilder.Entity<ReleaseContentBlock>()
+                .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
+
+            modelBuilder.Entity<User>();
+
+            modelBuilder.Entity<UserReleaseRole>()
+                .Property(r => r.Role)
+                .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
@@ -1221,7 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                    
+
                     Title = "Secondary and primary schools applications and offers",
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
@@ -1514,30 +1538,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
+            var absenceReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5");
+            var exclusionsReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278");
+            var applicationOffersReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717");
+
             modelBuilder.Entity<ReleaseSummary>().HasData(
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                        Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                    }
-                    ,
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                        Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
-                    },
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                        Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                    },
-                    new ReleaseSummary
-                    {
-                        ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                        Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                    }
-                )
-                ;
+                new ReleaseSummary
+                {
+                    ReleaseId = absenceReleaseId,
+                    Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
+                    Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = exclusionsReleaseId,
+                    Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
+                },
+                new ReleaseSummary
+                {
+                    ReleaseId = applicationOffersReleaseId,
+                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
+                }
+            );
+
 
             modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
                 new ReleaseSummaryVersion
@@ -1546,9 +1573,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("420ca58e-278b-456b-9031-fe74a6966159"),
                     Slug = "2016-17",
                     ReleaseName = "2016",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
@@ -1559,8 +1583,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Created = new DateTime(2016, 1, 1),
                     ReleaseName = "2015",
                     Slug = "2015-16",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     ReleaseSummaryId = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
@@ -1571,9 +1593,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Created = new DateTime(2018, 1, 1),
                     ReleaseName = "2016",
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     ReleaseSummaryId = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
@@ -1584,59 +1603,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Created = new DateTime(2018, 1, 1),
                     ReleaseName = "2018",
                     Slug = "2018",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     ReleaseSummaryId = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
                 });
-             
-            
+
+
             modelBuilder.Entity<Release>().HasData(
                 //absence
                 new Release
                 {
-                    Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    Id = absenceReleaseId,
                     ReleaseName = "2016",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21")
                 },
 
                 // exclusions
                 new Release
                 {
-                    Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    Id = exclusionsReleaseId,
                     ReleaseName = "2016",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    RelatedInformation = new List<BasicLink>
+                    {
+                        new BasicLink
+                        {
+                            Id = new Guid("f3c67bc9-6132-496e-a848-c39dfcd16f49"),
+                            Description = "Additional guidance",
+                            Url = "http://example.com"
+                        },
+                        new BasicLink
+                        {
+                            Id = new Guid("45acb50c-8b21-46b4-989f-36f4b0ee37fb"),
+                            Description = "Statistics guide",
+                            Url = "http://example.com"
+                        }
+                    },
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d")
                 },
-                
+
                 // Secondary and primary schools applications offers
                 new Release
                 {
-                    Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    Id = applicationOffersReleaseId,
                     ReleaseName = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     Published = new DateTime(2018, 6, 14),
                     Slug = "2018",
-                    Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    KeyStatisticsId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e")
                 }
             );
 
@@ -1645,147 +1667,557 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ContentSection
                 {
                     Id = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 1, Heading = "About these statistics", Caption = ""
+                    Order = 1, Heading = "About these statistics", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 2, Heading = "Pupil absence rates", Caption = ""
+                    Order = 2, Heading = "Pupil absence rates", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 3, Heading = "Persistent absence", Caption = ""
+                    Order = 3, Heading = "Persistent absence", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 4, Heading = "Reasons for absence", Caption = ""
+                    Order = 4, Heading = "Reasons for absence", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 5, Heading = "Distribution of absence", Caption = ""
+                    Order = 5, Heading = "Distribution of absence", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 6, Heading = "Absence by pupil characteristics", Caption = ""
+                    Order = 6, Heading = "Absence by pupil characteristics", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 7, Heading = "Absence for 4-year-olds", Caption = ""
+                    Order = 7, Heading = "Absence for 4-year-olds", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 8, Heading = "Pupil referral unit absence", Caption = ""
+                    Order = 8, Heading = "Pupil referral unit absence", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = ""
+                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
 
                 // exclusions
                 new ContentSection
                 {
                     Id = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 1, Heading = "About this release", Caption = ""
+                    Order = 1, Heading = "About this release", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 2, Heading = "Permanent exclusions", Caption = ""
+                    Order = 2, Heading = "Permanent exclusions", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 3, Heading = "Fixed-period exclusions", Caption = ""
+                    Order = 3, Heading = "Fixed-period exclusions", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = ""
+                    Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 5, Heading = "Reasons for exclusions", Caption = ""
+                    Order = 5, Heading = "Reasons for exclusions", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 6, Heading = "Exclusions by pupil characteristics", Caption = ""
+                    Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 7, Heading = "Independent exclusion reviews", Caption = ""
+                    Order = 7, Heading = "Independent exclusion reviews", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 8, Heading = "Pupil referral units exclusions", Caption = ""
+                    Order = 8, Heading = "Pupil referral units exclusions", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = ""
+                    Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
 
                 // Secondary and primary schools applications offers
                 new ContentSection
                 {
                     Id = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Order = 1, Heading = "About this release", Caption = ""
+                    Order = 1, Heading = "About this release", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Order = 2, Heading = "Secondary applications and offers", Caption = ""
+                    Order = 2, Heading = "Secondary applications and offers", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Order = 3, Heading = "Secondary geographical variation", Caption = ""
+                    Order = 3, Heading = "Secondary geographical variation", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Order = 4, Heading = "Primary applications and offers", Caption = ""
+                    Order = 4, Heading = "Primary applications and offers", Caption = "",
+                    Type = ContentSectionType.Generic
                 },
                 new ContentSection
                 {
                     Id = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Order = 5, Heading = "Primary geographical variation", Caption = ""
+                    Order = 5, Heading = "Primary geographical variation", Caption = "",
+                    Type = ContentSectionType.Generic
+                },
+
+                // Summary sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.ReleaseSummary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.ReleaseSummary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.ReleaseSummary
+                },
+
+                // Key Statistics sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatistics
+                },
+                new ContentSection
+                {
+                    Id = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatistics
+                },
+                new ContentSection
+                {
+                    Id = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatistics
+                },
+
+                // Key Statistics secondary sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+                new ContentSection
+                {
+                    Id = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.KeyStatisticsSecondary
+                },
+
+                // Headline sections for each Release
+                new ContentSection
+                {
+                    Id = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.Headlines
+                },
+                new ContentSection
+                {
+                    Id = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.Headlines
+                },
+                new ContentSection
+                {
+                    Id = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    Order = 1, Heading = "", Caption = "",
+                    Type = ContentSectionType.Headlines
                 }
             );
 
+            modelBuilder.Entity<ReleaseContentSection>().HasData(
+                // absence
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
+                    ReleaseId = absenceReleaseId,
+                },
+
+                // exclusions
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+
+                // Secondary and primary schools applications offers
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+
+                // Summary sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+
+                // Key Statistics sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+
+                // Key Statistics secondary sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+
+                // Headline sections for each Release
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
+                    ReleaseId = absenceReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                new ReleaseContentSection
+                {
+                    ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    ReleaseId = applicationOffersReleaseId,
+                }
+            );
+
+            modelBuilder.Entity<ReleaseContentBlock>().HasData(
+                // absence key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // absence key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // absence key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // absence key stats aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // absence generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // absence generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
+                    ReleaseId = absenceReleaseId,
+                },
+                // exclusions key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("038093a2-0be3-440b-8b22-8116e34aa616"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions detached data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // exclusions detached data block 2
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("0b4c43cd-fc12-4159-88b9-0c8646424555"),
+                    ReleaseId = exclusionsReleaseId,
+                },
+                // Secondary and primary schools applications key stats tile 1 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                // Secondary and primary schools applications key stats tile 2 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                // Secondary and primary schools applications key stats tile 3 data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                // Secondary and primary schools applications aggregate table data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                // Secondary and primary schools applications generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),
+                    ReleaseId = applicationOffersReleaseId,
+                },
+                // Secondary and primary schools applications generic content data block
+                new ReleaseContentBlock
+                {
+                    ContentBlockId = new Guid("a8c408ed-45d8-4690-a9f3-2fb0e86377bf"),
+                    ReleaseId = applicationOffersReleaseId,
+                }
+            );
+
+            modelBuilder.Entity<Comment>()    
+                .HasData(
+                    new Comment
+                    {
+                        Id = new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
+                        IContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                        CommentText = "Test Text",
+                        Name = "A Test User",
+                        State = CommentState.open,
+                        Time = new DateTime(2019, 12, 1, 15, 0, 0),
+                        ResolvedBy = null,
+                        ResolvedOn = null
+                    }
+                    
+                );
+            
             modelBuilder.Entity<MarkDownBlock>().HasData(
                 // absence
                 new MarkDownBlock
@@ -1971,15 +2403,410 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("8e10ad6c-9a68-4162-84f9-81fb6dc93ae3"),
                     ContentSectionId = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
                     Body = SampleMarkDownContent.Content[new Guid("8e10ad6c-9a68-4162-84f9-81fb6dc93ae3")]
+                },
+
+                // Summary sections for each Release
+                new MarkDownBlock
+                {
+                    Id = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                    ContentSectionId = new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"),
+                    Order = 1,
+                    Body =
+                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+                },
+                new MarkDownBlock
+                {
+                    Id = new Guid("7934e93d-2e11-478d-ab0e-f799f15164bb"),
+                    ContentSectionId = new Guid("f599c2e2-f215-423a-beab-c5c6a0c2e5a9"),
+                    Order = 1,
+                    Body = "Read national statistical summaries, view charts and tables and download " +
+                           "data files.\n\nFind out how and why these statistics are collected and " +
+                           "published - [Permanent and fixed-period exclusion statistics: methodology]" +
+                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                },
+                new MarkDownBlock
+                {
+                    Id = new Guid("31c6b325-cbfa-4108-9956-cde7fa6a99ec"),
+                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    Order = 1,
+                    Body = "Read national statistical summaries, view charts and tables and download " +
+                           "data files.\n\nFind out how and why these statistics are collected and " +
+                           "published - [Secondary and primary school applications and offers: methodology]" +
+                           "(../methodology/secondary-and-primary-schools-applications-and-offers)"
+                },
+
+                // Headline section for each Release
+                new MarkDownBlock
+                {
+                    Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
+                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    Order = 1,
+                    Body = " * pupils missed on average 8.2 school days\n" +
+                           " * overall and unauthorised absence rates up on 2015/16\n" +
+                           " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
+                           " * 10% of pupils persistently absent during 2016/17"
+                },
+                new MarkDownBlock
+                {
+                    Id = new Guid("db00f19a-96b7-47c9-84eb-92d6ace41434"),
+                    ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
+                    Order = 1,
+                    Body =
+                        "* majority of applicants received a preferred offer\n" +
+                        "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
+                        "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
+                },
+                new MarkDownBlock
+                {
+                    Id = new Guid("8a108b91-ff08-4866-9566-cf03e33cd4ec"),
+                    ContentSectionId = new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"),
+                    Order = 1,
+                    Body =
+                        "* majority of applicants received a preferred offer\n" +
+                        "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
+                        "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
                 }
             );
 
             modelBuilder.Entity<DataBlock>().HasData(
-                // absence
+                // absence key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Order = 1,
+                    Name = "Key Stat 1",
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Overall_absence_rate),
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Overall_absence_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 4.6% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Overall_absence_rate),
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Overall absence rate",
+                                        Unit = "%",
+                                        Colour = "#f5a450",
+                                        symbol = ChartSymbol.cross
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("3da30a08-9eeb-4a99-9872-796c3ea518fa"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Name = "Key Stat 2",
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Similar to previous years",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Authorised absence rate",
+                                        Unit = "%",
+                                        Colour = "#005ea5",
+                                        symbol = ChartSymbol.diamond
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("045a9585-688f-46fa-b3a9-9bdc237e0381"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    Name = "Key Stat 3",
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 1,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(1, FilterItemName.Characteristic__Total),
+                            FItem(1, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                        }
+                    },
+
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(1, IndicatorName.Unauthorised_absence_rate)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 1.1% in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                            }
+                        }
+                    },
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                FItem(1, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                    = new ChartConfiguration
+                                    {
+                                        Label = "Unauthorised absence rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+                // absence key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
-                    ContentSectionId = null, //KeyStatistics
+                    ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2023,14 +2850,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
                             @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
                             @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
-                        },
-                        description = new MarkDownBlock
-                        {
-                            Id = new Guid("f928762e-9bd5-4538-a4f0-d7f34b2874e6"),
-                            Body = " * pupils missed on average 8.2 school days\n" +
-                                   " * overall and unauthorised absence rates up on 2015/16\n" +
-                                   " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
-                                   " * 10% of pupils persistently absent during 2016/17"
                         }
                     },
                     Tables = new List<Table>
@@ -2123,6 +2942,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // absence generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
@@ -2241,7 +3061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
                                     }
-                            }, 
+                            },
                             Legend = Legend.top
                         }
                     }
@@ -2354,11 +3174,319 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 },
 
-                // exclusions
+                // exclusions key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("d0397918-1697-40d8-b649-bea3c63c7d3e"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 1",
+                    Order = 1,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 0.08% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12,
+                                                IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        }
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Permanent_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Permanent exclusion rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // exclusions key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("695de169-947f-4f66-8564-6392b6113dfc"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 2",
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 4.29% in 2015/16",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Fixed period exclusion rate",
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    },
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // exclusions key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("17251e1c-e978-419c-98f5-963131c952f7"),
+                    ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
+                    Name = "Key Stat 3",
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // exclusions key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
-                    ContentSectionId = null, // KeyStatistics
+                    ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
@@ -2406,15 +3534,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
                             @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
                         },
-                        description = new MarkDownBlock
-                        {
-                            Id = new Guid("132bef6e-c2a3-459d-996e-40f29ed6e74f"),
-                            Body =
-                                " * overall permanent exclusions rate has increased to 0.10% - up from 0.08% in 2015/16\n" +
-                                " * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\n" +
-                                " * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\n" +
-                                " * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\n"
-                        }
                     },
                     Tables = new List<Table>
                     {
@@ -2491,6 +3610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // exclusions generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
@@ -2662,11 +3782,373 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 },
 
-                // Secondary and primary schools applications offers
+                // exclusions detached Data Block (not yet belonging to any Content Section)
+                new DataBlock
+                {
+                    Id = new Guid("1869d10a-ca3f-450c-9685-780b11d916f5"),
+                    ContentSectionId = null, // not yet used in any Content
+                    Name = "Available Data Block",
+                    Order = 0,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // another exclusions detached Data Block (not yet belonging to any Content Section)
+                new DataBlock
+                {
+                    Id = new Guid("0b4c43cd-fc12-4159-88b9-0c8646424555"),
+                    ContentSectionId = null, // not yet used in any Content
+                    Name = "Available Data Block 2",
+                    Order = 0,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 12,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2012",
+                            StartCode = TimeIdentifier.AcademicYear,
+                            EndYear = "2016",
+                            EndCode = TimeIdentifier.AcademicYear
+                        },
+
+                        Filters = new List<string>
+                        {
+                            FItem(12, FilterItemName.School_Type__Total)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Up from 6,685 in 2015/16"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            }
+                        }
+                    },
+
+                    Charts = new List<IContentBlockChart>
+                    {
+                        new LineChart
+                        {
+                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            {
+                                ["major"] = new AxisConfigurationItem
+                                {
+                                    GroupBy = AxisGroupBy.timePeriod,
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<string>
+                                            {
+                                                FItem(12, FilterItemName.School_Type__Total)
+                                            }
+                                        },
+                                    },
+                                    Title = "School Year"
+                                },
+                                ["minor"] = new AxisConfigurationItem
+                                {
+                                    Min = 0,
+                                    Title = "Absence Rate"
+                                }
+                            },
+                            Labels = new Dictionary<string, ChartConfiguration>
+                            {
+                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                    =
+                                    new ChartConfiguration
+                                    {
+                                        Label = "Number of permanent exclusions",
+                                        Unit = "",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
+                                    }
+                            },
+                            Legend = Legend.top
+                        }
+                    }
+                },
+
+                // Secondary and primary schools applications offers key statistics tile 1
+                new DataBlock
+                {
+                    Id = new Guid("5947759d-c6f3-451b-b353-a4da063f020a"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 1",
+                    Order = 1,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_applications_received),
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_applications_received),
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 620,330 in 2017",
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of applications received for places at primary and secondary schools.",
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_applications_received),
+                            }
+                        }
+                    }
+                },
+
+                // Secondary and primary schools applications offers key statistics tile 2
+                new DataBlock
+                {
+                    Id = new Guid("02a637e7-6cc7-44e5-8991-8982edfe49fc"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 2",
+                    Order = 2,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 558,411 in 2017"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of first preferences offered to applicants by schools."
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                            }
+                        }
+                    }
+                },
+
+                // Secondary and primary schools applications offers key statistics tile 3
+                new DataBlock
+                {
+                    Id = new Guid("5d5f9b1f-8d0d-47d4-ba2b-ea97413d3117"),
+                    ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
+                    Name = "Key Stat 3",
+                    Order = 3,
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                        SubjectId = 17,
+                        GeographicLevel = GeographicLevel.Country,
+                        TimePeriod = new TimePeriod
+                        {
+                            StartYear = "2014",
+                            StartCode = TimeIdentifier.CalendarYear,
+                            EndYear = "2018",
+                            EndCode = TimeIdentifier.CalendarYear
+                        },
+                        Filters = new List<string>
+                        {
+                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                        },
+                        Indicators = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                        }
+                    },
+                    Summary = new Summary
+                    {
+                        dataKeys = new List<string>
+                        {
+                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                        },
+                        dataSummary = new List<string>
+                        {
+                            "Down from 34,792 in 2017"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of second preferences offered to applicants by schools."
+                        }
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string>
+                            {
+                                Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                            }
+                        }
+                    }
+                },
+
+                // Secondary and primary schools applications offers key statistics aggregate table
                 new DataBlock
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
-                    ContentSectionId = null, // KeyStatistics
+                    ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
+                    Name = "Key Stats aggregate table",
+                    Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
@@ -2714,14 +4196,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of applications received for places at primary and secondary schools.",
                             @"Total number of first preferences offered to applicants by schools.",
                             @"Total number of second preferences offered to applicants by schools."
-                        },
-                        description = new MarkDownBlock
-                        {
-                            Id = new Guid("fdcac9d3-dab5-445d-9802-a8af0990efb2"),
-                            Body =
-                                "* majority of applicants received a preferred offer\n" +
-                                "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
-                                "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
                         }
                     },
                     Tables = new List<Table>
@@ -2742,6 +4216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
+                // Secondary and primary schools applications offers generic data blocks used in content
                 new DataBlock
                 {
                     Id = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),
@@ -2848,7 +4323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                     On = new DateTime(2018, 4, 19),
                     Reason =
                         "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
@@ -2856,7 +4331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseId = absenceReleaseId,
                     On = new DateTime(2018, 3, 22),
                     Reason = "First published."
                 },
@@ -2870,14 +4345,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                     On = new DateTime(2018, 7, 19),
                     Reason = "First published."
                 },
                 new Update
                 {
                     Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseId = exclusionsReleaseId,
                     On = new DateTime(2018, 8, 25),
                     Reason =
                         "Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma)."
@@ -2923,7 +4398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Update
                 {
                     Id = new Guid("448ca9ea-0cd2-4e6d-b85b-76c3ef7d3bf9"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseId = applicationOffersReleaseId,
                     On = new DateTime(2018, 6, 14),
                     Reason = "First published."
                 }
@@ -3129,8 +4604,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -3147,8 +4622,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6bf20dd4-a7d6-4bc6-a13a-9f574935c9af"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -3165,8 +4640,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("63a318d9-05fa-40eb-9808-b825a6deb54a"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -3183,8 +4658,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7714efb9-cc82-4895-ba27-bf5464541e38"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3201,8 +4676,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6f81ab70-5730-4cf1-a513-669f5c4bef09"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3219,8 +4694,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a40d6c9e-fe61-48c0-b907-9757148beb0d"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3237,8 +4712,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("f620a229-21b7-4c6e-afd4-e9feb111f09a"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3258,8 +4733,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8b90b3b2-f63d-4499-91aa-41ccae74e1c7"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3276,8 +4751,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("47f3e500-ec9f-4a00-96f8-c488f76b06e6"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3294,8 +4769,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a00a7765-aa81-43f2-afe1-fead7f070291"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3312,8 +4787,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7cc516d4-fc79-4e22-b35b-a042d5b14d35"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3330,8 +4805,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8ddc6877-acd2-479d-a86f-1139c1bd429f"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexE.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexE.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3348,8 +4823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("0fd71cfd-cfdd-42c5-86e7-9e311beee646"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexF.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexF.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3379,9 +4854,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("ff7b34e3-58ba-4578-849a-e5044fc14b8d"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -3400,9 +4875,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("d7f310d7-e917-47e2-9e05-065c8bcab891"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -3421,9 +4896,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("a89226ef-1d6a-48ba-a795-0dbc334a9198"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -3442,9 +4917,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Id = new Guid("16898320-cf69-45c4-8dbb-2486901759b1"),
                                     Body =
                                         File.Exists(
-                                            @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html")
+                                            @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html")
                                             ? File.ReadAllText(
-                                                @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html",
+                                                @"Migrations/ContentMigrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html",
                                                 Encoding.UTF8)
                                             : ""
                                 }
@@ -3472,8 +4947,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("9a034a5f-7cdb-4895-b205-864e7f834ebf"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section1.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3490,8 +4965,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("f745893e-68a6-4813-ba8b-35d44c0935aa"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section2.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3508,8 +4983,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4c88cbdd-e0e2-4019-a656-31e4b97d19d5"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section3.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3526,8 +5001,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("085ba061-918b-4e6e-9a02-3a8b12671587"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section4.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3544,8 +5019,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("29f138eb-070e-41fe-95c6-e271cdf4eaf4"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section5.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3562,8 +5037,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8263cdc1-a2e8-4db6-a581-44043a6add64"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section6.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3580,8 +5055,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("e1eb03d9-25e4-4247-b3de-49805cce7889"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section7.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3601,8 +5076,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("c2d4d345-59b6-443b-bcb0-67c1f1dd9732"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexA.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3619,8 +5094,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("e4e4f98b-cbeb-451f-bd17-8e2d572b83f4"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexB.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3637,8 +5112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("94246f85-e43a-4b6c-97a0-b045701dc077"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexC.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3655,8 +5130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("b05ae1f7-b2d1-4ae3-9db6-28fb0edf98ae"),
-                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html")
-                                        ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html",
+                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexD.html")
+                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Exclusion_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -3665,6 +5140,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 }
             );
+            
+            var analystMvcUser1Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04");
+            var analystMvcUser2Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62");
+            var analystMvcUser3Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a");
+            var bauMvcUser1Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd");
+            var bauMvcUser2Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63");
+
+            modelBuilder.Entity<User>()
+                .HasData(
+                    new User
+                    {
+                        Id = analystMvcUser1Id,
+                        FirstName = "Analyst1",
+                        LastName = "User1",
+                        Email = "analyst1@example.com"
+                    },
+                    new User
+                    {
+                        Id = analystMvcUser2Id,
+                        FirstName = "Analyst2",
+                        LastName = "User2",
+                        Email = "analyst2@example.com"
+                    },
+                    new User
+                    {
+                        Id = analystMvcUser3Id,
+                        FirstName = "Analyst3",
+                        LastName = "User3",
+                        Email = "analyst3@example.com"
+                    },
+                    new User
+                    {
+                        Id = bauMvcUser1Id,
+                        FirstName = "Bau1",
+                        LastName = "User1",
+                        Email = "bau1@example.com"
+                    },
+                    new User
+                    {
+                        Id = bauMvcUser2Id,
+                        FirstName = "Bau2",
+                        LastName = "User2",
+                        Email = "bau2@example.com"
+                    }
+                );
+            
+            modelBuilder.Entity<UserReleaseRole>()
+                .HasData(
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("1501265c-979b-4cd4-8a55-00bfe909a2da"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser1Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("086b1354-473c-48bb-9d30-0ac1963dc4cb"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser1Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("f7884899-baf9-4009-8561-f0c5df0d0a69"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("77ff439d-e1cd-4e50-9c25-24a5207953a5"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Contributor
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("b00fd7c0-226f-474d-8cec-820a1a789182"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Lead
+                    }
+                );
         }
 
         private static string FItem(int subjectId, FilterItemName filterItemName)

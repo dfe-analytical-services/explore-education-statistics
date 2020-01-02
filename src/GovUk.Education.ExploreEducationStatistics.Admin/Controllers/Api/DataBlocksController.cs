@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DataBlockId = System.Guid;
-using ContentSectionId = System.Guid;
-using PublicationId = System.Guid;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -18,68 +17,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class DataBlocksController : ControllerBase
     {
         private readonly IDataBlockService _dataBlockService;
-        private readonly IReleaseService _releaseService;
+        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<DataBlock, Guid> _dataBlockHelper;
 
-        public DataBlocksController(IDataBlockService dataBlockService, IReleaseService releaseService)
+        public DataBlocksController(
+            IDataBlockService dataBlockService, 
+            IPersistenceHelper<Release, Guid> releaseHelper, 
+            IPersistenceHelper<DataBlock, Guid> dataBlockHelper)
         {
             _dataBlockService = dataBlockService;
-            _releaseService = releaseService;
+            _releaseHelper = releaseHelper;
+            _dataBlockHelper = dataBlockHelper;
         }
 
         [HttpPost("release/{releaseId}/datablocks")]
-        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(ReleaseId releaseId,
+        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(Guid releaseId,
             CreateDataBlockViewModel dataBlock)
         {
-            return await CheckReleaseExistsAsync(releaseId, async () =>
-                Ok(await _dataBlockService.CreateAsync(releaseId, dataBlock)));
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return await _releaseHelper
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_ => _dataBlockService.CreateAsync(releaseId, dataBlock))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpDelete("datablocks/{id}")]
-        public async Task<ActionResult> DeleteDataBlockAsync(DataBlockId id)
+        public Task<ActionResult> DeleteDataBlockAsync(Guid id)
         {
-            return await CheckDataBlockExistsAsync(id, async () =>
-            {
-                await _dataBlockService.DeleteAsync(id);
-                return new NoContentResult();
-            });
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return _dataBlockHelper
+                .CheckEntityExistsActionResult(id)
+                .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
+                .OnSuccess(_ => new NoContentResult())
+                .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(Guid releaseId)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(await _dataBlockService.ListAsync(releaseId)));
+            // TODO EES-918 - remove in favour of checking for release inside service calls
+            return await _releaseHelper
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_ => _dataBlockService.ListAsync(releaseId))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpGet("datablocks/{id}")]
-        public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(DataBlockId id)
+        public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(Guid id)
         {
-            return Ok(await _dataBlockService.GetAsync(id));
+            return await _dataBlockHelper
+                .CheckEntityExistsActionResult(id)
+                // TODO EES-918 - remove in favour of checking for release inside service calls
+                .OnSuccess(_ => _dataBlockService.GetAsync(id))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
 
         [HttpPut("datablocks/{id}")]
-        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlockAsync(DataBlockId id,
+        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlockAsync(Guid id,
             UpdateDataBlockViewModel dataBlock)
         {
-            return Ok(await _dataBlockService.UpdateAsync(id, dataBlock));
-        }
-
-        private async Task<ActionResult> CheckDataBlockExistsAsync(DataBlockId dataBlockId,
-            Func<Task<ActionResult>> andThen)
-        {
-            var dataBlock = await _dataBlockService.GetAsync(dataBlockId);
-            if (dataBlock == null)
-            {
-                return NotFound();
-            }
-
-            return await andThen.Invoke();
-        }
-
-        private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
-        {
-            var release = await _releaseService.GetAsync(releaseId);
-            return release == null ? NotFound() : await andThen.Invoke();
+            return await _dataBlockHelper
+                .CheckEntityExistsActionResult(id)
+                .OnSuccess(_ => _dataBlockService.UpdateAsync(id, dataBlock))
+                .OnSuccess(Ok)
+                .HandleFailures();
         }
     }
 }

@@ -20,8 +20,8 @@ import {
 } from 'react-beautiful-dnd';
 import { EditableRelease } from '@admin/services/publicationService';
 import {
-  FormGroup,
   FormFieldset,
+  FormGroup,
   FormTextInput,
 } from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
@@ -156,7 +156,7 @@ class EditablePublicationPage extends Component<Props, State> {
           Contents
         </h2>
 
-        <EditableAccordion id="contents-sections" index={0}>
+        <EditableAccordion id="contents-sections">
           {data.content.map(({ heading, caption, order, content }, index) => (
             <EditableAccordionSection
               heading={heading}
@@ -167,12 +167,8 @@ class EditablePublicationPage extends Component<Props, State> {
               <EditableContentBlock
                 editable={editing}
                 content={content}
-                reviewing={reviewing}
                 resolveComments={resolveComments}
                 id={`editable-block-${index}`}
-                onContentChange={(block, newContent) => {
-                  block.body = newContent;
-                }}
                 publication={data.publication}
               />
             </EditableAccordionSection>
@@ -278,12 +274,12 @@ class EditablePublicationPage extends Component<Props, State> {
                   </span>
 
                   <dl className="dfe-meta-content">
-                    <dt className="govuk-caption-m">Publish date: </dt>
+                    <dt className="govuk-caption-m">Publish date:</dt>
                     <dd>
                       <strong>20 September 2019</strong>
                     </dd>
                     <div>
-                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dt className="govuk-caption-m">Next update:</dt>
                       <dd>
                         <strong>20 September 2020</strong>
                       </dd>
@@ -301,11 +297,19 @@ class EditablePublicationPage extends Component<Props, State> {
                 </div>
               </div>
 
-              {reviewing && data && (
-                <AddComment initialComments={data.keyStatistics.comments} />
+              {reviewing && data && data.keyStatisticsSection.content && (
+                <AddComment
+                  initialComments={
+                    data.keyStatisticsSection.content[0].comments
+                  }
+                />
               )}
-              {resolveComments && data && (
-                <ResolveComment initialComments={data.keyStatistics.comments} />
+              {resolveComments && data && data.keyStatisticsSection.content && (
+                <ResolveComment
+                  initialComments={
+                    data.keyStatisticsSection.content[0].comments
+                  }
+                />
               )}
               <PrototypeEditableContent
                 reviewing={reviewing}
@@ -418,15 +422,161 @@ class EditablePublicationPage extends Component<Props, State> {
                 </dl>
 
                 <dl className="dfe-meta-content">
-                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dt className="govuk-caption-m">Last updated:</dt>
                   <dd data-testid="last-updated">
                     <strong>19 April 2019</strong>
                   </dd>
                   <dd>
                     <Details summary="See updates">
                       <div data-testid="publication-page--update-element">
-                        <h3 className="govuk-heading-s">20 September 2019</h3>
+                        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                          20 September 2019
+                        </h3>
                         <p>First published.</p>
+                        {editing && (
+                          <>
+                            <Link
+                              to="#"
+                              className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+                            >
+                              Edit
+                            </Link>
+                            <Link
+                              to="#"
+                              className="govuk-button govuk-button--warning"
+                            >
+                              Remove
+                            </Link>
+                          </>
+                        )}
+                        <hr />
+                        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                          2 December 2019
+                        </h3>
+                        <p>
+                          Lorem ipsum dolor sit amet consectetur adipisicing
+                          elit. Esse, fugit minima quis maiores accusamus
+                          doloremque.
+                        </p>
+                        {editing && (
+                          <>
+                            <Link
+                              to="#"
+                              className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+                            >
+                              Edit
+                            </Link>
+                            <Link
+                              to="#"
+                              className="govuk-button govuk-button--warning"
+                            >
+                              Remove
+                            </Link>
+                          </>
+                        )}
+                        <hr />
+                        {editing && (
+                          <>
+                            <h3 className="govuk-heading-s">
+                              Edit release note
+                            </h3>
+                            <fieldset className="govuk-fieldset">
+                              <legend className="govuk-fieldset__legend govuk-body">
+                                Edit date
+                              </legend>
+                              <div
+                                className="govuk-date-input"
+                                id="schedule-publish-date"
+                              >
+                                <div className="govuk-date-input__item">
+                                  <div className="govuk-form-group">
+                                    <label
+                                      htmlFor="schedule-day"
+                                      className="govuk-label govuk-date-input__label"
+                                    >
+                                      Day
+                                    </label>
+                                    <input
+                                      className="govuk-input govuk-date-input__inout govuk-input--width-2"
+                                      id="schedule-day"
+                                      name="schedule-day"
+                                      type="number"
+                                      pattern="[0-9]*"
+                                      value="02"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="govuk-date-input__item">
+                                  <div className="govuk-form-group">
+                                    <label
+                                      htmlFor="schedule-month"
+                                      className="govuk-label govuk-date-input__label"
+                                    >
+                                      Month
+                                    </label>
+                                    <input
+                                      className="govuk-input govuk-date-input__inout govuk-input--width-2"
+                                      id="schedule-month"
+                                      name="schedule-month"
+                                      type="number"
+                                      pattern="[0-9]*"
+                                      value="12"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="govuk-date-input__item">
+                                  <div className="govuk-form-group">
+                                    <label
+                                      htmlFor="schedule-year"
+                                      className="govuk-label govuk-date-input__label"
+                                    >
+                                      Year
+                                    </label>
+                                    <input
+                                      className="govuk-input govuk-date-input__inout govuk-input--width-4"
+                                      id="schedule-year"
+                                      name="schedule-year"
+                                      type="number"
+                                      pattern="[0-9]*"
+                                      value="2019"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </fieldset>
+                            <FormFieldset id="edit-release-note" legend="">
+                              <FormGroup>
+                                <label
+                                  htmlFor="releaseUpdateNote"
+                                  className="govuk-label"
+                                >
+                                  Update release note
+                                </label>
+                                <textarea
+                                  className="govuk-textarea govuk-!-margin-bottom-3"
+                                  id="releaseUpdateNote"
+                                  name="releaseUpdateNote"
+                                  rows={3}
+                                  value="Lorem ipsum dolor sit amet consectetur
+                                  adipisicing elit. Esse, fugit minima quis
+                                  maiores accusamus doloremque."
+                                />
+                              </FormGroup>
+                              <button
+                                type="submit"
+                                className="govuk-button govuk-!-margin-right-6"
+                              >
+                                Update
+                              </button>
+                              <a
+                                href="#"
+                                className="govuk-button govuk-button--secondary"
+                              >
+                                Cancel
+                              </a>
+                            </FormFieldset>
+                          </>
+                        )}
                       </div>
                     </Details>
                   </dd>
@@ -440,7 +590,7 @@ class EditablePublicationPage extends Component<Props, State> {
                           htmlFor="releaseUpdateNote"
                           className="govuk-label"
                         >
-                          Add release note
+                          Add new release note
                         </label>
                         <textarea
                           className="govuk-textarea govuk-!-margin-bottom-3"
@@ -523,11 +673,15 @@ class EditablePublicationPage extends Component<Props, State> {
           <h2 className="govuk-heading-l">
             Latest headline facts and figures - 2018/19
           </h2>
-          {reviewing && data && (
-            <AddComment initialComments={data.keyStatistics.comments} />
+          {reviewing && data && data.keyStatisticsSection.content && (
+            <AddComment
+              initialComments={data.keyStatisticsSection.content[0].comments}
+            />
           )}
-          {resolveComments && data && (
-            <ResolveComment initialComments={data.keyStatistics.comments} />
+          {resolveComments && data && data.keyStatisticsSection.content && (
+            <ResolveComment
+              initialComments={data.keyStatisticsSection.content[0].comments}
+            />
           )}
 
           <PrototypeDataSample

@@ -1,13 +1,14 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
+import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageCreatePublication from './images/guidance/guidance-publication-create.png';
-import imageContactPublication from './images/guidance/guidance-publication-contact.png';
-import imageProductionTeamPublication from './images/guidance/guidance-publication-production-team.png';
-import imageEditDeletePublication from './images/guidance/guidance-publication-edit-delete.png';
-import imageCreateReleasePublication from './images/guidance/guidance-publication-create-release.png';
+import imageCreatePublication from './images/guidance/guidance-publication-create.jpg';
+import imageContactPublication from './images/guidance/guidance-publication-contact.jpg';
+import imageProductionTeamPublication from './images/guidance/guidance-publication-production-team.jpg';
+import imageEditDeletePublication from './images/guidance/guidance-publication-edit-delete.jpg';
+import imageCreateReleasePublication from './images/guidance/guidance-publication-create-new-release.jpg';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -239,9 +240,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to create a new release -{' '}
-                <a href="/documentation/create-new-release">
+                <Link to="./create-new-release">
                   Creating a new release: step by step
-                </a>
+                </Link>
               </p>
             </StepNavItem>
           </StepNav>

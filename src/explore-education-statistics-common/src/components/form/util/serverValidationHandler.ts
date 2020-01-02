@@ -18,7 +18,7 @@ export type FieldErrorSetter = (
 
 export type GlobalErrorSetter = (errorMessage: string) => void;
 
-interface ServerValidationMessageMapper {
+export interface ServerValidationMessageMapper {
   canHandleMessage: (message: ServerValidationError) => boolean;
   handleMessage: (
     message: ServerValidationError,
@@ -136,9 +136,9 @@ class ServerValidationHandler {
     errors: ServerValidationErrors,
     setFieldError: FieldErrorSetter,
     setGlobalError: GlobalErrorSetter,
-  ) {
-    Object.keys(errors.errors).forEach(field => {
-      errors.errors[field].forEach(errorCode => {
+  ): boolean {
+    const mappingResults = Object.keys(errors.errors).map(field => {
+      return errors.errors[field].map(errorCode => {
         const validationError: ServerValidationError = {
           fieldName: field && field.length > 0 ? field : undefined,
           errorCode,
@@ -154,11 +154,14 @@ class ServerValidationHandler {
             setFieldError,
             setGlobalError,
           );
-        } else {
-          setGlobalError('An unexpected error occurred.');
+          return true;
         }
+
+        return false;
       });
     });
+
+    return mappingResults.flat().every(value => value);
   }
 }
 
@@ -218,9 +221,9 @@ const handleServerSideValidation = <T extends {}>(
   errors: ServerValidationErrors,
   setFieldError: FieldErrorSetter,
   setGlobalError: GlobalErrorSetter,
-) => {
+): boolean => {
   const serverValidationHandler = new ServerValidationHandler(messageMappers);
-  serverValidationHandler.handleServerValidationErrors(
+  return serverValidationHandler.handleServerValidationErrors(
     errors,
     setFieldError,
     setGlobalError,

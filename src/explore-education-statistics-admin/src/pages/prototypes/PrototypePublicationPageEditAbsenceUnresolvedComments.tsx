@@ -25,17 +25,25 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
 
   React.useEffect(() => {
     const allComments = [
-      ...data.keyStatistics.comments,
-      ...data.content.reduce<ExtendedComment[]>((allComments, content) => {
-        return [
-          ...allComments,
-          ...content.content.reduce<ExtendedComment[]>(
-            (all, _) => [...all, ..._.comments],
-            [],
-          ),
-        ];
-      }, []),
-    ];
+      ...((data.keyStatisticsSection.content &&
+        data.keyStatisticsSection.content[0].comments) ||
+        []),
+      ...data.content
+        .filter(_ => _.content !== undefined)
+        .reduce<ExtendedComment[]>(
+          (allComments, content) =>
+            content.content
+              ? [
+                  ...allComments,
+                  ...content.content.reduce<ExtendedComment[]>(
+                    (all, _) => [...all, ..._.comments],
+                    [],
+                  ),
+                ]
+              : allComments,
+          [],
+        ),
+    ].filter(comment => !!comment);
 
     setAllUnresolved(allComments.filter(c => c.state === 'open'));
   }, [data]);

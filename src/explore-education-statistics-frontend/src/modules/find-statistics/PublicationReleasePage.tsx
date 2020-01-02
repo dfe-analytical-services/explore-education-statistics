@@ -63,7 +63,9 @@ class PublicationReleasePage extends Component<Props> {
       <Page
         title={data.publication.title}
         caption={data.title}
-        description={data.summary}
+        description={
+          data.summarySection.content && data.summarySection.content[0].body
+        }
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
@@ -133,7 +135,13 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            <ReactMarkdown className="govuk-body" source={data.summary} />
+            <ReactMarkdown
+              className="govuk-body"
+              source={
+                data.summarySection.content &&
+                data.summarySection.content[0].body
+              }
+            />
             {data.downloadFiles && (
               <Details
                 summary="Download data files"
@@ -248,7 +256,7 @@ class PublicationReleasePage extends Component<Props> {
                     summary={`See all ${data.updates.length} updates`}
                   >
                     {data.updates.map(elem => (
-                      <div data-testid="last-updated-element" key={elem.on}>
+                      <div data-testid="last-updated-element" key={elem.id}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                           {elem.on}
                         </FormattedDate>
@@ -271,6 +279,12 @@ class PublicationReleasePage extends Component<Props> {
                       {`${data.publication.title}: methodology`}
                     </Link>
                   </li>
+                  {data.relatedInformation &&
+                    data.relatedInformation.map(link => (
+                      <li key={link.id}>
+                        <a href={link.url}>{link.description}</a>
+                      </li>
+                    ))}
                 </ul>
               </nav>
             </RelatedAside>
@@ -282,8 +296,11 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        {data.keyStatistics && (
-          <DataBlockWithAnalytics {...data.keyStatistics} id="keystats" />
+        {data.keyStatisticsSection && data.keyStatisticsSection.content && (
+          <DataBlockWithAnalytics
+            {...data.keyStatisticsSection.content[0]}
+            id="keystats"
+          />
         )}
 
         {data.content.length > 0 && (
