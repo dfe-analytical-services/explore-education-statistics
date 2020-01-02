@@ -17,10 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IConfiguration _configuration;
         private const string TemplateId = "a183f2ae-a859-49ad-9c26-f648f60d9f61";
 
-        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService)
+        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task<List<UserViewModel>> ListAsync()
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             try
             {
                 // TODO: add user to user invite table
-
+                
                 SendInviteEmail(email);
 
                 return true;
