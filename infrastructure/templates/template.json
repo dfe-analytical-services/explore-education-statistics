@@ -760,7 +760,10 @@
               "name": "ASPNETCORE_DETAILEDERRORS",
               "value": "true"
             },
-
+            {
+              "name": "NotifyApiKey",
+              "value": "[parameters('notifyApiKey')]"
+            },
             {
               "name": "IdentityServer:IssuerUri",
               "value": "[concat('urn=', parameters('adminUri'))]"
