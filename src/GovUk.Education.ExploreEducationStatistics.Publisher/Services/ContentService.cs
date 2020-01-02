@@ -38,94 +38,98 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
         }
 
-        public async Task UpdateAllContent()
+        public async Task UpdateAllContentAsync()
         {
-            // TODO delete all existing publications and methodologies?
+            await _fileStorageService.DeleteAllContentAsync();
+            await UpdateTreesAsync();
+
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
                 .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
-                await UpdatePublication(publication);
-                await UpdateLatestRelease(publication);
+                await UpdatePublicationAsync(publication);
+                await UpdateLatestReleaseAsync(publication);
                 foreach (var release in publication.Releases)
                 {
-                    await UpdateRelease(release.Id);
+                    await UpdateReleaseAsync(release.Id);
                 }
             }
 
             foreach (var methodologyId in methodologyIds)
             {
-                await UpdateMethodology(methodologyId);
+                await UpdateMethodologyAsync(methodologyId);
             }
         }
 
-        public async Task UpdateContent(Guid releaseId)
+        public async Task UpdateContentAsync(Guid releaseId)
         {
+            await UpdateTreesAsync();
+
             var release = _releaseService.GetRelease(releaseId);
             var publication = release.Publication;
-            await UpdatePublication(publication);
-            await UpdateLatestRelease(publication);
-            await UpdateRelease(releaseId);
+            await UpdatePublicationAsync(publication);
+            await UpdateLatestReleaseAsync(publication);
+            await UpdateReleaseAsync(releaseId);
             if (publication.MethodologyId.HasValue)
             {
-                await UpdateMethodology(publication.MethodologyId.Value);
+                await UpdateMethodologyAsync(publication.MethodologyId.Value);
             }
         }
 
-        public async Task UpdateTrees()
-        {
-            await UpdateDownloadTree();
-            await UpdatePublicationTree();
-            await UpdateMethodologyTree();
-        }
-
-        private async Task UpdatePublicationTree()
-        {
-            var tree = _publicationService.GetPublicationsTree();
-            await UploadAsync(PublicContentPublicationsTreePath(), tree, _jsonSerializerSettingsCamelCase);
-        }
-
-        private async Task UpdateDownloadTree()
+        private async Task UpdateDownloadTreeAsync()
         {
             // This is assuming the files have been copied first
             var tree = _downloadService.GetDownloadTree();
             await UploadAsync(PublicContentDownloadTreePath(), tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodologyTree()
+        private async Task UpdateMethodologyTreeAsync()
         {
             var tree = _methodologyService.GetTree();
             await UploadAsync(PublicContentMethodologyTreePath(), tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateLatestRelease(Publication publication)
+        private async Task UpdatePublicationTreeAsync()
+        {
+            var tree = _publicationService.GetPublicationsTree();
+            await UploadAsync(PublicContentPublicationsTreePath(), tree, _jsonSerializerSettingsCamelCase);
+        }
+
+        private async Task UpdateLatestReleaseAsync(Publication publication)
         {
             var viewModel = _releaseService.GetLatestRelease(publication.Id);
             await UploadAsync(PublicContentLatestReleasePath(publication.Slug), viewModel,
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodology(Guid methodologyId)
+        private async Task UpdateMethodologyAsync(Guid methodologyId)
         {
             var methodology = await _methodologyService.GetAsync(methodologyId);
             await UploadAsync(PublicContentMethodologyPath(methodology.Slug), methodology,
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublication(Publication publication)
+        private async Task UpdatePublicationAsync(Publication publication)
         {
             var viewModel = BuildPublicationViewModel(publication);
             await UploadAsync(PublicContentPublicationPath(publication.Slug), viewModel,
                 _jsonSerializerSettingsLowerCase);
         }
 
-        private async Task UpdateRelease(Guid releaseId)
+        private async Task UpdateReleaseAsync(Guid releaseId)
         {
             var viewModel = _releaseService.GetRelease(releaseId);
             await UploadAsync(PublicContentReleasePath(viewModel.Publication.Slug, viewModel.Slug), viewModel,
                 _jsonSerializerSettingsLowerCase);
+        }
+
+        private async Task UpdateTreesAsync()
+        {
+            await UpdateDownloadTreeAsync();
+            await UpdateMethodologyTreeAsync();
+            await UpdatePublicationTreeAsync();
         }
 
         private static PublicationViewModel BuildPublicationViewModel(Publication publication)
@@ -149,15 +153,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static string SerializeObject(object value, JsonSerializerSettings settings)
-        {
-            return JsonConvert.SerializeObject(value, null, settings);
-        }
-
         private async Task UploadAsync(string blobName, object value, JsonSerializerSettings settings)
         {
             await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json,
-                SerializeObject(value, settings));
+                JsonConvert.SerializeObject(value, null, settings));
         }
     }
 

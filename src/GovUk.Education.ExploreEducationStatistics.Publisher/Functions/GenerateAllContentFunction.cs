@@ -30,8 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             try
             {
-                await _contentService.UpdateTrees();
-                await _contentService.UpdateAllContent();
+                await _contentService.UpdateAllContentAsync();
             }
             catch (Exception e)
             {

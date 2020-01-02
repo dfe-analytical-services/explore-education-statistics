@@ -5,8 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IContentService
     {
-        Task UpdateTrees();
-        Task UpdateAllContent();
-        Task UpdateContent(Guid releaseId);
+        Task UpdateAllContentAsync();
+        Task UpdateContentAsync(Guid releaseId);
     }
 }

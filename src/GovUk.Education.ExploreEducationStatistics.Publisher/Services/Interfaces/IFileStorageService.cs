@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task CopyReleaseToPublicContainer(PublishReleaseFilesMessage message);
 
+        Task DeleteAllContentAsync();
+        
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
 
         Task UploadFromStreamAsync(string blobName, string contentType, string content);
