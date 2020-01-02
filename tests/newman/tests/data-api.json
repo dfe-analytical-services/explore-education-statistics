@@ -103,8 +103,8 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-													"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");"
+													"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");"
 												],
 												"type": "text/javascript"
 											}
@@ -186,14 +186,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/1",
+											"raw": "{{data_api_url}}/meta/subject/803fbf56-600f-490f-8409-6413a891720d",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"1"
+												"803fbf56-600f-490f-8409-6413a891720d"
 											]
 										}
 									},
@@ -207,7 +207,7 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.globals.set(\"FILT_SchoolType__Total\", \"84\");"
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");"
 												],
 												"type": "text/javascript"
 											}
@@ -272,14 +272,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/2",
+											"raw": "{{data_api_url}}/meta/subject/568576e5-d386-450e-a8db-307b7061d0d8",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"2"
+												"568576e5-d386-450e-a8db-307b7061d0d8"
 											]
 										}
 									},
@@ -351,14 +351,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/3",
+											"raw": "{{data_api_url}}/meta/subject/b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"3"
+												"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a"
 											]
 										}
 									},
@@ -407,14 +407,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/4",
+											"raw": "{{data_api_url}}/meta/subject/353db5ea-befd-488b-ad16-2ce7963c9bc9",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"4"
+												"353db5ea-befd-488b-ad16-2ce7963c9bc9"
 											]
 										}
 									},
@@ -463,14 +463,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/5",
+											"raw": "{{data_api_url}}/meta/subject/95c7f584-907e-4756-bbf0-4905ceae57df",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"5"
+												"95c7f584-907e-4756-bbf0-4905ceae57df"
 											]
 										}
 									},
@@ -522,14 +522,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/6",
+											"raw": "{{data_api_url}}/meta/subject/faf2152e-0a6c-4e97-af02-e9a89d48c47a",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"6"
+												"faf2152e-0a6c-4e97-af02-e9a89d48c47a"
 											]
 										}
 									},
@@ -577,14 +577,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/7",
+											"raw": "{{data_api_url}}/meta/subject/666cd878-87bb-4f77-9a3f-f5c75078e112",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"7"
+												"666cd878-87bb-4f77-9a3f-f5c75078e112"
 											]
 										}
 									},
@@ -635,14 +635,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/10",
+											"raw": "{{data_api_url}}/meta/subject/8e3d1bc0-2beb-4dc6-9db7-3d27d0608042",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"10"
+												"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042"
 											]
 										}
 									},
@@ -680,21 +680,21 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/99999",
+											"raw": "{{data_api_url}}/meta/subject/00000000-0000-0000-0000-000000000000",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"99999"
+												"00000000-0000-0000-0000-000000000000"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1 LA Barking and Dagenham + LAD Adur Copy",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d LA Barking and Dagenham + LAD Adur Copy",
 									"event": [
 										{
 											"listen": "test",
@@ -786,7 +786,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 1,\n    \"localAuthority\": [\"E09000002\"],\n    \"localAuthorityDistrict\": [\"E07000223\"]\n}"
+											"raw": "{\n\t\"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\"E09000002\"],\n    \"localAuthorityDistrict\": [\"E07000223\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -802,7 +802,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -890,7 +890,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1,\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t}\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -906,7 +906,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016, GeographicLevel Country",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016, GeographicLevel Country",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -993,7 +993,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1,\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"Country\"\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"Country\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1009,7 +1009,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016, GeographicLevel Local Authority",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016, GeographicLevel Local Authority",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -1094,7 +1094,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1,\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"LocalAuthority\"\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"LocalAuthority\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1110,7 +1110,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 2, Start/End date 2014, LA City of London",
+									"name": "Subject Meta - Filter SubjectId 568576e5-d386-450e-a8db-307b7061d0d8, Start/End date 2014, LA City of London",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -1184,7 +1184,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 2,\n\ttimePeriod: {\n\t\tstartYear: 2014,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n\tlocalAuthority: [\"E09000001\"]\n}"
+											"raw": "{\n\tsubjectId: \"568576e5-d386-450e-a8db-307b7061d0d8\",\n\ttimePeriod: {\n\t\tstartYear: 2014,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n\tlocalAuthority: [\"E09000001\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1200,7 +1200,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 7, Start/End date 2012-2014",
+									"name": "Subject Meta - Filter SubjectId 666cd878-87bb-4f77-9a3f-f5c75078e112, Start/End date 2012-2014",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -1272,7 +1272,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 7,\n\ttimePeriod: {\n\t\tstartYear: 2012,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n}"
+											"raw": "{\n\tsubjectId: \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n\ttimePeriod: {\n\t\tstartYear: 2012,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1362,14 +1362,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/11",
+											"raw": "{{data_api_url}}/meta/subject/92039f68-a894-46a9-bd44-4482728698b0",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"11"
+												"92039f68-a894-46a9-bd44-4482728698b0"
 											]
 										}
 									},
@@ -1422,14 +1422,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/12",
+											"raw": "{{data_api_url}}/meta/subject/3c0fbe56-0a4b-4caa-82f2-ab696cd96090",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"12"
+												"3c0fbe56-0a4b-4caa-82f2-ab696cd96090"
 											]
 										}
 									},
@@ -1484,14 +1484,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/13",
+											"raw": "{{data_api_url}}/meta/subject/8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"13"
+												"8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7"
 											]
 										}
 									},
@@ -1543,14 +1543,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/14",
+											"raw": "{{data_api_url}}/meta/subject/926e33e4-b3ce-41aa-9ed2-e04106068ffb",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"14"
+												"926e33e4-b3ce-41aa-9ed2-e04106068ffb"
 											]
 										}
 									},
@@ -1604,14 +1604,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/15",
+											"raw": "{{data_api_url}}/meta/subject/048a6276-1df1-487a-a501-fbd5e64d4b79",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"15"
+												"048a6276-1df1-487a-a501-fbd5e64d4b79"
 											]
 										}
 									},
@@ -1666,14 +1666,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/16",
+											"raw": "{{data_api_url}}/meta/subject/28feb263-4bf9-4dd7-9440-48e2685f6954",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"16"
+												"28feb263-4bf9-4dd7-9440-48e2685f6954"
 											]
 										}
 									},
@@ -1739,14 +1739,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/10",
+											"raw": "{{data_api_url}}/meta/subject/8e3d1bc0-2beb-4dc6-9db7-3d27d0608042",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"10"
+												"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042"
 											]
 										}
 									},
@@ -1800,14 +1800,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/9",
+											"raw": "{{data_api_url}}/meta/subject/55759ccd-da8f-4a27-9f4a-ca669f4218e0",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"9"
+												"55759ccd-da8f-4a27-9f4a-ca669f4218e0"
 											]
 										}
 									},
@@ -1861,14 +1861,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/8",
+											"raw": "{{data_api_url}}/meta/subject/01ebdcfc-979a-4fe7-8d39-e5f8a6546e95",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"8"
+												"01ebdcfc-979a-4fe7-8d39-e5f8a6546e95"
 											]
 										}
 									},
@@ -1963,21 +1963,21 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/17",
+											"raw": "{{data_api_url}}/meta/subject/fa0d7f1d-d181-43fb-955b-fc327da86f2c",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"17"
+												"fa0d7f1d-d181-43fb-955b-fc327da86f2c"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 17, Regions South East, South West",
+									"name": "Subject Meta - Filter SubjectId fa0d7f1d-d181-43fb-955b-fc327da86f2c, Regions South East, South West",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -2064,7 +2064,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: 17,\n\tRegion: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
+											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tRegion: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -2080,7 +2080,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 17, Country",
+									"name": "Subject Meta - Filter SubjectId fa0d7f1d-d181-43fb-955b-fc327da86f2c, Country",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -2165,7 +2165,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: 17,\n\tGeographicLevel: \"Country\"\n}"
+											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tGeographicLevel: \"Country\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -2413,43 +2413,43 @@
 													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(13);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
-													"            case 1:",
+													"            case \"fbb6262f-213a-453a-98ca-b832d6ae1c16\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
 													"                break;",
-													"            case 2:",
+													"            case \"e9076bab-6ff7-4c92-8972-2fb4affbe977\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
 													"                break;",
-													"            case 3:",
+													"            case \"128c6153-4937-40da-a99f-e137fc8c41e5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
 													"                break;",
-													"            case 4:",
+													"            case \"41c1eb5a-8415-45eb-bc49-cfa42382ebba\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 5:",
+													"            case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
 													"                break;",
-													"            case 6:",
+													"            case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 7:",
+													"            case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
 													"                break;",
-													"            case 8:",
+													"            case \"78c78049-22b3-4ec8-bc2a-7f47a6f7c74c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
 													"                break;",
-													"            case 9:",
+													"            case \"7b18666a-ff4a-43a9-9639-8f324374db0c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            case 10:",
+													"            case \"507b05b0-4015-4330-9901-20b47c5b154d\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
 													"                break;",
-													"            case 11:",
+													"            case \"82aa9459-2ff3-45b6-ba98-6d8819cea9f6\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).\");",
 													"                break;",
-													"            case 15:",
+													"            case \"e03c3b82-75df-4dee-b3ed-dac39378a9b5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 													"                break;",
-													"            case 16:",
+													"            case \"96641ff5-d33b-495d-8691-8045c148a595\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
 													"                break;",
 													"            default:",
@@ -2517,7 +2517,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__Total}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfPupilEnrolments}}, \n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__Total}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\", \n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2582,7 +2582,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2642,7 +2642,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}, \n        {{FILT_SchoolType__StateFundedPrimary}}, \n        {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2683,40 +2683,40 @@
 													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
-													"            case 1:",
+													"            case \"fbb6262f-213a-453a-98ca-b832d6ae1c16\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
 													"                break;",
-													"            case 2:",
+													"            case \"e9076bab-6ff7-4c92-8972-2fb4affbe977\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
 													"                break;",
-													"            case 3:",
+													"            case \"128c6153-4937-40da-a99f-e137fc8c41e5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
 													"                break;",
-													"            case 4:",
+													"            case \"41c1eb5a-8415-45eb-bc49-cfa42382ebba\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 5:",
+													"            case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
 													"                break;",
-													"            case 6:",
+													"            case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 7:",
+													"            case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
 													"                break;",
-													"            case 8:",
+													"            case \"78c78049-22b3-4ec8-bc2a-7f47a6f7c74c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
 													"                break;",
-													"            case 9:",
+													"            case \"7b18666a-ff4a-43a9-9639-8f324374db0c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            case 10:",
+													"            case \"507b05b0-4015-4330-9901-20b47c5b154d\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
 													"                break;",
-													"            case 15:",
+													"            case \"e03c3b82-75df-4dee-b3ed-dac39378a9b5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 													"                break;",
-													"            case 16:",
+													"            case \"96641ff5-d33b-495d-8691-8045c148a595\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
 													"                break;",
 													"            default:",
@@ -2758,7 +2758,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2799,34 +2799,34 @@
 													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(10);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
-													"            case 1:",
+													"            case \"fbb6262f-213a-453a-98ca-b832d6ae1c16\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
 													"                break;",
-													"            case 4:",
+													"            case \"41c1eb5a-8415-45eb-bc49-cfa42382ebba\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 5:",
+													"            case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
 													"                break;",
-													"            case 6:",
+													"            case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 7:",
+													"            case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
 													"                break;",
-													"            case 8:",
+													"            case \"78c78049-22b3-4ec8-bc2a-7f47a6f7c74c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
 													"                break;",
-													"            case 9:",
+													"            case \"7b18666a-ff4a-43a9-9639-8f324374db0c\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            case 10:",
+													"            case \"507b05b0-4015-4330-9901-20b47c5b154d\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
 													"                break;",
-													"            case 15:",
+													"            case \"e03c3b82-75df-4dee-b3ed-dac39378a9b5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 													"                break;",
-													"            case 16:",
+													"            case \"96641ff5-d33b-495d-8691-8045c148a595\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
 													"                break;",
 													"            default:",
@@ -2868,7 +2868,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__StateFundedPrimary}}, {{FILT_Char__EthMinor_Irish}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \"{{FILT_Char__EthMinor_Irish}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2930,7 +2930,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2994,7 +2994,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"localAuthority\": [\n    \t\"E08000016\",\n        \"E09000002\",\n        \"E09000003\"\n\n    ],\n    \"subjectId\": 1,\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfPupilEnrolments}},\n        {{IND_AbsenceFields__NumberOfSessionsPossible}}\n    ],\n    \"filters\": [\n        {{FILT_Char__Total}},\n        {{FILT_SchoolType__Total}},\n        ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n    \"localAuthority\": [\n    \t\"E08000016\",\n        \"E09000002\",\n        \"E09000003\"\n\n    ],\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\"\n    ],\n    \"filters\": [\n        \"{{FILT_Char__Total}}\",\n        \"{{FILT_SchoolType__Total}}\",\n        ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3063,7 +3063,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3127,7 +3127,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3195,7 +3195,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3217,25 +3217,25 @@
 										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"71\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"72\");",
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"11\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"18\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"10\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"48\");",
+											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"278ce0cb-f1d2-4e8f-84d1-ad794352c925\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"c649015c-8203-43aa-b424-dfb897766391\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"5a18e770-73b9-4b4f-8c3c-b3130b810422\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1293b484-93f5-4177-a451-fcf4467b26a2\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"74c8ab3a-0ec3-4348-852c-9055f354f86f\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
+											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");"
 										]
 									}
 								},
@@ -3318,7 +3318,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3401,7 +3401,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\n\t\t{{IND_AbsenceByReason__NumberOfIllnessSessions}}\n\t],\n\t\"filters\": [\n\t\t{{FILT_SchoolType__Total}}, \n\t\t{{FILT_SchoolType__StateFundedPrimary}}, \n\t\t{{FILT_SchoolType__StateFundedSecondary}}, \n\t\t{{FILT_SchoolType__Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"568576e5-d386-450e-a8db-307b7061d0d8\",\n\t\"indicators\":[\n\t\t\"{{IND_AbsenceByReason__NumberOfIllnessSessions}}\"\n\t],\n\t\"filters\": [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n\t\t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n\t\t\"{{FILT_SchoolType__Special}}\"\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3477,7 +3477,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3547,7 +3547,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3612,7 +3612,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3677,7 +3677,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"region\": [ \"E13000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"School\",\n    \"region\": [ \"E13000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3738,7 +3738,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3801,7 +3801,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n\t\"filters\" : [\n\t\t{{FILT_SchoolType__Total}}, \n\t\t{{FILT_SchoolType__StateFundedPrimary}}\n\t],\n\t\"indicators\": [\n\t\t{{IND_AbsenceByReason__NumberOfExtendedAuthorisedHolidaySessions}},\n\t\t{{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n\t\t{{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n\t\t{{IND_INVALID}}\n\t]\n}"
+											"raw": "{\n\t\"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n\t\"filters\" : [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\"\n\t],\n\t\"indicators\": [\n\t\t\"{{IND_AbsenceByReason__NumberOfExtendedAuthorisedHolidaySessions}}\",\n\t\t\"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n\t\t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n\t\t\"{{IND_INVALID}}\"\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3823,20 +3823,20 @@
 										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"84\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"83\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"82\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"81\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"006b1702-3d16-4d64-8d57-9336fbb7c4da\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"5c175038-297f-4b0d-89dd-2f6e9e22db29\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"c62fd826-00b0-4933-995c-0739fa7cd1fe\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"57\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"59\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"66\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"61\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"c5358a0e-50be-4de9-9a7a-366b96c21d2a\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"af786942-5ddc-4e41-8f98-61ca95931985\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"2d08d922-d57e-404d-971c-18fb386d3183\");",
+											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"1c3cb6ab-1917-448d-b67c-6b7d8438b7ce\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfIllnessSessions\", \"48\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfExtendedAuthorisedHolidaySessions\", \"42\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfIllnessSessions\", \"94f73d1c-dc74-4cae-a2c0-1534c634a4ef\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfExtendedAuthorisedHolidaySessions\", \"1aa8b098-356d-4b19-942d-e6bc0fded7d8\");",
 											"",
-											"pm.globals.set(\"IND_INVALID\", \"111212\");"
+											"pm.globals.set(\"IND_INVALID\", \"00000000-0000-0000-0000-000000000000\");"
 										]
 									}
 								},
@@ -3895,7 +3895,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}, \n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSessionsPossible}},\n\t\t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3948,7 +3948,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSessionsPossible}},\n\t\t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \"{{FILT_StateFundedSecondary}}\", \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3996,7 +3996,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSessionsPossible}},\n\t\t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4108,7 +4108,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSessionsPossible}},\n\t\t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4156,7 +4156,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSessionsPossible}},\n\t\t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4178,14 +4178,14 @@
 										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"91\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"90\");",
-											"pm.globals.set(\"FILT_Special\", \"89\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"514b404f-ca0c-4568-9539-9dea79d43bc8\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"df0506d1-456a-4b10-b0a6-268d59c1924e\");",
+											"pm.globals.set(\"FILT_Special\", \"23896559-d8cc-4c0d-b839-1a60d43e5928\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"68\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"86\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions\", \"87\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfOverallAbsenceSessions\", \"88\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"cb1fc409-b8fd-482a-aee0-627860cde918\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"1199a5e5-eed7-4261-98b9-0a3727104176\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions\", \"7a690779-08f3-40c3-80a4-ef5ab1fc0995\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfOverallAbsenceSessions\", \"a648c8b6-268e-4781-8fb7-801426a270ac\");"
 										]
 									}
 								},
@@ -4256,7 +4256,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Special}}, \n        {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Special}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4308,7 +4308,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4336,28 +4336,28 @@
 													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(8);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
-													"            case 2:",
+													"            case \"e9076bab-6ff7-4c92-8972-2fb4affbe977\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
 													"                break;",
-													"            case 3:",
+													"            case \"128c6153-4937-40da-a99f-e137fc8c41e5\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
 													"                break;",
-													"            case 4:",
+													"            case \"41c1eb5a-8415-45eb-bc49-cfa42382ebba\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 5:",
+													"            case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
 													"                break;",
-													"            case 6:",
+													"            case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
 													"                break;",
-													"            case 7:",
+													"            case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
 													"                break;",
-													"            case 21:",
+													"            case \"2268f97a-5107-464f-ade6-30debc36519a\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Includes pupils on the school roll for at least one session who are aged 4, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered at more than one school).\");",
 													"                break;",
-													"            case 22:",
+													"            case \"8a79e8c6-3552-496a-8790-d072cec8c43f\":",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.\");",
 													"                break;",
 													"            default:",
@@ -4395,7 +4395,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfPupilEnrolments}},\n\t\t{{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedSecondary}}\", \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n\t\t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4448,7 +4448,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"region\": [\"E12000005\", \"E12000008\", \"E12000009\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Total}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"region\": [\"E12000005\", \"E12000008\", \"E12000009\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Total}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4470,13 +4470,13 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"95\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"94\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"93\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"26f7f3d0-b7ad-4517-8815-e0c70295ff3b\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"442710bd-5fc6-4096-a4ae-05cb092ede15\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"d2cbfaa7-9768-4845-9d86-48e352635754\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"92\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"95\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfOverallAbsenceSessions\", \"94\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"f48c43ca-e6a2-4f16-a5ee-85899536f0a7\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"d7113560-e535-421e-9a5b-b6cd7528f4d4\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfOverallAbsenceSessions\", \"2550def1-9732-458e-812d-c70d034ec51d\");"
 										]
 									}
 								},
@@ -4547,7 +4547,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfSchools}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSchools}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4580,9 +4580,9 @@
 													"pm.test(\"geographicLevel and indicators/measures should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.113`));",
-													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.114`));",
-													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.115`));",
+													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.6d2de8c1-15d7-4cc4-a60a-d512b7876e4d`));",
+													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.6160c4f8-4c9f-40f0-a623-2a4f742860af`));",
+													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.ee11e1cb-2d9a-4d6d-8e6c-8d32f24fa08f`));",
 													"    }",
 													"});"
 												],
@@ -4602,7 +4602,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"localAuthority\": [\"E06000015\", \"E09000004\", \"E10000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"localAuthority\": [\"E06000015\", \"E09000004\", \"E10000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4650,7 +4650,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4700,7 +4700,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"localAuthority\": [\"E08000002\", \"E10000008\"],\n    \"region\": [\"E12000006\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"localAuthority\": [\"E08000002\", \"E10000008\"],\n    \"region\": [\"E12000006\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4722,10 +4722,10 @@
 										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSchools\", \"96\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"113\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"114\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"115\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSchools\", \"9472758e-6c4a-4cb2-8270-d0551ce91494\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"6d2de8c1-15d7-4cc4-a60a-d512b7876e4d\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"6160c4f8-4c9f-40f0-a623-2a4f742860af\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"ee11e1cb-2d9a-4d6d-8e6c-8d32f24fa08f\");"
 										]
 									}
 								},
@@ -4767,7 +4767,7 @@
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(2255); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(2259); });",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
@@ -4791,7 +4791,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}, \n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}},\n    \t{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}},\n    \t{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4839,7 +4839,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_StateFundedSecondary}}, \n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}},\n    \t{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}},\n    \t{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4861,13 +4861,13 @@
 										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"98\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"97\");",
-											"pm.globals.set(\"FILT_Special\", \"96\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0089b1b3-626c-4326-a2ec-a4b99b4735bc\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"d2b2e7af-d7b7-4526-817c-cc4fc1d010c3\");",
+											"pm.globals.set(\"FILT_Special\", \"4bd075b2-d4de-48db-a007-dc2f9226d206\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession\", \"135\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession\", \"136\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession\", \"137\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession\", \"a07cb02d-a07b-4928-a93a-fe1192011998\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession\", \"037e2587-2c2c-4bec-83e5-12e3cc35c836\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession\", \"ff1ccb6e-5faa-43bc-bd6d-be52f754bde6\");"
 										]
 									}
 								},
@@ -4933,7 +4933,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 7,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, \n        {{FILT_Special}}, \n        {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n    \t{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence}},\n    \t{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence}},\n    \t{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_Special}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4955,13 +4955,13 @@
 										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"127\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"178\");",
-											"pm.globals.set(\"FILT_Special\", \"205\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0af225c6-c70b-4053-b7e7-4e719e2b751f\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"c306ff42-ddea-4cd0-82af-770df078fd94\");",
+											"pm.globals.set(\"FILT_Special\", \"a7a7a691-a49e-422e-839e-53f1f545fa76\");",
 											"",
-											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence\", \"140\");",
-											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence\", \"142\");",
-											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence\", \"144\");",
+											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence\", \"fe313349-0438-41b7-8944-109690ee5158\");",
+											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence\", \"f3014e60-534a-4667-b90f-80b1fee6b08e\");",
+											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence\", \"cd2711ff-3dba-4452-858a-d55c5cfd04fb\");",
 											""
 										]
 									}
@@ -5098,7 +5098,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}\n"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}\n"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5182,7 +5182,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}, \n        {{FILT_SchoolType__StateFundedPrimary}}, \n        {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5263,7 +5263,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E10000007\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E10000007\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5336,7 +5336,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}, \n        {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5429,7 +5429,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, \n    \t{{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5508,7 +5508,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, \n    \t{{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"boundaryLevel\": 1\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 1\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5586,7 +5586,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, \n    \t{{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"boundaryLevel\": 3\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 3\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5665,7 +5665,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, \n    \t{{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"boundaryLevel\": 6\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 6\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5743,7 +5743,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}, \n        {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5821,7 +5821,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{IND_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfLateSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5843,29 +5843,29 @@
 										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"71\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"72\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"11\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"18\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"10\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"48\");",
+											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"278ce0cb-f1d2-4e8f-84d1-ad794352c925\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"c649015c-8203-43aa-b424-dfb897766391\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"5a18e770-73b9-4b4f-8c3c-b3130b810422\");",
 											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");",
-											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"10\");"
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1293b484-93f5-4177-a451-fcf4467b26a2\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"74c8ab3a-0ec3-4348-852c-9055f354f86f\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
+											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");",
+											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"71c77c7d-dec5-4c31-baa5-b59f3c8c8f2e\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"a3b1afa4-b3de-44c6-b8b2-0ef59f211a2a\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"71761e61-6a80-400f-8778-a8761306eb77\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"b4cc7de4-30f3-495b-a967-0d2a9473583f\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"57452cb9-6bda-495a-a012-7fda71e4bf90\");"
 										]
 									}
 								},
@@ -5971,7 +5971,7 @@
 													"    pm.expect(respJson.result.length).to.equal(24); ",
 													"});",
 													"",
-													"pm.test(\"All results have filter 884 or 885\", function () {",
+													"pm.test(\"All results have filter Characteristic Gender:Female or Gender:Male\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderMale\")) {",
 													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
@@ -5995,7 +5995,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"LocalAuthority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{INDI_TotalPointScoreBasedOnAssessmentRating}}\",\n        \"{{INDI_AveragePointScore}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -6017,11 +6017,11 @@
 										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"240\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"239\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"238\");",
-											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"161\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"162\");"
+											"pm.globals.set(\"FILT_Char__Total\", \"beeaa217-3233-48df-bc1d-11f066a26efe\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"2cf47ea3-1891-4bba-9381-81a0305a7581\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"edcc7822-d88e-490d-8446-baca8b6ccca4\");",
+											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"7d250efe-afad-4117-8ccf-debf689c4efc\");",
+											"pm.globals.set(\"INDI_AveragePointScore\", \"37faaef4-5b5e-473e-9585-8580c1df967a\");"
 										]
 									}
 								},
@@ -6111,7 +6111,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": 17,\n    \"localAuthority\": [\"E08000015\", \"E06000014\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [\n        {{FILT_Primary__R}}\n    ],\n    \"indicators\": [\n    \t{{IND_Applications__NumberOfApplicationsReceived}},\n    \t{{IND_Applications__NumberOfOnlineApplications}},\n    \t{{IND_Applications__PercentageOfOnlineApplications}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n    \"localAuthority\": [\"E08000015\", \"E06000014\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Primary__R}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_Applications__NumberOfApplicationsReceived}}\",\n    \t\"{{IND_Applications__NumberOfOnlineApplications}}\",\n    \t\"{{IND_Applications__PercentageOfOnlineApplications}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{data_api_url}}/data",
@@ -6133,13 +6133,13 @@
 								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set(\"FILT_Primary__R\", \"573\");",
-									"pm.globals.set(\"FILT_Secondary__9\", \"570\");",
-									"pm.globals.set(\"FILT_Secondary__7\", \"571\");",
+									"pm.globals.set(\"FILT_Primary__R\", \"f5ad9114-14b8-4102-89a1-3ab76801ecde\");",
+									"pm.globals.set(\"FILT_Secondary__9\", \"3f101896-1c4a-4153-bb22-1d3888eb61ea\");",
+									"pm.globals.set(\"FILT_Secondary__7\", \"ff8614ba-ec1c-4012-a5e3-2d788a4f5460\");",
 									"",
-									"pm.globals.set(\"IND_Applications__NumberOfApplicationsReceived\", \"212\");",
-									"pm.globals.set(\"IND_Applications__NumberOfOnlineApplications\", \"213\");",
-									"pm.globals.set(\"IND_Applications__PercentageOfOnlineApplications\", \"214\");"
+									"pm.globals.set(\"IND_Applications__NumberOfApplicationsReceived\", \"020a4da6-1111-443d-af80-3a425c558d14\");",
+									"pm.globals.set(\"IND_Applications__NumberOfOnlineApplications\", \"f472e6cc-9e25-401b-9fca-9dc3755bab2d\");",
+									"pm.globals.set(\"IND_Applications__PercentageOfOnlineApplications\", \"0af5ea39-828f-4afe-9a9f-643dce0112cf\");"
 								]
 							}
 						},
@@ -6231,25 +6231,25 @@
 							"script": {
 								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
 								"exec": [
-									"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-									"pm.globals.set(\"FILT_Char__GenderMale\", \"71\");",
-									"pm.globals.set(\"FILT_Char__GenderFemale\", \"72\");",
-									"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");",
-									"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-									"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-									"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
-									"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
-									"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
-									"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-									"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"51\");",
+									"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
+									"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
+									"pm.globals.set(\"FILT_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
+									"pm.globals.set(\"FILT_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
+									"pm.globals.set(\"FILT_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
+									"pm.globals.set(\"FILT_Char__FSMEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
+									"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"c649015c-8203-43aa-b424-dfb897766391\");",
+									"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"55388c8a-4e29-4f15-9973-571347ca6ff3\");",
+									"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"121714a6-f9cd-49c1-a7e2-dfeabe66d530\");",
 									"",
-									"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
-									"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-									"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-									"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
-									"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-									"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-									"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");"
+									"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1293b484-93f5-4177-a451-fcf4467b26a2\");",
+									"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"74c8ab3a-0ec3-4348-852c-9055f354f86f\");",
+									"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
+									"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
+									"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
+									"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
+									"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");"
 								],
 								"type": "text/javascript"
 							}
@@ -6267,7 +6267,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__Total}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfPupilEnrolments}},\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}}\n    ]\n}"
+							"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__Total}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{data_api_url}}/permalink",
@@ -6508,7 +6508,7 @@
 									"});",
 									"",
 									"pm.test(\"Query contains expected fields\", function () {",
-									"    pm.expect(respJson.query.subjectId).to.equal(4);",
+									"    pm.expect(respJson.query.subjectId).to.equal(\"353db5ea-befd-488b-ad16-2ce7963c9bc9\");",
 									"    pm.expect(respJson.query.timePeriod.startYear).to.equal(2014);",
 									"    pm.expect(respJson.query.timePeriod.startCode).to.equal(\"AY\");",
 									"    pm.expect(respJson.query.timePeriod.endYear).to.equal(2016);",
@@ -6606,9 +6606,9 @@
 						"id": "ed583c2e-33b1-4e58-b324-6c75f5dd0180",
 						"type": "text/javascript",
 						"exec": [
-							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"92\");",
+							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"2f219985-8900-4a84-b096-89d133ef8bc6\");",
 							"",
-							"pm.globals.set(\"IND_AbsenceForFourYearOlds__AbsenceFields__NumberOfOverallAbsenceSessions\", \"85\");"
+							"pm.globals.set(\"IND_AbsenceForFourYearOlds__AbsenceFields__NumberOfOverallAbsenceSessions\", \"2550def1-9732-458e-812d-c70d034ec51d\");"
 						]
 					}
 				},

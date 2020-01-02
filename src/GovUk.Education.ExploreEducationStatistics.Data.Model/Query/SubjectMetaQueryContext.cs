@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -5,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 {
     public class SubjectMetaQueryContext
     {
-        public long SubjectId { get; set; }
+        public Guid SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
         public long? BoundaryLevel { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
-        public IEnumerable<long> Indicators { get; set; }
+        public IEnumerable<Guid> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
         public IEnumerable<string> Institution { get; set; }
         public IEnumerable<string> LocalAuthority { get; set; }

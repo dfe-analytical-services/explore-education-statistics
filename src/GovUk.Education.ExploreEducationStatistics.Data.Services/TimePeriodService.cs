@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _context = context;
         }
         
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(long subjectId)
+        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
                 .Where(observation => observation.SubjectId == subjectId)

@@ -13,3 +13,8 @@ CREATE TYPE TimePeriodListType AS TABLE
     year INT,
     timeIdentifier varchar(6)
 );
+
+CREATE TYPE IdListGuidType AS TABLE
+(
+    id uniqueidentifier
+);

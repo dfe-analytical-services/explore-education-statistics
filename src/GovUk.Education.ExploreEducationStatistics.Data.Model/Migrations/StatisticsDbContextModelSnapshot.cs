@@ -43,10 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Hint")
                         .HasColumnType("nvarchar(max)");
@@ -57,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -71,11 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterFootnote", b =>
                 {
-                    b.Property<long>("FilterId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FilterId", "FootnoteId");
 
@@ -86,13 +85,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FilterId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
@@ -106,11 +104,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroupFootnote", b =>
                 {
-                    b.Property<long>("FilterGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterGroupId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FilterGroupId", "FootnoteId");
 
@@ -121,13 +119,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FilterGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterGroupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
@@ -141,11 +138,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItemFootnote", b =>
                 {
-                    b.Property<long>("FilterItemId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterItemId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FilterItemId", "FootnoteId");
 
@@ -156,10 +153,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
@@ -171,13 +167,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("IndicatorGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IndicatorGroupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
@@ -200,11 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
                 {
-                    b.Property<long>("IndicatorId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IndicatorId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("IndicatorId", "FootnoteId");
 
@@ -215,16 +210,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -235,10 +229,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -247,10 +240,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("CsvRow")
                         .HasColumnType("bigint");
@@ -260,8 +252,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<long>("LocationId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Measures")
                         .HasColumnType("nvarchar(max)");
@@ -272,8 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("SchoolLaEstab")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TimeIdentifier")
                         .IsRequired()
@@ -304,11 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
-                    b.Property<long>("ObservationId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ObservationId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FilterItemId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FilterItemId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ObservationId", "FilterItemId");
 
@@ -413,10 +405,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -433,11 +424,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
                 {
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("SubjectId", "FootnoteId");
 
@@ -594,10 +585,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 {
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Country", "Country", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -617,10 +606,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "Institution", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -640,10 +627,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthority", "LocalAuthority", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -668,10 +653,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthorityDistrict", "LocalAuthorityDistrict", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -691,10 +674,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocalEnterprisePartnership", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -714,10 +695,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "MultiAcademyTrust", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -737,10 +716,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "MayoralCombinedAuthority", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -760,10 +737,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "OpportunityArea", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -783,10 +758,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "ParliamentaryConstituency", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -806,10 +779,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "Region", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -829,10 +800,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.RscRegion", "RscRegion", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -849,10 +818,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "Sponsor", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
@@ -872,10 +839,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "Ward", b1 =>
                         {
-                            b1.Property<long>("LocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Code")
                                 .HasColumnType("nvarchar(450)");
