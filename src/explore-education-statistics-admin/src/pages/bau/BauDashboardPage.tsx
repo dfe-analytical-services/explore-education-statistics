@@ -6,8 +6,14 @@ function BauDashboardPage() {
   return (
     <Page wide>
       <h1 className="govuk-heading-xl">Platform administration</h1>
-
-      <Link to="/administration/methodology">View methodology status</Link>
+      <ul>
+        <li>
+          <Link to="/administration/methodology">View methodology status</Link>
+        </li>
+        <li>
+          <Link to="/administration/users">View service users</Link>
+        </li>
+      </ul>
     </Page>
   );
 }
