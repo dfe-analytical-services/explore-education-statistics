@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
+        
         [HttpPost("bau/users/invite")]
         public async Task<ActionResult> GetUserList(UserInvite userInvite)
         {

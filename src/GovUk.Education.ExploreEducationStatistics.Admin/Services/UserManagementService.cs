@@ -6,16 +6,21 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class UserManagementService : IUserManagementService
     {
         private readonly UsersAndRolesDbContext _context;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
+        private const string TemplateId = "a183f2ae-a859-49ad-9c26-f648f60d9f61";
 
-        public UserManagementService(UsersAndRolesDbContext context)
+        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<List<UserViewModel>> ListAsync()
@@ -38,15 +43,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             try
             {
                 // TODO: add user to user invite table
-                
-                // TODO: send invite email via notify
-                
+
+                SendInviteEmail(email);
+
                 return true;
             }
             catch
             {
                 return false;
             }
+        }
+
+        private void SendInviteEmail(string email)
+        {
+            var emailValues = new Dictionary<string, dynamic> {{"url", _configuration.GetValue<string>("")}};
+
+            _emailService.SendEmail(email, TemplateId, emailValues);
         }
     }
 }
