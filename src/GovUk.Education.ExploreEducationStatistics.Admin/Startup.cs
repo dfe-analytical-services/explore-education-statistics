@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
 
-            services.AddTransient<INotificationClient, NotificationClient>(n => new NotificationClient(Configuration.GetValue<string>("NotifyApiKeyName")));
+            services.AddTransient<INotificationClient, NotificationClient>(n => new NotificationClient(Configuration.GetValue<string>("NotifyApiKey")));
             services.AddTransient<IEmailService, EmailService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
