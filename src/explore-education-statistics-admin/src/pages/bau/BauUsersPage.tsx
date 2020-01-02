@@ -26,7 +26,10 @@ const BauUsersPage = () => {
         { name: 'Users' },
       ]}
     >
-      <h1 className="govuk-heading-xl">Users</h1>
+      <h1 className="govuk-heading-xl">
+        <span className="govuk-caption-xl">Manage access to the service</span>
+        Users
+      </h1>
 
       <table className="govuk-table">
         <caption className="govuk-table__caption">Active user accounts</caption>
@@ -53,7 +56,7 @@ const BauUsersPage = () => {
           </tbody>
         )}
       </table>
-      <Link to='/administration/users/invite' className="govuk-button">
+      <Link to="/administration/users/invite" className="govuk-button">
         Invite a new user
       </Link>
     </Page>
