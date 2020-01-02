@@ -49,9 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
+                var releases = publication.Releases.Where(release => release.Live);
                 await UpdatePublicationAsync(publication);
                 await UpdateLatestReleaseAsync(publication);
-                foreach (var release in publication.Releases)
+                foreach (var release in releases)
                 {
                     await UpdateReleaseAsync(release.Id);
                 }
