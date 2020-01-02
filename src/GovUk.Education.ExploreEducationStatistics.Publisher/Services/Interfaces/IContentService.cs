@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
@@ -7,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task UpdateDownloadTree();
         Task UpdatePublicationTree();
         Task UpdateMethodologyTree();
+        Task UpdatePublicationAndRelease(Guid releaseId);
         Task UpdatePublicationsAndReleases();
         Task UpdateMethodologies();
     }
