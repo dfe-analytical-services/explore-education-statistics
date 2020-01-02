@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
@@ -57,6 +58,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 SerializeObject(tree, _jsonSerializerSettingsCamelCase));
         }
 
+        public async Task UpdatePublicationAndRelease(Guid releaseId)
+        {
+            var release = _releaseService.GetRelease(releaseId);
+            var publication = release.Publication;
+            await UpdatePublication(publication);
+            await UpdateLatestRelease(publication);
+            await UpdateRelease(releaseId);
+        }
+
+        public async Task UpdatePublicationsAndReleases()
+        {
+            var publications = _publicationService.ListPublicationsWithPublishedReleases();
+            foreach (var publication in publications)
+            {
+                await UpdatePublication(publication);
+                await UpdateLatestRelease(publication);
+                foreach (var release in publication.Releases)
+                {
+                    await UpdateRelease(release.Id);
+                }
+            }
+        }
 
         public async Task UpdateMethodologies()
         {
@@ -70,39 +93,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdatePublicationsAndReleases()
+        private async Task UpdatePublication(Publication publication)
         {
-            var publications = _publicationService.ListPublicationsWithPublishedReleases();
+            var viewModel = BuildPublicationViewModel(publication);
+            var json = SerializeObject(viewModel, _jsonSerializerSettingsLowerCase);
+            await _fileStorageService.UploadFromStreamAsync(PublicContentPublicationPath(publication.Slug),
+                "application/json", json);
+        }
 
-            foreach (var publication in publications)
-            {
-                var publicationViewModel = BuildPublicationViewModel(publication);
-                var latestRelease = _releaseService.GetLatestRelease(publication.Id);
+        private async Task UpdateLatestRelease(Publication publication)
+        {
+            var viewModel = _releaseService.GetLatestRelease(publication.Id);
+            var json = SerializeObject(viewModel, _jsonSerializerSettingsCamelCase);
+            await _fileStorageService.UploadFromStreamAsync(
+                PublicContentLatestReleasePath(publication.Slug), "application/json", json);
+        }
 
-                var publicationJson = SerializeObject(publicationViewModel, _jsonSerializerSettingsLowerCase);
-                var latestReleaseJson = SerializeObject(latestRelease, _jsonSerializerSettingsCamelCase);
-
-                await _fileStorageService.UploadFromStreamAsync(PublicContentPublicationPath(publication.Slug),
-                    "application/json",
-                    publicationJson);
-
-                await _fileStorageService.UploadFromStreamAsync(
-                    PublicContentLatestReleasePath(latestRelease.Publication.Slug), "application/json",
-                    latestReleaseJson);
-
-                await _fileStorageService.UploadFromStreamAsync(
-                    PublicContentReleasePath(latestRelease.Publication.Slug, latestRelease.Slug), "application/json",
-                    latestReleaseJson);
-
-                foreach (var r in publication.Releases)
-                {
-                    var release = _releaseService.GetRelease(r.Id);
-                    var releaseJson = SerializeObject(release, _jsonSerializerSettingsLowerCase);
-
-                    await _fileStorageService.UploadFromStreamAsync(
-                        PublicContentReleasePath(publication.Slug, release.Slug), "application/json", releaseJson);
-                }
-            }
+        private async Task UpdateRelease(Guid releaseId)
+        {
+            var viewModel = _releaseService.GetRelease(releaseId);
+            var json = SerializeObject(viewModel, _jsonSerializerSettingsLowerCase);
+            await _fileStorageService.UploadFromStreamAsync(
+                PublicContentReleasePath(viewModel.Publication.Slug, viewModel.Slug), "application/json", json);
         }
 
         private static PublicationViewModel BuildPublicationViewModel(Publication publication)
