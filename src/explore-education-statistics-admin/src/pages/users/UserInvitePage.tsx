@@ -2,8 +2,20 @@ import React from 'react';
 import Page from '@admin/components/Page';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@admin/components/Link';
+import { RouteComponentProps } from 'react-router';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 
-function UserInvitePage() {
+interface FormValues {
+  userEmail: string;
+}
+
+const UserInvitePage = ({
+  history,
+}: RouteComponentProps & ErrorControlProps) => {
+  const cancelHandler = () => history.push('/administration/users');
+
   return (
     <Page
       wide
@@ -17,7 +29,7 @@ function UserInvitePage() {
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
             <span className="govuk-caption-xl">
-            Manage access to the service
+              Manage access to the service
             </span>
             Invite a new user
           </h1>
@@ -34,8 +46,14 @@ function UserInvitePage() {
           </RelatedInformation>
         </div>
       </div>
+
+      <div className="govuk-!-margin-top-6">
+        <Link to="#" onClick={cancelHandler}>
+          Cancel
+        </Link>
+      </div>
     </Page>
   );
-}
+};
 
 export default UserInvitePage;
