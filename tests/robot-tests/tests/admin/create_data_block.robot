@@ -14,7 +14,7 @@ Create Datablock test publication
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
-    user creates publication  Datablock test %{RUN_IDENTIFIER}   API Test Methodology    Sean Gibson
+    user creates publication  Datablock test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson
 
 Verify Datablock test publication is created
     [Tags]  HappyPath

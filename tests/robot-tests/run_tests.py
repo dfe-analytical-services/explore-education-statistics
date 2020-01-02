@@ -158,8 +158,10 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
         body = {'title': f'UI test topic {run_identifier}'}
         r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
 
-        assert r.status_code != 401, 'Failed to authenticate to create topic! Delete IDENTITY_*.txt files?'
-        assert r.status_code == 200, 'Failed to create topic!'
+        #print('r.status_code', r.status_code)
+        #print('r.text', r.text)
+        assert r.status_code != 401, 'Failed to authenticate to create topic! Delete robot-tests/IDENTITY_*.txt files?'
+        assert r.status_code == 200, 'Failed to create topic! Have you created the Test theme?'
         os.environ['RUN_IDENTIFIER'] = run_identifier
         assert os.getenv('RUN_IDENTIFIER') is not None
 

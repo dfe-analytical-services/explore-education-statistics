@@ -21,7 +21,7 @@ Select an existing methodology
     user waits until page contains element   xpath://label[text()="Add existing methodology"]
     user clicks element          xpath://label[text()="Add existing methodology"]
     user checks element is visible    xpath://label[text()="Select methodology"]
-    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   API Test Methodology
+    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   Test methodology
 
 Select contact "Sean Gibson"
     [Tags]  HappyPath
@@ -51,7 +51,7 @@ Verify that new publication has been created
     user waits until page contains element   xpath://button[text()="UI tests - create publication %{RUN_IDENTIFIER}"]
     user checks page contains accordion   UI tests - create publication %{RUN_IDENTIFIER}
     user opens accordion section  UI tests - create publication %{RUN_IDENTIFIER}
-    user checks page contains element   xpath://div/dt[text()="Methodology"]/../dd/a[text()="API Test Methodology"]
+    user checks page contains element   xpath://div/dt[text()="Methodology"]/../dd/a[text()="Test methodology"]
     user checks summary list item "Releases" should be "No releases created"
 
 Create new release
