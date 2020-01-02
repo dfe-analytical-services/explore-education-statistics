@@ -30,11 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             try
             {
-                await _contentService.UpdateDownloadTree();
-                await _contentService.UpdatePublicationTree();
-                await _contentService.UpdateMethodologyTree();
-                await _contentService.UpdatePublicationsAndReleases();
-                await _contentService.UpdateMethodologies();
+                await _contentService.UpdateTrees();
+                await _contentService.UpdateAllContent();
             }
             catch (Exception e)
             {

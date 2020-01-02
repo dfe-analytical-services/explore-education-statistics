@@ -32,11 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                await _contentService.UpdateDownloadTree();
-                await _contentService.UpdatePublicationTree();
-                await _contentService.UpdateMethodologyTree();
-                await _contentService.UpdatePublicationAndRelease(message.ReleaseId);
-                await _contentService.UpdateMethodologies();
+                await _contentService.UpdateTrees();
+                await _contentService.UpdateContent(message.ReleaseId);
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)
