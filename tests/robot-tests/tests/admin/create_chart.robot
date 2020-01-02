@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  Local  Dev  AltersData  UnderConstruction
+Force Tags  Admin  Local  Dev  AltersData   UnderConstruction
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
@@ -12,6 +12,6 @@ To do
 
 # Create publication
 # Create release
-# Upload subject
-# Upload more subjects
-# Upload ancillary files
+# Upload data csvs
+# Create data block
+# Create chart
