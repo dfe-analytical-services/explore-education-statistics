@@ -80,7 +80,7 @@ const UserInvitePage = ({
               userEmail: '',
             }}
             validationSchema={Yup.object({
-              userEmail: Yup.string().required('Provide the users email'),
+              userEmail: Yup.string().required('Provide the users email').email('Provide a valid email address'),
             })}
             onSubmit={submitFormHandler}
             render={(form: FormikProps<FormValues>) => {
