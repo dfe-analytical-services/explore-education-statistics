@@ -24,15 +24,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default", new Guid("c93635d2-83ad-4199-bd0d-0e740775c4ed")},
             };
-        
+
         private static readonly Dictionary<string, Guid> FilterGuids =
             new Dictionary<string, Guid>
             {
                 {$"{Absence_By_Characteristic}:school_type", new Guid("67a19370-6251-4678-84b3-5d2d379b903b")},
-                
+
                 {$"{Absence_Rate_Percent_Bands}:school_type", new Guid("51e645c1-4a37-4938-8b20-1244b15048f9")},
-            };      
-        
+            };
+
         private static readonly Dictionary<string, Guid> FilterItemGuids =
             new Dictionary<string, Guid>
             {
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                  }
              }
         }
-        
+
         public static void GenerateFilterGuids(StatisticsDbContext dbContext) {
             foreach (var filter in dbContext.Filter.Local.ToList())
             {
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 }
             }
         }
-        
+
         public static void GenerateFilterGroupGuids(StatisticsDbContext dbContext) {
             foreach (var filterGroup in dbContext.FilterGroup.Local.ToList())
             {

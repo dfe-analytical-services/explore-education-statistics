@@ -240,6 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
             ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
