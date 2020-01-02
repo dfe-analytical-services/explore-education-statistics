@@ -32,5 +32,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
+        
+        [HttpPost("bau/users/invite")]
+        public async Task<ActionResult> GetUserList(string email)
+        {
+            var invite = await _userManagementService.InviteAsync(email);
+
+            if (invite)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
     }
 }

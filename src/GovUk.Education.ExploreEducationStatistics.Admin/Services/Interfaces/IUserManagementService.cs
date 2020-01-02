@@ -7,5 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IUserManagementService
     {
         Task<List<UserViewModel>> ListAsync();
+
+        Task<bool> InviteAsync(string email);
     }
 }
