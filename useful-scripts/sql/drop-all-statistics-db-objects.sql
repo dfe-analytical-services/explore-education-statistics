@@ -30,6 +30,10 @@ DROP TYPE IdListIntegerType;
 DROP TYPE IdListVarcharType;
 DROP TYPE IdListGuidType;
 DROP TYPE TimePeriodListType;
+DROP TYPE ThemeType;
+DROP TYPE TopicType;
+DROP TYPE PublicationType;
+DROP TYPE ReleaseType;
 DROP VIEW geojson
 DROP FUNCTION geometry2json;
 DROP TABLE geometry;

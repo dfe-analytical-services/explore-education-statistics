@@ -648,8 +648,8 @@
 													"});",
 													"",
 													"pm.test(\"totalValues should be correct\", function () {",
-													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('1F_Char__Total'));",
-													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('1F_SchoolType__Total'));",
+													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('1FI_Char__Total'));",
+													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('1FI_SchoolType__Total'));",
 													"});",
 													"",
 													"pm.test(\"Should be correct number of characteristics\", function () { ",
@@ -697,7 +697,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{admin_api_url}}/data/meta/subject/1",
+											"raw": "{{admin_api_url}}/data/meta/subject/803fbf56-600f-490f-8409-6413a891720d",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -705,14 +705,14 @@
 												"data",
 												"meta",
 												"subject",
-												"1"
+												"803fbf56-600f-490f-8409-6413a891720d"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d",
 									"event": [
 										{
 											"listen": "test",
@@ -799,7 +799,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1\n}"
+											"raw": "{\n\tsubjectId: 803fbf56-600f-490f-8409-6413a891720d\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject",
@@ -1002,7 +1002,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__GenderMale}}, \n        {{1F_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}},\n        {{1I_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{1I_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": 803fbf56-600f-490f-8409-6413a891720d,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1FI_Char__GenderMale}}, \n        {{1FI_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}},\n        {{1I_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{1I_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
@@ -1104,7 +1104,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{1I_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{1I_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": 803fbf56-600f-490f-8409-6413a891720d,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1FI_Char__FSMEligible}}, \n        {{1FI_Char__FSMNotEligible}}, \n        {{1FI_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{1I_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{1I_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/data?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
@@ -1394,7 +1394,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1FILT_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1F_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1606,7 +1606,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__Total}}\n    ],\n    \"subjects\": []\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1FI_SchoolType__Total}}\n    ],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1672,7 +1672,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__StateFundedPrimary}},\n    \t{{1F_SchoolType__StateFundedSecondary}},\n    \t{{1F_SchoolType__Special}}\n    ],\n    \"subjects\": []\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1FI_SchoolType__StateFundedPrimary}},\n    \t{{1FI_SchoolType__StateFundedSecondary}},\n    \t{{1FI_SchoolType__Special}}\n    ],\n    \"subjects\": []\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
@@ -11962,32 +11962,29 @@
 				"type": "text/javascript",
 				"exec": [
 					"// Absence by characteristic",
-					"pm.globals.set(\"1FILT_SchoolType\", \"2\");",
-					"pm.globals.set(\"1FG_SchoolType_Default\", \"11\");",
-					"pm.globals.set(\"1F_Char__Total\", \"66\");",
-					"pm.globals.set(\"1F_Char__GenderMale\", \"71\");",
-					"pm.globals.set(\"1F_Char__GenderFemale\", \"72\");",
-					"pm.globals.set(\"1F_SchoolType__Total\", \"70\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"69\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"68\");",
-					"pm.globals.set(\"1F_SchoolType__Special\", \"67\");",
-					"pm.globals.set(\"1F_Char__FSMEligible\", \"11\");",
-					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"18\");",
-					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"10\");",
-					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"48\");",
+					"pm.globals.set(\"1F_SchoolType\", \"67a19370-6251-4678-84b3-5d2d379b903b\");",
+					"pm.globals.set(\"1FG_SchoolType_Default\", \"4941583b-1f6c-4586-a71f-c144f7298e18\");",
+					"pm.globals.set(\"1FI_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
+					"pm.globals.set(\"1FI_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
+					"pm.globals.set(\"1FI_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
+					"pm.globals.set(\"1FI_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");",
+					"pm.globals.set(\"1FI_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
+					"pm.globals.set(\"1FI_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
+					"pm.globals.set(\"1FI_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
+					"pm.globals.set(\"1FI_Char__FSMEligible\", \"278ce0cb-f1d2-4e8f-84d1-ad794352c925\");",
+					"pm.globals.set(\"1FI_Char__FSMNotEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
+					"pm.globals.set(\"1FI_Char__FSMUnclassified\", \"c649015c-8203-43aa-b424-dfb897766391\");",
 					"",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"31\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
-					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"1\");",
-					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"10\");"
+					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
+					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
+					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
+					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");",
+					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"71c77c7d-dec5-4c31-baa5-b59f3c8c8f2e\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"a3b1afa4-b3de-44c6-b8b2-0ef59f211a2a\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"71761e61-6a80-400f-8778-a8761306eb77\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"b4cc7de4-30f3-495b-a967-0d2a9473583f\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"57452cb9-6bda-495a-a012-7fda71e4bf90\");"
 				]
 			}
 		},

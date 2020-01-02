@@ -17,6 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private static readonly string EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018 = "8e3d1bc0-2beb-4dc6-9db7-3d27d0608042";
         private static readonly string School_Applications_And_Offers = "fa0d7f1d-d181-43fb-955b-fc327da86f2c";
 
+        private static readonly Dictionary<string, Guid> FilterGroupGuids =
+            new Dictionary<string, Guid>
+            {
+                {$"{Absence_By_Characteristic}:school_type:Default", new Guid("4941583b-1f6c-4586-a71f-c144f7298e18")},
+
+                {$"{Absence_Rate_Percent_Bands}:school_type:Default", new Guid("c93635d2-83ad-4199-bd0d-0e740775c4ed")},
+            };
+        
+        private static readonly Dictionary<string, Guid> FilterGuids =
+            new Dictionary<string, Guid>
+            {
+                {$"{Absence_By_Characteristic}:school_type", new Guid("67a19370-6251-4678-84b3-5d2d379b903b")},
+                
+                {$"{Absence_Rate_Percent_Bands}:school_type", new Guid("51e645c1-4a37-4938-8b20-1244b15048f9")},
+            };      
+        
         private static readonly Dictionary<string, Guid> FilterItemGuids =
             new Dictionary<string, Guid>
             {
@@ -52,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default:Total", new Guid("0af225c6-c70b-4053-b7e7-4e719e2b751f")},
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default:State-funded secondary", new Guid("c306ff42-ddea-4cd0-82af-770df078fd94")},
+                {$"{Absence_Rate_Percent_Bands}:school_type:Default:State-funded primary", new Guid("26db426f-fb4f-439c-9e37-360451305013")},
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default:Special", new Guid("a7a7a691-a49e-422e-839e-53f1f545fa76")},
                 
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:characteristic:Total:Total", new Guid("beeaa217-3233-48df-bc1d-11f066a26efe")},
@@ -107,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {$"{Absence_Rate_Percent_Bands}:Enrolments by absence percentage band:enrolments_overall", new Guid("fe313349-0438-41b7-8944-109690ee5158")},
                 {$"{Absence_Rate_Percent_Bands}:Enrolments by absence percentage band:enrolments_authorised", new Guid("f3014e60-534a-4667-b90f-80b1fee6b08e")},
                 {$"{Absence_Rate_Percent_Bands}:Enrolments by absence percentage band:enrolments_unauthorised", new Guid("cd2711ff-3dba-4452-858a-d55c5cfd04fb")},
-                
+
                 {$"{School_Applications_And_Offers}:Applications:applications_received", new Guid("020a4da6-1111-443d-af80-3a425c558d14")},
                 {$"{School_Applications_And_Offers}:Applications:online_applications", new Guid("f472e6cc-9e25-401b-9fca-9dc3755bab2d")},
                 {$"{School_Applications_And_Offers}:Applications:online_apps_percent", new Guid("0af5ea39-828f-4afe-9a9f-643dce0112cf")},
@@ -115,27 +132,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:Overall rating:point_score", new Guid("7d250efe-afad-4117-8ccf-debf689c4efc")},
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:Overall rating:average_point_score", new Guid("37faaef4-5b5e-473e-9585-8580c1df967a")},
             };
-        public static void GenerateIndicatorGuids(StatisticsDbContext dbContext)
-        {
-            foreach (var indicator in dbContext.Indicator.Local.ToList())
+        public static void GenerateIndicatorGuids(StatisticsDbContext dbContext) {
+             foreach (var indicator in dbContext.Indicator.Local.ToList())
+             {
+                 var key = $"{indicator.IndicatorGroup.SubjectId}:{indicator.IndicatorGroup.Label}:{indicator.Name}";
+                 var id = GetGuid(IndicatorGuids, key);
+                 if (id != Guid.Empty)
+                 {
+                     indicator.Id = id;
+                 }
+             }
+        }
+        
+        public static void GenerateFilterGuids(StatisticsDbContext dbContext) {
+            foreach (var filter in dbContext.Filter.Local.ToList())
             {
-                var key = $"{indicator.IndicatorGroup.SubjectId}:{indicator.IndicatorGroup.Label}:{indicator.Name}";
-                var id = GetGuid(IndicatorGuids, key);
+                var key = $"{filter.SubjectId}:{filter.Name}";
+                var id = GetGuid(FilterGuids, key);
                 if (id != Guid.Empty)
                 {
-                    indicator.Id = id;
+                    filter.Id = id;
                 }
             }
         }
+        
+        public static void GenerateFilterGroupGuids(StatisticsDbContext dbContext) {
+            foreach (var filterGroup in dbContext.FilterGroup.Local.ToList())
+            {
+                var key = $"{filterGroup.Filter.SubjectId}:{filterGroup.Filter.Name}:{filterGroup.Label}";
+                var id = GetGuid(FilterGroupGuids, key);
+                if (id != Guid.Empty)
+                {
+                    filterGroup.Id = id;
+                }
+            }
+        }
+
         public static void GenerateFilterItemGuids(StatisticsDbContext dbContext)
         {
             foreach (var filterItem in dbContext.FilterItem.Local.ToList())
             {
                 var key = $"{filterItem.FilterGroup.Filter.SubjectId}:{filterItem.FilterGroup.Filter.Name}:{filterItem.FilterGroup.Label}:{filterItem.Label}";
-                var id = GetGuid(FilterItemGuids, key);
-                if (id != Guid.Empty)
+                var filterItemId = GetGuid(FilterItemGuids, key);
+                if (filterItemId != Guid.Empty)
                 {
-                    filterItem.Id = id;
+                    filterItem.Id = filterItemId;
                 }
             }
         }
