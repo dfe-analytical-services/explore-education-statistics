@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseMetaService.Setup(s => s.GetSubjects(_releaseId))
                 .Returns(new List<IdLabel>
                 {
-                    new IdLabel(1, "Absence by characteristic")
+                    new IdLabel(Guid.NewGuid(), "Absence by characteristic")
                 });
 
             _controller = new MetaController(releaseMetaService.Object);

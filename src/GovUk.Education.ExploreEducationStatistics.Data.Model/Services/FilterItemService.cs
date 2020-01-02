@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class FilterItemService : AbstractRepository<FilterItem, long>, IFilterItemService
+    public class FilterItemService : AbstractRepository<FilterItem, Guid>, IFilterItemService
     {
         public FilterItemService(StatisticsDbContext context,
             ILogger<FilterItemService> logger) : base(context, logger)

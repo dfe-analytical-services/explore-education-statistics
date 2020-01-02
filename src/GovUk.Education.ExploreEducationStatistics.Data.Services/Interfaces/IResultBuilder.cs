@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -8,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         where TData : Observation
         where TResult : ObservationViewModel
     {
-        TResult BuildResult(TData observation, IEnumerable<long> indicators);
+        TResult BuildResult(TData observation, IEnumerable<Guid> indicators);
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class LocationService : AbstractRepository<Location, long>, ILocationService
+    public class LocationService : AbstractRepository<Location, Guid>, ILocationService
     {
         private static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
         {
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(Guid subjectId)
         {
             var locations = GetLocationsGroupedByGeographicLevel(subjectId);
             return GetObservationalUnits(locations);
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(long subjectId)
+        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(Guid subjectId)
         {
             var locationIdsWithGeographicLevel = _context.Observation
                 .Where(observation =>
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(
-            IEnumerable<(GeographicLevel GeographicLevel, long LocationId)> locationIdsWithGeographicLevel)
+            IEnumerable<(GeographicLevel GeographicLevel, Guid LocationId)> locationIdsWithGeographicLevel)
         {
             var locationIdsGroupedByGeographicLevel = locationIdsWithGeographicLevel.GroupBy(
                 tuple => tuple.GeographicLevel,
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     grouping => grouping.ToList().Select(id => locations[id]));
         }
 
-        private Dictionary<long, Location> GetLocations(long[] locationIds)
+        private Dictionary<Guid, Location> GetLocations(Guid[] locationIds)
         {
             var locations = Find(locationIds).ToList();
             return locations.ToDictionary(location => location.Id);

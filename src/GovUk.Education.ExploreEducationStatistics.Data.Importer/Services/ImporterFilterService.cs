@@ -1,6 +1,7 @@
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -64,14 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
         {
             return typeof(FilterGroup).Name + "_" +
-                   (filter.Id == 0 ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
+                   (filter.Id == null ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
                    filterGroupLabel.ToLower().Replace(" ", "_");            
         } 
         
         private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
         {
             return typeof(FilterItem).Name + "_" +
-                   (filterGroup.Id == 0 ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
+                   (filterGroup.Id == null ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
                    filterItemLabel.ToLower().Replace(" ", "_");
         }
     }

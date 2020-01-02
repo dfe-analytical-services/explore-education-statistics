@@ -24,6 +24,7 @@ DROP PROCEDURE FilteredObservations;
 DROP PROCEDURE FilteredFootnotes;
 DROP TYPE IdListIntegerType;
 DROP TYPE IdListVarcharType;
+DROP TYPE IdListGuidType;
 DROP TYPE TimePeriodListType;
 DROP VIEW geojson
 DROP FUNCTION geometry2json;

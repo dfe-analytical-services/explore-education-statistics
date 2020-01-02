@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public ObservationViewModel BuildResult(Observation observation, IEnumerable<long> indicators)
+        public ObservationViewModel BuildResult(Observation observation, IEnumerable<Guid> indicators)
         {
             return new ObservationViewModel
             {
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l).Select(l => l.ToString());
         }
 
-        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<long> indicators)
+        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<Guid> indicators)
         {
             var indicatorsList = indicators?.ToList();
             var measures = indicatorsList != null && indicatorsList.Any()
@@ -44,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
         }
         
-        private static Dictionary<long, string> FilterMeasures(
-            Dictionary<long, string> measures,
-            IEnumerable<long> indicators)
+        private static Dictionary<Guid, string> FilterMeasures(
+            Dictionary<Guid, string> measures,
+            IEnumerable<Guid> indicators)
         {
             return (
                 from kvp in measures

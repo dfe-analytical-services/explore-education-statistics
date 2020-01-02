@@ -14,11 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     {
         private readonly TableBuilderMetaController _controller;
 
-        private const long SubjectId = 1;
-        private const long NotFoundId = 2;
+        private static readonly Guid SubjectId = new Guid("3a5cbb72-ccd5-4afd-9a72-0f73d323d192");
+        private static readonly Guid NotFoundId =  new Guid("9d20d622-b9ec-4199-9d89-57726a8588cb");
         private readonly SubjectMetaQueryContext _queryContext = new SubjectMetaQueryContext
         {
-            SubjectId = 1
+            SubjectId = SubjectId
         };
         
         public TableBuilderMetaControllerTests()
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var queryContextNotFound = new SubjectMetaQueryContext
             {
-                SubjectId = 2
+                SubjectId = NotFoundId
             };
             
             var result = _controller.GetSubjectMeta(queryContextNotFound);

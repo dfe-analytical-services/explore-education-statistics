@@ -1,5 +1,5 @@
 begin
-	declare @subjectId int = 2
+	declare @subjectId uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8'
 
 	declare @geographicLevel nvarchar(6) = 'SCH'
 
@@ -33,7 +33,7 @@ begin
 
 	declare @wardsList IdListVarcharType
 
-	declare @filterItemList IdListIntegerType
+	declare @filterItemList IdListGuidType
 	insert @filterItemList values (83), (86)
 
 	declare @result int

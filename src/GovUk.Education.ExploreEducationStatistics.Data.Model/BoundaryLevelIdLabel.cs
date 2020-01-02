@@ -1,20 +1,18 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class IdLabel
+    public class BoundaryLevelIdLabel
     {
-        public IdLabel(Guid id, string label)
+        public BoundaryLevelIdLabel(long id, string label)
         {
             Id = id;
             Label = label;
         }
 
-        public IdLabel()
+        public BoundaryLevelIdLabel()
         {
         }
 
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public string Label { get; set; }
     }
 }
