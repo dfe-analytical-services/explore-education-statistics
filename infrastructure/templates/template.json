@@ -765,6 +765,10 @@
               "value": "[parameters('notifyApiKey')]"
             },
             {
+              "name": "AdminUri",
+              "value": "[parameters('adminUri')]"
+            },
+            {
               "name": "IdentityServer:IssuerUri",
               "value": "[concat('urn=', parameters('adminUri'))]"
             },

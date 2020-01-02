@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private void SendInviteEmail(string email)
         {
-            var emailValues = new Dictionary<string, dynamic> {{"url", _configuration.GetValue<string>("")}};
+            var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + _configuration.GetValue<string>("AdminUri")}};
 
             _emailService.SendEmail(email, TemplateId, emailValues);
         }
