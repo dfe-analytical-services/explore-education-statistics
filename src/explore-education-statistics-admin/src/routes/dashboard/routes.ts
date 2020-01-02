@@ -2,6 +2,7 @@ import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage'
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
+import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
@@ -57,6 +58,11 @@ const appRouteList: Dictionary<RouteProps> = {
   administrationUsers: {
     path: '/administration/users',
     component: BauUsersPage,
+    exact: true,
+  },
+  administrationUserInvite: {
+    path: '/administration/users/invite',
+    component: UserInvitePage,
     exact: true,
   },
   methodology: {
