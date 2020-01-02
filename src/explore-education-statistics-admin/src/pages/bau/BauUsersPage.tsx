@@ -53,6 +53,9 @@ const BauUsersPage = () => {
           </tbody>
         )}
       </table>
+      <Link to='/administration/users/invite' className="govuk-button">
+        Invite a new user
+      </Link>
     </Page>
   );
 };
