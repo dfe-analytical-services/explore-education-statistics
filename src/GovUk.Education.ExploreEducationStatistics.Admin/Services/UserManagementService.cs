@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<string>> ListPendingAsync()
         {
-            var pendingUsers = await _context.UserInvites.Select(u => u.Email).OrderBy(x => x).ToListAsync();
+            var pendingUsers = await _context.UserInvites.Where(u => u.Accepted == false).Select(u => u.Email)
+                .OrderBy(x => x).ToListAsync();
 
             return pendingUsers;
         }
