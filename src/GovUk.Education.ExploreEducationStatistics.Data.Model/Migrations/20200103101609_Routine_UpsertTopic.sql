@@ -6,8 +6,7 @@ BEGIN
     ON (target.Id = source.Id)
     WHEN MATCHED THEN
         UPDATE SET Title = source.Title,
-                   Slug = source.Slug
-                
+                   Slug = source.Slug             
     WHEN NOT MATCHED THEN
         INSERT (Id, Title, Slug, ThemeId)
         VALUES (source.Id, source.Title, source.Slug, source.ThemeId);

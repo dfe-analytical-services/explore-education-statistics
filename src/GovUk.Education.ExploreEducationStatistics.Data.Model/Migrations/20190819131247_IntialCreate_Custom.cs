@@ -21,11 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredObservations.sql");
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredFootnotes.sql");
             ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_geometry2json.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertTheme.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertTopic.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertPublication.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertRelease.sql");
-
             // Views
             ExecuteFile(migrationBuilder, $"{MigrationId}_Views.sql");
             // Indexes
@@ -48,10 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP FUNCTION dbo.geometry2json;");
             migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredFootnotes");
             migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredObservations");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTheme");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTopic");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertPublication");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertRelease");
             // Types
             migrationBuilder.Sql("DROP TYPE dbo.TimePeriodListType");
             migrationBuilder.Sql("DROP TYPE dbo.IdListVarcharType");

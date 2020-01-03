@@ -1,4 +1,4 @@
-CREATE PROCEDURE UpsertFilter @Filter dbo.FilterType, @FilterGroup dbo.FilterGroupType READONLY
+CREATE PROCEDURE UpsertFilter @Filter dbo.FilterType READONLY
 AS
 BEGIN
     MERGE dbo.Filter AS target
