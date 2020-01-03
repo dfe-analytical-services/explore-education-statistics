@@ -54,6 +54,11 @@ const PendingInvitesPage = () => {
       <Link to="/administration/users/invite" className="govuk-button">
         Invite a new user
       </Link>
+      <p>
+        <Link to="/administration/users/" className="govuk-back-link">
+          Back
+        </Link>
+      </p>
     </Page>
   );
 };
