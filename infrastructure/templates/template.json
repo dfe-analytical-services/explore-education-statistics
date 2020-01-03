@@ -155,6 +155,11 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
+    "notifyInviteTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+
     "notifyApiKey": {
       "type": "securestring",
       "defaultValue": "",
@@ -166,6 +171,7 @@
       "type": "securestring",
       "defaultValue": ""
     },
+
 
     "teamEmailAddresses": {
       "type": "array",
@@ -763,6 +769,10 @@
             {
               "name": "NotifyApiKey",
               "value": "[parameters('notifyApiKey')]"
+            },
+            {
+              "name": "NotifyInviteTemplateId",
+              "value": "[parameters('notifyInviteTemplateId')]"
             },
             {
               "name": "AdminUri",
