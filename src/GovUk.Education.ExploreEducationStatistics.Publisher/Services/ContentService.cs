@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly JsonSerializerSettings _jsonSerializerSettingsLowerCase =
             GetJsonSerializerSettings(new LowerCaseNamingStrategy());
 
+        private const string StagingPathPrefix = "staging";
+
         public ContentService(IDownloadService downloadService,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
@@ -38,10 +40,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
         }
 
+        /**
+         * Intended to be used as a Development / BAU Function to perform a full content refresh
+         */
         public async Task UpdateAllContentAsync()
         {
+            // Content is not staged when performing a full refresh
+            const bool staging = false;
+
             await _fileStorageService.DeleteAllContentAsync();
-            await UpdateTreesAsync();
+            await UpdateTreesAsync(staging);
 
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
@@ -50,17 +58,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             foreach (var publication in publications)
             {
                 var releases = publication.Releases.Where(release => release.Live);
-                await UpdatePublicationAsync(publication);
-                await UpdateLatestReleaseAsync(publication);
+                await UpdatePublicationAsync(publication, staging);
+                await UpdateLatestReleaseAsync(publication, staging);
                 foreach (var release in releases)
                 {
-                    await UpdateReleaseAsync(release.Id);
+                    await UpdateReleaseAsync(release.Id, staging);
                 }
             }
 
             foreach (var methodologyId in methodologyIds)
             {
-                await UpdateMethodologyAsync(methodologyId);
+                await UpdateMethodologyAsync(methodologyId, staging);
             }
         }
 
@@ -79,58 +87,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task UpdateDownloadTreeAsync()
+        private async Task UpdateDownloadTreeAsync(bool staging)
         {
             // This is assuming the files have been copied first
             var tree = _downloadService.GetDownloadTree();
-            await UploadAsync(PublicContentDownloadTreePath(), tree, _jsonSerializerSettingsCamelCase);
+            await UploadAsync(PublicContentDownloadTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodologyTreeAsync()
+        private async Task UpdateMethodologyTreeAsync(bool staging)
         {
             var tree = _methodologyService.GetTree();
-            await UploadAsync(PublicContentMethodologyTreePath(), tree, _jsonSerializerSettingsCamelCase);
+            await UploadAsync(PublicContentMethodologyTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublicationTreeAsync()
+        private async Task UpdatePublicationTreeAsync(bool staging)
         {
             var tree = _publicationService.GetPublicationsTree();
-            await UploadAsync(PublicContentPublicationsTreePath(), tree, _jsonSerializerSettingsCamelCase);
+            await UploadAsync(PublicContentPublicationsTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateLatestReleaseAsync(Publication publication)
+        private async Task UpdateLatestReleaseAsync(Publication publication, bool staging = true)
         {
             var viewModel = _releaseService.GetLatestRelease(publication.Id);
-            await UploadAsync(PublicContentLatestReleasePath(publication.Slug), viewModel,
+            await UploadAsync(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodologyAsync(Guid methodologyId)
+        private async Task UpdateMethodologyAsync(Guid methodologyId, bool staging = true)
         {
             var methodology = await _methodologyService.GetAsync(methodologyId);
-            await UploadAsync(PublicContentMethodologyPath(methodology.Slug), methodology,
+            await UploadAsync(prefix => PublicContentMethodologyPath(methodology.Slug, prefix), staging, methodology,
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublicationAsync(Publication publication)
+        private async Task UpdatePublicationAsync(Publication publication, bool staging = true)
         {
             var viewModel = BuildPublicationViewModel(publication);
-            await UploadAsync(PublicContentPublicationPath(publication.Slug), viewModel,
+            await UploadAsync(prefix => PublicContentPublicationPath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsLowerCase);
         }
 
-        private async Task UpdateReleaseAsync(Guid releaseId)
+        private async Task UpdateReleaseAsync(Guid releaseId, bool staging = true)
         {
             var viewModel = _releaseService.GetRelease(releaseId);
-            await UploadAsync(PublicContentReleasePath(viewModel.Publication.Slug, viewModel.Slug), viewModel,
-                _jsonSerializerSettingsLowerCase);
+            await UploadAsync(prefix => PublicContentReleasePath(viewModel.Publication.Slug, viewModel.Slug, prefix),
+                staging, viewModel, _jsonSerializerSettingsLowerCase);
         }
 
-        private async Task UpdateTreesAsync()
+        private async Task UpdateTreesAsync(bool staging = true)
         {
-            await UpdateDownloadTreeAsync();
-            await UpdateMethodologyTreeAsync();
-            await UpdatePublicationTreeAsync();
+            await UpdateDownloadTreeAsync(staging);
+            await UpdateMethodologyTreeAsync(staging);
+            await UpdatePublicationTreeAsync(staging);
         }
 
         private static PublicationViewModel BuildPublicationViewModel(Publication publication)
@@ -154,8 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private async Task UploadAsync(string blobName, object value, JsonSerializerSettings settings)
+        private async Task UploadAsync(Func<string, string> pathFunction, bool staging, object value,
+            JsonSerializerSettings settings)
         {
+            var pathPrefix = staging ? StagingPathPrefix : null;
+            var blobName = pathFunction.Invoke(pathPrefix);
             await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json,
                 JsonConvert.SerializeObject(value, null, settings));
         }

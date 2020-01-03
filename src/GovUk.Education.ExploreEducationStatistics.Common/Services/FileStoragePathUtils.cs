@@ -8,54 +8,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         public const string BatchesDir = "batches";
 
-        private static string PublicContentDownloadPath()
+        private static string PublicContentDownloadPath(string prefix = null)
         {
-            return "download";
+            return $"{AppendPathSeparator(prefix)}download";
         }
         
-        private static string PublicContentMethodologyPath()
+        private static string PublicContentMethodologiesPath(string prefix = null)
         {
-            return "methodology";
+            return $"{AppendPathSeparator(prefix)}methodology";
         }
         
-        private static string PublicContentPublicationsPath()
+        private static string PublicContentPublicationsPath(string prefix = null)
         {
-            return "publications";
+            return $"{AppendPathSeparator(prefix)}publications";
         }
 
-        public static string PublicContentDownloadTreePath()
+        public static string PublicContentDownloadTreePath(string prefix = null)
         {
-            return $"{PublicContentDownloadPath()}/tree.json";
+            return $"{PublicContentDownloadPath(prefix)}/tree.json";
         }
 
-        public static string PublicContentMethodologyTreePath()
+        public static string PublicContentMethodologyTreePath(string prefix = null)
         {
-            return $"{PublicContentMethodologyPath()}/tree.json";
+            return $"{PublicContentMethodologiesPath(prefix)}/tree.json";
         }
 
-        public static string PublicContentPublicationsTreePath()
+        public static string PublicContentPublicationsTreePath(string prefix = null)
         {
-            return $"{PublicContentPublicationsPath()}/tree.json";
+            return $"{PublicContentPublicationsPath(prefix)}/tree.json";
         }
 
-        public static string PublicContentMethodologyPath(string slug)
+        public static string PublicContentMethodologyPath(string slug, string prefix = null)
         {
-            return $"{PublicContentMethodologyPath()}/methodologies/{slug}.json";
+            return $"{PublicContentMethodologiesPath(prefix)}/methodologies/{slug}.json";
         }
 
-        public static string PublicContentPublicationPath(string slug)
+        public static string PublicContentPublicationPath(string slug, string prefix = null)
         {
-            return $"{PublicContentPublicationsPath()}/{slug}/publication.json";
+            return $"{PublicContentPublicationsPath(prefix)}/{slug}/publication.json";
         }
 
-        public static string PublicContentLatestReleasePath(string slug)
+        public static string PublicContentLatestReleasePath(string slug, string prefix = null)
         {
-            return $"{PublicContentPublicationsPath()}/{slug}/latest-release.json";
+            return $"{PublicContentPublicationsPath(prefix)}/{slug}/latest-release.json";
         }
         
-        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug)
+        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, string prefix = null)
         {
-            return $"{PublicContentPublicationsPath()}/{publicationSlug}/releases/{releaseSlug}.json";
+            return $"{PublicContentPublicationsPath(prefix)}/{publicationSlug}/releases/{releaseSlug}.json";
         }
 
         /**
@@ -141,6 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
         {
             return $"{publicationSlug}/{releaseSlug}/";
+        }
+        
+        private static string AppendPathSeparator(string segment = null)
+        {
+            return segment == null ? "" : segment + "/";
         }
     }
 }
