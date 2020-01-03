@@ -37,6 +37,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return NotFound();
         }
         
+        [HttpGet("bau/users/pending")]
+        public async Task<ActionResult<List<UserViewModel>>> GetPendingUsers()
+        {
+            var users = await _userManagementService.ListPendingAsync();
+
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+        }
+        
         [HttpPost("bau/users/invite")]
         public async Task<ActionResult> GetUserList(UserInviteViewModel userInviteViewModel)
         {

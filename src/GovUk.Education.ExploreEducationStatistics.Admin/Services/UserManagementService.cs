@@ -39,6 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return users;
         }
 
+        public async Task<List<string>> ListPendingAsync()
+        {
+            var pendingUsers = await _context.UserInvites.Select(u => u.Email).OrderBy(x => x).ToListAsync();
+
+            return pendingUsers;
+        }
+
         public async Task<bool> InviteAsync(string email, string user)
         {
             if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
