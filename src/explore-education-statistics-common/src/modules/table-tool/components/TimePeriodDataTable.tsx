@@ -176,7 +176,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               const geographicLevel = camelCase(result.geographicLevel);
               return (
                 result.location[geographicLevel] &&
-                result.location[geographicLevel].code === filter.value
+                result.location[geographicLevel].code === filter.value &&
+                filter.level === geographicLevel
               );
             })
           );
