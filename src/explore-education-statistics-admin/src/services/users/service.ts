@@ -3,9 +3,7 @@ import { UserStatus, UserInvite } from '@admin/services/users/types';
 
 export interface UsersService {
   getUsers(): Promise<UserStatus[]>;
-  inviteUser: (
-    invite: UserInvite,
-  ) => Promise<boolean>;
+  inviteUser: (invite: UserInvite) => Promise<boolean>;
 }
 
 const service: UsersService = {
@@ -13,9 +11,7 @@ const service: UsersService = {
     return client.get<UserStatus[]>('/bau/users');
   },
 
-  inviteUser(
-    invite: UserInvite,
-  ): Promise<boolean> {
+  inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/bau/users/invite`, invite);
   },
 };
