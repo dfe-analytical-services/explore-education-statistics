@@ -23,12 +23,13 @@ const PendingInvitesPage = () => {
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
+        { name: 'Users', link: '/administration/users' },
         { name: 'Pending invites' },
       ]}
     >
       <h1 className="govuk-heading-xl">
         <span className="govuk-caption-xl">Manage access to the service</span>
-        Pending invites
+        Pending user invites
       </h1>
 
       <table className="govuk-table">
