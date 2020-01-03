@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 {
@@ -44,7 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
                 return Ok();
             }
 
-            return BadRequest();
+            AddErrors(ModelState, ValidationResult(UserAlreadyExists));
+            
+            return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
     }
 }

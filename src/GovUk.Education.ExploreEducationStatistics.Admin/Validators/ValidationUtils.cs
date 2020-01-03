@@ -118,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
         PublicationNotFound,
-        CommentNotFound
+        CommentNotFound,
+        UserAlreadyExists
     }
 }
