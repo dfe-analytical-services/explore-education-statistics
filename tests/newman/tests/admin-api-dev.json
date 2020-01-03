@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "93a47c96-317d-436d-8299-8cb57e86adf7",
+		"_postman_id": "c2218d87-4e02-4aa7-a5e0-dbc308ef94fb",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -121,7 +121,7 @@
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
 									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Test methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be an empty array\", function () {",
@@ -314,7 +314,7 @@
 									"",
 									"    var createdDate = respJson[1].created.substring(0, respJson[1].created.indexOf('T'));",
 									"    var now = new Date();",
-									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
+									"    var nowDate = `${now.getFullYear()}-${('0' + (now.getMonth()+1)).slice(-2)}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
 									"    ",
 									"    pm.expect(respJson[0].userName).to.equal(\"bau1@example.com\");",
@@ -330,7 +330,7 @@
 									"",
 									"    var createdDate = respJson[1].created.substring(0, respJson[1].created.indexOf('T'));",
 									"    var now = new Date();",
-									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
+									"    var nowDate = `${now.getFullYear()}-${('0' + (now.getMonth()+1)).slice(-2)}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
 									"    ",
 									"    pm.expect(respJson[1].userName).to.equal(\"bau1@example.com\");",
@@ -404,7 +404,11 @@
 								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
-									"setTimeout(function () {}, 100000);"
+									"if(pm.environment.get('env') === 'local') {",
+									"    setTimeout(function () {}, 50000);",
+									"} else {",
+									"    setTimeout(function () {}, 100000);",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -707,7 +711,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"SUB1 test footnote subject\",\n    \"indicators\": [],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [{{sub1_id}}]\n}"
+							"raw": "{\n    \"content\": \"SUB1 test footnote subject\",\n    \"indicators\": [],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [\"{{sub1_id}}\"]\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/data/footnote",
@@ -786,7 +790,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"SUB1 test footnote indicator\",\n    \"indicators\": [{{SUB1_IND_Admission_Numbers}}],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
+							"raw": "{\n    \"content\": \"SUB1 test footnote indicator\",\n    \"indicators\": [\"{{SUB1_IND_Admission_Numbers}}\"],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/data/footnote",
@@ -1087,7 +1091,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"caa8e56f-41d2-4129-a5c3-53b051134bd7\"\n}",
+							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"b4886b45-53c2-4d6f-e6bc-08d77d76f342\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1601,7 +1605,7 @@
 									"",
 									"    // @NotCreatedData",
 									"    pm.expect(testPub.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(testPub.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(testPub.methodology.title).to.equal(\"Test methodology\");",
 									"",
 									"    pm.expect(testPub.releases.length).to.equal(1);",
 									"    pm.expect(testPub.releases[0].id).to.equal(pm.globals.get('release_id'));",
@@ -1701,7 +1705,7 @@
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
 									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Test methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be correct\", function () {",
@@ -2210,7 +2214,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": {{sub1_id}},\n\t\"localAuthority\": [\"E08000025\"]\n}"
+											"raw": "{\n\t\"subjectId\": \"{{sub1_id}}\",\n\t\"localAuthority\": [\"E08000025\"]\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject",
@@ -2359,7 +2363,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": {{sub1_id}},\n    \"localAuthority\": [\n    \t\"E09000007\",\n    \t\"E09000011\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t{{SUB1_IND_Admission_Numbers}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthority\": [\n    \t\"E09000007\",\n    \t\"E09000011\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId={{release_id}}",
@@ -2515,7 +2519,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": {{sub1_id}},\n    \"localAuthorityDistrict\": [\"E06000001\", \"E06000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2008,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t{{SUB1_IND_Admission_Numbers}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthorityDistrict\": [\"E06000001\", \"E06000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2008,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/data?releaseId={{release_id}}",
@@ -2683,7 +2687,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{7F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [\n    \t\"{{7F_AbsenceRatePercentBands_SchoolType}}\"\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2789,7 +2793,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t\"{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\"\n    ],\n    \"filterItems\": [],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2895,7 +2899,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\"\n    \t],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2961,7 +2965,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    ],\n    subjects: [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}}\",\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}}\",\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\"\n    ],\n    subjects: [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_items_id}}",
@@ -7165,10 +7169,11 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
-													"const respJson = pm.response.json();",
+													"var respJson;",
 													"",
 													"pm.test(\"Status code is 200\", function() {",
 													"    pm.response.to.have.status(200);",
+													"    respJson = pm.response.json();",
 													"});",
 													"",
 													"pm.test(\"Response shouldn't contain datablock1\", function () {",
