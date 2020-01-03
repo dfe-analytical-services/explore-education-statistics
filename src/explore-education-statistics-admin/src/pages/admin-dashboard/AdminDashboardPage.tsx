@@ -129,6 +129,11 @@ const AdminDashboardPage = ({
                       Creating a new release{' '}
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/contact-us" target="_blank">
+                      Contact us
+                    </Link>
+                  </li>
                 </ul>
               </RelatedInformation>
             </div>

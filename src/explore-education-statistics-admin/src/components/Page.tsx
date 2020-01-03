@@ -41,6 +41,7 @@ const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
             id="main-content"
             role="main"
           >
+            {pageTitle && <h1 className="govuk-heading-xl">{pageTitle}</h1>}
             {children}
           </main>
         </div>
