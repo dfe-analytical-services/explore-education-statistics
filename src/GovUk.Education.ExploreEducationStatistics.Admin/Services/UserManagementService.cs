@@ -17,9 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UsersAndRolesDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private const string TemplateId = "44ce65b5-c8c2-4774-913e-7a8aac6e1112"; //"a183f2ae-a859-49ad-9c26-f648f60d9f61";
 
-        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService, IConfiguration configuration)
+        private const string
+            TemplateId = "44ce65b5-c8c2-4774-913e-7a8aac6e1112"; //"a183f2ae-a859-49ad-9c26-f648f60d9f61";
+
+        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService,
+            IConfiguration configuration)
         {
             _context = context;
             _emailService = emailService;
@@ -45,16 +48,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             try
             {
-                var invite =  new UserInvite
+                if (_context.UserInvites.Any(i => i.Email == email) == false)
                 {
-                    Email = email,
-                    Created = DateTime.UtcNow,
-                    CreatedBy = user
-                };
-                
-                await _context.UserInvites.AddAsync(invite);
-                await _context.SaveChangesAsync();
-                
+                    var invite = new UserInvite
+                    {
+                        Email = email,
+                        Created = DateTime.UtcNow,
+                        CreatedBy = user
+                    };
+
+                    await _context.UserInvites.AddAsync(invite);
+                    await _context.SaveChangesAsync();
+                }
+
                 SendInviteEmail(email);
 
                 return true;
@@ -67,7 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private void SendInviteEmail(string email)
         {
-            var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + _configuration.GetValue<string>("AdminUri")}};
+            var uri = _configuration.GetValue<string>("AdminUri");
+
+            var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + uri}};
 
             _emailService.SendEmail(email, TemplateId, emailValues);
         }
