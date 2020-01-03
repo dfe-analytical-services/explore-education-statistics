@@ -8,6 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         public const string BatchesDir = "batches";
 
+        public static string PublicContentStagingPath()
+        {
+            return "staging";
+        }
+        
         private static string PublicContentDownloadPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}download";

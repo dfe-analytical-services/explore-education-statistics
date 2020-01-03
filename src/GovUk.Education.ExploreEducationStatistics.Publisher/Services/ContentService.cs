@@ -25,8 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly JsonSerializerSettings _jsonSerializerSettingsLowerCase =
             GetJsonSerializerSettings(new LowerCaseNamingStrategy());
 
-        private const string StagingPathPrefix = "staging";
-
         public ContentService(IDownloadService downloadService,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
@@ -165,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task UploadAsync(Func<string, string> pathFunction, bool staging, object value,
             JsonSerializerSettings settings)
         {
-            var pathPrefix = staging ? StagingPathPrefix : null;
+            var pathPrefix = staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
             await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json,
                 JsonConvert.SerializeObject(value, null, settings));

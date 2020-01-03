@@ -69,6 +69,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publication, release);
         }
 
+        public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
+        {
+            var container =
+                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            
+            var sourceDirectoryPath = PublicContentStagingPath();
+            var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
+            var destinationDirectory = container.GetDirectoryReference("");
+
+            var options = new CopyDirectoryOptions
+            {
+                Recursive = true
+            };
+
+            var allFilesTransferred = new List<CloudBlockBlob>();
+
+            var context = new DirectoryTransferContext();
+            context.FileTransferred += (sender, args) => FileTransferredCallback(sender, args, allFilesTransferred);
+            context.FileFailed += FileFailedCallback;
+            context.FileSkipped += FileSkippedCallback;
+
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
+                CopyMethod.ServiceSideAsyncCopy, options, context);
+        }
+        
         public async Task UploadFromStreamAsync(string blobName, string contentType, string content)
         {
             await FileStorageUtils.UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
