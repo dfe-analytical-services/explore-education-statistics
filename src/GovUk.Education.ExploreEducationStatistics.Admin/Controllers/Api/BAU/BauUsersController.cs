@@ -35,9 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         }
         
         [HttpPost("bau/users/invite")]
-        public async Task<ActionResult> GetUserList(UserInvite userInvite)
+        public async Task<ActionResult> GetUserList(UserInviteViewModel userInviteViewModel)
         {
-            var invite = await _userManagementService.InviteAsync(userInvite.Email);
+            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name);
 
             if (invite)
             {

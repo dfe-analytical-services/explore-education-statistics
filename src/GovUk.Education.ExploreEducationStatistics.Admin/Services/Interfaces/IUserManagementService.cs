@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<List<UserViewModel>> ListAsync();
 
-        Task<bool> InviteAsync(string email);
+        Task<bool> InviteAsync(string email, string user);
     }
 }

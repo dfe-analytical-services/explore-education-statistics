@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UsersAndRolesDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private const string TemplateId = "a183f2ae-a859-49ad-9c26-f648f60d9f61";
+        private const string TemplateId = "44ce65b5-c8c2-4774-913e-7a8aac6e1112"; //"a183f2ae-a859-49ad-9c26-f648f60d9f61";
 
         public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService, IConfiguration configuration)
         {
@@ -37,13 +39,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return users;
         }
 
-        public async Task<bool> InviteAsync(string email)
+        public async Task<bool> InviteAsync(string email, string user)
         {
             if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
 
             try
             {
-                // TODO: add user to user invite table
+                var invite =  new UserInvite
+                {
+                    Email = email,
+                    Created = DateTime.UtcNow,
+                    CreatedBy = user
+                };
+                
+                await _context.UserInvites.AddAsync(invite);
+                await _context.SaveChangesAsync();
                 
                 SendInviteEmail(email);
 

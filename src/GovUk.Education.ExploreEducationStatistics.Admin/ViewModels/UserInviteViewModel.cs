@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class UserInvite
+    public class UserInviteViewModel
     {
         public string Email { get; set; }
     }
