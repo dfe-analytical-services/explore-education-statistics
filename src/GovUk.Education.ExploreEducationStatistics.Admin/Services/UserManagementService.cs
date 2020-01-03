@@ -61,7 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
                 }
 
-                SendInviteEmail(email);
+                if (_context.UserInvites.Any(i => i.Email == email && i.Accepted == false))
+                {
+                    SendInviteEmail(email);
+                }
 
                 return true;
             }
