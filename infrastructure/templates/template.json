@@ -328,8 +328,9 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
+    "vNetId": "[concat(resourceGroup().id,'/providers/','Microsoft.Network/virtualNetworks/', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
-    "adminSubnetId": "[concat(resourceGroup().id,'/providers/','Microsoft.Network/virtualNetworks/', variables('adminSubnetName'))]",
+    "adminSubnetId": "[concat(variables('vNetId'), '/subnets/', variables('adminSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
