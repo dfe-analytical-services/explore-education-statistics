@@ -720,7 +720,7 @@
         },
         {
           "name": "virtualNetwork",
-          "type": "Microsoft.Web/sites/virtualNetworkConnections",
+          "type": "virtualNetworkConnections",
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
