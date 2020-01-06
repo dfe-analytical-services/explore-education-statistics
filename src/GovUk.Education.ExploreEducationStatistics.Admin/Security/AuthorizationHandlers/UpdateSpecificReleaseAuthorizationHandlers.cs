@@ -27,7 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         };
         
         public UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, roles => EditorRoles.Intersect(roles.Select(r => r.Role)).Any())
+            : base(context, ctx =>
+            {
+                return ctx.Release.Status != ReleaseStatus.Approved && 
+                       EditorRoles.Intersect(ctx.Roles.Select(r => r.Role)).Any();
+            })
         {}
     }
 }

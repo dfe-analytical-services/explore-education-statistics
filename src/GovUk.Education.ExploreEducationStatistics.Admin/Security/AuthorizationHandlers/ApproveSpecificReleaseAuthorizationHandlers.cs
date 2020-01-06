@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : HasRoleOnReleaseAuthorizationHandler<ApproveSpecificReleaseRequirement>
     {
         public ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, roles => roles.Any(role => role.Role == ReleaseRole.Approver))
+            : base(context, ctx => ctx.Roles.Any(role => role.Role == ReleaseRole.Approver))
         {}
     }
 }
