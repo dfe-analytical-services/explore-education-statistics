@@ -125,10 +125,7 @@ const ManagePublicationsAndReleasesTab = ({
     } else if (selectedThemeAndTopic.topic.id !== '') {
       // eslint-disable-next-line
       history.replaceState(
-        {
-          topicId: selectedThemeAndTopic.theme.id,
-          themeId: selectedThemeAndTopic.topic.id,
-        },
+        {},
         '',
         generateAdminDashboardThemeTopicLink(
           selectedThemeAndTopic.theme.id,
