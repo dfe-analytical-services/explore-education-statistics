@@ -1,23 +1,28 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import React, { useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 import userService from '@admin/services/users/service';
-import { UserStatus } from '@admin/services/users/types';
 
 interface Model {
   users: string[];
 }
 
-const PendingInvitesPage = () => {
+const PendingInvitesPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    userService.getPendingInvites().then(users => {
-      setModel({
-        users,
-      });
-    });
-  }, []);
+    userService
+      .getPendingInvites()
+      .then(users => {
+        setModel({
+          users,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
   return (
     <Page
       wide
@@ -63,4 +68,4 @@ const PendingInvitesPage = () => {
   );
 };
 
-export default PendingInvitesPage;
+export default withErrorControl(PendingInvitesPage);

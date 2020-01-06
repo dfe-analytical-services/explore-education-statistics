@@ -12,7 +12,6 @@ import Button from '@common/components/Button';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Form from '@common/components/form/Form';
 import { FormFieldset, Formik } from '@common/components/form';
-import { FormikProps } from 'formik';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
@@ -42,7 +41,7 @@ const UserInvitePage = ({
         email: values.userEmail,
       };
 
-      const invite = await userService.inviteUser(submission);
+      await userService.inviteUser(submission);
 
       history.push(`/administration/users`);
     },
@@ -93,7 +92,7 @@ const UserInvitePage = ({
                 .email('Provide a valid email address'),
             })}
             onSubmit={submitFormHandler}
-            render={(form: FormikProps<FormValues>) => {
+            render={_ => {
               return (
                 <Form id={formId}>
                   <FormFieldset
