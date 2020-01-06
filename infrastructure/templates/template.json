@@ -1952,7 +1952,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
           ]
         }
