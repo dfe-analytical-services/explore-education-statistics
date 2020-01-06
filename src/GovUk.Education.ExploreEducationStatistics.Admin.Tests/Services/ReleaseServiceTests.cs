@@ -469,6 +469,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService
                 .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanViewSpecificRelease))
                 .ReturnsAsync(true);
+            
+            userService
+                .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
 
             var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
 
