@@ -228,7 +228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
                 .OnSuccess(async release => {
                     release.Status = status;

@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(releaseService => 
                 releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Draft, ""), 
-                CanUpdateSpecificRelease, CanMarkSpecificReleaseAsDraft);
+                CanMarkSpecificReleaseAsDraft);
         }
         
         [Fact]
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(releaseService => 
                 releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.HigherLevelReview, ""), 
-                CanUpdateSpecificRelease, CanSubmitSpecificReleaseToHigherReview);
+                CanSubmitSpecificReleaseToHigherReview);
         }
         
         [Fact]
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(releaseService => 
                 releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Approved, ""), 
-                CanUpdateSpecificRelease, CanApproveSpecificRelease);
+                CanApproveSpecificRelease);
         }
         
         [Fact]

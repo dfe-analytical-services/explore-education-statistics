@@ -67,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .First(join => join.ContentBlockId == id)
                         .Release;
 
-                    return await _userService.CheckCanUpdateRelease(release)
+                    return await _userService
+                        .CheckCanUpdateRelease(release)
                         .OnSuccess(async _ =>
                         {
                             _context.DataBlocks.Remove(dataBlock);
@@ -96,13 +97,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }
 
-        public async Task<DataBlockViewModel> UpdateAsync(Guid id, UpdateDataBlockViewModel updateDataBlock)
+        public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id, UpdateDataBlockViewModel updateDataBlock)
         {
-            var existing = await _context.DataBlocks.FirstOrDefaultAsync(block => block.Id.Equals(id));
-            _context.DataBlocks.Update(existing);
-            _mapper.Map(updateDataBlock, existing);
-            await _context.SaveChangesAsync();
-            return await GetAsync(id);
+            return await _dataBlockHelper
+                .CheckEntityExistsActionResult(id)
+                .OnSuccess(async existing =>
+                {
+                    var release = _context
+                        .ReleaseContentBlocks
+                        .First(join => join.ContentBlockId == id)
+                        .Release;
+                    
+                    return await _userService
+                        .CheckCanUpdateRelease(release)
+                        .OnSuccess(async _ =>
+                        {
+                            _context.DataBlocks.Update(existing);
+                            _mapper.Map(updateDataBlock, existing);
+                            await _context.SaveChangesAsync();
+                            return await GetAsync(id);
+                        });
+                });
         }
     }
 }
