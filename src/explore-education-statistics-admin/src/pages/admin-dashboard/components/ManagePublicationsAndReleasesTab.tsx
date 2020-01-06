@@ -40,15 +40,15 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-export interface Props extends RouteComponentProps, ErrorControlProps {
-  themeId?: string;
-  topicId?: string;
-}
+export interface Props
+  extends RouteComponentProps<{
+      themeId?: string;
+      topicId?: string;
+    }>,
+    ErrorControlProps {}
 
-const MyPublicationsTab = ({
-  themeId,
-  topicId,
-  history,
+const ManagePublicationsAndReleasesTab = ({
+  match,
   handleApiErrors,
 }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
@@ -60,6 +60,8 @@ const MyPublicationsTab = ({
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
+
+  const { themeId, topicId } = match.params;
 
   const onThemeChange = (
     newThemeId: string,
@@ -121,7 +123,10 @@ const MyPublicationsTab = ({
         .then(setMyPublications)
         .catch(handleApiErrors);
     } else if (selectedThemeAndTopic.topic.id !== '') {
-      history.push(
+      // eslint-disable-next-line
+      history.replaceState(
+        {},
+        '',
         generateAdminDashboardThemeTopicLink(
           selectedThemeAndTopic.theme.id,
           selectedThemeAndTopic.topic.id,
@@ -133,88 +138,98 @@ const MyPublicationsTab = ({
 
   return (
     <>
-      {themes && selectedThemeAndTopic && myPublications && (
-        <section>
-          <p className="govuk-body">Select publications to:</p>
-          <ul className="govuk-list--bullet">
-            <li>create new releases and methodologies</li>
-            <li>edit exiting releases and methodologies</li>
-            <li>view and sign-off releases and methodologies</li>
-          </ul>
-          <p className="govuk-bo">
-            To remove publications, releases and methodologies email{' '}
-            <a href="mailto:explore.statistics@education.gov.uk">
-              explore.statistics@education.gov.uk
-            </a>
-          </p>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
-              <FormSelect
-                id="selectTheme"
-                label="Select theme"
-                name="selectTheme"
-                options={themes.map(theme => ({
-                  label: theme.title,
-                  value: theme.id,
-                }))}
-                value={selectedThemeAndTopic.theme.id}
-                onChange={event => {
-                  onThemeChange(event.target.value, themes);
-                }}
-              />
+      <section>
+        <p className="govuk-body">Select publications to:</p>
+        <ul className="govuk-list--bullet">
+          <li>create new releases and methodologies</li>
+          <li>edit exiting releases and methodologies</li>
+          <li>view and sign-off releases and methodologies</li>
+        </ul>
+        <p className="govuk-bo">
+          To remove publications, releases and methodologies email{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>
+        </p>
+        {themes && selectedThemeAndTopic && myPublications && (
+          <>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-half">
+                <FormSelect
+                  id="selectTheme"
+                  label="Select theme"
+                  name="selectTheme"
+                  options={themes.map(theme => ({
+                    label: theme.title,
+                    value: theme.id,
+                  }))}
+                  value={
+                    selectedThemeAndTopic.theme
+                      ? selectedThemeAndTopic.theme.id
+                      : undefined
+                  }
+                  onChange={event => {
+                    onThemeChange(event.target.value, themes);
+                  }}
+                />
+              </div>
+              <div className="govuk-grid-column-one-half">
+                <FormSelect
+                  id="selectTopic"
+                  label="Select topic"
+                  name="selectTopic"
+                  options={selectedThemeAndTopic.theme.topics.map(topic => ({
+                    label: topic.title,
+                    value: topic.id,
+                  }))}
+                  value={
+                    selectedThemeAndTopic.topic
+                      ? selectedThemeAndTopic.topic.id
+                      : undefined
+                  }
+                  onChange={event => {
+                    onTopicChange(
+                      event.target.value,
+                      selectedThemeAndTopic.theme,
+                    );
+                  }}
+                />
+              </div>
             </div>
-            <div className="govuk-grid-column-one-half">
-              <FormSelect
-                id="selectTopic"
-                label="Select topic"
-                name="selectTopic"
-                options={selectedThemeAndTopic.theme.topics.map(topic => ({
-                  label: topic.title,
-                  value: topic.id,
-                }))}
-                value={selectedThemeAndTopic.topic.id}
-                onChange={event => {
-                  onTopicChange(
-                    event.target.value,
-                    selectedThemeAndTopic.theme,
-                  );
-                }}
-              />
-            </div>
-          </div>
-          <hr />
-          <h2>{selectedThemeAndTopic.theme.title}</h2>
-          <h3>{selectedThemeAndTopic.topic.title}</h3>
-          {myPublications.length > 0 && (
-            <Accordion id="publications">
-              {myPublications.map(publication => (
-                <AccordionSection
-                  key={publication.id}
-                  heading={publication.title}
-                  headingTag="h3"
-                >
-                  <PublicationSummary publication={publication} />
-                </AccordionSection>
-              ))}
-            </Accordion>
-          )}
-          {myPublications.length === 0 && (
-            <div className="govuk-inset-text">
-              You have not yet created any publications
-            </div>
-          )}
-          <Link
-            to={publicationRoutes.createPublication.generateLink(
-              selectedThemeAndTopic.topic.id,
+            <hr />
+            <h2>{selectedThemeAndTopic.theme.title}</h2>
+            <h3>{selectedThemeAndTopic.topic.title}</h3>
+            {myPublications.length > 0 && (
+              <Accordion id="publications">
+                {myPublications.map(publication => (
+                  <AccordionSection
+                    key={publication.id}
+                    heading={publication.title}
+                    headingTag="h3"
+                  >
+                    <PublicationSummary publication={publication} />
+                  </AccordionSection>
+                ))}
+              </Accordion>
             )}
-            className="govuk-button"
-          >
-            Create new publication
-          </Link>
-        </section>
-      )}
+            {myPublications.length === 0 && (
+              <div className="govuk-inset-text">
+                You have not yet created any publications
+              </div>
+            )}
+            <Link
+              to={publicationRoutes.createPublication.generateLink(
+                selectedThemeAndTopic.topic.id,
+              )}
+              className="govuk-button"
+            >
+              Create new publication
+            </Link>
+          </>
+        )}
+      </section>
     </>
   );
 };
 
-export default withErrorControl(withRouter(MyPublicationsTab));
+export default withErrorControl(withRouter(ManagePublicationsAndReleasesTab));

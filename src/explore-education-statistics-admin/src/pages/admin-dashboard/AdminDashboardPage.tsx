@@ -20,8 +20,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import MyPublicationsTab from './components/MyPublicationsTab';
+import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAndReleasesTab';
 
 interface Model {
   draftReleases: AdminDashboardRelease[];
@@ -30,17 +29,8 @@ interface Model {
   preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
-interface MatchProps {
-  themeId: string;
-  topicId: string;
-}
-
-const AdminDashboardPage = ({
-  match,
-  handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
   const { user } = useContext(LoginContext);
-  const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
   useEffect(() => {
     Promise.all([
@@ -144,7 +134,7 @@ const AdminDashboardPage = ({
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab themeId={themeId} topicId={topicId} />
+              <ManagePublicationsAndReleasesTab />
             </TabsSection>
             <TabsSection
               id="draft-releases"
