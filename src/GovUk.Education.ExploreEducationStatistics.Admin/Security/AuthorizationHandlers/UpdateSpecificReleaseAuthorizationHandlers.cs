@@ -14,13 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
             : base(ctx =>
+                ctx.Release.Status != ReleaseStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
-                && ctx.Release.Status != ReleaseStatus.Approved
             )
         {
             
         }
-}
+    }
 
     public class UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler
         : HasRoleOnReleaseAuthorizationHandler<UpdateSpecificReleaseRequirement>
