@@ -328,9 +328,8 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
-    "vNetId": "[concat(resourceGroup().id,'/providers/','Microsoft.Network/virtualNetworks/', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
-    "adminSubnetId": "[concat(variables('vNetId'), '/subnets/', variables('adminSubnetName'))]",
+    "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -725,11 +724,12 @@
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceId": "[variables('adminSubnetId')]",
+            "subnetResourceid": "[variables('adminSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]"
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
           ]
         }
       ],
@@ -2035,22 +2035,32 @@
           "addressPrefixes": [
             "10.0.0.0/16"
           ]
-        }
-      },
-      "resources": [
-        {
-          "apiVersion": "2018-10-01",
-          "type": "subnets",
-          "location": "[resourceGroup().location]",
-          "name": "[variables('adminSubnetName')]",
-          "dependsOn": [
-            "[variables('vNetName')]"
-          ],
-          "properties": {
-            "addressPrefix": "10.0.0.0/24"
+        },
+        "subnets": [
+          {
+            "name": "[variables('adminSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   ]
 }
