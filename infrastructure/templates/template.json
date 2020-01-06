@@ -327,6 +327,7 @@
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "adminVnetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'), '-admin')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2005,6 +2006,20 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('adminVnetName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        }
       }
     }
   ]
