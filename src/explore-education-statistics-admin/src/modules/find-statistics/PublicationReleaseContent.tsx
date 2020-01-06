@@ -20,9 +20,9 @@ import classNames from 'classnames';
 import React from 'react';
 import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
+import ReleaseHeadlines from './components/ReleaseHeadlines';
 
 export interface RendererProps {
   contentId?: string;
@@ -257,13 +257,7 @@ const PublicationReleaseContent = ({
 
       <hr />
 
-      <h2 className="dfe-print-break-before">
-        Headline facts and figures - {release.yearTitle}
-      </h2>
-
-      {release.keyStatisticsSection && release.keyStatisticsSection.content && (
-        <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
-      )}
+      <ReleaseHeadlines release={release} />
 
       <ReleaseContentAccordion
         releaseId={release.id}
