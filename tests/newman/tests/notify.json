@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3660de0f-138f-4b54-807a-70906a35e5a2",
+		"_postman_id": "9befe910-ec8c-497e-bae6-8519213176ea",
 		"name": "DfE Notify",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -13,12 +13,9 @@
 					"script": {
 						"id": "e355658b-1bca-4e05-b5db-66398063d878",
 						"exec": [
-							"// EES-802",
-							"/*",
 							"pm.test(\"Status code is 200\", function () { ",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"*/  ",
 							"",
 							"if(pm.environment.get('env') === 'localhost') {",
 							"    const respJson = pm.response.json();",
