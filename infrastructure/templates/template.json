@@ -1072,7 +1072,7 @@
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
         "networkAcls": {
-          "bypass": "None",
+          "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
               "id": "[variables('adminSubnetRef')]",
