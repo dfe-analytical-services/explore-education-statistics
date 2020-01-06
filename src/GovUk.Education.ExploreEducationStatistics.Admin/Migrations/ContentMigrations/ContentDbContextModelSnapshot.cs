@@ -1826,11 +1826,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         },
                         new
                         {
-                            Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
-                            ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d")
-                        },
-                        new
-                        {
                             Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
                         },
@@ -1889,16 +1884,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             ReleaseName = "2016",
                             ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7"),
                             Slug = "2016-17",
-                            TimePeriodCoverage = "AY",
-                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
-                        },
-                        new
-                        {
-                            Id = new Guid("fe5e8cac-a574-4e83-861b-7b5f927d7d34"),
-                            Created = new DateTime(2016, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReleaseName = "2015",
-                            ReleaseSummaryId = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
-                            Slug = "2015-16",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
