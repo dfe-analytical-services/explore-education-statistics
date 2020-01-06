@@ -334,6 +334,8 @@
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
+    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -1786,7 +1788,7 @@
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('adminSubnetRef')]",
+            "subnetResourceid": "[variables('importerSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
@@ -2091,6 +2093,28 @@
             "name": "[variables('adminSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('importerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.1/24",
               "serviceEndpoints": [
                 {
                   "service": "Microsoft.Storage"
