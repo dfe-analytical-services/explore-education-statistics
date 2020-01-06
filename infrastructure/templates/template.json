@@ -329,6 +329,7 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
+    "adminSubnetId": "[concat(resourceGroup().id,'/providers/','Microsoft.Network/virtualNetworks/', variables('adminSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -716,6 +717,19 @@
           ],
           "properties": {
           }
+        },
+        {
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('adminSubnetId')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]"
+          ]
         }
       ],
       "properties": {
