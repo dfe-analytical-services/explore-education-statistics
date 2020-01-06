@@ -19,6 +19,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models.UserInvite", b =>
+                {
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Email");
+
+                    b.ToTable("UserInvites");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")

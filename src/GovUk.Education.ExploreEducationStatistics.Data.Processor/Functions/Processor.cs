@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 try
                 {
-                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
+                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext(), false);
                     logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
@@ -106,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 foreach (var message in messages)
                 {
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
-                    await ProcessSubject(message, DbUtils.CreateDbContext());
+                    await ProcessSubject(message, DbUtils.CreateDbContext(), true);
                     var subjectData = await _fileStorageService.GetSubjectData(message);
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
@@ -125,8 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             await _fileImportService.ImportObservations(message, DbUtils.CreateDbContext());
         }
-
-        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
+        
+        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext, bool isSeeding)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
@@ -143,9 +144,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
 
+            if (isSeeding)
+            {
+                SampleGuids.GenerateIndicatorGuids(dbContext);
+                SampleGuids.GenerateFilterGuids(dbContext);
+                SampleGuids.GenerateFilterGroupGuids(dbContext);
+            }
+
             await dbContext.SaveChangesAsync();
 
             _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
+            
+            if (isSeeding)
+            {
+                SampleGuids.GenerateFilterGuids(dbContext);
+                SampleGuids.GenerateFilterGroupGuids(dbContext);
+                SampleGuids.GenerateFilterItemGuids(dbContext);
+            }
 
             await dbContext.SaveChangesAsync();
             

@@ -11,7 +11,7 @@ using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class SubjectService : AbstractRepository<Subject, long>, ISubjectService
+    public class SubjectService : AbstractRepository<Subject, Guid>, ISubjectService
     {
         private readonly IReleaseService _releaseService;
 
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _releaseService = releaseService;
         }
 
-        public bool IsSubjectForLatestRelease(long subjectId)
+        public bool IsSubjectForLatestRelease(Guid subjectId)
         {
             var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
             if (subject == null)

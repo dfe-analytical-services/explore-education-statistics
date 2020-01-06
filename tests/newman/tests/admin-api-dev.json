@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "86fed618-679d-439d-9ec9-c99fe636a23d",
+		"_postman_id": "c2218d87-4e02-4aa7-a5e0-dbc308ef94fb",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -107,7 +107,7 @@
 									"pm.test(\"Expect correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    //pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
@@ -121,7 +121,7 @@
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
 									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Test methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be an empty array\", function () {",
@@ -314,12 +314,10 @@
 									"",
 									"    var createdDate = respJson[1].created.substring(0, respJson[1].created.indexOf('T'));",
 									"    var now = new Date();",
-									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
+									"    var nowDate = `${now.getFullYear()}-${('0' + (now.getMonth()+1)).slice(-2)}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
 									"    ",
-									"    if(pm.environment.get(\"env\") != \"local\") {",
-									"        pm.expect(respJson[0].userName).to.equal(\"EESADMIN.User1@azurehiveitco.onmicrosoft.com\");    ",
-									"    }",
+									"    pm.expect(respJson[0].userName).to.equal(\"bau1@example.com\");",
 									"});",
 									"",
 									"pm.test(\"Data file details should be correct\", function () { ",
@@ -332,12 +330,10 @@
 									"",
 									"    var createdDate = respJson[1].created.substring(0, respJson[1].created.indexOf('T'));",
 									"    var now = new Date();",
-									"    var nowDate = `${now.getFullYear()}-${now.getMonth()+1}-${('0' + now.getDate()).slice(-2)}`;",
+									"    var nowDate = `${now.getFullYear()}-${('0' + (now.getMonth()+1)).slice(-2)}-${('0' + now.getDate()).slice(-2)}`;",
 									"    pm.expect(createdDate).to.equal(nowDate);",
-									"",
-									"    if(pm.environment.get(\"admin_api_url\") != \"https://localhost:5021/api\") {",
-									"        pm.expect(respJson[1].userName).to.equal(\"EESADMIN.User1@azurehiveitco.onmicrosoft.com\");    ",
-									"    }",
+									"    ",
+									"    pm.expect(respJson[1].userName).to.equal(\"bau1@example.com\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -408,7 +404,11 @@
 								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
-									"setTimeout(function () {}, 100000);"
+									"if(pm.environment.get('env') === 'local') {",
+									"    setTimeout(function () {}, 50000);",
+									"} else {",
+									"    setTimeout(function () {}, 100000);",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -711,7 +711,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"SUB1 test footnote subject\",\n    \"indicators\": [],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [{{sub1_id}}]\n}"
+							"raw": "{\n    \"content\": \"SUB1 test footnote subject\",\n    \"indicators\": [],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [\"{{sub1_id}}\"]\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/data/footnote",
@@ -790,7 +790,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"SUB1 test footnote indicator\",\n    \"indicators\": [{{SUB1_IND_Admission_Numbers}}],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
+							"raw": "{\n    \"content\": \"SUB1 test footnote indicator\",\n    \"indicators\": [\"{{SUB1_IND_Admission_Numbers}}\"],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": []\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/data/footnote",
@@ -1091,7 +1091,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"caa8e56f-41d2-4129-a5c3-53b051134bd7\"\n}",
+							"raw": "{\n\t\"title\": \"API test publication {{RUN_IDENTIFIER}}\",\n\t\"contactId\": \"d246c696-4b3a-4aeb-842c-c1318ee334e8\",\n\t\"methodologyId\": \"b4886b45-53c2-4d6f-e6bc-08d77d76f342\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1605,7 +1605,7 @@
 									"",
 									"    // @NotCreatedData",
 									"    pm.expect(testPub.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(testPub.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(testPub.methodology.title).to.equal(\"Test methodology\");",
 									"",
 									"    pm.expect(testPub.releases.length).to.equal(1);",
 									"    pm.expect(testPub.releases[0].id).to.equal(pm.globals.get('release_id'));",
@@ -1690,7 +1690,7 @@
 									"pm.test(\"Expect correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    //pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
@@ -1705,7 +1705,7 @@
 									"// @NotCreatedData",
 									"pm.test(\"methodology should be correct\", function () {",
 									"    pm.expect(respJson.methodology.id).to.equal(\"b4886b45-53c2-4d6f-e6bc-08d77d76f342\");",
-									"    pm.expect(respJson.methodology.title).to.equal(\"API Test Methodology\");",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Test methodology\");",
 									"});",
 									"",
 									"pm.test(\"releases should be correct\", function () {",
@@ -2214,7 +2214,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": {{sub1_id}},\n\t\"localAuthority\": [\"E08000025\"]\n}"
+											"raw": "{\n\t\"subjectId\": \"{{sub1_id}}\",\n\t\"localAuthority\": [\"E08000025\"]\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject",
@@ -2363,7 +2363,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": {{sub1_id}},\n    \"localAuthority\": [\n    \t\"E09000007\",\n    \t\"E09000011\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t{{SUB1_IND_Admission_Numbers}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthority\": [\n    \t\"E09000007\",\n    \t\"E09000011\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId={{release_id}}",
@@ -2519,7 +2519,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": {{sub1_id}},\n    \"localAuthorityDistrict\": [\"E06000001\", \"E06000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2008,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t{{SUB1_IND_Admission_Numbers}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthorityDistrict\": [\"E06000001\", \"E06000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2008,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/data?releaseId={{release_id}}",
@@ -2687,7 +2687,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{7F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [\n    \t\"{{7F_AbsenceRatePercentBands_SchoolType}}\"\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2793,7 +2793,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t\"{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\"\n    ],\n    \"filterItems\": [],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2899,7 +2899,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjects\": [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n    \t\"{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\"\n    \t],\n    \"subjects\": [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -2965,7 +2965,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    ],\n    subjects: [7]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t\"{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}}\",\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}}\",\n    \t\"{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\"\n    ],\n    subjects: [\"666cd878-87bb-4f77-9a3f-f5c75078e112\"]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_items_id}}",
@@ -7169,10 +7169,11 @@
 											"script": {
 												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 												"exec": [
-													"const respJson = pm.response.json();",
+													"var respJson;",
 													"",
 													"pm.test(\"Status code is 200\", function() {",
 													"    pm.response.to.have.status(200);",
+													"    respJson = pm.response.json();",
 													"});",
 													"",
 													"pm.test(\"Response shouldn't contain datablock1\", function () {",
@@ -15983,41 +15984,15 @@
 				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
 				"type": "text/javascript",
 				"exec": [
-					"pm.globals.set(\"1F_Char__Total\", \"1\");",
-					"pm.globals.set(\"1F_Char__GenderMale\", \"53\");",
-					"pm.globals.set(\"1F_Char__GenderFemale\", \"52\");",
-					"pm.globals.set(\"1F_SchoolType__Total\", \"58\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"57\");",
-					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"56\");",
-					"pm.globals.set(\"1F_SchoolType__Special\", \"55\");",
-					"pm.globals.set(\"1F_Char__FSMEligible\", \"18\");",
-					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"10\");",
-					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"8\");",
-					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"50\");",
-					"pm.globals.set(\"1F_YearBreakdown__SixHalfTerms\", \"54\");",
-					"",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
-					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
-					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
-					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
-					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"10\");",
-					"",
-					"pm.globals.set(\"7F_AbsenceRatePercentBands_SchoolType\", \"11\");",
-					"pm.globals.set(\"7FG_AbsenceRatePercentBands_SchoolType_Default\", \"20\");",
-					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Total\", \"104\");",
-					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Special\", \"178\");",
-					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary\", \"179\");",
-					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary\", \"180\");",
-					"pm.globals.set(\"7I_AbsenceFields__NumberOfOverallAbsenceSessions\", \"140\");",
-					"pm.globals.set(\"7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions\", \"142\");",
-					"pm.globals.set(\"7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"144\");",
+					"pm.globals.set(\"7F_AbsenceRatePercentBands_SchoolType\", \"51e645c1-4a37-4938-8b20-1244b15048f9\");",
+					"pm.globals.set(\"7FG_AbsenceRatePercentBands_SchoolType_Default\", \"c93635d2-83ad-4199-bd0d-0e740775c4ed\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Total\", \"0af225c6-c70b-4053-b7e7-4e719e2b751f\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Special\", \"a7a7a691-a49e-422e-839e-53f1f545fa76\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary\", \"c306ff42-ddea-4cd0-82af-770df078fd94\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary\", \"26db426f-fb4f-439c-9e37-360451305013\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfOverallAbsenceSessions\", \"fe313349-0438-41b7-8944-109690ee5158\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions\", \"f3014e60-534a-4667-b90f-80b1fee6b08e\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"cd2711ff-3dba-4452-858a-d55c5cfd04fb\");",
 					"",
 					"",
 					"",

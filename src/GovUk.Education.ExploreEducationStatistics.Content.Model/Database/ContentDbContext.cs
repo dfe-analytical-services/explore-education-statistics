@@ -1549,11 +1549,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new ReleaseSummary
                 {
-                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
-                },
-                new ReleaseSummary
-                {
                     ReleaseId = exclusionsReleaseId,
                     Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
                 },
@@ -1575,16 +1570,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                },
-                new ReleaseSummaryVersion
-                {
-                    Id = new Guid("fe5e8cac-a574-4e83-861b-7b5f927d7d34"),
-                    Created = new DateTime(2016, 1, 1),
-                    ReleaseName = "2015",
-                    Slug = "2015-16",
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseSummaryId = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
                 },
                 new ReleaseSummaryVersion
                 {
@@ -2478,7 +2463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Name = "Key Stat 1",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2594,7 +2579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2692,7 +2677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2808,7 +2793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2948,7 +2933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3071,7 +3056,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 1,
+                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
                         GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
                         TimePeriod = new TimePeriod
                         {
@@ -3182,7 +3167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3290,7 +3275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3389,7 +3374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3488,7 +3473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3617,7 +3602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading = "Chart showing permanent exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3701,7 +3686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading = "Chart showing fixed-period exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3790,7 +3775,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 0,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3889,7 +3874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 0,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 12,
+                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3988,7 +3973,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4042,7 +4027,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4096,7 +4081,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4150,7 +4135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4224,7 +4209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Table of Timeseries of key secondary preference rates, England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4274,7 +4259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = 17,
+                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4336,13 +4321,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Update
                 {
-                    Id = new Guid("51bd1e2f-2669-4708-b300-799b6be9ec9a"),
-                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    On = new DateTime(2016, 3, 25),
-                    Reason = "First published."
-                },
-                new Update
-                {
                     Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
                     ReleaseId = exclusionsReleaseId,
                     On = new DateTime(2018, 7, 19),
@@ -4355,44 +4333,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     On = new DateTime(2018, 8, 25),
                     Reason =
                         "Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma)."
-                },
-                new Update
-                {
-                    Id = new Guid("aa4c0f33-cdf4-4df9-9540-18472d46a301"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 6, 13),
-                    Reason =
-                        "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("4bd0f73b-ef2b-4901-839a-80cbf8c0871f"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 7, 23),
-                    Reason =
-                        "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("7f911a4e-7a56-4f6f-92a6-bd556a9bcfd3"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 9, 5),
-                    Reason = "Added cross-border movement local authority level and underlying data tables."
-                },
-                new Update
-                {
-                    Id = new Guid("d008b331-af29-4c7e-bb8a-5a2005aa0131"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 9, 11),
-                    Reason =
-                        "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
-                    ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
-                    On = new DateTime(2018, 6, 20),
-                    Reason = "First published."
                 },
                 new Update
                 {

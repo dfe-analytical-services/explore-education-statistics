@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics
 {
     public class FootnotesSubjectMetaViewModel
     {
-        public Dictionary<long, FootnotesFilterMetaViewModel> Filters { get; set; }
+        public Dictionary<Guid, FootnotesFilterMetaViewModel> Filters { get; set; }
 
-        public Dictionary<long, FootnotesIndicatorsMetaViewModel> Indicators { get; set; }
+        public Dictionary<Guid, FootnotesIndicatorsMetaViewModel> Indicators { get; set; }
 
-        public long SubjectId { get; set; }
+        public Guid SubjectId { get; set; }
 
         public string SubjectName { get; set; }
     }

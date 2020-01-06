@@ -1,8 +1,10 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class IdLabel
     {
-        public IdLabel(long id, string label)
+        public IdLabel(Guid id, string label)
         {
             Id = id;
             Label = label;
@@ -12,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public string Label { get; set; }
     }
 }

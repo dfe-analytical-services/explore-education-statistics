@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
-    [ExcludeFromCodeCoverage]
     public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Level = table.Column<string>(nullable: false),
                     Label = table.Column<string>(nullable: true),
                     Published = table.Column<DateTime>(nullable: false)
@@ -29,8 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Footnote",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Content = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -42,14 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Location",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Country_Code = table.Column<string>(nullable: true),
                     Country_Name = table.Column<string>(nullable: true),
                     Institution_Code = table.Column<string>(nullable: true),
                     Institution_Name = table.Column<string>(nullable: true),
                     LocalAuthority_Code = table.Column<string>(nullable: true),
-                    LocalAuthority_Old_Code = table.Column<string>(nullable: true),
+                    LocalAuthority_OldCode = table.Column<string>(nullable: true),
                     LocalAuthority_Name = table.Column<string>(nullable: true),
                     LocalAuthorityDistrict_Code = table.Column<string>(nullable: true),
                     LocalAuthorityDistrict_Name = table.Column<string>(nullable: true),
@@ -185,8 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Subject",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     ReleaseId = table.Column<Guid>(nullable: false)
                 },
@@ -205,12 +199,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Filter",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Hint = table.Column<string>(nullable: true),
                     Label = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    SubjectId = table.Column<long>(nullable: false)
+                    SubjectId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -227,10 +220,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "IndicatorGroup",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Label = table.Column<string>(nullable: true),
-                    SubjectId = table.Column<long>(nullable: false)
+                    SubjectId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -247,16 +239,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Observation",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    SubjectId = table.Column<long>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
+                    SubjectId = table.Column<Guid>(nullable: false),
                     GeographicLevel = table.Column<string>(maxLength: 6, nullable: false),
-                    LocationId = table.Column<long>(nullable: false),
+                    LocationId = table.Column<Guid>(nullable: false),
                     ProviderUrn = table.Column<string>(nullable: true),
                     SchoolLaEstab = table.Column<string>(nullable: true),
                     Year = table.Column<int>(nullable: false),
                     TimeIdentifier = table.Column<string>(maxLength: 6, nullable: false),
-                    Measures = table.Column<string>(nullable: true)
+                    Measures = table.Column<string>(nullable: true),
+                    CsvRow = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -291,8 +283,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "SubjectFootnote",
                 columns: table => new
                 {
-                    SubjectId = table.Column<long>(nullable: false),
-                    FootnoteId = table.Column<long>(nullable: false)
+                    SubjectId = table.Column<Guid>(nullable: false),
+                    FootnoteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,8 +307,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "FilterFootnote",
                 columns: table => new
                 {
-                    FilterId = table.Column<long>(nullable: false),
-                    FootnoteId = table.Column<long>(nullable: false)
+                    FilterId = table.Column<Guid>(nullable: false),
+                    FootnoteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -339,9 +331,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "FilterGroup",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    FilterId = table.Column<long>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
+                    FilterId = table.Column<Guid>(nullable: false),
                     Label = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -359,12 +350,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "Indicator",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Label = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Unit = table.Column<string>(nullable: false),
-                    IndicatorGroupId = table.Column<long>(nullable: false)
+                    IndicatorGroupId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -381,8 +371,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "FilterGroupFootnote",
                 columns: table => new
                 {
-                    FilterGroupId = table.Column<long>(nullable: false),
-                    FootnoteId = table.Column<long>(nullable: false)
+                    FilterGroupId = table.Column<Guid>(nullable: false),
+                    FootnoteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -405,10 +395,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "FilterItem",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Label = table.Column<string>(nullable: true),
-                    FilterGroupId = table.Column<long>(nullable: false)
+                    FilterGroupId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -425,8 +414,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "IndicatorFootnote",
                 columns: table => new
                 {
-                    IndicatorId = table.Column<long>(nullable: false),
-                    FootnoteId = table.Column<long>(nullable: false)
+                    IndicatorId = table.Column<Guid>(nullable: false),
+                    FootnoteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -449,8 +438,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "FilterItemFootnote",
                 columns: table => new
                 {
-                    FilterItemId = table.Column<long>(nullable: false),
-                    FootnoteId = table.Column<long>(nullable: false)
+                    FilterItemId = table.Column<Guid>(nullable: false),
+                    FootnoteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -473,8 +462,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "ObservationFilterItem",
                 columns: table => new
                 {
-                    ObservationId = table.Column<long>(nullable: false),
-                    FilterItemId = table.Column<long>(nullable: false)
+                    ObservationId = table.Column<Guid>(nullable: false),
+                    FilterItemId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -562,6 +551,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "IX_Location_LocalAuthority_Code",
                 table: "Location",
                 column: "LocalAuthority_Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Location_LocalAuthority_OldCode",
+                table: "Location",
+                column: "LocalAuthority_OldCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Location_LocalAuthorityDistrict_Code",

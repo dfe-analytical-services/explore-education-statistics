@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
         }
 
-        public TableBuilderSubjectMetaViewModel GetSubjectMeta(long subjectId)
+        public TableBuilderSubjectMetaViewModel GetSubjectMeta(Guid subjectId)
         {
             var subject = _subjectService.Find(subjectId);
             if (subject == null)
@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private Dictionary<string, FilterMetaViewModel> GetFilters(long subjectId)
+        private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
         {
             return _filterService.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     });
         }
 
-        private TableBuilderTimePeriodsMetaViewModel GetTimePeriods(long subjectId)
+        private TableBuilderTimePeriodsMetaViewModel GetTimePeriods(Guid subjectId)
         {
             var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
             return BuildTimePeriodsViewModels(timePeriods);
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
-        private Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> GetObservationalUnits(long subjectId)
+        private Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> GetObservationalUnits(Guid subjectId)
         {
             var observationalUnits = _locationService.GetObservationalUnits(subjectId);
             return BuildObservationalUnitsViewModels(observationalUnits);
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildObservationalUnitsViewModels(observationalUnits);
         }
 
-        private Dictionary<string, TableBuilderIndicatorsMetaViewModel> GetIndicators(long subjectId)
+        private Dictionary<string, TableBuilderIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Label.PascalCase(),

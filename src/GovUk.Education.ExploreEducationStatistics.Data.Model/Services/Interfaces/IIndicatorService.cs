@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface IIndicatorService : IRepository<Indicator, long>
+    public interface IIndicatorService : IRepository<Indicator, Guid>
     {
-        IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds = null);
+        IEnumerable<Indicator> GetIndicators(Guid subjectId, IEnumerable<Guid> indicatorIds = null);
     }
 }

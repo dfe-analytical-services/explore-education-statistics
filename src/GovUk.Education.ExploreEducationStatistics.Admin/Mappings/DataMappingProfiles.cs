@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public DataMappingProfiles()
         {
-            CreateMap<BoundaryLevel, IdLabel>();
+            CreateMap<BoundaryLevel, BoundaryLevelIdLabel>();
 
             CreateMap<Indicator, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))

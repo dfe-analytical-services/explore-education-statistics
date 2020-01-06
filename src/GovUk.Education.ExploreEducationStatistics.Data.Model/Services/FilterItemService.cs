@@ -7,14 +7,14 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class FilterItemService : AbstractRepository<FilterItem, long>, IFilterItemService
+    public class FilterItemService : AbstractRepository<FilterItem, Guid>, IFilterItemService
     {
         public FilterItemService(StatisticsDbContext context,
             ILogger<FilterItemService> logger) : base(context, logger)
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
+        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
         {
             var filterItems = observations
                 .SelectMany(observation => observation.FilterItems)

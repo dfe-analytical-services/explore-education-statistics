@@ -7,14 +7,14 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class IndicatorGroupService : AbstractRepository<IndicatorGroup, long>, IIndicatorGroupService
+    public class IndicatorGroupService : AbstractRepository<IndicatorGroup, Guid>, IIndicatorGroupService
     {
         public IndicatorGroupService(StatisticsDbContext context,
             ILogger<IndicatorGroupService> logger) : base(context, logger)
         {
         }
 
-        public IEnumerable<IndicatorGroup> GetIndicatorGroups(long subjectId)
+        public IEnumerable<IndicatorGroup> GetIndicatorGroups(Guid subjectId)
         {
             return FindMany(group => group.SubjectId == subjectId,
                 new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators});

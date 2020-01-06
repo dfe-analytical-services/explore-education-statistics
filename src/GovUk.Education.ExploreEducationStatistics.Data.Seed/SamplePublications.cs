@@ -7,44 +7,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
     public static class SamplePublications
     {
-        public static readonly Dictionary<long, DataCsvFile> SubjectFiles =
-            new Dictionary<long, DataCsvFile>
+        public static readonly Dictionary<Guid, DataCsvFile> SubjectFiles =
+            new Dictionary<Guid, DataCsvFile>
             {
-                {1, DataCsvFile.absence_by_characteristic},
-                {2, DataCsvFile.absence_by_geographic_level},
-                {3, DataCsvFile.absence_by_term},
-                {4, DataCsvFile.absence_for_four_year_olds},
-                {5, DataCsvFile.absence_in_prus},
-                {6, DataCsvFile.absence_number_missing_at_least_one_session_by_reason},
-                {7, DataCsvFile.absence_rate_percent_bands},
-                {8, DataCsvFile.EYFSP_ELG_underlying_data_2013_2018},
-                {9, DataCsvFile.EYFSP_areas_of_learning_underlying_data_2013_2018},
-                {10, DataCsvFile.EYFSP_APS_GLD_ELG_underlying_data_2013_2018},
-                {11, DataCsvFile.exclusions_by_characteristic},
-                {12, DataCsvFile.exclusions_by_geographic_level},
-                {13, DataCsvFile.exclusions_by_reason},
-                {14, DataCsvFile.exclusions_duration_of_fixed_exclusions},
-                {15, DataCsvFile.exclusions_number_of_fixed_exclusions},
-                {16, DataCsvFile.exclusions_total_days_missed_fixed_exclusions},
-                {17, DataCsvFile.school_applications_and_offers},
-                {18, DataCsvFile.SEN2_AGE_NEW},
-                {19, DataCsvFile.SEN2_AGE_STOCK},
-                {20, DataCsvFile.SEN2_ESTAB_NEW},
-                {21, DataCsvFile.SEN2_ESTAB_STOCK},
-                {22, DataCsvFile.SEN2_MI},
-                {23, DataCsvFile.skeleton_dashboard_tidy_data_NARTS},
-                {24, DataCsvFile.skeleton_dashboard_tidy_data_annual_v4},
+                {new Guid("803fbf56-600f-490f-8409-6413a891720d"), DataCsvFile.absence_by_characteristic},
+                {new Guid("568576e5-d386-450e-a8db-307b7061d0d8"), DataCsvFile.absence_by_geographic_level},
+                {new Guid("b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a"), DataCsvFile.absence_by_term},
+                {new Guid("353db5ea-befd-488b-ad16-2ce7963c9bc9"), DataCsvFile.absence_for_four_year_olds},
+                {new Guid("95c7f584-907e-4756-bbf0-4905ceae57df"), DataCsvFile.absence_in_prus},
+                {new Guid("faf2152e-0a6c-4e97-af02-e9a89d48c47a"), DataCsvFile.absence_number_missing_at_least_one_session_by_reason},
+                {new Guid("666cd878-87bb-4f77-9a3f-f5c75078e112"), DataCsvFile.absence_rate_percent_bands},
+                {new Guid("01ebdcfc-979a-4fe7-8d39-e5f8a6546e95"), DataCsvFile.EYFSP_ELG_underlying_data_2013_2018},
+                {new Guid("55759ccd-da8f-4a27-9f4a-ca669f4218e0"), DataCsvFile.EYFSP_areas_of_learning_underlying_data_2013_2018},
+                {new Guid("8e3d1bc0-2beb-4dc6-9db7-3d27d0608042"), DataCsvFile.EYFSP_APS_GLD_ELG_underlying_data_2013_2018},
+                {new Guid("92039f68-a894-46a9-bd44-4482728698b0"), DataCsvFile.exclusions_by_characteristic},
+                {new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"), DataCsvFile.exclusions_by_geographic_level},
+                {new Guid("8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7"), DataCsvFile.exclusions_by_reason},
+                {new Guid("926e33e4-b3ce-41aa-9ed2-e04106068ffb"), DataCsvFile.exclusions_duration_of_fixed_exclusions},
+                {new Guid("048a6276-1df1-487a-a501-fbd5e64d4b79"), DataCsvFile.exclusions_number_of_fixed_exclusions},
+                {new Guid("28feb263-4bf9-4dd7-9440-48e2685f6954"), DataCsvFile.exclusions_total_days_missed_fixed_exclusions},
+                {new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"), DataCsvFile.school_applications_and_offers},
+                {new Guid("685104a5-1424-40ab-bf4e-bf0515a4fd7b"), DataCsvFile.SEN2_AGE_NEW},
+                {new Guid("8074c6a2-0fb5-4732-8c82-82ec8dccf7e6"), DataCsvFile.SEN2_AGE_STOCK},
+                {new Guid("d64069e1-f97e-4a9b-afc1-a5f121cae921"), DataCsvFile.SEN2_ESTAB_NEW},
+                {new Guid("eaad58a4-3f80-4703-b2af-3de4b678fa77"), DataCsvFile.SEN2_ESTAB_STOCK},
+                {new Guid("3e36d5f0-668d-4d9b-bfa1-8585b5223769"), DataCsvFile.SEN2_MI},
+                {new Guid("0339cd60-f0f1-4b27-a9cc-c2066d21293a"), DataCsvFile.skeleton_dashboard_tidy_data_NARTS},
+                {new Guid("46602e6d-f725-46eb-bb34-8473565f43a8"), DataCsvFile.skeleton_dashboard_tidy_data_annual_v4},
+                {new Guid("357b7e2c-7e65-477b-a576-16b8011da7d9"), DataCsvFile.level_2_3_national},
+                {new Guid("59db9158-a168-4fcb-a2ba-c46146960b1a"), DataCsvFile.level_2_3_sf},
+                {new Guid("13faaf84-0a54-470f-bfd9-ebd8b090ed1d"), DataCsvFile.level_2_3_sfla},
+                {new Guid("25ea589f-660a-46ec-83c3-b60647baea3d"), DataCsvFile.KS2_2016_test_UD},
+                {new Guid("0c7a7a5d-9520-4ca1-b01e-fe061ebeb122"), DataCsvFile.KS4_2018_LA_Char_Testdata},
+                {new Guid("ce5cc950-ccf6-4423-817a-48eb6a411fcc"), DataCsvFile.KS4_2018_Nat_Char_Testdata},
+                {new Guid("6b81ee8c-95d2-4603-8f71-ad03686cfbe1"), DataCsvFile.KS4_2018_Subject_Tables_S1_TestData},
+                {new Guid("3d46479c-0adc-49c7-baf9-250e4b86ee4b"), DataCsvFile.KS4_2018_Subject_Tables_S3_TestData},
                 
-                {25, DataCsvFile.level_2_3_national},
-                {26, DataCsvFile.level_2_3_sf},
-                {27, DataCsvFile.level_2_3_sfla},
-                {28, DataCsvFile.KS2_2016_test_UD},
-                {29, DataCsvFile.KS4_2018_LA_Char_Testdata},
-                {30, DataCsvFile.KS4_2018_Nat_Char_Testdata},
-                {31, DataCsvFile.KS4_2018_Subject_Tables_S1_TestData},
-                {32, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData},
-                
-                {33, DataCsvFile.clean_data_fe}
+                {new Guid("7a9a3afc-e751-4f64-a3fa-edff5a5f9417"), DataCsvFile.clean_data_fe}
 
             };
 
@@ -96,9 +95,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .SelectMany(release => release.Subjects);
 
             return subjects.Where(subject => !IgnoredSubjectFiles.Contains(
-                SubjectFiles[subject.Id])).OrderBy(subject => subject.Id).ToList();
+                GetSubjectFile(subject.Id))).ToList();
         }
 
+        private static Guid GetSubjectKey(int i)
+        {
+            return SubjectFiles.ElementAt(i).Key;
+        }
+        
+        private static DataCsvFile GetSubjectFile(Guid key)
+        {
+            SubjectFiles.TryGetValue(key, out DataCsvFile file);
+            return file;
+        }
+        
         private static IEnumerable<Theme> GetThemes()
         {
             var themes = new List<Theme>
@@ -134,37 +144,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 1,
+                                                    Id = GetSubjectKey(0),
                                                     Name = "Absence by characteristic"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 2,
+                                                    Id = GetSubjectKey(1),
                                                     Name = "Absence by geographic level"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 3,
+                                                    Id = GetSubjectKey(2),
                                                     Name = "Absence by term"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 4,
+                                                    Id = GetSubjectKey(3),
                                                     Name = "Absence for four year olds"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 5,
+                                                    Id = GetSubjectKey(4),
                                                     Name = "Absence in prus"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 6,
+                                                    Id = GetSubjectKey(5),
                                                     Name = "Absence number missing at least one session by reason"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 7,
+                                                    Id = GetSubjectKey(6),
                                                     Name = "Absence rate percent bands"
                                                 }
                                             }
@@ -197,32 +207,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 11,
+                                                    Id = GetSubjectKey(10),
                                                     Name = "Exclusions by characteristic"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 12,
+                                                    Id = GetSubjectKey(11),
                                                     Name = "Exclusions by geographic level"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 13,
+                                                    Id = GetSubjectKey(12),
                                                     Name = "Exclusions by reason"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 14,
+                                                    Id = GetSubjectKey(13),
                                                     Name = "Duration of fixed exclusions"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 15,
+                                                    Id = GetSubjectKey(14),
                                                     Name = "Number of fixed exclusions"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 16,
+                                                    Id = GetSubjectKey(15),
                                                     Name = "Total days missed due to fixed period exclusions"
                                                 }
                                             }
@@ -255,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 17,
+                                                    Id = GetSubjectKey(16),
                                                     Name = "Applications and offers by school phase"
                                                 }
                                             }
@@ -288,27 +298,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 18,
+                                                    Id = GetSubjectKey(17),
                                                     Name = "New cases by age"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 19,
+                                                    Id = GetSubjectKey(18),
                                                     Name = "Stock cases by age"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 20,
+                                                    Id = GetSubjectKey(19),
                                                     Name = "New cases by establishment"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 21,
+                                                    Id = GetSubjectKey(20),
                                                     Name = "Stock cases by establishment"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 22,
+                                                    Id = GetSubjectKey(21),
                                                     Name = "Management information"
                                                 }
                                             }
@@ -350,17 +360,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 8,
+                                                    Id = GetSubjectKey(7),
                                                     Name = "ELG underlying data 2013 - 2018"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 9,
+                                                    Id = GetSubjectKey(8),
                                                     Name = "Areas of learning underlying data 2013 - 2018"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 10,
+                                                    Id = GetSubjectKey(9),
                                                     Name = "APS GLD ELG underlying data 2013 - 2018"
                                                 }
                                             }
@@ -402,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 23,
+                                                    Id = GetSubjectKey(22),
                                                     Name = "National achievement rates tables (NARTs)"
                                                 }
                                             }
@@ -435,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 24,
+                                                    Id = GetSubjectKey(23),
                                                     Name = "Apprenticeship annual"
                                                 }
                                             }
@@ -459,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 33,
+                                                    Id = GetSubjectKey(32),
                                                     Name = "Further education and skills"
                                                 }
                                             }
@@ -501,17 +511,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 25,
+                                                    Id = GetSubjectKey(24),
                                                     Name = "Level 2 and 3 National"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 26,
+                                                    Id = GetSubjectKey(25),
                                                     Name = "Level 2 and 3 sf"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 27,
+                                                    Id = GetSubjectKey(26),
                                                     Name = "Level 2 and 3 sf by Local authority"
                                                 }
                                             }
@@ -544,7 +554,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 28,
+                                                    Id = GetSubjectKey(27),
                                                     Name = "2016 test data"
                                                 }
                                             }
@@ -577,22 +587,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 29,
+                                                    Id = GetSubjectKey(28),
                                                     Name = "Characteristic test data by Local authority"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 30,
+                                                    Id = GetSubjectKey(29),
                                                     Name = "National characteristic test data"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 31,
+                                                    Id = GetSubjectKey(30),
                                                     Name = "Subject tables S1 test data"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 32,
+                                                    Id = GetSubjectKey(31),
                                                     Name = "Subject tables S3 test data"
                                                 }
                                             }
