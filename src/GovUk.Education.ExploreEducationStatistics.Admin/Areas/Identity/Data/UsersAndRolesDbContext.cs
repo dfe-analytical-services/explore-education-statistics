@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using IdentityServer4.EntityFramework.Options;
@@ -10,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
+        public DbSet<UserInvite> UserInvites { get; set; }
+
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)

@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("subject/{subjectId}")]
-        public ActionResult<TableBuilderSubjectMetaViewModel> GetSubjectMeta(long subjectId)
+        public ActionResult<TableBuilderSubjectMetaViewModel> GetSubjectMeta(Guid subjectId)
         {
             TableBuilderSubjectMetaViewModel tableBuilderSubjectMetaViewModel;
 

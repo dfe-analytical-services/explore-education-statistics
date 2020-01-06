@@ -60,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var importMessageRelease = _mapper.Map<Release>(release);
             var message = new ImportMessage
             {
+                SubjectId = Guid.NewGuid(),
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,

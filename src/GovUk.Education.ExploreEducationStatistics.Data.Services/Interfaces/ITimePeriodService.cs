@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ITimePeriodService
     {
-        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(long subjectId);
+        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId);
 
         IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(IQueryable<Observation> observations);
 

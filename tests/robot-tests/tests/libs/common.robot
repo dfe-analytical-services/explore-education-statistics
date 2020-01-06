@@ -36,7 +36,7 @@ user signs in
   set cookie from json   %{IDENTITY_COOKIE}
 
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   User1
+  user waits until page contains heading   Bau1
   user waits until page contains element   css:#selectTheme
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard

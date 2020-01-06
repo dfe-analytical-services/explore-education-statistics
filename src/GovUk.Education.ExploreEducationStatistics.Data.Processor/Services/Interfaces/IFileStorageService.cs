@@ -17,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             string metaFileName,
             string name,
             string fileName,
-            string contentType);
+            string contentType,
+            int numRows);
 
         void DeleteDatafile(string releaseId, string dataFileName);
 

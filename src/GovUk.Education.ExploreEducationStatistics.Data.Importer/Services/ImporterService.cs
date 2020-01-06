@@ -210,17 +210,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             int rowsPerBatch
             )
         {
-            // In order to "Preserve Order" of the bulk insertion need to assign a temp id which cannot exist in db
-            long lastId = 1;
-            if (context.Observation.Any())
-            {
-                lastId = context.Observation.Select(x => x.Id).DefaultIfEmpty().Max() + 1;
-            }
-
             return lines.Select((line, i) =>
             {
                 var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
-                return ObservationFromCsv(context, line, headers, subject, subjectMeta, csvRowNum, lastId++);
+                return ObservationFromCsv(context, line, headers, subject, subjectMeta, csvRowNum);
             });
         }
         
@@ -230,8 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta,
-            int csvRowNum,
-            long lastId)
+            int csvRowNum)
         {
             var line = raw.Split(',');
         
@@ -247,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
                 CsvRow = csvRowNum,
-                Id = lastId
+                Id = Guid.NewGuid()
             };
         }
         
@@ -296,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }).ToList();
         }
 
-        private long GetLocationId(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
+        private Guid GetLocationId(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
         {
             return _importerLocationService.Find(
                 context,
@@ -332,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerSchoolService.Find(school, context);
         }
 
-        private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,
+        private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> line,
             List<string> headers, IEnumerable<(Indicator Indicator, string Column)> indicators)
         {
             var valueTuples = indicators.ToList();

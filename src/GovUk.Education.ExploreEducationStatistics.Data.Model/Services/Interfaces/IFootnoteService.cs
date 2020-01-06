@@ -7,32 +7,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     public interface IFootnoteService
     {
         Footnote CreateFootnote(string content,
-            IEnumerable<long> filterIds,
-            IEnumerable<long> filterGroupIds,
-            IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds,
-            IEnumerable<long> subjectIds);
+            IEnumerable<Guid> filterIds,
+            IEnumerable<Guid> filterGroupIds,
+            IEnumerable<Guid> filterItemIds,
+            IEnumerable<Guid> indicatorIds,
+            IEnumerable<Guid> subjectIds);
 
-        void DeleteFootnote(long id);
+        void DeleteFootnote(Guid id);
 
-        bool Exists(long id);
+        bool Exists(Guid id);
 
-        Footnote GetFootnote(long id);
+        Footnote GetFootnote(Guid id);
 
         IEnumerable<Footnote> GetFootnotes(Guid releaseId);
 
         IEnumerable<Footnote> GetFootnotes(
-            long subjectId,
+            Guid subjectId,
             IQueryable<Observation> observations,
-            IEnumerable<long> indicators
+            IEnumerable<Guid> indicators
         );
 
-        Footnote UpdateFootnote(long id,
+        Footnote UpdateFootnote(Guid id,
             string content,
-            IEnumerable<long> filterIds,
-            IEnumerable<long> filterGroupIds,
-            IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds,
-            IEnumerable<long> subjectIds);
+            IEnumerable<Guid> filterIds,
+            IEnumerable<Guid> filterGroupIds,
+            IEnumerable<Guid> filterItemIds,
+            IEnumerable<Guid> indicatorIds,
+            IEnumerable<Guid> subjectIds);
     }
 }

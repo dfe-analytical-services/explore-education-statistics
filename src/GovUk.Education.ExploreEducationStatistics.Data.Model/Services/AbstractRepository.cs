@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Max(expression);
         }
 
-        public long TopWithPredicate(Expression<Func<TEntity, long>> expression,
+        public Guid TopWithPredicate(Expression<Func<TEntity, Guid>> expression,
             Expression<Func<TEntity, bool>> predicate)
         {
             return DbSet().Where(predicate)
@@ -119,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Remove(entity).Entity;
         }
 
-        protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
+        protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<Guid> values)
         {
-            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListGuidType");
         }
 
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)

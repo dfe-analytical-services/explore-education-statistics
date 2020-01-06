@@ -45,12 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             string metaFileName,
             string name,
             string fileName,
-            string contentType)
+            string contentType,
+            int numRows)
         {
             await UploadFileAsync(releaseId.ToString(), stream, new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("name", name),
-                    new KeyValuePair<string, string>("metafile", metaFileName)
+                    new KeyValuePair<string, string>("metafile", metaFileName),
+                    new KeyValuePair<string, string>("NumberOfRows", numRows.ToString())
                 },
                 fileName,
                 contentType);

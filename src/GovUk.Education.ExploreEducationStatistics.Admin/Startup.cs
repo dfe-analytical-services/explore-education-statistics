@@ -44,6 +44,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Notify.Client;
+using Notify.Interfaces;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
@@ -238,6 +240,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
 
+            services.AddTransient<INotificationClient, NotificationClient>(n => new NotificationClient(Configuration.GetValue<string>("NotifyApiKey")));
+            services.AddTransient<IEmailService, EmailService>();
+            
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
@@ -262,6 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
             ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         int Max(Expression<Func<TEntity, int>> expression);
         
-        long TopWithPredicate(Expression<Func<TEntity, long>> expression, Expression<Func<TEntity, bool>> predicate);
+        Guid TopWithPredicate(Expression<Func<TEntity, Guid>> expression, Expression<Func<TEntity, bool>> predicate);
 
         TEntity Remove(TKey id);
 

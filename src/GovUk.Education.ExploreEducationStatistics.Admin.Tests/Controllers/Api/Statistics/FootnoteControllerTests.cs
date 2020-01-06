@@ -19,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     {
         private readonly FootnoteController _controller;
 
-        private const long FootnoteId = 1L;
+        private static readonly Guid FootnoteId = Guid.NewGuid();
 
         private readonly Guid _releaseId = Guid.NewGuid();
 
         public FootnoteControllerTests()
         {
-            var subjectIds = new[] {1L, 2L};
+            var subjectIds = new[] {Guid.NewGuid(), Guid.NewGuid()};
 
             var filterService = new Mock<IFilterService>();
             var indicatorGroupService = new Mock<IIndicatorGroupService>();
@@ -46,19 +46,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             footnoteService.Setup(s => s.Exists(FootnoteId)).Returns(true);
 
             footnoteService.Setup(s => s.CreateFootnote("Sample footnote",
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>())).Returns(footnote);
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>())).Returns(footnote);
 
             footnoteService.Setup(s => s.UpdateFootnote(FootnoteId,
                 "Updated sample footnote",
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>(),
-                It.IsAny<IEnumerable<long>>())).Returns(new Footnote
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>(),
+                It.IsAny<IEnumerable<Guid>>())).Returns(new Footnote
             {
                 Id = FootnoteId,
                 Content = "Updated sample footnote",
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     new Filter
                     {
-                        Id = 1,
+                        Id = Guid.NewGuid(),
                         Hint = "Filter Hint",
                         Label = "Filter label",
                         Name = "Filter name",
@@ -90,13 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         {
                             new FilterGroup
                             {
-                                Id = 1,
+                                Id = Guid.NewGuid(),
                                 Label = "Filter group",
                                 FilterItems = new List<FilterItem>
                                 {
                                     new FilterItem
                                     {
-                                        Id = 1,
+                                        Id = Guid.NewGuid(),
                                         Label = "Filter item",
                                     }
                                 }
@@ -111,13 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     new IndicatorGroup
                     {
-                        Id = 1,
+                        Id = Guid.NewGuid(),
                         Label = "Indicator group",
                         Indicators = new List<Indicator>
                         {
                             new Indicator
                             {
-                                Id = 1,
+                                Id = Guid.NewGuid(),
                                 Label = "Indicator label",
                                 Name = "Indicator name",
                                 Unit = Unit.Percent
@@ -139,11 +139,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = _controller.CreateFootnote(new CreateFootnoteViewModel
             {
                 Content = "Sample footnote",
-                Filters = new List<long>(),
-                FilterGroups = new List<long>(),
-                FilterItems = new List<long>(),
-                Indicators = new List<long>(),
-                Subjects = new List<long>()
+                Filters = new List<Guid>(),
+                FilterGroups = new List<Guid>(),
+                FilterItems = new List<Guid>(),
+                Indicators = new List<Guid>(),
+                Subjects = new List<Guid>()
             });
 
             Assert.IsAssignableFrom<FootnoteViewModel>(result.Value);
@@ -162,11 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = _controller.UpdateFootnote(FootnoteId, new UpdateFootnoteViewModel
             {
                 Content = "Updated sample footnote",
-                Filters = new List<long>(),
-                FilterGroups = new List<long>(),
-                FilterItems = new List<long>(),
-                Indicators = new List<long>(),
-                Subjects = new List<long>()
+                Filters = new List<Guid>(),
+                FilterGroups = new List<Guid>(),
+                FilterItems = new List<Guid>(),
+                Indicators = new List<Guid>(),
+                Subjects = new List<Guid>()
             });
 
             Assert.IsAssignableFrom<FootnoteViewModel>(result.Value);
