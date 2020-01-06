@@ -720,11 +720,11 @@
         },
         {
           "name": "virtualNetwork",
-          "type": "config",
+          "type": "Microsoft.Web/sites/virtualNetworkConnections",
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('adminSubnetId')]",
+            "vnetResourceId": "[variables('adminSubnetId')]",
             "swiftSupported": true
           },
           "dependsOn": [
