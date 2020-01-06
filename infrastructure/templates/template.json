@@ -1077,8 +1077,9 @@
             {
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
-            }
+            } 
           ],
+          "ipRules": [],
           "defaultAction": "Deny"
         }
       },
