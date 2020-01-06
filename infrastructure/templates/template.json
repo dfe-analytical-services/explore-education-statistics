@@ -721,7 +721,7 @@
         },
         {
           "name": "virtualNetwork",
-          "type": "networkConfig",
+          "type": "config",
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
