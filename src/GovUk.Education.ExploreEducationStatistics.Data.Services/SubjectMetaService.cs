@@ -147,13 +147,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
 
-        private IEnumerable<IdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
+        private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
             IEnumerable<GeographicLevel> geographicLevels)
         {
             var boundaryLevels = boundaryLevelId.HasValue
                 ? _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
                 : _boundaryLevelService.FindByGeographicLevels(geographicLevels);
-            return boundaryLevels.Select(level => _mapper.Map<IdLabel>(level));
+            return boundaryLevels.Select(level => _mapper.Map<BoundaryLevelIdLabel>(level));
         }
 
         private Dictionary<string, TimePeriodMetaViewModel> GetTimePeriod(IQueryable<Observation> observations)

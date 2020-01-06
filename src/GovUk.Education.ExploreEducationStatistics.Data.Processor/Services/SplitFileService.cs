@@ -51,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var header = enumerable.First();
             var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
             var batchCount = 1;
-            var numBatches = GetNumBatches(enumerable.Count(), message.RowsPerBatch);
+            var numRows = enumerable.Count();
+            var numBatches = GetNumBatches(numRows, message.RowsPerBatch);
 
             foreach (var batch in batches)
             {
@@ -76,11 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BlobUtils.GetMetaFileName(subjectData.DataBlob),
                     BlobUtils.GetName(subjectData.DataBlob),
                     fileName,
-                    "text/csv"
+                    "text/csv",
+                    numRows
                 );
 
                 var iMessage = new ImportMessage
                 {
+                    SubjectId = message.SubjectId,
                     DataFileName = fileName,
                     OrigDataFileName = message.DataFileName,
                     Release = message.Release,

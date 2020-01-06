@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Location
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public Country Country { get; set; }
         public Institution Institution { get; set; }
         public LocalAuthority LocalAuthority { get; set; }

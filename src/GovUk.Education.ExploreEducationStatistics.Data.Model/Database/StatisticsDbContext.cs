@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(data => data.Measures)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<long, string>>(v));
+                    v => JsonConvert.DeserializeObject<Dictionary<Guid, string>>(v));
         }
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)

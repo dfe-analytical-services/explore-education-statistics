@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using AutoMapper;
@@ -44,11 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 _logger.LogInformation($"Processing subject {subject.Id}");
                 var file = SamplePublications.SubjectFiles[subject.Id];
                 StoreFiles(subject.Release, file, subject.Name);
-                Seed(file + ".csv", subject.Release, subjects.Count);
+                Seed(subject.Id,file + ".csv", subject.Release, subjects.Count);
             }
         }
 
-        private void Seed(string dataFileName, Release release, int maxCount)
+        private void Seed(Guid subjectId, string dataFileName, Release release, int maxCount)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -60,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
                 messages.Add(new ImportMessage
                 {
+                    SubjectId = subjectId,
                     DataFileName = dataFileName,
                     OrigDataFileName = dataFileName,
                     Release = importMessageRelease,

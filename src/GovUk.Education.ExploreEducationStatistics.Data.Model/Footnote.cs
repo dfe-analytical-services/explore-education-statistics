@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Footnote
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public string Content { get; set; }
         public ICollection<IndicatorFootnote> Indicators { get; set; }
         public ICollection<FilterFootnote> Filters { get; set; }

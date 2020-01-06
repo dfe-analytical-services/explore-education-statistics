@@ -1,16 +1,16 @@
+using System;
 using System.Threading.Tasks;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface ISubjectService : IRepository<Subject, long>
+    public interface ISubjectService : IRepository<Subject, Guid>
     {
-        bool IsSubjectForLatestRelease(long subjectId);
+        bool IsSubjectForLatestRelease(Guid subjectId);
 
-        bool Exists(ReleaseId releaseId, string name);
+        bool Exists(Guid releaseId, string name);
 
-        Task<bool> DeleteAsync(ReleaseId releaseId, string name);
+        Task<bool> DeleteAsync(Guid releaseId, string name);
 
-        Task<Subject> GetAsync(ReleaseId releaseId, string name);
+        Task<Subject> GetAsync(Guid releaseId, string name);
     }
 }

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class FootnoteService : AbstractRepository<Footnote, long>, IFootnoteService
+    public class FootnoteService : AbstractRepository<Footnote, Guid>, IFootnoteService
     {
         private readonly IFilterService _filterService;
         private readonly IFilterGroupService _filterGroupService;
@@ -34,11 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public Footnote CreateFootnote(string content,
-            IEnumerable<long> filterIds,
-            IEnumerable<long> filterGroupIds,
-            IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds,
-            IEnumerable<long> subjectIds)
+            IEnumerable<Guid> filterIds,
+            IEnumerable<Guid> filterGroupIds,
+            IEnumerable<Guid> filterItemIds,
+            IEnumerable<Guid> indicatorIds,
+            IEnumerable<Guid> subjectIds)
         {
             var footnote = DbSet().Add(new Footnote
             {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return footnote;
         }
 
-        public void DeleteFootnote(long id)
+        public void DeleteFootnote(Guid id)
         {
             var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
             {
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _context.SaveChanges();
         }
 
-        public Footnote GetFootnote(long id)
+        public Footnote GetFootnote(Guid id)
         {
             return DbSet().Where(footnote => footnote.Id == id)
                 .Include(footnote => footnote.Filters)
@@ -96,13 +96,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .SingleOrDefault();
         }
 
-        public Footnote UpdateFootnote(long id,
+        public Footnote UpdateFootnote(Guid id,
             string content,
-            IEnumerable<long> filterIds,
-            IEnumerable<long> filterGroupIds,
-            IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds,
-            IEnumerable<long> subjectIds)
+            IEnumerable<Guid> filterIds,
+            IEnumerable<Guid> filterGroupIds,
+            IEnumerable<Guid> filterItemIds,
+            IEnumerable<Guid> indicatorIds,
+            IEnumerable<Guid> subjectIds)
         {
             var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
             {
@@ -127,9 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return GetFootnote(id);
         }
 
-        public IEnumerable<Footnote> GetFootnotes(long subjectId,
+        public IEnumerable<Footnote> GetFootnotes(Guid subjectId,
             IQueryable<Observation> observations,
-            IEnumerable<long> indicators)
+            IEnumerable<Guid> indicators)
         {
             var filterItems = observations.SelectMany(observation => observation.FilterItems)
                 .Select(item => item.FilterItem.Id).Distinct();
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(footnote => footnote.Subjects);
         }
 
-        private void CreateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
+        private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)
         {
             var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id));
 
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void CreateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
+        private void CreateFilterLinks(Footnote footnote, IEnumerable<Guid> filterIds)
         {
             var filters = _filterService.FindMany(filter => filterIds.Contains(filter.Id));
 
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void CreateFilterGroupLinks(Footnote footnote, IEnumerable<long> filterGroupIds)
+        private void CreateFilterGroupLinks(Footnote footnote, IEnumerable<Guid> filterGroupIds)
         {
             var filterGroups = _filterGroupService.FindMany(filterGroup => filterGroupIds.Contains(filterGroup.Id),
                 new List<Expression<Func<FilterGroup, object>>>
@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void CreateFilterItemLinks(Footnote footnote, IEnumerable<long> filterItemIds)
+        private void CreateFilterItemLinks(Footnote footnote, IEnumerable<Guid> filterItemIds)
         {
             var filterItems = _filterItemService.FindMany(filterItem => filterItemIds.Contains(filterItem.Id),
                 new List<Expression<Func<FilterItem, object>>>
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void CreateIndicatorsLinks(Footnote footnote, IEnumerable<long> indicatorIds)
+        private void CreateIndicatorsLinks(Footnote footnote, IEnumerable<Guid> indicatorIds)
         {
             var indicators = _indicatorService.FindMany(indicator => indicatorIds.Contains(indicator.Id),
                 new List<Expression<Func<Indicator, object>>>
@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void UpdateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
+        private void UpdateFilterLinks(Footnote footnote, IEnumerable<Guid> filterIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Filters.Select(link => link.FilterId), filterIds))
@@ -256,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void UpdateFilterGroupLinks(Footnote footnote, IEnumerable<long> filterGroupIds)
+        private void UpdateFilterGroupLinks(Footnote footnote, IEnumerable<Guid> filterGroupIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.FilterGroups.Select(link => link.FilterGroupId), filterGroupIds))
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void UpdateFilterItemLinks(Footnote footnote, IEnumerable<long> filterItemIds)
+        private void UpdateFilterItemLinks(Footnote footnote, IEnumerable<Guid> filterItemIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.FilterItems.Select(link => link.FilterItemId), filterItemIds))
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void UpdateIndicatorLinks(Footnote footnote, IEnumerable<long> indicatorIds)
+        private void UpdateIndicatorLinks(Footnote footnote, IEnumerable<Guid> indicatorIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Indicators.Select(link => link.IndicatorId), indicatorIds))
@@ -286,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private void UpdateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
+        private void UpdateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Subjects.Select(link => link.SubjectId), subjectIds))
@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, long footnoteId, long linkId)
+        private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new IndicatorFootnote
             {
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             });
         }
 
-        private static void AddFilterLink(ref ICollection<FilterFootnote> links, long footnoteId, long linkId)
+        private static void AddFilterLink(ref ICollection<FilterFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new FilterFootnote
             {
@@ -314,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             });
         }
 
-        private static void AddFilterGroupLink(ref ICollection<FilterGroupFootnote> links, long footnoteId, long linkId)
+        private static void AddFilterGroupLink(ref ICollection<FilterGroupFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new FilterGroupFootnote
             {
@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             });
         }
 
-        private static void AddFilterItemLink(ref ICollection<FilterItemFootnote> links, long footnoteId, long linkId)
+        private static void AddFilterItemLink(ref ICollection<FilterItemFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new FilterItemFootnote
             {
@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             });
         }
 
-        private static void AddSubjectLink(ref ICollection<SubjectFootnote> links, long footnoteId, long subjectId)
+        private static void AddSubjectLink(ref ICollection<SubjectFootnote> links, Guid footnoteId, Guid subjectId)
         {
             links.Add(new SubjectFootnote
             {
@@ -349,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private static bool SequencesAreEqualIgnoringOrder(IEnumerable<long> left, IEnumerable<long> right)
+        private static bool SequencesAreEqualIgnoringOrder(IEnumerable<Guid> left, IEnumerable<Guid> right)
         {
             return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
