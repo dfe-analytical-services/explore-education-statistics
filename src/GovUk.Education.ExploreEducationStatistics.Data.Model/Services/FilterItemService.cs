@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
+        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
         {
             var filterItems = observations
                 .SelectMany(observation => observation.FilterItems)
