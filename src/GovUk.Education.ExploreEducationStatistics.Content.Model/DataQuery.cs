@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
@@ -7,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 // ReSharper disable NotAccessedField.Global
 // ReSharper disable UnusedMember.Global
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class DataBlockRequest
     {
-        public int SubjectId;
+        public Guid SubjectId;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel? GeographicLevel;
