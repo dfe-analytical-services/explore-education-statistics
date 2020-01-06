@@ -721,11 +721,11 @@
         },
         {
           "name": "virtualNetwork",
-          "type": "virtualNetworkConnections",
+          "type": "networkConfig",
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "vnetResourceId": "[variables('adminSubnetId')]",
+            "subnetResourceId": "[variables('adminSubnetId')]",
             "swiftSupported": true
           },
           "dependsOn": [
