@@ -7,12 +7,16 @@ import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
+  setRelease?: (
+    newRelease: AbstractRelease<EditableContentBlock, Publication>,
+  ) => void;
 }
 
-const ReleaseHeadlines = ({ release }: Props) => {
+const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
   return (
     <>
       <h2 className="dfe-print-break-before">
@@ -22,17 +26,28 @@ const ReleaseHeadlines = ({ release }: Props) => {
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
           {release.keyStatisticsSection &&
-            release.keyStatisticsSection.content && (
-              <DataBlock
-                {...release.keyStatisticsSection.content[0]}
-                id="keystats"
-              />
-            )}
-          {release.headlinesSection && release.headlinesSection.content && (
-            <>
-              {console.log(release)}
-              HEADLINE SECTION
-            </>
+            release.keyStatisticsSection.content &&
+            release.keyStatisticsSection.content.map(datablock => (
+              <DataBlock {...datablock} key={datablock.id} id="keystats" />
+            ))}
+
+          {release.headlinesSection && (
+            <ContentBlock
+              sectionId={release.headlinesSection.id}
+              publication={release.publication}
+              id={release.headlinesSection.id as string}
+              content={release.headlinesSection.content}
+              canAddSingleBlock
+              onContentChange={newContent =>
+                setRelease({
+                  ...release,
+                  headlinesSection: {
+                    ...release.headlinesSection,
+                    content: newContent,
+                  },
+                })
+              }
+            />
           )}
         </TabsSection>
       </Tabs>

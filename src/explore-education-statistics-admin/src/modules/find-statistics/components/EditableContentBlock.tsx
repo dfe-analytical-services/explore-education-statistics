@@ -65,7 +65,11 @@ const EditableContentBlock = ({
 }: Props) => {
   const editingContext = useContext(EditingContext);
 
-  const [contentBlocks, setContentBlocks] = useState<ContentType>(content);
+  const [contentBlocks, setContentBlocks] = useState<ContentType>();
+
+  React.useEffect(() => {
+    setContentBlocks(content);
+  }, [content]);
 
   const { handleApiErrors } = useContext(ErrorControlContext);
 

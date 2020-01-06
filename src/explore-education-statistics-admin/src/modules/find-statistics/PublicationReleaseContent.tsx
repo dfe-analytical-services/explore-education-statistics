@@ -257,7 +257,7 @@ const PublicationReleaseContent = ({
 
       <hr />
 
-      <ReleaseHeadlines release={release} />
+      <ReleaseHeadlines release={release} setRelease={setRelease} />
 
       <ReleaseContentAccordion
         releaseId={release.id}
