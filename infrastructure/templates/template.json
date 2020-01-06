@@ -109,6 +109,10 @@
       "type": "bool",
       "defaultValue": false
     },
+    "sqlVulnerabilityAssessments": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
@@ -1077,9 +1081,10 @@
             {
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
-            } 
+            }
           ],
-          "ipRules": [],
+          "ipRules": [
+          ],
           "defaultAction": "Deny"
         }
       },
@@ -1239,6 +1244,7 @@
           }
         },
         {
+          "condition": "[parameters('sqlVulnerabilityAssessments')]",
           "type": "vulnerabilityAssessments",
           "name": "Default",
           "apiVersion": "2018-06-01-preview",
