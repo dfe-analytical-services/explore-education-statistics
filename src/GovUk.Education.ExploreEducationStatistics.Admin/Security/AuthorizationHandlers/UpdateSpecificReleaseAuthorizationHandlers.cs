@@ -8,13 +8,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement
     {}
-    
-    public class UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
+
+    public class UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
         UpdateSpecificReleaseRequirement>
     {
-        public UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler() 
-            : base(SecurityClaimTypes.UpdateAllReleases) {}
-    }
+        public UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
+            : base(ctx =>
+                SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
+                && ctx.Release.Status != ReleaseStatus.Approved
+            )
+        {
+            
+        }
+}
 
     public class UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler
         : HasRoleOnReleaseAuthorizationHandler<UpdateSpecificReleaseRequirement>

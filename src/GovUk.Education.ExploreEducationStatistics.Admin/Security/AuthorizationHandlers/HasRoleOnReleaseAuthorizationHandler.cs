@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class ReleaseAuthorizationContext
+    public class ReleaseAndRolesAuthorizationContext
     {
-        public ReleaseAuthorizationContext(Release release, List<UserReleaseRole> roles)
+        public ReleaseAndRolesAuthorizationContext(Release release, List<UserReleaseRole> roles)
         {
             Release = release;
             Roles = roles;
@@ -26,9 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         where TRequirement : IAuthorizationRequirement
     {
         private readonly ContentDbContext _context;
-        private readonly Predicate<ReleaseAuthorizationContext>? _roleTest;
+        private readonly Predicate<ReleaseAndRolesAuthorizationContext>? _roleTest;
 
-        protected HasRoleOnReleaseAuthorizationHandler(ContentDbContext context, Predicate<ReleaseAuthorizationContext> roleTest = null)
+        protected HasRoleOnReleaseAuthorizationHandler(ContentDbContext context, Predicate<ReleaseAndRolesAuthorizationContext> roleTest = null)
         {
             _context = context;
             _roleTest = roleTest;
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .Where(r => r.ReleaseId == release.Id && r.UserId == userId)
                 .ToListAsync();
         
-            if (releaseRoles.Any() && (_roleTest == null || _roleTest.Invoke(new ReleaseAuthorizationContext(release, releaseRoles)))) 
+            if (releaseRoles.Any() && (_roleTest == null || _roleTest.Invoke(new ReleaseAndRolesAuthorizationContext(release, releaseRoles)))) 
             {
                 authContext.Succeed(requirement);    
             }

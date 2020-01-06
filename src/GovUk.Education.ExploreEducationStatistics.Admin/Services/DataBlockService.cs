@@ -60,21 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _dataBlockHelper
                 .CheckEntityExistsActionResult(id)
+                .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async dataBlock =>
                 {
-                    var release = _context
-                        .ReleaseContentBlocks
-                        .First(join => join.ContentBlockId == id)
-                        .Release;
-
-                    return await _userService
-                        .CheckCanUpdateRelease(release)
-                        .OnSuccess(async _ =>
-                        {
-                            _context.DataBlocks.Remove(dataBlock);
-                            await _context.SaveChangesAsync();
-                            return true;
-                        });
+                    _context.DataBlocks.Remove(dataBlock);
+                    await _context.SaveChangesAsync();
+                    return true;
                 });
         }
         
@@ -101,23 +92,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _dataBlockHelper
                 .CheckEntityExistsActionResult(id)
+                .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async existing =>
                 {
-                    var release = _context
-                        .ReleaseContentBlocks
-                        .First(join => join.ContentBlockId == id)
-                        .Release;
-                    
-                    return await _userService
-                        .CheckCanUpdateRelease(release)
-                        .OnSuccess(async _ =>
-                        {
-                            _context.DataBlocks.Update(existing);
-                            _mapper.Map(updateDataBlock, existing);
-                            await _context.SaveChangesAsync();
-                            return await GetAsync(id);
-                        });
+                    _context.DataBlocks.Update(existing);
+                    _mapper.Map(updateDataBlock, existing);
+                    await _context.SaveChangesAsync();
+                    return await GetAsync(id);
                 });
+        }
+
+        private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
+        {
+            var release = _context
+                .ReleaseContentBlocks
+                .First(join => @join.ContentBlockId == dataBlock.Id)
+                .Release;
+
+            return await _userService
+                .CheckCanUpdateRelease(release)
+                .OnSuccess(_ => dataBlock);
         }
     }
 }
