@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -139,41 +138,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             repository.VerifyNoOtherCalls();
         }
         
-        private async void AssertSecurityPoliciesChecked<T>(
+        private void AssertSecurityPoliciesChecked<T>(
             Func<ReleaseService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository) = Mocks();
 
-            policies.ToList().ForEach(policy => 
-                userService
-                    .Setup(s => s.MatchesPolicy(_release, policy))
-                    .ReturnsAsync(policy != policies.Last()));
-            
             var releaseService = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
 
-            var result = await protectedAction.Invoke(releaseService);
-
-            AssertForbidden(result);
-            
-            policies.ToList().ForEach(policy =>
-                userService.Verify(s => s.MatchesPolicy(_release, policy)));
-            
-            userService.VerifyNoOtherCalls();
+            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, releaseService, policies);
         }
-
-        private static void AssertForbidden<T>(Either<ActionResult,T> result)
-        {
-            Assert.NotNull(result);
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<ForbidResult>(result.Left);
-        }
-
         private (
-            Mock<IUserService> UserService, 
-            Mock<IPersistenceHelper<Release,Guid>> ReleaseHelper, 
-            Mock<IPublishingService> PublishingService,
-            Mock<ContentDbContext> ContentDbContext,
+            Mock<IUserService>, 
+            Mock<IPersistenceHelper<Release,Guid>>, 
+            Mock<IPublishingService>,
+            Mock<ContentDbContext>,
             Mock<IReleaseRepository>) Mocks()
         {
             var userService = new Mock<IUserService>();

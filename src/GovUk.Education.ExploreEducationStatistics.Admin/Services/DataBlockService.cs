@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = _context
                 .ReleaseContentBlocks
-                .First(join => @join.ContentBlockId == dataBlock.Id)
+                .First(join => join.ContentBlockId == dataBlock.Id)
                 .Release;
 
             return await _userService
