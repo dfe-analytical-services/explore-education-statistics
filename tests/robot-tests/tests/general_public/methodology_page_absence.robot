@@ -50,19 +50,35 @@ Validate accordion sections order
     user checks accordion is in position  Annex E - Timeline                        12
     user checks accordion is in position  Annex F - Absence rates over time         13
 
-# EES-807
-#Validate first section contains correct contents
-#    [Tags]  HappyPath
-#    write tests here
-
 Validate page has Print this page link
     [Tags]  HappyPath
     user checks page contains link with text and url  Print this page   \#
 
-# EES-807
-#Validate search works
-#    [Tags]  HappyPath
-#    user clicks element   css:#pageSearchForm-input
-#    user presses keys    number of pupil enrolments
-#    user checks element contains  css:#pageSearchForm-resultsLabel   Found 1 result
-#    user clicks element   css:#pageSearchForm-option-0 div
+Search for "pupil"
+    [Documentation]    EES-807
+    [Tags]  HappyPath
+    user clicks element   css:#pageSearchForm-input
+    user verifies accordion is closed  1. Overview of absence statistics
+
+    user presses keys  pupil
+    user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 127 results
+    user clicks element   css:#pageSearchForm-option-0
+
+    user verifies accordion is open  1. Overview of absence statistics
+    user waits until element is visible  css:#section1-1
+    user waits until page contains    All maintained schools are required to provide 2 possible sessions per day,
+
+Search for "specific enquiry"
+    [Documentation]    EES-807
+    [Tags]  HappyPath
+    user clicks element   css:#pageSearchForm-input
+    user verifies accordion is closed  7. Contacts
+
+    user clears element text    css:#pageSearchForm-input
+    user presses keys  specific enquiry
+    user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
+    user clicks element   css:#pageSearchForm-option-0
+
+    user verifies accordion is open  7. Contacts
+    user checks page contains   If you have a specific enquiry about absence and exclusion statistics and
+    user checks element is visible  xpath://h4[contains(text(),"School absence and exclusions team")]

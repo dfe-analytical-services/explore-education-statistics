@@ -254,6 +254,10 @@ user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
 
+user clears element text
+  [Arguments]   ${locator}
+  clear element text   ${locator}
+
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
