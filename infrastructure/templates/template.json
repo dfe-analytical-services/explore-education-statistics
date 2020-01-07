@@ -1085,18 +1085,20 @@
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
         "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
           "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
+              "condition": "[parameters('deploySubnets')]",
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
             },
             {
+              "condition": "[parameters('deploySubnets')]",
               "id": "[variables('importerSubnetRef')]",
               "action": "Allow"
             },
             {
+              "condition": "[parameters('deploySubnets')]",
               "id": "[variables('publisherSubnetRef')]",
               "action": "Allow"
             }
