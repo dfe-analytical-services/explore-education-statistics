@@ -17,6 +17,7 @@ export const classes = {
 export interface TabsSectionProps {
   children: ReactNode;
   id?: string;
+  datablockId?: string;
   /**
    * Set to true if children should not be
    * rendered until tab has been selected.
@@ -32,7 +33,9 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
     {
       children,
       id,
+      datablockId,
       headingTitle = '',
+      title,
       headingTag = 'h3',
       ...restProps
     }: TabsSectionProps,
@@ -62,6 +65,12 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         tabIndex={onMedia(-1)}
       >
         {headingTitle && createElement(headingTag, { children: headingTitle })}
+        {title === 'Charts' && (
+          <a href={`#${datablockId}-tables`} aria-live="assertive">
+            If you are using a keyboard select this link for a accessible table
+            view
+          </a>
+        )}
         {children}
       </section>
     );
