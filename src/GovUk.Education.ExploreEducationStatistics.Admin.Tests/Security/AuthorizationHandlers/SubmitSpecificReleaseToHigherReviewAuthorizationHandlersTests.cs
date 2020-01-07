@@ -7,20 +7,20 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class MarkSpecificReleaseAsDraftAuthorizationHandlersTests
+    public class SubmitSpecificReleaseToHigherReviewAuthorizationHandlersTests
     {
         [Fact]
-        public void MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler()
+        public void SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler()
         {
             AssertHandlerSucceedsWithCorrectClaims(
-                new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
+                new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(), SubmitAllReleasesToHigherReview);
         }
         
         [Fact]
-        public void MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler()
+        public void SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler()
         {
             AssertHandlerSucceedsWithCorrectReleaseRoles(
-                contentDbContext => new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(contentDbContext),
+                contentDbContext => new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 GetEnumValuesAsArray<ReleaseRole>());
         }
     }
