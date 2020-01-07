@@ -55,116 +55,150 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             Number_that_received_an_offer_for_a_school_within_their_LA
         }
 
-        private static readonly Dictionary<int, Dictionary<FilterItemName, int>> SubjectFilterItemIds =
-            new Dictionary<int, Dictionary<FilterItemName, int>>
+        private enum SubjectName
+        {
+            AbsenceByCharacteristic,
+            ExclusionsByGeographicLevel,
+            SchoolApplicationsAndOffers
+        }
+        
+        private static readonly Dictionary<SubjectName, Guid> SubjectIds = new Dictionary<SubjectName, Guid>
+        {
+            {
+                SubjectName.AbsenceByCharacteristic, new Guid("803fbf56-600f-490f-8409-6413a891720d")
+            },
+            {
+                SubjectName.ExclusionsByGeographicLevel, new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090")
+            },
+            {
+                SubjectName.SchoolApplicationsAndOffers, new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c")
+            }
+        };
+        
+        private static readonly Dictionary<Guid, Dictionary<FilterItemName, Guid>> SubjectFilterItemIds =
+            new Dictionary<Guid, Dictionary<FilterItemName, Guid>>
             {
                 {
-                    1, new Dictionary<FilterItemName, int>
+                    SubjectIds[SubjectName.AbsenceByCharacteristic], new Dictionary<FilterItemName, Guid>
                     {
                         {
-                            FilterItemName.Characteristic__Total, 66
+                            FilterItemName.Characteristic__Total, new Guid("183f94c3-b5d7-4868-892d-c948e256744d")
                         },
                         {
-                            FilterItemName.School_Type__Total, 70
+                            FilterItemName.School_Type__Total, new Guid("cb9b57e8-9965-4cb6-b61a-acc6d34b32be")
                         }
                     }
                 },
                 {
-                    12, new Dictionary<FilterItemName, int>
+                    SubjectIds[SubjectName.ExclusionsByGeographicLevel], new Dictionary<FilterItemName, Guid>
                     {
                         {
-                            FilterItemName.School_Type__Total, 456
+                            FilterItemName.School_Type__Total, new Guid("1f3f86a4-de9f-43d7-5bfd-08d78f900a85")
                         }
                     }
                 },
                 {
-                    17, new Dictionary<FilterItemName, int>
+                    SubjectIds[SubjectName.SchoolApplicationsAndOffers], new Dictionary<FilterItemName, Guid>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_All_primary, 574
+                            FilterItemName.Year_of_admission__Primary_All_primary,
+                            new Guid("e957db0c-3bf8-4e4b-5c6f-08d78f900a85")
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_All_secondary, 572
+                            FilterItemName.Year_of_admission__Secondary_All_secondary,
+                            new Guid("5a7b4e97-7794-4037-5c71-08d78f900a85")
                         }
                     }
                 }
             };
 
-        private static readonly Dictionary<int, Dictionary<IndicatorName, int>> SubjectIndicatorIds =
-            new Dictionary<int, Dictionary<IndicatorName, int>>
+        private static readonly Dictionary<Guid, Dictionary<IndicatorName, Guid>> SubjectIndicatorIds =
+            new Dictionary<Guid, Dictionary<IndicatorName, Guid>>
             {
                 {
-                    1, new Dictionary<IndicatorName, int>
+                    SubjectIds[SubjectName.AbsenceByCharacteristic], new Dictionary<IndicatorName, Guid>
                     {
                         {
-                            IndicatorName.Unauthorised_absence_rate, 23
+                            IndicatorName.Unauthorised_absence_rate, new Guid("ccfe716a-6976-4dc3-8fde-a026cd30f3ae")
                         },
                         {
-                            IndicatorName.Overall_absence_rate, 26
+                            IndicatorName.Overall_absence_rate, new Guid("92d3437a-0a62-4cd7-8dfb-bcceba7eef61")
                         },
                         {
-                            IndicatorName.Authorised_absence_rate, 28
+                            IndicatorName.Authorised_absence_rate, new Guid("f9ae4976-7cd3-4718-834a-09349b6eb377")
                         }
                     }
                 },
                 {
-                    12, new Dictionary<IndicatorName, int>
+                    SubjectIds[SubjectName.ExclusionsByGeographicLevel], new Dictionary<IndicatorName, Guid>
                     {
                         {
-                            IndicatorName.Number_of_schools, 176
+                            IndicatorName.Number_of_schools, new Guid("b3df4fb1-dae3-4c16-4c01-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_pupils, 177
+                            IndicatorName.Number_of_pupils, new Guid("a5a58f92-aba1-4955-4c02-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_permanent_exclusions, 178
+                            IndicatorName.Number_of_permanent_exclusions,
+                            new Guid("167f4807-4fdd-461a-4c03-08d78f90080f")
                         },
                         {
-                            IndicatorName.Permanent_exclusion_rate, 179
+                            IndicatorName.Permanent_exclusion_rate, new Guid("be3b765b-005f-4279-4c04-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_fixed_period_exclusions, 180
+                            IndicatorName.Number_of_fixed_period_exclusions,
+                            new Guid("f045bc8d-8dd1-4f16-4c05-08d78f90080f")
                         },
                         {
-                            IndicatorName.Fixed_period_exclusion_rate, 181
+                            IndicatorName.Fixed_period_exclusion_rate, new Guid("68aeda43-2b6a-433a-4c06-08d78f90080f")
                         },
                         {
-                            IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions, 183
+                            IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions,
+                            new Guid("732f0d7b-dcd3-4bf8-4c08-08d78f90080f")
                         }
                     }
                 },
                 {
-                    17, new Dictionary<IndicatorName, int>
+                    SubjectIds[SubjectName.SchoolApplicationsAndOffers], new Dictionary<IndicatorName, Guid>
                     {
                         {
-                            IndicatorName.Number_of_admissions, 211
+                            IndicatorName.Number_of_admissions, new Guid("49d2a1f4-e4a9-4f25-4c24-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_applications_received, 212
+                            IndicatorName.Number_of_applications_received,
+                            new Guid("020a4da6-1111-443d-af80-3a425c558d14")
                         },
                         {
-                            IndicatorName.Number_of_first_preferences_offered, 216
+                            IndicatorName.Number_of_first_preferences_offered,
+                            new Guid("94f9b11c-df82-4eef-4c29-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_second_preferences_offered, 217
+                            IndicatorName.Number_of_second_preferences_offered,
+                            new Guid("d22e1104-de56-4617-4c2a-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_of_third_preferences_offered, 218
+                            IndicatorName.Number_of_third_preferences_offered,
+                            new Guid("319dd956-a714-40fd-4c2b-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_that_received_one_of_their_first_three_preferences, 219
+                            IndicatorName.Number_that_received_one_of_their_first_three_preferences,
+                            new Guid("a9211c9d-b467-48d7-4c2c-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_preferred_school, 220
+                            IndicatorName.Number_that_received_an_offer_for_a_preferred_school,
+                            new Guid("be1e1643-f7c8-40b0-4c2d-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school, 221
+                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school,
+                            new Guid("16cdfc0a-f66f-496b-4c2e-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_that_did_not_receive_an_offer, 222
+                            IndicatorName.Number_that_did_not_receive_an_offer,
+                            new Guid("2c63589e-b5d4-4922-4c2f-08d78f90080f")
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA, 223
+                            IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA,
+                            new Guid("d10d4f10-c2f8-4120-4c30-08d78f90080f")
                         }
                     }
                 }
@@ -267,7 +301,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
-                .HasColumnName("DataBlock_Request");
+                .HasColumnName("DataBlock_Request")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<DataBlockRequest>(v));
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
@@ -289,12 +326,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<Table>>(v));
-
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.DataBlockRequest)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<DataBlockRequest>(v));
 
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
@@ -2186,7 +2217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             );
 
-            modelBuilder.Entity<Comment>()    
+            modelBuilder.Entity<Comment>()
                 .HasData(
                     new Comment
                     {
@@ -2463,7 +2494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Name = "Key Stat 1",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2472,22 +2503,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate),
                         }
                     },
 
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate)
                         },
                         dataSummary = new List<string>
                         {
@@ -2502,9 +2536,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(1, IndicatorName.Overall_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Overall_absence_rate)
                             }
                         }
                     },
@@ -2521,29 +2556,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -2557,7 +2601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Overall absence rate",
@@ -2588,22 +2632,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate)
                         }
                     },
 
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate)
                         },
                         dataSummary = new List<string>
                         {
@@ -2618,9 +2665,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Authorised_absence_rate)
                             }
                         }
                     },
@@ -2637,11 +2685,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -2655,7 +2706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Authorised absence rate",
@@ -2677,7 +2728,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2686,22 +2737,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate),
                         }
                     },
 
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate)
                         },
                         dataSummary = new List<string>
                         {
@@ -2716,9 +2770,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Unauthorised_absence_rate)
                             }
                         }
                     },
@@ -2735,29 +2790,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -2771,7 +2835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
@@ -2793,7 +2857,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2802,26 +2866,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                            Indicator(1, IndicatorName.Overall_absence_rate),
-                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate)
                         }
                     },
 
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Overall_absence_rate),
-                            Indicator(1, IndicatorName.Authorised_absence_rate),
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate)
                         },
                         dataSummary = new List<string>
                         {
@@ -2840,11 +2911,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                                Indicator(1, IndicatorName.Overall_absence_rate),
-                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Unauthorised_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Overall_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Authorised_absence_rate)
                             }
                         }
                     },
@@ -2861,29 +2935,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -2897,7 +2980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
@@ -2905,7 +2988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     },
-                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Overall absence rate",
@@ -2913,7 +2996,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
                                     },
-                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Authorised absence rate",
@@ -2933,7 +3016,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -2942,27 +3025,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                            Indicator(1, IndicatorName.Overall_absence_rate),
-                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate)
                         }
                     },
                     Tables = new List<Table>
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                                Indicator(1, IndicatorName.Overall_absence_rate),
-                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Unauthorised_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Overall_absence_rate),
+                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                    IndicatorName.Authorised_absence_rate)
                             }
                         }
                     },
@@ -2979,35 +3069,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1,
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                 IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1,
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                     FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator =
-                                                Indicator(1, IndicatorName.Overall_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1,
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                     FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1,
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                 IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1,
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                     FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3021,7 +3114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
@@ -3029,7 +3122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     },
-                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Overall absence rate",
@@ -3037,7 +3130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
                                     },
-                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Authorised absence rate",
@@ -3056,7 +3149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
                         TimePeriod = new TimePeriod
                         {
@@ -3066,16 +3159,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
-                            Indicator(1, IndicatorName.Overall_absence_rate),
-                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Unauthorised_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Overall_absence_rate),
+                            Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                IndicatorName.Authorised_absence_rate)
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(1, FilterItemName.Characteristic__Total),
-                            FItem(1, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                FilterItemName.Characteristic__Total),
+                            FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         }
                     },
                     Charts = new List<IContentBlockChart>
@@ -3091,32 +3188,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1,
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                 IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator =
-                                                Indicator(1, IndicatorName.Overall_absence_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1,
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                                 IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(1, FilterItemName.Characteristic__Total),
-                                                FItem(1, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3129,7 +3232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
@@ -3137,7 +3240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     },
-                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Overall absence rate",
@@ -3145,7 +3248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
                                     },
-                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
                                         Label = "Authorised absence rate",
@@ -3167,7 +3270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3177,20 +3280,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Permanent_exclusion_rate),
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Permanent_exclusion_rate),
                         },
                         dataSummary = new List<string>
                         {
@@ -3205,9 +3311,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Permanent_exclusion_rate),
                             }
                         }
                     },
@@ -3225,19 +3332,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12,
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                                 IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3251,7 +3361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Permanent_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3275,7 +3385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3285,20 +3395,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Fixed_period_exclusion_rate),
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Fixed_period_exclusion_rate),
                         },
                         dataSummary = new List<string>
                         {
@@ -3313,9 +3426,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Fixed_period_exclusion_rate),
                             }
                         }
                     },
@@ -3333,10 +3447,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                     },
@@ -3350,7 +3466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3374,7 +3490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3384,20 +3500,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         },
                         dataSummary = new List<string>
                         {
@@ -3412,9 +3531,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_permanent_exclusions)
                             }
                         }
                     },
@@ -3432,10 +3552,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                     },
@@ -3449,7 +3571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3473,7 +3595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3483,28 +3605,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_schools),
-                            Indicator(12, IndicatorName.Number_of_pupils),
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions),
-                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
-                            Indicator(12, IndicatorName.Number_of_fixed_period_exclusions),
-                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                            Indicator(12, IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_schools),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_pupils),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Permanent_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_fixed_period_exclusions),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Fixed_period_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
-                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Permanent_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Fixed_period_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         },
                         dataSummary = new List<string>
                         {
@@ -3523,11 +3656,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
-                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Permanent_exclusion_rate),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Fixed_period_exclusion_rate),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_permanent_exclusions)
                             }
                         }
                     },
@@ -3545,19 +3681,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12,
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                                 IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3571,7 +3710,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3580,7 +3719,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     },
-                                [$"{Indicator(12, IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3602,7 +3741,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading = "Chart showing permanent exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3611,26 +3750,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2016",
                             EndCode = TimeIdentifier.AcademicYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
-                            Indicator(12, IndicatorName.Number_of_pupils),
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Permanent_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_pupils),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         }
                     },
                     Tables = new List<Table>
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Number_of_pupils),
-                                Indicator(12, IndicatorName.Number_of_permanent_exclusions),
-                                Indicator(12, IndicatorName.Permanent_exclusion_rate)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_pupils),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_permanent_exclusions),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Permanent_exclusion_rate)
                             }
                         }
                     },
@@ -3647,11 +3793,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12,
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                                 IndicatorName.Permanent_exclusion_rate),
-                                            Filters = new List<string>
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3665,7 +3812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Permanent_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3686,7 +3833,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading = "Chart showing fixed-period exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3696,26 +3843,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
-                            Indicator(12, IndicatorName.Number_of_pupils),
-                            Indicator(12, IndicatorName.Number_of_fixed_period_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Fixed_period_exclusion_rate),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_pupils),
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_fixed_period_exclusions)
                         }
                     },
                     Tables = new List<Table>
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Number_of_pupils),
-                                Indicator(12, IndicatorName.Number_of_fixed_period_exclusions),
-                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_pupils),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_fixed_period_exclusions),
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Fixed_period_exclusion_rate)
                             }
                         }
                     },
@@ -3732,12 +3886,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator =
-                                                Indicator(12,
-                                                    IndicatorName.Fixed_period_exclusion_rate),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Fixed_period_exclusion_rate),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         }
                                     },
@@ -3751,7 +3905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3775,7 +3929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 0,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3785,20 +3939,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         },
                         dataSummary = new List<string>
                         {
@@ -3813,9 +3970,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_permanent_exclusions)
                             }
                         }
                     },
@@ -3833,10 +3991,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                     },
@@ -3850,7 +4010,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3874,7 +4034,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 0,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("3c0fbe56-0a4b-4caa-82f2-ab696cd96090"),
+                        SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3884,20 +4044,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(12, FilterItemName.School_Type__Total)
+                            FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                FilterItemName.School_Type__Total)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                            Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                IndicatorName.Number_of_permanent_exclusions)
                         },
                         dataSummary = new List<string>
                         {
@@ -3912,9 +4075,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                    IndicatorName.Number_of_permanent_exclusions)
                             }
                         }
                     },
@@ -3932,10 +4096,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(12, IndicatorName.Number_of_permanent_exclusions),
-                                            Filters = new List<string>
+                                            Indicator = Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                IndicatorName.Number_of_permanent_exclusions),
+                                            Filters = new List<Guid>
                                             {
-                                                FItem(12, FilterItemName.School_Type__Total)
+                                                FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                                    FilterItemName.School_Type__Total)
                                             }
                                         },
                                     },
@@ -3949,7 +4115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Labels = new Dictionary<string, ChartConfiguration>
                             {
-                                [$"{Indicator(12, IndicatorName.Number_of_permanent_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                [$"{Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions)}_{FItem(SubjectIds[SubjectName.ExclusionsByGeographicLevel], FilterItemName.School_Type__Total)}_____"]
                                     =
                                     new ChartConfiguration
                                     {
@@ -3973,7 +4139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -3982,20 +4148,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2018",
                             EndCode = TimeIdentifier.CalendarYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Primary_All_primary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_applications_received),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_applications_received),
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_applications_received),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_applications_received),
                         },
                         dataSummary = new List<string>
                         {
@@ -4010,9 +4179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17, IndicatorName.Number_of_applications_received),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_applications_received),
                             }
                         }
                     }
@@ -4027,7 +4197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4036,20 +4206,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2018",
                             EndCode = TimeIdentifier.CalendarYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Primary_All_primary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_first_preferences_offered)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_first_preferences_offered)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_first_preferences_offered)
                         },
                         dataSummary = new List<string>
                         {
@@ -4064,9 +4237,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_first_preferences_offered),
                             }
                         }
                     }
@@ -4081,7 +4255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 3,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4090,20 +4264,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2018",
                             EndCode = TimeIdentifier.CalendarYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Primary_All_primary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_second_preferences_offered)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_second_preferences_offered)
                         },
                         dataSummary = new List<string>
                         {
@@ -4118,9 +4295,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_second_preferences_offered)
                             }
                         }
                     }
@@ -4135,7 +4313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4144,30 +4322,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndYear = "2018",
                             EndCode = TimeIdentifier.CalendarYear
                         },
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Primary_All_primary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_admissions),
-                            Indicator(17, IndicatorName.Number_of_applications_received),
-                            Indicator(17, IndicatorName.Number_of_first_preferences_offered),
-                            Indicator(17, IndicatorName.Number_of_second_preferences_offered),
-                            Indicator(17, IndicatorName.Number_of_third_preferences_offered),
-                            Indicator(17, IndicatorName.Number_that_received_one_of_their_first_three_preferences),
-                            Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                            Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                            Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_admissions),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_applications_received),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_first_preferences_offered),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_second_preferences_offered),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_third_preferences_offered),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_received_one_of_their_first_three_preferences),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_did_not_receive_an_offer)
                         }
                     },
                     Summary = new Summary
                     {
-                        dataKeys = new List<string>
+                        dataKeys = new List<Guid>
                         {
-                            Indicator(17, IndicatorName.Number_of_applications_received),
-                            Indicator(17, IndicatorName.Number_of_first_preferences_offered),
-                            Indicator(17, IndicatorName.Number_of_second_preferences_offered)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_applications_received),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_first_preferences_offered),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_of_second_preferences_offered)
                         },
                         dataSummary = new List<string>
                         {
@@ -4186,16 +4377,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17, IndicatorName.Number_of_applications_received),
-                                Indicator(17, IndicatorName.Number_of_admissions),
-                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
-                                Indicator(17, IndicatorName.Number_of_second_preferences_offered),
-                                Indicator(17, IndicatorName.Number_of_third_preferences_offered),
-                                Indicator(17,
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_applications_received),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_admissions),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_first_preferences_offered),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_second_preferences_offered),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_of_third_preferences_offered),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                     IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_that_did_not_receive_an_offer)
                             }
                         }
                     }
@@ -4209,7 +4406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Table of Timeseries of key secondary preference rates, England",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4219,34 +4416,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.CalendarYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Secondary_All_secondary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Secondary_All_secondary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17,
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                            Indicator(17,
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                            Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer),
-                            Indicator(17,
-                                IndicatorName
-                                    .Number_that_received_an_offer_for_a_school_within_their_LA)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_did_not_receive_an_offer),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA)
                         }
                     },
                     Tables = new List<Table>
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17,
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                     IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                                Indicator(17,
-                                    IndicatorName
-                                        .Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_that_did_not_receive_an_offer)
                             }
                         }
                     }
@@ -4259,7 +4457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("fa0d7f1d-d181-43fb-955b-fc327da86f2c"),
+                        SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
@@ -4269,34 +4467,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             EndCode = TimeIdentifier.CalendarYear
                         },
 
-                        Filters = new List<string>
+                        Filters = new List<Guid>
                         {
-                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
+                            FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                FilterItemName.Year_of_admission__Primary_All_primary)
                         },
-                        Indicators = new List<string>
+                        Indicators = new List<Guid>
                         {
-                            Indicator(17,
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                            Indicator(17,
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                            Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer),
-                            Indicator(17,
-                                IndicatorName
-                                    .Number_that_received_an_offer_for_a_school_within_their_LA)
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_did_not_receive_an_offer),
+                            Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA)
                         }
                     },
                     Tables = new List<Table>
                     {
                         new Table
                         {
-                            indicators = new List<string>
+                            indicators = new List<Guid>
                             {
-                                Indicator(17,
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                     IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                                Indicator(17,
-                                    IndicatorName
-                                        .Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                    IndicatorName.Number_that_did_not_receive_an_offer)
                             }
                         }
                     }
@@ -4543,8 +4742,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4561,8 +4762,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6bf20dd4-a7d6-4bc6-a13a-9f574935c9af"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4579,8 +4782,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("63a318d9-05fa-40eb-9808-b825a6deb54a"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
                                 },
@@ -4597,8 +4802,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7714efb9-cc82-4895-ba27-bf5464541e38"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4615,8 +4822,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("6f81ab70-5730-4cf1-a513-669f5c4bef09"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4633,8 +4842,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a40d6c9e-fe61-48c0-b907-9757148beb0d"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4651,8 +4862,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("f620a229-21b7-4c6e-afd4-e9feb111f09a"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4672,8 +4885,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8b90b3b2-f63d-4499-91aa-41ccae74e1c7"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4690,8 +4905,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("47f3e500-ec9f-4a00-96f8-c488f76b06e6"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4708,8 +4925,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("a00a7765-aa81-43f2-afe1-fead7f070291"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -4726,8 +4945,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("7cc516d4-fc79-4e22-b35b-a042d5b14d35"),
-                                    Body = File.Exists(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html")
-                                        ? File.ReadAllText(@"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html",
+                                    Body = File.Exists(
+                                        @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html")
+                                        ? File.ReadAllText(
+                                            @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
                                 }
@@ -5179,14 +5400,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 );
         }
 
-        private static string FItem(int subjectId, FilterItemName filterItemName)
+        private static Guid FItem(Guid subjectId, FilterItemName filterItemName)
         {
-            return SubjectFilterItemIds[subjectId][filterItemName].ToString();
+            return SubjectFilterItemIds[subjectId][filterItemName];
         }
 
-        private static string Indicator(int subjectId, IndicatorName indicatorName)
+        private static Guid Indicator(Guid subjectId, IndicatorName indicatorName)
         {
-            return SubjectIndicatorIds[subjectId][indicatorName].ToString();
+            return SubjectIndicatorIds[subjectId][indicatorName];
         }
     }
 }

@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private static readonly string Absence_In_Prus = "95c7f584-907e-4756-bbf0-4905ceae57df";
         private static readonly string Absence_Number_Missing_At_Least_One_Session_By_Reason = "faf2152e-0a6c-4e97-af02-e9a89d48c47a";
         private static readonly string Absence_Rate_Percent_Bands = "666cd878-87bb-4f77-9a3f-f5c75078e112";
+        private static readonly string Exclusions_By_Geographic_Level = "3c0fbe56-0a4b-4caa-82f2-ab696cd96090";
         private static readonly string EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018 = "8e3d1bc0-2beb-4dc6-9db7-3d27d0608042";
         private static readonly string School_Applications_And_Offers = "fa0d7f1d-d181-43fb-955b-fc327da86f2c";
 
@@ -71,11 +72,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default:State-funded primary", new Guid("26db426f-fb4f-439c-9e37-360451305013")},
                 {$"{Absence_Rate_Percent_Bands}:school_type:Default:Special", new Guid("a7a7a691-a49e-422e-839e-53f1f545fa76")},
                 
+                {$"{Exclusions_By_Geographic_Level}:school_type:Default:Total", new Guid("1f3f86a4-de9f-43d7-5bfd-08d78f900a85")},
+                
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:characteristic:Total:Total", new Guid("beeaa217-3233-48df-bc1d-11f066a26efe")},
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:characteristic:Gender:Gender Male", new Guid("2cf47ea3-1891-4bba-9381-81a0305a7581")},
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:characteristic:Gender:Gender Female", new Guid("edcc7822-d88e-490d-8446-baca8b6ccca4")},
                 
+                {$"{School_Applications_And_Offers}:nc_year_admission:Primary:All primary", new Guid("e957db0c-3bf8-4e4b-5c6f-08d78f900a85")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Primary:R", new Guid("f5ad9114-14b8-4102-89a1-3ab76801ecde")},
+                {$"{School_Applications_And_Offers}:nc_year_admission:Primary:All secondary", new Guid("5a7b4e97-7794-4037-5c71-08d78f900a85")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Secondary:9", new Guid("3f101896-1c4a-4153-bb22-1d3888eb61ea")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Secondary:7", new Guid("ff8614ba-ec1c-4012-a5e3-2d788a4f5460")},
             };
@@ -125,13 +130,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 {$"{Absence_Rate_Percent_Bands}:Enrolments by absence percentage band:enrolments_authorised", new Guid("f3014e60-534a-4667-b90f-80b1fee6b08e")},
                 {$"{Absence_Rate_Percent_Bands}:Enrolments by absence percentage band:enrolments_unauthorised", new Guid("cd2711ff-3dba-4452-858a-d55c5cfd04fb")},
 
+                {$"{Exclusions_By_Geographic_Level}:Default:num_schools", new Guid("b3df4fb1-dae3-4c16-4c01-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:headcount", new Guid("a5a58f92-aba1-4955-4c02-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:perm_excl", new Guid("167f4807-4fdd-461a-4c03-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:perm_excl_rate", new Guid("be3b765b-005f-4279-4c04-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:fixed_excl", new Guid("f045bc8d-8dd1-4f16-4c05-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:fixed_excl_rate", new Guid("68aeda43-2b6a-433a-4c06-08d78f90080f")},
+                {$"{Exclusions_By_Geographic_Level}:Default:one_plus_fixed_rate", new Guid("732f0d7b-dcd3-4bf8-4c08-08d78f90080f")},
+                
                 {$"{School_Applications_And_Offers}:Applications:applications_received", new Guid("020a4da6-1111-443d-af80-3a425c558d14")},
                 {$"{School_Applications_And_Offers}:Applications:online_applications", new Guid("f472e6cc-9e25-401b-9fca-9dc3755bab2d")},
                 {$"{School_Applications_And_Offers}:Applications:online_apps_percent", new Guid("0af5ea39-828f-4afe-9a9f-643dce0112cf")},
-                
+                {$"{School_Applications_And_Offers}:Admissions:admission_numbers", new Guid("49d2a1f4-e4a9-4f25-4c24-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:first_preference_offers", new Guid("94f9b11c-df82-4eef-4c29-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:second_preference_offers", new Guid("d22e1104-de56-4617-4c2a-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:third_preference_offers", new Guid("319dd956-a714-40fd-4c2b-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:one_of_the_three_preference_offers", new Guid("a9211c9d-b467-48d7-4c2c-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:preferred_school_offer", new Guid("be1e1643-f7c8-40b0-4c2d-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:non_preferred_offer", new Guid("16cdfc0a-f66f-496b-4c2e-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:no_offer", new Guid("2c63589e-b5d4-4922-4c2f-08d78f90080f")},
+                {$"{School_Applications_And_Offers}:Preferences breakdowns:schools_in_la_offer", new Guid("d10d4f10-c2f8-4120-4c30-08d78f90080f")},
+
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:Overall rating:point_score", new Guid("7d250efe-afad-4117-8ccf-debf689c4efc")},
                 {$"{EYFSP_APS_GLD_ELG_Underlying_Data_2013_2018}:Overall rating:average_point_score", new Guid("37faaef4-5b5e-473e-9585-8580c1df967a")},
             };
+        
         public static void GenerateIndicatorGuids(StatisticsDbContext dbContext) {
              foreach (var indicator in dbContext.Indicator.Local.ToList())
              {
