@@ -334,9 +334,6 @@
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
-    "importervNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'), '-importer')]",
-    "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
-    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('importervNetName'), variables('importerSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -1084,10 +1081,6 @@
             {
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
-            },
-            {
-              "id": "[variables('importerSubnetRef')]",
-              "action": "Allow"
             }
           ],
           "ipRules": [
@@ -1109,8 +1102,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', variables('importervNetName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
       ],
       "sku": {
         "name": "Standard_RAGRS"
@@ -2103,43 +2095,6 @@
         "subnets": [
           {
             "name": "[variables('adminSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.0.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2018-10-01",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('importervNetName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "10.0.0.0/16"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('importerSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.0.0/24",
               "serviceEndpoints": [
