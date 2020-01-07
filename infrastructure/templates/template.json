@@ -1759,8 +1759,8 @@
       },
       "properties": {
         "name": "[variables('importerPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        // "computeMode": "Dynamic",
+        "sku": "EP1"
       }
     },
     {
@@ -1811,7 +1811,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
-          "AlwaysOn": false,
+          "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
