@@ -4,18 +4,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200106161229_ChangingFilterItemAndIndicatorTypes")]
+    partial class ChangingFilterItemAndIndicatorTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -2528,13 +2530,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         },
                         new
                         {
-                            Id = new Guid("1851e50d-04ac-4e16-911b-3df3350c589b"),
-                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            Role = "Approver",
-                            UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
-                        },
-                        new
-                        {
                             Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "Contributor",
@@ -2544,7 +2539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            Role = "Approver",
+                            Role = "Contributor",
                             UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
                         },
                         new
@@ -2566,13 +2561,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("b00fd7c0-226f-474d-8cec-820a1a789182"),
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Role = "Lead",
-                            UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
-                        },
-                        new
-                        {
-                            Id = new Guid("d1cbc96e-75c0-424f-bd63-c1920b763020"),
-                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            Role = "Approver",
                             UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
                         });
                 });
