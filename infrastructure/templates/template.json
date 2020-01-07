@@ -281,6 +281,10 @@
         "1.2"
       ]
     },
+    "deploySubnets": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -727,6 +731,7 @@
           }
         },
         {
+          "condition": "[parameters('deploySubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1080,6 +1085,7 @@
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
         "networkAcls": {
+          "condition": "[parameters('deploySubnets')]",
           "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
@@ -1799,6 +1805,7 @@
       },
       "resources": [
         {
+          "condition": "[parameters('deploySubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1961,12 +1968,13 @@
       },
       "resources": [
         // {
+        //   "condition": "[parameters('deploySubnets')]",
         //   "name": "virtualNetwork",
         //   "type": "config",
         //   "apiVersion": "2018-02-01",
         //   "location": "[resourceGroup().location]",
         //   "properties": {
-        //     "subnetResourceid": "[variables('adminSubnetRef')]",
+        //     "subnetResourceid": "[variables('publisherSubnetRef')]",
         //     "swiftSupported": true
         //   },
         //   "dependsOn": [
