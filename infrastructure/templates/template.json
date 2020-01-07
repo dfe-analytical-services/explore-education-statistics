@@ -1770,7 +1770,7 @@
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
       ],
@@ -1794,17 +1794,17 @@
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('importerSubnetRef')]",
+            "subnetResourceid": "[variables('adminSubnetName')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('importervNetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('adminSubnetRef'))]"
           ]
         }
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
