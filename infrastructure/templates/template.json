@@ -1089,6 +1089,10 @@
             {
               "id": "[variables('importerSubnetRef')]",
               "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
             }
           ],
           "ipRules": [
