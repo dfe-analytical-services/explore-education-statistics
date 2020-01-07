@@ -151,12 +151,7 @@ const ManagePublicationsAndReleasesTab = ({
             explore.statistics@education.gov.uk
           </a>
         </p>
-        {console.log(
-          themes,
-          selectedThemeAndTopic,
-          myPublications,
-          match.params,
-        )}
+
         {themes && selectedThemeAndTopic && myPublications && (
           <>
             <div className="govuk-grid-row">
