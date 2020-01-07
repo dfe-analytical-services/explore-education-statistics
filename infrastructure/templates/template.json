@@ -109,6 +109,10 @@
       "type": "bool",
       "defaultValue": false
     },
+    "sqlVulnerabilityAssessments": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publicAppBasicAuth": {
       "type": "string",
@@ -155,6 +159,11 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
+    "notifyInviteTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+
     "notifyApiKey": {
       "type": "securestring",
       "defaultValue": "",
@@ -166,6 +175,7 @@
       "type": "securestring",
       "defaultValue": ""
     },
+
 
     "teamEmailAddresses": {
       "type": "array",
@@ -321,6 +331,11 @@
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
+    "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
+    "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
+    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -708,6 +723,20 @@
           ],
           "properties": {
           }
+        },
+        {
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('adminSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
         }
       ],
       "properties": {
@@ -760,7 +789,18 @@
               "name": "ASPNETCORE_DETAILEDERRORS",
               "value": "true"
             },
-
+            {
+              "name": "NotifyApiKey",
+              "value": "[parameters('notifyApiKey')]"
+            },
+            {
+              "name": "NotifyInviteTemplateId",
+              "value": "[parameters('notifyInviteTemplateId')]"
+            },
+            {
+              "name": "AdminUri",
+              "value": "[parameters('adminUri')]"
+            },
             {
               "name": "IdentityServer:IssuerUri",
               "value": "[concat('urn=', parameters('adminUri'))]"
@@ -1036,7 +1076,23 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": [
+          ],
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1052,6 +1108,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
       ],
       "sku": {
         "name": "Standard_RAGRS"
@@ -1193,6 +1250,7 @@
           }
         },
         {
+          "condition": "[parameters('sqlVulnerabilityAssessments')]",
           "type": "vulnerabilityAssessments",
           "name": "Default",
           "apiVersion": "2018-06-01-preview",
@@ -1697,10 +1755,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+       "sku": {
+        "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuAdmin'), ' '))]"
+      },
       "properties": {
         "name": "[variables('importerPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
@@ -1710,7 +1774,7 @@
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
       ],
@@ -1727,8 +1791,24 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "resources": [
+        {
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('importerSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
+        }
+      ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
@@ -1873,6 +1953,22 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "resources": [
+        // {
+        //   "name": "virtualNetwork",
+        //   "type": "config",
+        //   "apiVersion": "2018-02-01",
+        //   "location": "[resourceGroup().location]",
+        //   "properties": {
+        //     "subnetResourceid": "[variables('adminSubnetRef')]",
+        //     "swiftSupported": true
+        //   },
+        //   "dependsOn": [
+        //     "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        //     "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+        //   ]
+        // }
+      ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
         "httpsOnly": true,
@@ -1988,6 +2084,66 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('vNetName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('adminSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('importerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.1.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   ]
