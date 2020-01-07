@@ -1794,12 +1794,12 @@
           "apiVersion": "2018-02-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('adminSubnetName')]",
+            "subnetResourceid": "[variables('adminSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('adminSubnetRef'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
           ]
         }
       ],
