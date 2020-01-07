@@ -1768,15 +1768,16 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "sku": {
-        "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
-        "Name": "[first(split(parameters('skuAdmin'), ' '))]"
+        "Tier": "ElasticPremium",
+        "Name": "EP1"
       },
       "properties": {
         "name": "[variables('importerPlanName')]",
         "workerSizeId": "0",
         "reserved": false,
         "numberOfWorkers": "1",
-        "hostingEnvironment": ""
+        "hostingEnvironment": "",
+        "maximumElasticWorkerCount": "20"
       }
     },
     {
