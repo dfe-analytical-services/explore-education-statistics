@@ -334,8 +334,9 @@
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "importervNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'), '-importer')]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
-    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
+    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('importervNetName'), variables('importerSubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -1793,7 +1794,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('importervNetName'))]"
           ]
         }
       ],
@@ -2110,11 +2111,26 @@
                 }
               ]
             }
-          },
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('vNetName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
           {
             "name": "[variables('importerSubnetName')]",
             "properties": {
-              "addressPrefix": "10.0.1.0/24",
+              "addressPrefix": "10.0.0.0/24",
               "serviceEndpoints": [
                 {
                   "service": "Microsoft.Storage"
