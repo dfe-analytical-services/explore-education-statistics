@@ -1084,29 +1084,27 @@
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "condition": "[parameters('deploySubnets')]",
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('deploySubnets')]",
-              "id": "[variables('importerSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('deploySubnets')]",
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
-          "ipRules": [
-          ],
-          "defaultAction": "Deny"
-        }
+        // "networkAcls": {
+        //   "condition": "[parameters('deploySubnets')]",
+        //   "bypass": "AzureServices",
+        //   "virtualNetworkRules": [
+        //     {
+        //       "id": "[variables('adminSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "id": "[variables('importerSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "id": "[variables('publisherSubnetRef')]",
+        //       "action": "Allow"
+        //     }
+        //   ],
+        //   "ipRules": [
+        //   ],
+        //   "defaultAction": "Deny"
+        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
