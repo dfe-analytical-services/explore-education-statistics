@@ -3,6 +3,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import permissionService from '@admin/services/permissions/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -38,6 +39,8 @@ const ReleaseManageDataBlocksPage = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
+  const [canUpdateRelease, setCanUpdateRelease] = React.useState(false);
+
   const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
 
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
@@ -50,7 +53,13 @@ const ReleaseManageDataBlocksPage = ({
   };
 
   React.useEffect(() => {
-    updateDataBlocks(releaseId).then(() => {});
+    updateDataBlocks(releaseId);
+  }, [releaseId]);
+
+  React.useEffect(() => {
+    permissionService
+      .canUpdateRelease(releaseId)
+      .then(canUpdateRelease => setCanUpdateRelease(canUpdateRelease));
   }, [releaseId]);
 
   const dataBlockOptions = React.useMemo(
@@ -188,7 +197,7 @@ const ReleaseManageDataBlocksPage = ({
     doLoad(releaseId, selectedDataBlock, dataBlocks);
   }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
 
-  return (
+  return canUpdateRelease ? (
     <>
       <FormSelect
         id="selectDataBlock"
@@ -285,6 +294,8 @@ const ReleaseManageDataBlocksPage = ({
         </div>
       </div>
     </>
+  ) : (
+    <div>This release is currently not editable.</div>
   );
 };
 

@@ -23,14 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             _releaseHelper = releaseHelper;
         }
 
-        // GET api/permissions/release/status/submit
+        [HttpGet("release/{releaseId}/update")]
+        public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseId)
+        {
+            return CheckPolicyAgainstRelease(releaseId, _userService.CheckCanUpdateRelease);
+        }
+
         [HttpGet("release/{releaseId}/status/submit")]
         public Task<ActionResult<bool>> CanSubmitReleaseToHigherReview(Guid releaseId)
         {
             return CheckPolicyAgainstRelease(releaseId, _userService.CheckCanSubmitReleaseToHigherApproval);
         }
 
-        // GET api/permissions/release/status/approve
         [HttpGet("release/{releaseId}/status/approve")]
         public Task<ActionResult<bool>> CanApproveRelease(Guid releaseId)
         {
