@@ -75,80 +75,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
         }
         
-        public static void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+        public static async void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
             Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
             params ReleaseRole[] succeedingRoles) 
             where TRequirement : IAuthorizationRequirement
         {
             GetEnumValues<ReleaseRole>().ForEach(async role =>
             {
-                var release = new Release
-                {
-                    Id = Guid.NewGuid()
-                };
-
-                var userId = Guid.NewGuid();
+                var succeeded = await RunHandleAsync(handlerSupplier, succeedingRoles, role);
                 
-                var identity = new ClaimsIdentity();
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
-                var user = new ClaimsPrincipal(identity);
-
-                // add a new UserReleaseRole for the current User and ReleaseRole
-                var rolesList = new List<UserReleaseRole>
-                {
-                    new UserReleaseRole
-                    {
-                        ReleaseId = release.Id,
-                        UserId = userId,
-                        Role = role
-                    }
-                };
-                
-                // add some roles to unrelated Users to ensure that only the current User is being
-                // taken into consideration
-                succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
-                {
-                    rolesList.Add(new UserReleaseRole
-                    {
-                        ReleaseId = release.Id,
-                        UserId = Guid.NewGuid(),
-                        Role = roleExpectedToSucceed
-                    });
-                });
-                
-                // add some roles to unrelated Releases to ensure that only the Release under test is being
-                // taken into consideration
-                succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
-                {
-                    rolesList.Add(new UserReleaseRole
-                    {
-                        ReleaseId = Guid.NewGuid(),
-                        UserId = userId,
-                        Role = roleExpectedToSucceed
-                    });
-                });
-               
-                var contentDbContext = new Mock<ContentDbContext>();
-
-                contentDbContext
-                    .Setup(s => s.UserReleaseRoles)
-                    .ReturnsDbSet(rolesList);
-                
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
-                    user, release);
-
-                await handlerSupplier(contentDbContext.Object).HandleAsync(authContext);
-
                 if (succeedingRoles.Contains(role))
                 {
-                    Assert.True(authContext.HasSucceeded, "Expected role " + role + " to have made the handler succeed"); 
+                    Assert.True(succeeded, "Expected role " + role + " to have made the handler succeed");
                 }
                 else
                 {
-                    Assert.False(authContext.HasSucceeded, "Expected role " + role + " to have made the handler fail"); 
+                    Assert.False(succeeded, "Expected role " + role + " to have made the handler fail");
                 }
             });
+            
+            var succeededWithNoRole = await RunHandleAsync(handlerSupplier, succeedingRoles, null);
+            Assert.False(succeededWithNoRole, "Expected not having a role on the Release would have made the handler fail");
+        }
+
+        private static async Task<bool> RunHandleAsync<TRequirement>(
+            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier, 
+            ReleaseRole[] succeedingRoles,
+            ReleaseRole? currentRoleUnderTest) where TRequirement : IAuthorizationRequirement
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var userId = Guid.NewGuid();
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+            var user = new ClaimsPrincipal(identity);
+
+            var rolesList = new List<UserReleaseRole>();
+
+            if (currentRoleUnderTest.HasValue)
+            {
+                // add a new UserReleaseRole for the current User and ReleaseRole
+                rolesList.Add(new UserReleaseRole
+                {
+                    ReleaseId = release.Id,
+                    UserId = userId,
+                    Role = currentRoleUnderTest.Value
+                });
+            }
+
+            // add some roles to unrelated Users to ensure that only the current User is being
+            // taken into consideration
+            succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
+            {
+                rolesList.Add(new UserReleaseRole
+                {
+                    ReleaseId = release.Id,
+                    UserId = Guid.NewGuid(),
+                    Role = roleExpectedToSucceed
+                });
+            });
+
+            // add some roles to unrelated Releases to ensure that only the Release under test is being
+            // taken into consideration
+            succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
+            {
+                rolesList.Add(new UserReleaseRole
+                {
+                    ReleaseId = Guid.NewGuid(),
+                    UserId = userId,
+                    Role = roleExpectedToSucceed
+                });
+            });
+
+            var contentDbContext = new Mock<ContentDbContext>();
+
+            contentDbContext
+                .Setup(s => s.UserReleaseRoles)
+                .ReturnsDbSet(rolesList);
+
+            var authContext = new AuthorizationHandlerContext(
+                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                user, release);
+
+            await handlerSupplier(contentDbContext.Object).HandleAsync(authContext);
+
+            return authContext.HasSucceeded;
         }
     }
 }

@@ -24,5 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
         }
+
+        public static TEnum[] GetEnumValuesAsArray<TEnum>()
+        {
+            return GetEnumValues<TEnum>().ToArray();
+        }
     }
 }
