@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
@@ -6,21 +8,21 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Per
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class ApproveSpecificReleaseAuthorizationHandlersTests
+    public class MarkSpecificReleaseAsDraftAuthorizationHandlersTests
     {
         [Fact]
-        public void ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler()
+        public void MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler()
         {
             AssertHandlerSucceedsWithCorrectClaims(
-                new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(), ApproveAllReleases);
+                new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
         }
         
         [Fact]
-        public void ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler()
+        public void MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler()
         {
             AssertHandlerSucceedsWithCorrectReleaseRoles(
-                contentDbContext => new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(contentDbContext), 
-                ReleaseRole.Approver);
+                contentDbContext => new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(contentDbContext),
+                Enum.GetValues(typeof(ReleaseRole)).Cast<ReleaseRole>().ToArray());
         }
     }
 }

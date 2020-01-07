@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -17,6 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             throw new ArgumentException("The value '" + value + "' is not supported.");
+        }
+
+        public static List<TEnum> GetEnumValues<TEnum>()
+        {
+            return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
         }
     }
 }

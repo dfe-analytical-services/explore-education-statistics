@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class MarkReleaseAsDraftRequirement : IAuthorizationRequirement
+    public class MarkSpecificReleaseAsDraftRequirement : IAuthorizationRequirement
     {}
     
     public class MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler : HasClaimAuthorizationHandler<
-        MarkReleaseAsDraftRequirement>
+        MarkSpecificReleaseAsDraftRequirement>
     {
         public MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler() 
             : base(SecurityClaimTypes.MarkAllReleasesAsDraft) {}
     }
 
     public class MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<MarkReleaseAsDraftRequirement>
+        : HasRoleOnReleaseAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement>
     {
         public MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(ContentDbContext context) : base(context)
         {}

@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
                 // does this user have permission to mark a specific Release as a Draft?
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
-                    policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
+                    policy.Requirements.Add(new MarkSpecificReleaseAsDraftRequirement()));
 
                 // does this user have permission to submit a specific Release to Higher Review?
                 options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>

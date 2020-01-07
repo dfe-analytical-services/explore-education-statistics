@@ -1,20 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -47,6 +45,110 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.NotNull(result);
             Assert.True(result.IsLeft);
             Assert.IsAssignableFrom<ForbidResult>(result.Left);
+        }
+
+        public static void AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
+            AuthorizationHandler<TRequirement> handler, 
+            params SecurityClaimTypes[] succeedingClaims) 
+            where TRequirement : IAuthorizationRequirement
+        {
+            GetEnumValues<SecurityClaimTypes>().ForEach(async claim =>
+            {
+                var identity = new ClaimsIdentity();
+                identity.AddClaim(new Claim(claim.ToString(), ""));
+                var user = new ClaimsPrincipal(identity);
+
+                var authContext = new AuthorizationHandlerContext(
+                    new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                    user, new Release());
+
+                await handler.HandleAsync(authContext);
+
+                if (succeedingClaims.Contains(claim))
+                {
+                    Assert.True(authContext.HasSucceeded, "Expected claim " + claim + " to have made the handler succeed"); 
+                }
+                else
+                {
+                    Assert.False(authContext.HasSucceeded, "Expected claim " + claim + " to have made the handler fail"); 
+                }
+            });
+        }
+        
+        public static void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            params ReleaseRole[] succeedingRoles) 
+            where TRequirement : IAuthorizationRequirement
+        {
+            GetEnumValues<ReleaseRole>().ForEach(async role =>
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var userId = Guid.NewGuid();
+                
+                var identity = new ClaimsIdentity();
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+                var user = new ClaimsPrincipal(identity);
+
+                // add a new UserReleaseRole for the current User and ReleaseRole
+                var rolesList = new List<UserReleaseRole>
+                {
+                    new UserReleaseRole
+                    {
+                        ReleaseId = release.Id,
+                        UserId = userId,
+                        Role = role
+                    }
+                };
+                
+                // add some roles to unrelated Users to ensure that only the current User is being
+                // taken into consideration
+                succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
+                {
+                    rolesList.Add(new UserReleaseRole
+                    {
+                        ReleaseId = release.Id,
+                        UserId = Guid.NewGuid(),
+                        Role = roleExpectedToSucceed
+                    });
+                });
+                
+                // add some roles to unrelated Releases to ensure that only the Release under test is being
+                // taken into consideration
+                succeedingRoles.ToList().ForEach(roleExpectedToSucceed =>
+                {
+                    rolesList.Add(new UserReleaseRole
+                    {
+                        ReleaseId = Guid.NewGuid(),
+                        UserId = userId,
+                        Role = roleExpectedToSucceed
+                    });
+                });
+               
+                var contentDbContext = new Mock<ContentDbContext>();
+
+                contentDbContext
+                    .Setup(s => s.UserReleaseRoles)
+                    .ReturnsDbSet(rolesList);
+                
+                var authContext = new AuthorizationHandlerContext(
+                    new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                    user, release);
+
+                await handlerSupplier(contentDbContext.Object).HandleAsync(authContext);
+
+                if (succeedingRoles.Contains(role))
+                {
+                    Assert.True(authContext.HasSucceeded, "Expected role " + role + " to have made the handler succeed"); 
+                }
+                else
+                {
+                    Assert.False(authContext.HasSucceeded, "Expected role " + role + " to have made the handler fail"); 
+                }
+            });
         }
     }
 }
