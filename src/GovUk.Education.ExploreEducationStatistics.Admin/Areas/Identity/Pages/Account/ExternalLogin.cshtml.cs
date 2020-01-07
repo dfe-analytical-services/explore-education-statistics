@@ -152,9 +152,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     LastName = lastName
                 };
                 var createdUserResult = await _userManager.CreateAsync(user);
+                var addedUserRoles = await _userManager.AddToRoleAsync(user, "Application User");
                 
-                if (createdUserResult.Succeeded)
+                if (createdUserResult.Succeeded && addedUserRoles.Succeeded)
                 {
+                    
                     _contentDbContext.Users.Add(new User
                     {
                         Id = new Guid(user.Id),
@@ -188,6 +190,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 }
                 
                 foreach (var error in createdUserResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                foreach (var error in addedUserRoles.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
