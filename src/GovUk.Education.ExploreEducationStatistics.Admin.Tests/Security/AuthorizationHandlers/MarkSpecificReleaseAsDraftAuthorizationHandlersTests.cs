@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             AssertHandlerSucceedsWithCorrectReleaseRoles(
                 contentDbContext => new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(contentDbContext),
-                GetEnumValuesAsArray<ReleaseRole>());
+                ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
         }
     }
 }

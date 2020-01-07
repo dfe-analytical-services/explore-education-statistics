@@ -52,6 +52,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             params SecurityClaimTypes[] succeedingClaims) 
             where TRequirement : IAuthorizationRequirement
         {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            AssertHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(handler, release, succeedingClaims);
+        }
+
+        public static void AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
+            AuthorizationHandler<TRequirement, Release> handler, 
+            Release release,
+            params SecurityClaimTypes[] succeedingClaims) 
+            where TRequirement : IAuthorizationRequirement
+        {
+            AssertHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(handler, release, succeedingClaims);
+        }
+        
+        private static void AssertHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(
+            IAuthorizationHandler handler, 
+            Release release,
+            params SecurityClaimTypes[] succeedingClaims) 
+            where TRequirement : IAuthorizationRequirement
+        {
             GetEnumValues<SecurityClaimTypes>().ForEach(async claim =>
             {
                 var identity = new ClaimsIdentity();
@@ -60,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
-                    user, new Release());
+                    user, release);
 
                 await handler.HandleAsync(authContext);
 
@@ -74,15 +97,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             });
         }
-        
-        public static async void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+
+        public static void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
             Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            params ReleaseRole[] succeedingRoles)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            AssertHandlerSucceedsWithCorrectReleaseRolesInternal(handlerSupplier, release, succeedingRoles);
+        }
+
+        public static void AssertHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            Release release, 
+            params ReleaseRole[] succeedingRoles)
+            where TRequirement : IAuthorizationRequirement
+        {
+            AssertHandlerSucceedsWithCorrectReleaseRolesInternal(handlerSupplier, release, succeedingRoles);
+        }
+
+        private static async void AssertHandlerSucceedsWithCorrectReleaseRolesInternal<TRequirement>(
+            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            Release release,
             params ReleaseRole[] succeedingRoles) 
             where TRequirement : IAuthorizationRequirement
         {
             GetEnumValues<ReleaseRole>().ForEach(async role =>
             {
-                var succeeded = await RunHandleAsync(handlerSupplier, succeedingRoles, role);
+                var succeeded = await RunHandleAsync(handlerSupplier, release, succeedingRoles, role);
                 
                 if (succeedingRoles.Contains(role))
                 {
@@ -94,19 +140,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             });
             
-            var succeededWithNoRole = await RunHandleAsync(handlerSupplier, succeedingRoles, null);
+            var succeededWithNoRole = await RunHandleAsync(handlerSupplier, release, succeedingRoles, null);
             Assert.False(succeededWithNoRole, "Expected not having a role on the Release would have made the handler fail");
         }
 
         private static async Task<bool> RunHandleAsync<TRequirement>(
             Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier, 
+            Release release,
             ReleaseRole[] succeedingRoles,
             ReleaseRole? currentRoleUnderTest) where TRequirement : IAuthorizationRequirement
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
 
             var userId = Guid.NewGuid();
 

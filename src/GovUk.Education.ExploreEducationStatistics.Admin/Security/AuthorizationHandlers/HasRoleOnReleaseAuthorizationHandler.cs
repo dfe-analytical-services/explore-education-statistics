@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class ReleaseAndRolesAuthorizationContext
     {
-        public ReleaseAndRolesAuthorizationContext(Release release, List<UserReleaseRole> roles)
+        public ReleaseAndRolesAuthorizationContext(Release release, List<ReleaseRole> roles)
         {
             Release = release;
             Roles = roles;
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         public Release Release { get; set; }
 
-        public List<UserReleaseRole> Roles { get; set; }
+        public List<ReleaseRole> Roles { get; set; }
     }
     
     public abstract class HasRoleOnReleaseAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, Release> 
@@ -44,8 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .UserReleaseRoles
                 .Where(r => r.ReleaseId == release.Id && r.UserId == userId)
                 .ToListAsync();
-        
-            if (releaseRoles.Any() && (_roleTest == null || _roleTest.Invoke(new ReleaseAndRolesAuthorizationContext(release, releaseRoles)))) 
+
+            var ctx =
+                new ReleaseAndRolesAuthorizationContext(release, releaseRoles.Select(r => r.Role).ToList());
+            
+            if (releaseRoles.Any() && (_roleTest == null || _roleTest.Invoke(ctx))) 
             {
                 authContext.Succeed(requirement);    
             }

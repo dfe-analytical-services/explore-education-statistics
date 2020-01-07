@@ -3,6 +3,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -25,19 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler
         : HasRoleOnReleaseAuthorizationHandler<UpdateSpecificReleaseRequirement>
     {
-        private static readonly List<ReleaseRole> EditorRoles = new List<ReleaseRole>
-        {
-            ReleaseRole.Contributor,
-            ReleaseRole.Approver,
-            ReleaseRole.Lead
-        };
-        
         public UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx =>
-            {
-                return ctx.Release.Status != ReleaseStatus.Approved && 
-                       EditorRoles.Intersect(ctx.Roles.Select(r => r.Role)).Any();
-            })
+            : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
         {}
     }
 }

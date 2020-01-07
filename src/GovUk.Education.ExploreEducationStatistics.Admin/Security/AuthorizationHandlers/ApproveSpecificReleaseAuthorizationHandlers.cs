@@ -2,6 +2,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -19,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : HasRoleOnReleaseAuthorizationHandler<ApproveSpecificReleaseRequirement>
     {
         public ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ctx.Roles.Any(role => role.Role == ReleaseRole.Approver))
+            : base(context, ctx => ContainsApproverRole(ctx.Roles))
         {}
     }
 }
