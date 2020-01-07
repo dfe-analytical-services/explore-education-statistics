@@ -134,10 +134,19 @@ const Comments = ({
           className="govuk-!-margin-bottom-1 govuk-body-s"
           onToggle={isOpen => {
             if (ref.current) {
+              const section = document.getElementById(
+                `content-section-${contentBlockId}`,
+              );
               if (isOpen) {
                 ref.current.classList.add(styles.top);
+                if (section) {
+                  section.classList.add(styles.minCommentHeight);
+                }
               } else {
                 ref.current.classList.remove(styles.top);
+                if (section) {
+                  section.classList.remove(styles.minCommentHeight);
+                }
               }
             }
           }}
