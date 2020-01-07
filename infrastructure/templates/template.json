@@ -1084,6 +1084,10 @@
             {
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
+            },
+            {
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
             }
           ],
           "ipRules": [
