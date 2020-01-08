@@ -47,22 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             _usersAndRolesDbContext = usersAndRolesDbContext;
         }
 
-        [BindProperty] public InputModel Input { get; set; }
-
-        public string LoginProvider { get; set; }
-
         public string ReturnUrl { get; set; }
 
         [TempData] public string ErrorMessage { get; set; }
 
-        public class InputModel
-        {
-            [Required] [EmailAddress] public string Email { get; set; }
-
-            [Required] public string FirstName { get; set; }
-
-            [Required] public string LastName { get; set; }
-        }
 
         public IActionResult OnGetAsync()
         {
@@ -194,10 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 }
             }
 
-
-            // TODO: Show error page rather than registration (leaving this default as fallback)
             ReturnUrl = returnUrl;
-            LoginProvider = info.LoginProvider;
 
             return Page();
         }
