@@ -2,8 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.ReleaseAuthorizationHandlersTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -12,14 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler()
         {
-            AssertHandlerSucceedsWithCorrectClaims(
+            AssertReleaseHandlerSucceedsWithCorrectClaims(
                 new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(), SubmitAllReleasesToHigherReview);
         }
         
         [Fact]
         public void SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler()
         {
-            AssertHandlerSucceedsWithCorrectReleaseRoles(
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
                 contentDbContext => new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
         }

@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
+using Xunit.Sdk;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -13,29 +15,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Status = ReleaseStatus.Draft
-            };
-            
-            AssertHandlerSucceedsWithCorrectClaims(
-                new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release, UpdateAllReleases);
+            AssertReleaseHandlerSucceedsWithCorrectClaimsWithCorrectReleaseStatuses(
+                ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview);
         }
         
         [Fact]
         public void UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler()
         {
-            var release = new Release
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRolesWithCorrectReleaseStatuses(
+                ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview);
+        }
+
+        private void AssertReleaseHandlerSucceedsWithCorrectClaimsWithCorrectReleaseStatuses(params ReleaseStatus[] succeedingStatuses)
+        {
+            GetEnumValues<ReleaseStatus>().ForEach(status =>
             {
-                Id = Guid.NewGuid(),
-                Status = ReleaseStatus.Draft
-            };
-            
-            AssertHandlerSucceedsWithCorrectReleaseRoles(
-                contentDbContext => new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(contentDbContext),
-                release,
-                ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Status = status
+                };
+
+                if (succeedingStatuses.Contains(status))
+                {
+                    AssertReleaseHandlerSucceedsWithCorrectClaims(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release, UpdateAllReleases);
+                }
+                else
+                {
+                    AssertReleaseHandlerSucceedsWithCorrectClaims(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release);
+                }
+            });
+        }
+
+        private void AssertReleaseHandlerSucceedsWithCorrectReleaseRolesWithCorrectReleaseStatuses(params ReleaseStatus[] succeedingStatuses)
+        {
+            GetEnumValues<ReleaseStatus>().ForEach(status =>
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Status = status
+                };
+
+                if (succeedingStatuses.Contains(status))
+                {
+                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+                        contentDbContext => new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(contentDbContext),
+                        release,
+                        ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
+                }
+                else
+                {
+                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+                        contentDbContext => new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(contentDbContext),
+                        release);
+                }
+            });
         }
     }
 }

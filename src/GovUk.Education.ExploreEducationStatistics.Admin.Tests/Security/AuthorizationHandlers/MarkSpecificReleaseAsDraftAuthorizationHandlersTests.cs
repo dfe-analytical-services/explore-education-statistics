@@ -2,8 +2,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler()
         {
-            AssertHandlerSucceedsWithCorrectClaims(
+            AssertReleaseHandlerSucceedsWithCorrectClaims(
                 new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
         }
         
         [Fact]
         public void MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler()
         {
-            AssertHandlerSucceedsWithCorrectReleaseRoles(
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
                 contentDbContext => new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
         }
