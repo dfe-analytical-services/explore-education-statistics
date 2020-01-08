@@ -121,7 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         EntityNotFound,
         ReleaseNotFound,
         ReleaseNoteNotFound,
-        RelatedInformationItemNotFound,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
