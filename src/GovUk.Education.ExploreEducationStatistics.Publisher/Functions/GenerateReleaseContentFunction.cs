@@ -32,11 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                await _contentService.UpdateDownloadTree();
-                await _contentService.UpdatePublicationTree();
-                await _contentService.UpdateMethodologyTree();
-                await _contentService.UpdatePublicationsAndReleases();
-                await _contentService.UpdateMethodologies();
+                await _contentService.UpdateContentAsync(message.ReleaseId);
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)
@@ -50,12 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage)
         {
-            // TODO EES-861 ReleaseId is currently optional because we allow using the message to initiate a full content refresh
-            if (message.ReleaseId.HasValue && message.ReleaseStatusId.HasValue)
-            {
-                await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId.Value,
-                    message.ReleaseStatusId.Value, stage);
-            }
+            await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
     }
 }

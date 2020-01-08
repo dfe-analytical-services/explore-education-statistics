@@ -8,54 +8,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         public const string BatchesDir = "batches";
 
-        private static string PublicContentDownloadPath()
+        public static string PublicContentStagingPath()
         {
-            return "download";
+            return "staging";
         }
         
-        private static string PublicContentMethodologyPath()
+        private static string PublicContentDownloadPath(string prefix = null)
         {
-            return "methodology";
+            return $"{AppendPathSeparator(prefix)}download";
         }
         
-        private static string PublicContentPublicationsPath()
+        private static string PublicContentMethodologiesPath(string prefix = null)
         {
-            return "publications";
-        }
-
-        public static string PublicContentDownloadTreePath()
-        {
-            return $"{PublicContentDownloadPath()}/tree.json";
-        }
-
-        public static string PublicContentMethodologyTreePath()
-        {
-            return $"{PublicContentMethodologyPath()}/tree.json";
-        }
-
-        public static string PublicContentPublicationsTreePath()
-        {
-            return $"{PublicContentPublicationsPath()}/tree.json";
-        }
-
-        public static string PublicContentMethodologyPath(string slug)
-        {
-            return $"{PublicContentMethodologyPath()}/methodologies/{slug}.json";
-        }
-
-        public static string PublicContentPublicationPath(string slug)
-        {
-            return $"{PublicContentPublicationsPath()}/{slug}/publication.json";
-        }
-
-        public static string PublicContentLatestReleasePath(string slug)
-        {
-            return $"{PublicContentPublicationsPath()}/{slug}/latest-release.json";
+            return $"{AppendPathSeparator(prefix)}methodology";
         }
         
-        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug)
+        private static string PublicContentPublicationsPath(string prefix = null)
         {
-            return $"{PublicContentPublicationsPath()}/{publicationSlug}/releases/{releaseSlug}.json";
+            return $"{AppendPathSeparator(prefix)}publications";
+        }
+
+        public static string PublicContentDownloadTreePath(string prefix = null)
+        {
+            return $"{PublicContentDownloadPath(prefix)}/tree.json";
+        }
+
+        public static string PublicContentMethodologyTreePath(string prefix = null)
+        {
+            return $"{PublicContentMethodologiesPath(prefix)}/tree.json";
+        }
+
+        public static string PublicContentPublicationsTreePath(string prefix = null)
+        {
+            return $"{PublicContentPublicationsPath(prefix)}/tree.json";
+        }
+
+        public static string PublicContentMethodologyPath(string slug, string prefix = null)
+        {
+            return $"{PublicContentMethodologiesPath(prefix)}/methodologies/{slug}.json";
+        }
+
+        public static string PublicContentPublicationPath(string slug, string prefix = null)
+        {
+            return $"{PublicContentPublicationsPath(prefix)}/{slug}/publication.json";
+        }
+
+        public static string PublicContentLatestReleasePath(string slug, string prefix = null)
+        {
+            return $"{PublicContentPublicationsPath(prefix)}/{slug}/latest-release.json";
+        }
+        
+        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, string prefix = null)
+        {
+            return $"{PublicContentPublicationsPath(prefix)}/{publicationSlug}/releases/{releaseSlug}.json";
         }
 
         /**
@@ -141,6 +146,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
         {
             return $"{publicationSlug}/{releaseSlug}/";
+        }
+        
+        private static string AppendPathSeparator(string segment = null)
+        {
+            return segment == null ? "" : segment + "/";
         }
     }
 }

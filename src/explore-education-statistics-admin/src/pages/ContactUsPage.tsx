@@ -3,7 +3,10 @@ import React from 'react';
 
 function ContactUsPage() {
   return (
-    <Page pageTitle="Contact explore education statistics">
+    <Page
+      pageTitle="Contact explore education statistics"
+      breadcrumbs={[{ name: 'Contact' }]}
+    >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <section>

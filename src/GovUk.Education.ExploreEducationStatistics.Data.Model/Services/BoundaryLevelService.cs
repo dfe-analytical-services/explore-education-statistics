@@ -33,9 +33,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public BoundaryLevel FindLatestByGeographicLevel(GeographicLevel geographicLevel)
         {
-            return FindMany(level => level.Level == geographicLevel)
+            var boundaryLevel = FindMany(level => level.Level == geographicLevel)
                 .OrderByDescending(level => level.Published)
-                .First();
+                .FirstOrDefault();
+
+            if (boundaryLevel == null)
+            {
+                throw new ArgumentException($"Boundary Level does not exist for geographic level {geographicLevel}",
+                    nameof(geographicLevel));
+            }
+
+            return boundaryLevel;
         }
 
         public IEnumerable<BoundaryLevel> FindRelatedByBoundaryLevel(long boundaryLevelId)
