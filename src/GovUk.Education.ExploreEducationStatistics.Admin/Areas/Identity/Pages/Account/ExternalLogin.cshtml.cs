@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     LastName = lastName
                 };
                 var createdUserResult = await _userManager.CreateAsync(user);
-                
+
                 // TODO: For now we just assign invited users the default role
                 var addedUserRoles = await _userManager.AddToRoleAsync(user, "Application User");
 
@@ -168,14 +168,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                     await _contentDbContext.SaveChangesAsync();
 
+
                     createdUserResult = await _userManager.AddLoginAsync(user, info);
                     if (createdUserResult.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider); 
-                        
-                        // TODO: Flag invite as accepted
-                        
+                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+
+                        invite.Accepted = true;
+                        _usersAndRolesDbContext.UserInvites.Update(invite);
+                        await _usersAndRolesDbContext.SaveChangesAsync();
+
                         return LocalRedirect(returnUrl);
                     }
                 }
