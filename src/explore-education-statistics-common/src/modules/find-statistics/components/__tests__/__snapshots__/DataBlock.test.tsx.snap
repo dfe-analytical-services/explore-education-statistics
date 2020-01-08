@@ -9,6 +9,13 @@ exports[`DataBlock renders map instead of chart 1`] = `
   tabindex="-1"
 >
   
+  <a
+    aria-live="assertive"
+    class="govuk-visually-hidden"
+    href="#test-datablock-tables"
+  >
+    If you are using a keyboard or a screen reader you may wish to view the accessible table instead. Press enter to switch to the data tables tab.
+  </a>
   <form>
     <div
       class="govuk-form-group"
