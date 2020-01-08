@@ -1083,28 +1083,28 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('deploySubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "id": "[variables('importerSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": [
-        //   ],
-        //   "defaultAction": "Deny"
-        // }
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('deploySubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": [
+          ],
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
