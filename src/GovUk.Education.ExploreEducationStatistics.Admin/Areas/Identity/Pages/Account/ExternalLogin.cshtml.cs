@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // Check if the user is invited
             var invite = await _usersAndRolesDbContext.UserInvites
                 .FirstOrDefaultAsync(i =>
-                    string.Equals(i.Email, email, StringComparison.CurrentCultureIgnoreCase)
+                    i.Email.ToLower() == email.ToLower()
                     && i.Accepted == false);
 
             // If the user has a invite register them automatically
@@ -152,11 +152,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     LastName = lastName
                 };
                 var createdUserResult = await _userManager.CreateAsync(user);
-                var addedUserRoles = await _userManager.AddToRoleAsync(user, "Application User");
                 
+                // TODO: For now we just assign invited users the default role
+                var addedUserRoles = await _userManager.AddToRoleAsync(user, "Application User");
+
                 if (createdUserResult.Succeeded && addedUserRoles.Succeeded)
                 {
-                    
                     _contentDbContext.Users.Add(new User
                     {
                         Id = new Guid(user.Id),
@@ -171,28 +172,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     if (createdUserResult.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new {area = "Identity", userId = userId, code = code},
-                            protocol: Request.Scheme);
-
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
+                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider); 
+                        
+                        // TODO: Flag invite as accepted
+                        
                         return LocalRedirect(returnUrl);
                     }
                 }
-                
+
                 foreach (var error in createdUserResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+
                 foreach (var error in addedUserRoles.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -204,12 +196,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             ReturnUrl = returnUrl;
             LoginProvider = info.LoginProvider;
 
-            Input = new InputModel
-            {
-                Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                FirstName = firstName,
-                LastName = lastName
-            };
             return Page();
         }
 
@@ -218,9 +204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         {
             returnUrl = returnUrl ?? Url.Content("~/");
 
-            // This method should no longer be used, return user to login page if its hit
+            // This method should no longer be used but just incase return user to login page if its hit
             return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
-
         }
     }
 }
