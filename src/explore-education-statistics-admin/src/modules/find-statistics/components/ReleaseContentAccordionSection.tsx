@@ -2,7 +2,7 @@ import { EditableContentBlock } from '@admin/services/publicationService';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import ContentBlock, {
   ReorderHook,
-} from '@admin/modules/find-statistics/components/EditableContentBlock';
+} from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';

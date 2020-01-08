@@ -5,7 +5,7 @@ import Details from '@common/components/Details';
 import classNames from 'classnames';
 import React from 'react';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
+import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import FormattedDate from '@common/components/FormattedDate';
 import styles from './Comments.module.scss';
 

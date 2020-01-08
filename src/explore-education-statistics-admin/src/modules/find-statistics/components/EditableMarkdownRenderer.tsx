@@ -4,7 +4,7 @@ import { RendererProps } from '@admin/modules/find-statistics/PublicationRelease
 import React, { useContext } from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
+import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps &

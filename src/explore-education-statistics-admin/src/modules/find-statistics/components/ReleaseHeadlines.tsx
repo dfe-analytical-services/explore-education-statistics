@@ -7,7 +7,7 @@ import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
+import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -18,40 +18,44 @@ interface Props {
 
 const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
   return (
-    <>
+    <section id="headlines">
       <h2 className="dfe-print-break-before">
         Headline facts and figures - {release.yearTitle}
       </h2>
 
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
-          {release.keyStatisticsSection &&
-            release.keyStatisticsSection.content &&
-            release.keyStatisticsSection.content.map(datablock => (
-              <DataBlock {...datablock} key={datablock.id} id="keystats" />
-            ))}
-
-          {release.headlinesSection && (
-            <ContentBlock
-              sectionId={release.headlinesSection.id}
-              publication={release.publication}
-              id={release.headlinesSection.id as string}
-              content={release.headlinesSection.content}
-              canAddSingleBlock
-              onContentChange={newContent =>
-                setRelease({
-                  ...release,
-                  headlinesSection: {
-                    ...release.headlinesSection,
-                    content: newContent,
-                  },
-                })
-              }
-            />
-          )}
+          <section id="keystats">
+            {release.keyStatisticsSection &&
+              release.keyStatisticsSection.content &&
+              release.keyStatisticsSection.content.map(datablock => (
+                <DataBlock {...datablock} key={datablock.id} id="keystats" />
+              ))}
+          </section>
+          <section id="headlines">
+            {release.headlinesSection && (
+              <ContentBlocks
+                sectionId={release.headlinesSection.id}
+                publication={release.publication}
+                id={release.headlinesSection.id as string}
+                content={release.headlinesSection.content}
+                canAddSingleBlock
+                textOnly
+                onContentChange={newContent =>
+                  setRelease({
+                    ...release,
+                    headlinesSection: {
+                      ...release.headlinesSection,
+                      content: newContent,
+                    },
+                  })
+                }
+              />
+            )}
+          </section>
         </TabsSection>
       </Tabs>
-    </>
+    </section>
   );
 };
 
