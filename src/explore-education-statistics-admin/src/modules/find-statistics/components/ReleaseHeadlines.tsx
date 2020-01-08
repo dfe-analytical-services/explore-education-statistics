@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   AbstractRelease,
   Publication,
@@ -7,22 +7,24 @@ import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import getKeyStatisticsSecondaryTabs from './KeyStatisticsSecondary';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
-  setRelease?: (
+  setRelease: (
     newRelease: AbstractRelease<EditableContentBlock, Publication>,
   ) => void;
 }
 
 const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
+  const { isEditing } = useContext(EditingContext);
   return (
     <section id="headlines">
       <h2 className="dfe-print-break-before">
         Headline facts and figures - {release.yearTitle}
       </h2>
-
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
           <section id="keystats">
@@ -54,6 +56,8 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
             )}
           </section>
         </TabsSection>
+
+        {getKeyStatisticsSecondaryTabs({ release, setRelease, isEditing })}
       </Tabs>
     </section>
   );
