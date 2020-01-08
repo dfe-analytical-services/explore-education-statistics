@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -102,13 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
          */
         private void GenerateReleaseContent()
         {
-            const string queueName = "generate-release-content";
+            const string queueName = "generate-all-content";
             try
             {
                 var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
                 var queue = QueueUtils.GetQueueReference(storageConnectionString, queueName);
 
-                var message = new GenerateReleaseContentMessage();
+                var message = new GenerateAllContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
                 
                 _logger.LogInformation($"Message added to {queueName} queue");
