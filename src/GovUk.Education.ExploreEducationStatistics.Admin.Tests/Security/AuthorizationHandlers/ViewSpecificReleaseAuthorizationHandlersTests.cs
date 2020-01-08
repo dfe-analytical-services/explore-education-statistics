@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler()
         {
+            // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
+            // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims(
                 new ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler(), AccessAllReleases);
         }
@@ -19,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler()
         {
+            // Assert that a User who has any role on a Release can view the Release
             AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
                 contentDbContext => new ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 GetEnumValuesAsArray<ReleaseRole>());

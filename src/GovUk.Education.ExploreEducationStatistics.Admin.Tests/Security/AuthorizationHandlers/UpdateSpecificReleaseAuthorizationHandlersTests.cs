@@ -15,6 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
         {
+            // Assert that any users with the "UpdateAllReleases" claim can update an arbitrary Release if it is not
+            // in Approved state
+            // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaimsWithCorrectReleaseStatuses(
                 ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview);
         }
@@ -22,6 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler()
         {
+            // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a Release can update a Release
+            // if it is not in Approved state
+            // (and no other role or Release Status)
             AssertReleaseHandlerSucceedsWithCorrectReleaseRolesWithCorrectReleaseStatuses(
                 ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview);
         }
