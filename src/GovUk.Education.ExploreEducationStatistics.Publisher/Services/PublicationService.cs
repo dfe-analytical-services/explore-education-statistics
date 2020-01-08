@@ -44,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
             return _context.Publications
-                // TODO: Only include releases that are live rather than all releases
                 .Include(p => p.Releases)
                 .ToList()
                 .Where(publication => publication.Releases.Any(release => release.Live));
