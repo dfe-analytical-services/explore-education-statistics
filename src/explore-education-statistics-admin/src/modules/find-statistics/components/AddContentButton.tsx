@@ -7,9 +7,13 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 interface AddContentButtonProps {
   onClick: (type: string, data: string) => void;
   availableDataBlocks: DataBlock[];
+  textOnly?: boolean;
 }
 
-const AddContentButton = ({ onClick }: AddContentButtonProps) => {
+const AddContentButton = ({
+  onClick,
+  textOnly = false,
+}: AddContentButtonProps) => {
   const editingContext = React.useContext(EditingContext);
 
   const { availableDataBlocks } = editingContext;
@@ -24,12 +28,14 @@ const AddContentButton = ({ onClick }: AddContentButtonProps) => {
       >
         Add HTML
       </Button>
-      <Button
-        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => setShowDataBlocks(true)}
-      >
-        Add DataBlock
-      </Button>
+      {!textOnly && (
+        <Button
+          className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
+          onClick={() => setShowDataBlocks(true)}
+        >
+          Add DataBlock
+        </Button>
+      )}
 
       {showDataBlocks && (
         <>

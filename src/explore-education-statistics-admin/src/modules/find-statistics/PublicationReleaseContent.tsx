@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -138,7 +138,7 @@ const PublicationReleaseContent = ({
           </div>
 
           {release.summarySection && (
-            <ContentBlock
+            <ContentBlocks
               sectionId={release.summarySection.id}
               publication={publication}
               id={release.summarySection.id as string}

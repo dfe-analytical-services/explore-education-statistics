@@ -211,6 +211,7 @@ const EditableContentBlock = ({
         </div>
         {(canAddBlocks || canAddSingleBlock) && (
           <AddContentButton
+            textOnly={textOnly}
             onClick={(type, data) => onAddContentCallback(type, data, 0)}
             availableDataBlocks={editingContext.availableDataBlocks}
           />
@@ -242,6 +243,7 @@ const EditableContentBlock = ({
                 <>
                   {canAddBlocks && (
                     <AddContentButton
+                      textOnly={textOnly}
                       onClick={(type, data) =>
                         onAddContentCallback(type, data, index)
                       }
@@ -284,6 +286,7 @@ const EditableContentBlock = ({
                 canAddBlocks &&
                 index === contentBlocks.length - 1 && (
                   <AddContentButton
+                    textOnly={textOnly}
                     onClick={(type, data) =>
                       onAddContentCallback(type, data, contentBlocks.length)
                     }
