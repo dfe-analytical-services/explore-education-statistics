@@ -24,6 +24,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
     type="text"
   />
   <div
+    aria-live="assertive"
     class="optionsContainer"
   >
     <div
@@ -158,6 +159,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
     type="text"
   />
   <div
+    aria-live="assertive"
     class="optionsContainer"
   >
     <div
