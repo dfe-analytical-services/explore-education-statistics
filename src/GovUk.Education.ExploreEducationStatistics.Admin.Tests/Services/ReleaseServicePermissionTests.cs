@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -148,6 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, releaseService, policies);
         }
+        
         private (
             Mock<IUserService>, 
             Mock<IPersistenceHelper<Release,Guid>>, 
@@ -155,15 +157,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ContentDbContext>,
             Mock<IReleaseRepository>) Mocks()
         {
-            var userService = new Mock<IUserService>();
-
-            var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
-
-            releaseHelper
-                .Setup(s => s.CheckEntityExistsActionResult(_release.Id, null))
-                .ReturnsAsync(new Either<ActionResult, Release>(_release));
-            
-            return (userService, releaseHelper, new Mock<IPublishingService>(), new Mock<ContentDbContext>(), 
+            return (
+                new Mock<IUserService>(), 
+                MockUtils.MockPersistenceHelper(_release.Id, _release), 
+                new Mock<IPublishingService>(), 
+                new Mock<ContentDbContext>(), 
                 new Mock<IReleaseRepository>());
         }
     }

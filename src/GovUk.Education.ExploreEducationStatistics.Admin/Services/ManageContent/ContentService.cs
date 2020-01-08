@@ -586,7 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         .Content
                         .Select(join => join.ContentSection)
                         .ToList()
-                        .Find(join => join.Id == contentSectionId);
+                        .Find(contentSection => contentSection.Id == contentSectionId);
 
                     if (section == null)
                     {

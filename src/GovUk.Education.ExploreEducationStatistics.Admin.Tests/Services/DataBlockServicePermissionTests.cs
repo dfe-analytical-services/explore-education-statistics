@@ -68,20 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPersistenceHelper<DataBlock,Guid>>,
             Mock<ContentDbContext>) Mocks()
         {
-            var userService = new Mock<IUserService>();
-
-            var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
-
-            releaseHelper
-                .Setup(s => s.CheckEntityExistsActionResult(_release.Id, null))
-                .ReturnsAsync(new Either<ActionResult, Release>(_release));
-
-            var dataBlockHelper = new Mock<IPersistenceHelper<DataBlock, Guid>>();
-
-            dataBlockHelper
-                .Setup(s => s.CheckEntityExistsActionResult(_dataBlock.Id, null))
-                .ReturnsAsync(new Either<ActionResult, DataBlock>(_dataBlock));
-
             var contentDbContext = new Mock<ContentDbContext>();
 
             var releaseContentBlocks = new List<ReleaseContentBlock>
@@ -97,7 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.ReleaseContentBlocks)
                 .ReturnsDbSet(releaseContentBlocks);
             
-            return (userService, releaseHelper, dataBlockHelper, contentDbContext);
+            return (
+                new Mock<IUserService>(), 
+                MockUtils.MockPersistenceHelper(_release.Id, _release), 
+                MockUtils.MockPersistenceHelper(_dataBlock.Id, _dataBlock), 
+                contentDbContext);
         }
     }
 }

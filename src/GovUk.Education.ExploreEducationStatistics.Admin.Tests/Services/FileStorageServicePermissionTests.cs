@@ -92,15 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>, 
             Mock<IPersistenceHelper<Release,Guid>>) Mocks()
         {
-            var userService = new Mock<IUserService>();
-
-            var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
-
-            releaseHelper
-                .Setup(s => s.CheckEntityExistsActionResult(_release.Id, null))
-                .ReturnsAsync(new Either<ActionResult, Release>(_release));
-
-            return (new Mock<IConfiguration>(), new Mock<ISubjectService>(), userService, releaseHelper);
+            return (
+                new Mock<IConfiguration>(), 
+                new Mock<ISubjectService>(), 
+                new Mock<IUserService>(), 
+                MockUtils.MockPersistenceHelper(_release.Id, _release));
         }
     }
 }
