@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
             // (and no other claim allows this)
-            AssertReleaseHandlerSucceedsWithCorrectClaims(
+            AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
                 new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(), SubmitAllReleasesToHigherReview);
         }
         
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a Release can submit the Release
             // to higher review
             // (and no other role)
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<SubmitSpecificReleaseToHigherReviewRequirement>(
                 contentDbContext => new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
         }

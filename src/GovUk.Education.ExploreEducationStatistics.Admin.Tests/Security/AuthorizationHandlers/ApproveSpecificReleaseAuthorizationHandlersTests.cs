@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             // Assert that any users with the "ApproveAllReleases" claim can approve an arbitrary Release
             // (and no other claim allows this)
-            AssertReleaseHandlerSucceedsWithCorrectClaims(
+            AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
                 new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(), ApproveAllReleases);
         }
         
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             // Assert that a User who has the "Approver" role on a Release can approve the Release
             // (and no other role)
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ApproveSpecificReleaseRequirement>(
                 contentDbContext => new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(contentDbContext), 
                 ReleaseRole.Approver);
         }

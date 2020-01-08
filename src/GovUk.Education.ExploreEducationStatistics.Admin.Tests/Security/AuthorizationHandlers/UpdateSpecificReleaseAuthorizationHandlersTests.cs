@@ -3,7 +3,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
-using Xunit.Sdk;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
@@ -44,11 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 if (succeedingStatuses.Contains(status))
                 {
-                    AssertReleaseHandlerSucceedsWithCorrectClaims(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release, UpdateAllReleases);
+                    AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
+                        new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release, UpdateAllReleases);
                 }
                 else
                 {
-                    AssertReleaseHandlerSucceedsWithCorrectClaims(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release);
+                    AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release);
                 }
             });
         }
@@ -65,14 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 if (succeedingStatuses.Contains(status))
                 {
-                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseRequirement>(
                         contentDbContext => new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(contentDbContext),
                         release,
                         ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
                 }
                 else
                 {
-                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+                    AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseRequirement>(
                         contentDbContext => new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(contentDbContext),
                         release);
                 }

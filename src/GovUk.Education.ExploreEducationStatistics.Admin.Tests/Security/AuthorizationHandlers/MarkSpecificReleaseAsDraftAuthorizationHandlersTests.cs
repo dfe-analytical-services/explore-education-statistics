@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             // Assert that any users with the "MarkAllReleasesAsDraft" claim can mark an arbitrary Release as draft
             // (and no other claim allows this)
-            AssertReleaseHandlerSucceedsWithCorrectClaims(
+            AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
                 new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
         }
         
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a Release can mark the Release
             // as Draft
             // (and no other role)
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles(
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MarkSpecificReleaseAsDraftRequirement>(
                 contentDbContext => new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
         }

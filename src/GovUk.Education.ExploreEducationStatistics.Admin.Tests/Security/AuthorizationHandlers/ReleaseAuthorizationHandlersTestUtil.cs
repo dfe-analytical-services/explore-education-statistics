@@ -15,8 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 {
     public static class ReleaseAuthorizationHandlersTestUtil
     {
+        /**
+         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and fails otherwise
+         */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            AuthorizationHandler<TRequirement> handler, 
+            IAuthorizationHandler handler, 
             params SecurityClaimTypes[] claimsExpectedToSucceed) 
             where TRequirement : IAuthorizationRequirement
         {
@@ -25,19 +28,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Id = Guid.NewGuid()
             };
             
-            AssertReleaseHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(handler, release, claimsExpectedToSucceed);
+            AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(handler, release, claimsExpectedToSucceed);
         }
 
+        /**
+         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and fails otherwise
+         */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            AuthorizationHandler<TRequirement, Release> handler, 
-            Release release,
-            params SecurityClaimTypes[] claimsExpectedToSucceed) 
-            where TRequirement : IAuthorizationRequirement
-        {
-            AssertReleaseHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(handler, release, claimsExpectedToSucceed);
-        }
-        
-        private static void AssertReleaseHandlerSucceedsWithCorrectClaimsInternal<TRequirement>(
             IAuthorizationHandler handler, 
             Release release,
             params SecurityClaimTypes[] claimsExpectedToSucceed) 
@@ -82,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             params ReleaseRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
@@ -91,22 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Id = Guid.NewGuid()
             };
             
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRolesScenarios<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
         }
 
         public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-            Func<ContentDbContext, AuthorizationHandler<TRequirement, Release>> handlerSupplier,
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             Release release, 
             params ReleaseRole[] rolesExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRolesScenarios<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
-        }
-
-        private static void AssertReleaseHandlerSucceedsWithCorrectReleaseRolesScenarios<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release,
-            params ReleaseRole[] rolesExpectedToSucceed) 
             where TRequirement : IAuthorizationRequirement
         {
             var inTeamScenarios = CreateUserInProductionTeamScenarios(release, rolesExpectedToSucceed);
