@@ -66,9 +66,14 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       >
         {headingTitle && createElement(headingTag, { children: headingTitle })}
         {title === 'Charts' && (
-          <a href={`#${datablockId}-tables`} aria-live="assertive">
-            If you are using a keyboard select this link for a accessible table
-            view
+          <a
+            className="govuk-visually-hidden"
+            href={`#${datablockId}-tables`}
+            aria-live="assertive"
+          >
+            If you are using a keyboard or a screen reader you may wish to view
+            the accessible table instead. Press enter to switch to the data
+            tables tab.
           </a>
         )}
         {children}
