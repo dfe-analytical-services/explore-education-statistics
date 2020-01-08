@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 var createdUserResult = await _userManager.CreateAsync(user);
 
                 // TODO: For now we just assign invited users the default role
-                var addedUserRoles = await _userManager.AddToRoleAsync(user, "Application User");
+                var addedUserRoles = await _userManager.AddToRoleAsync(user, "BAU User");
 
                 if (createdUserResult.Succeeded && addedUserRoles.Succeeded)
                 {
