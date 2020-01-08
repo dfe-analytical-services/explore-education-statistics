@@ -16,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public static class ReleaseAuthorizationHandlersTestUtil
     {
         /**
-         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and fails otherwise
+         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed" and is tested
+         * against an arbitrary Release, and fails otherwise
          */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
             IAuthorizationHandler handler, 
@@ -32,7 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         /**
-         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and fails otherwise
+         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and is tested
+         * against the supplied Release, and fails otherwise
          */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
             IAuthorizationHandler handler, 
@@ -57,6 +59,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             scenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
         }
 
+        /**
+         * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on an arbitrary
+         * Release, and fails otherwise
+         */
+        public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            params ReleaseRole[] rolesExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
+        }
+
+        /**
+         * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on the supplied
+         * Release, and fails otherwise
+         */
+        public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            Release release, 
+            params ReleaseRole[] rolesExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var inTeamScenarios = CreateUserInProductionTeamScenarios(release, rolesExpectedToSucceed);
+            var notInTeamScenario = CreateUserNotInProductionTeamScenario(release, rolesExpectedToSucceed);
+            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
+            allScenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+        }
+
         private static async void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
             IAuthorizationHandler handler, 
             ReleaseHandlerTestScenario scenario) 
@@ -76,31 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Assert.False(authContext.HasSucceeded, scenario.UnexpectedPassMessage); 
             }
-        }
-
-        public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params ReleaseRole[] rolesExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-            
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
-        }
-
-        public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release, 
-            params ReleaseRole[] rolesExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var inTeamScenarios = CreateUserInProductionTeamScenarios(release, rolesExpectedToSucceed);
-            var notInTeamScenario = CreateUserNotInProductionTeamScenario(release, rolesExpectedToSucceed);
-            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
-            allScenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
         private static ReleaseHandlerTestScenario CreateUserNotInProductionTeamScenario(Release release,
@@ -203,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return scenarios;
         }
 
-        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
+        private static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
         {
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
