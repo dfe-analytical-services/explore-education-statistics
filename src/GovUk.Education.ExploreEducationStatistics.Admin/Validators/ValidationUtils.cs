@@ -80,11 +80,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
         // rename this to "ValidationResult"
-        public static BadRequestObjectResult ValidationActionResult(ValidationErrorMessages message)
+        public static ActionResult ValidationActionResult(ValidationErrorMessages message)
         {
             ModelStateDictionary errors = new ModelStateDictionary();
             errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
             return new BadRequestObjectResult(new ValidationProblemDetails(errors));
+        }
+
+        // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
+        // rename this to "ValidationResult"
+        public static Either<ActionResult, T> ValidationActionResult<T>(ValidationErrorMessages message)
+        {
+            return ValidationActionResult(message);
+        }
+
+        public static Either<ActionResult, T> NotFound<T>()
+        {
+            return new NotFoundResult();
         }
     }
 

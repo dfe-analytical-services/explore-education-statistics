@@ -7,59 +7,59 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
 {
-    // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IContentService
     {
-        Task<Either<ValidationResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
             Guid releaseId);
 
-        Task<Either<ValidationResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder);
         
-        Task<Either<ValidationResult, ContentSectionViewModel>> AddContentSectionAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
             Guid releaseId, AddContentSectionRequest? request);
 
-        Task<Either<ValidationResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
             Guid releaseId, Guid contentSectionId, string newHeading);
 
-        Task<Either<ValidationResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ValidationResult, ContentSectionViewModel>> GetContentSectionAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(
             Guid releaseId, Guid contentSectionId);
         
-        Task<Either<ValidationResult, List<IContentBlock>>> ReorderContentBlocksAsync(
+        Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid,int> newBlocksOrder);
         
-        Task<Either<ValidationResult, IContentBlock>> AddContentBlockAsync(
+        Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(
             Guid releaseId, Guid contentSectionId,
             AddContentBlockRequest request);
         
-        Task<Either<ValidationResult, List<IContentBlock>>> RemoveContentBlockAsync(
+        Task<Either<ActionResult, List<IContentBlock>>> RemoveContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
         
-        Task<Either<ValidationResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
+        Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request);
         
-        Task<Either<ValidationResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
+        Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
             where T : IContentBlock;
         
-        Task<Either<ValidationResult, IContentBlock>> AttachContentBlockAsync(
+        Task<Either<ActionResult, IContentBlock>> AttachContentBlockAsync(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request);
 
-        Task<Either<ValidationResult, List<CommentViewModel>>> GetCommentsAsync(
+        Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
         
-        Task<Either<ValidationResult, CommentViewModel>> AddCommentAsync(
+        Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment);
         
-        Task<Either<ValidationResult, CommentViewModel>> UpdateCommentAsync(
+        Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment);
         
-        Task<Either<ValidationResult, CommentViewModel>> DeleteCommentAsync(
+        Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId);
         
     }

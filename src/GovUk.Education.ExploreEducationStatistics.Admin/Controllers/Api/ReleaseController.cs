@@ -106,8 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     release.PublicationId = publicationId;
                     return _releaseService.CreateReleaseAsync(release);
                 })
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
         
         // GET api/release/{releaseId}/data
@@ -120,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // GET api/release/{releaseId}/ancillary
@@ -134,8 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // GET api/release/{releaseId}/chart
@@ -148,8 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // POST api/release/{releaseId}/ancillary
@@ -166,8 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name,
                     ReleaseFileTypes.Ancillary, false))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // POST api/release/{releaseId}/chart
@@ -183,8 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // POST api/release/{releaseId}/data
@@ -209,8 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 })
                 // add message to queue to process these files
                 .OnSuccessDo(() => _importService.Import(file.FileName, releaseId))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("releases/{releaseId}")]
@@ -232,8 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _releaseService.EditReleaseSummaryAsync(releaseId, request))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // GET api/publications/{publicationId}/releases
@@ -276,8 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 })
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // DELETE api/release/{releaseId}/ancillary/{fileName}
@@ -288,8 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         // DELETE api/release/{releaseId}/chart/{fileName}
@@ -300,8 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ =>  _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
         
         [HttpGet("releases/{releaseId}/status")]
