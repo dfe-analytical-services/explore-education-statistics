@@ -1751,7 +1751,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2018-11-01",
       "name": "[variables('importerPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -1768,16 +1768,15 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "sku": {
-        "Tier": "ElasticPremium",
-        "Name": "EP1"
+        "Tier": "Standard",
+        "Name": "S1"
       },
       "properties": {
         "name": "[variables('importerPlanName')]",
+        "workerSize": "0",
         "workerSizeId": "0",
-        "reserved": false,
         "numberOfWorkers": "1",
-        "hostingEnvironment": "",
-        "maximumElasticWorkerCount": "20"
+        "hostingEnvironment": ""
       }
     },
     {
