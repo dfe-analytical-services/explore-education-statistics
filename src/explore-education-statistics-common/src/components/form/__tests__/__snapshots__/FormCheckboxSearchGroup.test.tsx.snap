@@ -18,7 +18,9 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
            id="test-checkboxes-search"
            type="text"
     >
-    <div class="optionsContainer">
+    <div aria-live="assertive"
+         class="optionsContainer"
+    >
       <div class="govuk-checkboxes govuk-checkboxes--small">
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input"
