@@ -18,7 +18,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
            id="test-checkboxes-search"
            type="text"
     >
-    <div class="optionsContainer">
+    <div aria-live="assertive"
+         class="optionsContainer"
+    >
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
                   id="test-checkboxes-groupA"

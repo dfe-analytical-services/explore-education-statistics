@@ -94,84 +94,87 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                   </FormGroup>
 
                   <FormGroup>
-                    {options
-                      .filter(group => {
-                        return group.topics.some(topic =>
-                          topic.publications.some(
-                            publication =>
-                              publication.id === values.publicationId ||
-                              publication.title.search(
-                                new RegExp(searchTerm, 'i'),
-                              ) > -1,
-                          ),
-                        );
-                      })
-                      .map(group => {
-                        return (
-                          <DetailsMenu
-                            summary={group.title}
-                            key={group.id}
-                            open={
-                              searchTerm !== '' ||
-                              group.topics.some(topic =>
-                                topic.publications.some(
-                                  publication =>
-                                    publication.id === values.publicationId,
-                                ),
-                              )
-                            }
-                          >
-                            {group.topics
-                              .filter(topic => {
-                                return topic.publications.find(
-                                  publication =>
-                                    publication.id === values.publicationId ||
-                                    publication.title.search(
-                                      new RegExp(searchTerm, 'i'),
-                                    ) > -1,
-                                );
-                              })
-                              .map(topic => (
-                                <DetailsMenu
-                                  summary={topic.title}
-                                  key={topic.id}
-                                  open={
-                                    searchTerm !== '' ||
-                                    topic.publications.some(
-                                      publication =>
-                                        publication.id === values.publicationId,
-                                    )
-                                  }
-                                >
-                                  <FormFieldRadioGroup
-                                    legend={`Choose option from ${topic.title}`}
-                                    legendHidden
-                                    small
-                                    showError={false}
-                                    name="publicationId"
-                                    id={`${formId}-publicationId-${camelCase(
-                                      topic.title,
-                                    )}`}
-                                    options={topic.publications
-                                      .filter(
+                    <div aria-live="assertive">
+                      {options
+                        .filter(group => {
+                          return group.topics.some(topic =>
+                            topic.publications.some(
+                              publication =>
+                                publication.id === values.publicationId ||
+                                publication.title.search(
+                                  new RegExp(searchTerm, 'i'),
+                                ) > -1,
+                            ),
+                          );
+                        })
+                        .map(group => {
+                          return (
+                            <DetailsMenu
+                              summary={group.title}
+                              key={group.id}
+                              open={
+                                searchTerm !== '' ||
+                                group.topics.some(topic =>
+                                  topic.publications.some(
+                                    publication =>
+                                      publication.id === values.publicationId,
+                                  ),
+                                )
+                              }
+                            >
+                              {group.topics
+                                .filter(topic => {
+                                  return topic.publications.find(
+                                    publication =>
+                                      publication.id === values.publicationId ||
+                                      publication.title.search(
+                                        new RegExp(searchTerm, 'i'),
+                                      ) > -1,
+                                  );
+                                })
+                                .map(topic => (
+                                  <DetailsMenu
+                                    summary={topic.title}
+                                    key={topic.id}
+                                    open={
+                                      searchTerm !== '' ||
+                                      topic.publications.some(
                                         publication =>
                                           publication.id ===
-                                            values.publicationId ||
-                                          publication.title.search(
-                                            new RegExp(searchTerm, 'i'),
-                                          ) > -1,
+                                          values.publicationId,
                                       )
-                                      .map(publication => ({
-                                        id: publication.id,
-                                        label: publication.title,
-                                        value: publication.id,
-                                      }))}
-                                  />
-                                </DetailsMenu>
-                              ))}
-                          </DetailsMenu>
-                        );
-                      })}
+                                    }
+                                  >
+                                    <FormFieldRadioGroup
+                                      legend={`Choose option from ${topic.title}`}
+                                      legendHidden
+                                      small
+                                      showError={false}
+                                      name="publicationId"
+                                      id={`${formId}-publicationId-${camelCase(
+                                        topic.title,
+                                      )}`}
+                                      options={topic.publications
+                                        .filter(
+                                          publication =>
+                                            publication.id ===
+                                              values.publicationId ||
+                                            publication.title.search(
+                                              new RegExp(searchTerm, 'i'),
+                                            ) > -1,
+                                        )
+                                        .map(publication => ({
+                                          id: publication.id,
+                                          label: publication.title,
+                                          value: publication.id,
+                                        }))}
+                                    />
+                                  </DetailsMenu>
+                                ))}
+                            </DetailsMenu>
+                          );
+                        })}
+                    </div>
                   </FormGroup>
                 </FormFieldset>
 
