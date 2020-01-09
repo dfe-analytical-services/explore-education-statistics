@@ -2,11 +2,11 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Security
 {
     public class UserService : IUserService
     {

@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupPublicationExistsResult(mocks.PublicationHelper);
             
             mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
-                .Returns(Task.FromResult(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel())));
+                .ReturnsAsync(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel()));
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.FileStorageService
                 .Setup(service =>
                     service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
-                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                .ReturnsAsync(new List<FileInfo>());
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             SetupReleaseExistsResult(mocks.ReleaseHelper);
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
-                .Returns(Task.FromResult(testFiles));
+                .ReturnsAsync(testFiles);
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, "test user"))
-                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                .ReturnsAsync(new List<FileInfo>());
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
@@ -192,8 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, 
                     "test user"))
-                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(
-                    new BadRequestObjectResult(CannotOverwriteFile)));
+                .ReturnsAsync(new BadRequestObjectResult(CannotOverwriteFile));
 
             var controller = ReleasesControllerWithMocks(mocks);
             
@@ -228,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupReleaseExistsResult(mocks.ReleaseHelper);
             
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
-                .Returns(Task.FromResult(testFiles));
+                .ReturnsAsync(testFiles);
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -260,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+                .ReturnsAsync(new List<FileInfo>());
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -278,8 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ActionResult, IEnumerable<FileInfo>>>(
-                    ValidationActionResult(UnableToFindMetadataFileToDelete)));
+                .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -299,8 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     It.Is<Guid>(id => id.Equals(_releaseId)), 
                     It.IsAny<UpdateReleaseSummaryRequest>())
                 )
-                .Returns(Task.FromResult(
-                    new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel {Id = _releaseId})));
+                .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test

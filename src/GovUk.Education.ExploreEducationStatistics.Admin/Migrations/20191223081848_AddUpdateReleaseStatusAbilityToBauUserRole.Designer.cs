@@ -4,39 +4,22 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191223081848_AddUpdateReleaseStatusAbilityToBauUserRole")]
+    partial class AddUpdateReleaseStatusAbilityToBauUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models.UserInvite", b =>
-                {
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("Accepted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Email");
-
-                    b.ToTable("UserInvites");
-                });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Models.ApplicationUser", b =>
                 {

@@ -5364,6 +5364,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     },
                     new UserReleaseRole
                     {
+                        Id = new Guid("1851e50d-04ac-4e16-911b-3df3350c589b"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Approver
+                    },
+                    new UserReleaseRole
+                    {
                         Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
                         ReleaseId = exclusionsReleaseId,
                         UserId = analystMvcUser1Id,
@@ -5374,7 +5381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
                         ReleaseId = exclusionsReleaseId,
                         UserId = analystMvcUser2Id,
-                        Role = ReleaseRole.Contributor
+                        Role = ReleaseRole.Approver
                     },
                     new UserReleaseRole
                     {
@@ -5396,6 +5403,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         ReleaseId = applicationOffersReleaseId,
                         UserId = analystMvcUser3Id,
                         Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("d1cbc96e-75c0-424f-bd63-c1920b763020"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Approver
                     }
                 );
         }

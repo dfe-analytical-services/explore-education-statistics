@@ -6,10 +6,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -175,9 +178,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
                 
-                // does this user have permission to view a specific Release (on a case-by-case basis)?
+                // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
+
+                // does this user have permission to mark a specific Release as a Draft?
+                options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
+                    policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
+
+                // does this user have permission to submit a specific Release to Higher Review?
+                options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
+                    policy.Requirements.Add(new SubmitSpecificReleaseToHigherReviewRequirement()));
+
+                // does this user have permission to approve a specific Release?
+                options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -205,11 +220,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IReleaseStatusService, ReleaseStatusService>();
             services.AddTransient<IThemeService, ThemeService>();
+            services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -263,6 +281,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {

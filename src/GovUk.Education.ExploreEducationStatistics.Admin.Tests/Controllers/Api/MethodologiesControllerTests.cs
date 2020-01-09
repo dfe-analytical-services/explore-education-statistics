@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseService = new Mock<IMethodologyService>();
 
             releaseService.Setup(s => s.GetTopicMethodologiesAsync(It.IsAny<Guid>()))
-                .Returns(Task.FromResult(new List<MethodologyViewModel>()));
+                .ReturnsAsync(new List<MethodologyViewModel>());
             var controller = new MethodologiesController(releaseService.Object);
 
             // Method under test
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseService = new Mock<IMethodologyService>();
 
             releaseService.Setup(s => s.ListAsync())
-                .Returns(Task.FromResult(new List<MethodologyViewModel>()));
+                .ReturnsAsync(new List<MethodologyViewModel>());
             var controller = new MethodologiesController(releaseService.Object);
 
             // Method under test
