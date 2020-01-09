@@ -1805,6 +1805,7 @@
       },
       "resources": [
         {
+          "condition": "[parameters('deploySubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
