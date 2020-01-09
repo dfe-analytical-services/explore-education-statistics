@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -32,11 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _releaseHelper = releaseHelper;
         }
 
-        public Task<Either<ValidationResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
+        public Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExists(releaseId, HydrateReleaseForReleaseViewModel)
+                .CheckEntityExistsActionResult(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(async release =>
                     {
                         var availableDataBlocks =
@@ -64,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 AvailableDataBlocks = blocks
                             };
                         });
-                        
                     });
         }
         

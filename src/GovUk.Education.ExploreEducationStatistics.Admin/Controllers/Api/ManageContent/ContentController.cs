@@ -24,147 +24,146 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/sections")]
-        public Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid releaseId)
+        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.GetContentSectionsAsync(releaseId),
-                Ok);
+            return await _contentService
+                .GetContentSectionsAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpPut("release/{releaseId}/content/sections/order")]
-        public Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
+        public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.ReorderContentSectionsAsync(releaseId, newSectionOrder),
-                Ok);
+            return await _contentService
+                .ReorderContentSectionsAsync(releaseId, newSectionOrder)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPost("release/{releaseId}/content/sections/add")]
-        public Task<ActionResult<ContentSectionViewModel>> AddContentSection(
+        public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
             Guid releaseId, AddContentSectionRequest? request = null)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.AddContentSectionAsync(releaseId, request),
-                Ok);
+            return await _contentService
+                .AddContentSectionAsync(releaseId, request)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/heading")]
-        public Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
+        public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid releaseId, Guid contentSectionId, UpdateContentSectionHeadingRequest request)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.UpdateContentSectionHeadingAsync(releaseId, contentSectionId, request.Heading),
-                Ok);
+            return await _contentService
+                .UpdateContentSectionHeadingAsync(releaseId, contentSectionId, request.Heading)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpDelete("release/{releaseId}/content/section/{contentSectionId}")]
-        public Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(
+        public async Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(
             Guid releaseId, Guid contentSectionId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.RemoveContentSectionAsync(releaseId, contentSectionId),
-                Ok);
+            return await _contentService
+                .RemoveContentSectionAsync(releaseId, contentSectionId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("release/{releaseId}/content/section/{contentSectionId}")]
-        public Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
+        public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.GetContentSectionAsync(releaseId, contentSectionId),
-                Ok);
+            return await _contentService
+                .GetContentSectionAsync(releaseId, contentSectionId)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
-        public Task<ActionResult<List<IContentBlock>>> ReorderContentBlocks(
+        public async Task<ActionResult<List<IContentBlock>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.ReorderContentBlocksAsync(releaseId, contentSectionId, newBlocksOrder),
-                Ok);
+            return await _contentService
+                .ReorderContentBlocksAsync(releaseId, contentSectionId, newBlocksOrder)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/add")]
-        public Task<ActionResult<IContentBlock>> AddContentBlock(
+        public async Task<ActionResult<IContentBlock>> AddContentBlock(
             Guid releaseId, Guid contentSectionId, AddContentBlockRequest request)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.AddContentBlockAsync(releaseId, contentSectionId, request),
-                Ok);
+            return await _contentService
+                .AddContentBlockAsync(releaseId, contentSectionId, request)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
-        public Task<ActionResult<List<IContentBlock>>> RemoveContentBlock(
+        public async Task<ActionResult<List<IContentBlock>>> RemoveContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.RemoveContentBlockAsync(releaseId, contentSectionId, contentBlockId),
-                Ok);
+            return await _contentService
+                .RemoveContentBlockAsync(releaseId, contentSectionId, contentBlockId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
-        public Task<ActionResult<IContentBlock>> UpdateTextBasedContentBlock(
+        public async Task<ActionResult<IContentBlock>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.UpdateTextBasedContentBlockAsync(
-                    releaseId, contentSectionId, contentBlockId, request),
-                Ok);
+            return await _contentService
+                .UpdateTextBasedContentBlockAsync(releaseId, contentSectionId, contentBlockId, request)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("release/{releaseId}/content/available-datablocks")]
-        public Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
+        public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId),
-                Ok);
+            return await _contentService
+                .GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
-        public Task<ActionResult<IContentBlock>> AddContentBlock(
+        public async Task<ActionResult<IContentBlock>> AddContentBlock(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.AttachContentBlockAsync(releaseId, contentSectionId, request),
-                Ok);
+            return await _contentService
+                .AttachContentBlockAsync(releaseId, contentSectionId, request)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments")]
-        public Task<ActionResult<List<CommentViewModel>>> GetComments(
+        public async Task<ActionResult<List<CommentViewModel>>> GetComments(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.GetCommentsAsync(releaseId, contentSectionId, contentBlockId),
-                Ok);
+            return await _contentService
+                .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
+                .HandleFailuresOr(Ok);
         }
         
         
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
-        public Task<ActionResult<CommentViewModel>> AddComment(
+        public async Task<ActionResult<CommentViewModel>> AddComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment),
-                Ok);
+            return await _contentService
+                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment)
+                .HandleFailuresOr(Ok);
         }
         
                 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public Task<ActionResult<CommentViewModel>> AddComment(
+        public async Task<ActionResult<CommentViewModel>> AddComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, comment),
-                Ok);
+            return await _contentService
+                .UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, comment)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public Task<ActionResult<CommentViewModel>> DeleteComment(
+        public async Task<ActionResult<CommentViewModel>> DeleteComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _contentService.DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId),
-                Ok);
+            return await _contentService
+                .DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId)
+                .HandleFailuresOr(Ok);
         }
     }
 }

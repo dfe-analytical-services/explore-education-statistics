@@ -33,10 +33,13 @@ public class Either<Tl, Tr> {
         public Either<Tl, T> Map<T>(Func<Tr, Either<Tl, T>> func) =>
             IsLeft ? new Either<Tl, T>(Left) : func.Invoke(Right);
         
+        public Either<Tl, T> OnSuccess<T>(Func<Tr, T> func) => Map(func);
+        
+        public Either<Tl, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
+        
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
         
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
-
     }
 
     public static class EitherTaskExtensions 

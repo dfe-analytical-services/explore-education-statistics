@@ -22,38 +22,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/related-information")]
-        public Task<ActionResult<List<BasicLink>>> GetRelatedInformation(Guid releaseId)
+        public async Task<ActionResult<List<BasicLink>>> GetRelatedInformation(Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _relatedInformationService.GetRelatedInformationAsync(releaseId),
-                Ok);
+            return await _relatedInformationService
+                .GetRelatedInformationAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpPost("release/{releaseId}/content/related-information")]
-        public Task<ActionResult<List<BasicLink>>> AddRelatedInformation(CreateUpdateLinkRequest request, Guid releaseId)
+        public async Task<ActionResult<List<BasicLink>>> AddRelatedInformation(CreateUpdateLinkRequest request, Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _relatedInformationService.AddRelatedInformationAsync(releaseId, request),
-                result => Created(HttpContext.Request.Path, result));
+            return await _relatedInformationService
+                .AddRelatedInformationAsync(releaseId, request)
+                .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
         }
         
         [HttpPut("release/{releaseId}/content/related-information/{relatedInformationId}")]
-        public Task<ActionResult<List<BasicLink>>> UpdateRelatedInformation(
+        public async Task<ActionResult<List<BasicLink>>> UpdateRelatedInformation(
             CreateUpdateLinkRequest request, Guid releaseId, Guid relatedInformationId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _relatedInformationService.UpdateRelatedInformationAsync(releaseId, relatedInformationId,
-                    request),
-                Ok);
+            return await _relatedInformationService
+                .UpdateRelatedInformationAsync(releaseId, relatedInformationId, request)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpDelete("release/{releaseId}/content/related-information/{relatedInformationId}")]
-        public Task<ActionResult<List<BasicLink>>> DeleteRelatedInformation(
+        public async Task<ActionResult<List<BasicLink>>> DeleteRelatedInformation(
             Guid releaseId, Guid relatedInformationId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _relatedInformationService.DeleteRelatedInformationAsync(releaseId, relatedInformationId),
-                Ok);
+            return await _relatedInformationService
+                .DeleteRelatedInformationAsync(releaseId, relatedInformationId)
+                .HandleFailuresOr(Ok);
         }
     }
 }
