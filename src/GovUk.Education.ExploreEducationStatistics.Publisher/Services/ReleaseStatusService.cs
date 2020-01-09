@@ -50,11 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 releaseStatus.FilesStage = stage.Files.ToString();
                 releaseStatus.PublishingStage = stage.Publishing.ToString();
                 releaseStatus.Stage = stage.Overall.ToString();
-
-                if (logMessages != null)
-                {
-                    releaseStatus.AppendLogMessages(logMessages);
-                }
+                releaseStatus.AppendLogMessages(logMessages);
             }
 
             await table.ExecuteAsync(TableOperation.InsertOrReplace(releaseStatus));
@@ -141,12 +137,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         "DataStage",
                         "FilesStage",
                         "PublishingStage",
-                        "Stage"
+                        "Stage",
+                        "Messages"
                     }));
 
             if (tableResult.Result is ReleaseStatus releaseStatus)
             {
-                await table.ExecuteAsync(TableOperation.InsertOrMerge(updateFunction.Invoke(releaseStatus)));
+                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releaseStatus)));
             }
         }
 
@@ -166,7 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 if (Enum.TryParse<Stage>(releaseStatus.ContentStage, out var contentStage) && contentStage == Failed ||
                     Enum.TryParse<Stage>(releaseStatus.DataStage, out var dataStage) && dataStage == Failed ||
                     Enum.TryParse<Stage>(releaseStatus.FilesStage, out var filesStage) && filesStage == Failed ||
-                    Enum.TryParse<Stage>(releaseStatus.PublishingStage, out var publishingStage) && publishingStage == Failed)
+                    Enum.TryParse<Stage>(releaseStatus.PublishingStage, out var publishingStage) &&
+                    publishingStage == Failed)
                 {
                     releaseStatus.Stage = Failed.ToString();
                 }

@@ -54,7 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
         public void AppendLogMessages(IEnumerable<ReleaseStatusLogMessage> logMessages)
         {
-            Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
+            if (logMessages != null)
+            {
+                Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
+            }
         }
     }
 
