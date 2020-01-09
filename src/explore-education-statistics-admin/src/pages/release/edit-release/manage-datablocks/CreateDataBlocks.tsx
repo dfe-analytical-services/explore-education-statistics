@@ -113,7 +113,6 @@ const CreateDataBlocks = ({
           if (onTableToolLoaded) onTableToolLoaded();
         }}
         onTableCreated={response => {
-          setTableHeaders(undefined);
           setQuery(response.query);
           setTable(response.table);
           setTableHeaders(response.tableHeaders);
