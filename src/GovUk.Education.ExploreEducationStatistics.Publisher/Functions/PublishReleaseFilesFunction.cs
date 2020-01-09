@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                _publishingService.PublishReleaseFiles(message).Wait();
+                _publishingService.PublishReleaseFilesAsync(message).Wait();
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)

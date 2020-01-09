@@ -94,7 +94,7 @@ const FormCheckboxSearchSubGroups = ({
             width={20}
           />
 
-          <div className={styles.optionsContainer}>
+          <div aria-live="assertive" className={styles.optionsContainer}>
             {filteredOptions.map(optionGroup => (
               <FormCheckboxGroup
                 {...props}

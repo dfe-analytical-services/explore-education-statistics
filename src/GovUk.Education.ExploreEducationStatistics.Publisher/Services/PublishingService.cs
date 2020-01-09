@@ -13,7 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _fileStorageService = fileStorageService;
         }
 
-        public async Task PublishReleaseFiles(PublishReleaseFilesMessage message)
+        public async Task PublishStagedContentAsync(ReleaseStatus releaseStatus)
+        {
+            await _fileStorageService.MoveStagedContentAsync(releaseStatus);
+        }
+
+        public async Task PublishReleaseFilesAsync(PublishReleaseFilesMessage message)
         {
             await _fileStorageService.CopyReleaseToPublicContainer(message);
         }
