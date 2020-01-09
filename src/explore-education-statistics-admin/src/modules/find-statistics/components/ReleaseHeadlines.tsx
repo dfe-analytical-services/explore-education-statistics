@@ -9,7 +9,10 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import getKeyStatisticsSecondaryTabs from './KeyStatisticsSecondary';
+import getKeyStatisticsSecondaryTabs, {
+  hasSecondaryStats,
+  AddSecondaryStats,
+} from './KeyStatisticsSecondary';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -25,6 +28,22 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
       <h2 className="dfe-print-break-before">
         Headline facts and figures - {release.yearTitle}
       </h2>
+
+      {hasSecondaryStats(release.keyStatisticsSecondarySection) ? (
+        <AddSecondaryStats
+          release={release}
+          setRelease={setRelease}
+          isEditing={isEditing}
+          updating
+        />
+      ) : (
+        <AddSecondaryStats
+          release={release}
+          setRelease={setRelease}
+          isEditing={isEditing}
+        />
+      )}
+
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
           <section id="keystats">
