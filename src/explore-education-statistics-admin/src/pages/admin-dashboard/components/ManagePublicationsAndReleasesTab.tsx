@@ -117,12 +117,12 @@ const ManagePublicationsAndReleasesTab = ({
   }, [themeId, themes, topicId]);
 
   useEffect(() => {
-    if (selectedThemeAndTopic.topic.id === topicId) {
+    if (selectedThemeAndTopic.topic.id) {
       dashboardService
         .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
         .then(setMyPublications)
         .catch(handleApiErrors);
-    } else if (selectedThemeAndTopic.topic.id !== '') {
+
       // eslint-disable-next-line
       history.replaceState(
         {},
@@ -151,6 +151,7 @@ const ManagePublicationsAndReleasesTab = ({
             explore.statistics@education.gov.uk
           </a>
         </p>
+
         {themes && selectedThemeAndTopic && myPublications && (
           <>
             <div className="govuk-grid-row">

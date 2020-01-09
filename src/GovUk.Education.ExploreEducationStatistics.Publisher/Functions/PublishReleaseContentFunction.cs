@@ -15,12 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IPublishingService _publishingService;
 
         public PublishReleaseContentFunction(INotificationsService notificationsService,
-            IReleaseStatusService releaseStatusService)
+            IReleaseStatusService releaseStatusService,
+            IPublishingService publishingService)
         {
             _notificationsService = notificationsService;
             _releaseStatusService = releaseStatusService;
+            _publishingService = publishingService;
         }
 
         [FunctionName("PublishReleaseContent")]
@@ -37,11 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 foreach (var releaseStatus in scheduled)
                 {
                     logger.LogInformation($"Moving content for release: {releaseStatus.ReleaseId}");
-
                     await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id,
                         Started);
-
-                    // TODO EES-865 Move content
+                    await _publishingService.PublishStagedContentAsync(releaseStatus);
                 }
 
                 var releaseIds = scheduled.Select(status => status.ReleaseId);

@@ -29,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly string _publicStorageConnectionString =
             ConnectionUtils.GetAzureStorageConnectionString("PublicStorage");
 
-        private const string PrivateContainerName = "releases";
-        private const string PublicContainerName = "downloads";
+        private const string PrivateFilesContainerName = "releases";
+        private const string PublicFilesContainerName = "downloads";
         private const string PublicContentContainerName = "cache";
 
         public FileStorageService(ILogger<FileStorageService> logger)
@@ -42,25 +42,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var privateContainer =
                 await FileStorageUtils.GetCloudBlobContainerAsync(_privateStorageConnectionString,
-                    PrivateContainerName);
+                    PrivateFilesContainerName);
             var publicContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContainerName);
+                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
+                    PublicFilesContainerName);
 
             var sourceDirectoryPath = AdminReleaseDirectoryPath(message.ReleaseId);
             var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
 
-            await DeleteFilesAsync(publicContainer, destinationDirectoryPath);
+            await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
                 publicContainer, message);
         }
 
-        public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
+        public async Task DeleteAllContentAsync()
         {
-            return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicContainerName, publication,
-                release);
+            var publicContainer = await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
+                    PublicContentContainerName);
+            await DeleteBlobsAsync(publicContainer, "");
         }
 
+        public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
+        {
+            return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicFilesContainerName,
+                publication, release);
+        }
+
+        public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
+        {
+            var container =
+                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            
+            var sourceDirectoryPath = PublicContentStagingPath();
+            var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
+            var destinationDirectory = container.GetDirectoryReference("");
+
+            var options = new CopyDirectoryOptions
+            {
+                Recursive = true
+            };
+
+            var allFilesTransferred = new List<CloudBlockBlob>();
+
+            var context = new DirectoryTransferContext();
+            context.FileTransferred += (sender, args) => FileTransferredCallback(sender, args, allFilesTransferred);
+            context.FileFailed += FileFailedCallback;
+            context.FileSkipped += FileSkippedCallback;
+
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
+                CopyMethod.ServiceSideAsyncCopy, options, context);
+        }
+        
         public async Task UploadFromStreamAsync(string blobName, string contentType, string content)
         {
             await FileStorageUtils.UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
@@ -192,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return blob;
         }
 
-        private async Task DeleteFilesAsync(CloudBlobContainer container, string directoryPath)
+        private async Task DeleteBlobsAsync(CloudBlobContainer container, string directoryPath)
         {
             var token = new BlobContinuationToken();
             do

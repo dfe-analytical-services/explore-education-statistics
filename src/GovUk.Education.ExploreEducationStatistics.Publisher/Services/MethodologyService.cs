@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
@@ -18,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _context = context;
         }
 
-        public IEnumerable<Methodology> Get()
+        public async Task<Methodology> GetAsync(Guid id)
         {
-            return _context.Methodologies.ToList();
+            return await _context.Methodologies.FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public List<ThemeTree> GetTree()
         {
-            var tree = _context.Themes
+            return _context.Themes
                 .Include(theme => theme.Topics)
                     .ThenInclude(topic => topic.Publications)
                     .ThenInclude(publication => publication.Releases)
@@ -36,8 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(themeTree => themeTree.Topics.Any())
                 .OrderBy(theme => theme.Title)
                 .ToList();
-            
-            return tree;
         }
 
         private static ThemeTree BuildThemeTree(Theme theme)
