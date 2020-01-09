@@ -71,8 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
         {
-            var container =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
+            var container = await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
                     PublicContentContainerName);
 
             var sourceDirectoryPath = PublicContentStagingPath();
@@ -94,6 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
                 CopyMethod.ServiceSideAsyncCopy, options, context);
+            
+            await DeleteBlobsAsync(container, sourceDirectoryPath);
         }
 
         public async Task UploadFromStreamAsync(string blobName, string contentType, string content)
