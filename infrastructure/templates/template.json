@@ -342,6 +342,8 @@
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
+    "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
+    "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2185,8 +2187,29 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('notifySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.3.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
           }
-
 
         ]
       }
