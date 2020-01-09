@@ -74,6 +74,12 @@
         "description": "Firewall restrictions for the admin application"
       }
     },
+    "storageFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for storage accounts, string array"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
@@ -1103,8 +1109,7 @@
               "action": "Allow"
             }
           ],
-          "ipRules": [
-          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
       },
@@ -2090,8 +2095,7 @@
               "action": "Allow"
             }
           ],
-          "ipRules": [
-          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
       },
