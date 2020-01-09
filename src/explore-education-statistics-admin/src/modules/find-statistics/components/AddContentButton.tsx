@@ -18,18 +18,17 @@ const AddContentButton = ({ onClick }: AddContentButtonProps) => {
 
   return (
     <>
-      <Button
-        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => onClick('HtmlBlock', 'Click to edit')}
-      >
-        Add HTML
-      </Button>
-      <Button
-        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => setShowDataBlocks(true)}
-      >
-        Add DataBlock
-      </Button>
+      <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9 dfe-align--centre">
+        <Button
+          variant="secondary"
+          onClick={() => onClick('HtmlBlock', 'Click to edit')}
+        >
+          Add content
+        </Button>
+        <Button variant="secondary" onClick={() => setShowDataBlocks(true)}>
+          Add DataBlock
+        </Button>
+      </div>
 
       {showDataBlocks && (
         <>

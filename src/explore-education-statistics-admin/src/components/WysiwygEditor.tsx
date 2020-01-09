@@ -80,7 +80,8 @@ const WysiwygEditor = ({
       <div
         role="button"
         className={classnames({
-          [styles.editableContentEditing]: editable && editing,
+          [styles.editableContentEditing]:
+            (editable && editing) || (editable && !content),
           [styles.editableContent]: editable && !editing,
           [styles.unsaved]: editable && !saved,
         })}
@@ -91,7 +92,7 @@ const WysiwygEditor = ({
       >
         {editable && (
           <div className={styles.editableButton}>
-            {editing ? (
+            {editing || !content ? (
               <button
                 className="govuk-button"
                 onClick={() => save()}
@@ -101,8 +102,8 @@ const WysiwygEditor = ({
               </button>
             ) : (
               <div className={styles.editableButtonContent}>
-                <span className="govuk-button govuk-body-s govuk-!-margin-bottom-0">
-                  Edit this section
+                <span className="govuk-button govuk-button--secondary govuk-body-s govuk-!-margin-bottom-0">
+                  Edit
                 </span>
                 {canDelete && (
                   <>
@@ -115,7 +116,7 @@ const WysiwygEditor = ({
                       }}
                       className="govuk-button govuk-button--warning govuk-body-s govuk-!-margin-bottom-0"
                     >
-                      Delete this section
+                      Delete
                     </button>
                   </>
                 )}
@@ -124,7 +125,7 @@ const WysiwygEditor = ({
           </div>
         )}
 
-        {editable && editing ? (
+        {(editable && editing) || (editable && !content) ? (
           <CKEditor
             editor={ClassicEditor}
             config={{
@@ -159,7 +160,7 @@ const WysiwygEditor = ({
             dangerouslySetInnerHTML={{
               __html: temporaryContent,
             }}
-            className="govuk-!-padding-left-1 govuk-!-padding-right-1"
+            className={`${styles.wysiwygPreview} govuk-!-padding-left-2 govuk-!-padding-right-2`}
           />
         )}
       </div>

@@ -109,7 +109,11 @@ h1.govuk-panel__title {
 
 .dfe-toggle-edit {
   background: $govuk-brand-colour;
-  padding: 10px;
+  bottom: 0;
+  left: 0;
+  padding: 0 6px 6px;
+  position: fixed;
+  z-index: 10000;
 }
 .dfe-toggle-edit {
   .govuk-fieldset__legend {
@@ -123,6 +127,7 @@ h1.govuk-panel__title {
   }
   .govuk-radios {
     background: govuk-colour('white');
+    min-height: 100px;
     padding: 6px 6px 0;
   }
 }
