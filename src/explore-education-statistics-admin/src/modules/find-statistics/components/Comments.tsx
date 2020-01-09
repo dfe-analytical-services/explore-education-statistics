@@ -140,12 +140,12 @@ const Comments = ({
               if (isOpen) {
                 ref.current.classList.add(styles.top);
                 if (section) {
-                  section.classList.add(styles.minCommentHeight);
+                  section.classList.add(styles.commentWhileCommenting);
                 }
               } else {
                 ref.current.classList.remove(styles.top);
                 if (section) {
-                  section.classList.remove(styles.minCommentHeight);
+                  section.classList.remove(styles.commentWhileCommenting);
                 }
               }
             }

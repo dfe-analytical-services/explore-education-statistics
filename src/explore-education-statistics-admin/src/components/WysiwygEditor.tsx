@@ -160,7 +160,7 @@ const WysiwygEditor = ({
             dangerouslySetInnerHTML={{
               __html: temporaryContent,
             }}
-            className={`${styles.preTextWrap} govuk-!-padding-left-2 govuk-!-padding-right-2`}
+            className={`${styles.wysiwygPreview} govuk-!-padding-left-2 govuk-!-padding-right-2`}
           />
         )}
       </div>

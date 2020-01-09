@@ -226,8 +226,8 @@ const EditableContentBlock = ({
           droppableId={`${sectionId}`}
         >
           {contentBlocks.map((block, index) => (
-            // eslint-disable-next-line react/jsx-key
             <div
+              key={`content-section-${block.id}`}
               id={`content-section-${block.id}`}
               className="govuk-!-margin-bottom-9"
             >

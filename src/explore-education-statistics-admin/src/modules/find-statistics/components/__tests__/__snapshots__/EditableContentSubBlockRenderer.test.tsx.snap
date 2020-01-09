@@ -17,7 +17,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
         </button>
       </div>
     </div>
-    <div class="preTextWrap govuk-!-padding-left-2 govuk-!-padding-right-2">
+    <div class="wysiwygPreview govuk-!-padding-left-2 govuk-!-padding-right-2">
       <p>
         test
       </p>
@@ -38,7 +38,7 @@ exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block cor
         </span>
       </div>
     </div>
-    <div class="preTextWrap govuk-!-padding-left-2 govuk-!-padding-right-2">
+    <div class="wysiwygPreview govuk-!-padding-left-2 govuk-!-padding-right-2">
       <p>
         test
       </p>
