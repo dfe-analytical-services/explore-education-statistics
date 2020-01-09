@@ -46,6 +46,8 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent.FootnoteService;
+using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent.IFootnoteService;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
