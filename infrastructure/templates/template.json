@@ -1821,7 +1821,7 @@
         }
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
