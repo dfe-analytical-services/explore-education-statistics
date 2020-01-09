@@ -177,6 +177,13 @@
         "description": "Gov UK Notify service API key"
       }
     },
+    "notifyApiKeyAdmin": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service API key"
+      }
+    },
     "notifyTokenSecretKey": {
       "type": "securestring",
       "defaultValue": ""
@@ -806,7 +813,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
+              "value": "[parameters('notifyApiKeyAdmin')]"
             },
             {
               "name": "NotifyInviteTemplateId",
