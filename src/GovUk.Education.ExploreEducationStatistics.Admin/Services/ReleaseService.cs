@@ -112,11 +112,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
         }
 
-        // TODO Authorisation will be required when users are introduced
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
-            return await ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId)
+            return await _releaseHelper
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
                 {
                     var release = await _context.Releases
@@ -171,8 +173,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(), releaseStatuses));
         }
         
-        // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
-        // rename this to "ValidateReleaseSlugUniqueToPublication"
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
