@@ -136,9 +136,15 @@ export const reverseMapTableHeadersConfig = (
 
       return optionGroup
         .map(
-          ({ value }) =>
+          option =>
             locationAndFilterGroups[currentIndex].find(
-              element => element.value === value,
+              element =>
+                element.value === option.value &&
+                // check for matching location level
+                ((element as LocationFilter).level
+                  ? (element as LocationFilter).level ===
+                    (option as LocationFilter).level
+                  : true),
             ) as LocationFilter | CategoryFilter,
         )
         .filter(_ => _ !== undefined);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
@@ -7,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 // ReSharper disable NotAccessedField.Global
 // ReSharper disable UnusedMember.Global
@@ -24,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class DataBlockRequest
     {
-        public int SubjectId;
+        public Guid SubjectId;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel? GeographicLevel;
 
         public TimePeriod TimePeriod;
-        public List<string> Filters;
-        public List<string> Indicators;
+        public List<Guid> Filters;
+        public List<Guid> Indicators;
 
         public List<string> Country;
         public List<string> Institution;
@@ -73,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class ChartDataSet
     {
-        public string Indicator;
-        public List<string> Filters;
+        public Guid Indicator;
+        public List<Guid> Filters;
         public List<ChartDataLocation> Location;
         public string TimePeriod;
     }

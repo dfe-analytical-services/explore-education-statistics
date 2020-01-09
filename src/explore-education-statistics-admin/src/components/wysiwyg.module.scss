@@ -16,26 +16,37 @@
 }
 
 .editableContent {
+  background: govuk-colour('light-grey');
   cursor: pointer;
   margin: 0;
   min-height: 2.2em;
-  padding: 1.5rem 0 0;
+  padding: 0.1rem;
   position: relative;
 
   .editableButton {
-    border: 1px solid $govuk-border-colour;
+    border: 2px solid $govuk-border-colour;
     display: block;
     font-weight: bold;
     height: 100%;
-    margin-top: -1.5rem;
     padding: 0;
     position: absolute;
     width: 100%;
   }
+
+  .editableButtonContent {
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
   &.unsaved .editableButton {
     text-align: center;
     white-space: pre;
   }
+}
+
+.editableContentEditing.editableContent .editableButton button {
+  position: absolute;
+  right: 0;
 }
 
 .editableStatus {
@@ -44,10 +55,18 @@
   top: 0;
 }
 
+.editableButton:focus,
+.editableButton:hover {
+  .editableButtonContent {
+    opacity: 1;
+  }
+}
+
 .editableContentEditing {
+  border: 2px solid #000;
   cursor: pointer;
   margin: 0;
-  padding: 0.2rem;
+  padding: 0;
   position: relative;
 
   .editableButton {
@@ -56,8 +75,12 @@
     margin: 0;
     padding: 0;
     position: absolute;
-    right: 4px;
-    top: 2px;
+    right: 0;
+    top: 0;
     z-index: 1000;
   }
+}
+
+.wysiwygPreview pre {
+  white-space: normal;
 }

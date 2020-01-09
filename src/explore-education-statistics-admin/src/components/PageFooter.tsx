@@ -32,6 +32,11 @@ const PageFooter = ({ wide }: Props) => (
                 API Documentation
               </a>
             </li>
+            <li className="govuk-footer__inline-list-item">
+              <Link className="govuk-footer__link" to="/contact-us">
+                Contact us
+              </Link>
+            </li>
           </ul>
 
           <svg

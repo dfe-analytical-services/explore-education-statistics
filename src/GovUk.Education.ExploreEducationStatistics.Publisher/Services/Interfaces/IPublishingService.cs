@@ -5,6 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IPublishingService
     {
-        Task PublishReleaseFiles(PublishReleaseFilesMessage message);
+        Task PublishStagedContentAsync(ReleaseStatus releaseStatus);
+        
+        Task PublishReleaseFilesAsync(PublishReleaseFilesMessage message);
     }
 }

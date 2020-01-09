@@ -18,6 +18,7 @@ export interface FormRadioProps {
   name: string;
   onChange?: RadioChangeEventHandler;
   value: string;
+  disabled?: boolean;
 }
 
 const FormRadio = ({
@@ -30,6 +31,7 @@ const FormRadio = ({
   name,
   onChange,
   value,
+  disabled = false,
 }: FormRadioProps) => {
   return (
     <>
@@ -50,6 +52,7 @@ const FormRadio = ({
           type="radio"
           value={value}
           data-testid={label}
+          disabled={disabled}
         />
         <label className="govuk-label govuk-radios__label" htmlFor={id}>
           {label}

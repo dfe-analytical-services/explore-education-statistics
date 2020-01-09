@@ -3,6 +3,7 @@
   "logging": {
     "logLevel": {
       "default": "None",
+      "Function.GenerateAllContent": "Information",
       "Function.GenerateReleaseContent": "Information",
       "Function.PublishReleases": "Information",
       "Function.PublishReleaseContent": "Information",

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using IdentityServer4.EntityFramework.Options;
@@ -10,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
+        public DbSet<UserInvite> UserInvites { get; set; }
+
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
@@ -128,6 +131,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         Id = -4,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.AccessAllTopics.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -5,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.MarkAllReleasesAsDraft.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -6,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.SubmitAllReleasesToHigherReview.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -7,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.ApproveAllReleases.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -8,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.UpdateAllReleases.ToString(),
                         ClaimValue = "",
                     }
                 );

@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class Summary
     {
-        public List<string> dataKeys { get; set; }
+        public List<Guid> dataKeys { get; set; }
 
         public List<string> dataSummary { get; set; }
 
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class Table
     {
-        public List<string> indicators { get; set; }
+        public List<Guid> indicators { get; set; }
 
         public TableHeaders tableHeaders { get; set; }
     }

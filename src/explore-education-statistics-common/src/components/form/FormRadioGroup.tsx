@@ -9,7 +9,7 @@ import FormRadio, {
   RadioChangeEventHandler,
 } from './FormRadio';
 
-type RadioOption = PartialBy<
+export type RadioOption = PartialBy<
   OmitStrict<FormRadioProps, 'checked' | 'name' | 'onChange'>,
   'id'
 >;

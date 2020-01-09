@@ -75,7 +75,7 @@ const FormCheckboxSearchGroup = ({
             width={20}
           />
 
-          <div className={styles.optionsContainer}>
+          <div aria-live="assertive" className={styles.optionsContainer}>
             <BaseFormCheckboxGroup {...props} options={filteredOptions} small />
           </div>
         </FormFieldset>

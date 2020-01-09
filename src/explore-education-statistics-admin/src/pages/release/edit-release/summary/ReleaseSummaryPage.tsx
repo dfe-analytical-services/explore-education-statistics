@@ -13,6 +13,7 @@ import {
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
+import permissionService from '@admin/services/permissions/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import withErrorControl, {
   ErrorControlProps,
@@ -30,6 +31,7 @@ interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
   timePeriodCoverageGroups: TimePeriodCoverageGroup[];
   releaseTypes: IdTitlePair[];
+  canEditRelease: boolean;
 }
 
 const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
@@ -44,17 +46,20 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
       service.getReleaseSummaryDetails(releaseId),
       commonService.getReleaseTypes(),
       commonService.getTimePeriodCoverageGroups(),
+      permissionService.canUpdateRelease(releaseId),
     ])
       .then(
         ([
-          releaseSummaryResult,
-          releaseTypesResult,
-          timePeriodGroupsResult,
+          releaseSummaryDetails,
+          releaseTypes,
+          timePeriodCoverageGroups,
+          canEditRelease,
         ]) => {
           setModel({
-            releaseSummaryDetails: releaseSummaryResult,
-            timePeriodCoverageGroups: timePeriodGroupsResult,
-            releaseTypes: releaseTypesResult,
+            releaseSummaryDetails,
+            timePeriodCoverageGroups,
+            releaseTypes,
+            canEditRelease,
           });
         },
       )
@@ -107,11 +112,15 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
               {model.releaseSummaryDetails.type.title}
             </SummaryListItem>
           </SummaryList>
-          <div className="dfe-align--right">
-            <Link to={summaryEditRoute.generateLink(publication.id, releaseId)}>
-              Edit release summary
-            </Link>
-          </div>
+          {model.canEditRelease && (
+            <div className="dfe-align--right">
+              <Link
+                to={summaryEditRoute.generateLink(publication.id, releaseId)}
+              >
+                Edit release summary
+              </Link>
+            </div>
+          )}
         </>
       )}
     </>

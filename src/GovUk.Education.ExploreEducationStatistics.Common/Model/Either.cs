@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
@@ -125,7 +124,7 @@ public class Either<Tl, Tr> {
             return next;
         }
         
-        public static async Task<Either<T, Tr>> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<T>> func)
+        public static async Task<Tr> OrElse<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task<Tr>> func)
         {
             var firstResult = await task;
             if (firstResult.IsRight)
@@ -133,11 +132,11 @@ public class Either<Tl, Tr> {
                 return firstResult.Right;
             }
 
-            var next = await func(firstResult.Left);
+            var next = await func();
             return next;
         }
         
-        public static async Task<T> OnFailure<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tl, T> func) where Tr : T
+        public static async Task<Tr> OrElse<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr> func)
         {
             var firstResult = await task;
             if (firstResult.IsRight)
@@ -145,7 +144,7 @@ public class Either<Tl, Tr> {
                 return firstResult.Right;
             }
 
-            return func(firstResult.Left);
+            return func();
         }
     }
 }

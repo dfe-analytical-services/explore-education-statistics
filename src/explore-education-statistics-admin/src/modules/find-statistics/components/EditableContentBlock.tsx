@@ -226,65 +226,63 @@ const EditableContentBlock = ({
           droppableId={`${sectionId}`}
         >
           {contentBlocks.map((block, index) => (
-            <ContentBlockDraggable
-              draggable={isReordering}
-              draggableId={`${block.id}`}
-              key={`${block.id}`}
-              index={index}
+            <div
+              key={`content-section-${block.id}`}
+              id={`content-section-${block.id}`}
+              className="govuk-!-margin-bottom-9"
             >
-              {!isReordering && (
-                <>
-                  {canAddBlocks && (
+              <ContentBlockDraggable
+                draggable={isReordering}
+                draggableId={`${block.id}`}
+                key={`${block.id}`}
+                index={index}
+              >
+                {!isReordering && (
+                  <>
+                    {(editingContext.isCommenting ||
+                      editingContext.isReviewing) && (
+                      <Comments
+                        contentBlockId={block.id}
+                        initialComments={block.comments}
+                        canResolve={editingContext.isReviewing}
+                        canComment={editingContext.isCommenting}
+                        onCommentsChange={async comments => {
+                          const newBlocks = [...contentBlocks];
+                          newBlocks[index].comments = comments;
+                          setContentBlocks(newBlocks);
+                          if (onContentChange) {
+                            onContentChange(newBlocks);
+                          }
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+
+                <EditableContentSubBlockRenderer
+                  editable={editable && !isReordering}
+                  canDelete={!!canAddBlocks && !isReordering}
+                  block={block}
+                  id={id}
+                  index={index}
+                  onContentChange={(newContent: string) =>
+                    onContentBlockChange(index, newContent)
+                  }
+                  onDelete={() => onDeleteContent(block.id)}
+                />
+
+                {!isReordering &&
+                  canAddBlocks &&
+                  index === contentBlocks.length - 1 && (
                     <AddContentButton
                       onClick={(type, data) =>
-                        onAddContentCallback(type, data, index)
+                        onAddContentCallback(type, data, contentBlocks.length)
                       }
                       availableDataBlocks={editingContext.availableDataBlocks}
                     />
                   )}
-                  {(editingContext.isCommenting ||
-                    editingContext.isReviewing) && (
-                    <Comments
-                      contentBlockId={block.id}
-                      initialComments={block.comments}
-                      canResolve={editingContext.isReviewing}
-                      canComment={editingContext.isCommenting}
-                      onCommentsChange={async comments => {
-                        const newBlocks = [...contentBlocks];
-                        newBlocks[index].comments = comments;
-                        setContentBlocks(newBlocks);
-                        if (onContentChange) {
-                          onContentChange(newBlocks);
-                        }
-                      }}
-                    />
-                  )}
-                </>
-              )}
-
-              <EditableContentSubBlockRenderer
-                editable={editable && !isReordering}
-                canDelete={!!canAddBlocks && !isReordering}
-                block={block}
-                id={id}
-                index={index}
-                onContentChange={(newContent: string) =>
-                  onContentBlockChange(index, newContent)
-                }
-                onDelete={() => onDeleteContent(block.id)}
-              />
-
-              {!isReordering &&
-                canAddBlocks &&
-                index === contentBlocks.length - 1 && (
-                  <AddContentButton
-                    onClick={(type, data) =>
-                      onAddContentCallback(type, data, contentBlocks.length)
-                    }
-                    availableDataBlocks={editingContext.availableDataBlocks}
-                  />
-                )}
-            </ContentBlockDraggable>
+              </ContentBlockDraggable>
+            </div>
           ))}
         </ContentBlockDroppable>
       </DragDropContext>
