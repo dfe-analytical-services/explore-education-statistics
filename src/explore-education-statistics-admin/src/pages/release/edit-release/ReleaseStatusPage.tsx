@@ -4,12 +4,14 @@ import ManageReleaseContext, {
 } from '@admin/pages/release/ManageReleaseContext';
 import appRouteList from '@admin/routes/dashboard/routes';
 import service from '@admin/services/release/edit-release/status/service';
+import permissionService from '@admin/services/permissions/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
@@ -21,18 +23,48 @@ interface FormValues {
   internalReleaseNote: string;
 }
 
+interface Model {
+  releaseStatus: ReleaseStatus;
+  statusOptions: RadioOption[];
+}
+
 const ReleaseStatusPage = ({
   history,
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
-  const [releaseStatus, setReleaseStatus] = useState<ReleaseStatus>();
+  const [model, setModel] = useState<Model>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   useEffect(() => {
-    service
-      .getReleaseStatus(releaseId)
-      .then(setReleaseStatus)
+    Promise.all([
+      service.getReleaseStatus(releaseId),
+      permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
+      permissionService.canApproveRelease(releaseId),
+    ])
+      .then(([releaseStatus, canSubmit, canApprove]) => {
+        const statusOptions: RadioOption[] = [
+          {
+            label: 'In draft',
+            value: 'Draft',
+          },
+          {
+            label: 'Ready for higher review',
+            value: 'HigherLevelReview',
+            disabled: !canSubmit,
+          },
+          {
+            label: 'Approved for publication',
+            value: 'Approved',
+            disabled: !canApprove,
+          },
+        ];
+
+        setModel({
+          releaseStatus,
+          statusOptions,
+        });
+      })
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
@@ -43,11 +75,11 @@ const ReleaseStatusPage = ({
       <h2 className="govuk-heading-m">Update release status</h2>
       <p>Select and update the release status.</p>
 
-      {releaseStatus && (
+      {model && (
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            releaseStatus,
+            releaseStatus: model.releaseStatus,
             internalReleaseNote: '',
           }}
           onSubmit={async (values: FormValues) => {
@@ -70,20 +102,7 @@ const ReleaseStatusPage = ({
                   legend="Status"
                   name="releaseStatus"
                   id={`${formId}-releaseStatus`}
-                  options={[
-                    {
-                      label: 'In draft',
-                      value: 'Draft',
-                    },
-                    {
-                      label: 'Ready for higher review',
-                      value: 'HigherLevelReview',
-                    },
-                    {
-                      label: 'Approved for publication',
-                      value: 'Approved',
-                    },
-                  ]}
+                  options={model.statusOptions}
                   orderDirection={[]}
                 />
                 <FormFieldTextArea

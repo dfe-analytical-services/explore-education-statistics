@@ -1,30 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ThemeServiceTests
+    public class ThemeRepositoryTests
     {
-        // TODO this test will need to change when we have users in the system
         [Fact]
         public void GetThemes()
         {
             using (var context = DbUtils.InMemoryApplicationDbContext("Find"))
             {
-                var userService = Mocks();
-                
                 var themeToSave =
                     new Theme
                     {
@@ -52,29 +41,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     };
 
-
                 context.Add(themeToSave);
                 context.SaveChanges();
 
-                var service = new ThemeService(context, userService.Object);
+                var repository = new ThemeRepository(context);
                 // Method under test
-                var retrievedUserTheme = service.GetMyThemesAsync().Result;
+                var retrievedUserTheme = repository.GetAllThemesAsync().Result;
                 Assert.True(retrievedUserTheme.Exists(t => t.Title == "Title A"));
                 var themeA = retrievedUserTheme.Single(t => t.Title == "Title A");
                 Assert.True(themeA.Topics.Exists(t => t.Title == "Title A"));
                 Assert.True(themeA.Topics.Exists(t => t.Title == "Title B"));
             }
-        }
-
-        private Mock<IUserService> Mocks()
-        {
-            var userService = new Mock<IUserService>();
-
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
-                .ReturnsAsync(true);
-
-            return userService;
         }
     }
 }

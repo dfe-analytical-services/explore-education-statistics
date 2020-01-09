@@ -203,7 +203,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             )}
 
             {charts && (
-              <TabsSection id={`${id}-charts`} title="Charts" lazy={false}>
+              <TabsSection
+                datablockId={id}
+                id={`${id}-charts`}
+                title="Charts"
+                lazy={false}
+              >
                 {charts.map((chart, idx) => {
                   const key = `${id}_chart_${idx}`;
 

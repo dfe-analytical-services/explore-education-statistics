@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public GeographicLevel? GeographicLevel;
 
         public TimePeriod TimePeriod;
-        public List<string> Filters;
-        public List<string> Indicators;
+        public List<Guid> Filters;
+        public List<Guid> Indicators;
 
         public List<string> Country;
         public List<string> Institution;
@@ -73,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class ChartDataSet
     {
-        public string Indicator;
-        public List<string> Filters;
+        public Guid Indicator;
+        public List<Guid> Filters;
         public List<ChartDataLocation> Location;
         public string TimePeriod;
     }
