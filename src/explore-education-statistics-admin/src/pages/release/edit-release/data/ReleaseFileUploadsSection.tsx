@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
+import permissionService from '@admin/services/permissions/service';
 import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
@@ -36,11 +37,17 @@ const ReleaseFileUploadsSection = ({
 }: Props & ErrorControlProps) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
+  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
   useEffect(() => {
-    service
-      .getAncillaryFiles(releaseId)
-      .then(setFiles)
+    Promise.all([
+      service.getAncillaryFiles(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ])
+      .then(([filesResult, canUpdateReleaseResult]) => {
+        setFiles(filesResult);
+        setCanUpdateRelease(canUpdateReleaseResult);
+      })
       .catch(handleApiErrors);
   }, [publicationId, releaseId, handleApiErrors]);
 
@@ -98,40 +105,45 @@ const ReleaseFileUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            <FormFieldset
-              id={`${formId}-allFieldsFieldset`}
-              legend="Upload file"
-            >
-              <FormFieldTextInput<FormValues>
-                id={`${formId}-name`}
-                name="name"
-                label="Name"
-                width={20}
-              />
+            {canUpdateRelease && (
+              <>
+                <FormFieldset
+                  id={`${formId}-allFieldsFieldset`}
+                  legend="Upload file"
+                >
+                  <FormFieldTextInput<FormValues>
+                    id={`${formId}-name`}
+                    name="name"
+                    label="Name"
+                    width={20}
+                  />
 
-              <FormFieldFileSelector<FormValues>
-                id={`${formId}-file`}
-                name="file"
-                label="Upload file"
-                formGroupClass="govuk-!-margin-top-6"
-                form={form}
-              />
-            </FormFieldset>
+                  <FormFieldFileSelector<FormValues>
+                    id={`${formId}-file`}
+                    name="file"
+                    label="Upload file"
+                    formGroupClass="govuk-!-margin-top-6"
+                    form={form}
+                  />
+                </FormFieldset>
 
-            <Button
-              type="submit"
-              className="govuk-button govuk-!-margin-right-6"
-            >
-              Upload file
-            </Button>
+                <Button
+                  type="submit"
+                  className="govuk-button govuk-!-margin-right-6"
+                >
+                  Upload file
+                </Button>
 
-            <Link
-              to="#"
-              className="govuk-button govuk-button--secondary"
-              onClick={() => resetPage(form)}
-            >
-              Cancel
-            </Link>
+                <Link
+                  to="#"
+                  className="govuk-button govuk-button--secondary"
+                  onClick={() => resetPage(form)}
+                >
+                  Cancel
+                </Link>
+              </>
+            )}
+
             {files && (
               <>
                 <hr />
@@ -159,17 +171,19 @@ const ReleaseFileUploadsSection = ({
                   <SummaryListItem term="Filesize">
                     {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
                   </SummaryListItem>
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <Link
-                        to="#"
-                        onClick={() => setDeleteFileName(file.filename)}
-                      >
-                        Delete file
-                      </Link>
-                    }
-                  />
+                  {canUpdateRelease && (
+                    <SummaryListItem
+                      term="Actions"
+                      actions={
+                        <Link
+                          to="#"
+                          onClick={() => setDeleteFileName(file.filename)}
+                        >
+                          Delete file
+                        </Link>
+                      }
+                    />
+                  )}
                 </SummaryList>
               ))}
 
