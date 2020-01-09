@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task DeleteAllContentAsync()
         {
             var publicContainer = await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
-                    PublicContentContainerName);
+                PublicContentContainerName);
             await DeleteBlobsAsync(publicContainer, "");
         }
 
@@ -72,8 +72,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
         {
             var container =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-            
+                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
+                    PublicContentContainerName);
+
             var sourceDirectoryPath = PublicContentStagingPath();
             var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = container.GetDirectoryReference("");
@@ -89,11 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileTransferred += (sender, args) => FileTransferredCallback(sender, args, allFilesTransferred);
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
+            context.ShouldOverwriteCallbackAsync += (source, destination) => Task.FromResult(true);
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
                 CopyMethod.ServiceSideAsyncCopy, options, context);
         }
-        
+
         public async Task UploadFromStreamAsync(string blobName, string contentType, string content)
         {
             await FileStorageUtils.UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
@@ -130,19 +132,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
         {
-            allFilesStream.Add(e.Source as CloudBlockBlob);
-            _logger.LogInformation("Transfer succeeds. {0} -> {1}.", e.Source, e.Destination);
+            var source = (CloudBlockBlob) e.Source;
+            var destination = (CloudBlockBlob) e.Destination;
+            allFilesStream.Add(source);
+            _logger.LogInformation("Transfer succeeds. {0} -> {1}.", source.Uri, destination.Uri);
         }
 
         private void FileFailedCallback(object sender, TransferEventArgs e)
         {
-            _logger.LogInformation("Transfer fails. {0} -> {1}. Error message:{2}", e.Source, e.Destination,
+            var source = (CloudBlockBlob) e.Source;
+            var destination = (CloudBlockBlob) e.Destination;
+            _logger.LogInformation("Transfer fails. {0} -> {1}. Error message:{2}", source.Uri, destination.Uri,
                 e.Exception.Message);
         }
 
         private void FileSkippedCallback(object sender, TransferEventArgs e)
         {
-            _logger.LogInformation("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
+            var source = (CloudBlockBlob) e.Source;
+            var destination = (CloudBlockBlob) e.Destination;
+            _logger.LogInformation("Transfer skips. {0} -> {1}.", source.Uri, destination.Uri);
         }
 
 #pragma warning disable 1998
@@ -154,13 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 cloudBlockBlob.Metadata["releasedatetime"] = releasePublishedString;
             }
-        }
-
-#pragma warning disable 1998
-        private static async Task<bool> ShouldOverwriteCallbackAsync(object source, object destination)
-#pragma warning restore 1998
-        {
-            return false;
         }
 
         private static async Task<bool> ShouldTransferCallbackAsync(object source, object destination)
@@ -191,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var context = new SingleTransferContext();
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
-            context.ShouldOverwriteCallbackAsync += ShouldOverwriteCallbackAsync;
 
             zipOutputStream.Finish();
             await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
