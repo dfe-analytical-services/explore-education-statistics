@@ -1,6 +1,7 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
+import permissionService from '@admin/services/permissions/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
@@ -51,11 +52,17 @@ const ReleaseDataUploadsSection = ({
 }: Props & ErrorControlProps) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
+  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
   useEffect(() => {
-    service
-      .getReleaseDataFiles(releaseId)
-      .then(setDataFiles)
+    Promise.all([
+      service.getReleaseDataFiles(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ])
+      .then(([releaseDataFiles, canUpdateReleaseResponse]) => {
+        setDataFiles(releaseDataFiles);
+        setCanUpdateRelease(canUpdateReleaseResponse);
+      })
       .catch(handleApiErrors);
   }, [publicationId, releaseId, handleApiErrors]);
 
@@ -181,46 +188,50 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            <FormFieldset
-              id={`${formId}-allFieldsFieldset`}
-              legend="Add new data to release"
-            >
-              <FormFieldTextInput<FormValues>
-                id={`${formId}-subjectTitle`}
-                name="subjectTitle"
-                label="Subject title"
-                width={20}
-              />
+            {canUpdateRelease && (
+              <>
+                <FormFieldset
+                  id={`${formId}-allFieldsFieldset`}
+                  legend="Add new data to release"
+                >
+                  <FormFieldTextInput<FormValues>
+                    id={`${formId}-subjectTitle`}
+                    name="subjectTitle"
+                    label="Subject title"
+                    width={20}
+                  />
 
-              <FormFieldFileSelector<FormValues>
-                id={`${formId}-dataFile`}
-                name="dataFile"
-                label="Upload data file"
-                formGroupClass="govuk-!-margin-top-6"
-                form={form}
-              />
+                  <FormFieldFileSelector<FormValues>
+                    id={`${formId}-dataFile`}
+                    name="dataFile"
+                    label="Upload data file"
+                    formGroupClass="govuk-!-margin-top-6"
+                    form={form}
+                  />
 
-              <FormFieldFileSelector<FormValues>
-                id={`${formId}-metadataFile`}
-                name="metadataFile"
-                label="Upload metadata file"
-                form={form}
-              />
-            </FormFieldset>
+                  <FormFieldFileSelector<FormValues>
+                    id={`${formId}-metadataFile`}
+                    name="metadataFile"
+                    label="Upload metadata file"
+                    form={form}
+                  />
+                </FormFieldset>
 
-            <Button
-              type="submit"
-              className="govuk-button govuk-!-margin-right-6"
-            >
-              Upload data files
-            </Button>
-            <Link
-              to="#"
-              className="govuk-button govuk-button--secondary"
-              onClick={() => resetPage(form)}
-            >
-              Cancel
-            </Link>
+                <Button
+                  type="submit"
+                  className="govuk-button govuk-!-margin-right-6"
+                >
+                  Upload data files
+                </Button>
+                <Link
+                  to="#"
+                  className="govuk-button govuk-button--secondary"
+                  onClick={() => resetPage(form)}
+                >
+                  Cancel
+                </Link>
+              </>
+            )}
 
             {dataFiles.length > 0 && (
               <>
@@ -285,7 +296,7 @@ const ReleaseDataUploadsSection = ({
                 <SummaryListItem term="Date uploaded">
                   {format(dataFile.created, 'd/M/yyyy HH:mm')}
                 </SummaryListItem>
-                {dataFile.canDelete && (
+                {canUpdateRelease && dataFile.canDelete && (
                   <SummaryListItem
                     term="Actions"
                     actions={

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -14,7 +15,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
-    public class RelatedInformationServicePermissionTests
+    public class ReleaseNoteServicePermissionTests
     {
         private readonly Release _release = new Release
         {
@@ -22,52 +23,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         };
 
         [Fact]
-        public void AddRelatedInformationAsync()
+        public void AddReleaseNoteAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.AddRelatedInformationAsync(
+                    service.AddReleaseNoteAsync(
                         _release.Id,
-                        new CreateUpdateLinkRequest()), 
+                        new CreateOrUpdateReleaseNoteRequest()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
         [Fact]
-        public void DeleteRelatedInformationAsync()
+        public void DeleteReleaseNoteAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteRelatedInformationAsync(
+                    service.DeleteReleaseNoteAsync(
                         _release.Id,
                         Guid.NewGuid()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
         [Fact]
-        public void UpdateRelatedInformationAsync()
+        public void UpdateReleaseNoteAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.UpdateRelatedInformationAsync(
+                    service.UpdateReleaseNoteAsync(
                         _release.Id,
                         Guid.NewGuid(), 
-                        new CreateUpdateLinkRequest()), 
+                        new CreateOrUpdateReleaseNoteRequest()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
         
         private void AssertSecurityPoliciesChecked<T>(
-            Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+            Func<ReleaseNoteService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (contentDbContext, releaseHelper, userService) = Mocks();
+            var (mapper, contentDbContext, releaseHelper, userService) = Mocks();
 
-            var service = new RelatedInformationService(contentDbContext.Object, releaseHelper.Object, userService.Object);
+            var service = new ReleaseNoteService(mapper.Object, contentDbContext.Object, releaseHelper.Object, userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
         
         private (
+            Mock<IMapper>,
             Mock<ContentDbContext>,
             Mock<IPersistenceHelper<Release,Guid>>,
             Mock<IUserService>) Mocks()
         {
             return (
+                new Mock<IMapper>(), 
                 new Mock<ContentDbContext>(), 
                 MockUtils.MockPersistenceHelper(_release.Id, _release), 
                 new Mock<IUserService>());
