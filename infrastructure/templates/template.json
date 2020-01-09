@@ -1926,6 +1926,10 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
       "properties": {
         "name": "[variables('publisherPlanName')]",
         "workerSize": "0",
