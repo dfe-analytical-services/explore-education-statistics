@@ -1910,7 +1910,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2018-11-01",
       "name": "[variables('publisherPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -1928,8 +1928,10 @@
       },
       "properties": {
         "name": "[variables('publisherPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
