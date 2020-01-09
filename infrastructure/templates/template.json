@@ -1786,7 +1786,7 @@
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
       ],
