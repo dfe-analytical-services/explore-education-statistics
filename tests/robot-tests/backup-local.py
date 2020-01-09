@@ -96,3 +96,8 @@ for blob in generator:
 os.makedirs(os.path.join('backup-data', 'imports'))
 backup_table_cmd = [AzCopy, f'/Source:{storage_table_url}/imports', '/sourceType:table', f'/Dest:{os.path.join(os.getcwd(),"backup-data", "imports")}', f'/SourceKey:{storage_key}', '/Manifest:table-backup.manifest']
 print(subprocess.run(backup_table_cmd))
+
+# Backup ReleaseStatus table to backup-data/ReleaseStatus
+os.makedirs(os.path.join('backup-data', 'ReleaseStatus'))
+backup_table_cmd = [AzCopy, f'/Source:{storage_table_url}/ReleaseStatus', '/sourceType:table', f'/Dest:{os.path.join(os.getcwd(),"backup-data", "ReleaseStatus")}', f'/SourceKey:{storage_key}', '/Manifest:table-backup.manifest']
+print(subprocess.run(backup_table_cmd))
