@@ -720,16 +720,16 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
-          ],
-          "properties": {
-          }
-        },
+        // {
+        //   "type": "siteextensions",
+        //   "name": "Microsoft.ApplicationInsights.AzureWebSites",
+        //   "apiVersion": "2016-08-01",
+        //   "dependsOn": [
+        //     "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+        //   ],
+        //   "properties": {
+        //   }
+        // },
         {
           "condition": "[parameters('deploySubnets')]",
           "name": "virtualNetwork",
