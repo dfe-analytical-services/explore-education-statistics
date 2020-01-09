@@ -283,7 +283,7 @@
     },
     "deploySubnets": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
 
     "publishReleasesCronSchedule": {
