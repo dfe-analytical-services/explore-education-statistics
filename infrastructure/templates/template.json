@@ -74,6 +74,12 @@
         "description": "Firewall restrictions for the admin application"
       }
     },
+    "storageFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for storage accounts, string array"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
@@ -342,6 +348,8 @@
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
+    "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
+    "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -1101,8 +1109,7 @@
               "action": "Allow"
             }
           ],
-          "ipRules": [
-          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
       },
@@ -2088,8 +2095,7 @@
               "action": "Allow"
             }
           ],
-          "ipRules": [
-          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
       },
@@ -2185,8 +2191,29 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('notifySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.3.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
           }
-
 
         ]
       }
