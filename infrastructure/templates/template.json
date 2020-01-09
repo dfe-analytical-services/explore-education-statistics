@@ -58,7 +58,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S3 Standard",
+      "defaultValue": "S1 Standard",
       "allowedValues": [
         "B1 Basic",
         "B2 Basic",
