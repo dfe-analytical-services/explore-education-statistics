@@ -294,6 +294,10 @@
         "1.2"
       ]
     },
+    "useSubnets": {
+      "type": "bool",
+      "defaultValue": true
+    },
     "deploySubnets": {
       "type": "bool",
       "defaultValue": true
@@ -746,7 +750,7 @@
         //   }
         // },
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1100,7 +1104,7 @@
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
         "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
@@ -1819,7 +1823,7 @@
       },
       "resources": [
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1980,7 +1984,7 @@
       },
       "resources": [
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -2090,7 +2094,7 @@
       "properties": {
         "supportsHttpsTrafficOnly": true,
         "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
@@ -2122,6 +2126,7 @@
     },
 
     {
+      "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
