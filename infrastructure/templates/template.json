@@ -1108,14 +1108,18 @@
           "bypass": "AzureServices",
           "virtualNetworkRules": [
             {
+              "condition": "[parameters('useSubnets')]",
               "id": "[variables('adminSubnetRef')]",
               "action": "Allow"
             },
             {
+
+              "condition": "[parameters('useSubnets')]",
               "id": "[variables('importerSubnetRef')]",
               "action": "Allow"
             },
             {
+              "condition": "[parameters('useSubnets')]",
               "id": "[variables('publisherSubnetRef')]",
               "action": "Allow"
             }
