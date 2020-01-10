@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -9,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
@@ -38,65 +41,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public ActionResult<FootnoteViewModel> CreateFootnote(CreateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(CreateFootnoteViewModel footnote)
         {
-            var created = _footnoteService.CreateFootnote(footnote.Content,
-                footnote.Filters,
-                footnote.FilterGroups,
-                footnote.FilterItems,
-                footnote.Indicators,
-                footnote.Subjects);
-
-            return GatherAndBuildFootnoteViewModel(created);
+            return await _footnoteService
+                .CreateFootnote(footnote.Content,
+                    footnote.Filters,
+                    footnote.FilterGroups,
+                    footnote.FilterItems,
+                    footnote.Indicators,
+                    footnote.Subjects)
+                .OnSuccess(GatherAndBuildFootnoteViewModel)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteFootnote(Guid id)
+        public async Task<ActionResult> DeleteFootnote(Guid id)
         {
-            return CheckFootnoteExists(id, () =>
-            {
-                _footnoteService.DeleteFootnote(id);
-                return new NoContentResult();
-            });
+            return await _footnoteService
+                .DeleteFootnote(id)
+                .HandleFailuresOr(result => new NoContentResult());
         }
 
         [HttpGet("release/{releaseId}")]
-        public ActionResult<FootnotesViewModel> GetFootnotes(Guid releaseId)
+        public async Task<ActionResult<FootnotesViewModel>> GetFootnotes(Guid releaseId)
         {
-            var footnotes = _footnoteService.GetFootnotes(releaseId).Select(GatherAndBuildFootnoteViewModel);
-            var subjects = _releaseMetaService.GetSubjects(releaseId).ToDictionary(subject => subject.Id, subject =>
-                new FootnotesSubjectMetaViewModel
+            return await _footnoteService
+                .GetFootnotesAsync(releaseId)
+                .OnSuccess(footnotes =>
                 {
-                    Filters = GetFilters(subject.Id),
-                    Indicators = GetIndicators(subject.Id),
-                    SubjectId = subject.Id,
-                    SubjectName = subject.Label
-                });
+                    var viewModels = footnotes.Select(GatherAndBuildFootnoteViewModel);
 
-            return new FootnotesViewModel
-            {
-                Footnotes = footnotes,
-                Meta = subjects
-            };
+                    var subjects = _releaseMetaService
+                        .GetSubjects(releaseId)
+                        .ToDictionary(subject => subject.Id, subject =>
+                            new FootnotesSubjectMetaViewModel
+                            {
+                                Filters = GetFilters(subject.Id),
+                                Indicators = GetIndicators(subject.Id),
+                                SubjectId = subject.Id,
+                                SubjectName = subject.Label
+                            }
+                        );
+
+                    return new FootnotesViewModel
+                    {
+                        Footnotes = viewModels,
+                        Meta = subjects
+
+                    };
+                })
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<FootnoteViewModel> UpdateFootnote(Guid id, UpdateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid id, UpdateFootnoteViewModel footnote)
         {
-            var updated = _footnoteService.UpdateFootnote(id,
-                footnote.Content,
-                footnote.Filters,
-                footnote.FilterGroups,
-                footnote.FilterItems,
-                footnote.Indicators,
-                footnote.Subjects);
-
-            return GatherAndBuildFootnoteViewModel(updated);
-        }
-
-        private ActionResult CheckFootnoteExists(Guid id, Func<ActionResult> andThen)
-        {
-            return _footnoteService.Exists(id) ? andThen.Invoke() : NotFound();
+            return await _footnoteService
+                .UpdateFootnote(id,
+                    footnote.Content,
+                    footnote.Filters,
+                    footnote.FilterGroups,
+                    footnote.FilterItems,
+                    footnote.Indicators,
+                    footnote.Subjects
+                )
+                .OnSuccess(GatherAndBuildFootnoteViewModel)
+                .HandleFailuresOr(Ok);
         }
 
         private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)

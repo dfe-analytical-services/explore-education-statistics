@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -46,10 +47,13 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent.IFootnoteService;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
@@ -272,10 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
-            ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
-            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.ReleaseNoteNotFound);
-            ServicesAddPersistenceHelper(services, c => c.DataBlocks, ValidationErrorMessages.ContentBlockNotFound);
-            ServicesAddPersistenceHelper(services, c => c.Publications, ValidationErrorMessages.PublicationNotFound);
+            AddPersistenceHelper<Release, ContentDbContext>(services, c => c.Releases, ReleaseNotFound);
+            AddPersistenceHelper<Update, ContentDbContext>(services, c => c.Update, ReleaseNoteNotFound);
+            AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks, ContentBlockNotFound);
+            AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications, PublicationNotFound);
+            AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote, EntityNotFound);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -322,19 +327,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
         }
 
-        private static void ServicesAddPersistenceHelper<TEntity>(
+        private static void AddPersistenceHelper<TEntity, TDbContext>(
             IServiceCollection services, 
-            Func<ContentDbContext, DbSet<TEntity>> entitySetFn,
+            Func<TDbContext, DbSet<TEntity>> entitySetFn,
             ValidationErrorMessages notFoundMessage)
             where TEntity : class 
+            where TDbContext : DbContext
         {
             services.AddTransient<
                 IPersistenceHelper<TEntity, Guid>,
-                PersistenceHelper<TEntity, Guid, ContentDbContext>>(
+                PersistenceHelper<TEntity, Guid, TDbContext>>(
                 s =>
                 {
-                    var dbContext = s.GetService<ContentDbContext>();
-                    return new PersistenceHelper<TEntity, Guid, ContentDbContext>(
+                    var dbContext = s.GetService<TDbContext>();
+                    return new PersistenceHelper<TEntity, Guid, TDbContext>(
                         dbContext,
                         entitySetFn.Invoke(dbContext),
                         notFoundMessage);
