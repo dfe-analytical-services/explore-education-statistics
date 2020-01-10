@@ -1,9 +1,22 @@
 from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
+from selenium.webdriver.common.action_chains  import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 from datetime import datetime
 import json
+
+def user_sets_focus_to_element(selector):
+  if selector.startswith('css:'):
+    selector = selector[4:]
+    sl.wait_until_page_contains_element(f'css:{selector}')
+    elem = sl.driver.find_element_by_css_selector(selector)
+  elif selector.startswith('xpath:'):
+    selector = selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{selector}')
+    elem = sl.driver.find_element_by_xpath(selector)
+  elem.send_keys(Keys.NULL)
 
 def set_cookie_from_json(cookie_json):
   cookie_dict = json.loads(cookie_json)

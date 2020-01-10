@@ -133,121 +133,63 @@ Validate Gender female Overall absence rate row
     user checks results table cell contains  6    3     4.6%
     user checks results table cell contains  6    4     4.5%
 
-User generates a permanent link
-    [Tags]   HappyPath
-    user clicks element    xpath://*[text()="Generate permanent link"]
-    user waits until page contains element   xpath://a[text()="View permanent link"]   60
-    user checks generated permalink is valid
-
-User validates permanent link works correctly
-    [Tags]   HappyPath
-    user clicks link   View permanent link
-    select window    NEW
-    user waits until page contains heading  'Absence by characteristic' from 'Pupil absence in schools in England'
-
-User validates permalink table columns
-    [Tags]   HappyPath
-    user checks results table column heading contains  1   1   2012/13
-    user checks results table column heading contains  1   2   2013/14
-    user checks results table column heading contains  1   3   2014/15
-    user checks results table column heading contains  1   4   2015/16
-
-User validates permalink table rows
-    [Tags]   HappyPath
-    user checks results table row heading contains  1    1    Gender
-    user checks results table row heading contains  1    2    Gender male
-    user checks results table row heading contains  1    3    Authorised absence rate
-    user checks results table row heading contains  2    1    Unauthorised absence rate
-    user checks results table row heading contains  3    1    Overall absence rate
-
-    user checks results table row heading contains  4    1    Gender female
-    user checks results table row heading contains  4    2    Authorised absence rate
-    user checks results table row heading contains  5    1    Unauthorised absence rate
-    user checks results table row heading contains  6    1    Overall absence rate
-
-Validate Permalink Gender male Authorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  1    1     4.2%
-    user checks results table cell contains  1    2     3.4%
-    user checks results table cell contains  1    3     3.6%
-    user checks results table cell contains  1    4     3.5%
-
-Validate Permalink Gender male Unauthorised absence rate row
-    [Tags]  HappyPath
-
-    user checks results table cell contains  2    1     1.1%
-    user checks results table cell contains  2    2     1.1%
-    user checks results table cell contains  2    3     1.1%
-    user checks results table cell contains  2    4     1.1%
-
-Validate Permalink Gender male Overall absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  3    1     5.2%
-    user checks results table cell contains  3    2     4.5%
-    user checks results table cell contains  3    3     4.6%
-    user checks results table cell contains  3    4     4.6%
-
-Validate Permalink Gender female Authorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  4    1     4.2%
-    user checks results table cell contains  4    2     3.5%
-    user checks results table cell contains  4    3     3.5%
-    user checks results table cell contains  4    4     3.4%
-
-Validate Permalink Gender female Unauthorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  5    1     1.1%
-    user checks results table cell contains  5    2     1.1%
-    user checks results table cell contains  5    3     1.1%
-    user checks results table cell contains  5    4     1.1%
-
-Validate Permalink Gender female Overall absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  6    1     5.3%
-    user checks results table cell contains  6    2     4.5%
-    user checks results table cell contains  6    3     4.6%
-    user checks results table cell contains  6    4     4.5%
-
 Reorder results
-    [Tags]  HappyPath   UnderConstruction
+    [Tags]  HappyPath
     user opens details dropdown     Re-order table headers
+    user reorders table headers  xpath://legend[text()="Row group 1"]   xpath://legend[text()="Column groups"]  # England to Column groups
 
-    user reorders table headers  xpath://legend[text()="Row group 1"]   xpath://legend[text()="Column groups"]  # England
+Reorder results 2
+    [Tags]  HappyPath
     user waits until page contains element   xpath://legend[text()="Column group 2"]
-    user reorders table headers  xpath://legend[text()="Row group 1"]   xpath://legend[text()="Column groups"]  # Gender female, Gender male
-    user waits until page contains element   xpath://legend[text()="Column group 3"]
-    user reorders table headers  xpath://legend[text()="Column group 3"]    xpath://div[text()="Add groups by dragging them here"]
+    user checks page does not contain element   xpath://legend[text()="Row group 1"]
+    user reorders table headers  xpath://legend[text()="Column group 1"]   xpath://*[text()="Add groups by dragging them here"]  # Gender female, Gender male to Row groups
+    user waits until page contains element   xpath://legend[text()="Row group 1"]
+    user checks page does not contain element   xpath://legend[text()="Column group 2"]
 
-    user reorders table headers  xpath://strong[text()="Gender male"]/..  xpath://strong[text()="Gender female"]/..
-    user reorders table headers  xpath://strong[text()="Authorised absence rate"]   xpath://strong[text()="Unauthorised absence rate"]
-    user reorders table headers  xpath://strong[text()="2012/13"]   xpath://strong[text()="2015/16"]
-    
+Reorder results 3
+    [Tags]  HappyPath
+    user sets focus to element   //strong[text()="Gender male"]/../..  # The /../.. to get to a focusable element
+    press keys    ${NONE}  SPACE
+    press keys    ${NONE}  ARROW_DOWN
+    press keys    ${NONE}  SPACE
+
+    user sets focus to element  //strong[text()="Authorised absence rate"]/../..  # The /../.. to get to a focusable element
+    press keys    ${NONE}  SPACE
+    press keys    ${NONE}  ARROW_DOWN
+    press keys    ${NONE}  ARROW_DOWN
+    sleep  1
+    press keys    ${NONE}  SPACE
+
+    user sets focus to element  //strong[text()="2012/13"]/../..  # The /../.. to get to a focusable element
+    press keys    ${NONE}  SPACE
+    press keys    ${NONE}  ARROW_DOWN
+    press keys    ${NONE}  ARROW_DOWN
+    press keys    ${NONE}  ARROW_DOWN
+    sleep  1
+    press keys    ${NONE}  SPACE
+
     user clicks element     xpath://button[text()="Re-order table"]
 
 Validate results table column headings after reordering
-    [Tags]  HappyPath     UnderConstruction
-    user checks results table column heading contains  1   1   Gender female
-    user checks results table column heading contains  1   2   Gender male
-
-    user checks results table column heading contains  2   1   England
-    user checks results table column heading contains  2   2   England
-
-    user checks results table column heading contains  3   1   2013/14
-    user checks results table column heading contains  3   2   2014/15
-    user checks results table column heading contains  3   3   2015/16
-    user checks results table column heading contains  3   4   2012/13
-
-    user checks results table column heading contains  3   5   2013/14
-    user checks results table column heading contains  3   6   2014/15
-    user checks results table column heading contains  3   7   2015/16
-    user checks results table column heading contains  3   8   2012/13
+    [Tags]  HappyPath
+    user checks results table column heading contains  1   1   2013/14
+    user checks results table column heading contains  1   2   2014/15
+    user checks results table column heading contains  1   3   2015/16
+    user checks results table column heading contains  1   4   2012/13
 
 Validate results table row headings after reordering
-    [Tags]  HappyPath     UnderConstruction
-    user checks results table row heading contains  1    1      Total
-#    user checks results table row heading contains  1    2      Authorised absence rate
-#    user checks results table row heading contains  2    1      Overall absence rate
-#    user checks results table row heading contains  3    1      Unauthorised absence rate
+    [Tags]  HappyPath
+    user checks results table row heading contains  1    1      Gender
+
+    user checks results table row heading contains  1    2      Gender female
+    user checks results table row heading contains  1    3      Unauthorised absence rate
+    user checks results table row heading contains  2    1      Overall absence rate
+    user checks results table row heading contains  3    1      Authorised absence rate
+
+    user checks results table row heading contains  4    1      Gender male
+    user checks results table row heading contains  4    2      Unauthorised absence rate
+    user checks results table row heading contains  5    1      Overall absence rate
+    user checks results table row heading contains  6    1      Authorised absence rate
 
 Validate Total Overall absence rate row after reordering
     [Tags]  HappyPath    UnderConstruction
@@ -291,3 +233,77 @@ Validate Total Authorised absence rate row after reordering
     user checks results table cell contains  5    7     3.6%
     user checks results table cell contains  5    8     3.5%
     user checks results table cell contains  5    9     4.2%
+
+User generates a permanent link
+    [Tags]   HappyPath    UnderConstruction
+    user clicks element    xpath://*[text()="Generate permanent link"]
+    user waits until page contains element   xpath://a[text()="View permanent link"]   60
+    user checks generated permalink is valid
+
+User validates permanent link works correctly
+    [Tags]   HappyPath    UnderConstruction
+    user clicks link   View permanent link
+    select window    NEW
+    user waits until page contains heading  'Absence by characteristic' from 'Pupil absence in schools in England'
+
+User validates permalink table columns
+    [Tags]   HappyPath    UnderConstruction
+    user checks results table column heading contains  1   1   2012/13
+    user checks results table column heading contains  1   2   2013/14
+    user checks results table column heading contains  1   3   2014/15
+    user checks results table column heading contains  1   4   2015/16
+
+User validates permalink table rows
+    [Tags]   HappyPath    UnderConstruction
+    user checks results table row heading contains  1    1    Gender
+    user checks results table row heading contains  1    2    Gender male
+    user checks results table row heading contains  1    3    Authorised absence rate
+    user checks results table row heading contains  2    1    Unauthorised absence rate
+    user checks results table row heading contains  3    1    Overall absence rate
+
+    user checks results table row heading contains  4    1    Gender female
+    user checks results table row heading contains  4    2    Authorised absence rate
+    user checks results table row heading contains  5    1    Unauthorised absence rate
+    user checks results table row heading contains  6    1    Overall absence rate
+
+Validate Permalink Gender male Authorised absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  1    1     4.2%
+    user checks results table cell contains  1    2     3.4%
+    user checks results table cell contains  1    3     3.6%
+    user checks results table cell contains  1    4     3.5%
+
+Validate Permalink Gender male Unauthorised absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  2    1     1.1%
+    user checks results table cell contains  2    2     1.1%
+    user checks results table cell contains  2    3     1.1%
+    user checks results table cell contains  2    4     1.1%
+
+Validate Permalink Gender male Overall absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  3    1     5.2%
+    user checks results table cell contains  3    2     4.5%
+    user checks results table cell contains  3    3     4.6%
+    user checks results table cell contains  3    4     4.6%
+
+Validate Permalink Gender female Authorised absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  4    1     4.2%
+    user checks results table cell contains  4    2     3.5%
+    user checks results table cell contains  4    3     3.5%
+    user checks results table cell contains  4    4     3.4%
+
+Validate Permalink Gender female Unauthorised absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  5    1     1.1%
+    user checks results table cell contains  5    2     1.1%
+    user checks results table cell contains  5    3     1.1%
+    user checks results table cell contains  5    4     1.1%
+
+Validate Permalink Gender female Overall absence rate row
+    [Tags]  HappyPath    UnderConstruction
+    user checks results table cell contains  6    1     5.3%
+    user checks results table cell contains  6    2     4.5%
+    user checks results table cell contains  6    3     4.6%
+    user checks results table cell contains  6    4     4.5%
