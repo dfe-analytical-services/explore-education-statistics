@@ -144,12 +144,13 @@ const ReleaseFileUploadsSection = ({
               </>
             )}
 
-            {files && (
+            {files && files.length > 0 && (
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded files</h2>
               </>
             )}
+
             {files &&
               files.map(file => (
                 <SummaryList key={file.filename}>
