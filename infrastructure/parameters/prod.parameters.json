@@ -1,18 +1,24 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "skuPublic": {
-            "value": "B1 Basic"
-        },
-        "skuData": {
-            "value": "S2 Standard"
-        },
-        "skuContent": {
-            "value": "S1 Standard"
-        },
-        "skuAdmin": {
-            "value": "S2 Standard"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuPublic": {
+      "value": "B1 Basic"
+    },
+    "skuData": {
+      "value": "S2 Standard"
+    },
+    "skuContent": {
+      "value": "S1 Standard"
+    },
+    "skuAdmin": {
+      "value": "S2 Standard"
+    },
+    "useSubnets": {
+      "value": false
+    },
+    "deploySubnets": {
+      "value": false
     }
+  }
 }
