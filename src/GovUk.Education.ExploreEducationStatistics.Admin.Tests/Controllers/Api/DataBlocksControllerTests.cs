@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsActionResult(_releaseId, null))
+                    .CheckEntityExists(_releaseId, null))
                 .Returns(_releaseExistsResult);
         }
         
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsActionResult(_releaseId, null))
+                    .CheckEntityExists(_releaseId, null))
                 .Returns(_releaseNotFoundResult);
         }
         
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsActionResult(_dataBlockId, null))
+                    .CheckEntityExists(_dataBlockId, null))
                 .Returns(_dataBlockExistsResult);
         }
         
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             releaseHelper
                 .Setup(s => s
-                    .CheckEntityExistsActionResult(_dataBlockId, null))
+                    .CheckEntityExists(_dataBlockId, null))
                 .Returns(_dataBlockNotFoundResult);
         }
     }

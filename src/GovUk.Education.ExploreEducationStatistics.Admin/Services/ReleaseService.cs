@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, Release>> GetAsync(Guid id)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(id)
+                .CheckEntityExists(id)
                 .OnSuccess(_userService.CheckCanViewRelease);
         }
         
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
                 .OnSuccess(async release => {
                     release.Status = status;

@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             CreateOrUpdateReleaseNoteRequest request)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateReleaseForUpdates)
+                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseNoteId, CreateOrUpdateReleaseNoteRequest request)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateReleaseForUpdates)
+                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseNoteId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateReleaseForUpdates)
+                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
