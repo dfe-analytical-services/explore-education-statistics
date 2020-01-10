@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await TriggerDataFactoryReleasePipeline(executionContext, message);
-            await UpdateStage(message, Started);
+            var response = await TriggerDataFactoryReleasePipeline(executionContext, message);
+            await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
         
-        private async Task TriggerDataFactoryReleasePipeline(ExecutionContext context, PublishReleaseDataMessage message)
+        private async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context, PublishReleaseDataMessage message)
         {
             var config = LoadAppSettings(context);
             var subscriptionId = config.GetValue<string>(SubscriptionId);
@@ -69,10 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var url = $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
             using var client = new HttpClient();
 
-            var response = await client.PostAsync(url, data);
-
-            // TODO Check result etc
-            string result = response.Content.ReadAsStringAsync().Result;
+            return await client.PostAsync(url, data);
         }
         
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)

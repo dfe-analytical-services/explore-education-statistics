@@ -30,25 +30,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             log.LogInformation($"{executionContext.FunctionName} triggered");
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            PipelineResponse response = JsonConvert.DeserializeObject<PipelineResponse>(requestBody);
 
-            var releaseId = new Guid(data.ReleaseId);
-            var releaseStatusId = new Guid(data.ReleaseStatusId);
-            string status = data.Status;
-            string err = data.ErrorMessage;
-
-            if (status == "Failed")
+            if (response.Status == "Failed")
             {
-                log.LogError($"Datafactory pipelined failed with error: {err}");
+                log.LogError($"Datafactory pipelined failed with error: {response.ErrorMessage}");
             }
             
-            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, status == "Complete"? Complete : Failed);
+            await _releaseStatusService.UpdateFilesStageAsync(response.ReleaseId, response.ReleaseStatusId, response.Status == "Complete"? Complete : Failed);
             
             log.LogInformation($"{executionContext.FunctionName} complete");
 
-            return status != null
-                ? (ActionResult) new OkObjectResult($"status, {status}")
+            return response.Status != null
+                ? (ActionResult) new OkObjectResult($"status, {response.Status}")
                 : new BadRequestObjectResult("No status was passed in the request body");
         }
+    }
+
+    public class PipelineResponse
+    {
+        public Guid ReleaseId { get; set; }
+        public Guid ReleaseStatusId { get; set; }
+        public string Status { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }
