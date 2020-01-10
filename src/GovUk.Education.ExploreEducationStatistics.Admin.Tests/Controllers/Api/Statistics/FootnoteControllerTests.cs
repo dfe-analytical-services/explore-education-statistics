@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent.IFootnoteService;
+using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
@@ -49,11 +49,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
             
             footnoteService.Setup(s => s.CreateFootnote("Sample footnote",
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>())).Returns(createFootnoteResult);
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>())).Returns(createFootnoteResult);
 
             var updateFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(new Footnote
             {
@@ -68,11 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             footnoteService.Setup(s => s.UpdateFootnote(FootnoteId,
                 "Updated sample footnote",
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>(),
-                It.IsAny<IEnumerable<Guid>>())).Returns(updateFootnoteResult);
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<Guid>>())).Returns(updateFootnoteResult);
 
             var footnotes = Task.FromResult(new Either<ActionResult, IEnumerable<Footnote>>(new List<Footnote>
             {
