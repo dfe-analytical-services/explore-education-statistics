@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
@@ -17,7 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleaseStatusService _releaseStatusService;
 
         public const string QueueName = "publish-release-data";
-
+        
+        private const string SubscriptionId = "AzureSubscriptionId";
+        private const string ResourceGroupName = "AzureResourceGroupName";
+        private const string DataFactoryName = "AzureDataFactoryName";
+        private const string DataFactoryPipelineName = "AzureDataFactoryPipelineName";
+        
         public PublishReleaseDataFunction(IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
@@ -30,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await TriggerDataFactoryReleasePipeline(message);
+            await TriggerDataFactoryReleasePipeline(executionContext, message);
             await UpdateStage(message, Started);
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
@@ -40,9 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
         
-        private async Task TriggerDataFactoryReleasePipeline(PublishReleaseDataMessage message)
+        private async Task TriggerDataFactoryReleasePipeline(ExecutionContext context, PublishReleaseDataMessage message)
         {
-            // TODO - get the additional params to pass to pipeline
+            var config = LoadAppSettings(context);
+            var subscriptionId = config.GetValue<string>(SubscriptionId);
+            var resourceGroupName = config.GetValue<string>(ResourceGroupName);
+            var dataFactoryName = config.GetValue<string>(DataFactoryName);
+            var dataFactoryPipelineName = config.GetValue<string>(DataFactoryPipelineName);
+            
             Dictionary<string, Guid> postParams = new Dictionary<string, Guid>
             {
                 {"releaseId", message.ReleaseId},
@@ -52,21 +63,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {"publicationId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
                 {"subjectId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
             };
-            
-            var subscriptionId = "Guid - derive from running function possibly";
-            var resourceGroupName = "Azure resource group name";
-            var factoryName = "s101d01datafactory";
-            var pipelineName = "pl_release_statistics";
-            
+
             var json = JsonConvert.SerializeObject(postParams);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var url = $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}/createRun?api-version=2018-06-01";
+            var url = $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
             using var client = new HttpClient();
 
             var response = await client.PostAsync(url, data);
 
             // TODO Check result etc
             string result = response.Content.ReadAsStringAsync().Result;
+        }
+        
+        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -22,26 +23,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         
         [FunctionName("DataFactoryPipelineStatusFunction")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "publisher/datafactory/pipeline/status")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publisher/datafactory/pipeline/status/")]
             HttpRequest req,
-            ILogger log)
+            ILogger log,
+            ExecutionContext executionContext)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation($"{executionContext.FunctionName} triggered");
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-            var releaseId = data.ReleaseId;
-            var releaseStatusId = data.ReleaseStatusId;
-            var status = data.status;
-            
-            // TODO check status etc
+            var releaseId = new Guid(data.ReleaseId);
+            var releaseStatusId = new Guid(data.ReleaseStatusId);
+            string status = data.Status;
+            string err = data.ErrorMessage;
 
-            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, Complete);
+            if (status == "Failed")
+            {
+                log.LogError($"Datafactory pipelined failed with error: {err}");
+            }
+            
+            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, status == "Complete"? Complete : Failed);
+            
+            log.LogInformation($"{executionContext.FunctionName} complete");
 
             return status != null
                 ? (ActionResult) new OkObjectResult($"status, {status}")
                 : new BadRequestObjectResult("No status was passed in the request body");
         }
     }
-    
 }
