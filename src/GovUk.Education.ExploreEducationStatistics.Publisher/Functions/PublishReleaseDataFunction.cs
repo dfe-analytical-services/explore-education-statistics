@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -16,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseDataFunction
     {
         private readonly IReleaseStatusService _releaseStatusService;
-
+        private readonly StatisticsDbContext _context;
+        
         public const string QueueName = "publish-release-data";
         
         private const string SubscriptionId = "AzureSubscriptionId";
@@ -24,9 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private const string DataFactoryName = "AzureDataFactoryName";
         private const string DataFactoryPipelineName = "AzureDataFactoryPipelineName";
         
-        public PublishReleaseDataFunction(IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(
+            StatisticsDbContext context,
+            IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
+            _context = context;
         }
 
         [FunctionName("PublishReleaseData")]
@@ -54,14 +61,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var dataFactoryName = config.GetValue<string>(DataFactoryName);
             var dataFactoryPipelineName = config.GetValue<string>(DataFactoryPipelineName);
             
+            var subject = _context.Subject
+                .Where(s => s.Id.Equals(message.ReleaseId))
+                .Include(s => s.Release)
+                .ThenInclude(r => r.Publication)
+                .ThenInclude(p => p.Topic)
+                .ThenInclude(t => t.Theme)
+                .FirstOrDefault();
+            
             Dictionary<string, Guid> postParams = new Dictionary<string, Guid>
             {
-                {"releaseId", message.ReleaseId},
+                {"subjectId", subject.Id},
+                {"releaseId", subject.ReleaseId},
                 {"releaseStatusId", message.ReleaseStatusId},
-                {"themeId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
-                {"topicId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
-                {"publicationId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
-                {"subjectId", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")},
+                {"publicationId", subject.Release.PublicationId},
+                {"topicId", subject.Release.Publication.TopicId},
+                {"themeId", subject.Release.Publication.Topic.ThemeId},
             };
 
             var json = JsonConvert.SerializeObject(postParams);
