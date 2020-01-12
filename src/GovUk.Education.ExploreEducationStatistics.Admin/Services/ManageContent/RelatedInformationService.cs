@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -17,24 +17,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly IUserService _userService; 
 
-        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper)
+        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper, 
+            IUserService userService)
         {
             _context = context;
             _releaseHelper = releaseHelper;
+            _userService = userService;
         }
         
-        public Task<Either<ValidationResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
+        public Task<Either<ActionResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExists(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(release => release.RelatedInformation);
         }
 
-        public Task<Either<ValidationResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
+        public Task<Either<ActionResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
         {
             return _releaseHelper
-                .CheckEntityExists(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
                     if (release.RelatedInformation == null)
@@ -55,18 +59,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
         
-        public Task<Either<ValidationResult, List<BasicLink>>> UpdateRelatedInformationAsync(
+        public Task<Either<ActionResult, List<BasicLink>>> UpdateRelatedInformationAsync(
             Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
             return _releaseHelper
-                .CheckEntityExists(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    var toUpdate = release.RelatedInformation.Find(item => item.Id == relatedInformationId);
+                    var toUpdate = release
+                        .RelatedInformation
+                        .Find(item => item.Id == relatedInformationId);
 
                     if (toUpdate == null)
                     {
-                        return ValidationResult(ValidationErrorMessages.RelatedInformationItemNotFound);
+                        return NotFound<List<BasicLink>>();
                     }
 
                     toUpdate.Description = request.Description;
@@ -74,14 +81,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
-                    return new Either<ValidationResult, List<BasicLink>>(release.RelatedInformation);
+                    return release.RelatedInformation;
                 });
         }
         
-        public Task<Either<ValidationResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
+        public Task<Either<ActionResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
         {
             return _releaseHelper
-                .CheckEntityExists(releaseId)
+                .CheckEntityExistsActionResult(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
                     release.RelatedInformation.Remove(

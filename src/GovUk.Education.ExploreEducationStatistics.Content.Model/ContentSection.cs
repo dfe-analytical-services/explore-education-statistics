@@ -157,8 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class Table
     {
-        public List<Guid> indicators { get; set; }
-
         public TableHeaders tableHeaders { get; set; }
     }
 
@@ -166,14 +164,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public List<List<TableOption>> columnGroups { get; set; }
         public List<TableOption> columns { get; set; }
-        public List<List<TableOption>> rowGroups { get; set; }
+        public List<List<TableRowGroupOption>> rowGroups { get; set; }
         public List<TableOption> rows { get; set; }
     }
 
+    public class TableRowGroupOption
+    {
+        public string label { get; set; }
+        public string level { get; set; }
+        public string value { get; set; }
+
+        public TableRowGroupOption()
+        {
+        }
+
+        public TableRowGroupOption(string label, string level, string value)
+        {
+            this.label = label;
+            this.level = level;
+            this.value = value;
+        }
+    }
+    
     public class TableOption
     {
         public string label { get; set; }
         public string value { get; set; }
+
+        public TableOption()
+        {
+        }
+
+        public TableOption(string label, string value)
+        {
+            this.label = label;
+            this.value = value;
+        }
     }
 
     public static class ContentBlockUtil

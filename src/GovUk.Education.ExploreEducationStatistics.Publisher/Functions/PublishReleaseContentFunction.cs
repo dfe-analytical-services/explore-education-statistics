@@ -37,21 +37,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
             {
+                var published = new List<ReleaseStatus>();
                 foreach (var releaseStatus in scheduled)
                 {
                     logger.LogInformation($"Moving content for release: {releaseStatus.ReleaseId}");
-                    await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id,
-                        Started);
-                    await _publishingService.PublishStagedContentAsync(releaseStatus);
+                    await UpdateStage(releaseStatus, Started);
+                    try
+                    {
+                        await _publishingService.PublishStagedContentAsync(releaseStatus);
+                        published.Add(releaseStatus);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                        await UpdateStage(releaseStatus, Failed);
+                    }
                 }
 
-                var releaseIds = scheduled.Select(status => status.ReleaseId);
-                await _notificationsService.NotifySubscribersAsync(releaseIds);
+                var releaseIds = published.Select(status => status.ReleaseId);
 
-                foreach (var releaseStatus in scheduled)
+                try
                 {
-                    await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id,
-                        Complete);
+                    await _notificationsService.NotifySubscribersAsync(releaseIds);
+                    await UpdateStage(published, Complete);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    await UpdateStage(published, Failed);
                 }
             }
 
@@ -72,6 +85,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 stageQuery));
 
             return await _releaseStatusService.ExecuteQueryAsync(query);
+        }
+
+        private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, Stage stage)
+        {
+            foreach (var releaseStatus in releaseStatuses)
+            {
+                await UpdateStage(releaseStatus, stage);
+            }
+        }
+
+        private async Task UpdateStage(ReleaseStatus releaseStatus, Stage stage)
+        {
+            await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, stage);
         }
     }
 }
