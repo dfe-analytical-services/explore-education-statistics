@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         
         [FunctionName("DataFactoryPipelineStatusFunction")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publisher/datafactory/pipeline/status/")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "datafactory/pipeline/status/")]
             HttpRequest req,
             ILogger log,
             ExecutionContext executionContext)

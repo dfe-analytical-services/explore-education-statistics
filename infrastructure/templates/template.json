@@ -317,6 +317,22 @@
       "metadata": {
         "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
       }
+    },
+
+    "azureDataFactoryName": {
+      "type": "string",
+      "defaultValue": "s101d01datafactory",
+      "metadata": {
+        "description": "Datafactory name used by Publish Release Data Function in the Publisher App"
+      }
+    },
+
+    "azureDataFactoryPipelineName": {
+      "type": "string",
+      "defaultValue": "pl_release_statistics",
+      "metadata": {
+        "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
+      }
     }
   },
   "variables": {
@@ -2037,6 +2053,22 @@
             {
               "name": "PublishReleaseContentCronSchedule",
               "value": "[parameters('publishReleaseContentCronSchedule')]"
+            },
+            {
+              "name": "AzureDataFactoryName",
+              "value": "[parameters('azureDataFactoryName')]"
+            },
+            {
+              "name": "AzureDataFactoryPipelineName",
+              "value": "[parameters('azureDataFactoryPipelineName')]"
+            },
+            {
+              "name": "AzureSubscriptionId",
+              "value": "[subscription().subscriptionId]"
+            },
+            {
+              "name": "AzureResourceGroupName",
+              "value": "[resourceGroup().name]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",

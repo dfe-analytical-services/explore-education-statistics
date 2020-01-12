@@ -20,6 +20,12 @@
     "publishReleaseContentCronSchedule": {
       "value": "0 30 * * * *"
     },
+    "azureDataFactoryName": {
+      "value": "s101d01datafactory"
+    },
+    "azureDataFactoryPipelineName": {
+      "value": "pl_release_statistics"
+    },
     "useSubnets": {
       "value": true
     },
