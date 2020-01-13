@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -23,7 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseFilesAsync(PublishReleaseFilesMessage message)
         {
-            await _fileStorageService.CopyReleaseToPublicContainer(message);
+            var copyReleaseCommand = new CopyReleaseCommand
+            {
+                ReleaseId = message.ReleaseId,
+                PublicationSlug = message.PublicationSlug,
+                PublishScheduled = message.ReleasePublished,
+                ReleaseSlug = message.ReleaseSlug
+            };
+            await _fileStorageService.CopyReleaseToPublicContainer(copyReleaseCommand);
         }
     }
 }
