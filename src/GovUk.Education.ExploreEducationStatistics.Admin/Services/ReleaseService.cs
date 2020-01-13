@@ -23,28 +23,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
-        private readonly IPersistenceHelper<Publication, Guid> _publicationHelper;
 
         public ReleaseService(ContentDbContext context, IMapper mapper, IPublishingService publishingService,
-            IPersistenceHelper<Release, Guid> releaseHelper, IUserService userService, IReleaseRepository repository, 
-            IPersistenceHelper<Publication, Guid> publicationHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, IUserService userService, IReleaseRepository repository)
         {
             _context = context;
             _publishingService = publishingService;
             _mapper = mapper;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
-            _publicationHelper = publicationHelper;
         }
 
         public Task<Either<ActionResult, Release>> GetAsync(Guid id)
         {
-            return _releaseHelper
-                .CheckEntityExists(id)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(id)
                 .OnSuccess(_userService.CheckCanViewRelease);
         }
         
@@ -60,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            return await _publicationHelper
-                .CheckEntityExists(createRelease.PublicationId)
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(createRelease.PublicationId)
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
                 .OnSuccess(async () =>
@@ -100,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
@@ -119,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
-            return await _releaseHelper
-                .CheckEntityExists(releaseId)
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
@@ -230,8 +227,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
                 .OnSuccess(async release => {
                     release.Status = status;

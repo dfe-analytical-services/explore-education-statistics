@@ -11,29 +11,26 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
 {
-    public class PersistenceHelper<TEntity, TEntityId, TDbContext> : IPersistenceHelper<TEntity, TEntityId> 
-        where TEntity : class 
+    public class PersistenceHelper<TDbContext> : IPersistenceHelper<TDbContext>
         where TDbContext : DbContext
     {
         private readonly TDbContext _context;
-        private readonly DbSet<TEntity> _entitySet;
             
         public PersistenceHelper(
-            TDbContext context,
-            DbSet<TEntity> entitySet)
+            TDbContext context)
         {
             _context = context;
-            _entitySet = entitySet;
         }
         
-        public Task<Either<ActionResult, TEntity>> CheckEntityExists(
+        public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
             TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) 
+            where TEntity : class
         {
             return HandleErrorsAsync(
                 async () =>
                 {
-                    var queryableEntities = _entitySet
+                    var queryableEntities = _context.Set<TEntity>()
                         .FindByPrimaryKey(_context, id);
 
                     var hydratedEntities = hydrateEntityFn != null
@@ -48,6 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                         : new Either<ActionResult, TEntity>(entity);
                 },
                 entity => Task.FromResult(new Either<ActionResult, TEntity>(entity)));
+        }        
+        
+        public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+            Guid id, 
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) 
+            where TEntity : class
+        {
+            return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
         }
     }
 }

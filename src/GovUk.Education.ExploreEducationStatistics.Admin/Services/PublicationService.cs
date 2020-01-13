@@ -8,12 +8,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -23,16 +25,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IPersistenceHelper<Topic, Guid> _topicHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService, 
-            IPublicationRepository publicationRepository, IPersistenceHelper<Topic, Guid> topicHelper)
+            IPublicationRepository publicationRepository, IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
             _publicationRepository = publicationRepository;
-            _topicHelper = topicHelper;
+            _persistenceHelper = persistenceHelper;
         }
 
         public async Task<Publication> GetAsync(Guid id)
@@ -62,8 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
         {
-            return await _topicHelper
-                .CheckEntityExists(publication.TopicId)
+            return await _persistenceHelper
+                .CheckEntityExists<Topic>(publication.TopicId)
                 .OnSuccess(_userService.CheckCanCreatePublicationForTopic)
                 .OnSuccess(async _ =>
                 {

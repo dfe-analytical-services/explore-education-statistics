@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
 
         private readonly ISubjectService _subjectService;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
 
         private const string ContainerName = "releases";
@@ -37,12 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
-            IPersistenceHelper<Release, Guid> releaseHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
         }
 
         public IEnumerable<FileInfo> ListPublicFilesPreview(Guid releaseId)
@@ -53,8 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -74,8 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteDataFileAsync(Guid releaseId,
             string fileName)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -97,8 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -117,8 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteFileAsync(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {

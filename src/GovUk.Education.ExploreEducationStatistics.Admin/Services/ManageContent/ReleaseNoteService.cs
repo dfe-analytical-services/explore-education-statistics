@@ -21,26 +21,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
 
         public ReleaseNoteService(
             IMapper mapper, 
             ContentDbContext context, 
-            IPersistenceHelper<Release, Guid> releaseHelper, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService)
         {
             _mapper = mapper;
             _context = context;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
         }
 
         public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId,
             CreateOrUpdateReleaseNoteRequest request)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -59,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(Guid releaseId,
             Guid releaseNoteId, CreateOrUpdateReleaseNoteRequest request)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -85,8 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNoteAsync(Guid releaseId,
             Guid releaseNoteId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId, HydrateReleaseForUpdates)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForUpdates)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
