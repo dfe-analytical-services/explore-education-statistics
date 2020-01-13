@@ -125,6 +125,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                   name="pageMode"
                   value={model.pageMode}
                   legend="Set page view"
+                  small
                   options={[
                     {
                       label: 'Add / view comments and edit content',
@@ -135,7 +136,6 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                       value: 'preview',
                     },
                   ]}
-                  inline
                   onChange={event => {
                     setModel({
                       ...model,

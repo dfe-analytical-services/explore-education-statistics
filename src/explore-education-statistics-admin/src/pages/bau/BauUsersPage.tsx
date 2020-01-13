@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
-import Link from '@admin/components/Link';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
+import Link from '@admin/components/Link';
 
 interface Model {
   users: UserStatus[];

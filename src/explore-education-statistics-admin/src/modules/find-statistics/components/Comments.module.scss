@@ -35,5 +35,10 @@
 }
 
 .top {
+  height: auto;
   z-index: 1000;
+}
+
+.commentWhileCommenting {
+  min-height: 470px !important;
 }
