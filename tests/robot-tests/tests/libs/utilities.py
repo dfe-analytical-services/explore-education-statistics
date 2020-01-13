@@ -16,6 +16,8 @@ def user_sets_focus_to_element(selector):
     selector = selector[6:]
     sl.wait_until_page_contains_element(f'xpath:{selector}')
     elem = sl.driver.find_element_by_xpath(selector)
+  else:
+    raise AssertionError('Selector must be either css or xpath!')
   elem.send_keys(Keys.NULL)
 
 def set_cookie_from_json(cookie_json):

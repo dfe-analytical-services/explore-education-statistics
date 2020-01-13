@@ -247,7 +247,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
-  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
+  user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user checks summary list item "${}" should contain link "${link}"
 user selects from list by label
@@ -261,6 +261,7 @@ user clears element text
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
+  sleep   0.1
 
 user enters text into element
   [Arguments]   ${selector}   ${text}
