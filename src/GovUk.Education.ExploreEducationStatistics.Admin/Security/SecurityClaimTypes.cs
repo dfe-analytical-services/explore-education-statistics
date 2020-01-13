@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         AccessAllReleases,
         AccessAllTopics,
         
+        UpdateAllReleases,
+        
         MarkAllReleasesAsDraft,
         SubmitAllReleasesToHigherReview,
         ApproveAllReleases,

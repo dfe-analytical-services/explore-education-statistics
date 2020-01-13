@@ -7,6 +7,7 @@ import {
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import permissionService from '@admin/services/permissions/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import withErrorControl, {
   ErrorControlProps,
@@ -26,6 +27,7 @@ interface Model {
   pageMode: PageMode;
   content: ManageContentPageViewModel;
   availableDataBlocks: DataBlock[];
+  canUpdateRelease: boolean;
 }
 
 const contentSectionComments = (
@@ -71,14 +73,17 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   ) as ManageRelease;
 
   useEffect(() => {
-    releaseContentService
-      .getContent(releaseId)
-      .then(newContent => {
+    Promise.all([
+      releaseContentService.getContent(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ])
+      .then(([newContent, canUpdateRelease]) => {
         setModel({
           unresolvedComments: getUnresolveComments(newContent.release),
-          pageMode: 'edit',
+          pageMode: canUpdateRelease ? 'edit' : 'preview',
           content: newContent,
           availableDataBlocks: newContent.availableDataBlocks,
+          canUpdateRelease,
         });
       })
       .catch(handleApiErrors);
@@ -100,44 +105,48 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     <>
       {model && (
         <>
-          <div className="govuk-form-group">
-            {model.unresolvedComments.length > 0 && (
-              <WarningMessage>
-                There are {model.unresolvedComments.length} unresolved comments
-              </WarningMessage>
-            )}
+          {model.canUpdateRelease && (
+            <div className="govuk-form-group">
+              {model.unresolvedComments.length > 0 && (
+                <WarningMessage>
+                  There are {model.unresolvedComments.length} unresolved
+                  comments
+                </WarningMessage>
+              )}
 
-            <FormFieldset
-              id="pageModelFieldset"
-              legend=""
-              className="dfe-toggle-edit"
-              legendHidden
-            >
-              <FormRadioGroup
-                id="pageMode"
-                name="pageMode"
-                value={model.pageMode}
-                legend="Set page view"
-                small
-                options={[
-                  {
-                    label: 'Add / view comments and edit content',
-                    value: 'edit',
-                  },
-                  {
-                    label: 'Preview content',
-                    value: 'preview',
-                  },
-                ]}
-                onChange={event => {
-                  setModel({
-                    ...model,
-                    pageMode: event.target.value as PageMode,
-                  });
-                }}
-              />
-            </FormFieldset>
-          </div>
+              <FormFieldset
+                id="pageModelFieldset"
+                legend=""
+                className="dfe-toggle-edit"
+                legendHidden
+              >
+                <FormRadioGroup
+                  id="pageMode"
+                  name="pageMode"
+                  value={model.pageMode}
+                  legend="Set page view"
+                  small
+                  options={[
+                    {
+                      label: 'Add / view comments and edit content',
+                      value: 'edit',
+                    },
+                    {
+                      label: 'Preview content',
+                      value: 'preview',
+                    },
+                  ]}
+                  onChange={event => {
+                    setModel({
+                      ...model,
+                      pageMode: event.target.value as PageMode,
+                    });
+                  }}
+                />
+              </FormFieldset>
+            </div>
+          )}
+
           <div
             className={classNames('govuk-width-container', {
               'dfe-align--comments': model.pageMode === 'edit',

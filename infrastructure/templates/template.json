@@ -294,6 +294,10 @@
         "1.2"
       ]
     },
+    "useSubnets": {
+      "type": "bool",
+      "defaultValue": true
+    },
     "deploySubnets": {
       "type": "bool",
       "defaultValue": true
@@ -746,7 +750,7 @@
         //   }
         // },
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1098,27 +1102,31 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true,
-        "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('importerSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "defaultAction": "Deny"
-        }
+        "supportsHttpsTrafficOnly": true
+        // "networkAcls": {
+        //   "condition": "[parameters('useSubnets')]",
+        //   "bypass": "AzureServices",
+        //   "virtualNetworkRules": [
+        //     {
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('adminSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('importerSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('publisherSubnetRef')]",
+        //       "action": "Allow"
+        //     }
+        //   ],
+        //   "ipRules": "[parameters('storageFirewallRules')]",
+        //   "defaultAction": "Deny"
+        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1819,7 +1827,7 @@
       },
       "resources": [
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1980,7 +1988,7 @@
       },
       "resources": [
         {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -2088,23 +2096,23 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "defaultAction": "Deny"
-        }
+        "supportsHttpsTrafficOnly": true
+        // "networkAcls": {
+        //   "condition": "[parameters('useSubnets')]",
+        //   "bypass": "AzureServices",
+        //   "virtualNetworkRules": [
+        //     {
+        //       "id": "[variables('adminSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "id": "[variables('publisherSubnetRef')]",
+        //       "action": "Allow"
+        //     }
+        //   ],
+        //   "ipRules": "[parameters('storageFirewallRules')]",
+        //   "defaultAction": "Deny"
+        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2122,6 +2130,7 @@
     },
 
     {
+      "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",

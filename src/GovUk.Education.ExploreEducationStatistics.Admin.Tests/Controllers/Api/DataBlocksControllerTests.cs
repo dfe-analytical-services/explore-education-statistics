@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupDataBlockExistsResult(dataBlockHelper);
 
             dataBlockService.Setup(s => s.DeleteAsync(_dataBlockId))
-                .Returns(Task.CompletedTask);
+                .Returns(Task.FromResult(new Either<ActionResult, bool>(true)));
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 

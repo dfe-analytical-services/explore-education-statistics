@@ -469,13 +469,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService
                 .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanViewSpecificRelease))
                 .ReturnsAsync(true);
-
-            var releaseHelper = new Mock<IPersistenceHelper<Release, Guid>>();
-
-            releaseHelper
-                .Setup(s => s.CheckEntityExistsActionResult(It.IsAny<Guid>(), null))
-                .ReturnsAsync(new Either<ActionResult, Release>(new Release()));
             
+            userService
+                .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+
+            var releaseHelper = MockUtils.MockPersistenceHelper<Release,Guid>();
+
             return (userService, releaseHelper, new Mock<IPublishingService>(), new Mock<IReleaseRepository>());
         }
     }

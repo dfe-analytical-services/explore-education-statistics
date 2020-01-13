@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewAllReleases,
         CanViewSpecificRelease,
         
+        CanUpdateSpecificRelease,
+        
         CanMarkSpecificReleaseAsDraft,
         CanSubmitSpecificReleaseToHigherReview,
         CanApproveSpecificRelease,

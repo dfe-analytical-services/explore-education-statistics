@@ -182,9 +182,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
 
+                // does this user have permission to update a specific Release?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+
                 // does this user have permission to mark a specific Release as a Draft?
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
-                    policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
+                    policy.Requirements.Add(new MarkSpecificReleaseAsDraftRequirement()));
 
                 // does this user have permission to submit a specific Release to Higher Review?
                 options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
@@ -281,6 +285,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler>();
