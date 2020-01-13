@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task CopyReleaseToPublicContainer(PublishReleaseFilesMessage message);
 
-        Task DeleteAllContentAsync();
+        Task DeleteAllContentAsyncExcludingStaging();
 
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
 
