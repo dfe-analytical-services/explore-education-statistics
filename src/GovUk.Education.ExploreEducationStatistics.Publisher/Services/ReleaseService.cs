@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -106,6 +107,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             return null;
+        }
+
+        public async Task SetPublishedDateAsync(Guid id)
+        {
+            var release = await _context.Releases
+                .Where(r => r.Id == id)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (release == null)
+            {
+                throw new ArgumentException("Release does not exist", nameof(id));
+            }
+
+            release.Published = DateTime.UtcNow;
+            _context.Releases.Update(release);
         }
 
         // TODO: This logic is flawed but will provide an accurate result with the current seed data

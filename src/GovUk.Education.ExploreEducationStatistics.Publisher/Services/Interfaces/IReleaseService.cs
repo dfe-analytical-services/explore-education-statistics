@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
@@ -8,5 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         ReleaseViewModel GetRelease(Guid id);
 
         ReleaseViewModel GetLatestRelease(Guid id);
+
+        Task SetPublishedDateAsync(Guid id);
     }
 }
