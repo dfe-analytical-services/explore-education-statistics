@@ -2,6 +2,10 @@ import React, { useContext, useState } from 'react';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import DataBlock, {
+  DataBlockProps,
+} from '@common/modules/find-statistics/components/DataBlock';
+import Details from '@common/components/Details';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -18,6 +22,24 @@ const DatablockSelectForm = ({
 }: Props) => {
   const { availableDataBlocks } = useContext(EditingContext);
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
+
+  function getDBPreview() {
+    const selectedDataBlock = availableDataBlocks.find(
+      datablock => datablock.id === selectedDataBlockId,
+    );
+    return selectedDataBlock ? (
+      <section>
+        <Details
+          className="govuk-!-margin-top-3"
+          summary="Datablock preview"
+          open
+          onToggle={() => {}}
+        >
+          <DataBlock {...(selectedDataBlock as DataBlockProps)} />
+        </Details>
+      </section>
+    ) : null;
+  }
 
   return (
     <>
@@ -39,7 +61,7 @@ const DatablockSelectForm = ({
           })),
         ]}
       />
-      {selectedDataBlockId && <div>show db preview</div>}
+      {getDBPreview()}
       {selectedDataBlockId !== '' && (
         <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
       )}
