@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
-import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -23,6 +22,7 @@ import { releaseContentService } from '@admin/services/release/edit-release/cont
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
+import ContentBlocks from './components/EditableContentBlocks';
 
 export interface RendererProps {
   contentId?: string;
@@ -149,7 +149,7 @@ const PublicationReleaseContent = ({
             />
           )}
 
-          {release.downloadFiles && (
+          {release.downloadFiles && !editing && (
             <Details
               summary="Download data files"
               onToggle={(open: boolean) =>
@@ -183,11 +183,13 @@ const PublicationReleaseContent = ({
               </ul>
             </Details>
           )}
-          <PageSearchForm
-            id="search-form"
-            inputLabel="Search in this release page."
-            className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
-          />
+          {!editing && (
+            <PageSearchForm
+              id="search-form"
+              inputLabel="Search in this release page."
+              className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
+            />
+          )}
         </div>
 
         <div className="govuk-grid-column-one-third">

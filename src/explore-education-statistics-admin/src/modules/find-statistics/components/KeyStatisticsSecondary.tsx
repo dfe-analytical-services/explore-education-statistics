@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   AbstractRelease,
   Publication,
@@ -7,10 +7,9 @@ import {
 import TabsSection from '@common/components/TabsSection';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import {
-  EditingContext,
-  ReleaseContentContext,
-} from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import DatablockSelectForm from './DatablockSelectForm';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -33,23 +32,6 @@ export function hasSecondaryStats(
   );
 }
 
-// function renderAddSecondaryStats({
-//   release,
-//   setRelease,
-//   isEditing = false,
-// }: Props): JSX.Element[] {
-//   if (!isEditing) return [];
-//   return [
-//     <TabsSection
-//       key="add"
-//       id="headline-add-secondary"
-//       title="Add additional statistics"
-//     >
-//       Something here about adding a datablock
-//     </TabsSection>,
-//   ];
-// }
-
 function renderSecondaryStats({
   release,
   setRelease,
@@ -66,7 +48,6 @@ function renderSecondaryStats({
   return [
     <TabsSection key="table" id="headline-secondary-table" title="Table">
       Table
-      {secondaryStatsDatablock}
     </TabsSection>,
     <TabsSection key="chart" id="headline-secondary-Chart" title="Chart">
       Chart
@@ -90,18 +71,67 @@ function getKeyStatisticsSecondaryTabs({
 export const AddSecondaryStats = ({
   release,
   setRelease,
-  isEditing,
   updating = false,
 }: Props) => {
+  const {
+    isEditing,
+    availableDataBlocks,
+    updateAvailableDataBlocks,
+  } = useContext(EditingContext);
+  const [isPicking, setIsPicking] = useState<boolean>(false);
   if (!isEditing) return null;
+  if (!isPicking)
+    return (
+      <>
+        <Button
+          className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
+          onClick={() => {
+            setIsPicking(true);
+          }}
+        >
+          {updating ? 'Change' : 'Add'} Secondary Stats
+        </Button>
+        {updating && (
+          <Button
+            className="govuk-!-margin-top-4 govuk-!-margin-bottom-4 govuk-button--warning"
+            onClick={() => {}}
+          >
+            Remove Secondary Stats
+          </Button>
+        )}
+      </>
+    );
+
   return (
     <>
-      <Button
-        className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-        onClick={() => {}}
-      >
-        {updating ? 'Change' : 'Add'} Secondary Stats
-      </Button>
+      <DatablockSelectForm
+        label="Select a datablock to show beside the headline facts and figures as secondary statistics."
+        onSelect={selectedDataBlockId => {
+          if (
+            release.keyStatisticsSecondarySection &&
+            release.keyStatisticsSecondarySection.id
+          )
+            releaseContentService
+              .attachContentSectionBlock(
+                release.id,
+                release.keyStatisticsSecondarySection &&
+                  release.keyStatisticsSecondarySection.id,
+                {
+                  contentBlockId: selectedDataBlockId,
+                  order: 0,
+                },
+              )
+              .then(v => {
+                if (updateAvailableDataBlocks) {
+                  updateAvailableDataBlocks();
+                }
+                return v;
+              });
+        }}
+        onCancel={() => {
+          setIsPicking(false);
+        }}
+      />
     </>
   );
 };
