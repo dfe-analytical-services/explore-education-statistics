@@ -55,6 +55,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -184,6 +185,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
                 
+                // does this user have permission to create a publication under a specific topic?
+                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy => 
+                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
+                
+                // does this user have permission to create a release under a specific publication?
+                options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
+                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
+                
                 // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
@@ -281,6 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks);
             AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications);
             AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote);
+            AddPersistenceHelper<Topic, ContentDbContext>(services, c => c.Topics);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -290,6 +300,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserService, UserService>();
             
             // These handlers enforce Resource-based access control
+            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler>();
@@ -344,7 +356,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         entitySetFn.Invoke(dbContext));
                 });
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

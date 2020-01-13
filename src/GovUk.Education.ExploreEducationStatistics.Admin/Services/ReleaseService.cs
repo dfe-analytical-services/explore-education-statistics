@@ -26,9 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
+        private readonly IPersistenceHelper<Publication, Guid> _publicationHelper;
 
         public ReleaseService(ContentDbContext context, IMapper mapper, IPublishingService publishingService,
-            IPersistenceHelper<Release, Guid> releaseHelper, IUserService userService, IReleaseRepository repository)
+            IPersistenceHelper<Release, Guid> releaseHelper, IUserService userService, IReleaseRepository repository, 
+            IPersistenceHelper<Publication, Guid> publicationHelper)
         {
             _context = context;
             _publishingService = publishingService;
@@ -36,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseHelper = releaseHelper;
             _userService = userService;
             _repository = repository;
+            _publicationHelper = publicationHelper;
         }
 
         public Task<Either<ActionResult, Release>> GetAsync(Guid id)
@@ -55,11 +58,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<ReleaseViewModel>(release);
         }
         
-        // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(
-            CreateReleaseViewModel createRelease)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            return await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId)
+            return await _publicationHelper
+                .CheckEntityExists(createRelease.PublicationId)
+                .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
+                .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
                 .OnSuccess(async () =>
                 {
                     var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);

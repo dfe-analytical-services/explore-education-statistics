@@ -1,4 +1,5 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
+import ErrorBoundary from '@admin/components/ErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
@@ -31,15 +32,17 @@ function App() {
     <AriaLiveAnnouncer>
       <ThemeAndTopic>
         <BrowserRouter>
-          <Switch>
-            {authRoutes}
-            {appRoutes}
-            {prototypeRoutes}
-            <ProtectedRoute
-              redirectIfNotLoggedIn={false}
-              component={PageNotFoundPage}
-            />
-          </Switch>
+          <ErrorBoundary>
+            <Switch>
+              {authRoutes}
+              {appRoutes}
+              {prototypeRoutes}
+              <ProtectedRoute
+                redirectIfNotLoggedIn={false}
+                component={PageNotFoundPage}
+              />
+            </Switch>
+          </ErrorBoundary>
         </BrowserRouter>
       </ThemeAndTopic>
     </AriaLiveAnnouncer>

@@ -56,14 +56,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
-            var result = await _publicationService.CreatePublicationAsync(publication);
-            if (result.IsLeft)
-            {
-                ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem(new ValidationProblemDetails(ModelState));
-            }
-
-            return result.Right;
+            
+            return await _publicationService
+                .CreatePublicationAsync(publication)
+                .HandleFailuresOr(Ok);
         }
     }
 }
