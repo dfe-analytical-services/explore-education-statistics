@@ -127,34 +127,34 @@ Validate table's column headings
 
 Validate table's row headings
     [Tags]   HappyPath
-    user checks results table row heading contains  1   1   Barnet
-    user checks results table row heading contains  1   2   Number of sessions possible
-    user checks results table row heading contains  2   1   Number of pupil enrolments
+    user checks results table row heading contains  1   1   Barnsley
+    user checks results table row heading contains  1   2   Number of pupil enrolments
+    user checks results table row heading contains  2   1   Number of sessions possible
 
-    user checks results table row heading contains  3   1   Barnsley
-    user checks results table row heading contains  3   2   Number of sessions possible
-    user checks results table row heading contains  4   1   Number of pupil enrolments
+    user checks results table row heading contains  3   1   Bedford
+    user checks results table row heading contains  3   2   Number of pupil enrolments
+    user checks results table row heading contains  4   1   Number of sessions possible
 
-    user checks results table row heading contains  5   1   Bedford
-    user checks results table row heading contains  5   2   Number of sessions possible
-    user checks results table row heading contains  6   1   Number of pupil enrolments
+    user checks results table row heading contains  5   1   Barnet
+    user checks results table row heading contains  5   2   Number of pupil enrolments
+    user checks results table row heading contains  6   1   Number of sessions possible
 
 Validate table results
     [Tags]    HappyPath
-    # Barnet
-    user checks results table cell contains   1     1     38,345
-    user checks results table cell contains   1     2     36,820
-    user checks results table cell contains   2     1     224
-    user checks results table cell contains   2     2     210
-
     # Barnsley
-    user checks results table cell contains   3     1     31,938
-    user checks results table cell contains   3     2     36,250
-    user checks results table cell contains   4     1     149
-    user checks results table cell contains   4     2     146
+    user checks results table cell contains   1     1     149
+    user checks results table cell contains   1     2     146
+    user checks results table cell contains   2     1     31,938
+    user checks results table cell contains   2     2     36,250
 
     # Bedford
-    user checks results table cell contains   5     1     17,687
-    user checks results table cell contains   5     2     21,847
-    user checks results table cell contains   6     1     176
-    user checks results table cell contains   6     2     178
+    user checks results table cell contains   3     1     176
+    user checks results table cell contains   3     2     178
+    user checks results table cell contains   4     1     17,687
+    user checks results table cell contains   4     2     21,847
+
+    # Barnet
+    user checks results table cell contains   5     1     224
+    user checks results table cell contains   5     2     210
+    user checks results table cell contains   6     1     38,345
+    user checks results table cell contains   6     2     36,820
