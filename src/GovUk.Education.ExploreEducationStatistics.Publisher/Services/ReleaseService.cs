@@ -112,7 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task SetPublishedDateAsync(Guid id)
         {
             var release = await _context.Releases
-                .Where(r => r.Id == id)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (release == null)
@@ -122,6 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             release.Published = DateTime.UtcNow;
             _context.Releases.Update(release);
+            await _context.SaveChangesAsync();
         }
 
         // TODO: This logic is flawed but will provide an accurate result with the current seed data

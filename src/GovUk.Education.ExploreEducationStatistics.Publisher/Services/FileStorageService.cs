@@ -138,14 +138,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
             allFilesStream.Add(source);
-            _logger.LogInformation("Transfer succeeds. {0} -> {1}.", source.Uri, destination.Uri);
+            _logger.LogInformation("Transferred {0} -> {1}.", source.Name, destination.Name);
         }
 
         private void FileFailedCallback(object sender, TransferEventArgs e)
         {
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
-            _logger.LogInformation("Transfer fails. {0} -> {1}. Error message:{2}", source.Uri, destination.Uri,
+            _logger.LogInformation("Failed to transfer {0} -> {1}. Error message:{2}", source.Name, destination.Name,
                 e.Exception.Message);
         }
 
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
-            _logger.LogInformation("Transfer skips. {0} -> {1}.", source.Uri, destination.Uri);
+            _logger.LogInformation("Skipped transfer {0} -> {1}.", source.Name, destination.Name);
         }
 
 #pragma warning disable 1998
