@@ -38,8 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _dataBlockService.CreateAsync(releaseId, dataBlock))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         [HttpDelete("datablocks/{id}")]
@@ -49,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return _dataBlockHelper
                 .CheckEntityExistsActionResult(id)
                 .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
-                .OnSuccess(_ => new NoContentResult())
-                .HandleFailures();
+                .HandleFailuresOr(_ => new NoContentResult());
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
@@ -60,8 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseHelper
                 .CheckEntityExistsActionResult(releaseId)
                 .OnSuccess(_ => _dataBlockService.ListAsync(releaseId))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("datablocks/{id}")]
@@ -71,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .CheckEntityExistsActionResult(id)
                 // TODO EES-918 - remove in favour of checking for release inside service calls
                 .OnSuccess(_ => _dataBlockService.GetAsync(id))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("datablocks/{id}")]
@@ -82,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _dataBlockHelper
                 .CheckEntityExistsActionResult(id)
                 .OnSuccess(_ => _dataBlockService.UpdateAsync(id, dataBlock))
-                .OnSuccess(Ok)
-                .HandleFailures();
+                .HandleFailuresOr(Ok);
         }
     }
 }

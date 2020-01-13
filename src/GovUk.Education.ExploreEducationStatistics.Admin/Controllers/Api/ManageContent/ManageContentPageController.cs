@@ -21,11 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content")]
-        public Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseId)
+        public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseId)
         {
-            return this.HandlingValidationErrorsAsync(
-                () => _manageContentPageService.GetManageContentPageViewModelAsync(releaseId),
-                Ok);
+            return await _manageContentPageService
+                .GetManageContentPageViewModelAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
     }
 }

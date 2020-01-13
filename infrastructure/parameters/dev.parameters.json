@@ -1,24 +1,30 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "skuPublic": {
-            "value": "B1 Basic"
-        },
-        "skuData": {
-            "value": "S1 Standard"
-        },
-        "skuContent": {
-            "value": "S1 Standard"
-        },
-        "skuAdmin": {
-            "value": "S2 Standard"
-        },
-        "publishReleasesCronSchedule": {
-            "value": "0 0 * * * *"
-        },
-        "publishReleaseContentCronSchedule": {
-            "value": "0 30 * * * *"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuPublic": {
+      "value": "B1 Basic"
+    },
+    "skuData": {
+      "value": "S1 Standard"
+    },
+    "skuContent": {
+      "value": "S1 Standard"
+    },
+    "skuAdmin": {
+      "value": "S2 Standard"
+    },
+    "publishReleasesCronSchedule": {
+      "value": "0 0 * * * *"
+    },
+    "publishReleaseContentCronSchedule": {
+      "value": "0 30 * * * *"
+    },
+    "useSubnets": {
+      "value": true
+    },
+    "deploySubnets": {
+      "value": true
     }
+  }
 }

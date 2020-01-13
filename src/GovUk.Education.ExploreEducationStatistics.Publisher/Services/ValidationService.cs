@@ -31,11 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var release = await GetReleaseAsync(statusMessage.ReleaseId);
 
-            var (approvalValid, approvalLogMessages) = ValidateApproval(release);
-            var (methodologyValid, methodologyLogMessages) = ValidateMethodology(release);
+            var (approvalValid, approvalMessages) = ValidateApproval(release);
+            var (methodologyValid, methodologyMessages) = ValidateMethodology(release);
+            var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);
 
-            var valid = approvalValid && methodologyValid;
-            var logMessages = approvalLogMessages.Concat(methodologyLogMessages);
+            var valid = approvalValid &&
+                        methodologyValid &&
+                        scheduledPublishDateValid;
+
+            var logMessages = approvalMessages
+                .Concat(methodologyMessages)
+                .Concat(scheduledPublishDateMessages);
 
             return Result(valid, logMessages);
         }
@@ -50,14 +56,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static (bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages) ValidateMethodology(
             Release release)
         {
-            // TODO EES-869 Validate the release
-            return Success();
+            return release.Publication.MethodologyId.HasValue
+                ? Success()
+                : Failure(ValidationStage.Methodology, $"Methodology is not set");
+        }
+
+        private static (bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages) ValidateScheduledPublishDate(
+            Release release)
+        {
+            return release.PublishScheduled.HasValue
+                ? Success()
+                : Failure(ValidationStage.ScheduledPublishDate, $"Scheduled publish date status is not set");
         }
 
         private Task<Release> GetReleaseAsync(Guid releaseId)
         {
             return _context.Releases
                 .AsNoTracking()
+                .Include(release => release.Publication)
                 .SingleAsync(release => release.Id == releaseId);
         }
 
@@ -90,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private enum ValidationStage
         {
             Approval,
-            Methodology
+            Methodology,
+            ScheduledPublishDate
         }
     }
 }

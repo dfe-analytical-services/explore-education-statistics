@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataBlock = new CreateDataBlockViewModel();
 
             dataBlockService.Setup(s => s.CreateAsync(_releaseId, dataBlock))
-                .Returns(Task.FromResult(new DataBlockViewModel()));
+                .ReturnsAsync(new DataBlockViewModel());
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupDataBlockExistsResult(dataBlockHelper);
 
             dataBlockService.Setup(s => s.DeleteAsync(_dataBlockId))
-                .Returns(Task.CompletedTask);
+                .Returns(Task.FromResult(new Either<ActionResult, bool>(true)));
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var (dataBlockService, releaseHelper, dataBlockHelper) = Mocks();
             SetupDataBlockExistsResult(dataBlockHelper);
-            dataBlockService.Setup(s => s.GetAsync(_dataBlockId)).Returns(Task.FromResult(new DataBlockViewModel()));
+            dataBlockService.Setup(s => s.GetAsync(_dataBlockId)).ReturnsAsync(new DataBlockViewModel());
             
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new DataBlockViewModel()
             };
 
-            dataBlockService.Setup(s => s.ListAsync(_releaseId)).Returns(Task.FromResult(sampleRes));
+            dataBlockService.Setup(s => s.ListAsync(_releaseId)).ReturnsAsync(sampleRes);
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataBlock = new UpdateDataBlockViewModel();
 
             dataBlockService.Setup(s => s.UpdateAsync(_dataBlockId, dataBlock))
-                .Returns(Task.FromResult(new DataBlockViewModel()));
+                .ReturnsAsync(new DataBlockViewModel());
 
             var controller = ControllerWithMocks(dataBlockService, releaseHelper, dataBlockHelper);
 

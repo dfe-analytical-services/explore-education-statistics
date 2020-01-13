@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
@@ -204,6 +205,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
             };
 
+        private const string CountryLabelEngland = "England";
+        private const string CountryCodeEngland = "E92000001";
+        
         public DbSet<Methodology> Methodologies { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
@@ -220,10 +224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
 
@@ -2495,7 +2499,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2536,10 +2543,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Overall_absence_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Overall absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -2623,8 +2648,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 2,
                     DataBlockRequest = new DataBlockRequest
                     {
-                        SubjectId = new Guid("803fbf56-600f-490f-8409-6413a891720d"),
-                        GeographicLevel = GeographicLevel.Country,
+                        SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2665,10 +2693,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Authorised_absence_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Authorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -2729,7 +2775,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2770,10 +2819,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Unauthorised_absence_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Unauthorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -2858,7 +2925,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2911,14 +2981,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Unauthorised_absence_rate),
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Overall_absence_rate),
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Authorised_absence_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Authorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString()),
+                                    new TableOption("Unauthorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString()),
+                                    new TableOption("Overall absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -3014,10 +3100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
+                    Name = "Generic data block - National",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3045,14 +3135,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Unauthorised_absence_rate),
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Overall_absence_rate),
-                                Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                    IndicatorName.Authorised_absence_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Authorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString()),
+                                    new TableOption("Unauthorised absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString()),
+                                    new TableOption("Overall absence rate", Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -3147,6 +3253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
+                    Name = "Generic data block - LA",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
@@ -3271,7 +3378,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3311,10 +3421,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Permanent_exclusion_rate),
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Permanent exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -3386,7 +3514,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3426,14 +3557,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Fixed_period_exclusion_rate),
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Fixed period exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString())
+                                }
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -3491,7 +3639,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3531,10 +3682,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_permanent_exclusions)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of permanent exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString())
+                                }
                             }
                         }
                     },
@@ -3596,7 +3765,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3656,14 +3828,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Permanent_exclusion_rate),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Fixed_period_exclusion_rate),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_permanent_exclusions)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Permanent exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString()),
+                                    new TableOption("Fixed period exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString()),
+                                    new TableOption("Number of permanent exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString())
+                                }
                             }
                         }
                     },
@@ -3739,10 +3927,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                     Heading = "Chart showing permanent exclusions in England",
+                    Name = "Generic data block 1",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3769,14 +3961,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_pupils),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_permanent_exclusions),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Permanent_exclusion_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of pupils", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_pupils).ToString()),
+                                    new TableOption("Number of permanent exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString()),
+                                    new TableOption("Permanent exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -3831,10 +4039,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("038093a2-0be3-440b-8b22-8116e34aa616"),
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                     Heading = "Chart showing fixed-period exclusions in England",
+                    Name = "Generic data block 2",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3862,14 +4074,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_pupils),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_fixed_period_exclusions),
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Fixed_period_exclusion_rate)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of pupils", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_pupils).ToString()),
+                                    new TableOption("Number of fixed period exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_fixed_period_exclusions).ToString()),
+                                    new TableOption("Fixed period exclusion rate", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString())
+                                }
                             }
                         }
                     },
@@ -3930,7 +4158,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -3970,10 +4201,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_permanent_exclusions)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of permanent exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString())
+                                }
                             }
                         }
                     },
@@ -4035,7 +4284,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -4075,10 +4327,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
-                                    IndicatorName.Number_of_permanent_exclusions)
+                                columnGroups = new List<List<TableOption>>(),
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2012/13", "2012_AY"),
+                                    new TableOption("2013/14", "2013_AY"),
+                                    new TableOption("2014/15", "2014_AY"),
+                                    new TableOption("2015/16", "2015_AY"),
+                                    new TableOption("2016/17", "2016_AY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of permanent exclusions", Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString())
+                                }
                             }
                         }
                     },
@@ -4140,7 +4410,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4179,10 +4452,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_applications_received),
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All primary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of applications received", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_applications_received).ToString())
+                                }
                             }
                         }
                     }
@@ -4198,7 +4495,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4237,10 +4537,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_first_preferences_offered),
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All primary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of first preferences offered", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_first_preferences_offered).ToString())
+                                }
                             }
                         }
                     }
@@ -4256,7 +4580,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4295,10 +4622,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_second_preferences_offered)
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All primary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of second preferences offered", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_second_preferences_offered).ToString())
+                                }
                             }
                         }
                     }
@@ -4314,7 +4665,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4377,22 +4731,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_applications_received),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_admissions),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_first_preferences_offered),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_second_preferences_offered),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_of_third_preferences_offered),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_did_not_receive_an_offer)
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All primary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number of applications received", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_applications_received).ToString()),
+                                    new TableOption("Number of admissions", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_admissions).ToString()),
+                                    new TableOption("Number of first preferences offered", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_first_preferences_offered).ToString()),
+                                    new TableOption("Number of second preferences offered", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_second_preferences_offered).ToString()),
+                                    new TableOption("Number of third preferences offered", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_third_preferences_offered).ToString()),
+                                    new TableOption("Number that received an offer for a non preferred school", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString()),
+                                    new TableOption("Number that did not receive an offer", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString())
+                                }
                             }
                         }
                     }
@@ -4404,10 +4776,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
                     Heading =
                         "Table of Timeseries of key secondary preference rates, England",
+                    Name = "Generic data block 1",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4437,14 +4813,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_did_not_receive_an_offer)
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All secondary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Secondary_All_secondary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number that received an offer for a preferred school", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString()),
+                                    new TableOption("Number that received an offer for a non preferred school", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString()),
+                                    new TableOption("Number that did not receive an offer", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString())
+                                }
                             }
                         }
                     }
@@ -4455,10 +4853,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
                     Heading =
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
+                    Name = "Generic data block 2",
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                        GeographicLevel = GeographicLevel.Country,
+                        Country = new List<string>
+                        {
+                            CountryCodeEngland
+                        },
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -4488,14 +4890,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new Table
                         {
-                            indicators = new List<Guid>
+                            tableHeaders = new TableHeaders
                             {
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
-                                Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
-                                    IndicatorName.Number_that_did_not_receive_an_offer)
+                                columnGroups = new List<List<TableOption>>
+                                {
+                                    new List<TableOption>
+                                    {
+                                        new TableOption("All primary", FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString())
+                                    }
+                                },
+                                columns = new List<TableOption>
+                                {
+                                    new TableOption("2014", "2014_CY"),
+                                    new TableOption("2015", "2015_CY"),
+                                    new TableOption("2016", "2016_CY"),
+                                    new TableOption("2017", "2017_CY"),
+                                    new TableOption("2018", "2018_CY")
+                                },
+                                rowGroups = new List<List<TableRowGroupOption>>
+                                {
+                                    new List<TableRowGroupOption>
+                                    {
+                                        new TableRowGroupOption(CountryLabelEngland, GeographicLevel.Country.ToString().CamelCase(), CountryCodeEngland)
+                                    }
+                                },
+                                rows = new List<TableOption>
+                                {
+                                    new TableOption("Number that received an offer for a preferred school", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString()),
+                                    new TableOption("Number that received an offer for a non preferred school", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString()),
+                                    new TableOption("Number that did not receive an offer", Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString())
+                                }
                             }
                         }
                     }
@@ -5364,6 +5788,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     },
                     new UserReleaseRole
                     {
+                        Id = new Guid("1851e50d-04ac-4e16-911b-3df3350c589b"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = analystMvcUser2Id,
+                        Role = ReleaseRole.Approver
+                    },
+                    new UserReleaseRole
+                    {
                         Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
                         ReleaseId = exclusionsReleaseId,
                         UserId = analystMvcUser1Id,
@@ -5374,7 +5805,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
                         ReleaseId = exclusionsReleaseId,
                         UserId = analystMvcUser2Id,
-                        Role = ReleaseRole.Contributor
+                        Role = ReleaseRole.Approver
                     },
                     new UserReleaseRole
                     {
@@ -5396,6 +5827,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         ReleaseId = applicationOffersReleaseId,
                         UserId = analystMvcUser3Id,
                         Role = ReleaseRole.Lead
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("d1cbc96e-75c0-424f-bd63-c1920b763020"),
+                        ReleaseId = applicationOffersReleaseId,
+                        UserId = analystMvcUser3Id,
+                        Role = ReleaseRole.Approver
                     }
                 );
         }

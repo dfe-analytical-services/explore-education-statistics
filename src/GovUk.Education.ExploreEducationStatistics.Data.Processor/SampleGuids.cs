@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 
                 {$"{School_Applications_And_Offers}:nc_year_admission:Primary:All primary", new Guid("e957db0c-3bf8-4e4b-5c6f-08d78f900a85")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Primary:R", new Guid("f5ad9114-14b8-4102-89a1-3ab76801ecde")},
-                {$"{School_Applications_And_Offers}:nc_year_admission:Primary:All secondary", new Guid("5a7b4e97-7794-4037-5c71-08d78f900a85")},
+                {$"{School_Applications_And_Offers}:nc_year_admission:Secondary:All secondary", new Guid("5a7b4e97-7794-4037-5c71-08d78f900a85")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Secondary:9", new Guid("3f101896-1c4a-4153-bb22-1d3888eb61ea")},
                 {$"{School_Applications_And_Offers}:nc_year_admission:Secondary:7", new Guid("ff8614ba-ec1c-4012-a5e3-2d788a4f5460")},
             };

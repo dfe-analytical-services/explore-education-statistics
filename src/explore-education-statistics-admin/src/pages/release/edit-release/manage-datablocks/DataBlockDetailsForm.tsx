@@ -90,12 +90,7 @@ const DataBlockDetailsForm = ({
       name: values.name,
 
       source: values.source,
-      tables: [
-        {
-          indicators: [],
-          tableHeaders,
-        },
-      ],
+      tables: [],
     };
 
     try {

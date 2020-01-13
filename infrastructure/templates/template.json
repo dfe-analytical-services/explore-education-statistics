@@ -58,7 +58,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S3 Standard",
+      "defaultValue": "S1 Standard",
       "allowedValues": [
         "B1 Basic",
         "B2 Basic",
@@ -72,6 +72,12 @@
       "type": "array",
       "metadata": {
         "description": "Firewall restrictions for the admin application"
+      }
+    },
+    "storageFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for storage accounts, string array"
       }
     },
     "sqlFirewallRules": {
@@ -165,6 +171,13 @@
     },
 
     "notifyApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service API key"
+      }
+    },
+    "notifyApiKeyAdmin": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
@@ -281,9 +294,13 @@
         "1.2"
       ]
     },
+    "useSubnets": {
+      "type": "bool",
+      "defaultValue": true
+    },
     "deploySubnets": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
 
     "publishReleasesCronSchedule": {
@@ -342,6 +359,8 @@
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
+    "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
+    "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
     "ipWhiteList": {
       "copy": [
         {
@@ -720,18 +739,18 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
+        // {
+        //   "type": "siteextensions",
+        //   "name": "Microsoft.ApplicationInsights.AzureWebSites",
+        //   "apiVersion": "2016-08-01",
+        //   "dependsOn": [
+        //     "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+        //   ],
+        //   "properties": {
+        //   }
+        // },
         {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
-          ],
-          "properties": {
-          }
-        },
-        {
-          "condition": "[parameters('deploySubnets')]",
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -798,7 +817,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
+              "value": "[parameters('notifyApiKeyAdmin')]"
             },
             {
               "name": "NotifyInviteTemplateId",
@@ -1083,28 +1102,31 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true,
-        "networkAcls": {
-          "condition": "[parameters('deploySubnets')]",
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('importerSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
-          "ipRules": [
-          ],
-          "defaultAction": "Deny"
-        }
+        "supportsHttpsTrafficOnly": true
+        // "networkAcls": {
+        //   "condition": "[parameters('useSubnets')]",
+        //   "bypass": "AzureServices",
+        //   "virtualNetworkRules": [
+        //     {
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('adminSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('importerSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "condition": "[parameters('useSubnets')]",
+        //       "id": "[variables('publisherSubnetRef')]",
+        //       "action": "Allow"
+        //     }
+        //   ],
+        //   "ipRules": "[parameters('storageFirewallRules')]",
+        //   "defaultAction": "Deny"
+        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1786,7 +1808,7 @@
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
       ],
@@ -1805,6 +1827,7 @@
       },
       "resources": [
         {
+          "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
           "apiVersion": "2018-02-01",
@@ -1820,7 +1843,7 @@
         }
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
@@ -1848,16 +1871,8 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
-              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(variables('importerAppName'))]"
-            },
-            {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
+              "value": "0"
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -1917,7 +1932,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2018-11-01",
       "name": "[variables('publisherPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -1933,10 +1948,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
       "properties": {
         "name": "[variables('publisherPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
@@ -1966,21 +1987,21 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
-        // {
-        //   "condition": "[parameters('deploySubnets')]",
-        //   "name": "virtualNetwork",
-        //   "type": "config",
-        //   "apiVersion": "2018-02-01",
-        //   "location": "[resourceGroup().location]",
-        //   "properties": {
-        //     "subnetResourceid": "[variables('publisherSubnetRef')]",
-        //     "swiftSupported": true
-        //   },
-        //   "dependsOn": [
-        //     "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        //     "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
-        //   ]
-        // }
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('publisherSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
+        }
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
@@ -2016,14 +2037,6 @@
             {
               "name": "PublishReleaseContentCronSchedule",
               "value": "[parameters('publishReleaseContentCronSchedule')]"
-            },
-            {
-              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(variables('publisherAppName'))]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -2084,6 +2097,22 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true
+        // "networkAcls": {
+        //   "condition": "[parameters('useSubnets')]",
+        //   "bypass": "AzureServices",
+        //   "virtualNetworkRules": [
+        //     {
+        //       "id": "[variables('adminSubnetRef')]",
+        //       "action": "Allow"
+        //     },
+        //     {
+        //       "id": "[variables('publisherSubnetRef')]",
+        //       "action": "Allow"
+        //     }
+        //   ],
+        //   "ipRules": "[parameters('storageFirewallRules')]",
+        //   "defaultAction": "Deny"
+        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2101,6 +2130,7 @@
     },
 
     {
+      "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
@@ -2177,8 +2207,29 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('notifySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.3.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
           }
-
 
         ]
       }
