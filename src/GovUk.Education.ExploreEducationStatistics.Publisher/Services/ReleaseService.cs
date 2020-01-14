@@ -24,6 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
+        public Task<Release> GetAsync(Guid id)
+        {
+            return _context.Releases
+                .Include(release => release.Publication)
+                .FirstOrDefaultAsync(release => release.Id == id);
+        }
+
         public ReleaseViewModel GetRelease(Guid id)
         {
             var release = _context.Releases
