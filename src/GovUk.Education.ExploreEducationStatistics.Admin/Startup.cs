@@ -276,11 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
-            AddPersistenceHelper<Release, ContentDbContext>(services, c => c.Releases, ReleaseNotFound);
-            AddPersistenceHelper<Update, ContentDbContext>(services, c => c.Update, ReleaseNoteNotFound);
-            AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks, ContentBlockNotFound);
-            AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications, PublicationNotFound);
-            AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote, EntityNotFound);
+            AddPersistenceHelper<Release, ContentDbContext>(services, c => c.Releases);
+            AddPersistenceHelper<Update, ContentDbContext>(services, c => c.Update);
+            AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks);
+            AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications);
+            AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -329,8 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         private static void AddPersistenceHelper<TEntity, TDbContext>(
             IServiceCollection services, 
-            Func<TDbContext, DbSet<TEntity>> entitySetFn,
-            ValidationErrorMessages notFoundMessage)
+            Func<TDbContext, DbSet<TEntity>> entitySetFn)
             where TEntity : class 
             where TDbContext : DbContext
         {
@@ -342,8 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     var dbContext = s.GetService<TDbContext>();
                     return new PersistenceHelper<TEntity, Guid, TDbContext>(
                         dbContext,
-                        entitySetFn.Invoke(dbContext),
-                        notFoundMessage);
+                        entitySetFn.Invoke(dbContext));
                 });
         }
 

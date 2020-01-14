@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string fileName)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReleaseFileTypes type, string fileName)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {

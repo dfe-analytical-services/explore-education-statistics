@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid id)
         {
             return await _footnoteHelper
-                .CheckEntityExistsActionResult(id, HydrateFootnote)
+                .CheckEntityExists(id, HydrateFootnote)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(footnote =>
                 {
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> subjectIds)
         {
             return _footnoteHelper
-                .CheckEntityExistsActionResult(id, HydrateFootnote)
+                .CheckEntityExists(id, HydrateFootnote)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(footnote =>
                 {
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(release => DbSet()
                     .Where(footnote =>
                         (!footnote.Subjects.Any() ||
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private Task<Either<ActionResult, Release>> GetContentReleaseById(Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExistsActionResult(releaseId);
+            return _releaseHelper.CheckEntityExists(releaseId);
         }
 
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)
