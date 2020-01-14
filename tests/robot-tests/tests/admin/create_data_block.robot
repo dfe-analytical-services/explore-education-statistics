@@ -115,27 +115,82 @@ Validate table's column headings
     user checks results table column heading contains  1  16  2020
 
 Validate table's row headings
-    [Tags]  HappyPath   Failing
-    user checks results table row heading contains   1   1   Bolton 001 (E02000984)
+    [Tags]  HappyPath
+    sleep   10
+    user checks results table row heading contains   1   1   Nailsea Youngwood
     user checks results table row heading contains   1   2   Admission Numbers
 
-    user checks results table row heading contains   2   1   Bolton 004 (E02000987)
+    user checks results table row heading contains   2   1   Syon
     user checks results table row heading contains   2   2   Admission Numbers
 
-    user checks results table row heading contains   3   1   Bolton 001 (E05000364)
+    user checks results table row heading contains   3   1   Bolton 004 (E05010450)
     user checks results table row heading contains   3   2   Admission Numbers
 
-    user checks results table row heading contains   4   1   Bolton 004 (E05010450)
+    user checks results table row heading contains   4   1   Bolton 001 (E05000364)
     user checks results table row heading contains   4   2   Admission Numbers
 
-    user checks results table row heading contains   5   1   Syon
+    user checks results table row heading contains   5   1   Bolton 001 (E02000984)
     user checks results table row heading contains   5   2   Admission Numbers
 
-    user checks results table row heading contains   6   1   Nailsea Youngwood
+    user checks results table row heading contains   6   1   Bolton 004 (E02000987)
     user checks results table row heading contains   6   2   Admission Numbers
 
-Validate table results
-    [Tags]  HappyPath  UnderConstruction
+Validate table results - Nailsea Youngwood
+    [Tags]  HappyPath
+    user checks results table cell contains  1   1    3,612
+    user checks results table cell contains  1   2    n/a
+    user checks results table cell contains  1   3    n/a
+    user checks results table cell contains  1   4    n/a
+    user checks results table cell contains  1   5    n/a
+    user checks results table cell contains  1   6    9,304
+    user checks results table cell contains  1   7    9,603
+    user checks results table cell contains  1   8    8,150
+    user checks results table cell contains  1   9    n/a
+    user checks results table cell contains  1   10   n/a
+    user checks results table cell contains  1   11   n/a
+    user checks results table cell contains  1   12   4,198
+    user checks results table cell contains  1   13   n/a
+    user checks results table cell contains  1   14   n/a
+    user checks results table cell contains  1   15   n/a
+    user checks results table cell contains  1   16   n/a
+
+Validate table results - Syon
+    [Tags]  HappyPath
+    user checks results table cell contains  2   1    n/a
+    user checks results table cell contains  2   2    n/a
+    user checks results table cell contains  2   3    9,914
+    user checks results table cell contains  2   4    5,505
+    user checks results table cell contains  2   5    n/a
+    user checks results table cell contains  2   6    6,060
+    user checks results table cell contains  2   7    n/a
+    user checks results table cell contains  2   8    1,109
+    user checks results table cell contains  2   9    n/a
+    user checks results table cell contains  2   10   n/a
+    user checks results table cell contains  2   11   n/a
+    user checks results table cell contains  2   12   n/a
+    user checks results table cell contains  2   13   1,959
+    user checks results table cell contains  2   14   n/a
+    user checks results table cell contains  2   15   n/a
+    user checks results table cell contains  2   16   n/a
+
+Validate table results - Bolton 004 (E02000987)
+    [Tags]  HappyPath
+    user checks results table cell contains  6   1    n/a
+    user checks results table cell contains  6   2    n/a
+    user checks results table cell contains  6   3    n/a
+    user checks results table cell contains  6   4    n/a
+    user checks results table cell contains  6   5    n/a
+    user checks results table cell contains  6   6    n/a
+    user checks results table cell contains  6   7    n/a
+    user checks results table cell contains  6   8    n/a
+    user checks results table cell contains  6   9    n/a
+    user checks results table cell contains  6   10   n/a
+    user checks results table cell contains  6   11   n/a
+    user checks results table cell contains  6   12   n/a
+    user checks results table cell contains  6   13   n/a
+    user checks results table cell contains  6   14   n/a
+    user checks results table cell contains  6   15   n/a
+    user checks results table cell contains  6   16   6,031
 
 Save data block
     [Tags]  HappyPath  UnderConstruction
