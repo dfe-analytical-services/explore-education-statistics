@@ -19,11 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Publication Get(string slug);
 
-        Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId);
+        Task<List<MyPublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId);
 
-        Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(
+        Task<Either<ActionResult, MyPublicationViewModel>> CreatePublicationAsync(
             CreatePublicationViewModel publication);
 
-        Task<PublicationViewModel> GetViewModelAsync(Guid publicationId);
+        Task<MyPublicationViewModel> GetViewModelAsync(Guid publicationId);
     }
 }

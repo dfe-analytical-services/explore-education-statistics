@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<List<PublicationViewModel>> GetMyPublicationsAsync(
+        public async Task<List<MyPublicationViewModel>> GetMyPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
+        public async Task<ActionResult<MyPublicationViewModel>> GetPublicationByIdAsync(
             [Required] Guid publicationId)
         {
             // var userId = new Guid(); // TODO get the Guid from AD
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(
+        public async Task<ActionResult<MyPublicationViewModel>> CreatePublicationAsync(
             CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications.ToList();
         }
 
-        public Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
+        public Task<List<MyPublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
             return _userService
                 .CheckCanViewAllReleases()
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     GetPublicationsForTopicRelatedToUserAsync(topicId, _userService.GetUserId()));
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
+        public async Task<Either<ActionResult, MyPublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(publication.TopicId)
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (_context.Publications.Any(p => p.Slug == publication.Slug))
                     {
-                        return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
+                        return ValidationActionResult<MyPublicationViewModel>(SlugNotUnique);
                     }
             
                     var saved = _context.Publications.Add(new Publication
@@ -87,13 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<PublicationViewModel> GetViewModelAsync(Guid publicationId)
+        public async Task<MyPublicationViewModel> GetViewModelAsync(Guid publicationId)
         {
             var publication = await _context.Publications
                 .Where(p => p.Id == publicationId)
                 .HydratePublicationForPublicationViewModel()
                 .FirstOrDefaultAsync();
-            return _mapper.Map<PublicationViewModel>(publication);
+            return _mapper.Map<MyPublicationViewModel>(publication);
         }
     }
     

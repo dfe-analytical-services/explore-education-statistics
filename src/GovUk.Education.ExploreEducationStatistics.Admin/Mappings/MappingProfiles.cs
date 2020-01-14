@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
 using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.PublicationViewModel;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
@@ -48,6 +47,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     {
                         new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
                     }));
+            
+            CreateMap<Release, MyReleaseViewModel>()
+                .ForMember(
+                    dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
+                .ForMember(dest => dest.Contact, 
+                    m => m.MapFrom(r => r.Publication.Contact))
+                .ForMember(dest => dest.PublicationTitle, 
+                    m => m.MapFrom(r => r.Publication.Title))
+                .ForMember(dest => dest.PublicationId, 
+                    m => m.MapFrom(r => r.Publication.Id))
+                // TODO return real Comments as soon as commenting on Releases has been implemented
+                .ForMember(dest => dest.DraftComments, 
+                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
+                    {
+                        new ReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
+                        new ReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
+                        new ReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
+                    }))
+                .ForMember(dest => dest.HigherReviewComments, 
+                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
+                    {
+                        new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
+                    }))
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<MyReleasePermissionSetPropertyResolver>());
 
             CreateMap<Release, ReleaseSummaryViewModel>();
 
@@ -71,10 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Methodology, MethodologyStatusViewModel>();
             CreateMap<Publication, MethodologyStatusPublications>();
             
-            CreateMap<Publication, PublicationViewModel>()
+            CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(
                     dest => dest.ThemeId,
-                    m => m.MapFrom(p => p.Topic.ThemeId));    
+                    m => m.MapFrom(p => p.Topic.ThemeId))
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<MyPublicationPermissionSetPropertyResolver>());   
 
             CreateMap<DataBlock, DataBlockViewModel>();
             CreateMap<CreateDataBlockViewModel, DataBlock>();

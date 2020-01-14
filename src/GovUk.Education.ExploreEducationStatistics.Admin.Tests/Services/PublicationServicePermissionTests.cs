@@ -38,9 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
                 ReturnsAsync(true);
 
-            var list = new List<PublicationViewModel>()
+            var list = new List<MyPublicationViewModel>()
             {
-                new PublicationViewModel
+                new MyPublicationViewModel
                 {
                     Id = Guid.NewGuid()
                 }
@@ -79,9 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetUserId()).
                 Returns(userId);
 
-            var list = new List<PublicationViewModel>()
+            var list = new List<MyPublicationViewModel>()
             {
-                new PublicationViewModel
+                new MyPublicationViewModel
                 {
                     Id = Guid.NewGuid()
                 }

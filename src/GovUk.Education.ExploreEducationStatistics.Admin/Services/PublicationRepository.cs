@@ -22,17 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Task<List<PublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
+        public Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
         {
             return _context
                 .Publications
                 .HydratePublicationForPublicationViewModel()
                 .Where(publication => publication.TopicId == topicId)
-                .Select(publication => _mapper.Map<PublicationViewModel>(publication))
+                .Select(publication => _mapper.Map<MyPublicationViewModel>(publication))
                 .ToListAsync();
         }
 
-        public async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
+        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
         {
             var userReleasesForTopic = await _context
                 .UserReleaseRoles
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (publication, releases) = publicationWithReleases;
 
-                    return new PublicationViewModel
+                    return new MyPublicationViewModel
                     {
                         Id = publication.Id,
                         Contact = publication.Contact,

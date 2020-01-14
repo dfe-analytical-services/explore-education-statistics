@@ -27,13 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         }
 
         [HttpGet("topic/{topicId}/publication/create")]
-        public Task<ActionResult<bool>> CanCreatePublication(Guid topicId)
+        public Task<ActionResult<bool>> CanCreatePublicationForTopic(Guid topicId)
         {
             return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
         }
 
         [HttpGet("publication/{publicationId}/release/create")]
-        public Task<ActionResult<bool>> CanCreateRelease(Guid publicationId)
+        public Task<ActionResult<bool>> CanCreateReleaseForPublication(Guid publicationId)
         {
             return CheckPolicyAgainstEntity<Publication>(publicationId, _userService.CheckCanCreateReleaseForPublication);
         }

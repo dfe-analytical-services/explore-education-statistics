@@ -25,16 +25,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationService
                 .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
+                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, MyPublicationViewModel>(new MyPublicationViewModel {TopicId = p.TopicId})));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
             // Method under test
             var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
             Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.IsAssignableFrom<PublicationViewModel>(((OkObjectResult) result.Result).Value);
+            Assert.IsAssignableFrom<MyPublicationViewModel>(((OkObjectResult) result.Result).Value);
 
-            var viewModel = (PublicationViewModel) ((OkObjectResult) result.Result).Value;
+            var viewModel = (MyPublicationViewModel) ((OkObjectResult) result.Result).Value;
             Assert.Equal(topicId, viewModel.TopicId);
         }
         
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             var validationResponse =
-                new Either<ActionResult, PublicationViewModel>(
+                new Either<ActionResult, MyPublicationViewModel>(
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService

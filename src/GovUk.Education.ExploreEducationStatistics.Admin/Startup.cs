@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -184,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 
                 // does this user have permission to create a release under a specific publication?
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
-                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
+                    policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement())));
                 
                 // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
@@ -210,6 +211,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddTransient<MyReleasePermissionSetPropertyResolver>();
+            services.AddTransient<MyPublicationPermissionSetPropertyResolver>();
+
+            services.AddAutoMapper(typeof(Startup).Assembly);
+            
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));

@@ -4,8 +4,8 @@ import {
   getReleaseSummaryLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import {
-  AdminDashboardRelease,
   Comment,
+  AdminDashboardRelease,
 } from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
