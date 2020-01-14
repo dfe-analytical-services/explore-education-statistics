@@ -37,16 +37,12 @@ export const AddSecondaryStats = ({
   setRelease,
   updating = false,
 }: Props) => {
-  const {
-    isEditing,
-    availableDataBlocks,
-    updateAvailableDataBlocks,
-  } = useContext(EditingContext);
+  const { isEditing, updateAvailableDataBlocks } = useContext(EditingContext);
   const [isPicking, setIsPicking] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   async function removeSecondarySectionBlock() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async resolve => {
       if (
         release.keyStatisticsSecondarySection &&
         release.keyStatisticsSecondarySection.id &&
@@ -57,7 +53,7 @@ export const AddSecondaryStats = ({
             (content: EditableContentBlock) => {
               return releaseContentService.deleteContentSectionBlock(
                 release.id,
-                //@ts-ignore
+                // @ts-ignore will be defined, due to above if statement
                 release.keyStatisticsSecondarySection.id,
                 content.id,
               );

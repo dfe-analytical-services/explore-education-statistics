@@ -66,10 +66,7 @@ const DatablockSelectForm = ({
         <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
       )}
       {!hideCancel && (
-        <Button
-          className="govuk-button--secondary"
-          onClick={onCancel /*() => setShowDataBlocks(false)*/}
-        >
+        <Button className="govuk-button--secondary" onClick={onCancel}>
           Cancel
         </Button>
       )}

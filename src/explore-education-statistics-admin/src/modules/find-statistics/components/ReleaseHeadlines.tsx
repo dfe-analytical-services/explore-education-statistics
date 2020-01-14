@@ -44,14 +44,13 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
     setSecondaryStatsDatablockData(undefined);
     if (hasSecondaryStats(release.keyStatisticsSecondarySection)) {
       const secondaryDatablock =
-        //@ts-ignore above if statement ensures it is defined
+        // @ts-ignore above if statement ensures it is defined
         release.keyStatisticsSecondarySection.content[0];
       DataBlockService.getDataBlockForSubject(
         secondaryDatablock.dataBlockRequest as TableDataQuery,
       ).then(data => {
-        let chartProps: ChartRendererProps | undefined;
+        let chartProps;
         if (data && secondaryDatablock.charts && secondaryDatablock.charts[0]) {
-          //@ts-ignore
           chartProps = {
             data,
             meta: parseMetaData(data.metaData),
@@ -61,7 +60,7 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
         setSecondaryStatsDatablockData({
           datablock: secondaryDatablock as DataBlock,
           data: mapDataBlockResponseToFullTable(data as DataBlockResponse),
-          chartProps,
+          chartProps: chartProps as ChartRendererProps,
         });
       });
     }
