@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -152,14 +151,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
         private (
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<Release,Guid>>, 
+            Mock<IPersistenceHelper<ContentDbContext>>, 
             Mock<IPublishingService>,
             Mock<ContentDbContext>,
             Mock<IReleaseRepository>) Mocks()
         {
             return (
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release), 
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release), 
                 new Mock<IPublishingService>(), 
                 new Mock<ContentDbContext>(), 
                 new Mock<IReleaseRepository>());

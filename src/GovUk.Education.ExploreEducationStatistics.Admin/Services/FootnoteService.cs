@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IIndicatorService _indicatorService;
         private readonly ISubjectService _subjectService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IPersistenceHelper<ContentDbContext> _statisticsPersistenceHelper;
+        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
 
         public FootnoteService(StatisticsDbContext context,
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ISubjectService subjectService, 
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper, 
             IUserService userService, 
-            IPersistenceHelper<ContentDbContext> statisticsPersistenceHelper) : base(context, logger)
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper) : base(context, logger)
         {
             _filterService = filterService;
             _filterGroupService = filterGroupService;

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -90,13 +91,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IConfiguration>,
             Mock<ISubjectService>,
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<Release,Guid>>) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
             return (
                 new Mock<IConfiguration>(), 
                 new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release));
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release));
         }
     }
 }

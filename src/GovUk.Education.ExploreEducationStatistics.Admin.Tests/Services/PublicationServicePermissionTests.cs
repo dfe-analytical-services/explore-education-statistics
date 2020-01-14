@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -12,10 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -24,12 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
         {
-            var (context, userService, repository) = Mocks();
+            var (context, userService, repository, persistenceHelper) = Mocks();
 
             var topicId = Guid.NewGuid();
             
             var publicationService = new PublicationService(context.Object, MapperForProfile<MappingProfiles>(), 
-                userService.Object, repository.Object);
+                userService.Object, repository.Object, persistenceHelper.Object);
 
             userService.
                 Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
@@ -60,13 +56,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
         {
-            var (context, userService, repository) = Mocks();
+            var (context, userService, repository, persistenceHelper) = Mocks();
 
             var topicId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             
             var publicationService = new PublicationService(context.Object, MapperForProfile<MappingProfiles>(), 
-                userService.Object, repository.Object);
+                userService.Object, repository.Object, persistenceHelper.Object);
 
             userService.
                 Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
@@ -99,7 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             repository.VerifyNoOtherCalls();
         }
         
-        private (Mock<ContentDbContext>, Mock<IUserService>, Mock<IPublicationRepository>) Mocks()
+        private (
+            Mock<ContentDbContext>, 
+            Mock<IUserService>, 
+            Mock<IPublicationRepository>,
+            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
             var userService = new Mock<IUserService>();
 
@@ -107,7 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
                 .ReturnsAsync(true);
 
-            return (new Mock<ContentDbContext>(), userService, new Mock<IPublicationRepository>());
+            return (new Mock<ContentDbContext>(), userService, new Mock<IPublicationRepository>(), 
+                    MockUtils.MockPersistenceHelper<ContentDbContext, Publication>());
         }
     }
 }

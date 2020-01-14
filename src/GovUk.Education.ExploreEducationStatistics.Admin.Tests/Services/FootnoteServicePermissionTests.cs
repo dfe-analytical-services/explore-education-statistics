@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -127,9 +128,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IFilterItemService>,
             Mock<IIndicatorService>,
             Mock<ISubjectService>,
-            Mock<IPersistenceHelper<Release, Guid>>,
+            Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IUserService>,
-            Mock<IPersistenceHelper<Footnote, Guid>>) Mocks()
+            Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
             var statisticsDbContext = new Mock<StatisticsDbContext>();
 
@@ -148,9 +149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IFilterItemService>(), 
                 new Mock<IIndicatorService>(), 
                 new Mock<ISubjectService>(), 
-                MockUtils.MockPersistenceHelper(Release.Id, Release),
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(Footnote.Id, Footnote));
+                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
         }
     }
 }
