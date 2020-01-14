@@ -1,3 +1,4 @@
+import sortBy from 'lodash/sortBy';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -42,7 +43,7 @@ export const transformTableMetaFiltersToCategoryFilters = (
   filters: DataBlockMetadata['filters'] | FullTableMeta['filters'],
 ): Dictionary<CategoryFilter[]> => {
   return mapValuesWithKeys(filters, (filterKey, filterValue) =>
-    Object.values(filterValue.options)
+    sortBy(Object.values(filterValue.options), o => o.label)
       .flatMap(options => {
         return options.options.map(option => ({
           ...option,
