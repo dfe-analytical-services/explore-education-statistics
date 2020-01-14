@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -42,14 +43,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Release)
                 .ThenInclude(release => release.Publication)
                 .ThenInclude(publication => publication.Topic)
-                .Where(r => r.UserId == userId)
+                .Where(r => r.UserId == userId && r.Release.Publication.TopicId == topicId)
                 .Select(r => r.Release)
+                .Distinct()
                 .Where(release => release.Publication.TopicId == topicId)
                 .ToListAsync();
 
             var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
 
-            foreach (var publication in userReleasesForTopic.Select(release => release.Publication).Distinct())
+            foreach (var publication in userReleasesForTopic
+                .Select(release => release.Publication)
+                .Distinct())
             {
                 var releasesForPublication = userReleasesForTopic.FindAll(release => release.Publication == publication);
                 userReleasesByPublication.Add(publication, releasesForPublication);
@@ -59,17 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(publicationWithReleases =>
                 {
                     var (publication, releases) = publicationWithReleases;
-
-                    return new MyPublicationViewModel
-                    {
-                        Id = publication.Id,
-                        Contact = publication.Contact,
-                        Methodology = _mapper.Map<MethodologyViewModel>(publication.Methodology),
-                        Releases = releases.Select(release => _mapper.Map<MyReleaseViewModel>(release)).ToList(),
-                        Title = publication.Title,
-                        NextUpdate = publication.NextUpdate,
-                        ThemeId = publication.Topic.ThemeId
-                    };
+                    publication.Releases = releases;
+                    return _mapper.Map<MyPublicationViewModel>(publication);
                 })
                 .ToList();
         }

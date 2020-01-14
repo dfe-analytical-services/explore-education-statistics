@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Security
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeRepository : IThemeRepository
     {
@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Security
                 .ThenInclude(topic => topic.Theme)
                 .Where(r => r.UserId == userId)
                 .Select(r => r.Release.Publication.Topic)
+                .Distinct()
                 .ToListAsync();
 
             var userTopicsByTheme = new Dictionary<Theme, List<Topic>>();
