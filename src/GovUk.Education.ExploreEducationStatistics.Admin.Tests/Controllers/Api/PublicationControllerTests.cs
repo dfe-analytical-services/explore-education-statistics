@@ -29,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Method under test
             var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
             Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.IsAssignableFrom<MyPublicationViewModel>(((OkObjectResult) result.Result).Value);
+            Assert.IsAssignableFrom<PublicationViewModel>(((OkObjectResult) result.Result).Value);
 
-            var viewModel = (MyPublicationViewModel) ((OkObjectResult) result.Result).Value;
+            var viewModel = (PublicationViewModel) ((OkObjectResult) result.Result).Value;
             Assert.Equal(topicId, viewModel.TopicId);
         }
         

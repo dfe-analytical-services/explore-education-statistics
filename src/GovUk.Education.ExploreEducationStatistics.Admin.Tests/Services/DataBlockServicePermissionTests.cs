@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (userService, persistenceHelper, contentDbContext) = Mocks();
 
-            var service = new DataBlockService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new DataBlockService(contentDbContext.Object, AdminMapper(), 
                 persistenceHelper.Object, userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);

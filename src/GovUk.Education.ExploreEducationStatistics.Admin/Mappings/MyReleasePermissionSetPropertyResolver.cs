@@ -1,12 +1,12 @@
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
-    public class MyReleasePermissionSetPropertyResolver
-        : IValueResolver<Release, MyReleaseViewModel, MyReleaseViewModel.PermissionsSet>
+    public class MyReleasePermissionSetPropertyResolver : IMyReleasePermissionSetPropertyResolver
     {
         private readonly IUserService _userService;
  

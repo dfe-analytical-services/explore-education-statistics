@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(), 
+                var releaseService = new ReleaseService(context, AdminMapper(), 
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 var result = releaseService.CreateReleaseAsync(
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 // Service method under test
@@ -208,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // loading of the entity graph as we go.
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 // Method under test
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 // Method under test
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 // Method under test 
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
                 
                 // Method under test 
@@ -441,7 +441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
+                var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object);
 
                 // Method under test 

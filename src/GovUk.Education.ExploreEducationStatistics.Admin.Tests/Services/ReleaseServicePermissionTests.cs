@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
                 .ReturnsAsync(list);
             
-            var service = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(userId, ReleaseStatus.Approved))
                 .ReturnsAsync(list);
             
-            var service = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository) = Mocks();
 
-            var service = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);

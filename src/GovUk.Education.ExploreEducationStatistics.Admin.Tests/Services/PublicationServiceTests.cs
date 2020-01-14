@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
                 // Service method under test
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
-                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
                 // Service method under test
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
                 var result = await publicationService.CreatePublicationAsync(
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var publicationService = new PublicationService(context, MapperForProfile<MappingProfiles>(),
+                var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
                 // Service method under test
