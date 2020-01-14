@@ -1,4 +1,3 @@
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +7,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class ApproveSpecificReleaseRequirement : IAuthorizationRequirement
     {}
+    
+    public class ApproveSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
+    {
+        public ApproveSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
+            new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(),
+            new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(context))
+        {
+            
+        }
+    }
     
     public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
         ApproveSpecificReleaseRequirement>
@@ -23,4 +32,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             : base(context, ctx => ContainsApproverRole(ctx.Roles))
         {}
     }
+    
 }
