@@ -114,42 +114,50 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
             )}
           </section>
         </TabsSection>
-        {release.keyStatisticsSecondarySection && [
-          <TabsSection key="table" id="headline-secondary-table" title="Table">
-            {secondaryStatsDatablock ? (
-              <TimePeriodDataTable
-                fullTable={secondaryStatsDatablock.data}
-                tableHeadersConfig={
-                  (secondaryStatsDatablock.datablock.tables &&
-                    secondaryStatsDatablock.datablock.tables[0] &&
-                    secondaryStatsDatablock.datablock.tables[0].tableHeaders) ||
-                  getDefaultTableHeaderConfig(
-                    secondaryStatsDatablock.data.subjectMeta,
-                  )
-                }
-              />
-            ) : (
-              <LoadingSpinner text="Loading secondary statistics" />
-            )}
-          </TabsSection>,
+        {release.keyStatisticsSecondarySection &&
           release.keyStatisticsSecondarySection.content &&
-            release.keyStatisticsSecondarySection.content[0] &&
-            release.keyStatisticsSecondarySection.content[0].charts &&
-            release.keyStatisticsSecondarySection.content[0].charts.length && (
-              <TabsSection
-                key="chart"
-                id="headline-secondary-chart"
-                title="Chart"
-              >
-                {secondaryStatsDatablock &&
-                secondaryStatsDatablock.chartProps ? (
-                  <ChartRenderer {...secondaryStatsDatablock.chartProps} />
-                ) : (
-                  <LoadingSpinner text="Loading secondary statistics" />
-                )}
-              </TabsSection>
-            ),
-        ]}
+          release.keyStatisticsSecondarySection.content.length && [
+            <TabsSection
+              key="table"
+              id="headline-secondary-table"
+              title="Table"
+            >
+              {secondaryStatsDatablock ? (
+                <TimePeriodDataTable
+                  fullTable={secondaryStatsDatablock.data}
+                  tableHeadersConfig={
+                    (secondaryStatsDatablock.datablock.tables &&
+                      secondaryStatsDatablock.datablock.tables[0] &&
+                      secondaryStatsDatablock.datablock.tables[0]
+                        .tableHeaders) ||
+                    getDefaultTableHeaderConfig(
+                      secondaryStatsDatablock.data.subjectMeta,
+                    )
+                  }
+                />
+              ) : (
+                <LoadingSpinner text="Loading secondary statistics" />
+              )}
+            </TabsSection>,
+            release.keyStatisticsSecondarySection.content &&
+              release.keyStatisticsSecondarySection.content[0] &&
+              release.keyStatisticsSecondarySection.content[0].charts &&
+              release.keyStatisticsSecondarySection.content[0].charts
+                .length && (
+                <TabsSection
+                  key="chart"
+                  id="headline-secondary-chart"
+                  title="Chart"
+                >
+                  {secondaryStatsDatablock &&
+                  secondaryStatsDatablock.chartProps ? (
+                    <ChartRenderer {...secondaryStatsDatablock.chartProps} />
+                  ) : (
+                    <LoadingSpinner text="Loading secondary statistics" />
+                  )}
+                </TabsSection>
+              ),
+          ]}
       </Tabs>
     </section>
   );
