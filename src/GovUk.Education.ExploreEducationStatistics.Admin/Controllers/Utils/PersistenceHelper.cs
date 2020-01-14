@@ -17,46 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
     {
         private readonly TDbContext _context;
         private readonly DbSet<TEntity> _entitySet;
-        private readonly ValidationErrorMessages _notFoundErrorMessage;
             
         public PersistenceHelper(
             TDbContext context,
-            DbSet<TEntity> entitySet,
-            ValidationErrorMessages notFoundErrorMessage = ValidationErrorMessages.EntityNotFound)
+            DbSet<TEntity> entitySet)
         {
             _context = context;
             _entitySet = entitySet;
-            _notFoundErrorMessage = notFoundErrorMessage;
         }
         
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, TEntity>> CheckEntityExists(
-            TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            return HandleValidationErrorsAsync(
-                async () =>
-                {
-                    var queryableEntities = _entitySet
-                        .FindByPrimaryKey(_context, id);
-
-                    var hydratedEntities = hydrateEntityFn != null
-                        ? hydrateEntityFn.Invoke(queryableEntities)
-                        : queryableEntities;
-                    
-                    var entity = await hydratedEntities
-                        .FirstOrDefaultAsync();
-
-                    return entity == null
-                        ? ValidationResult(_notFoundErrorMessage)
-                        : new Either<ValidationResult, TEntity>(entity);
-                }, 
-                entity => Task.FromResult(new Either<ValidationResult, TEntity>(entity)));
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        // When the work for EES-919 is complete, rename this to "CheckEntityExists"
-        public Task<Either<ActionResult, TEntity>> CheckEntityExistsActionResult(
+        public Task<Either<ActionResult, TEntity>> CheckEntityExists(
             TEntityId id, 
             Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
         {

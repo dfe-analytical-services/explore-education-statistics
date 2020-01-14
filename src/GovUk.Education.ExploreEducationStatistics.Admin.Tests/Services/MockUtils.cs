@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var persistenceHelper = new Mock<IPersistenceHelper<TEntity, TEntityId>>();
 
             persistenceHelper
-                .Setup(s => s.CheckEntityExistsActionResult(id, 
+                .Setup(s => s.CheckEntityExists(id, 
                     It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(entity));
 
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var persistenceHelper = new Mock<IPersistenceHelper<TEntity, TEntityId>>();
 
             persistenceHelper
-                .Setup(s => s.CheckEntityExistsActionResult(It.IsAny<TEntityId>(), 
+                .Setup(s => s.CheckEntityExists(It.IsAny<TEntityId>(), 
                     It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(Activator.CreateInstance<TEntity>()));
 

@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
                 .HandleFailures();
         }
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
                 .HandleFailures();
         }
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
                 .HandleFailures();
         }
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             PublicationId publicationId)
         {
             return await _publicationHelper
-                .CheckEntityExistsActionResult(publicationId)
+                .CheckEntityExists(publicationId)
                 .OnSuccess(() =>
                 {
                     release.PublicationId = publicationId;
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
                 .HandleFailuresOr(Ok);
         }
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
                 .HandleFailuresOr(Ok);
         }
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart))
                 .HandleFailuresOr(Ok);
         }
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name,
                     ReleaseFileTypes.Ancillary, false))
                 .HandleFailuresOr(Ok);
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false))
                 .HandleFailuresOr(Ok);
         }
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 // upload the files
                 .OnSuccess(async _ =>
                 {
@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _releaseService.EditReleaseSummaryAsync(releaseId, request))
                 .HandleFailuresOr(Ok);
         }
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(async _ =>
                 {
                     await _tableStorageService.DeleteEntityAsync("imports",
@@ -277,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId, string fileName)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName))
                 .HandleFailuresOr(Ok);
         }
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId, string fileName)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ =>  _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
                 .HandleFailuresOr(Ok);
         }

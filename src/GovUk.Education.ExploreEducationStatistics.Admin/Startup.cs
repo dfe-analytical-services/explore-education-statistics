@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -47,7 +46,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
@@ -256,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
+            services.AddTransient<Data.Model.Services.Interfaces.IFootnoteService, Data.Model.Services.FootnoteService>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
@@ -276,11 +275,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
-            AddPersistenceHelper<Release, ContentDbContext>(services, c => c.Releases, ReleaseNotFound);
-            AddPersistenceHelper<Update, ContentDbContext>(services, c => c.Update, ReleaseNoteNotFound);
-            AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks, ContentBlockNotFound);
-            AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications, PublicationNotFound);
-            AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote, EntityNotFound);
+            AddPersistenceHelper<Release, ContentDbContext>(services, c => c.Releases);
+            AddPersistenceHelper<Update, ContentDbContext>(services, c => c.Update);
+            AddPersistenceHelper<DataBlock, ContentDbContext>(services, c => c.DataBlocks);
+            AddPersistenceHelper<Publication, ContentDbContext>(services, c => c.Publications);
+            AddPersistenceHelper<Footnote, StatisticsDbContext>(services, c => c.Footnote);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -329,8 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         private static void AddPersistenceHelper<TEntity, TDbContext>(
             IServiceCollection services, 
-            Func<TDbContext, DbSet<TEntity>> entitySetFn,
-            ValidationErrorMessages notFoundMessage)
+            Func<TDbContext, DbSet<TEntity>> entitySetFn)
             where TEntity : class 
             where TDbContext : DbContext
         {
@@ -342,8 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     var dbContext = s.GetService<TDbContext>();
                     return new PersistenceHelper<TEntity, Guid, TDbContext>(
                         dbContext,
-                        entitySetFn.Invoke(dbContext),
-                        notFoundMessage);
+                        entitySetFn.Invoke(dbContext));
                 });
         }
 
