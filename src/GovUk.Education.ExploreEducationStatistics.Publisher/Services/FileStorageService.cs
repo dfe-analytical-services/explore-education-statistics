@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publication, release);
         }
 
-        public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
+        public async Task MoveStagedContentAsync()
         {
             var container = await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
                 PublicContentContainerName);

@@ -1,12 +1,12 @@
+using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
     public interface IPublishingService
     {
-        Task PublishReleaseContentAsync(ReleaseStatus releaseStatus);
-        
-        Task PublishReleaseFilesAsync(PublishReleaseFilesMessage message);
+        Task PublishReleaseContentAsync(Guid releaseId);
+
+        Task PublishReleaseFilesAsync(Guid releaseId);
     }
 }
