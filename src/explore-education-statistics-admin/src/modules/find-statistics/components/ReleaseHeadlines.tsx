@@ -22,7 +22,6 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
-import KeyStatistics from './KeyStatistics';
 import { AddSecondaryStats, hasSecondaryStats } from './KeyStatisticsSecondary';
 
 interface Props {
@@ -89,9 +88,6 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
 
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
-          <section id="keystats">
-            {release.keyStatisticsSection && <KeyStatistics />}
-          </section>
           <section id="headlines">
             {release.headlinesSection && (
               <ContentBlocks
