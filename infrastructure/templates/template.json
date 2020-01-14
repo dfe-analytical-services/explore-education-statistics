@@ -92,6 +92,24 @@
         "description": "The password of the data api user of the public SQL Server"
       }
     },
+    "sqlPublisherUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlImporterUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlAdminUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
