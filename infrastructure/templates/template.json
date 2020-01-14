@@ -98,16 +98,34 @@
         "description": "The username of the publisher for the public SQL Server"
       }
     },
+    "sqlPublisherUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the publisher application used to read from the content db"
+      }
+    },
     "sqlImporterUser": {
       "type": "securestring",
       "metadata": {
         "description": "The username of the publisher for the public SQL Server"
       }
     },
+    "sqlImporterUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the importer application used to import data to the statistics db"
+      }
+    },
     "sqlAdminUser": {
       "type": "securestring",
       "metadata": {
         "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlAdminUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin application the content and statistics db"
       }
     },
     "sqlFirewallRules": {
@@ -892,12 +910,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             }
           ]
         }
@@ -1930,7 +1948,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             }
           ]
         }
@@ -2109,7 +2127,7 @@
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }
           ]
         }
