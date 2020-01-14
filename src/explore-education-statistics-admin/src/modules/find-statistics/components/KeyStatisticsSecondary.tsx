@@ -4,7 +4,6 @@ import {
   Publication,
   ContentSection,
 } from '@common/services/publicationService';
-import TabsSection from '@common/components/TabsSection';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
@@ -31,47 +30,6 @@ export function hasSecondaryStats(
     keyStatisticsSecondarySection.content &&
     keyStatisticsSecondarySection.content.length
   );
-}
-
-function renderSecondaryStats({
-  release,
-  setRelease,
-  isEditing = false,
-}: Props): JSX.Element[] {
-  const { keyStatisticsSecondarySection } = release;
-  if (!hasSecondaryStats(keyStatisticsSecondarySection)) {
-    return [];
-  }
-
-  // @ts-ignore - it will not be undefined due to above check
-  const secondaryStatsDatablock = keyStatisticsSecondarySection.content[0];
-
-  return [
-    <TabsSection key="table" id="headline-secondary-table" title="Table">
-      <p>Table</p>
-
-      {
-        //@ts-ignore
-        secondaryStatsDatablock.name
-      }
-    </TabsSection>,
-    <TabsSection key="chart" id="headline-secondary-Chart" title="Chart">
-      Chart
-    </TabsSection>,
-  ];
-}
-
-function getKeyStatisticsSecondaryTabs({
-  release,
-  setRelease,
-  isEditing = false,
-}: Props): JSX.Element[] {
-  //returns a set of tabs based on what has previously added to the release
-  const { keyStatisticsSecondarySection } = release;
-
-  return hasSecondaryStats(keyStatisticsSecondarySection)
-    ? renderSecondaryStats({ release, setRelease, isEditing })
-    : [];
 }
 
 export const AddSecondaryStats = ({
@@ -216,5 +174,3 @@ export const AddSecondaryStats = ({
     </>
   );
 };
-
-export default getKeyStatisticsSecondaryTabs;

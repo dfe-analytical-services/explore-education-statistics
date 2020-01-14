@@ -75,6 +75,7 @@ const DataBlockDetailsForm = ({
 
   const saveDataBlock = async (values: DataBlockDetailsFormValues) => {
     const dataBlock: DataBlock = {
+      id: initialDataBlock ? initialDataBlock.id : undefined,
       dataBlockRequest: {
         ...query,
         geographicLevel: query.geographicLevel as GeographicLevel,
