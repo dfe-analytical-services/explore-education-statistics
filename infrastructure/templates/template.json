@@ -80,6 +80,18 @@
         "description": "Firewall restrictions for storage accounts, string array"
       }
     },
+    "sqlPublicDataApiUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the data api for the public SQL Server"
+      }
+    },
+    "sqlPublicDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user of the public SQL Server"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
@@ -455,7 +467,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
             },
             {
               "name": "PublicStorage",
