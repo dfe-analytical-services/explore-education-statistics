@@ -35,21 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Publication> GetAsync(Guid id)
-        {
-            return await _context.Publications.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public Publication Get(string slug)
-        {
-            return _context.Publications.FirstOrDefault(x => x.Slug == slug);
-        }
-
-        public List<Publication> List()
-        {
-            return _context.Publications.ToList();
-        }
-
         public Task<List<MyPublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
             return _userService
@@ -60,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     GetPublicationsForTopicRelatedToUserAsync(topicId, _userService.GetUserId()));
         }
 
-        public async Task<Either<ActionResult, MyPublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
+        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(publication.TopicId)
@@ -69,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (_context.Publications.Any(p => p.Slug == publication.Slug))
                     {
-                        return ValidationActionResult<MyPublicationViewModel>(SlugNotUnique);
+                        return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
                     }
             
                     var saved = _context.Publications.Add(new Publication
@@ -87,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<MyPublicationViewModel> GetViewModelAsync(Guid publicationId)
+        public async Task<PublicationViewModel> GetViewModelAsync(Guid publicationId)
         {
             var publication = await _context.Publications
                 .Where(p => p.Id == publicationId)
                 .HydratePublicationForPublicationViewModel()
                 .FirstOrDefaultAsync();
-            return _mapper.Map<MyPublicationViewModel>(publication);
+            return _mapper.Map<PublicationViewModel>(publication);
         }
     }
     

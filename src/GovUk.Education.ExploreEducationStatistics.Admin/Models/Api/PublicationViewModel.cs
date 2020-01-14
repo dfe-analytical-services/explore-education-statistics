@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
-    public class MyPublicationViewModel
+    public class PublicationViewModel
     {
         public Guid Id { get; set; }
         
@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DateTime? NextUpdate { get; set; }
 
-        public List<MyReleaseViewModel> Releases { get; set; }
+        public List<ReleaseViewModel> Releases { get; set; }
         
         public MethodologyViewModel Methodology { get; set; }
         
@@ -21,12 +21,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid ThemeId { get; set; }
         
         public Contact Contact { get; set; }
-
-        public PermissionsSet Permissions { get; set; }
-
-        public class PermissionsSet
-        {
-            public bool CanCreateReleases { get; set; }
-        }
     }
 }

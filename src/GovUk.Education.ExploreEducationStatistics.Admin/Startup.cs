@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 
                 // does this user have permission to create a release under a specific publication?
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
-                    policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement())));
+                    policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
                 
                 // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>

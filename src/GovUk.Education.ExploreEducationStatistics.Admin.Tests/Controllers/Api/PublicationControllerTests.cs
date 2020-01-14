@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -9,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using Xunit;
 
@@ -25,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationService
                 .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, MyPublicationViewModel>(new MyPublicationViewModel {TopicId = p.TopicId})));
+                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
@@ -44,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             var validationResponse =
-                new Either<ActionResult, MyPublicationViewModel>(
+                new Either<ActionResult, PublicationViewModel>(
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService

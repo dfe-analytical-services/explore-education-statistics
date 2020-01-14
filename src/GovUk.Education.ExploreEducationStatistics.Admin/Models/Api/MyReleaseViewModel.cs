@@ -48,5 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         {
             public bool CanUpdateRelease { get; set; }
         }
+
+        public class Comment
+        {
+            public string AuthorName { get; set; }
+            
+            public DateTime CreatedDate { get; set; }
+
+            public string Message { get; set; }
+        }
     }
 }

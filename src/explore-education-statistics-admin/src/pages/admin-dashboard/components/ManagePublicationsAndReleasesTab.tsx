@@ -66,15 +66,6 @@ const ManagePublicationsAndReleasesTab = ({
 
   const { themeId, topicId } = match.params;
 
-  useEffect(() => {
-    if (topicId) {
-      permissionService
-        .canCreatePublicationForTopic(topicId)
-        .then(setCanCreatePublication)
-        .catch(handleApiErrors);
-    }
-  }, [topicId, handleApiErrors]);
-
   const onThemeChange = (
     newThemeId: string,
     availableThemes: ThemeAndTopicsIdsAndTitles[],
@@ -130,20 +121,26 @@ const ManagePublicationsAndReleasesTab = ({
 
   useEffect(() => {
     if (selectedThemeAndTopic.topic.id) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications)
+      Promise.all([
+        dashboardService
+          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .then(setMyPublications),
+        permissionService
+          .canCreatePublicationForTopic(selectedThemeAndTopic.topic.id)
+          .then(setCanCreatePublication),
+      ])
+        .then(_ =>
+          // eslint-disable-next-line
+          history.replaceState(
+            {},
+            '',
+            generateAdminDashboardThemeTopicLink(
+              selectedThemeAndTopic.theme.id,
+              selectedThemeAndTopic.topic.id,
+            ),
+          ),
+        )
         .catch(handleApiErrors);
-
-      // eslint-disable-next-line
-      history.replaceState(
-        {},
-        '',
-        generateAdminDashboardThemeTopicLink(
-          selectedThemeAndTopic.theme.id,
-          selectedThemeAndTopic.topic.id,
-        ),
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThemeAndTopic]);
