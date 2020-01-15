@@ -367,6 +367,14 @@
       }
     },
 
+    "publishReleaseDataFunctionDisabled": {
+      "type": "string",
+      "defaultValue": "true",
+      "metadata": {
+        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+      }
+    },
+
     "azureDataFactoryPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
@@ -2089,7 +2097,7 @@
             },
             {
               "name": "AzureWebJobs.PublishReleaseData.Disabled",
-              "value": "true"
+              "value": "[parameters('publishReleaseDataFunctionDisabled')]"
             },
             {
               "name": "PublishReleasesCronSchedule",
