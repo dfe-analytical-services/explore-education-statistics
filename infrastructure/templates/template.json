@@ -367,14 +367,6 @@
       }
     },
 
-    "azureDataFactoryName": {
-      "type": "string",
-      "defaultValue": "s101d01datafactory",
-      "metadata": {
-        "description": "Datafactory name used by Publish Release Data Function in the Publisher App"
-      }
-    },
-
     "azureDataFactoryPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
@@ -425,6 +417,7 @@
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
     "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
     "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
+    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2095,6 +2088,10 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "AzureWebJobs.PublishReleaseData.Disabled",
+              "value": "true"
+            },
+            {
               "name": "PublishReleasesCronSchedule",
               "value": "[parameters('publishReleasesCronSchedule')]"
             },
@@ -2104,7 +2101,7 @@
             },
             {
               "name": "AzureDataFactoryName",
-              "value": "[parameters('azureDataFactoryName')]"
+              "value": "[variables('azureDataFactoryName')]"
             },
             {
               "name": "AzureDataFactoryPipelineName",
