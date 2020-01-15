@@ -1150,31 +1150,31 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
 
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('importerSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2144,23 +2144,23 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
