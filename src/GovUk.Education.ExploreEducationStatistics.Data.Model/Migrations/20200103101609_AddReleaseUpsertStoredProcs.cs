@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
@@ -36,24 +36,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             // Routines
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilter.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterGroup.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterGroupFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterItem.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterItemFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicator.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicatorFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicatorGroup.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertLocation.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertPublication.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertRelease.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertSubject.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertSubjectFootnote.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTheme.sql");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTopic.sql");
-
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilter");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterGroup");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterGroupFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterItem");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilterItemFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicator");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicatorFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertIndicatorGroup");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertLocation");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertPublication");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertRelease");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertSubject");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertSubjectFootnote");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTheme");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertTopic");
             // Types
             migrationBuilder.Sql("DROP TYPE dbo.FilterType");
             migrationBuilder.Sql("DROP TYPE dbo.FilterFootnoteType");
@@ -73,14 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TYPE dbo.ThemeType");
             migrationBuilder.Sql("DROP TYPE dbo.TopicType");
         }
-        
+
         private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
         {
             var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
-            
+
             migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
 }
-
