@@ -54,18 +54,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<DataBlockService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (userService, releaseHelper, dataBlockHelper, contentDbContext) = Mocks();
+            var (userService, persistenceHelper, contentDbContext) = Mocks();
 
-            var service = new DataBlockService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
-                releaseHelper.Object, userService.Object, dataBlockHelper.Object);
+            var service = new DataBlockService(contentDbContext.Object, AdminMapper(), 
+                persistenceHelper.Object, userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
 
         private (
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<Release,Guid>>, 
-            Mock<IPersistenceHelper<DataBlock,Guid>>,
+            Mock<IPersistenceHelper<ContentDbContext>>, 
             Mock<ContentDbContext>) Mocks()
         {
             var contentDbContext = new Mock<ContentDbContext>();
@@ -82,11 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             contentDbContext
                 .Setup(s => s.ReleaseContentBlocks)
                 .ReturnsDbSet(releaseContentBlocks);
-            
+
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
+            MockUtils.SetupCall(persistenceHelper, _dataBlock.Id, _dataBlock);
+
             return (
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release), 
-                MockUtils.MockPersistenceHelper(_dataBlock.Id, _dataBlock), 
+                persistenceHelper,
                 contentDbContext);
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -26,40 +25,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
+
+        private readonly Publication _publication = new Publication
+        {
+            Id = Guid.NewGuid()
+        };
         
         [Fact]
         public void GetAsync()
         {
-            AssertSecurityPoliciesChecked(releaseService => releaseService.GetAsync(_release.Id), CanViewSpecificRelease);
+            AssertSecurityPoliciesChecked(service => 
+                service.GetAsync(_release.Id), 
+                _release,
+                CanViewSpecificRelease);
         }
         
         [Fact]
         public void GetReleaseSummaryAsync()
         {
-            AssertSecurityPoliciesChecked(releaseService => releaseService.GetReleaseSummaryAsync(_release.Id), CanViewSpecificRelease);
+            AssertSecurityPoliciesChecked(service => 
+                service.GetReleaseSummaryAsync(_release.Id),  
+                _release,
+                CanViewSpecificRelease);
+        }
+        
+        [Fact]
+        public void CreateReleaseAsync()
+        {
+            AssertSecurityPoliciesChecked(
+                service => service.CreateReleaseAsync(new CreateReleaseViewModel
+                {
+                    PublicationId = _publication.Id,
+                }), 
+                _publication, 
+                CanCreateReleaseForSpecificPublication);
         }
         
         [Fact]
         public void UpdateReleaseStatusAsync_Draft()
         {
-            AssertSecurityPoliciesChecked(releaseService => 
-                releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Draft, ""), 
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Draft, ""),  
+                _release,
                 CanMarkSpecificReleaseAsDraft);
         }
         
         [Fact]
         public void UpdateReleaseStatusAsync_SubmitForHigherLevelReview()
         {
-            AssertSecurityPoliciesChecked(releaseService => 
-                releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.HigherLevelReview, ""), 
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.HigherLevelReview, ""),  
+                _release,
                 CanSubmitSpecificReleaseToHigherReview);
         }
         
         [Fact]
         public void UpdateReleaseStatusAsync_Approve()
         {
-            AssertSecurityPoliciesChecked(releaseService => 
-                releaseService.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Approved, ""), 
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Approved, ""),  
+                _release,
                 CanApproveSpecificRelease);
         }
         
@@ -84,10 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
                 .ReturnsAsync(list);
             
-            var releaseService = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
             
-            var result = await releaseService.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
+            var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             Assert.Equal(list, result);
             
             userService.Verify(s => s.MatchesPolicy(CanViewAllReleases));
@@ -124,10 +149,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(userId, ReleaseStatus.Approved))
                 .ReturnsAsync(list);
             
-            var releaseService = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
             
-            var result = await releaseService.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
+            var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
             Assert.Equal(list, result);
             
@@ -139,27 +164,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             repository.VerifyNoOtherCalls();
         }
         
-        private void AssertSecurityPoliciesChecked<T>(
-            Func<ReleaseService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+        private void AssertSecurityPoliciesChecked<T, TEntity>(
+            Func<ReleaseService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity, params SecurityPolicies[] policies)
+            where TEntity : class
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository) = Mocks();
 
-            var releaseService = new ReleaseService(contentDbContext.Object, MapperForProfile<MappingProfiles>(), 
+            var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, releaseService, policies);
+            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }
         
         private (
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<Release,Guid>>, 
+            Mock<IPersistenceHelper<ContentDbContext>>, 
             Mock<IPublishingService>,
             Mock<ContentDbContext>,
             Mock<IReleaseRepository>) Mocks()
         {
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
+            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
+            MockUtils.SetupCall(persistenceHelper, _publication.Id, _publication);
+            
             return (
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release), 
+                persistenceHelper, 
                 new Mock<IPublishingService>(), 
                 new Mock<ContentDbContext>(), 
                 new Mock<IReleaseRepository>());

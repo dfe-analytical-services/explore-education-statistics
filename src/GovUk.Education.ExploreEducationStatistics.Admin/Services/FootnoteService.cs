@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
@@ -25,9 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFilterItemService _filterItemService;
         private readonly IIndicatorService _indicatorService;
         private readonly ISubjectService _subjectService;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
-        private readonly IPersistenceHelper<Footnote, Guid> _footnoteHelper;
 
         public FootnoteService(StatisticsDbContext context,
             ILogger<FootnoteService> logger,
@@ -36,18 +37,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFilterItemService filterItemService,
             IIndicatorService indicatorService,
             ISubjectService subjectService, 
-            IPersistenceHelper<Release, Guid> releaseHelper, 
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper, 
             IUserService userService, 
-            IPersistenceHelper<Footnote, Guid> footnoteHelper) : base(context, logger)
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper) : base(context, logger)
         {
             _filterService = filterService;
             _filterGroupService = filterGroupService;
             _filterItemService = filterItemService;
             _indicatorService = indicatorService;
             _subjectService = subjectService;
-            _releaseHelper = releaseHelper;
+            _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
-            _footnoteHelper = footnoteHelper;
+            _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
@@ -89,8 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid id)
         {
-            return await _footnoteHelper
-                .CheckEntityExists(id, HydrateFootnote)
+            return await _statisticsPersistenceHelper
+                .CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(footnote =>
                 {
@@ -114,8 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds)
         {
-            return _footnoteHelper
-                .CheckEntityExists(id, HydrateFootnote)
+            return _statisticsPersistenceHelper
+                .CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(footnote =>
                 {
@@ -136,8 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => DbSet()
                     .Where(footnote =>
                         (!footnote.Subjects.Any() ||
@@ -445,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private Task<Either<ActionResult, Release>> GetContentReleaseById(Guid releaseId)
         {
-            return _releaseHelper.CheckEntityExists(releaseId);
+            return _contentPersistenceHelper.CheckEntityExists<Release>(releaseId);
         }
 
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)

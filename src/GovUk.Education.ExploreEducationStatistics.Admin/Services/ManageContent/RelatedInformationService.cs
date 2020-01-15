@@ -16,28 +16,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class RelatedInformationService : IRelatedInformationService
     {
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
 
-        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper, 
+        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService)
         {
             _context = context;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
         }
         
         public Task<Either<ActionResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => release.RelatedInformation);
         }
 
         public Task<Either<ActionResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -62,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<BasicLink>>> UpdateRelatedInformationAsync(
             Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -87,8 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         
         public Task<Either<ActionResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {

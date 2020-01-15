@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -27,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<List<PublicationViewModel>> GetMyPublicationsAsync(
+        public async Task<List<MyPublicationViewModel>> GetMyPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
@@ -56,14 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
-            var result = await _publicationService.CreatePublicationAsync(publication);
-            if (result.IsLeft)
-            {
-                ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem(new ValidationProblemDetails(ModelState));
-            }
-
-            return result.Right;
+            
+            return await _publicationService
+                .CreatePublicationAsync(publication)
+                .HandleFailuresOr(Ok);
         }
     }
 }

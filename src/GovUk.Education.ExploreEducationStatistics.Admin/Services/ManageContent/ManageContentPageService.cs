@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,25 +19,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IContentService _contentService;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public ManageContentPageService(
             IMapper mapper,
             IFileStorageService fileStorageService, 
             IContentService contentService, 
-            IPersistenceHelper<Release, Guid> releaseHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _mapper = mapper;
             _fileStorageService = fileStorageService;
             _contentService = contentService;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
         }
 
         public Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
             Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExists(releaseId, HydrateReleaseForReleaseViewModel)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(async release =>
                     {
                         var availableDataBlocks =

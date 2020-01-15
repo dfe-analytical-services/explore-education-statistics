@@ -37,6 +37,8 @@ public class Either<Tl, Tr> {
         
         public Either<Tl, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
         
+        public Either<Tl, Tr> OrElse(Func<Tr> func) => IsLeft ? func() : Right;
+        
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
         
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);

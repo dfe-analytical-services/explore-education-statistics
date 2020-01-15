@@ -42,6 +42,9 @@ export interface AdminDashboardRelease {
   internalReleaseNote?: string;
   draftComments: Comment[];
   higherReviewComments: Comment[];
+  permissions: {
+    canUpdateRelease: boolean;
+  };
 }
 
 export interface AdminDashboardPublication {
@@ -50,4 +53,7 @@ export interface AdminDashboardPublication {
   methodology?: IdTitlePair;
   releases: AdminDashboardRelease[];
   contact: ContactDetails;
+  permissions: {
+    canCreateReleases: boolean;
+  };
 }

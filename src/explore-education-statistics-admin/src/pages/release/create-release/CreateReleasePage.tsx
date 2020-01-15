@@ -158,7 +158,8 @@ const CreateReleasePage = ({
         onSubmitHandler={submitFormHandler}
         onCancelHandler={cancelHandler}
         additionalFields={
-          model && (
+          model &&
+          model.templateRelease && (
             <FormFieldRadioGroup<FormValues>
               id="releaseSummaryForm-templateReleaseId"
               legend="Select template"
@@ -169,9 +170,8 @@ const CreateReleasePage = ({
                   value: 'new',
                 },
                 {
-                  label: `Copy existing template (${model.templateRelease &&
-                    model.templateRelease.title})`,
-                  value: `${model.templateRelease && model.templateRelease.id}`,
+                  label: `Copy existing template (${model.templateRelease.title})`,
+                  value: `${model.templateRelease.id}`,
                 },
               ]}
             />

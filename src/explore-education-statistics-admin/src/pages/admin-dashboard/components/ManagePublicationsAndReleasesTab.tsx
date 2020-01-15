@@ -4,6 +4,7 @@ import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/ro
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
+import permissionService from '@admin/services/permissions/service';
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
@@ -60,6 +61,8 @@ const ManagePublicationsAndReleasesTab = ({
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
+
+  const [canCreatePublication, setCanCreatePublication] = useState(false);
 
   const { themeId, topicId } = match.params;
 
@@ -118,20 +121,26 @@ const ManagePublicationsAndReleasesTab = ({
 
   useEffect(() => {
     if (selectedThemeAndTopic.topic.id) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications)
+      Promise.all([
+        dashboardService
+          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .then(setMyPublications),
+        permissionService
+          .canCreatePublicationForTopic(selectedThemeAndTopic.topic.id)
+          .then(setCanCreatePublication),
+      ])
+        .then(_ =>
+          // eslint-disable-next-line
+          history.replaceState(
+            {},
+            '',
+            generateAdminDashboardThemeTopicLink(
+              selectedThemeAndTopic.theme.id,
+              selectedThemeAndTopic.topic.id,
+            ),
+          ),
+        )
         .catch(handleApiErrors);
-
-      // eslint-disable-next-line
-      history.replaceState(
-        {},
-        '',
-        generateAdminDashboardThemeTopicLink(
-          selectedThemeAndTopic.theme.id,
-          selectedThemeAndTopic.topic.id,
-        ),
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThemeAndTopic]);
@@ -213,19 +222,21 @@ const ManagePublicationsAndReleasesTab = ({
                 ))}
               </Accordion>
             )}
-            {myPublications.length === 0 && (
+            {canCreatePublication && myPublications.length === 0 && (
               <div className="govuk-inset-text">
                 You have not yet created any publications
               </div>
             )}
-            <Link
-              to={publicationRoutes.createPublication.generateLink(
-                selectedThemeAndTopic.topic.id,
-              )}
-              className="govuk-button"
-            >
-              Create new publication
-            </Link>
+            {canCreatePublication && (
+              <Link
+                to={publicationRoutes.createPublication.generateLink(
+                  selectedThemeAndTopic.topic.id,
+                )}
+                className="govuk-button"
+              >
+                Create new publication
+              </Link>
+            )}
           </>
         )}
       </section>

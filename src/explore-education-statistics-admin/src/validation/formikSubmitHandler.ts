@@ -37,18 +37,18 @@ const submitWithFormikValidation = <FormValues>(
     } catch (error) {
       if (!isServerValidationError(error)) {
         handleApiErrors(error);
-      }
+      } else {
+        const validationHandler = handleServerSideValidation(...messageMappers);
 
-      const validationHandler = handleServerSideValidation(...messageMappers);
+        const errorHandled = validationHandler(
+          error.data as ServerValidationErrors,
+          actions.setFieldError,
+          actions.setError,
+        );
 
-      const errorHandled = validationHandler(
-        error.data as ServerValidationErrors,
-        actions.setFieldError,
-        actions.setError,
-      );
-
-      if (!errorHandled) {
-        handleApiErrors(error);
+        if (!errorHandled) {
+          handleApiErrors(error);
+        }
       }
     }
   };

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -22,32 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService, 
-            IPublicationRepository publicationRepository)
+            IPublicationRepository publicationRepository, IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
             _publicationRepository = publicationRepository;
+            _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Publication> GetAsync(Guid id)
-        {
-            return await _context.Publications.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public Publication Get(string slug)
-        {
-            return _context.Publications.FirstOrDefault(x => x.Slug == slug);
-        }
-
-        public List<Publication> List()
-        {
-            return _context.Publications.ToList();
-        }
-
-        public Task<List<PublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
+        public Task<List<MyPublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
             return _userService
                 .CheckCanViewAllReleases()
@@ -57,25 +45,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     GetPublicationsForTopicRelatedToUserAsync(topicId, _userService.GetUserId()));
         }
 
-        public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
+        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
         {
-            if (_context.Publications.Any(p => p.Slug == publication.Slug))
-            {
-                return ValidationResult(SlugNotUnique);
-            }
+            return await _persistenceHelper
+                .CheckEntityExists<Topic>(publication.TopicId)
+                .OnSuccess(_userService.CheckCanCreatePublicationForTopic)
+                .OnSuccess(async _ =>
+                {
+                    if (_context.Publications.Any(p => p.Slug == publication.Slug))
+                    {
+                        return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
+                    }
             
-            var saved = _context.Publications.Add(new Publication
-            {
-                Id = Guid.NewGuid(),
-                ContactId = publication.ContactId,
-                Title = publication.Title,
-                TopicId = publication.TopicId,
-                MethodologyId = publication.MethodologyId,
-                Slug = publication.Slug
-            });
-            _context.SaveChanges();
-            return await GetViewModelAsync(saved.Entity.Id);
-            
+                    var saved = _context.Publications.Add(new Publication
+                    {
+                        Id = Guid.NewGuid(),
+                        ContactId = publication.ContactId,
+                        Title = publication.Title,
+                        TopicId = publication.TopicId,
+                        MethodologyId = publication.MethodologyId,
+                        Slug = publication.Slug
+                    });
+                    
+                    _context.SaveChanges();
+                    return await GetViewModelAsync(saved.Entity.Id);
+                });
         }
 
         public async Task<PublicationViewModel> GetViewModelAsync(Guid publicationId)
@@ -87,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<PublicationViewModel>(publication);
         }
     }
-    
     
     public static class PublicationLinqExtensions
     {
