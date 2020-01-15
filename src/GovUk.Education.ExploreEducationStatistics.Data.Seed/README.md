@@ -35,6 +35,6 @@ restarted during a currently running seed as a consequence of others performing 
 - When all are flagged as COMPLETE then add the footnotes data by opening a connection to the statistics DB previously seeded & run the script: 
 ```~\projects\explore-education-statistics\useful-scripts\sql\FootnoteData.sql```
 - Run the data-api tests in postman to check that all tests are passing with the new data.
-- Repeat the process against the public-statistics DB (Only required if not seeding locally. You will need to switch the statistics connection strings in the admin app & restart the 
-admin app to point to the public-statistics DB to re-create the public-statistics schema but remember to switch back).
+- Repeat the process against the public-statistics DB (Only required if not seeding locally. You will need to restart the data-api to re-create the public-statistics schema,
+ and change the Importer function configuration to use the public-statistics database. Don't forget to switch the connection string back once the import is complete.).
 - In order for the public site to have visible links to the uploaded files in its download files section you will need to public the content (See as yet unwritten README for that :).

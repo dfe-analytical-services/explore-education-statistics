@@ -84,5 +84,3 @@ BEGIN
                 source.Sponsor_Code);
 END
 GO
-
-                  

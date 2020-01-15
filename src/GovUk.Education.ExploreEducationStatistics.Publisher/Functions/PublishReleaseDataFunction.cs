@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -20,14 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly StatisticsDbContext _context;
-        
+
         public const string QueueName = "publish-release-data";
-        
+
         private const string SubscriptionId = "AzureSubscriptionId";
         private const string ResourceGroupName = "AzureResourceGroupName";
         private const string DataFactoryName = "AzureDataFactoryName";
         private const string DataFactoryPipelineName = "AzureDataFactoryPipelineName";
-        
+
         public PublishReleaseDataFunction(
             StatisticsDbContext context,
             IReleaseStatusService releaseStatusService)
@@ -52,24 +53,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
-        
-        private async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context, PublishReleaseDataMessage message)
+
+        private async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context,
+            PublishReleaseDataMessage message)
         {
             var config = LoadAppSettings(context);
             var subscriptionId = config.GetValue<string>(SubscriptionId);
             var resourceGroupName = config.GetValue<string>(ResourceGroupName);
             var dataFactoryName = config.GetValue<string>(DataFactoryName);
             var dataFactoryPipelineName = config.GetValue<string>(DataFactoryPipelineName);
-            
+
             var subject = _context.Subject
                 .Where(s => s.Id.Equals(message.ReleaseId))
                 .Include(s => s.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
                 .FirstOrDefault();
-            
-            Dictionary<string, Guid> postParams = new Dictionary<string, Guid>
+
+            var postParams = new Dictionary<string, Guid>
             {
                 {"subjectId", subject.Id},
                 {"releaseId", subject.ReleaseId},
@@ -80,13 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             };
 
             var json = JsonConvert.SerializeObject(postParams);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var url = $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
+            var data = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var url =
+                $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
             using var client = new HttpClient();
 
             return await client.PostAsync(url, data);
         }
-        
+
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
         {
             return new ConfigurationBuilder()
