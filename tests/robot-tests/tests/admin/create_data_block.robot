@@ -247,11 +247,12 @@ Validate table row Syon
     user checks row cell contains text   ${row}   16   n/a
 
 Save data block
-    [Tags]  HappyPath  UnderConstruction
-    user enters text into element  css:#data-block-title       UI Test create data block title
-    user enters text into element  css:#data-block-source      UI Test create data block source
-    user enters text into element  css:#data-block-footnotes   UI Test create data block footnote
-    user enters text into element  css:#data-block-name        UI Test create data block name
+    [Tags]  HappyPath
+    user enters text into element  css:#data-block-name        UI Test data block name
+    user clears element text   css:#data-block-title
+    user enters text into element  css:#data-block-title       UI Test table title
+    user enters text into element  css:#data-block-source      UI Test source
+    user enters text into element  css:#data-block-footnotes   UI Test footnotes
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
