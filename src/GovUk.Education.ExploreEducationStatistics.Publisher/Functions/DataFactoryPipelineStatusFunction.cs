@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
@@ -15,31 +15,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class DataFactoryPipelineStatusFunction
     {
         private readonly IReleaseStatusService _releaseStatusService;
-        
+
         public DataFactoryPipelineStatusFunction(IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
         }
-        
+
         [FunctionName("DataFactoryPipelineStatusFunction")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "datafactory/pipeline/status/")]
             HttpRequest req,
-            ILogger log,
+            ILogger logger,
             ExecutionContext executionContext)
         {
-            log.LogInformation($"{executionContext.FunctionName} triggered");
+            logger.LogInformation($"{executionContext.FunctionName} triggered");
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            PipelineResponse response = JsonConvert.DeserializeObject<PipelineResponse>(requestBody);
+            var response = JsonConvert.DeserializeObject<PipelineResponse>(requestBody);
 
-            if (response.Status == "Failed")
+            if (response.Status != "Complete")
             {
-                log.LogError($"Datafactory pipelined failed with error: {response.ErrorMessage}");
+                logger.LogError(
+                    $"Datafactory pipelined failed with status: {response.Status}, error: {response.ErrorMessage}");
             }
-            
-            await _releaseStatusService.UpdateFilesStageAsync(response.ReleaseId, response.ReleaseStatusId, response.Status == "Complete"? Complete : Failed);
-            
-            log.LogInformation($"{executionContext.FunctionName} complete");
+
+            await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
+                response.Status == "Complete" ? Complete : Failed);
+
+            logger.LogInformation($"{executionContext.FunctionName} completed");
 
             return response.Status != null
                 ? (ActionResult) new OkObjectResult($"status, {response.Status}")
@@ -47,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
     }
 
-    public class PipelineResponse
+    internal class PipelineResponse
     {
         public Guid ReleaseId { get; set; }
         public Guid ReleaseStatusId { get; set; }
