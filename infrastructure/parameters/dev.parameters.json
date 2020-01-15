@@ -20,6 +20,9 @@
     "publishReleaseContentCronSchedule": {
       "value": "0 30 * * * *"
     },
+    "publishReleaseDataFunctionDisabled": {
+      "value": "true"
+    },
     "useSubnets": {
       "value": true
     },
