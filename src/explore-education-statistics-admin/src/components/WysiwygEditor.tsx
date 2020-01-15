@@ -80,8 +80,7 @@ const WysiwygEditor = ({
       <div
         role="button"
         className={classnames({
-          [styles.editableContentEditing]:
-            (editable && editing) || (editable && !content),
+          [styles.editableContentEditing]: editable && editing,
           [styles.editableContent]: editable && !editing,
           [styles.unsaved]: editable && !saved,
         })}
@@ -92,7 +91,7 @@ const WysiwygEditor = ({
       >
         {editable && (
           <div className={styles.editableButton}>
-            {editing || !content ? (
+            {editing ? (
               <button
                 className="govuk-button"
                 onClick={() => save()}
@@ -125,7 +124,7 @@ const WysiwygEditor = ({
           </div>
         )}
 
-        {(editable && editing) || (editable && !content) ? (
+        {editable && editing ? (
           <CKEditor
             editor={ClassicEditor}
             config={{
@@ -158,9 +157,12 @@ const WysiwygEditor = ({
           <div
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
-              __html: temporaryContent,
+              __html: temporaryContent || '<p>This section is empty</p>',
             }}
-            className={`${styles.wysiwygPreview} govuk-!-padding-left-2 govuk-!-padding-right-2`}
+            className={`${
+              styles.wysiwygPreview
+            } govuk-!-padding-left-2 govuk-!-padding-right-2 ${!temporaryContent &&
+              styles.wysiwygPlaceholder}`}
           />
         )}
       </div>
