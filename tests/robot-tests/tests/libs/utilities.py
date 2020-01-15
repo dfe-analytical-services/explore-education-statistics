@@ -217,6 +217,26 @@ def user_checks_results_table_column_heading_contains(row, column, expected):
     raise AssertionError(
       f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
 
+def user_gets_row_with_heading(heading):
+  elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
+  #BuiltIn().log_to_console(elem.find_element_by_xpath('.//th[1]').text)
+  return elem
+
+def user_checks_row_contains_heading(row_elem, heading):
+  try:
+    row_elem.find_element_by_xpath(f'.//th[text()="{heading}"]')
+  except:
+    raise AssertionError(f'Heading "{heading}" not found for provided row element.')
+
+def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
+  try:
+    elem = row_elem.find_element_by_xpath(f'.//td[{cell_num}]')
+  except:
+    raise AssertionError(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
+
+  if expected_text not in elem.text:
+    raise AssertionError(f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}". Found text "{elem.text}"')
+
 def user_checks_results_table_row_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
   if expected not in elem.text:
