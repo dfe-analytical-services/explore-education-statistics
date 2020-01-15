@@ -127,7 +127,7 @@ export const AddSecondaryStats = ({
   return (
     <>
       <DatablockSelectForm
-        label="Select a datablock to show beside the headline facts and figures as secondary statistics."
+        label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
         onSelect={async selectedDataBlockId => {
           if (
             release.keyStatisticsSecondarySection &&
