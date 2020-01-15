@@ -2,27 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class PublishReleasesFunction
     {
+        private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
+        
+        private static readonly ReleaseStatusState StartedState =
+            new ReleaseStatusState(NotStarted, Queued, Queued, Scheduled, Started);
 
-        private static readonly ReleaseStatusState StartedState = new ReleaseStatusState(Queued, Queued, Queued, Scheduled, Started);
-
-        public PublishReleasesFunction(IReleaseStatusService releaseStatusService)
+        public PublishReleasesFunction(IQueueService queueService, IReleaseStatusService releaseStatusService)
         {
+            _queueService = queueService;
             _releaseStatusService = releaseStatusService;
         }
 
@@ -36,39 +35,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
-            PublishReleases(logger).Wait();
+            PublishReleases().Wait();
             logger.LogInformation(
                 $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
         }
 
-        private async Task PublishReleases(ILogger logger)
+        private async Task PublishReleases()
         {
-            var storageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
-            var scheduled = (await QueryScheduledReleases()).ToList();
+            var scheduled = (await QueryScheduledReleases()).Select(status => (status.ReleaseId, status.Id)).ToList();
             if (scheduled.Any())
             {
-                var generateReleaseContentQueue =
-                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString,
-                        GenerateReleaseContentFunction.QueueName);
-                var publishReleaseFilesQueue =
-                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString,
-                        PublishReleaseFilesFunction.QueueName);
-                var publishReleaseDataQueue =
-                    await QueueUtils.GetQueueReferenceAsync(storageConnectionString,
-                        PublishReleaseDataFunction.QueueName);
-
-                foreach (var releaseStatus in scheduled)
+                await _queueService.QueuePublishReleaseFilesMessagesAsync(scheduled);
+                await _queueService.QueuePublishReleaseDataMessagesAsync(scheduled);
+                foreach (var (releaseId, releaseStatusId) in scheduled)
                 {
-                    logger.LogInformation($"Adding messages for release: {releaseStatus.ReleaseId}");
-                    generateReleaseContentQueue.AddMessage(
-                        ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releaseStatus)));
-                    publishReleaseFilesQueue.AddMessage(
-                        ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releaseStatus)));
-                    publishReleaseDataQueue.AddMessage(
-                        ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseStatus)));
-
-                    await _releaseStatusService.UpdateStateAsync(releaseStatus.ReleaseId, releaseStatus.Id,
-                        StartedState);
+                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId, StartedState);
                 }
             }
         }
@@ -77,47 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var stageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage), QueryComparisons.Equal,
+            var stageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
+                QueryComparisons.Equal,
                 Scheduled.ToString());
             var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
                 stageQuery));
 
             return await _releaseStatusService.ExecuteQueryAsync(query);
-        }
-
-        private static PublishReleaseFilesMessage BuildPublishReleaseFilesMessage(ReleaseStatus releaseStatus)
-        {
-            return new PublishReleaseFilesMessage
-            {
-                PublicationSlug = releaseStatus.PublicationSlug,
-                ReleasePublished = releaseStatus.Publish.Value,
-                ReleaseSlug = releaseStatus.ReleaseSlug,
-                ReleaseId = releaseStatus.ReleaseId,
-                ReleaseStatusId = releaseStatus.Id
-            };
-        }
-
-        private static PublishReleaseDataMessage BuildPublishReleaseDataMessage(ReleaseStatus releaseStatus)
-        {
-            return new PublishReleaseDataMessage
-            {
-                ReleaseId = releaseStatus.ReleaseId,
-                ReleaseStatusId = releaseStatus.Id
-            };
-        }
-
-        private static GenerateReleaseContentMessage BuildGenerateReleaseContentMessage(ReleaseStatus releaseStatus)
-        {
-            return new GenerateReleaseContentMessage
-            {
-                ReleaseId = releaseStatus.ReleaseId,
-                ReleaseStatusId = releaseStatus.Id
-            };
-        }
-
-        private static CloudQueueMessage ToCloudQueueMessage(object value)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

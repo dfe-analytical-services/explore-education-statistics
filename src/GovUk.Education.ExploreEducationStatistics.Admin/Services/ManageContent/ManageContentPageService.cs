@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateReleaseForReleaseViewModel)
+                .CheckEntityExists(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(async release =>
                     {
                         var availableDataBlocks =

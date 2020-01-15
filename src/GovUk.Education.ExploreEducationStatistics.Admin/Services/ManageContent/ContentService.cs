@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+                .CheckEntityExists(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(release => 
                     release
                         .GenericContent
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Dictionary<Guid, int> newSectionOrder)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+                .CheckEntityExists(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, AddContentSectionRequest? request)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+                .CheckEntityExists(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -579,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+                .CheckEntityExists(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(release =>
                 {
                     var section = release

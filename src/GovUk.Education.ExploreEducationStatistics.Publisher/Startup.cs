@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>()
+                .AddScoped<IQueueService, QueueService>()
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .BuildServiceProvider();

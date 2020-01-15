@@ -9,7 +9,7 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlock';
+import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
 import MethodologyContent from '@frontend/modules/methodologies/components/MethodologyContent';
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextContext } from 'next';

@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _dataBlockService.CreateAsync(releaseId, dataBlock))
                 .HandleFailuresOr(Ok);
         }
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return _dataBlockHelper
-                .CheckEntityExistsActionResult(id)
+                .CheckEntityExists(id)
                 .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
                 .HandleFailuresOr(_ => new NoContentResult());
         }
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_ => _dataBlockService.ListAsync(releaseId))
                 .HandleFailuresOr(Ok);
         }
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(Guid id)
         {
             return await _dataBlockHelper
-                .CheckEntityExistsActionResult(id)
+                .CheckEntityExists(id)
                 // TODO EES-918 - remove in favour of checking for release inside service calls
                 .OnSuccess(_ => _dataBlockService.GetAsync(id))
                 .HandleFailuresOr(Ok);
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UpdateDataBlockViewModel dataBlock)
         {
             return await _dataBlockHelper
-                .CheckEntityExistsActionResult(id)
+                .CheckEntityExists(id)
                 .OnSuccess(_ => _dataBlockService.UpdateAsync(id, dataBlock))
                 .HandleFailuresOr(Ok);
         }

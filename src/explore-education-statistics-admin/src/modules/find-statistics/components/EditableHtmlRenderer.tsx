@@ -3,7 +3,7 @@ import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import React, { useContext } from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlock';
+import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 
 export type Props = RendererProps & {

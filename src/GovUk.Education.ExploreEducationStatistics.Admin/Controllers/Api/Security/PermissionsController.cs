@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private async Task<ActionResult<bool>> CheckPolicyAgainstRelease(Guid releaseId, Func<Release, Task<Either<ActionResult, Release>>> policyCheck)
         {
             return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(policyCheck.Invoke)
                 .OnSuccess(_ => new OkObjectResult(true))
                 .OrElse(() => new OkObjectResult(false));

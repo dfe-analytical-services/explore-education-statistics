@@ -30,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(release => release.RelatedInformation);
         }
 
         public Task<Either<ActionResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
         {
             return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+                .CheckEntityExists(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {

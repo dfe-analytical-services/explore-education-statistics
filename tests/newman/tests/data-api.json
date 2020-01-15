@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b4992823-5b1e-4edd-b075-9abe3060740a",
+		"_postman_id": "17010158-8a50-4954-85a7-e21bc379698f",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -6698,7 +6698,8 @@
 									"});",
 									"",
 									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    pm.expect(respJson.observationCount).to.be.above(1101149);",
+									"    // KS2_2016_test_UD is excluded, so 1101149 - 35700",
+									"    pm.expect(respJson.observationCount).to.be.above(1065449);",
 									"});",
 									"",
 									"pm.test(\"Release count is above the expected count\", function () {",

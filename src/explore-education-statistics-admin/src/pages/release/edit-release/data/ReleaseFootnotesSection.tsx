@@ -5,6 +5,7 @@ import {
   FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import permissionService from '@admin/services/permissions/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
 import withErrorControl, {
@@ -41,17 +42,21 @@ const ReleaseFootnotesSection = ({
     Footnote | undefined
   >();
   const [hasSufficientData, setHasSufficientData] = useState<boolean>(true);
+  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
   function getFootnoteData() {
     setLoading(true);
-    footnotesService
-      .getReleaseFootnoteData(releaseId)
-      .then(({ meta, footnotes: footnotesList }) => {
+    Promise.all([
+      footnotesService.getReleaseFootnoteData(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ])
+      .then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
         setFootnoteMeta(meta);
         setHasSufficientData(!!Object.keys(meta).length);
         setFootnotes(footnotesList);
         setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
         setLoading(false);
+        setCanUpdateRelease(canUpdateReleaseResult);
       })
       .catch(handleApiErrors);
   }
@@ -114,16 +119,18 @@ const ReleaseFootnotesSection = ({
       {loading && <LoadingSpinner />}
       {!loading && hasSufficientData && footnoteMeta && footnoteMetaGetters && (
         <>
-          <FootnoteForm
-            {...footnoteForm}
-            footnote={undefined}
-            onOpen={footnoteFormControls.create}
-            onCancel={footnoteFormControls.cancel}
-            onSubmit={footnoteFormControls.save}
-            isFirst={footnotes && footnotes.length === 0}
-            footnoteMeta={footnoteMeta}
-            footnoteMetaGetters={footnoteMetaGetters}
-          />
+          {canUpdateRelease && (
+            <FootnoteForm
+              {...footnoteForm}
+              footnote={undefined}
+              onOpen={footnoteFormControls.create}
+              onCancel={footnoteFormControls.cancel}
+              onSubmit={footnoteFormControls.save}
+              isFirst={footnotes && footnotes.length === 0}
+              footnoteMeta={footnoteMeta}
+              footnoteMetaGetters={footnoteMetaGetters}
+            />
+          )}
           {footnoteMeta && (
             <>
               <FootnotesList
@@ -131,6 +138,7 @@ const ReleaseFootnotesSection = ({
                 footnoteMeta={footnoteMeta}
                 footnoteMetaGetters={footnoteMetaGetters}
                 footnoteFormControls={footnoteFormControls}
+                canUpdateRelease={canUpdateRelease}
               />
               {typeof footnoteToBeDeleted !== 'undefined' && (
                 <ModalConfirm
