@@ -209,28 +209,34 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 title="Charts"
                 lazy={false}
               >
-                {charts.map((chart, idx) => {
-                  const key = `${id}_chart_${idx}`;
+                {charts.length === 0 ? (
+                  <span>
+                    No Charts have been configured for this datablock.
+                  </span>
+                ) : (
+                  charts.map((chart, idx) => {
+                    const key = `${id}_chart_${idx}`;
 
-                  return (
-                    <React.Fragment key={key}>
-                      {chart.data &&
-                      chart.meta &&
-                      chart.data.result.length > 0 ? (
-                        <>
-                          <ChartRenderer {...chart} height={height}>
-                            <DataSource />
-                            <DownloadDetails />
-                          </ChartRenderer>
-                        </>
-                      ) : (
-                        <div>
-                          Unable to render chart, invalid data configured
-                        </div>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
+                    return (
+                      <React.Fragment key={key}>
+                        {chart.data &&
+                        chart.meta &&
+                        chart.data.result.length > 0 ? (
+                          <>
+                            <ChartRenderer {...chart} height={height}>
+                              <DataSource />
+                              <DownloadDetails />
+                            </ChartRenderer>
+                          </>
+                        ) : (
+                          <div>
+                            Unable to render chart, invalid data configured
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })
+                )}
 
                 {additionalTabContent}
               </TabsSection>

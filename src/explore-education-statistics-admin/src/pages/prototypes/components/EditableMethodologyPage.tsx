@@ -3,7 +3,7 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
-import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
+import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { Component } from 'react';
 import {

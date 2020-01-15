@@ -3,9 +3,9 @@ import AddContentButton from '@admin/modules/find-statistics/components/AddConte
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { EditableRelease } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import ContentBlock, {
+import PreviewContentBlocks, {
   ContentBlockProps,
-} from '@common/modules/find-statistics/components/ContentBlock';
+} from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent, {
   EditingContext,
   ReleaseContentContext,
@@ -31,6 +31,7 @@ export interface Props extends ContentBlockProps {
   editable?: boolean;
   canAddBlocks: boolean;
   canAddSingleBlock?: boolean;
+  textOnly?: boolean;
   isReordering?: boolean;
   resolveComments?: boolean;
   onContentChange?: (content: ContentType) => void;
@@ -60,12 +61,17 @@ const EditableContentBlock = ({
   onContentChange,
   canAddBlocks = false,
   canAddSingleBlock = false,
+  textOnly = false,
   isReordering = false,
   onReorderHook = undefined,
 }: Props) => {
   const editingContext = useContext(EditingContext);
 
-  const [contentBlocks, setContentBlocks] = useState<ContentType>(content);
+  const [contentBlocks, setContentBlocks] = useState<ContentType>();
+
+  React.useEffect(() => {
+    setContentBlocks(content);
+  }, [content]);
 
   const { handleApiErrors } = useContext(ErrorControlContext);
 
@@ -205,6 +211,7 @@ const EditableContentBlock = ({
         </div>
         {(canAddBlocks || canAddSingleBlock) && (
           <AddContentButton
+            textOnly={textOnly}
             onClick={(type, data) => onAddContentCallback(type, data, 0)}
             availableDataBlocks={editingContext.availableDataBlocks}
           />
@@ -275,6 +282,7 @@ const EditableContentBlock = ({
                   canAddBlocks &&
                   index === contentBlocks.length - 1 && (
                     <AddContentButton
+                      textOnly={textOnly}
                       onClick={(type, data) =>
                         onAddContentCallback(type, data, contentBlocks.length)
                       }
@@ -290,4 +298,9 @@ const EditableContentBlock = ({
   );
 };
 
-export default wrapEditableComponent(EditableContentBlock, ContentBlock);
+const ContentBlocks = wrapEditableComponent(
+  EditableContentBlock,
+  PreviewContentBlocks,
+);
+
+export default ContentBlocks;
