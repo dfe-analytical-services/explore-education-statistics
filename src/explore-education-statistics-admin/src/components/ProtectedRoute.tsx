@@ -1,29 +1,65 @@
+import ErrorBoundary, {
+  ErrorControlContext,
+} from '@admin/components/ErrorBoundary';
 import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
-import React, { useContext } from 'react';
+import permissionService from '@admin/services/permissions/service';
+import React, { useContext, useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 import ProtectedRoutes from './ProtectedRoutes';
 
 interface ProtectedRouteProps extends RouteProps {
-  redirectIfNotLoggedIn?: boolean;
+  allowAnonymousUsers?: boolean;
+  protectionAction?: () => Promise<boolean>;
 }
+
+const basicAccessCheck = () => permissionService.canAccessSystem();
 
 const AuthenticationCheckingComponent = ({
   component,
-  redirectIfNotLoggedIn = true,
+  allowAnonymousUsers = false,
+  protectionAction,
   ...props
 }: ProtectedRouteProps) => {
   const { user } = useContext(LoginContext);
+
+  const { handleApiErrors, handleManualErrors } = useContext(
+    ErrorControlContext,
+  );
+
+  const [protectedByAction, setProtectedByAction] = useState<boolean>();
+
+  useEffect(() => {
+    if (user) {
+      const accessCheck = protectionAction || basicAccessCheck;
+
+      accessCheck()
+        .then(result => setProtectedByAction(!result))
+        .catch(handleApiErrors);
+    } else {
+      const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
+      setProtectedByAction(denyAccessToNonLoggedInUsers);
+    }
+  }, [protectionAction, handleApiErrors]);
 
   if (!component) {
     return null;
   }
 
-  if (redirectIfNotLoggedIn && (!user || user.validToken === false)) {
+  if (!allowAnonymousUsers && (!user || user.validToken === false)) {
     return <Redirect to={signInService.getSignInLink()} />;
   }
 
-  return React.createElement(component, props);
+  if (typeof protectedByAction !== 'undefined' && protectedByAction) {
+    handleManualErrors.forbidden();
+    return null;
+  }
+
+  if (typeof protectedByAction !== 'undefined' && !protectedByAction) {
+    return React.createElement(component, props);
+  }
+
+  return null;
 };
 
 /**
@@ -39,16 +75,20 @@ const AuthenticationCheckingComponent = ({
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const ProtectedRoute = ({
   component,
-  redirectIfNotLoggedIn = true,
+  allowAnonymousUsers = false,
+  protectionAction,
   ...rest
 }: ProtectedRouteProps) => {
   const routeComponent = (props: any) => (
     <ProtectedRoutes>
-      <AuthenticationCheckingComponent
-        component={component}
-        redirectIfNotLoggedIn={redirectIfNotLoggedIn}
-        {...props}
-      />
+      <ErrorBoundary>
+        <AuthenticationCheckingComponent
+          component={component}
+          allowAnonymousUsers={allowAnonymousUsers}
+          protectionAction={protectionAction}
+          {...props}
+        />
+      </ErrorBoundary>
     </ProtectedRoutes>
   );
 
