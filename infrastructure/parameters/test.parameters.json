@@ -19,7 +19,7 @@
       "value": false
     },
     "deploySubnets": {
-      "value": false
+      "value": true
     }
   }
 }
