@@ -97,6 +97,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
   }
 
+  public componentDidUpdate(prevProps: DataBlockProps) {
+    const { id: datablockId } = this.props;
+    if (prevProps.id !== datablockId) this.componentDidMount();
+  }
+
   public async componentWillUnmount() {
     this.query = undefined;
   }
