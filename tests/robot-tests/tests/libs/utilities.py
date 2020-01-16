@@ -219,8 +219,17 @@ def user_checks_results_table_column_heading_contains(row, column, expected):
 
 def user_gets_row_with_heading(heading):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
-  #BuiltIn().log_to_console(elem.find_element_by_xpath('.//th[1]').text)
   return elem
+
+def user_gets_row_with_group_and_indicator(group, indicator):
+  elems = sl.driver.find_elements_by_xpath(f'//table/tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+  for elem in elems:
+    try:
+      elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
+      return elem
+    except:
+      continue
+  raise AssertionError(f'Indicator "{indicator}" not found!')
 
 def user_checks_row_contains_heading(row_elem, heading):
   try:
