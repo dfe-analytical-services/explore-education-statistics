@@ -2,7 +2,6 @@ import PageFooter from '@admin/components/PageFooter';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Helmet } from 'react-helmet';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';

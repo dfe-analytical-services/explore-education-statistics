@@ -23,7 +23,7 @@ const PageFooter = ({ wide }: Props) => {
           // never happen anyway
         });
     }
-  }, []);
+  }, [user]);
 
   return (
     <footer className="govuk-footer" role="contentinfo">

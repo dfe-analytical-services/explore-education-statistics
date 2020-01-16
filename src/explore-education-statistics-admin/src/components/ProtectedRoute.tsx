@@ -40,7 +40,7 @@ const AuthenticationCheckingComponent = ({
       const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
       setProtectedByAction(denyAccessToNonLoggedInUsers);
     }
-  }, [protectionAction, handleApiErrors]);
+  }, [protectionAction, handleApiErrors, allowAnonymousUsers, user]);
 
   if (!component) {
     return null;
