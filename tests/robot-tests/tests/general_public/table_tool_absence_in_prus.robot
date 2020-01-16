@@ -120,41 +120,49 @@ Create table again
     user clicks element    css:#filtersForm-submit
     user waits until results table appears
 
-Validate table's column headings
+Validate new table column headings
     [Tags]   HappyPath
     user checks results table column heading contains  1   1   2014/15
     user checks results table column heading contains  1   2   2015/16
 
-Validate table's row headings
-    [Tags]   HappyPath
-    user checks results table row heading contains  1   1   Barnsley
-    user checks results table row heading contains  1   2   Number of pupil enrolments
-    user checks results table row heading contains  2   1   Number of sessions possible
+Validate Barnet Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnet   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     224
+    user checks row cell contains text  ${row}    2     210
 
-    user checks results table row heading contains  3   1   Bedford
-    user checks results table row heading contains  3   2   Number of pupil enrolments
-    user checks results table row heading contains  4   1   Number of sessions possible
+Validate Barnet Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnet   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     38,345
+    user checks row cell contains text  ${row}    2     36,820
 
-    user checks results table row heading contains  5   1   Barnet
-    user checks results table row heading contains  5   2   Number of pupil enrolments
-    user checks results table row heading contains  6   1   Number of sessions possible
+Validate Barnsley Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnsley   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     149
+    user checks row cell contains text  ${row}    2     146
 
-Validate table results
-    [Tags]    HappyPath
-    # Barnsley
-    user checks results table cell contains   1     1     149
-    user checks results table cell contains   1     2     146
-    user checks results table cell contains   2     1     31,938
-    user checks results table cell contains   2     2     36,250
+Validate Barnsley Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnsley   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     31,938
+    user checks row cell contains text  ${row}    2     36,250
 
-    # Bedford
-    user checks results table cell contains   3     1     176
-    user checks results table cell contains   3     2     178
-    user checks results table cell contains   4     1     17,687
-    user checks results table cell contains   4     2     21,847
+Validate Bedford Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Bedford   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     176
+    user checks row cell contains text  ${row}    2     178
 
-    # Barnet
-    user checks results table cell contains   5     1     224
-    user checks results table cell contains   5     2     210
-    user checks results table cell contains   6     1     38,345
-    user checks results table cell contains   6     2     36,820
+Validate Bedford Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Bedford   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     17,687
+    user checks row cell contains text  ${row}    2     21,847
