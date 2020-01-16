@@ -76,7 +76,7 @@ Search for "specific enquiry"
 
     user clears element text    css:#pageSearchForm-input
     user presses keys  specific enquiry
-    user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
+    user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   css:#pageSearchForm-option-0
 
     user verifies accordion is open  7. Contacts
