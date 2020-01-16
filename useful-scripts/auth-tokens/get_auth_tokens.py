@@ -81,10 +81,10 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
     except Exception as e:
         pass
 
-    time.sleep(5)
-    print(driver.page_source)
-
-    wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')
+    try:
+        wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')   # Should be Admin dashboard for user
+    except:
+        raise AssertionError(f'Couldn\'t find \'//span[text()="Welcome"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
 
     local_storage_json = driver.execute_script(f"return window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin')")
     assert local_storage_json is not None, f"Couldn't find 'GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin' in Local Storage!"
