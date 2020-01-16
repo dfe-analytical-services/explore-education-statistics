@@ -57,11 +57,11 @@ Validate page has Print this page link
 Search for "pupil"
     [Documentation]    EES-807
     [Tags]  HappyPath
-    user clicks element   css:#pageSearchForm-input
     user verifies accordion is closed  1. Overview of absence statistics
 
+    user clicks element   css:#pageSearchForm-input
     user presses keys  pupil
-    user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 127 results
+    user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 127 results
     user clicks element   css:#pageSearchForm-option-0
 
     user verifies accordion is open  1. Overview of absence statistics
@@ -71,12 +71,12 @@ Search for "pupil"
 Search for "specific enquiry"
     [Documentation]    EES-807
     [Tags]  HappyPath
-    user clicks element   css:#pageSearchForm-input
     user verifies accordion is closed  7. Contacts
 
     user clears element text    css:#pageSearchForm-input
+    user clicks element   css:#pageSearchForm-input
     user presses keys  specific enquiry
-    user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result     60
+    user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   css:#pageSearchForm-option-0
 
     user verifies accordion is open  7. Contacts
