@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                throw;
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
