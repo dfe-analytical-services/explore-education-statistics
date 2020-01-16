@@ -59,6 +59,12 @@ const service = {
       `/release/${releaseId}/prerelease-contact/${preReleaseContactId}`,
     );
   },
+  getReleaseStatus(
+    releaseId: string,
+    // @ts-ignore
+  ): Promise<any> {
+    return client.get<UserDetails[]>(`/releases/${releaseId}/status`);
+  },
 };
 
 export default service;

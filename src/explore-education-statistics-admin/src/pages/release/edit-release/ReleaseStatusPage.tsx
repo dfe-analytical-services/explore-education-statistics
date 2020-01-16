@@ -1,10 +1,10 @@
 import Link from '@admin/components/Link';
+import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import appRouteList from '@admin/routes/dashboard/routes';
-import service from '@admin/services/release/edit-release/status/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/status/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -33,6 +33,7 @@ const ReleaseStatusPage = ({
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
+  const [showHomeLink, setShowHomeLink] = useState<boolean>(false);
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
@@ -72,10 +73,9 @@ const ReleaseStatusPage = ({
 
   return (
     <>
-      <h2 className="govuk-heading-m">Update release status</h2>
-      <p>Select and update the release status.</p>
+      <h2 className="govuk-heading-m">Release status</h2>
 
-      {model && (
+      {model && model.releaseStatus !== 'Approved' && (
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
@@ -87,7 +87,8 @@ const ReleaseStatusPage = ({
               .updateReleaseStatus(releaseId, values)
               .catch(handleApiErrors);
 
-            history.push(appRouteList.adminDashboard.path as string);
+            // history.push(appRouteList.adminDashboard.path as string);
+            setShowHomeLink(true);
           }}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
@@ -98,6 +99,7 @@ const ReleaseStatusPage = ({
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>
+                <p>Select and update the release status.</p>
                 <FormFieldRadioGroup<FormValues>
                   legend="Status"
                   name="releaseStatus"
@@ -124,6 +126,13 @@ const ReleaseStatusPage = ({
             );
           }}
         />
+      )}
+      {model && model.releaseStatus === 'Approved' && (
+        <>
+          <p>This release has been approved</p>
+          <ReleaseServiceStatus releaseId={releaseId} />
+          <Link to="/">Back to dashboard</Link>
+        </>
       )}
     </>
   );
