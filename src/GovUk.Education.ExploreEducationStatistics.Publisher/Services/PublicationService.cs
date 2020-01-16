@@ -29,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
             return _context.Publications
-                .Include(p => p.Releases)
+                .Include(publication => publication.Releases)
                 .ToList()
-                .Where(IsPublicationPublished);
+                .Where(publication => publication.Releases.Any(IsReleasePublished));
         }
 
         private static ThemeTree BuildThemeTree(Theme theme)
@@ -62,15 +62,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static PublicationTree BuildPublicationTree(Publication p)
+        private static PublicationTree BuildPublicationTree(Publication publication)
         {
             return new PublicationTree
             {
-                Id = p.Id,
-                Title = p.Title,
-                Summary = p.Summary,
-                Slug = p.Slug,
-                LegacyPublicationUrl = p.LegacyPublicationUrl?.ToString()
+                Id = publication.Id,
+                Title = publication.Title,
+                Summary = publication.Summary,
+                Slug = publication.Slug,
+                LegacyPublicationUrl = publication.LegacyPublicationUrl?.ToString()
             };
         }
 
