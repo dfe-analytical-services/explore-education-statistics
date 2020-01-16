@@ -130,8 +130,8 @@ user waits until page does not contain element
   wait until page does not contain element  ${element}
 
 user waits until element contains
-  [Arguments]    ${element}    ${text}
-  wait until element contains    ${element}    ${text}
+  [Arguments]    ${element}    ${text}     ${wait}=${timeout}
+  wait until element contains    ${element}    ${text}     timeout=${wait}
 
 user waits until page contains link
   [Arguments]    ${link_text}
