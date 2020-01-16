@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Content is not staged when performing a full refresh
             const bool staging = false;
 
-            await _fileStorageService.DeleteAllContentAsync();
+            await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
             await UpdateTreesAsync(staging);
 
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();

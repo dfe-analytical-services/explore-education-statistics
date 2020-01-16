@@ -17,6 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Summary { get; set; }
 
-        public List<PublicationViewModel> Publications { get; set; }
+        public List<MyPublicationViewModel> Publications { get; set; }
     }
 }

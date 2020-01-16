@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
-                    .Where(publication => publication.Releases.Any(r => r.Published != null))
+                    .Where(publication => publication.Releases.Any(release => release.Live))
                     .Select(BuildPublicationTree)
                     .Where(publicationTree => publicationTree.DownloadFiles.Any())
                     .OrderBy(publication => publication.Title)

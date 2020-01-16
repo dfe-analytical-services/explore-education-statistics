@@ -11,59 +11,26 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
 {
-    public class PersistenceHelper<TEntity, TEntityId, TDbContext> : IPersistenceHelper<TEntity, TEntityId> 
-        where TEntity : class 
+    public class PersistenceHelper<TDbContext> : IPersistenceHelper<TDbContext>
         where TDbContext : DbContext
     {
         private readonly TDbContext _context;
-        private readonly DbSet<TEntity> _entitySet;
-        private readonly ValidationErrorMessages _notFoundErrorMessage;
             
         public PersistenceHelper(
-            TDbContext context,
-            DbSet<TEntity> entitySet,
-            ValidationErrorMessages notFoundErrorMessage = ValidationErrorMessages.EntityNotFound)
+            TDbContext context)
         {
             _context = context;
-            _entitySet = entitySet;
-            _notFoundErrorMessage = notFoundErrorMessage;
         }
         
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public Task<Either<ValidationResult, TEntity>> CheckEntityExists(
+        public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
             TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        {
-            return HandleValidationErrorsAsync(
-                async () =>
-                {
-                    var queryableEntities = _entitySet
-                        .FindByPrimaryKey(_context, id);
-
-                    var hydratedEntities = hydrateEntityFn != null
-                        ? hydrateEntityFn.Invoke(queryableEntities)
-                        : queryableEntities;
-                    
-                    var entity = await hydratedEntities
-                        .FirstOrDefaultAsync();
-
-                    return entity == null
-                        ? ValidationResult(_notFoundErrorMessage)
-                        : new Either<ValidationResult, TEntity>(entity);
-                }, 
-                entity => Task.FromResult(new Either<ValidationResult, TEntity>(entity)));
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        // When the work for EES-919 is complete, rename this to "CheckEntityExists"
-        public Task<Either<ActionResult, TEntity>> CheckEntityExistsActionResult(
-            TEntityId id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) 
+            where TEntity : class
         {
             return HandleErrorsAsync(
                 async () =>
                 {
-                    var queryableEntities = _entitySet
+                    var queryableEntities = _context.Set<TEntity>()
                         .FindByPrimaryKey(_context, id);
 
                     var hydratedEntities = hydrateEntityFn != null
@@ -78,6 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
                         : new Either<ActionResult, TEntity>(entity);
                 },
                 entity => Task.FromResult(new Either<ActionResult, TEntity>(entity)));
+        }        
+        
+        public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+            Guid id, 
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) 
+            where TEntity : class
+        {
+            return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
         }
     }
 }

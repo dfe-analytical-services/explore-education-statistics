@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -47,16 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Task<Either<ActionResult, Release>> _releaseNotFoundResult 
             = Task.FromResult(new Either<ActionResult, Release>(new NotFoundResult()));
 
-        public ReleaseControllerTests()
-        {
-            SetupUser();
-        }
-
         [Fact]
         public async void Create_Release_Returns_Ok()
         {
             var mocks = Mocks();
-            SetupPublicationExistsResult(mocks.PublicationHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _publicationId, _publicationExistsResult);
             
             mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
                 .ReturnsAsync(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel()));
@@ -64,14 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             // Call the method under test
             var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), _publicationId);
-            AssertOkResult<ReleaseViewModel>(result);
+            AssertOkResult(result);
         }
 
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var mocks = Mocks();
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
@@ -90,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
             var mocks = Mocks();
-            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
             
             var ancillaryFile = MockFile("ancillaryFile.doc");
             var controller = ReleasesControllerWithMocks(mocks);
@@ -121,14 +117,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             };
             var mocks = Mocks();
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
                 .ReturnsAsync(testFiles);
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
             var result = await controller.GetAncillaryFilesAsync(_releaseId);
-            var unboxed = AssertOkResult<IEnumerable<FileInfo>>(result);
+            var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }
 
@@ -136,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task GetAncillaryFilesAsync_Returns_NotFound()
         {
             var mocks = Mocks();
-            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
 
             var controller = ReleasesControllerWithMocks(mocks);
             
@@ -152,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
 
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, "test user"))
@@ -169,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
             var mocks = Mocks();
-            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
             
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -187,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
 
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, 
@@ -224,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
                 .ReturnsAsync(testFiles);
@@ -241,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task GetDataFilesAsync_Returns_NotFound()
         {
             var mocks = Mocks();
-            SetupReleaseNotFoundResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
 
             var controller = ReleasesControllerWithMocks(mocks);
             
@@ -255,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
@@ -273,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(_releaseId, "datafilename"))
@@ -290,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
             
-            SetupReleaseExistsResult(mocks.ReleaseHelper);
+            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             mocks.ReleaseService
                 .Setup(s => s.EditReleaseSummaryAsync(
@@ -392,8 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
-            Mock<IPersistenceHelper<Release, Guid>> ReleaseHelper,
-            Mock<IPersistenceHelper<Publication, Guid>> PublicationHelper) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
         {
             return (new Mock<IImportService>(),
                     new Mock<IReleaseService>(),
@@ -402,9 +397,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseStatusService>(),
                     new Mock<ISubjectService>(),
                     new Mock<ITableStorageService>(),
-                    MockUserManager<ApplicationUser>(Users),
-                    new Mock<IPersistenceHelper<Release, Guid>>(),
-                    new Mock<IPersistenceHelper<Publication, Guid>>()
+                    MockUserManager(Users),
+                    new Mock<IPersistenceHelper<ContentDbContext>>()
                 );
         }
 
@@ -417,8 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
             Mock<UserManager<ApplicationUser>> UserManager,
-            Mock<IPersistenceHelper<Release, Guid>> ReleaseHelper,
-            Mock<IPersistenceHelper<Publication, Guid>> PublicationHelper) mocks)
+            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) mocks)
         {
             return new ReleasesController(
                 mocks.ImportService.Object,
@@ -429,9 +422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.SubjectService.Object,
                 mocks.TableStorageService.Object,
                 mocks.UserManager.Object,
-                mocks.ReleaseHelper.Object,
-                mocks.PublicationHelper.Object
-                );
+                mocks.PersistenceHelper.Object);
         }
         
         private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class
@@ -448,42 +439,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return mgr;
         }
         
-        private void SetupReleaseExistsResult(Mock<IPersistenceHelper<Release, Guid>> releaseHelper)
+        private void SetupEntityLookupResult<TEntity>(Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper, Guid id, 
+            Task<Either<ActionResult, TEntity>> result) 
+            where TEntity : class
         {
-            releaseHelper
+            persistenceHelper
                 .Setup(s => s
-                    .CheckEntityExistsActionResult(_releaseId, null))
-                .Returns(_releaseExistsResult);
-        }
-        
-        private void SetupReleaseNotFoundResult(Mock<IPersistenceHelper<Release, Guid>> releaseHelper)
-        {
-            releaseHelper
-                .Setup(s => s
-                    .CheckEntityExistsActionResult(_releaseId, null))
-                .Returns(_releaseNotFoundResult);
-        }
-
-        private void SetupPublicationExistsResult(Mock<IPersistenceHelper<Publication, Guid>> publicationHelper)
-        {
-            publicationHelper
-                .Setup(s => s
-                    .CheckEntityExistsActionResult(_publicationId, null))
-                .Returns(_publicationExistsResult);
-        }
-
-        private void SetupUser()
-        {
-            // TODO - This doesn't work
-//            var claims = new List<Claim>() 
-//            { 
-//                new Claim(ClaimTypes.Name, "username"),
-//                new Claim(ClaimTypes.NameIdentifier, "userId"),
-//                new Claim("name", "John Doe"),
-//            };
-//            var identity = new ClaimsIdentity(claims, "TestAuthType");
-//            var claimsPrincipal = new ClaimsPrincipal(identity);
-//            AppDomain.CurrentDomain.SetThreadPrincipal(claimsPrincipal); 
+                    .CheckEntityExists<TEntity>(id, null))
+                .Returns(result);
         }
     }
 }

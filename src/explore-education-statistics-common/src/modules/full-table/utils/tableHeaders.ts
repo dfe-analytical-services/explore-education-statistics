@@ -45,7 +45,7 @@ const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
     columns: timePeriodRange.map(
       timePeriod => new TimePeriodFilter(timePeriod),
     ),
-    rows: indicators.map(indicator => new Indicator(indicator)),
+    rows: sortBy(indicators.map(i => new Indicator(i)), o => o.label),
   };
 };
 

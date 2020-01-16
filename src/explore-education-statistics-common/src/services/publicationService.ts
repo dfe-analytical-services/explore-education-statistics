@@ -228,8 +228,9 @@ export interface AbstractRelease<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
-  headlinesSection: ContentSection<ContentBlockType>;
   keyStatisticsSection: ContentSection<ContentBlockType>;
+  keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
+  headlinesSection: ContentSection<ContentBlockType>;
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;

@@ -2214,10 +2214,11 @@
 									"script": {
 										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
 										"exec": [
-											"var respJson = pm.response.json();",
+											"var respJson;",
 											"",
 											"pm.test(\"Status code is 201\", function () {",
 											"    pm.response.to.have.status(201); ",
+											"    respJson = pm.response.json();",
 											"});",
 											"",
 											"pm.test(\"Release Notes array contains values\", function () {",
@@ -5627,7 +5628,7 @@
 					"response": []
 				},
 				{
-					"name": "Release summary - Exclusions 2016",
+					"name": "Release summary - Exclusions 2016  !!!TESTS STOP HERE!!!",
 					"event": [
 						{
 							"listen": "test",

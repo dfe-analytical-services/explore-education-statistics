@@ -80,6 +80,54 @@
         "description": "Firewall restrictions for storage accounts, string array"
       }
     },
+    "sqlPublicDataApiUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the data api for the public SQL Server"
+      }
+    },
+    "sqlPublicDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user of the public SQL Server"
+      }
+    },
+    "sqlPublisherUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlPublisherUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the publisher application used to read from the content db"
+      }
+    },
+    "sqlImporterUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlImporterUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the importer application used to import data to the statistics db"
+      }
+    },
+    "sqlAdminUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlAdminUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin application the content and statistics db"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
@@ -317,6 +365,22 @@
       "metadata": {
         "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
       }
+    },
+
+    "publishReleaseDataFunctionDisabled": {
+      "type": "string",
+      "defaultValue": "true",
+      "metadata": {
+        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+      }
+    },
+
+    "azureDataFactoryPipelineName": {
+      "type": "string",
+      "defaultValue": "pl_release_statistics",
+      "metadata": {
+        "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
+      }
     }
   },
   "variables": {
@@ -361,6 +425,7 @@
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
     "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
     "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
+    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -455,7 +520,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
             },
             {
               "name": "PublicStorage",
@@ -862,12 +927,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             }
           ]
         }
@@ -1102,31 +1167,31 @@
       "location": "westeurope",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
 
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('importerSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1872,7 +1937,7 @@
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "0"
+              "value": "1"
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -1900,7 +1965,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             }
           ]
         }
@@ -2031,12 +2096,32 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "AzureWebJobs.PublishReleaseData.Disabled",
+              "value": "[parameters('publishReleaseDataFunctionDisabled')]"
+            },
+            {
               "name": "PublishReleasesCronSchedule",
               "value": "[parameters('publishReleasesCronSchedule')]"
             },
             {
               "name": "PublishReleaseContentCronSchedule",
               "value": "[parameters('publishReleaseContentCronSchedule')]"
+            },
+            {
+              "name": "AzureDataFactoryName",
+              "value": "[variables('azureDataFactoryName')]"
+            },
+            {
+              "name": "AzureDataFactoryPipelineName",
+              "value": "[parameters('azureDataFactoryPipelineName')]"
+            },
+            {
+              "name": "AzureSubscriptionId",
+              "value": "[subscription().subscriptionId]"
+            },
+            {
+              "name": "AzureResourceGroupName",
+              "value": "[resourceGroup().name]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -2079,7 +2164,12 @@
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             }
           ]
         }
@@ -2096,23 +2186,23 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",

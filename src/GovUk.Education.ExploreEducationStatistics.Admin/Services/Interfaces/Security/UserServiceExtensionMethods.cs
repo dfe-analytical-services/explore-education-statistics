@@ -18,6 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanViewAllReleases);
         }
         
+        public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
+            this IUserService userService, Topic topic)
+        {
+            return userService.DoCheck(topic, SecurityPolicies.CanCreatePublicationForSpecificTopic);
+        }
+        
+        public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
+            this IUserService userService, Publication publication)
+        {
+            return userService.DoCheck(publication, SecurityPolicies.CanCreateReleaseForSpecificPublication);
+        }
+        
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
             this IUserService userService, Release release)
         {

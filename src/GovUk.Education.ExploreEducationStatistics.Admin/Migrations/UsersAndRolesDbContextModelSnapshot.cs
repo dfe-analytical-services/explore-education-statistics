@@ -400,6 +400,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "UpdateAllReleases",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -9,
+                            ClaimType = "CreateAnyPublication",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -10,
+                            ClaimType = "CreateAnyRelease",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });
                 });
 

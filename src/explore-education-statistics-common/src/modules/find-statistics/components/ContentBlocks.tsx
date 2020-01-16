@@ -11,7 +11,7 @@ export interface ContentBlockProps {
   onToggle?: SectionToggleHandler;
 }
 
-const ContentBlock = ({
+const ContentBlocks = ({
   content,
   id,
   publication,
@@ -39,4 +39,4 @@ const ContentBlock = ({
   );
 };
 
-export default ContentBlock;
+export default ContentBlocks;

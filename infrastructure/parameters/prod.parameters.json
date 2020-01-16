@@ -15,10 +15,10 @@
       "value": "S2 Standard"
     },
     "useSubnets": {
-      "value": false
+      "value": true
     },
     "deploySubnets": {
-      "value": false
+      "value": true
     }
   }
 }

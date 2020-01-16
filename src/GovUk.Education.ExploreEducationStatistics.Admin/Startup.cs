@@ -1,9 +1,10 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -13,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -46,6 +46,8 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
+using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
@@ -178,6 +180,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
                 
+                // does this user have permission to create a publication under a specific topic?
+                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy => 
+                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
+                
+                // does this user have permission to create a release under a specific publication?
+                options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
+                    policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
+                
                 // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
@@ -202,6 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
+            services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
+
+            services.AddAutoMapper(typeof(Startup).Assembly);
+            
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
@@ -250,6 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
+            services.AddTransient<Data.Model.Services.Interfaces.IFootnoteService, Data.Model.Services.FootnoteService>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
@@ -270,10 +286,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
-            ServicesAddPersistenceHelper(services, c => c.Releases, ValidationErrorMessages.ReleaseNotFound);
-            ServicesAddPersistenceHelper(services, c => c.Update, ValidationErrorMessages.ReleaseNoteNotFound);
-            ServicesAddPersistenceHelper(services, c => c.DataBlocks, ValidationErrorMessages.ContentBlockNotFound);
-            ServicesAddPersistenceHelper(services, c => c.Publications, ValidationErrorMessages.PublicationNotFound);
+            AddPersistenceHelper<ContentDbContext>(services);
+            AddPersistenceHelper<StatisticsDbContext>(services);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -283,16 +297,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserService, UserService>();
             
             // These handlers enforce Resource-based access control
-            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseHasRoleOnReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseCanSeeAllReleasesAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {
@@ -320,25 +331,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
         }
 
-        private static void ServicesAddPersistenceHelper<TEntity>(
-            IServiceCollection services, 
-            Func<ContentDbContext, DbSet<TEntity>> entitySetFn,
-            ValidationErrorMessages notFoundMessage)
-            where TEntity : class 
+        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
+            where TDbContext : DbContext
         {
             services.AddTransient<
-                IPersistenceHelper<TEntity, Guid>,
-                PersistenceHelper<TEntity, Guid, ContentDbContext>>(
+                IPersistenceHelper<TDbContext>,
+                PersistenceHelper<TDbContext>>(
                 s =>
                 {
-                    var dbContext = s.GetService<ContentDbContext>();
-                    return new PersistenceHelper<TEntity, Guid, ContentDbContext>(
-                        dbContext,
-                        entitySetFn.Invoke(dbContext),
-                        notFoundMessage);
+                    var dbContext = s.GetService<TDbContext>();
+                    return new PersistenceHelper<TDbContext>(dbContext);
                 });
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

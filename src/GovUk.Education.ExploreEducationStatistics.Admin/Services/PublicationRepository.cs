@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,31 +23,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Task<List<PublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
+        public async Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
         {
-            return _context
+            var results = await _context
                 .Publications
                 .HydratePublicationForPublicationViewModel()
                 .Where(publication => publication.TopicId == topicId)
-                .Select(publication => _mapper.Map<PublicationViewModel>(publication))
                 .ToListAsync();
+                
+            return results
+                .Select(publication => _mapper.Map<MyPublicationViewModel>(publication))
+                .ToList();
         }
 
-        public async Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
+        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
         {
             var userReleasesForTopic = await _context
                 .UserReleaseRoles
                 .Include(r => r.Release)
                 .ThenInclude(release => release.Publication)
                 .ThenInclude(publication => publication.Topic)
-                .Where(r => r.UserId == userId)
+                .Where(r => r.UserId == userId && r.Release.Publication.TopicId == topicId)
                 .Select(r => r.Release)
+                .Distinct()
                 .Where(release => release.Publication.TopicId == topicId)
                 .ToListAsync();
 
             var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
 
-            foreach (var publication in userReleasesForTopic.Select(release => release.Publication).Distinct())
+            foreach (var publication in userReleasesForTopic
+                .Select(release => release.Publication)
+                .Distinct())
             {
                 var releasesForPublication = userReleasesForTopic.FindAll(release => release.Publication == publication);
                 userReleasesByPublication.Add(publication, releasesForPublication);
@@ -56,17 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(publicationWithReleases =>
                 {
                     var (publication, releases) = publicationWithReleases;
-
-                    return new PublicationViewModel
-                    {
-                        Id = publication.Id,
-                        Contact = publication.Contact,
-                        Methodology = _mapper.Map<MethodologyViewModel>(publication.Methodology),
-                        Releases = releases.Select(release => _mapper.Map<ReleaseViewModel>(release)).ToList(),
-                        Title = publication.Title,
-                        NextUpdate = publication.NextUpdate,
-                        ThemeId = publication.Topic.ThemeId
-                    };
+                    publication.Releases = releases;
+                    return _mapper.Map<MyPublicationViewModel>(publication);
                 })
                 .ToList();
         }

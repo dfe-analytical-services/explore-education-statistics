@@ -117,6 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Invalid,
         Queued,
         Scheduled,
+        NotStarted,
         Started
     }
 }

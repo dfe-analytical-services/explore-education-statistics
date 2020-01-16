@@ -4,9 +4,9 @@ import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSumma
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
-import { formatTestId } from '@common/util/test-utils';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { formatTestId } from '@common/util/test-utils';
 import React from 'react';
 
 export interface Props {
@@ -40,7 +40,9 @@ const PublicationSummary = ({ publication }: Props) => {
                         }, ${getReleaseSummaryLabel(release)}`,
                       )}
                     >
-                      Edit this release
+                      {release.permissions.canUpdateRelease
+                        ? 'Edit this release'
+                        : 'View this release'}
                     </ButtonLink>
                   }
                 />
@@ -52,13 +54,15 @@ const PublicationSummary = ({ publication }: Props) => {
       </SummaryList>
       <SummaryList>
         <SummaryListItem term="" smallKey>
-          <ButtonLink
-            to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
-            className="govuk-!-margin-right-6"
-            testId={`Create new release link for ${publication.title}`}
-          >
-            Create new release
-          </ButtonLink>
+          {publication.permissions.canCreateReleases && (
+            <ButtonLink
+              to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
+              className="govuk-!-margin-right-6"
+              testId={`Create new release link for ${publication.title}`}
+            >
+              Create new release
+            </ButtonLink>
+          )}
 
           {publication.methodology && (
             <ButtonLink

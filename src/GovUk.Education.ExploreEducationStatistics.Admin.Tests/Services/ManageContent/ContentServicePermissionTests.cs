@@ -189,13 +189,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         
         private (
             Mock<ContentDbContext>,
-            Mock<IPersistenceHelper<Release,Guid>>,
+            Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IMapper>,
             Mock<IUserService>) Mocks()
         {
             return (
                 new Mock<ContentDbContext>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release), 
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release), 
                 new Mock<IMapper>(), 
                 new Mock<IUserService>());
         }
