@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import dashboardService from '@admin/services/dashboard/service';
@@ -11,78 +11,73 @@ interface Props {
 }
 
 interface ReleaseServiceStatus {
+  // has additional props too
   overallStage: string;
 }
 
 const ReleaseServiceStatus = ({ releaseId, refreshPeriod = 5000 }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseServiceStatus>();
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>();
+  const [statusColor, setStatusColor] = useState<
+    'blue' | 'orange' | 'red' | 'green' // could be StatusBlockProps.color once the component is created
+  >('blue');
 
   function fetchReleaseServiceStatus() {
     // update the status
-    dashboardService.getReleaseStatus(releaseId).then(([status]) => {
+    return dashboardService.getReleaseStatus(releaseId).then(([status]) => {
       console.log(status);
       setCurrentStatus(status);
     });
   }
 
-  function initialiseTimer() {
-    fetchReleaseServiceStatus();
-    setIntervalId(setInterval(fetchReleaseServiceStatus, refreshPeriod));
-  }
+  const intervalRef = useRef<NodeJS.Timeout>();
 
   function cancelTimer() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(undefined);
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
   }
+
   useEffect(() => {
-    initialiseTimer();
+    fetchReleaseServiceStatus();
+    intervalRef.current = setInterval(fetchReleaseServiceStatus, refreshPeriod);
+    return () => {
+      cancelTimer();
+    };
   }, []);
 
   useEffect(() => {
-    return function cleanup() {
-      cancelTimer();
-    };
-  });
-
-  function getReleaseServiceStatusClass(
-    releaseServiceCode: string,
-  ): string[] | undefined {
-    switch (releaseServiceCode) {
-      case 'NOT_FOUND':
-        return [styles.ragStatusAmber];
-      case 'RUNNING_PHASE_1':
-        return [styles.ragStatusAmber];
-      case 'RUNNING_PHASE_2':
-        return [styles.ragStatusAmber];
-      case 'RUNNING_PHASE_3':
-        return [styles.ragStatusAmber];
-      case 'COMPLETE':
-        cancelTimer();
-        return [styles.ragStatusGreen];
-      case 'FAILED':
-        cancelTimer();
-        return [styles.ragStatusRed];
-      default:
-        return undefined;
+    // overallStage status changed?
+    // stop timer? set block color?
+    if (currentStatus && currentStatus.overallStage) {
+      switch (currentStatus.overallStage) {
+        case 'Scheduled':
+        case 'Started':
+          // blue?
+          break;
+        case 'Cancelled':
+          // blue? and stop timer?
+          break;
+        case 'Invalid':
+        case 'Failed':
+          // red? and stop timer?
+          break;
+        case 'Complete':
+          // green? and stop timer?
+          break;
+        default:
+          break;
+      }
     }
-  }
+  }, [currentStatus]);
+
   if (!currentStatus) return null;
   return (
     <>
       <div>
         <div>
-          <strong
-            className={classNames(
-              'govuk-!-margin-right-1',
-              'govuk-tag',
-              //   currentStatus && getReleaseServiceStatusClass(currentStatus),
-            )}
-          >
+          {/* this strong block could be a StatusBlock component that takes color/className prop(s) and renders the text children */}
+          <strong className={classNames('govuk-!-margin-right-1', 'govuk-tag')}>
             {currentStatus && currentStatus.overallStage}
           </strong>
+          {/* show loading spinner if timer is active (it's still processing) */}
 
           {currentStatus && currentStatus.overallStage === 'Started' && (
             <Details className={styles.errorSummary} summary="See more">
