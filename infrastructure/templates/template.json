@@ -1163,8 +1163,9 @@
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2019-04-01",
       "location": "westeurope",
+      "kind": "StorageV2",
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
@@ -1586,14 +1587,32 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('notificationsstorageAccountName')]",
-      "apiVersion": "2016-12-01",
+      "apiVersion": "2019-04-01",
       "location": "[resourceGroup().location]",
       "kind": "Storage",
       "sku": {
         "name": "Standard_LRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('notifySubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1688,10 +1707,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+       "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
       "properties": {
         "name": "[variables('notificationsPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
@@ -1718,6 +1743,23 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('notifySubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
+        }
+      ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "httpsOnly": true,
