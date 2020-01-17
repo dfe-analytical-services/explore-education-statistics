@@ -5,7 +5,9 @@ import {
 } from '@common/services/publicationService';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
+import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
+import KeyStat from './KeyStat';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -32,8 +34,10 @@ const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
   if (!keyStats) return null;
   return (
     <>
-      {keyStats.content &&
-        keyStats.content.map(stat => <div key={stat.id}>{stat.heading}</div>)}
+      <div className={styles.keyStatsContainer}>
+        {keyStats.content &&
+          keyStats.content.map(stat => <KeyStat key={stat.id} {...stat} />)}
+      </div>
       {isEditing && (
         <AddKeyStatistics release={release} setRelease={setRelease} />
       )}
@@ -46,7 +50,7 @@ const AddKeyStatistics = ({ release, setRelease }: Props) => {
 
   const another =
     release.keyStatisticsSection.content &&
-    !!release.keyStatisticsSection.content.length &&
+    release.keyStatisticsSection.content.length > 0 &&
     ' another ';
   return (
     <>

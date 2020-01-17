@@ -1,11 +1,10 @@
 /* eslint-disable react/no-danger */
-import Details, { DetailsToggleHandler } from '@common/components/Details';
+import { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 import { DataBlockData, Result } from '@common/services/dataBlockService';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import { ChartMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import styles from './SummaryRenderer.module.scss';
+import KeyStatTile from './KeyStatTile';
 
 export interface SummaryRendererProps {
   data: DataBlockData;
@@ -17,7 +16,7 @@ export interface SummaryRendererProps {
   onToggle?: DetailsToggleHandler;
 }
 
-function getLatestMeasures(result: Result[]) {
+export function getLatestMeasures(result: Result[]) {
   const copiedResult = [...result];
 
   copiedResult.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -58,33 +57,15 @@ export default function SummaryRenderer({
           const indicatorKey = `${key}_${index}`;
 
           return (
-            <div className={styles.keyStatTile} key={indicatorKey}>
-              <div className={styles.keyStat}>
-                <h3
-                  className="govuk-heading-s"
-                  data-testid="key-stat-tile-title"
-                >
-                  {meta.indicators[key].label}
-                </h3>
-                <p
-                  className="govuk-heading-xl"
-                  data-testid="key-stat-tile-value"
-                >
-                  {`${formatPretty(measures[key])}${meta.indicators[key].unit}`}
-                </p>
-                {dataSummary && (
-                  <p className="govuk-body-s">{dataSummary[index]}</p>
-                )}
-              </div>
-              <Details
-                onToggle={onToggle}
-                summary={`Define '${meta.indicators[key].label}'`}
-              >
-                <div
-                  dangerouslySetInnerHTML={{ __html: dataDefinition[index] }}
-                />
-              </Details>
-            </div>
+            <KeyStatTile
+              key={indicatorKey}
+              meta={meta}
+              measures={measures}
+              indicatorKey={key}
+              onToggle={onToggle}
+              dataDefinition={dataDefinition[index]}
+              dataSummary={dataSummary[index]}
+            />
           );
         })}
       </div>
