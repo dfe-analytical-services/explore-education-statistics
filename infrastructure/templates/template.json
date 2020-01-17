@@ -1163,8 +1163,9 @@
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2019-04-01",
       "location": "westeurope",
+      "kind": "StorageV2",
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
@@ -1586,14 +1587,32 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('notificationsstorageAccountName')]",
-      "apiVersion": "2016-12-01",
+      "apiVersion": "2019-04-01",
       "location": "[resourceGroup().location]",
       "kind": "Storage",
       "sku": {
         "name": "Standard_LRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('notifySubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
