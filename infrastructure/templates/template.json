@@ -1707,10 +1707,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+       "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
       "properties": {
         "name": "[variables('notificationsPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
