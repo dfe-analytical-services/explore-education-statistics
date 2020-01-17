@@ -34,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (response.Status != "Complete")
             {
-                logger.LogError(
-                    $"Datafactory pipelined failed with status: {response.Status}, error: {response.ErrorMessage}");
+                logger.LogError($"Data factory pipeline failed: {response}");
             }
 
             await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
@@ -51,9 +50,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
     internal class PipelineResponse
     {
+        public string DataFactoryName { get; set; }
+        public string ErrorMessage { get; set; }
+        public string PipelineName { get; set; }
+        public string PipelineTriggerTime { get; set; }
         public Guid ReleaseId { get; set; }
         public Guid ReleaseStatusId { get; set; }
         public string Status { get; set; }
-        public string ErrorMessage { get; set; }
+
+        public override string ToString()
+        {
+            return
+                $"{nameof(DataFactoryName)}: {DataFactoryName}, {nameof(ErrorMessage)}: {ErrorMessage}, {nameof(PipelineName)}: {PipelineName}, {nameof(PipelineTriggerTime)}: {PipelineTriggerTime}, {nameof(ReleaseId)}: {ReleaseId}, {nameof(ReleaseStatusId)}: {ReleaseStatusId}, {nameof(Status)}: {Status}";
+        }
     }
 }
