@@ -176,6 +176,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         new UpdateTextBasedContentBlockRequest()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
+
+        [Fact]
+        public void UpdateDataBlockAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.UpdateDataBlockAsync(
+                        _release.Id,
+                        ContentSectionId,
+                        ContentBlockId,
+                        new UpdateDataBlockRequest()), 
+                SecurityPolicies.CanUpdateSpecificRelease);
+        }
         
         private void AssertSecurityPoliciesChecked<T>(
             Func<ContentService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
