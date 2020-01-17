@@ -13,7 +13,7 @@ export interface SummaryRendererProps {
   dataKeys: string[];
   dataSummary: string[];
   dataDefinition: string[];
-  description: { type: string; body: string };
+  // description: { type: string; body: string };
   onToggle?: DetailsToggleHandler;
 }
 
@@ -30,7 +30,7 @@ function getLatestMeasures(result: Result[]) {
 
 export default function SummaryRenderer({
   meta,
-  description,
+  // description,
   data,
   dataKeys,
   dataSummary,
@@ -88,9 +88,9 @@ export default function SummaryRenderer({
           );
         })}
       </div>
-      {description && description.body !== '' && (
+      {/* description && description.body !== '' && (
         <ReactMarkdown source={description.body} />
-      )}
+      ) */}
     </>
   );
 }
