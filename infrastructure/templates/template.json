@@ -427,6 +427,8 @@
     "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
     "contentSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
+    "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
+    "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
@@ -1214,8 +1216,7 @@
       ],
       "sku": {
         "name": "Standard_RAGRS"
-      },
-      "kind": "StorageV2"
+      }
     },
     {
       "name": "[variables('sqlserverName')]",
@@ -2360,6 +2361,28 @@
             "name": "[variables('contentSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.4.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('dataSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.5.0/24",
               "serviceEndpoints": [
                 {
                   "service": "Microsoft.Storage"
