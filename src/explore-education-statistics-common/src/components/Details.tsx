@@ -15,7 +15,7 @@ export type DetailsToggleHandler = (
 
 export interface DetailsProps {
   className?: string;
-  tag?: string;
+  tag?: ReactNode[];
   children: ReactNode;
   id?: string;
   onToggle?: DetailsToggleHandler;
@@ -106,9 +106,24 @@ const Details = ({
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
-          {tag && (
-            <span className="govuk-tag govuk-!-margin-left-2">{tag}</span>
-          )}
+          {tag &&
+            tag.map((item, index) => {
+              if (typeof item === 'string') {
+                return (
+                  <span className="govuk-tag govuk-!-margin-left-2">
+                    {item}
+                  </span>
+                );
+              }
+              return (
+                <span
+                  key={`tag-${String(index)}`}
+                  className="govuk-!-margin-left-2"
+                >
+                  {item}
+                </span>
+              );
+            })}
         </span>
       </summary>
       <div
