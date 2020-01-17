@@ -6,7 +6,6 @@
 Run 'python run_tests.py -h' to see argument options
 """
 
-import sys
 import os
 import argparse
 from robot import run_cli as robot_run_cli
@@ -16,6 +15,9 @@ import pstats
 import scripts.keyword_profile as kp
 import chromedriver_install as cdi
 from dotenv import load_dotenv
+import time
+import requests
+import json
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
@@ -81,18 +83,26 @@ if args.admin_pass:
 timeout = 20
 implicit_wait = 20
 
-# Set robotArgs
-robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
-             "--exclude", "UnderConstruction", "--exclude", "AltersData"]
+# Install chromedriver and add it to PATH
+cdi.install(file_directory='./webdriver/',
+            verbose=False,
+            chmod=True,
+            overwrite=False,
+            version=args.chromedriver_version)
+os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
+# Set robotArgs
+robotArgs = ["--outputdir", "test-results/",
+             "--exclude", "Failing",
+             "--exclude", "UnderConstruction"]
 if args.tags:
     robotArgs += ["--include", args.tags]
 
 if args.ci:
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
-    robotArgs += ["--removekeywords", "name:library.user logs into microsoft online"]
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
+    robotArgs += ['--removekeywords', 'name:common.user goes to url']  # To hide basic auth credentials
 else:
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
     assert os.getenv('PUBLIC_URL') is not None
@@ -101,17 +111,57 @@ else:
     assert os.getenv('ADMIN_PASSWORD') is not None
 
 if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    # NOTE(mark): Because you cannot import from a parent dir, we do this...
-    if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
-        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
-    elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):   # For pipeline
-        f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
-    assert f is not None, 'Failed to open file get_auth_tokens.py!'
-    get_auth_tokens_script = f.read()
-    globals()['__name__'] = '__test_runner__'
-    exec(get_auth_tokens_script, globals(), locals())
-    assert callable(get_identity_info)
-    os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
+    if os.path.exists('IDENTITY_LOCAL_STORAGE.txt') and os.path.exists('IDENTITY_COOKIE.txt'):
+        print('Getting authentication information from local files...', end='')
+        with open('IDENTITY_LOCAL_STORAGE.txt', 'r') as ls_file:
+            os.environ['IDENTITY_LOCAL_STORAGE'] = ls_file.read()
+        with open('IDENTITY_COOKIE.txt', 'r') as cookie_file:
+            os.environ['IDENTITY_COOKIE'] = cookie_file.read()
+        print('done!')
+    else:
+        print('Logging in to obtain authentication information...', end='', flush=True)
+        # NOTE(mark): Because you cannot import from a parent dir, we do this...
+        if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
+            f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+        elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):  # For pipeline
+            f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
+        assert f is not None, 'Failed to open file get_auth_tokens.py!'
+        get_auth_tokens_script = f.read()
+        globals()['__name__'] = '__test_runner__'
+        exec(get_auth_tokens_script, globals(), locals())
+        assert callable(get_identity_info)
+        os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
+
+        # Save auth info to files for efficiency
+        with open('IDENTITY_LOCAL_STORAGE.txt', 'w') as ls_file:
+            ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE'])
+        with open('IDENTITY_COOKIE.txt', 'w') as cookie_file:
+            cookie_file.write(os.environ['IDENTITY_COOKIE'])
+        print(' done!')
+
+    assert os.getenv('IDENTITY_LOCAL_STORAGE') is not None
+    assert os.getenv('IDENTITY_COOKIE') is not None
+
+    # NOTE(mark): Tests that alter data only occur on local and dev environments
+    if args.env in ['local', 'dev']:
+        requests.packages.urllib3.disable_warnings()  # To prevent InsecureRequestWarning
+        # Create topic to be used by UI tests
+        run_identifier = str(time.time()).split('.')[0]
+        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
+        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE'])['access_token']
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {jwt_token}',
+        }
+        body = {'title': f'UI test topic {run_identifier}'}
+        r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
+
+        #print('r.status_code', r.status_code)
+        #print('r.text', r.text)
+        assert r.status_code != 401, 'Failed to authenticate to create topic! Delete robot-tests/IDENTITY_*.txt files?'
+        assert r.status_code == 200, 'Failed to create topic! Have you created the Test theme?'
+        os.environ['RUN_IDENTIFIER'] = run_identifier
+        assert os.getenv('RUN_IDENTIFIER') is not None
 
 if args.env == 'local':
     robotArgs += ['--include', 'Local']
@@ -119,13 +169,11 @@ if args.env == 'local':
 if args.env == 'dev':
     robotArgs += ['--include', 'Dev']
 if args.env == 'test':
-    robotArgs += ['--include', 'Test']
+    robotArgs += ['--include', 'Test',
+                  '--exclude', 'AltersData']
 if args.env in ['dev03', 'prod']:
-    robotArgs += ['--include', 'Prod']
-
-if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
-    print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file or pipeline variables needs to be set")
-    sys.exit(1)
+    robotArgs += ['--include', 'Prod',
+                  '--exclude', 'AltersData']
 
 if args.visual:
     robotArgs += ["-v", "headless:0"]
@@ -134,14 +182,6 @@ else:
 
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
-
-# Install chromedriver and add it to PATH
-cdi.install(file_directory='./webdriver/',
-                   verbose=False,
-                   chmod=True,
-                   overwrite=False,
-                   version=args.chromedriver_version)
-os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Run tests
 if args.interp == "robot":

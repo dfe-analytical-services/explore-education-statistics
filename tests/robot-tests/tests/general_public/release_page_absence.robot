@@ -94,6 +94,18 @@ Validate Key Statistics data block -- Summary tab
     #user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
     #user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
 
+Validate Key Statistics data block -- Data tables tab
+   [Tags]  HappyPath
+   user clicks element   css:#keystats-tables-tab
+   user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
+   # TODO Verify table
+
+Validate Key Statistics data block -- Charts tab
+   [Tags]  HappyPath
+   user clicks element   css:#keystats-charts-tab
+   user checks element is visible  css:.recharts-responsive-container
+   # TODO: Possible to verify chart?
+
 Validate accordion sections order
     [Tags]  HappyPath
     user checks accordion is in position  About these statistics            1

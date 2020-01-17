@@ -72,7 +72,10 @@ Enable google analytics
     [Tags]  HappyPath    NotAgainstLocal
     user reloads page
 
-    user waits until page does not contain  Your cookie settings were saved
+    user checks page does not contain  Your cookie settings were saved
+    user waits until page contains heading   Cookies on Explore education statistics
+
+    sleep  1   # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
     user clicks element   css:#googleAnalytics-on
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
