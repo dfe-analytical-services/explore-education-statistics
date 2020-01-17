@@ -427,7 +427,7 @@
     "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
     "contentSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
-    "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
+    "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
