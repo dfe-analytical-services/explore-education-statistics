@@ -91,6 +91,11 @@ const ReleaseStatusPage = ({
                   statusOptions: model.statusOptions,
                 });
               })
+              .then(() => {
+                if (values.releaseStatus !== 'Approved') {
+                  history.push(appRouteList.adminDashboard.path as string);
+                }
+              })
               .catch(handleApiErrors);
           }}
           validationSchema={Yup.object<FormValues>({
