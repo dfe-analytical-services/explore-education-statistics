@@ -31,9 +31,7 @@ const ReleaseServiceStatus = ({
   const fetchReleaseServiceStatus = useCallback(() => {
     return dashboardService
       .getReleaseStatus(releaseId)
-      .then(([status]) => {
-        setCurrentStatus(status);
-      })
+      .then(setCurrentStatus)
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 

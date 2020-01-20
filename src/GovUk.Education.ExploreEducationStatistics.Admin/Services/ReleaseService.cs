@@ -11,12 +11,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -28,9 +32,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
+        private readonly ISubjectService _subjectService;
+        private readonly ITableStorageService _tableStorageService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper, IPublishingService publishingService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, IUserService userService, IReleaseRepository repository)
+        public ReleaseService(
+            ContentDbContext context, 
+            IMapper mapper, 
+            IPublishingService publishingService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IUserService userService, 
+            IReleaseRepository repository, 
+            ISubjectService subjectService,
+            ITableStorageService tableStorageService, 
+            IFileStorageService fileStorageService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -38,6 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
+            _subjectService = subjectService;
+            _tableStorageService = tableStorageService;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -248,6 +266,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _publishingService.QueueReleaseStatusAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);
+                });
+        }
+
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async _ =>
+                {
+                    await _tableStorageService.DeleteEntityAsync("imports",
+                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
+                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
         }
 
