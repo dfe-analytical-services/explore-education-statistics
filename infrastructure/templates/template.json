@@ -2155,6 +2155,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
