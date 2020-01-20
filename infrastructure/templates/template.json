@@ -165,7 +165,7 @@
     },
     "sqlVulnerabilityAssessments": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
 
     "publicAppBasicAuth": {
