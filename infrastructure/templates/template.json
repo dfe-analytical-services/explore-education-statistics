@@ -1398,8 +1398,8 @@
         },
         {
           "condition": "[parameters('sqlAuditing')]",
-          "type": "extendedAuditingSettings2",
-          "name": "Default",
+          "type": "extendedAuditingSettings",
+          "name": "Default2",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
