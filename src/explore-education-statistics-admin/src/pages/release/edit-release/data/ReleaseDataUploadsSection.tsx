@@ -188,7 +188,7 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && (
+            {canUpdateRelease ? (
               <>
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
@@ -231,6 +231,8 @@ const ReleaseDataUploadsSection = ({
                   Cancel
                 </Link>
               </>
+            ) : (
+              'Release has been approved, and can no longer be updated.'
             )}
 
             {dataFiles.length > 0 && (

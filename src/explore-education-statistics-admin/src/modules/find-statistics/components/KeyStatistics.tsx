@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import Button from '@common/components/Button';
+import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
   AbstractRelease,
   Publication,
 } from '@common/services/publicationService';
-import { EditableContentBlock } from '@admin/services/publicationService';
-import Button from '@common/components/Button';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import React, { useContext, useEffect, useState } from 'react';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 import KeyStat from './KeyStat';
 
@@ -46,7 +48,8 @@ const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
 };
 
 const AddKeyStatistics = ({ release, setRelease }: Props) => {
-  const [isAddingStat, setIsAddingStat] = useState<boolean>(false);
+  const { updateAvailableDataBlocks } = useContext(EditingContext);
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 
   const another =
     release.keyStatisticsSection.content &&
@@ -54,16 +57,53 @@ const AddKeyStatistics = ({ release, setRelease }: Props) => {
     ' another ';
   return (
     <>
-      {isAddingStat && (
+      {isFormOpen && (
         <KeyIndicatorSelectForm
-          onSelect={datablock => console.log(datablock)}
-          onCancel={() => setIsAddingStat(false)}
+          onSelect={async datablockId => {
+            if (
+              release.keyStatisticsSection &&
+              release.keyStatisticsSection.id
+            ) {
+              await releaseContentService
+                .attachContentSectionBlock(
+                  release.id,
+                  release.keyStatisticsSection &&
+                    release.keyStatisticsSection.id,
+                  {
+                    contentBlockId: datablockId,
+                    order:
+                      (release.keyStatisticsSection.content &&
+                        release.keyStatisticsSection.content.length) ||
+                      0,
+                  },
+                )
+                .then(v => {
+                  if (updateAvailableDataBlocks) {
+                    updateAvailableDataBlocks();
+                  }
+                  return v;
+                });
+
+              const keyStatisticsSection = await releaseContentService.getContentSection(
+                release.id,
+                release.keyStatisticsSection.id,
+              );
+              if (keyStatisticsSection) {
+                setRelease({
+                  ...release,
+                  keyStatisticsSection,
+                });
+                setIsFormOpen(false);
+              }
+            }
+          }}
+          onCancel={() => setIsFormOpen(false)}
         />
       )}
-      {!isAddingStat && (
+      {!isFormOpen && (
         <Button
           onClick={() => {
-            setIsAddingStat(true);
+            setIsFormOpen(true);
           }}
         >
           Add {another} key statistic
