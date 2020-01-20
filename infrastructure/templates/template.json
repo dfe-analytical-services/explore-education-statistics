@@ -1365,11 +1365,11 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
             "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
           ],
           "properties": {
-            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
               "emailSubscriptionAdmins": true
@@ -1384,8 +1384,8 @@
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
