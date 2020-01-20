@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
-                .ReturnsAsync(testFiles);
+                .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
             
             // Call the method under test
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseExistsResult);
             
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
-                .ReturnsAsync(testFiles);
+                .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
