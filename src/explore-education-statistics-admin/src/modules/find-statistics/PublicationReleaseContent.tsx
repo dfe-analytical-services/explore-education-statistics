@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
-import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -20,9 +19,10 @@ import classNames from 'classnames';
 import React from 'react';
 import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
+import ReleaseHeadlines from './components/ReleaseHeadlines';
+import ContentBlocks from './components/EditableContentBlocks';
 
 export interface RendererProps {
   contentId?: string;
@@ -138,12 +138,13 @@ const PublicationReleaseContent = ({
           </div>
 
           {release.summarySection && (
-            <ContentBlock
+            <ContentBlocks
               sectionId={release.summarySection.id}
               publication={publication}
               id={release.summarySection.id as string}
               content={release.summarySection.content}
               canAddSingleBlock
+              textOnly
               onContentChange={onSummaryContentChange}
             />
           )}
@@ -259,13 +260,7 @@ const PublicationReleaseContent = ({
 
       <hr />
 
-      <h2 className="dfe-print-break-before">
-        Headline facts and figures - {release.yearTitle}
-      </h2>
-
-      {release.keyStatisticsSection && release.keyStatisticsSection.content && (
-        <DataBlock {...release.keyStatisticsSection.content[0]} id="keystats" />
-      )}
+      <ReleaseHeadlines release={release} setRelease={setRelease} />
 
       <ReleaseContentAccordion
         releaseId={release.id}

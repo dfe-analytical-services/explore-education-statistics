@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             new ReleaseStatusState(Cancelled, Cancelled, Cancelled, Cancelled, Invalid);
 
         private static readonly ReleaseStatusState ValidState =
-            new ReleaseStatusState(Scheduled, Scheduled, Scheduled, Scheduled, Scheduled);
+            new ReleaseStatusState(NotStarted, NotStarted, NotStarted, NotStarted, Scheduled);
 
         public ValidateReleaseFunction(IReleaseStatusService releaseStatusService, IValidationService validationService)
         {

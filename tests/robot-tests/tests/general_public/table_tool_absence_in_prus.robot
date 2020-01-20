@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Dev  Test
+Force Tags  GeneralPublic  Local  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -120,41 +120,49 @@ Create table again
     user clicks element    css:#filtersForm-submit
     user waits until results table appears
 
-Validate table's column headings
+Validate new table column headings
     [Tags]   HappyPath
     user checks results table column heading contains  1   1   2014/15
     user checks results table column heading contains  1   2   2015/16
 
-Validate table's row headings
-    [Tags]   HappyPath
-    user checks results table row heading contains  1   1   Barnet
-    user checks results table row heading contains  1   2   Number of sessions possible
-    user checks results table row heading contains  2   1   Number of pupil enrolments
+Validate Barnet Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnet   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     224
+    user checks row cell contains text  ${row}    2     210
 
-    user checks results table row heading contains  3   1   Barnsley
-    user checks results table row heading contains  3   2   Number of sessions possible
-    user checks results table row heading contains  4   1   Number of pupil enrolments
+Validate Barnet Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnet   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     38,345
+    user checks row cell contains text  ${row}    2     36,820
 
-    user checks results table row heading contains  5   1   Bedford
-    user checks results table row heading contains  5   2   Number of sessions possible
-    user checks results table row heading contains  6   1   Number of pupil enrolments
+Validate Barnsley Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnsley   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     149
+    user checks row cell contains text  ${row}    2     146
 
-Validate table results
-    [Tags]    HappyPath
-    # Barnet
-    user checks results table cell contains   1     1     38,345
-    user checks results table cell contains   1     2     36,820
-    user checks results table cell contains   2     1     224
-    user checks results table cell contains   2     2     210
+Validate Barnsley Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Barnsley   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     31,938
+    user checks row cell contains text  ${row}    2     36,250
 
-    # Barnsley
-    user checks results table cell contains   3     1     31,938
-    user checks results table cell contains   3     2     36,250
-    user checks results table cell contains   4     1     149
-    user checks results table cell contains   4     2     146
+Validate Bedford Number of pupil enrolments row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Bedford   Number of pupil enrolments
+    user checks row contains heading  ${row}  Number of pupil enrolments
+    user checks row cell contains text  ${row}    1     176
+    user checks row cell contains text  ${row}    2     178
 
-    # Bedford
-    user checks results table cell contains   5     1     17,687
-    user checks results table cell contains   5     2     21,847
-    user checks results table cell contains   6     1     176
-    user checks results table cell contains   6     2     178
+Validate Bedford Number of sessions possible row
+    [Tags]  HappyPath
+    ${row}=  user gets row with group and indicator   Bedford   Number of sessions possible
+    user checks row contains heading  ${row}  Number of sessions possible
+    user checks row cell contains text  ${row}    1     17,687
+    user checks row cell contains text  ${row}    2     21,847

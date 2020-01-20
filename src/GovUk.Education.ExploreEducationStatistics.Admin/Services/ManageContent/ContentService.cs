@@ -234,6 +234,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
+        public Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+        {
+            return
+                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(async tuple =>
+                    {
+                        var (_, section) = tuple;
+
+                        var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+
+                        if (blockToUpdate == null)
+                        {
+                            return NotFound<IContentBlock>();
+                        }
+
+                        switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
+                        {
+                            case ContentBlockType.DataBlock:
+                                return await UpdateDataBlock((DataBlock) blockToUpdate, request);
+                            default:
+                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
+                        }
+                    });
+        }
+
+
         public Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
         {
@@ -532,6 +560,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             blockToUpdate.Heading = heading;
             blockToUpdate.Body = body;
+            return await SaveContentBlock(blockToUpdate);
+        }
+
+        private async Task<Either<ActionResult, IContentBlock>> UpdateDataBlock(DataBlock blockToUpdate,
+            UpdateDataBlockRequest request)
+        {
+            blockToUpdate.Summary.dataDefinitionTitle = new List<string>
+            {
+                request.DataDefinitionTitle
+            };
+            
+            blockToUpdate.Summary.dataDefinition = new List<string>
+            {
+                request.DataDefinition
+            };
+
+            blockToUpdate.Summary.dataSummary = new List<string>
+            {
+                request.DataSummary
+            };
+
             return await SaveContentBlock(blockToUpdate);
         }
 
