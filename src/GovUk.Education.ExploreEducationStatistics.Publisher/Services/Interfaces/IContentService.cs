@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
@@ -6,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IContentService
     {
         Task UpdateAllContentAsync();
-        Task UpdateContentAsync(Guid releaseId);
+        Task UpdateContentAsync(IEnumerable<Guid> releaseIds);
     }
 }

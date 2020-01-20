@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -70,15 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContentAsync(Guid releaseId)
+        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds)
         {
             await UpdateTreesAsync();
 
-            var release = _releaseService.GetRelease(releaseId);
+            var release = _releaseService.GetRelease(releaseIds.First());
             var publication = release.Publication;
             await UpdatePublicationAsync(publication);
             await UpdateLatestReleaseAsync(publication);
-            await UpdateReleaseAsync(releaseId);
+            await UpdateReleaseAsync(releaseIds.First());
             if (publication.MethodologyId.HasValue)
             {
                 await UpdateMethodologyAsync(publication.MethodologyId.Value);
