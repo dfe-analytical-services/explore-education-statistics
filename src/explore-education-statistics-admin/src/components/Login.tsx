@@ -7,6 +7,7 @@ const LoginContext = React.createContext<Authentication>({
     id: 'guest',
     name: 'logged out',
     permissions: [],
+    validToken: false,
   },
 });
 
