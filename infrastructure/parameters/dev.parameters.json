@@ -21,7 +21,7 @@
       "value": "0 30 * * * *"
     },
     "publishReleaseDataFunctionDisabled": {
-      "value": "true"
+      "value": "false"
     },
     "useSubnets": {
       "value": true

@@ -161,11 +161,11 @@
     },
     "sqlAuditing": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
     "sqlVulnerabilityAssessments": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
 
     "publicAppBasicAuth": {
@@ -1381,7 +1381,7 @@
         {
           "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
-          "name": "DefaultAuditingSettings",
+          "name": "DefaultAuditingSettings2",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
@@ -1393,9 +1393,25 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default2",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
           ]
         }
       ],
@@ -1547,6 +1563,25 @@
           "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
           "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
