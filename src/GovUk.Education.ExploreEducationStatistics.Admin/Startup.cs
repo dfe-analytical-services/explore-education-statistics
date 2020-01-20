@@ -245,7 +245,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<IPublishingService, PublishingService>();
-            services.AddTransient<IReleaseStatusService, ReleaseStatusService>();
+            services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s => 
+                new ReleaseStatusService(
+                    s.GetService<IMapper>(),
+                    s.GetService<IUserService>(),
+                    s.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    new TableStorageService(Configuration.GetConnectionString("PublisherStorage"))));
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();

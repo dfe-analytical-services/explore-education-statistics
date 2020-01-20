@@ -284,7 +284,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/status")]
         public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(Guid releaseId)
         {
-            return Ok(await _releaseStatusService.GetReleaseStatusesAsync(releaseId));
+            return await _releaseStatusService
+                .GetReleaseStatusesAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("releases/{releaseId}/status")]
