@@ -1393,9 +1393,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]"
-            // "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
           ]
         },
         {
@@ -1413,9 +1411,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
           ]
         }
       ],
