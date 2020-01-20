@@ -48,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         [FunctionName("PublicationNotifier")]
         // ReSharper disable once UnusedMember.Global
         public void PublicationNotifierFunc(
-            [QueueTrigger("publication-queue")]
-            JObject pn,
+            [QueueTrigger("publication-queue")] JObject pn,
             ILogger logger,
             ExecutionContext context)
         {
@@ -135,7 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             {
                 subscriptionPending =
                     _storageTableService
-                        .RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result != null;
+                        .RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result !=
+                    null;
 
                 logger.LogInformation($"pending subscription found? : {subscriptionPending}");
 
@@ -144,12 +144,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 {
                     // Now check if already subscribed
 
-                    if (_storageTableService
-                            .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email)).Result !=
-                        null)
+                    var activeSubscriber = _storageTableService
+                        .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email)).Result;
+                    if (activeSubscriber != null)
                     {
-                        return new BadRequestObjectResult(
-                            "You are already subscribed to this publication.");
+                        var unsubscribeToken =
+                            _tokenService.GenerateToken(tokenSecretKey, activeSubscriber.RowKey,
+                                DateTime.UtcNow.AddYears(1));
+                        // var confirmationEmail = _tokenService.GetEmailFromToken(token, tokenSecretKey);
+                        var confirmationEmailTemplateId = config.GetValue<string>(ConfirmationEmailTemplateIdName);
+                        var confirmationValues = new Dictionary<string, dynamic>
+                        {
+                            {"publication_name", activeSubscriber.Title},
+                            {
+                                "unsubscribe_link",
+                                baseUrl + activeSubscriber.PartitionKey + "/unsubscribe/" + unsubscribeToken
+                            }
+                        };
+                        _emailService.SendEmail(client, email, confirmationEmailTemplateId, confirmationValues);
+                        return new OkObjectResult("Thanks! Please check your email.");
                     }
 
                     // Verification Token expires in 1 hour
