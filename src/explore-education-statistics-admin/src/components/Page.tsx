@@ -2,9 +2,8 @@ import PageFooter from '@admin/components/PageFooter';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Helmet } from 'react-helmet';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
-import PrototypePageBanner from './PageBanner';
+import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';
 
 type Props = {
@@ -16,38 +15,36 @@ type Props = {
 const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
   return (
     <>
-      <ErrorBoundary>
-        <Helmet>
-          <title>
-            {pageTitle
-              ? `${pageTitle} - Explore education statistics - GOV.UK`
-              : 'Explore education statistics - GOV.UK'}
-          </title>
-        </Helmet>
+      <Helmet>
+        <title>
+          {pageTitle
+            ? `${pageTitle} - Explore education statistics - GOV.UK`
+            : 'Explore education statistics - GOV.UK'}
+        </title>
+      </Helmet>
 
-        <PageHeader wide={wide} />
+      <PageHeader wide={wide} />
 
-        <div
-          className={classNames('govuk-width-container', {
-            'dfe-width-container--wide': wide,
-          })}
+      <div
+        className={classNames('govuk-width-container', {
+          'dfe-width-container--wide': wide,
+        })}
+      >
+        <PageBanner />
+
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
+
+        <main
+          className="app-main-class govuk-main-wrapper"
+          id="main-content"
+          role="main"
         >
-          <PrototypePageBanner />
+          {pageTitle && <h1 className="govuk-heading-xl">{pageTitle}</h1>}
+          {children}
+        </main>
+      </div>
 
-          <Breadcrumbs breadcrumbs={breadcrumbs} />
-
-          <main
-            className="app-main-class govuk-main-wrapper"
-            id="main-content"
-            role="main"
-          >
-            {pageTitle && <h1 className="govuk-heading-xl">{pageTitle}</h1>}
-            {children}
-          </main>
-        </div>
-
-        <PageFooter wide={wide} />
-      </ErrorBoundary>
+      <PageFooter wide={wide} />
     </>
   );
 };

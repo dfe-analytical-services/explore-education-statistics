@@ -1,5 +1,4 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
@@ -19,7 +18,13 @@ function App() {
   );
 
   const appRoutes = Object.entries(appRouteList).map(([key, appRoute]) => {
-    return <ProtectedRoute key={`appRoute-${key}`} {...appRoute} />;
+    return (
+      <ProtectedRoute
+        key={`appRoute-${key}`}
+        protectionAction={appRoute.protectedAction}
+        {...appRoute}
+      />
+    );
   });
 
   const prototypeRoutes = Object.entries(prototypeRouteList).map(
@@ -32,17 +37,12 @@ function App() {
     <AriaLiveAnnouncer>
       <ThemeAndTopic>
         <BrowserRouter>
-          <ErrorBoundary>
-            <Switch>
-              {authRoutes}
-              {appRoutes}
-              {prototypeRoutes}
-              <ProtectedRoute
-                redirectIfNotLoggedIn={false}
-                component={PageNotFoundPage}
-              />
-            </Switch>
-          </ErrorBoundary>
+          <Switch>
+            {authRoutes}
+            {appRoutes}
+            {prototypeRoutes}
+            <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
+          </Switch>
         </BrowserRouter>
       </ThemeAndTopic>
     </AriaLiveAnnouncer>

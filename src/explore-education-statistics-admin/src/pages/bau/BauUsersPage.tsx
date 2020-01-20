@@ -1,3 +1,6 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import React, { useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
@@ -8,16 +11,19 @@ interface Model {
   users: UserStatus[];
 }
 
-const BauUsersPage = () => {
+const BauUsersPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    userService.getUsers().then(users => {
-      setModel({
-        users,
-      });
-    });
-  }, []);
+    userService
+      .getUsers()
+      .then(users => {
+        setModel({
+          users,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
   return (
     <Page
       wide
@@ -68,4 +74,4 @@ const BauUsersPage = () => {
   );
 };
 
-export default BauUsersPage;
+export default withErrorControl(BauUsersPage);

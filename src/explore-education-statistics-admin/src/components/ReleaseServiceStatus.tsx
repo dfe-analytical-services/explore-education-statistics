@@ -85,7 +85,7 @@ const ReleaseServiceStatus = ({
       {currentStatus &&
         currentStatus.overallStage === 'Started' &&
         exclude !== 'details' && (
-          <Details className={styles.errorSummary} summary="See more">
+          <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(
                 ([key, val]) =>
@@ -93,7 +93,7 @@ const ReleaseServiceStatus = ({
                     <li key={key}>
                       <StatusBlock
                         color={statusDetailColor(val)}
-                        text={`${key} - ${val}`}
+                        text={`${key.replace('Stage', '')} - ${val}`}
                       />{' '}
                     </li>
                   ),

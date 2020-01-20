@@ -4,6 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
     {
         ApplicationAccessGranted,
 
+        ManageAnyUser,
+        ManageAnyMethodology,
+        
         CreateAnyPublication,
         CreateAnyRelease,
 

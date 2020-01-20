@@ -25,13 +25,18 @@ import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageCo
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { Dictionary } from '@admin/types';
 import { RouteProps } from 'react-router';
+import permissionService from '@admin/services/permissions/service';
+
+interface ProtectedRouteProps extends RouteProps {
+  protectedAction?: () => Promise<boolean>;
+}
 
 export const generateAdminDashboardThemeTopicLink: (
   themeId: string,
   topicId: string,
 ) => string = (themeId, topicId) => `/dashboard/${themeId}/${topicId}`;
 
-const appRouteList: Dictionary<RouteProps> = {
+const appRouteList: Dictionary<ProtectedRouteProps> = {
   home: {
     path: '/',
     component: AdminDashboardPage,
@@ -49,26 +54,31 @@ const appRouteList: Dictionary<RouteProps> = {
   administration: {
     path: '/administration',
     component: BauDashboardPage,
+    protectedAction: () => permissionService.canAccessAdministration(),
     exact: true,
   },
   administrationMethodology: {
     path: '/administration/methodology',
     component: BauMethodologyPage,
+    protectedAction: () => permissionService.canManageAllMethodologies(),
     exact: true,
   },
   administrationUsers: {
     path: '/administration/users',
     component: BauUsersPage,
+    protectedAction: () => permissionService.canManageAllUsers(),
     exact: true,
   },
   administrationUserInvite: {
     path: '/administration/users/invite',
     component: UserInvitePage,
+    protectedAction: () => permissionService.canManageAllUsers(),
     exact: true,
   },
   administrationPendingUsers: {
     path: '/administration/users/pending',
     component: PendingInvitesPage,
+    protectedAction: () => permissionService.canManageAllUsers(),
     exact: true,
   },
   methodology: {

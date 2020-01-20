@@ -68,7 +68,7 @@ const ProtectedRoutes = ({ children }: Props) => {
     populateAuthenticationState();
   }, [populateAuthenticationState]);
 
-  const handleLoad = useCallback(async () => {
+  useEffect(() => {
     const subscriptionId = authService.subscribe(
       handleAuthenticationStateChanged,
     );
@@ -79,10 +79,6 @@ const ProtectedRoutes = ({ children }: Props) => {
       authService.unsubscribe(subscriptionId);
     };
   }, [populateAuthenticationState, handleAuthenticationStateChanged]);
-
-  useEffect(() => {
-    handleLoad();
-  }, [handleLoad]);
 
   const authenticationContext: Authentication = {
     user: authState.user,

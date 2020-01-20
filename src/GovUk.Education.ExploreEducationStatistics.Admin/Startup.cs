@@ -172,6 +172,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
                 
+                // does this user have permissions to invite and manage all users on the system?
+                options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
+                
+                // does this user have permissions to manage all methodologies on the system?
+                options.AddPolicy(SecurityPolicies.CanManageMethodologiesOnSystem.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.ManageAnyMethodology.ToString()));
+                
                 // does this user have permission to view all Topics across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
