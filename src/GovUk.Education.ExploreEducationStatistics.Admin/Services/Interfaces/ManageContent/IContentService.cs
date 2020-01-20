@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -43,6 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         
         Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request);
+        
+        Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request);
         
         Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
             where T : IContentBlock;

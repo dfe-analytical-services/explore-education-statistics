@@ -2530,6 +2530,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                 IndicatorName.Overall_absence_rate)
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is overall absence?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Up from 4.6% in 2015/16",
@@ -2680,6 +2684,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                 IndicatorName.Authorised_absence_rate)
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is authorized absence rate?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Similar to previous years",
@@ -2805,6 +2813,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                 IndicatorName.Unauthorised_absence_rate)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is unauthorized absence rate?"
                         },
                         dataSummary = new List<string>
                         {
@@ -2963,6 +2975,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Authorised_absence_rate),
                             Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
                                 IndicatorName.Unauthorised_absence_rate)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is overall absence?",
+                            "What is authorized absence?",
+                            "What is unauthorized absence?"
                         },
                         dataSummary = new List<string>
                         {
@@ -3408,6 +3426,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Permanent_exclusion_rate),
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is permanent exclusion rate?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Up from 0.08% in 2015/16",
@@ -3544,6 +3566,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Fixed_period_exclusion_rate),
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is fixed period exclusion rate?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Up from 4.29% in 2015/16",
@@ -3668,6 +3694,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of permanent exclusions?"
                         },
                         dataSummary = new List<string>
                         {
@@ -3810,6 +3840,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Fixed_period_exclusion_rate),
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Number_of_permanent_exclusions)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is permanent exclusion rate?",
+                            "What is fixed period exclusion rate?",
+                            "What is number of permanent exclusions?"
                         },
                         dataSummary = new List<string>
                         {
@@ -4188,6 +4224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Number_of_permanent_exclusions)
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of permanent exclusions?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Up from 6,685 in 2015/16"
@@ -4314,6 +4354,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                                 IndicatorName.Number_of_permanent_exclusions)
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of permanent exclusions?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Up from 6,685 in 2015/16"
@@ -4439,6 +4483,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_of_applications_received),
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of applications received?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Down from 620,330 in 2017",
@@ -4524,6 +4572,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_of_first_preferences_offered)
                         },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of first preferences offered?"
+                        },
                         dataSummary = new List<string>
                         {
                             "Down from 558,411 in 2017"
@@ -4608,6 +4660,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_of_second_preferences_offered)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of second preferences offered?"
                         },
                         dataSummary = new List<string>
                         {
@@ -4713,6 +4769,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Number_of_first_preferences_offered),
                             Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                                 IndicatorName.Number_of_second_preferences_offered)
+                        },
+                        dataDefinitionTitle = new List<string>
+                        {
+                            "What is number of applications received?",
+                            "What is number of first preferences offered?",
+                            "What is number of second preferences offered?"
                         },
                         dataSummary = new List<string>
                         {
