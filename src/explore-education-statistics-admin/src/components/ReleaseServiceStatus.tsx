@@ -83,7 +83,8 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        currentStatus.overallStage === 'Started' &&
+        currentStatus.overallStage !== 'Scheduled' &&
+        currentStatus.overallStage !== 'Invalid' &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
