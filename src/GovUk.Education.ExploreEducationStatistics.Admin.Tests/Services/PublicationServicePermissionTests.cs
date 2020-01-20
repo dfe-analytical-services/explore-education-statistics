@@ -133,25 +133,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPublicationRepository>, 
             Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
-            var userService = new Mock<IUserService>();
-
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
-                .ReturnsAsync(true);
-            
-            userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<Topic>(), 
-                    SecurityPolicies.CanCreatePublicationForSpecificTopic))
-                .ReturnsAsync(true);
-
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
-//            MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
 
             return (
                 new Mock<ContentDbContext>(),
                 new Mock<IMapper>(), 
-                userService, 
+                MockUtils.AlwaysTrueUserService(), 
                 new Mock<IPublicationRepository>(), 
                 persistenceHelper);
         }

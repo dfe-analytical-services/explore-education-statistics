@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,13 +16,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using DataBlockId = System.Guid;
-using ContentSectionId = System.Guid;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using PublicationId = System.Guid;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -64,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
-        public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
+        public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -73,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/data/{filename}")]
-        public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
+        public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -82,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
-        public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
+        public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -93,15 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/publication/{publicationId}/releases
         [HttpPost("publications/{publicationId}/releases")]
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
-            PublicationId publicationId)
+            Guid publicationId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(() =>
-                {
-                    release.PublicationId = publicationId;
-                    return _releaseService.CreateReleaseAsync(release);
-                })
+            release.PublicationId = publicationId;
+
+            return await _releaseService
+                .CreateReleaseAsync(release)
                 .HandleFailuresOr(Ok);
         }
         
@@ -110,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(ReleaseId releaseId)
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -123,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(ReleaseId releaseId)
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -136,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(ReleaseId releaseId)
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -151,13 +145,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(ReleaseId releaseId,
+        public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(Guid releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name,
-                    ReleaseFileTypes.Ancillary, false))
+            return await _fileStorageService
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOr(Ok);
         }
 
@@ -168,12 +160,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddChartFilesAsync(ReleaseId releaseId,
+        public async Task<ActionResult<IEnumerable<FileInfo>>> AddChartFilesAsync(Guid releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false))
+            return await _fileStorageService
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false)
                 .HandleFailuresOr(Ok);
         }
 
@@ -184,76 +175,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(ReleaseId releaseId,
+        public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(Guid releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                // upload the files
-                .OnSuccess(async _ =>
-                {
-                    var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
-                    return await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false,
-                            user.Email);
-                })
+            return await _fileStorageService
+                .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
                 // add message to queue to process these files
                 .OnSuccessDo(() => _importService.Import(file.FileName, releaseId))
                 .HandleFailuresOr(Ok);
         }
 
         [HttpGet("releases/{releaseId}")]
-        public async Task<ReleaseViewModel> GetReleaseAsync(ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> GetReleaseAsync(Guid releaseId)
         {
-            return await _releaseService.GetReleaseForIdAsync(releaseId);
+            return await _releaseService
+                .GetReleaseForIdAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("releases/{releaseId}/summary")]
-        public Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
-            return HandleErrorsAsync(() => _releaseService.GetReleaseSummaryAsync(releaseId), Ok);
+            return await _releaseService
+                .GetReleaseSummaryAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("releases/{releaseId}/summary")]
         public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
-            ReleaseId releaseId)
+            Guid releaseId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _releaseService.EditReleaseSummaryAsync(releaseId, request))
+            return await _releaseService
+                .EditReleaseSummaryAsync(releaseId, request)
                 .HandleFailuresOr(Ok);
         }
 
-        // GET api/publications/{publicationId}/releases
-        [HttpGet("publications/{publicationId}/releases")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
-            [Required] PublicationId publicationId)
+        // GET api/publications/{publicationId}/releases/template
+        [HttpGet("publications/{publicationId}/releases/template")]
+        public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateReleaseAsync(
+            [Required] Guid publicationId)
         {
-            return Ok(await _releaseService.GetReleasesForPublicationAsync(publicationId));
+            return await _releaseService
+                .GetLatestReleaseAsync(publicationId)
+                .HandleFailuresOr(releaseId => new OkObjectResult(releaseId));
         }
         
         // GET api/releases/draft
         [HttpGet("releases/draft")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
-            return Ok(await _releaseService.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview));
+            return await _releaseService
+                .GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview)
+                .HandleFailuresOr(Ok);
         }
         
         // GET api/releases/scheduled
         [HttpGet("releases/scheduled")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
-            return Ok(await _releaseService.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
+            return await _releaseService
+                .GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved)
+                .HandleFailuresOr(Ok);
         }
         
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(ReleaseId releaseId, string fileName)
+        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
         {
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -270,41 +264,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // DELETE api/release/{releaseId}/ancillary/{fileName}
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
-            ReleaseId releaseId, string fileName)
+            Guid releaseId, string fileName)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName))
+            return await _fileStorageService
+                .DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOr(Ok);
         }
 
         // DELETE api/release/{releaseId}/chart/{fileName}
         [HttpDelete("release/{releaseId}/chart/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
-            ReleaseId releaseId, string fileName)
+            Guid releaseId, string fileName)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ =>  _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
+            return await _fileStorageService
+                .DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
                 .HandleFailuresOr(Ok);
         }
         
         [HttpGet("releases/{releaseId}/status")]
-        public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(ReleaseId releaseId)
+        public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(Guid releaseId)
         {
             return Ok(await _releaseStatusService.GetReleaseStatusesAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/status")]
-        public Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            UpdateReleaseStatusRequest updateRequest, ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+            UpdateReleaseStatusRequest updateRequest, Guid releaseId)
         {
-            return HandleErrorsAsync(
-                () => _releaseService.UpdateReleaseStatusAsync(
-                    releaseId, 
-                    updateRequest.ReleaseStatus, 
-                    updateRequest.InternalReleaseNote),
-                Ok);
+            return await _releaseService
+                .UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
+                .HandleFailuresOr(Ok);
         }
     }
 }

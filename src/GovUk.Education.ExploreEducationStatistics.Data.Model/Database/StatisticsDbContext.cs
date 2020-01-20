@@ -14,9 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             
         }
         
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : base(options)
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
         {
-            Database.SetCommandTimeout(int.MaxValue);
+        }
+        
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
+        {
+            if (timeout.HasValue)
+            {
+                Database.SetCommandTimeout(timeout);
+            }
         }
 
         public DbSet<BoundaryLevel> BoundaryLevel { get; set; }

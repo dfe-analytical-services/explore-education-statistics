@@ -39,7 +39,7 @@ export type FormValues = {
   templateReleaseId: string;
 } & EditFormValues;
 
-interface TemplateReleaseModel {
+interface Model {
   templateRelease: IdTitlePair | undefined;
   publication: Publication;
 }
@@ -51,7 +51,7 @@ const CreateReleasePage = ({
 }: RouteComponentProps<MatchProps> & ErrorControlProps) => {
   const { publicationId } = match.params;
 
-  const [model, setModel] = useState<TemplateReleaseModel>();
+  const [model, setModel] = useState<Model>();
 
   useEffect(() => {
     Promise.all([
