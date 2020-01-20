@@ -2271,7 +2271,7 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true,
+        "supportsHttpsTrafficOnly": true
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
