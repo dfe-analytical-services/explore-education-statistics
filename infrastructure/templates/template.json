@@ -161,7 +161,7 @@
     },
     "sqlAuditing": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
     "sqlVulnerabilityAssessments": {
       "type": "bool",
