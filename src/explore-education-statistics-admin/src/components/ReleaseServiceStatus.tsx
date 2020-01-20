@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import dashboardService from '@admin/services/dashboard/service';
 import Details from '@common/components/Details';
-import StatusBlock from '@admin/components/StatusBlock';
+import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
 
 interface Props {
   releaseId: string;
@@ -11,7 +11,6 @@ interface Props {
 }
 
 interface ReleaseServiceStatus {
-  // has additional props too
   overallStage: string;
 }
 
@@ -21,12 +20,11 @@ const ReleaseServiceStatus = ({
   exclude,
 }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseServiceStatus>();
-  const [statusColor, setStatusColor] = useState<
-    'blue' | 'orange' | 'red' | 'green' | undefined // could be StatusBlockProps.color once the component is created
-  >('blue');
+  const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
+    'blue',
+  );
 
   function fetchReleaseServiceStatus() {
-    // update the status
     return dashboardService.getReleaseStatus(releaseId).then(([status]) => {
       setCurrentStatus(status);
     });
@@ -68,8 +66,6 @@ const ReleaseServiceStatus = ({
   };
 
   useEffect(() => {
-    // overallStage status changed?
-    // stop timer? set block color?
     if (currentStatus && currentStatus.overallStage) {
       const color = statusDetailColor(currentStatus.overallStage);
       if (color === ('red' || 'green')) {
