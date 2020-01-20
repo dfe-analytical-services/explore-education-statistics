@@ -1,9 +1,24 @@
 from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
+from selenium.webdriver.common.action_chains  import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 from datetime import datetime
 import json
+
+def user_sets_focus_to_element(selector):
+  if selector.startswith('css:'):
+    selector = selector[4:]
+    sl.wait_until_page_contains_element(f'css:{selector}')
+    elem = sl.driver.find_element_by_css_selector(selector)
+  elif selector.startswith('xpath:'):
+    selector = selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{selector}')
+    elem = sl.driver.find_element_by_xpath(selector)
+  else:
+    raise AssertionError('Selector must be either css or xpath!')
+  elem.send_keys(Keys.NULL)
 
 def set_cookie_from_json(cookie_json):
   cookie_dict = json.loads(cookie_json)
@@ -63,17 +78,24 @@ def user_verifies_accordion_is_closed(section_text):
 
 def user_opens_accordion_section(exact_section_text):
   try:
-    sl.driver\
-      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')\
-      .click()
+    elem = sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')
   except NoSuchElementException:
     raise AssertionError(f'Cannot find accordion with header {exact_section_text}')
 
   try:
     sl.driver \
-      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
   except NoSuchElementException:
-    raise AssertionError(f'Accordion "{exact_section_text} not expanded!')
+    BuiltIn().log_to_console(f'WARNING: Accordion section "{exact_section_text}" already open!')
+    return
+
+  try:
+    elem.click()
+  except:
+    raise AssertionError(f'Cannot click accordion section header {exact_section_text}')
+
+  sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
 
 def user_closes_accordion_section(exact_section_text):
   try:
@@ -194,6 +216,35 @@ def user_checks_results_table_column_heading_contains(row, column, expected):
   if expected not in elem.text:
     raise AssertionError(
       f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
+
+def user_gets_row_with_heading(heading):
+  elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
+  return elem
+
+def user_gets_row_with_group_and_indicator(group, indicator):
+  elems = sl.driver.find_elements_by_xpath(f'//table/tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+  for elem in elems:
+    try:
+      elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
+      return elem
+    except:
+      continue
+  raise AssertionError(f'Indicator "{indicator}" not found!')
+
+def user_checks_row_contains_heading(row_elem, heading):
+  try:
+    row_elem.find_element_by_xpath(f'.//th[text()="{heading}"]')
+  except:
+    raise AssertionError(f'Heading "{heading}" not found for provided row element.')
+
+def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
+  try:
+    elem = row_elem.find_element_by_xpath(f'.//td[{cell_num}]')
+  except:
+    raise AssertionError(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
+
+  if expected_text not in elem.text:
+    raise AssertionError(f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}". Found text "{elem.text}"')
 
 def user_checks_results_table_row_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')

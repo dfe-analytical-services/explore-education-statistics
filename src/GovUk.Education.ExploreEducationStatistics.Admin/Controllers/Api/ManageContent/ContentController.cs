@@ -102,6 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOr(Ok);
         }
 
+        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/data-block/{contentBlockId}")]
+        public async Task<ActionResult<IContentBlock>> UpdateDataBlock(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+        {
+            return await _contentService
+                .UpdateDataBlockAsync(releaseId, contentSectionId, contentBlockId, request)
+                .HandleFailuresOr(Ok);
+        }
+
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
         public async Task<ActionResult<IContentBlock>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)

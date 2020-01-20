@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -14,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 {
     [Route("api")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "CanManageUsersOnSystem")]
     public class BauUsersController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;

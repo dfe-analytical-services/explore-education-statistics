@@ -95,7 +95,7 @@ const PrototypeFootnotes = ({ subject, titleRow }: Props) => {
               <Details
                 summary="Indicator"
                 className="govuk-!-margin-bottom-1"
-                tag="3 selected"
+                tag={['3 selected']}
               >
                 <div className="dfe-filter-overflow">
                   <img
@@ -176,7 +176,7 @@ const PrototypeFootnotes = ({ subject, titleRow }: Props) => {
               </span>
               <Details
                 summary="Characteristic"
-                tag="1 selected"
+                tag={['1 selected']}
                 className="govuk-!-margin-bottom-2"
               >
                 <div className="dfe-filter-overflow">
@@ -186,7 +186,7 @@ const PrototypeFootnotes = ({ subject, titleRow }: Props) => {
                   />
                 </div>
               </Details>
-              <Details summary="School type" tag="1 selected">
+              <Details summary="School type" tag={['1 selected']}>
                 <div className="dfe-filter-overflow">
                   <img
                     src="/static/images/prototype/school-filter.png"

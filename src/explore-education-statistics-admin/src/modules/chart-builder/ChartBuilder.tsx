@@ -119,6 +119,7 @@ const ChartBuilder = ({
   initialConfiguration,
   onRequiresDataUpdate,
   handleApiErrors,
+  handleManualErrors,
 }: Props & ErrorControlProps) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
@@ -519,6 +520,7 @@ const ChartBuilder = ({
               meta={metaData}
               data={data}
               handleApiErrors={handleApiErrors}
+              handleManualErrors={handleManualErrors}
             />
           </TabsSection>
 

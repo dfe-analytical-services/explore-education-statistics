@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task CopyReleaseToPublicContainer(PublishReleaseFilesMessage message)
+        public async Task CopyReleaseToPublicContainer(CopyReleaseCommand copyReleaseCommand)
         {
             var privateContainer =
                 await FileStorageUtils.GetCloudBlobContainerAsync(_privateStorageConnectionString,
@@ -48,13 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
                     PublicFilesContainerName);
 
-            var sourceDirectoryPath = AdminReleaseDirectoryPath(message.ReleaseId);
-            var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
+            var sourceDirectoryPath = AdminReleaseDirectoryPath(copyReleaseCommand.ReleaseId);
+            var destinationDirectoryPath =
+                PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug, copyReleaseCommand.ReleaseSlug);
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
-                publicContainer, message);
+                publicContainer, copyReleaseCommand);
         }
 
         public async Task DeleteAllContentAsyncExcludingStaging()
@@ -71,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publication, release);
         }
 
-        public async Task MoveStagedContentAsync(ReleaseStatus releaseStatus)
+        public async Task MoveStagedContentAsync()
         {
             var container = await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
                 PublicContentContainerName);
@@ -107,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
-            PublishReleaseFilesMessage message)
+            CopyReleaseCommand copyReleaseCommand)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
@@ -124,13 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
             context.SetAttributesCallbackAsync += (destination) =>
-                SetAttributesCallbackAsync(destination, message.ReleasePublished);
+                SetAttributesCallbackAsync(destination, copyReleaseCommand.PublishScheduled);
             context.ShouldTransferCallbackAsync += ShouldTransferCallbackAsync;
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
                 CopyMethod.ServiceSideAsyncCopy, options, context);
 
-            await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
+            await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, copyReleaseCommand);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
@@ -179,9 +180,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private static async Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
-            PublishReleaseFilesMessage message)
+            CopyReleaseCommand copyReleaseCommand)
         {
-            var cloudBlockBlob = CreateBlobForAllFilesZip(directory, message);
+            var cloudBlockBlob = CreateBlobForAllFilesZip(directory, copyReleaseCommand);
             var memoryStream = new MemoryStream();
 
             var zipOutputStream = new ZipOutputStream(memoryStream);
@@ -194,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var context = new SingleTransferContext();
             context.SetAttributesCallbackAsync += (destination) =>
-                SetAttributesCallbackAsync(destination, message.ReleasePublished);
+                SetAttributesCallbackAsync(destination, copyReleaseCommand.PublishScheduled);
 
             zipOutputStream.Finish();
             await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
@@ -214,21 +215,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return cloudBlob.Uri.Segments.Last();
         }
 
-        private static string GetZipFilePath(PublishReleaseFilesMessage message)
+        private static string GetZipFilePath(CopyReleaseCommand copyReleaseCommand)
         {
-            return $"{Ancillary.GetEnumLabel()}/{message.PublicationSlug}_{message.ReleaseSlug}.zip";
+            return $"{Ancillary.GetEnumLabel()}/{copyReleaseCommand.PublicationSlug}_{copyReleaseCommand.ReleaseSlug}.zip";
         }
 
-        private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory,
-            PublishReleaseFilesMessage message)
+        private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory, CopyReleaseCommand copyReleaseCommand)
         {
-            var blob = directory.GetBlockBlobReference(GetZipFilePath(message));
+            var blob = directory.GetBlockBlobReference(GetZipFilePath(copyReleaseCommand));
             blob.Properties.ContentType = "application/x-zip-compressed";
             blob.Metadata.Add("name", "All files");
             return blob;
         }
 
-        private async Task DeleteBlobsAsync(CloudBlobContainer container, string directoryPath, string excludePattern = null)
+        private async Task DeleteBlobsAsync(CloudBlobContainer container, string directoryPath,
+            string excludePattern = null)
         {
             var token = new BlobContinuationToken();
             do
@@ -251,12 +252,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                             return false;
                         }
 
-                        var excluded = excludePattern != null && 
+                        var excluded = excludePattern != null &&
                                        Regex.IsMatch(item.Name, excludePattern, RegexOptions.IgnoreCase);
                         if (excluded)
                         {
                             _logger.LogInformation($"Ignoring {item.Name}");
                         }
+
                         return !excluded;
                     });
 

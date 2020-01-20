@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = _context
                 .ReleaseContentBlocks
+                .Include(join => join.Release)
                 .First(join => join.ContentBlockId == dataBlock.Id)
                 .Release;
 

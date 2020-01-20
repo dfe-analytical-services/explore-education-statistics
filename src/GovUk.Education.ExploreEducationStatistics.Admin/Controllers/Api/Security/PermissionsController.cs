@@ -26,6 +26,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             _persistenceHelper = persistenceHelper;
         }
 
+        [HttpGet("access")]
+        public Task<ActionResult<bool>> CanAccessSystem()
+        {
+            return CheckPolicy(_userService.CheckCanAccessSystem);
+        }
+
+        [HttpGet("administration/access")]
+        public Task<ActionResult<bool>> CanAccessAdministration()
+        {
+            return CheckPolicy(
+                _userService.CheckCanManageAllUsers,
+                _userService.CheckCanManageAllMethodologies
+            );
+        }
+        
+        [HttpGet("users/manage")]
+        public Task<ActionResult<bool>> CanManageAllUsers()
+        {
+            return CheckPolicy(_userService.CheckCanManageAllUsers);
+        }
+        
+        [HttpGet("methodologies/manage")]
+        public Task<ActionResult<bool>> CanManageAllMethodologies()
+        {
+            return CheckPolicy(_userService.CheckCanManageAllMethodologies);
+        }
+
         [HttpGet("topic/{topicId}/publication/create")]
         public Task<ActionResult<bool>> CanCreatePublicationForTopic(Guid topicId)
         {
@@ -66,6 +93,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(policyCheck.Invoke)
                 .OnSuccess(_ => new OkObjectResult(true))
                 .OrElse(() => new OkObjectResult(false));
+        }
+
+        private async Task<ActionResult<bool>> CheckPolicy(params Func<Task<Either<ActionResult, bool>>>[] policyChecks) 
+        {
+            foreach (var policyCheck in policyChecks)
+            {
+                var result = await policyCheck();
+
+                if (result.IsRight)
+                {
+                    return new OkObjectResult(true);
+                }
+            }
+
+            return new OkObjectResult(false);
         }
     }
 }

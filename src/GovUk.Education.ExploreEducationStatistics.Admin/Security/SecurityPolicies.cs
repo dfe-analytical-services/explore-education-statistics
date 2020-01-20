@@ -4,6 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
     {
         CanAccessSystem,
 
+        CanManageUsersOnSystem,
+        CanManageMethodologiesOnSystem,
+
         CanViewAllTopics,
         
         CanCreatePublicationForSpecificTopic,

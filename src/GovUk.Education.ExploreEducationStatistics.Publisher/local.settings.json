@@ -4,14 +4,20 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "PublishReleasesCronSchedule": "0 0-58/2 * * * *",
-    "PublishReleaseContentCronSchedule": "0 1-59/2 * * * *"
+    "PublishReleaseContentCronSchedule": "0 1-59/2 * * * *",
+    "AzureSubscriptionId": "change-me",
+    "AzureResourceGroupName": "change-me",
+    "AzureDataFactoryName": "s101d01datafactory",
+    "AzureDataFactoryPipelineName": "pl_release_statistics",
+    "AzureWebJobs.PublishReleaseData.Disabled": true
   },
   "ConnectionStrings": {
     "CoreStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
     "NotificationStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://data-storage:10001/devstoreaccount1;",
     "PublisherStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;QueueEndpoint=http://data-storage:10001/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;",
     "PublicStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
-    "ContentDb": "Server=db;Database=content;User=SA;Password=Your_Password123;"
+    "ContentDb": "Server=db;Database=content;User=SA;Password=Your_Password123;",
+    "StatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;"
   },
   "Host": {
     "CORS": "*"

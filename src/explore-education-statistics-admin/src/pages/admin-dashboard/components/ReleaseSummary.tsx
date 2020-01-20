@@ -17,6 +17,7 @@ import {
 } from '@common/services/publicationService';
 import { format } from 'date-fns';
 import React, { ReactNode, useContext } from 'react';
+import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 
 interface Props {
   release: AdminDashboardRelease;
@@ -36,7 +37,11 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
     <Details
       className="govuk-!-margin-bottom-0"
       summary={getReleaseSummaryLabel(release)}
-      tag={getReleaseStatusLabel(release.status)}
+      tag={[
+        getReleaseStatusLabel(release.status),
+        // eslint-disable-next-line react/jsx-key
+        <ReleaseServiceStatus exclude="details" releaseId={release.id} />,
+      ]}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
@@ -50,6 +55,9 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
               {dayMonthYearToDate(release.nextReleaseDate)}
             </FormattedDate>
           )}
+        </SummaryListItem>
+        <SummaryListItem term="Release status">
+          <ReleaseServiceStatus releaseId={release.id} />
         </SummaryListItem>
         <SummaryListItem term="Lead statistician">
           {release.contact && (

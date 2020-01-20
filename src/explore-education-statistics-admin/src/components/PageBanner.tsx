@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from './Link';
 
 const PageBanner = () => {
   return (
@@ -10,8 +9,15 @@ const PageBanner = () => {
         </strong>
 
         <span className="govuk-phase-banner__text">
-          This is a new service – your <Link to="/feedback">feedback</Link> will
-          help us to improve it.
+          This is a new service – your{' '}
+          <a
+            href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-VQ56HAfKLpBrG0LxbfxbVdUQjVJQVdMOFlSMURGQ1kyMzRNWlpKN1NMVy4u"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            feedback
+          </a>{' '}
+          will help us to improve it.
         </span>
       </p>
     </div>

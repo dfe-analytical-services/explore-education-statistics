@@ -12,7 +12,6 @@ interface Props {
 
 const PageHeader = ({ wide }: Props) => {
   const { user } = useContext(LoginContext);
-
   return (
     <>
       <a href="#main-content" className="govuk-skip-link">
@@ -66,12 +65,11 @@ const PageHeader = ({ wide }: Props) => {
                 className="govuk-header__navigation "
                 aria-label="Top Level Navigation"
               >
-                <li className="govuk-header__navigation-item">
-                  <a className="govuk-header__link" href="/documentation">
-                    Administrators' guide
-                  </a>
-                </li>
-                {user ? <LoggedInLinks user={user} /> : <NotLoggedInLinks />}
+                {user && user.validToken ? (
+                  <LoggedInLinks user={user} />
+                ) : (
+                  <NotLoggedInLinks />
+                )}
               </ul>
             </nav>
           </div>
@@ -83,6 +81,11 @@ const PageHeader = ({ wide }: Props) => {
 
 const LoggedInLinks = ({ user }: Authentication) => (
   <>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="/documentation">
+        Administrators' guide
+      </a>
+    </li>
     <li className="govuk-header__navigation-item">
       <a className="govuk-header__link" href="/identity/account/manage">
         {user ? user.name : ''}

@@ -1,7 +1,10 @@
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
-import { ApiErrorHandler } from '@admin/validation/withErrorControl';
+import {
+  ApiErrorHandler,
+  ManualErrorHandler,
+} from '@admin/validation/withErrorControl';
 import { AxiosResponse } from 'axios';
 import * as H from 'history';
 import React, { createContext } from 'react';
@@ -9,10 +12,14 @@ import { RouteComponentProps, withRouter } from 'react-router';
 
 interface ErrorControl {
   handleApiErrors: ApiErrorHandler;
+  handleManualErrors: ManualErrorHandler;
 }
 
 export const ErrorControlContext = createContext<ErrorControl>({
   handleApiErrors: _ => {},
+  handleManualErrors: {
+    forbidden: () => {},
+  },
 });
 
 interface State {
@@ -64,12 +71,22 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
       throw error;
     };
 
+    const handleManualErrors = {
+      forbidden: () => {
+        this.setState({
+          errorCode: 403,
+        });
+      },
+    };
+
     const { children } = this.props;
     const { errorCode } = this.state;
 
     if (!errorCode) {
       return (
-        <ErrorControlContext.Provider value={{ handleApiErrors }}>
+        <ErrorControlContext.Provider
+          value={{ handleApiErrors, handleManualErrors }}
+        >
           {children}
         </ErrorControlContext.Provider>
       );
