@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -83,20 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_NotFound()
-        {
-            var mocks = Mocks();
-            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
-            
-            var ancillaryFile = MockFile("ancillaryFile.doc");
-            var controller = ReleasesControllerWithMocks(mocks);
-            
-            // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
-            AssertNotFound(actionResult);
-        }
-
-        [Fact]
         public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
         {
             IEnumerable<FileInfo> testFiles = new[]
@@ -159,21 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
-        }
-
-        [Fact]
-        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_NotFound()
-        {
-            var mocks = Mocks();
-            SetupEntityLookupResult(mocks.PersistenceHelper, _releaseId, _releaseNotFoundResult);
-            
-            var dataFile = MockFile("datafile.csv");
-            var metaFile = MockFile("metafile.csv");
-            var controller = ReleasesControllerWithMocks(mocks);
-            
-            // Call the method under test
-            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertNotFound(result);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -321,13 +293,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void Get_Releases_For_Publication_Returns_Ok()
         {
             var mocks = Mocks();
+            var templateReleaseResult =
+                new Either<ActionResult, TitleAndIdViewModel>(new TitleAndIdViewModel());
             mocks.ReleaseService
-                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == _releaseId)))
-                .Returns<Guid>(x => Task.FromResult(new List<ReleaseViewModel>()));
+                .Setup(s => s.GetLatestReleaseAsync(It.Is<Guid>(id => id == _releaseId)))
+                .Returns<Guid>(x => Task.FromResult(templateReleaseResult));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.GetReleaseForPublicationAsync(_releaseId);
+            var result = await controller.GetTemplateReleaseAsync(_releaseId);
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }

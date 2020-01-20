@@ -226,15 +226,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier, 
             ReleaseHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
         {
-            var contentDbContext = new Mock<ContentDbContext>();
-
-            contentDbContext
-                .Setup(s => s.UserReleaseRoles)
-                .ReturnsDbSet(scenario.UserReleaseRoles);
-
-            var handler = handlerSupplier(contentDbContext.Object);
-            
-            AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
+            using (var context = DbUtils.InMemoryApplicationDbContext())
+            {
+                context.AddRange(scenario.UserReleaseRoles);
+                context.SaveChanges();
+                
+                var handler = handlerSupplier(context);
+                AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
+            }
         }
 
         private class ReleaseHandlerTestScenario

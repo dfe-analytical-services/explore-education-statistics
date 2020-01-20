@@ -8,6 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
 {
     public static class UserServiceExtensionMethods
     {
+        public static Task<Either<ActionResult, bool>> CheckCanAccessSystem(
+            this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessSystem);
+        }
+        
         public static Task<Either<ActionResult, bool>> CheckCanViewAllTopics(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewAllTopics);
