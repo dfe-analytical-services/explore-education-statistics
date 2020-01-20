@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
@@ -44,8 +45,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            var response = await TriggerDataFactoryReleasePipeline(executionContext, message);
-            await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);
+            
+            if (IsDevelopment())
+            {
+                // Skip Data Factory
+                await UpdateStage(message, Complete);
+            }
+            else
+            {
+                try
+                {
+                    var response = await TriggerDataFactoryReleasePipeline(executionContext, message);
+                    await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);   
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    await UpdateStage(message, Failed);
+                }
+            }
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
@@ -96,6 +114,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+        }
+
+        private static bool IsDevelopment()
+        {
+            var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
+            return environment?.Equals(EnvironmentName.Development) ?? false;
         }
     }
 }
