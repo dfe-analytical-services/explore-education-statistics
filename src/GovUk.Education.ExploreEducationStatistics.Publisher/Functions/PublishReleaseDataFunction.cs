@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private IEnumerable<Subject> GetSubjects(Guid releaseId)
         {
             return _context.Subject
-                .Where(s => s.Id.Equals(releaseId))
+                .Where(s => s.ReleaseId.Equals(releaseId))
                 .Include(s => s.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic);
