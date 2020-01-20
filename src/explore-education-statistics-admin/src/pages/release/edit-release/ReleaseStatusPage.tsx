@@ -17,6 +17,7 @@ import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import appRouteList from '@admin/routes/dashboard/routes';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -33,7 +34,6 @@ const ReleaseStatusPage = ({
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
-  const [showHomeLink, setShowHomeLink] = useState<boolean>(false);
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
@@ -85,10 +85,13 @@ const ReleaseStatusPage = ({
           onSubmit={async (values: FormValues) => {
             await service
               .updateReleaseStatus(releaseId, values)
+              .then(() => {
+                setModel({
+                  releaseStatus: values.releaseStatus,
+                  statusOptions: model.statusOptions,
+                });
+              })
               .catch(handleApiErrors);
-
-            // history.push(appRouteList.adminDashboard.path as string);
-            setShowHomeLink(true);
           }}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
@@ -128,11 +131,10 @@ const ReleaseStatusPage = ({
         />
       )}
       {model && model.releaseStatus === 'Approved' && (
-        <>
+        <div>
           <p>This release has been approved</p>
           <ReleaseServiceStatus releaseId={releaseId} />
-          <Link to="/">Back to dashboard</Link>
-        </>
+        </div>
       )}
     </>
   );
