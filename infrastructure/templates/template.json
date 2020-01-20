@@ -1372,7 +1372,8 @@
             "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
-              "emailSubscriptionAdmins": true
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
             }
           }
         },
@@ -1537,7 +1538,8 @@
             "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
-              "emailSubscriptionAdmins": true
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
             }
           }
         },
