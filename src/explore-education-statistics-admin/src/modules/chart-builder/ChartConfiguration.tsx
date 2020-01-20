@@ -171,6 +171,7 @@ const ChartConfiguration = ({
   data,
   onBoundaryLevelChange,
   handleApiErrors,
+  handleManualErrors,
 }: Props & ErrorControlProps) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
@@ -199,6 +200,7 @@ const ChartConfiguration = ({
               });
             }}
             handleApiErrors={handleApiErrors}
+            handleManualErrors={handleManualErrors}
           />
           <hr />
         </>

@@ -6,8 +6,13 @@ import { Omit } from 'react-router';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApiErrorHandler = (error: AxiosResponse) => any;
 
+export interface ManualErrorHandler {
+  forbidden: () => void;
+}
+
 export interface ErrorControlProps {
   handleApiErrors: ApiErrorHandler;
+  handleManualErrors: ManualErrorHandler;
 }
 
 /**
@@ -34,8 +39,14 @@ function withErrorControl<
   // eslint-disable-next-line react/display-name
   return (props: O) => (
     <ErrorControlContext.Consumer>
-      {({ handleApiErrors }) => {
-        return <Component {...props} handleApiErrors={handleApiErrors} />;
+      {({ handleApiErrors, handleManualErrors }) => {
+        return (
+          <Component
+            {...props}
+            handleApiErrors={handleApiErrors}
+            handleManualErrors={handleManualErrors}
+          />
+        );
       }}
     </ErrorControlContext.Consumer>
   );

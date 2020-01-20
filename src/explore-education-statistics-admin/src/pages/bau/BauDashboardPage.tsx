@@ -1,21 +1,52 @@
-import React from 'react';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
+import permissionService from '@admin/services/permissions/service';
+import React, { useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 
-function BauDashboardPage() {
+interface Permissions {
+  canManageUsers: boolean;
+  canManageMethodologies: boolean;
+}
+
+const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
+  const [permissions, setPermissions] = useState<Permissions>();
+
+  useEffect(() => {
+    Promise.all([
+      permissionService.canManageAllUsers(),
+      permissionService.canManageAllMethodologies(),
+    ])
+      .then(([canManageUsers, canManageMethodologies]) =>
+        setPermissions({
+          canManageUsers,
+          canManageMethodologies,
+        }),
+      )
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
+
   return (
     <Page wide>
       <h1 className="govuk-heading-xl">Platform administration</h1>
       <ul>
-        <li>
-          <Link to="/administration/methodology">View methodology status</Link>
-        </li>
-        <li>
-          <Link to="/administration/users">View service users</Link>
-        </li>
+        {permissions && permissions.canManageMethodologies && (
+          <li>
+            <Link to="/administration/methodology">
+              View methodology status
+            </Link>
+          </li>
+        )}
+        {permissions && permissions.canManageUsers && (
+          <li>
+            <Link to="/administration/users">View service users</Link>
+          </li>
+        )}
       </ul>
     </Page>
   );
-}
+};
 
-export default BauDashboardPage;
+export default withErrorControl(BauDashboardPage);

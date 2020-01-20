@@ -174,6 +174,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.CreateAnyRelease.ToString(),
                         ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -11,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.ManageAnyUser.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -12,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.ManageAnyMethodology.ToString(),
+                        ClaimValue = "",
                     }
                 );
             

@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 {
     [Route("api")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "CanManageMethodologiesOnSystem")]
     public class BauMethodologyController : ControllerBase
     {
         private readonly IMethodologyService _methodologyService;

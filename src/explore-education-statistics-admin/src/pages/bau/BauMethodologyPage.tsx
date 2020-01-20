@@ -1,3 +1,6 @@
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import React, { useEffect, useState } from 'react';
 import methodologyService from '@admin/services/methodology/service';
 import Page from '@admin/components/Page';
@@ -7,16 +10,19 @@ interface Model {
   methodologies: MethodologyStatus[];
 }
 
-const BauMethodologyPage = () => {
+const BauMethodologyPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService.getMethodologies().then(methodologies => {
-      setModel({
-        methodologies,
-      });
-    });
-  }, []);
+    methodologyService
+      .getMethodologies()
+      .then(methodologies => {
+        setModel({
+          methodologies,
+        });
+      })
+      .catch(handleApiErrors);
+  }, [handleApiErrors]);
 
   return (
     <Page
@@ -69,4 +75,4 @@ const BauMethodologyPage = () => {
   );
 };
 
-export default BauMethodologyPage;
+export default withErrorControl(BauMethodologyPage);
