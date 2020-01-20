@@ -1380,8 +1380,8 @@
 
         {
           "condition": "[parameters('sqlAuditing')]",
-          "type": "auditingSettings",
-          "name": "DefaultAuditingSettings",
+          "type": "Microsoft.Sql/servers/databases/auditingSettings",
+          "name": "[concat(string(variables('sqlserverName')), '/content/Default')]",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
@@ -1394,14 +1394,14 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]"
+            // "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
           ]
         },
         {
           "condition": "[parameters('sqlAuditing')]",
-          "type": "extendedAuditingSettings",
-          "name": "Default",
+          "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+          "name": "[concat(string(variables('sqlserverName')), '/content/Default')]",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
@@ -1414,8 +1414,8 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]"
+            // "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
           ]
         }
       ],
