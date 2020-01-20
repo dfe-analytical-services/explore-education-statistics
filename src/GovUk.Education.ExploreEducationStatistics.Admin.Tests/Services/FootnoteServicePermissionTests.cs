@@ -92,7 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Func<FootnoteService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
             var (
-                statisticsDbContext, 
                 logger, 
                 filterService, 
                 filterGroupService, 
@@ -104,24 +103,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteHelper
                 ) = Mocks();
 
-            var service = new FootnoteService(
-                statisticsDbContext.Object, 
-                logger.Object, 
-                filterService.Object, 
-                filterGroupService.Object, 
-                filterItemService.Object,
-                indicatorService.Object, 
-                subjectService.Object, 
-                releaseHelper.Object, 
-                userService.Object, 
-                footnoteHelper.Object
-            );
+            using (var context = DbUtils.InMemoryStatisticsDbContext())
+            {
+                context.Add(Subject);
+                context.SaveChanges();
+                
+                var service = new FootnoteService(
+                    context, 
+                    logger.Object, 
+                    filterService.Object, 
+                    filterGroupService.Object, 
+                    filterItemService.Object,
+                    indicatorService.Object, 
+                    subjectService.Object, 
+                    releaseHelper.Object, 
+                    userService.Object, 
+                    footnoteHelper.Object
+                );
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, Release, userService, service, policies);
+                PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, Release, userService, service, policies);
+            }
         }
         
         private (
-            Mock<StatisticsDbContext>, 
             Mock<ILogger<FootnoteService>>,
             Mock<IFilterService>, 
             Mock<IFilterGroupService>,
@@ -132,17 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>,
             Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
-            var statisticsDbContext = new Mock<StatisticsDbContext>();
-
-            statisticsDbContext
-                .Setup(s => s.Subject)
-                .ReturnsDbSet(new List<Subject>
-                {
-                    Subject
-                });
-            
             return (
-                statisticsDbContext, 
                 new Mock<ILogger<FootnoteService>>(), 
                 new Mock<IFilterService>(), 
                 new Mock<IFilterGroupService>(), 

@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +58,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.CheckEntityExists<TEntity>(It.IsAny<Guid>(),
                     It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(Activator.CreateInstance<TEntity>()));
+        }
+
+        public static Mock<IUserService> AlwaysTrueUserService()
+        {
+            var userService = new Mock<IUserService>();
+
+            userService
+                .Setup(s => s.MatchesPolicy(It.IsAny<SecurityPolicies>()))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s => s.MatchesPolicy(It.IsAny<object>(), It.IsAny<SecurityPolicies>()))
+                .ReturnsAsync(true);
+
+            return userService;
         }
     }
 }

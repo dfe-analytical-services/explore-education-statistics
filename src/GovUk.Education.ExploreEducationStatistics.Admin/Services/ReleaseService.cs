@@ -6,8 +6,10 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -38,21 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _repository = repository;
         }
 
-        public Task<Either<ActionResult, Release>> GetAsync(Guid id)
+        public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
         {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(id)
-                .OnSuccess(_userService.CheckCanViewRelease);
-        }
-        
-        // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id)
-        {
-            var release = await _context.Releases
-                .HydrateReleaseForReleaseViewModel()
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
-            return _mapper.Map<ReleaseViewModel>(release);
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(id, HydrateReleaseForReleaseViewModel)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
         
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
@@ -153,21 +146,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId)
+        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestReleaseAsync(Guid publicationId)
         {
-            var release = await _context.Releases
-                .HydrateReleaseForReleaseViewModel()
-                .Where(r => r.Publication.Id == publicationId)
-                .ToListAsync();
-            return _mapper.Map<List<ReleaseViewModel>>(release);
+            return await
+                CheckCanViewPublication(publicationId)
+                    .OnSuccess(_ =>
+                    {
+                        var releases = _context
+                            .Releases
+                            .Where(r => r.PublicationId == publicationId && r.Published != null)
+                            .OrderBy(r => r.Published);
+
+                        if (!releases.Any())
+                        {
+                            return null;
+                        }
+                        
+                        var latestRelease = releases.Last();
+                        return new TitleAndIdViewModel
+                        {
+                            Id = latestRelease.Id,
+                            Title = latestRelease.Title
+                        };
+                    });
         }
         
-        public Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses)
         {
-            return _userService
-                .CheckCanViewAllReleases()
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_userService.CheckCanViewAllReleases)
                 .OnSuccess(() => _repository.
                     GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
                 .OrElse(() => _repository.
@@ -241,11 +250,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await GetReleaseSummaryAsync(releaseId);
                 });
         }
-    }
 
-    public static class ReleaseLinqExtensions
-    {
-        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(this IQueryable<Release> values)
+        private async Task<Either<ActionResult, bool>> CheckCanViewPublication(Guid publicationId)
+        {
+            if (await _userService.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            {
+                return true;
+            }
+            
+            var userId = _userService.GetUserId();
+            
+            if (await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .Where(r => r.UserId == userId)
+                .AnyAsync(r => r.Release.PublicationId == publicationId))
+            {
+                return true;
+            }
+
+            return new ForbidResult();
+        }
+        
+        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest
