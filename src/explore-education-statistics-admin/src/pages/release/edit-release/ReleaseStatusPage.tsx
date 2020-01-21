@@ -15,7 +15,9 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
+import appRouteList from '@admin/routes/dashboard/routes';
 import React, { useContext, useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -27,7 +29,10 @@ interface Model {
   statusOptions: RadioOption[];
 }
 
-const ReleaseStatusPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseStatusPage = ({
+  history,
+  handleApiErrors,
+}: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
