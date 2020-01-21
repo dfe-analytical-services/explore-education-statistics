@@ -75,6 +75,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ), 
                 CanUpdateSpecificRelease);
         }
+
+        [Fact]
+        public void ListFilesAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.ListFilesAsync(
+                        _release.Id,
+                        ReleaseFileTypes.Ancillary
+                    ), 
+                CanViewSpecificRelease);
+        }
+        
+        [Fact]
+        public void ListPublicFilesPreview()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.ListPublicFilesPreview(
+                        _release.Id
+                    ), 
+                CanViewSpecificRelease);
+        }
+        
+        [Fact]
+        public void StreamFile()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.StreamFile(
+                        _release.Id,
+                        ReleaseFileTypes.Ancillary,
+                        ""
+                    ), 
+                CanViewSpecificRelease);
+        }
         
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)

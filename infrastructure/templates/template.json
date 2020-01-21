@@ -161,7 +161,7 @@
     },
     "sqlAuditing": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
     "sqlVulnerabilityAssessments": {
       "type": "bool",
@@ -1398,8 +1398,8 @@
         },
         {
           "condition": "[parameters('sqlAuditing')]",
-          "type": "extendedAuditingSettings2",
-          "name": "Default",
+          "type": "extendedAuditingSettings",
+          "name": "Default2",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
@@ -1547,11 +1547,11 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
             "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
           ],
           "properties": {
-            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
               "emailSubscriptionAdmins": true,
@@ -1566,8 +1566,8 @@
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
@@ -1585,8 +1585,8 @@
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
@@ -2155,6 +2155,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -2248,7 +2249,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }
           ]
         }

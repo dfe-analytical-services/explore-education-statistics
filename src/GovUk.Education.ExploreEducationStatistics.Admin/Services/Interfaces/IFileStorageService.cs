@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metaFile, string name, bool overwrite, string userName);
 
-        Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type);
 
-        IEnumerable<Common.Model.FileInfo> ListPublicFilesPreview(Guid releaseId);
+        Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListPublicFilesPreview(Guid releaseId);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile dataFile,
             string name, ReleaseFileTypes type, bool overwrite);

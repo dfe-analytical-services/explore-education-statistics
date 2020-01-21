@@ -15,9 +15,9 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
+import appRouteList from '@admin/routes/dashboard/routes';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import appRouteList from '@admin/routes/dashboard/routes';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -90,6 +90,11 @@ const ReleaseStatusPage = ({
                   releaseStatus: values.releaseStatus,
                   statusOptions: model.statusOptions,
                 });
+              })
+              .then(() => {
+                if (values.releaseStatus !== 'Approved') {
+                  history.push(appRouteList.adminDashboard.path as string);
+                }
               })
               .catch(handleApiErrors);
           }}

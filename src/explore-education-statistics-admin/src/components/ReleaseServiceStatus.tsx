@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import dashboardService from '@admin/services/dashboard/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
-import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Props {
   releaseId: string;
@@ -18,17 +21,19 @@ const ReleaseServiceStatus = ({
   releaseId,
   refreshPeriod = 5000,
   exclude,
-}: Props) => {
+  handleApiErrors,
+}: Props & ErrorControlProps) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseServiceStatus>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
   );
 
-  function fetchReleaseServiceStatus() {
-    return dashboardService.getReleaseStatus(releaseId).then(([status]) => {
-      setCurrentStatus(status);
-    });
-  }
+  const fetchReleaseServiceStatus = useCallback(() => {
+    return dashboardService
+      .getReleaseStatus(releaseId)
+      .then(setCurrentStatus)
+      .catch(handleApiErrors);
+  }, [releaseId, handleApiErrors]);
 
   const intervalRef = useRef<NodeJS.Timeout>();
 
@@ -42,7 +47,7 @@ const ReleaseServiceStatus = ({
     return () => {
       cancelTimer();
     };
-  }, []);
+  }, [fetchReleaseServiceStatus, refreshPeriod]);
 
   const statusDetailColor = (text: string) => {
     if (currentStatus) {
@@ -83,7 +88,8 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        currentStatus.overallStage === 'Started' &&
+        currentStatus.overallStage !== 'Scheduled' &&
+        currentStatus.overallStage !== 'Invalid' &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
@@ -105,4 +111,4 @@ const ReleaseServiceStatus = ({
   );
 };
 
-export default ReleaseServiceStatus;
+export default withErrorControl(ReleaseServiceStatus);

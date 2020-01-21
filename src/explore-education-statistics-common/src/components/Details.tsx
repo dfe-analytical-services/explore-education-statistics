@@ -110,7 +110,10 @@ const Details = ({
             tag.map((item, index) => {
               if (typeof item === 'string') {
                 return (
-                  <span className="govuk-tag govuk-!-margin-left-2">
+                  <span
+                    key={`tag-${String(index)}`}
+                    className="govuk-tag govuk-!-margin-left-2"
+                  >
                     {item}
                   </span>
                 );

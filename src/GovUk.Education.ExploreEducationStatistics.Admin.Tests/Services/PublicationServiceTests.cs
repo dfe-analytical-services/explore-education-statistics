@@ -145,19 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPublicationRepository>, 
             Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
-            var userService = new Mock<IUserService>();
-
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
-                .ReturnsAsync(true);
-            
-            userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<Topic>(), 
-                    SecurityPolicies.CanCreatePublicationForSpecificTopic))
-                .ReturnsAsync(true);
-
             return (
-                userService, 
+                MockUtils.AlwaysTrueUserService(), 
                 new Mock<IPublicationRepository>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Topic>());
         }

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            
+
             if (IsDevelopment())
             {
                 // Skip Data Factory
@@ -55,8 +56,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 try
                 {
-                    var response = await TriggerDataFactoryReleasePipeline(executionContext, message);
-                    await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);   
+                    var subjects = GetSubjects(message.ReleaseId).ToList();
+                    if (subjects.Any())
+                    {
+                        var response = await TriggerDataFactoryReleasePipeline(executionContext, logger,
+                            subjects.First(), message.ReleaseStatusId);
+                        await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);
+                    }
+                    else
+                    {
+                        await UpdateStage(message, Complete);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -64,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await UpdateStage(message, Failed);
                 }
             }
+
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
@@ -72,8 +83,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
         }
 
-        private async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context,
-            PublishReleaseDataMessage message)
+        private IEnumerable<Subject> GetSubjects(Guid releaseId)
+        {
+            return _context.Subject
+                .Where(s => s.ReleaseId.Equals(releaseId))
+                .Include(s => s.Release)
+                .ThenInclude(r => r.Publication)
+                .ThenInclude(p => p.Topic);
+        }
+
+        private static async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context,
+            ILogger logger, Subject subject, Guid releaseStatusId)
         {
             var config = LoadAppSettings(context);
             var subscriptionId = config.GetValue<string>(SubscriptionId);
@@ -81,30 +101,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var dataFactoryName = config.GetValue<string>(DataFactoryName);
             var dataFactoryPipelineName = config.GetValue<string>(DataFactoryPipelineName);
 
-            var subject = _context.Subject
-                .Where(s => s.Id.Equals(message.ReleaseId))
-                .Include(s => s.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .FirstOrDefault();
+            var jsonBody = BuildPostParamsJson(subject, releaseStatusId);
+            logger.LogInformation($"Triggering data factory: {jsonBody}");
 
-            var postParams = new Dictionary<string, Guid>
-            {
-                {"subjectId", subject.Id},
-                {"releaseId", subject.ReleaseId},
-                {"releaseStatusId", message.ReleaseStatusId},
-                {"publicationId", subject.Release.PublicationId},
-                {"topicId", subject.Release.Publication.TopicId},
-                {"themeId", subject.Release.Publication.Topic.ThemeId},
-            };
-
-            var json = JsonConvert.SerializeObject(postParams);
-            var data = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var data = new StringContent(jsonBody, Encoding.UTF8, MediaTypeNames.Application.Json);
             var url =
                 $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
             using var client = new HttpClient();
 
             return await client.PostAsync(url, data);
+        }
+
+        private static string BuildPostParamsJson(Subject subject, Guid releaseStatusId)
+        {
+            var publication = subject.Release.Publication;
+            var topic = publication.Topic;
+            var postParams = new Dictionary<string, Guid>
+            {
+                {"subjectId", subject.Id},
+                {"releaseId", subject.ReleaseId},
+                {"releaseStatusId", releaseStatusId},
+                {"publicationId", publication.Id},
+                {"topicId", topic.Id},
+                {"themeId", topic.ThemeId}
+            };
+
+            return JsonConvert.SerializeObject(postParams);
         }
 
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
