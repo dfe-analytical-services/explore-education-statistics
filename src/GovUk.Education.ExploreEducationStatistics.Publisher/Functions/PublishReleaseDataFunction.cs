@@ -24,17 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly StatisticsDbContext _context;
 
         public const string QueueName = "publish-release-data";
-        private const string ApplicationClientId = "ApplicationClientId";
-        private const string AuthenticationKey = "AuthenticationKey";
-        private const string DirectoryTenantId = "DirectoryTenantId";
-        private const string SubscriptionId = "AzureSubscriptionId";
-        private const string ResourceGroupName = "AzureResourceGroupName";
-        private const string DataFactoryName = "AzureDataFactoryName";
-        private const string DataFactoryPipelineName = "AzureDataFactoryPipelineName";
 
-        public PublishReleaseDataFunction(
-            StatisticsDbContext context,
-            IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(StatisticsDbContext context, IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
             _context = context;
@@ -60,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     var subjects = GetSubjects(message.ReleaseId).ToList();
                     if (subjects.Any())
                     {
-                        var success = TriggerDataFactoryReleasePipeline(executionContext, logger, subjects.First(),
+                        var configuration = LoadClientConfiguration(executionContext);
+                        var success = TriggerDataFactoryReleasePipeline(configuration, logger, subjects.First(),
                             message.ReleaseStatusId);
                         await UpdateStage(message, success ? Started : Failed);
                     }
@@ -93,23 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ThenInclude(p => p.Topic);
         }
 
-        private static bool TriggerDataFactoryReleasePipeline(ExecutionContext context,
+        private static bool TriggerDataFactoryReleasePipeline(DataFactoryClientConfiguration configuration,
             ILogger logger, Subject subject, Guid releaseStatusId)
         {
-            var config = LoadAppSettings(context);
-            var applicationId = config.GetValue<string>(ApplicationClientId);
-            var authenticationKey = config.GetValue<string>(AuthenticationKey);
-            var dataFactoryName = config.GetValue<string>(DataFactoryName);
-            var directoryTenantId = config.GetValue<string>(DirectoryTenantId);
-            var pipelineName = config.GetValue<string>(DataFactoryPipelineName);
-            var resourceGroupName = config.GetValue<string>(ResourceGroupName);
-            var subscriptionId = config.GetValue<string>(SubscriptionId);
             var parameters = BuildPipelineParameters(subject, releaseStatusId);
-            var client = GetDataFactoryClient(directoryTenantId, applicationId, authenticationKey, subscriptionId);
+            var client = GetDataFactoryClient(configuration);
 
-            var runResponse = client.Pipelines
-                .CreateRunWithHttpMessagesAsync(resourceGroupName, dataFactoryName, pipelineName,
-                    parameters: parameters).Result;
+            var runResponse = client.Pipelines.CreateRunWithHttpMessagesAsync(configuration.ResourceGroupName,
+                configuration.DataFactoryName, configuration.PipelineName, parameters: parameters).Result;
 
             logger.LogInformation(
                 $"Pipeline status code: {runResponse.Response.StatusCode}, run Id: {runResponse.Body.RunId}");
@@ -132,33 +115,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             };
         }
 
-        private static DataFactoryManagementClient GetDataFactoryClient(string tenantId, string applicationId,
-            string authenticationKey, string subscriptionId)
+        private static DataFactoryManagementClient GetDataFactoryClient(DataFactoryClientConfiguration configuration)
         {
-            var context = new AuthenticationContext("https://login.windows.net/" + tenantId);
-            var clientCredential = new ClientCredential(applicationId, authenticationKey);
+            var context = new AuthenticationContext($"https://login.windows.net/{configuration.TenantId}");
+            var clientCredential = new ClientCredential(configuration.ClientId, configuration.ClientSecret);
             var result = context.AcquireTokenAsync("https://management.azure.com/", clientCredential).Result;
             ServiceClientCredentials credentials = new TokenCredentials(result.AccessToken);
 
             return new DataFactoryManagementClient(credentials)
             {
-                SubscriptionId = subscriptionId
+                SubscriptionId = configuration.SubscriptionId
             };
         }
 
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        private static DataFactoryClientConfiguration LoadClientConfiguration(ExecutionContext context)
         {
-            return new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(context.FunctionAppDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+            return new DataFactoryClientConfiguration(configuration);
         }
 
         private static bool IsDevelopment()
         {
             var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
             return environment?.Equals(EnvironmentName.Development) ?? false;
+        }
+
+        private class DataFactoryClientConfiguration
+        {
+            public string ClientId { get; }
+            public string ClientSecret { get; }
+            public string DataFactoryName { get; }
+            public string PipelineName { get; }
+            public string ResourceGroupName { get; }
+            public string SubscriptionId { get; }
+            public string TenantId { get; }
+
+            public DataFactoryClientConfiguration(IConfiguration configuration)
+            {
+                ClientId = configuration.GetValue<string>(nameof(ClientId));
+                ClientSecret = configuration.GetValue<string>(nameof(ClientSecret));
+                DataFactoryName = configuration.GetValue<string>(nameof(DataFactoryName));
+                PipelineName = configuration.GetValue<string>(nameof(PipelineName));
+                ResourceGroupName = configuration.GetValue<string>(nameof(ResourceGroupName));
+                SubscriptionId = configuration.GetValue<string>(nameof(SubscriptionId));
+                TenantId = configuration.GetValue<string>(nameof(TenantId));
+            }
         }
     }
 }

@@ -375,28 +375,21 @@
       }
     },
 
-    "publisherApplicationClientId": {
+    "publisherClientId": {
       "type": "string",
       "metadata": {
         "description": "Publisher Active Directory Application Client Id used for authentication requests"
       }
     },
 
-    "publisherAuthenticationKey": {
+    "publisherClientSecret": {
       "type": "string",
       "metadata": {
-        "description": "Publisher Active Directory Application secret string used to prove its identity when requesting a token"
+        "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
       }
     },
 
-    "publisherDirectoryTenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "Publisher Active Directory Tenant Id used for authentication requests"
-      }
-    },
-
-    "azureDataFactoryPipelineName": {
+    "publisherPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
       "metadata": {
@@ -455,7 +448,7 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2209,32 +2202,32 @@
               "value": "[parameters('publishReleaseContentCronSchedule')]"
             },
             {
-              "name": "ApplicationClientId",
-              "value": "[parameters('publisherApplicationClientId')]"
+              "name": "ClientId",
+              "value": "[parameters('publisherClientId')]"
             },
             {
-              "name": "AuthenticationKey",
-              "value": "[parameters('publisherAuthenticationKey')]"
+              "name": "ClientSecret",
+              "value": "[parameters('publisherClientSecret')]"
             },
             {
-              "name": "DirectoryTenantId",
-              "value": "[parameters('publisherDirectoryTenantId')]"
+              "name": "DataFactoryName",
+              "value": "[variables('dataFactoryName')]"
             },
             {
-              "name": "AzureDataFactoryName",
-              "value": "[variables('azureDataFactoryName')]"
+              "name": "PipelineName",
+              "value": "[parameters('publisherPipelineName')]"
             },
             {
-              "name": "AzureDataFactoryPipelineName",
-              "value": "[parameters('azureDataFactoryPipelineName')]"
+              "name": "ResourceGroupName",
+              "value": "[resourceGroup().name]"
             },
             {
-              "name": "AzureSubscriptionId",
+              "name": "SubscriptionId",
               "value": "[subscription().subscriptionId]"
             },
             {
-              "name": "AzureResourceGroupName",
-              "value": "[resourceGroup().name]"
+              "name": "TenantId",
+              "value": "[subscription().tenantId]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
