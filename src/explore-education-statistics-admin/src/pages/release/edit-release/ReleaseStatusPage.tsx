@@ -16,8 +16,6 @@ import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import appRouteList from '@admin/routes/dashboard/routes';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -29,10 +27,7 @@ interface Model {
   statusOptions: RadioOption[];
 }
 
-const ReleaseStatusPage = ({
-  history,
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+const ReleaseStatusPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;

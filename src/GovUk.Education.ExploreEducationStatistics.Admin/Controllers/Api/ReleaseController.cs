@@ -32,21 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
-        private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _tableStorageService;
         private readonly UserManager<ApplicationUser> _userManager;
-        // TODO EES-918 - remove in favour of checking for release inside service calls
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
             IReleaseStatusService releaseStatusService,
-            ISubjectService subjectService,
-            ITableStorageService tableStorageService,
-            UserManager<ApplicationUser> userManager,
-            IPersistenceHelper<ContentDbContext> persistenceHelper
+            UserManager<ApplicationUser> userManager
             )
         {
             _importService = importService;
@@ -54,36 +47,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _releaseStatusService = releaseStatusService;
-            _subjectService = subjectService;
-            _tableStorageService = tableStorageService;
             _userManager = userManager;
-            _persistenceHelper = persistenceHelper;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
         public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename))
+            return await _fileStorageService
+                .StreamFile(releaseId, ReleaseFileTypes.Chart, filename)
                 .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename))
+            return await _fileStorageService
+                .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
                 .HandleFailures();
         }
 
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
         public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename))
+            return await _fileStorageService
+                .StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename)
                 .HandleFailures();
         }
 
@@ -106,9 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
+            return await _fileStorageService
+                .ListFilesAsync(releaseId, ReleaseFileTypes.Data)
                 .HandleFailuresOr(Ok);
         }
 
@@ -119,9 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
+            return await _fileStorageService
+                .ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)
                 .HandleFailuresOr(Ok);
         }
 
@@ -132,9 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(Guid releaseId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_ => _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart))
+            return await _fileStorageService
+                .ListFilesAsync(releaseId, ReleaseFileTypes.Chart)
                 .HandleFailuresOr(Ok);
         }
 
@@ -249,15 +233,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(async _ =>
-                {
-                    await _tableStorageService.DeleteEntityAsync("imports",
-                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
-                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
-                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
-                })
+            return await _releaseService
+                .DeleteDataFilesAsync(releaseId, fileName, subjectTitle)
                 .HandleFailuresOr(Ok);
         }
 
@@ -284,7 +261,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/status")]
         public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(Guid releaseId)
         {
-            return Ok(await _releaseStatusService.GetReleaseStatusesAsync(releaseId));
+            return await _releaseStatusService
+                .GetReleaseStatusesAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpPut("releases/{releaseId}/status")]

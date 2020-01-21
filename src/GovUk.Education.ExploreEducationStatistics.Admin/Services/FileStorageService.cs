@@ -46,9 +46,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public IEnumerable<FileInfo> ListPublicFilesPreview(Guid releaseId)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
         {
-            return FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId);
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(release => 
+                    FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
@@ -134,47 +138,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<IEnumerable<Models.FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
+        public async Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
         {
-            var blobContainer = await GetCloudBlobContainer();
-
-            return blobContainer
-                .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                .Where(blob => !IsBatchedFile(blob, releaseId))
-                .OfType<CloudBlockBlob>()
-                .Select(file => new Models.FileInfo
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
                 {
-                    Extension = GetExtension(file),
-                    Name = GetName(file),
-                    Path = file.Name,
-                    Size = GetSize(file),
-                    MetaFileName = GetMetaFileName(file),
-                    Rows = GetNumberOfRows(file),
-                    UserName = GetUserName(file),
-                    Created = file.Properties.Created
-                })
-                .OrderBy(info => info.Name);
+                    var blobContainer = await GetCloudBlobContainer();
+
+                    IEnumerable<Models.FileInfo> files = blobContainer
+                        .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
+                        .Where(blob => !IsBatchedFile(blob, releaseId))
+                        .OfType<CloudBlockBlob>()
+                        .Select(file => new Models.FileInfo
+                        {
+                            Extension = GetExtension(file),
+                            Name = GetName(file),
+                            Path = file.Name,
+                            Size = GetSize(file),
+                            MetaFileName = GetMetaFileName(file),
+                            Rows = GetNumberOfRows(file),
+                            UserName = GetUserName(file),
+                            Created = file.Properties.Created
+                        })
+                        .OrderBy(info => info.Name);
+
+                    return files;
+                });
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
-            var blobContainer = await GetCloudBlobContainer();
-            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, fileName));
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
+                {
+                    var blobContainer = await GetCloudBlobContainer();
+                    var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, fileName));
 
-            if (!blob.Exists())
-            {
-                return ValidationActionResult(FileNotFound);
-            }
+                    if (!blob.Exists())
+                    {
+                        return ValidationActionResult<FileStreamResult>(FileNotFound);
+                    }
 
-            var stream = new MemoryStream();
+                    var stream = new MemoryStream();
 
-            await blob.DownloadToStreamAsync(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            return new FileStreamResult(stream, blob.Properties.ContentType)
-            {
-                FileDownloadName = fileName
-            };
+                    await blob.DownloadToStreamAsync(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return new FileStreamResult(stream, blob.Properties.ContentType)
+                    {
+                        FileDownloadName = fileName
+                    };
+                });
         }
 
         private async static Task<Either<ActionResult, (string dataFilePath, string metadataFilePath)>>
