@@ -32,9 +32,9 @@ interface Model {
 const statusMap: {
   [keyof: string]: string;
 } = {
-  Draft: 'Draft',
+  Draft: 'In Draft',
   HigherLevelReview: 'Awaiting higher review',
-  Approved: 'Approved',
+  Approved: 'Approved for publication',
 };
 
 const ReleaseStatusPage = ({
