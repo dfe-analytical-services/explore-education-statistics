@@ -169,8 +169,8 @@ export interface Table {
 export interface Summary {
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinitionTitle: string[];
   dataDefinition: string[];
-  description: { type: string; body: string };
 }
 
 export type ContentBlockType =
