@@ -31,7 +31,7 @@ const ReleaseServiceStatus = ({
   const fetchReleaseServiceStatus = useCallback(() => {
     return dashboardService
       .getReleaseStatus(releaseId)
-      .then(setCurrentStatus)
+      .then(([status]) => setCurrentStatus(status))
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
@@ -73,7 +73,7 @@ const ReleaseServiceStatus = ({
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {
       const color = statusDetailColor(currentStatus.overallStage);
-      if (color === ('red' || 'green')) {
+      if (color === 'red' || color === 'green') {
         cancelTimer();
       }
       setStatusColor(color);
