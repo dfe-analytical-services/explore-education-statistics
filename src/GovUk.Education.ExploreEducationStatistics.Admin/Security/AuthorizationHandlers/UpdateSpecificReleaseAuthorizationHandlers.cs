@@ -10,6 +10,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement
     {}
 
+    public class UpdateSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
+    {
+        public UpdateSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
+            new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(),
+            new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(context))
+        {
+            
+        }
+    }
+    
     public class UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
         UpdateSpecificReleaseRequirement>
     {

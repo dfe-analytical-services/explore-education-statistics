@@ -16,6 +16,7 @@ interface Props {
   footnoteMetaGetters: FootnoteMetaGetters;
   footnotes: Footnote[];
   footnoteFormControls: FootnoteFormControls;
+  canUpdateRelease: boolean;
 }
 
 const FootnotesList = ({
@@ -23,6 +24,7 @@ const FootnotesList = ({
   footnoteMeta,
   footnoteMetaGetters,
   footnoteFormControls,
+  canUpdateRelease,
 }: Props) => {
   if (footnotes.length === 0) {
     return null;
@@ -49,21 +51,23 @@ const FootnotesList = ({
           <>
             <div className={styles.row}>
               <div className={styles.row__footnoteContent}>{content}</div>
-              <div className={styles.row__footnoteActions}>
-                <Button
-                  type="button"
-                  className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"
-                  onClick={() => footnoteFormControls.edit(footnote)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
-                  onClick={() => footnoteFormControls.delete(footnote)}
-                >
-                  Delete
-                </Button>
-              </div>
+              {canUpdateRelease && (
+                <div className={styles.row__footnoteActions}>
+                  <Button
+                    type="button"
+                    className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"
+                    onClick={() => footnoteFormControls.edit(footnote)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                    onClick={() => footnoteFormControls.delete(footnote)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              )}
             </div>
             <Details
               summary="See matching criteria"

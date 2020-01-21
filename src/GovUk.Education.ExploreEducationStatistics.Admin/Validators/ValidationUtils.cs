@@ -1,7 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -29,55 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         }
 
         // TODO EES-919 - return ActionResults rather than ValidationResults
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, Task<Either<ValidationResult, R>>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            if (validationResult.IsLeft)
-            {
-                return validationResult.Left;
-            }
-
-            return await successAction.Invoke(validationResult.Right);
-        }
-        
-        public static async Task<ActionResult<T>> HandleErrorsAsync<T>(
-            Func<Task<Either<ActionResult, T>>> errorsRaisingAction,
-            Func<T, ActionResult> onSuccessAction) 
-        {
-            var result = await errorsRaisingAction.Invoke();
-
-            return result.IsRight ? onSuccessAction.Invoke(result.Right) : result.Left;
-        }
-        
-        public static async Task<Either<ActionResult, R>> HandleErrorsAsync<T, R>(
-            Func<Task<Either<ActionResult, T>>> validationErrorAction,
-            Func<T, Task<Either<ActionResult, R>>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            if (validationResult.IsLeft)
-            {
-                return validationResult.Left;
-            }
-
-            return await successAction.Invoke(validationResult.Right);
-        }
-
-        // TODO EES-919 - return ActionResults rather than ValidationResults
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
         {
             return new ValidationResult(message.ToString().ScreamingSnakeCase());
         }
         
-        // TODO EES-919 - return ActionResults rather than ValidationResults
-        public static Either<ValidationResult, T> ValidationResult<T>(ValidationErrorMessages message)
-        {
-            return ValidationResult(message);
-        }
-
         // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
         // rename this to "ValidationResult"
         public static ActionResult ValidationActionResult(ValidationErrorMessages message)
@@ -118,16 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
         SubjectTitleMustBeUnique,
-        EntityNotFound,
-        ReleaseNotFound,
-        ReleaseNoteNotFound,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
-        PublicationNotFound,
         CommentNotFound,
         UserAlreadyExists
     }

@@ -19,26 +19,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
-        private readonly IPersistenceHelper<DataBlock, Guid> _dataBlockHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
 
         public DataBlockService(
             ContentDbContext context,
-            IMapper mapper, IPersistenceHelper<Release, Guid> releaseHelper, 
-            IUserService userService, IPersistenceHelper<DataBlock, Guid> dataBlockHelper)
+            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IUserService userService)
         {
             _context = context;
             _mapper = mapper;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
-            _dataBlockHelper = dataBlockHelper;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(Guid releaseId, CreateDataBlockViewModel createDataBlock)
         {
-            return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -58,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, bool>> DeleteAsync(Guid id)
         {
-            return await _dataBlockHelper
-                .CheckEntityExistsActionResult(id)
+            return await _persistenceHelper
+                .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async dataBlock =>
                 {
@@ -90,8 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id, UpdateDataBlockViewModel updateDataBlock)
         {
-            return await _dataBlockHelper
-                .CheckEntityExistsActionResult(id)
+            return await _persistenceHelper
+                .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async existing =>
                 {

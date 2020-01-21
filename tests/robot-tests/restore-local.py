@@ -90,3 +90,7 @@ for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 
 # Restore imports table
 restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}', '/destType:table', f'/Dest:{storage_table_url}/imports', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
 print(subprocess.run(restore_table_cmd))
+
+# Restore ReleaseStatus table
+restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "ReleaseStatus")}', '/destType:table', f'/Dest:{storage_table_url}/ReleaseStatus', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
+print(subprocess.run(restore_table_cmd))

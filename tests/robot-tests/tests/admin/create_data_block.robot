@@ -1,83 +1,91 @@
 *** Settings ***
 Resource    ../libs/admin-common.robot
+Library  Collections
 
-Force Tags  Admin  Local
+Force Tags  Admin  Local  Dev  AltersData
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify correct data is shown when theme and topic is shown
+Create Datablock test publication
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "UI tests topic" from the admin dashboard
-    user checks page contains accordion  UI tests - data block
-    user opens accordion section  UI tests - data block
-    user checks accordion section contains text  UI tests - data block    Methodology
-    user checks accordion section contains text  UI tests - data block    Releases
+    environment variable should be set   RUN_IDENTIFIER
+    user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
+    user waits until page contains element    xpath://a[text()="Create new publication"]     60
+    user clicks link  Create new publication
+    user creates publication  Datablock test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson
 
-User clicks edit release
+Verify Datablock test publication is created
     [Tags]  HappyPath
-    user checks page contains details section  Financial Year, 2030 to 2031 (not Live)
-    user opens details section  Financial Year, 2030 to 2031 (not Live)
-    user waits until page contains element  css:[data-testid="Edit release link for UI tests - data block, Financial Year, 2030 to 2031 (not Live)"]
-    user clicks element  css:[data-testid="Edit release link for UI tests - data block, Financial Year, 2030 to 2031 (not Live)"]
+    user checks page contains accordion  Datablock test %{RUN_IDENTIFIER}
+    user opens accordion section  Datablock test %{RUN_IDENTIFIER}
+    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Methodology
+    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Releases
 
-Validate release summary tab has correct details
+Create release
+    [Tags]  HappyPath
+    user clicks element  css:[data-testid="Create new release link for Datablock test %{RUN_IDENTIFIER}"]
+    user creates a new release for publication "Datablock test %{RUN_IDENTIFIER}" for start year "2025"
+    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
+
+Upload subject
     [Tags]  HappyPath
     user waits until page contains element    xpath://h2[text()="Release summary"]
-    user checks summary list item "Publication title" should be "UI tests - data block"
-    user checks summary list item "Time period" should be "Financial Year"
-    user checks summary list item "Release period" should be "2030 to 2031"
-    user checks summary list item "Lead statistician" should be "Mark Pearson"
-    user checks summary list item "Scheduled release" should be "03 March 2030"
-    user checks summary list item "Next release expected" should be "04 April 2031"
-    user checks summary list item "Release type" should be "Ad Hoc"
-
-Navigate to Manage data tab, check subjects are there
-    [Tags]  HappyPath
+    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
     user clicks element  xpath://li/a[text()="Manage data"]
-    user waits until page contains element   xpath://legend[text()="Add new data to release"]
-    data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="Absence in PRUs"]
-    data csv number contains xpath  2   //dt[text()="Subject title"]/../dd/h4[text()="Absence rate percent bands"]
+    user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
+    choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
+    choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user clicks element   xpath://button[text()="Upload data files"]
+
+    user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
+    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
     user clicks element  xpath://li/a[text()="Manage data blocks"]
-    user waits until page contains element  css:#publicationSubjectForm
+    user waits until page contains element   xpath://h2[text()="Choose a subject"]
 
-Select Subject "Absence in PRUs"
+Select subject "UI test subject"
     [Tags]  HappyPath
-    user selects radio    Absence in PRUs
+    user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains   Choose locations
-    user checks previous table tool step contains  1   Subject   Absence in PRUs
+    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user checks previous table tool step contains  1    Subject     UI test subject
 
-Select Location LAs Barnet, Barnsley, and Bedford
-    [Tags]  HappyPath
-    user opens details dropdown  Local Authority
-    user clicks checkbox   Barnet
-    user clicks checkbox   Barnsley
-    user clicks checkbox   Bedford
-    user clicks element  css:#locationFiltersForm-submit
-    user waits until page contains   Choose time period
-    user checks previous table tool step contains  2  Local Authority   Barnet
-    user checks previous table tool step contains  2  Local Authority   Barnsley
-    user checks previous table tool step contains  2  Local Authority   Bedford
+Select locations
+    [Tags]   HappyPath
+    user opens details dropdown   Opportunity Area
+    user clicks checkbox   Bolton 001 (E02000984)
+    user clicks checkbox   Bolton 001 (E05000364)
+    user clicks checkbox   Bolton 004 (E02000987)
+    user clicks checkbox   Bolton 004 (E05010450)
+    user opens details dropdown   Ward
+    user clicks checkbox   Nailsea Youngwood
+    user clicks checkbox   Syon
+    user clicks element     css:#locationFiltersForm-submit
+    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
 
-Select Time Period 2014/15 - 2014/15
-    [Tags]  HappyPath
-    user selects start date    2014/15
-    user selects end date    2014/15
-    user clicks element  css:#timePeriodForm-submit
-    user waits until page contains   Choose your filters
-    user checks previous table tool step contains  3   Start date   2014/15
-    user checks previous table tool step contains  3   End date     2014/15
+Select time period
+    [Tags]   HappyPath
+    ${timePeriodStartList}=   get list items  css:#timePeriodForm-start
+    ${timePeriodEndList}=   get list items  css:#timePeriodForm-end
+    ${expectedList}=   create list   Please select  2005  2007  2008  2009  2010  2011  2012  2016  2017  2018  2019  2020
+    lists should be equal  ${timePeriodStartList}   ${expectedList}
+    lists should be equal  ${timePeriodEndList}   ${expectedList}
+
+    user selects start date    2005
+    user selects end date      2020
+    user clicks element     css:#timePeriodForm-submit
+    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user checks previous table tool step contains  3    Start date    2005
+    user checks previous table tool step contains  3    End date      2020
 
 Select indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox  Absence fields   Authorised absence rate
-    user clicks subheaded indicator checkbox  Absence fields   Overall absence rate
-    user clicks subheaded indicator checkbox  Absence fields   Unauthorised absence rate
+    user clicks indicator checkbox    Admission Numbers
 
 Create table
     [Tags]  HappyPath
@@ -86,54 +94,170 @@ Create table
 
 Validate table's column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1  1  Pupil Referral Unit
-    user checks results table column heading contains  2  1  2014/15
+    user checks results table column heading contains  1  1   2005
+    user checks results table column heading contains  1  2   2006
+    user checks results table column heading contains  1  3   2007
+    user checks results table column heading contains  1  4   2008
+    user checks results table column heading contains  1  5   2009
+    user checks results table column heading contains  1  6   2010
+    user checks results table column heading contains  1  7   2011
+    user checks results table column heading contains  1  8   2012
+    user checks results table column heading contains  1  9   2013
+    user checks results table column heading contains  1  10  2014
+    user checks results table column heading contains  1  11  2015
+    user checks results table column heading contains  1  12  2016
 
-Validate table's row headings
+    scroll element into view   xpath://table/thead/tr[1]/th[16]
+
+    user checks results table column heading contains  1  13  2017
+    user checks results table column heading contains  1  14  2018
+    user checks results table column heading contains  1  15  2019
+    user checks results table column heading contains  1  16  2020
+
+Validate table row Bolton 001 (E02000984)
     [Tags]  HappyPath
-    user checks results table row heading contains   1   1   Barnet
-    user checks results table row heading contains   1   2   Unauthorised absence rate
-    user checks results table row heading contains   2   1   Authorised absence rate
-    user checks results table row heading contains   3   1   Overall absence rate
+    ${row}=  user gets row with heading   Bolton 001 (E02000984)
+    user checks row contains heading  ${row}   Bolton 001 (E02000984)
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text  ${row}   1   n/a
+    user checks row cell contains text  ${row}   2   n/a
+    user checks row cell contains text  ${row}   3   n/a
+    user checks row cell contains text  ${row}   4   n/a
+    user checks row cell contains text  ${row}   5   n/a
+    user checks row cell contains text  ${row}   6   n/a
+    user checks row cell contains text  ${row}   7   n/a
+    user checks row cell contains text  ${row}   8   n/a
+    user checks row cell contains text  ${row}   9   n/a
+    user checks row cell contains text  ${row}   10   n/a
+    user checks row cell contains text  ${row}   11   n/a
+    user checks row cell contains text  ${row}   12   n/a
+    user checks row cell contains text  ${row}   13   n/a
+    user checks row cell contains text  ${row}   14   n/a
+    user checks row cell contains text  ${row}   15   8,533
+    user checks row cell contains text  ${row}   16   n/a
 
-    user checks results table row heading contains   4   1   Barnsley
-    user checks results table row heading contains   4   2   Unauthorised absence rate
-    user checks results table row heading contains   5   1   Authorised absence rate
-    user checks results table row heading contains   6   1   Overall absence rate
-
-    user checks results table row heading contains   7   1   Bedford
-    user checks results table row heading contains   7   2   Unauthorised absence rate
-    user checks results table row heading contains   8   1   Authorised absence rate
-    user checks results table row heading contains   9   1   Overall absence rate
-
-Validate table results
+Validate table row Bolton 001 (E05000364)
     [Tags]  HappyPath
-    # Barnet
-    user checks results table cell contains   1     1     13.2%
-    user checks results table cell contains   2     1     26.9%
-    user checks results table cell contains   3     1     40.1%
+    ${row}=  user gets row with heading   Bolton 001 (E05000364)
+    user checks row contains heading  ${row}   Bolton 001 (E05000364)
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text  ${row}   1   n/a
+    user checks row cell contains text  ${row}   2   n/a
+    user checks row cell contains text  ${row}   3   n/a
+    user checks row cell contains text  ${row}   4   n/a
+    user checks row cell contains text  ${row}   5   5,815
+    user checks row cell contains text  ${row}   6   5,595
+    user checks row cell contains text  ${row}   7   n/a
+    user checks row cell contains text  ${row}   8   n/a
+    user checks row cell contains text  ${row}   9   n/a
+    user checks row cell contains text  ${row}   10   n/a
+    user checks row cell contains text  ${row}   11   n/a
+    user checks row cell contains text  ${row}   12   n/a
+    user checks row cell contains text  ${row}   13   6,373
+    user checks row cell contains text  ${row}   14   n/a
+    user checks row cell contains text  ${row}   15   n/a
+    user checks row cell contains text  ${row}   16   n/a
 
-    # Barnsley
-    user checks results table cell contains   4     1     9.4%
-    user checks results table cell contains   5     1     18.3%
-    user checks results table cell contains   6     1     27.8%
+Validate table row Bolton 004 (E02000987)
+    [Tags]  HappyPath
+    ${row}=  user gets row with heading   Bolton 004 (E02000987)
+    user checks row contains heading  ${row}   Bolton 004 (E02000987)
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text  ${row}   1    n/a
+    user checks row cell contains text  ${row}   2    n/a
+    user checks row cell contains text  ${row}   3    n/a
+    user checks row cell contains text  ${row}   4    n/a
+    user checks row cell contains text  ${row}   5    n/a
+    user checks row cell contains text  ${row}   6    n/a
+    user checks row cell contains text  ${row}   7    n/a
+    user checks row cell contains text  ${row}   8    n/a
+    user checks row cell contains text  ${row}   9    n/a
+    user checks row cell contains text  ${row}   10   n/a
+    user checks row cell contains text  ${row}   11   n/a
+    user checks row cell contains text  ${row}   12   n/a
+    user checks row cell contains text  ${row}   13   n/a
+    user checks row cell contains text  ${row}   14   n/a
+    user checks row cell contains text  ${row}   15   n/a
+    user checks row cell contains text  ${row}   16   6,031
 
-    # Bedford
-    user checks results table cell contains   7     1     5.8%
-    user checks results table cell contains   8     1     17.9%
-    user checks results table cell contains   9     1     23.7%
+Validate table row Bolton 004 (E05010450)
+    [Tags]  HappyPath
+    ${row}=  user gets row with heading   Bolton 004 (E05010450)
+    user checks row contains heading  ${row}   Bolton 004 (E05010450)
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text  ${row}   1    8,557
+    user checks row cell contains text  ${row}   2    n/a
+    user checks row cell contains text  ${row}   3    n/a
+    user checks row cell contains text  ${row}   4    n/a
+    user checks row cell contains text  ${row}   5    n/a
+    user checks row cell contains text  ${row}   6    n/a
+    user checks row cell contains text  ${row}   7    n/a
+    user checks row cell contains text  ${row}   8    n/a
+    user checks row cell contains text  ${row}   9    n/a
+    user checks row cell contains text  ${row}   10   n/a
+    user checks row cell contains text  ${row}   11   n/a
+    user checks row cell contains text  ${row}   12   n/a
+    user checks row cell contains text  ${row}   13   3,481
+    user checks row cell contains text  ${row}   14   8,630
+    user checks row cell contains text  ${row}   15   n/a
+    user checks row cell contains text  ${row}   16   n/a
+
+Validate table row Nailsea Youngwood
+    [Tags]  HappyPath
+    ${row}=  user gets row with heading   Nailsea Youngwood
+    user checks row contains heading  ${row}   Nailsea Youngwood
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text   ${row}    1    3,612
+    user checks row cell contains text   ${row}    2    n/a
+    user checks row cell contains text   ${row}    3    n/a
+    user checks row cell contains text   ${row}    4    n/a
+    user checks row cell contains text   ${row}    5    n/a
+    user checks row cell contains text   ${row}    6    9,304
+    user checks row cell contains text   ${row}    7    9,603
+    user checks row cell contains text   ${row}    8    8,150
+    user checks row cell contains text   ${row}    9    n/a
+    user checks row cell contains text   ${row}    10   n/a
+    user checks row cell contains text   ${row}    11   n/a
+    user checks row cell contains text   ${row}    12   4,198
+    user checks row cell contains text   ${row}    13   n/a
+    user checks row cell contains text   ${row}    14   n/a
+    user checks row cell contains text   ${row}    15   n/a
+    user checks row cell contains text   ${row}    16   n/a
+
+Validate table row Syon
+    [Tags]  HappyPath
+    ${row}=  user gets row with heading   Syon
+    user checks row contains heading  ${row}   Syon
+    user checks row contains heading  ${row}   Admission Numbers
+    user checks row cell contains text   ${row}   1    n/a
+    user checks row cell contains text   ${row}   2    n/a
+    user checks row cell contains text   ${row}   3    9,914
+    user checks row cell contains text   ${row}   4    5,505
+    user checks row cell contains text   ${row}   5    n/a
+    user checks row cell contains text   ${row}   6    6,060
+    user checks row cell contains text   ${row}   7    n/a
+    user checks row cell contains text   ${row}   8    1,109
+    user checks row cell contains text   ${row}   9    n/a
+    user checks row cell contains text   ${row}   10   n/a
+    user checks row cell contains text   ${row}   11   n/a
+    user checks row cell contains text   ${row}   12   n/a
+    user checks row cell contains text   ${row}   13   1,959
+    user checks row cell contains text   ${row}   14   n/a
+    user checks row cell contains text   ${row}   15   n/a
+    user checks row cell contains text   ${row}   16   n/a
 
 Save data block
     [Tags]  HappyPath
-    user enters text into element  css:#data-block-title       UI Test create data block title
-    user enters text into element  css:#data-block-source      UI Test create data block source
-    user enters text into element  css:#data-block-footnotes   UI Test create data block footnote
-    user enters text into element  css:#data-block-name        UI Test create data block name
+    user enters text into element  css:#data-block-name        UI Test data block name
+    user clears element text   css:#data-block-title
+    user enters text into element  css:#data-block-title       UI Test table title
+    user enters text into element  css:#data-block-source      UI Test source
+    user enters text into element  css:#data-block-footnotes   UI Test footnotes
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
 Refresh page, select new data block, verify selections
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user reloads page
     user selects from list by label  css:#selectDataBlock   UI Test create data block title
     user waits until page contains element   xpath://h3[text()="Update data source"]
@@ -158,8 +282,11 @@ Refresh page, select new data block, verify selections
     user checks results table cell contains   2     1     26.9%
     user checks results table cell contains   3     1     40.1%
 
+Edit data block
+    [Tags]  HappyPath  UnderConstruction
+
 Delete data block
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks button   Delete this data block
     user waits until page contains heading   Delete data block
     user clicks button   Confirm

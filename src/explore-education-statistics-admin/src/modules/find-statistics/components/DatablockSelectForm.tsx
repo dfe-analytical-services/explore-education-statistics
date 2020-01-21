@@ -50,6 +50,7 @@ const DatablockSelectForm = ({
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}
+        order={['style']}
         options={[
           {
             label: 'Select a data block',

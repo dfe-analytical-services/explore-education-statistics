@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationRepository
     {
-        Task<List<PublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId);
+        Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId);
 
-        Task<List<PublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId);
+        Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId);
     }
 }

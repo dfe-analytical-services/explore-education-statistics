@@ -18,7 +18,13 @@ function App() {
   );
 
   const appRoutes = Object.entries(appRouteList).map(([key, appRoute]) => {
-    return <ProtectedRoute key={`appRoute-${key}`} {...appRoute} />;
+    return (
+      <ProtectedRoute
+        key={`appRoute-${key}`}
+        protectionAction={appRoute.protectedAction}
+        {...appRoute}
+      />
+    );
   });
 
   const prototypeRoutes = Object.entries(prototypeRouteList).map(
@@ -35,10 +41,7 @@ function App() {
             {authRoutes}
             {appRoutes}
             {prototypeRoutes}
-            <ProtectedRoute
-              redirectIfNotLoggedIn={false}
-              component={PageNotFoundPage}
-            />
+            <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
           </Switch>
         </BrowserRouter>
       </ThemeAndTopic>

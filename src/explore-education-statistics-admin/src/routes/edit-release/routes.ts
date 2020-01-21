@@ -71,7 +71,7 @@ export const contentRoute = createReadonlyRoute(
 );
 export const publishStatusRoute = createReadonlyRoute(
   'status',
-  'Update release status',
+  'Release status',
   ReleasePublishStatusPage,
 );
 export const summaryEditRoute = createEditRoute(

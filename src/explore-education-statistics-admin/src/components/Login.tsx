@@ -3,11 +3,7 @@ import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import * as React from 'react';
 
 const LoginContext = React.createContext<Authentication>({
-  user: {
-    id: 'guest',
-    name: 'logged out',
-    permissions: [],
-  },
+  user: undefined,
 });
 
 export const PrototypeLoginContext = React.createContext<Authentication>(

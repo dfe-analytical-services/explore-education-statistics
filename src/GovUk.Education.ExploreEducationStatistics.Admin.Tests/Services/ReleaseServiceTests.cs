@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -22,10 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
+        private readonly Guid _userId = Guid.NewGuid();
+        
         [Fact]
         public void CreateReleaseNoTemplate()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
@@ -37,8 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(), 
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(), 
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -60,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseWithTemplate()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
@@ -130,8 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Service method under test
                 var result = releaseService.CreateReleaseAsync(
@@ -175,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void LatestReleaseCorrectlyReported()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
             var latestReleaseId = new Guid("274d4621-7d21-431b-80de-77b62a4374d2");
             var notLatestReleaseId = new Guid("49b73c2f-141a-4dc7-a2d4-69316aef8bbc");
@@ -208,32 +212,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // loading of the entity graph as we go.
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test
                 var notLatest =
                     await releaseService.GetReleaseForIdAsync(
                         notLatestReleaseId);
-                Assert.False(notLatest.LatestRelease);
+                Assert.False(notLatest.Right.LatestRelease);
             }
+            
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test
                 var notLatest =
                     await releaseService.GetReleaseForIdAsync(
                         notLatestReleaseId);
-                Assert.False(notLatest.LatestRelease);
+                Assert.False(notLatest.Right.LatestRelease);
             }
         }
 
         [Fact]
         public async void EditReleaseSummary()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
             var releaseId = new Guid("02c73027-3e06-4495-82a4-62b778c005a9");
             var addHocReleaseTypeId = new Guid("f3800c32-1e1c-4d42-8165-d1bcb3c8b47c");
@@ -289,8 +296,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test 
                 var edited = await releaseService
@@ -316,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetReleaseSummaryAsync()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
             
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
             var adhocReleaseType = new ReleaseType
@@ -374,8 +382,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test 
                 var summaryResult = await releaseService.GetReleaseSummaryAsync(releaseId);
@@ -390,27 +399,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void GetReleasesForPublicationAsync()
+        public void GetLatestReleaseAsync()
         {
-            var (userService, releaseHelper, publishingService, repository) = Mocks();
+            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
             
-            var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
             var publicationId = new Guid("94af186f-5dbe-4f46-8a8e-f5480ed9f4fc");
-            var publishScheduledForFirstRelease = DateTime.Now.AddDays(1);
-            var publishScheduledForSecondRelease = DateTime.Now.AddDays(2);
             var firstReleaseId = new Guid("8781ebf8-790c-484b-8a34-19ea501c9c74");
             var secondReleaseId = new Guid("cace48cf-9f08-4471-815c-b3703aade096");
-                
+
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
-                context.AddRange(new List<ReleaseType>
+                context.Add(new UserReleaseRole
                 {
-                    new ReleaseType
-                    {
-                        Id = addHocReleaseTypeId,
-                        Title = "Ad Hoc"
-                    },
+                    UserId = _userId,
+                    ReleaseId = firstReleaseId
                 });
+                
                 context.Add(new Publication
                 {
                     Id = publicationId,
@@ -419,19 +423,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new Release
                         {
                             Id = firstReleaseId,
-                            TypeId = addHocReleaseTypeId,
-                            TimePeriodCoverage = TimeIdentifier.February,
-                            PublishScheduled = publishScheduledForFirstRelease,
-                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2040"},
+                            Published = DateTime.Now.AddDays(1),
                             ReleaseName = "2035",
                         },
                         new Release
                         {
                             Id = secondReleaseId,
-                            TypeId = addHocReleaseTypeId,
-                            TimePeriodCoverage = TimeIdentifier.January,
-                            PublishScheduled = publishScheduledForSecondRelease,
-                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2041"},
+                            Published = DateTime.Now.AddDays(2),
                             ReleaseName = "2036"
                         }
                     }
@@ -441,42 +439,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
-                var releaseService = new ReleaseService(context, MapperForProfile<MappingProfiles>(),
-                    publishingService.Object, releaseHelper.Object, userService.Object, repository.Object);
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object);
 
                 // Method under test 
-                var summary = await releaseService.GetReleasesForPublicationAsync(publicationId);
-                Assert.Equal(2, summary.Count);
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TypeId == addHocReleaseTypeId));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TimePeriodCoverage== TimeIdentifier.February));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.ReleaseName == "2035"));
+                var latest = releaseService.GetLatestReleaseAsync(publicationId).Result.Right;
+                Assert.Equal(secondReleaseId, latest.Id);
+                Assert.Equal("Academic Year 2036/37", latest.Title);
             }
         }
 
         private (
-            Mock<IUserService> UserService, 
-            Mock<IPersistenceHelper<Release,Guid>> ReleaseHelper, 
-            Mock<IPublishingService> PublishingService,
-            Mock<IReleaseRepository>) Mocks()
+            Mock<IUserService>, 
+            Mock<IPersistenceHelper<ContentDbContext>>, 
+            Mock<IPublishingService>,
+            Mock<IReleaseRepository>,
+            Mock<ISubjectService>,
+            Mock<ITableStorageService>,
+            Mock<IFileStorageService>) Mocks()
         {
-            var userService = new Mock<IUserService>();
+            var userService = MockUtils.AlwaysTrueUserService();
 
             userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
-                .ReturnsAsync(true);
+                .Setup(s => s.GetUserId())
+                .Returns(_userId);
+
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
+            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
             
-            userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanViewSpecificRelease))
-                .ReturnsAsync(true);
-            
-            userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
-                .ReturnsAsync(true);
-
-            var releaseHelper = MockUtils.MockPersistenceHelper<Release,Guid>();
-
-            return (userService, releaseHelper, new Mock<IPublishingService>(), new Mock<IReleaseRepository>());
+            return (
+                userService, 
+                persistenceHelper, 
+                new Mock<IPublishingService>(), 
+                new Mock<IReleaseRepository>(),
+                new Mock<ISubjectService>(), 
+                new Mock<ITableStorageService>(), 
+                new Mock<IFileStorageService>());
         }
     }
 }

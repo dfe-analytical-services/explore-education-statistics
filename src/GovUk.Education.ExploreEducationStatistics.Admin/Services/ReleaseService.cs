@@ -6,15 +6,21 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -23,43 +29,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
+        private readonly ISubjectService _subjectService;
+        private readonly ITableStorageService _tableStorageService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ReleaseService(ContentDbContext context, IMapper mapper, IPublishingService publishingService,
-            IPersistenceHelper<Release, Guid> releaseHelper, IUserService userService, IReleaseRepository repository)
+        public ReleaseService(
+            ContentDbContext context, 
+            IMapper mapper, 
+            IPublishingService publishingService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IUserService userService, 
+            IReleaseRepository repository, 
+            ISubjectService subjectService,
+            ITableStorageService tableStorageService, 
+            IFileStorageService fileStorageService)
         {
             _context = context;
             _publishingService = publishingService;
             _mapper = mapper;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
+            _subjectService = subjectService;
+            _tableStorageService = tableStorageService;
+            _fileStorageService = fileStorageService;
         }
 
-        public Task<Either<ActionResult, Release>> GetAsync(Guid id)
+        public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(id)
-                .OnSuccess(_userService.CheckCanViewRelease);
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(id, HydrateReleaseForReleaseViewModel)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
         
-        // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetReleaseForIdAsync(Guid id)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            var release = await _context.Releases
-                .HydrateReleaseForReleaseViewModel()
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
-            return _mapper.Map<ReleaseViewModel>(release);
-        }
-        
-        // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(
-            CreateReleaseViewModel createRelease)
-        {
-            return await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId)
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(createRelease.PublicationId)
+                .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
+                .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
                 .OnSuccess(async () =>
                 {
                     var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);
@@ -96,8 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
@@ -115,8 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
-            return await _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
@@ -152,21 +164,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId)
+        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestReleaseAsync(Guid publicationId)
         {
-            var release = await _context.Releases
-                .HydrateReleaseForReleaseViewModel()
-                .Where(r => r.Publication.Id == publicationId)
-                .ToListAsync();
-            return _mapper.Map<List<ReleaseViewModel>>(release);
+            return await
+                CheckCanViewPublication(publicationId)
+                    .OnSuccess(_ =>
+                    {
+                        var releases = _context
+                            .Releases
+                            .Where(r => r.PublicationId == publicationId && r.Published != null)
+                            .OrderBy(r => r.Published);
+
+                        if (!releases.Any())
+                        {
+                            return null;
+                        }
+                        
+                        var latestRelease = releases.Last();
+                        return new TitleAndIdViewModel
+                        {
+                            Id = latestRelease.Id,
+                            Title = latestRelease.Title
+                        };
+                    });
         }
         
-        public Task<List<ReleaseViewModel>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses)
         {
-            return _userService
-                .CheckCanViewAllReleases()
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_userService.CheckCanViewAllReleases)
                 .OnSuccess(() => _repository.
                     GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
                 .OrElse(() => _repository.
@@ -226,8 +254,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
             Guid releaseId, ReleaseStatus status, string internalReleaseNote)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
                 .OnSuccess(async release => {
                     release.Status = status;
@@ -240,11 +268,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await GetReleaseSummaryAsync(releaseId);
                 });
         }
-    }
 
-    public static class ReleaseLinqExtensions
-    {
-        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(this IQueryable<Release> values)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async _ =>
+                {
+                    await _tableStorageService.DeleteEntityAsync("imports",
+                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
+                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
+                });
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckCanViewPublication(Guid publicationId)
+        {
+            if (await _userService.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            {
+                return true;
+            }
+            
+            var userId = _userService.GetUserId();
+            
+            if (await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .Where(r => r.UserId == userId)
+                .AnyAsync(r => r.Release.PublicationId == publicationId))
+            {
+                return true;
+            }
+
+            return new ForbidResult();
+        }
+        
+        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest

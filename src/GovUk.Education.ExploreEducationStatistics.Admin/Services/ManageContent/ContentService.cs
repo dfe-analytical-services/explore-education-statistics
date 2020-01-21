@@ -26,14 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<Release, Guid> _releaseHelper; 
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
 
-        public ContentService(ContentDbContext context, IPersistenceHelper<Release, Guid> releaseHelper, 
+        public ContentService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IMapper mapper, IUserService userService)
         {
             _context = context;
-            _releaseHelper = releaseHelper;
+            _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _userService = userService;
         }
@@ -41,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
             Guid releaseId)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(release => 
                     release
                         .GenericContent
@@ -55,8 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, 
             Dictionary<Guid, int> newSectionOrder)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -78,8 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
             Guid releaseId, AddContentSectionRequest? request)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
@@ -233,6 +233,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return OrderedContentBlocks(section);
                     });
         }
+
+        public Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+        {
+            return
+                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(async tuple =>
+                    {
+                        var (_, section) = tuple;
+
+                        var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+
+                        if (blockToUpdate == null)
+                        {
+                            return NotFound<IContentBlock>();
+                        }
+
+                        switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
+                        {
+                            case ContentBlockType.DataBlock:
+                                return await UpdateDataBlock((DataBlock) blockToUpdate, request);
+                            default:
+                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
+                        }
+                    });
+        }
+
 
         public Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
@@ -535,6 +563,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await SaveContentBlock(blockToUpdate);
         }
 
+        private async Task<Either<ActionResult, IContentBlock>> UpdateDataBlock(DataBlock blockToUpdate,
+            UpdateDataBlockRequest request)
+        {
+            blockToUpdate.Summary.dataDefinitionTitle = new List<string>
+            {
+                request.DataDefinitionTitle
+            };
+            
+            blockToUpdate.Summary.dataDefinition = new List<string>
+            {
+                request.DataDefinition
+            };
+
+            blockToUpdate.Summary.dataSummary = new List<string>
+            {
+                request.DataSummary
+            };
+
+            return await SaveContentBlock(blockToUpdate);
+        }
+
         private async Task<IContentBlock> SaveContentBlock(IContentBlock blockToUpdate)
         {
             _context.ContentBlocks.Update(blockToUpdate);
@@ -578,8 +627,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExistsActionResult(
             Guid releaseId, Guid contentSectionId)
         {
-            return _releaseHelper
-                .CheckEntityExistsActionResult(releaseId, HydrateContentSectionsAndBlocks)
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
                 .OnSuccess(release =>
                 {
                     var section = release

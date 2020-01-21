@@ -9,9 +9,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
     public class StatisticsDbContext : DbContext
     {
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : base(options)
+        public StatisticsDbContext()
         {
-            Database.SetCommandTimeout(int.MaxValue);
+            
+        }
+        
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
+        {
+        }
+        
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
+        {
+            if (timeout.HasValue)
+            {
+                Database.SetCommandTimeout(timeout);
+            }
         }
 
         public DbSet<BoundaryLevel> BoundaryLevel { get; set; }
@@ -32,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
-        public DbSet<Subject> Subject { get; set; }
+        public virtual DbSet<Subject> Subject { get; set; }
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }

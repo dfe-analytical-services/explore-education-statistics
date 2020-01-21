@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +75,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ), 
                 CanUpdateSpecificRelease);
         }
+
+        [Fact]
+        public void ListFilesAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.ListFilesAsync(
+                        _release.Id,
+                        ReleaseFileTypes.Ancillary
+                    ), 
+                CanViewSpecificRelease);
+        }
+        
+        [Fact]
+        public void ListPublicFilesPreview()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.ListPublicFilesPreview(
+                        _release.Id
+                    ), 
+                CanViewSpecificRelease);
+        }
+        
+        [Fact]
+        public void StreamFile()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.StreamFile(
+                        _release.Id,
+                        ReleaseFileTypes.Ancillary,
+                        ""
+                    ), 
+                CanViewSpecificRelease);
+        }
         
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
@@ -90,13 +124,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IConfiguration>,
             Mock<ISubjectService>,
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<Release,Guid>>) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
             return (
                 new Mock<IConfiguration>(), 
                 new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper(_release.Id, _release));
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release));
         }
     }
 }

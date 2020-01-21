@@ -80,6 +80,54 @@
         "description": "Firewall restrictions for storage accounts, string array"
       }
     },
+    "sqlPublicDataApiUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the data api for the public SQL Server"
+      }
+    },
+    "sqlPublicDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user of the public SQL Server"
+      }
+    },
+    "sqlPublisherUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlPublisherUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the publisher application used to read from the content db"
+      }
+    },
+    "sqlImporterUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlImporterUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the importer application used to import data to the statistics db"
+      }
+    },
+    "sqlAdminUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the publisher for the public SQL Server"
+      }
+    },
+    "sqlAdminUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin application the content and statistics db"
+      }
+    },
     "sqlFirewallRules": {
       "type": "array",
       "metadata": {
@@ -117,7 +165,7 @@
     },
     "sqlVulnerabilityAssessments": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
 
     "publicAppBasicAuth": {
@@ -317,6 +365,22 @@
       "metadata": {
         "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
       }
+    },
+
+    "publishReleaseDataFunctionDisabled": {
+      "type": "string",
+      "defaultValue": "true",
+      "metadata": {
+        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+      }
+    },
+
+    "azureDataFactoryPipelineName": {
+      "type": "string",
+      "defaultValue": "pl_release_statistics",
+      "metadata": {
+        "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
+      }
     }
   },
   "variables": {
@@ -352,6 +416,11 @@
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+
+
+    "loggingStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'logging')]",
+    "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
+
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
@@ -361,6 +430,11 @@
     "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
     "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
     "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
+    "contentSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
+    "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
+    "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
+    "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
+    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -455,7 +529,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
             },
             {
               "name": "PublicStorage",
@@ -862,12 +936,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             }
           ]
         }
@@ -1098,35 +1172,36 @@
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2019-04-01",
       "location": "westeurope",
+      "kind": "StorageV2",
       "properties": {
         "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
 
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('importerSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "condition": "[parameters('useSubnets')]",
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1146,8 +1221,7 @@
       ],
       "sku": {
         "name": "Standard_RAGRS"
-      },
-      "kind": "StorageV2"
+      }
     },
     {
       "name": "[variables('sqlserverName')]",
@@ -1291,14 +1365,15 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
             "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
           ],
           "properties": {
-            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
-              "emailSubscriptionAdmins": true
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
             }
           }
         },
@@ -1306,21 +1381,37 @@
         {
           "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
-          "name": "DefaultAuditingSettings",
+          "name": "DefaultAuditingSettings2",
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'content')]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('sqlserverName'), 'statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default2",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
           ]
         }
       ],
@@ -1456,14 +1547,15 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
             "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
           ],
           "properties": {
-            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "recurringScans": {
               "isEnabled": true,
-              "emailSubscriptionAdmins": true
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
             }
           }
         },
@@ -1474,8 +1566,27 @@
           "apiVersion": "2017-03-01-preview",
           "properties": {
             "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
             "retentionDays": "[parameters('secAlertRetentionDays')]",
@@ -1521,14 +1632,32 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('notificationsstorageAccountName')]",
-      "apiVersion": "2016-12-01",
+      "apiVersion": "2019-04-01",
       "location": "[resourceGroup().location]",
       "kind": "Storage",
       "sku": {
         "name": "Standard_LRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('notifySubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1623,10 +1752,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
       "properties": {
         "name": "[variables('notificationsPlanName')]",
-        "computeMode": "Dynamic",
-        "sku": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
       }
     },
     {
@@ -1653,6 +1788,23 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('notifySubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
+        }
+      ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "httpsOnly": true,
@@ -1683,14 +1835,6 @@
             {
               "name": "AzureWebJobsStorage",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(variables('notificationsAppName'))]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -1872,7 +2016,7 @@
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "0"
+              "value": "1"
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -1900,7 +2044,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             }
           ]
         }
@@ -2011,6 +2155,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
+          "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -2031,12 +2176,32 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
+              "name": "AzureWebJobs.PublishReleaseData.Disabled",
+              "value": "[parameters('publishReleaseDataFunctionDisabled')]"
+            },
+            {
               "name": "PublishReleasesCronSchedule",
               "value": "[parameters('publishReleasesCronSchedule')]"
             },
             {
               "name": "PublishReleaseContentCronSchedule",
               "value": "[parameters('publishReleaseContentCronSchedule')]"
+            },
+            {
+              "name": "AzureDataFactoryName",
+              "value": "[variables('azureDataFactoryName')]"
+            },
+            {
+              "name": "AzureDataFactoryPipelineName",
+              "value": "[parameters('azureDataFactoryPipelineName')]"
+            },
+            {
+              "name": "AzureSubscriptionId",
+              "value": "[subscription().subscriptionId]"
+            },
+            {
+              "name": "AzureResourceGroupName",
+              "value": "[resourceGroup().name]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -2079,7 +2244,12 @@
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }
           ]
         }
@@ -2096,23 +2266,50 @@
         "name": "Standard_GZRS"
       },
       "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('loggingStorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GZRS"
+      },
+      "properties": {
         "supportsHttpsTrafficOnly": true
-        // "networkAcls": {
-        //   "condition": "[parameters('useSubnets')]",
-        //   "bypass": "AzureServices",
-        //   "virtualNetworkRules": [
-        //     {
-        //       "id": "[variables('adminSubnetRef')]",
-        //       "action": "Allow"
-        //     },
-        //     {
-        //       "id": "[variables('publisherSubnetRef')]",
-        //       "action": "Allow"
-        //     }
-        //   ],
-        //   "ipRules": "[parameters('storageFirewallRules')]",
-        //   "defaultAction": "Deny"
-        // }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2229,8 +2426,51 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('contentSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.4.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('dataSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.5.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
           }
-
         ]
       }
     }

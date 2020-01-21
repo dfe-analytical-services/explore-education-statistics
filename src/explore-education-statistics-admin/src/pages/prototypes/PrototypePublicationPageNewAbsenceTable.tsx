@@ -138,7 +138,7 @@ const PublicationDataPage = () => {
           {window.location.search === '?status=step2' && (
             <>
               <p>Select at least one</p>
-              <Details summary="National" tag="1 selected">
+              <Details summary="National" tag={['1 selected']}>
                 <fieldset
                   className="govuk-fieldset"
                   id="locationFiltersForm-levels-National"
@@ -296,7 +296,7 @@ const PublicationDataPage = () => {
 
               <Details
                 summary="Characteristic"
-                tag="1 selected"
+                tag={['1 selected']}
                 className="govuk-!-margin-bottom-2"
               >
                 <div className="dfe-filter-overflow">
@@ -306,7 +306,7 @@ const PublicationDataPage = () => {
                   />
                 </div>
               </Details>
-              <Details summary="School type" tag="1 selected">
+              <Details summary="School type" tag={['1 selected']}>
                 <div className="dfe-filter-overflow">
                   <img
                     src="/static/images/prototype/school-filter.png"
@@ -321,7 +321,7 @@ const PublicationDataPage = () => {
                   Select at least one indicator
                 </span>
               </h3>
-              <Details summary="Indicator" tag="3 selected">
+              <Details summary="Indicator" tag={['3 selected']}>
                 <div className="dfe-filter-overflow">
                   <img
                     src="/static/images/prototype/indicator-filters.png"

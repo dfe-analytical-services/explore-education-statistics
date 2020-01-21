@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public string ContentStage { get; set; }
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
-        public string Stage { get; set; }
+        public string OverallStage { get; set; }
         public IEnumerable<ReleaseStatusLogMessage> LogMessages { get; set; }
         public DateTimeOffset LastUpdated { get; set; }
     }

@@ -55,7 +55,7 @@ const PrototypeDashboardRelease = ({
       summary={`${title} ${years} ${isLive ? '(Live)' : ''} ${
         isLatest ? '(Live - Latest release)' : ''
       }`}
-      tag={tag}
+      tag={[tag]}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">

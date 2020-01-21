@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -21,6 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _context = context;
             _fileStorageService = fileStorageService;
             _mapper = mapper;
+        }
+
+        public Task<Release> GetAsync(Guid id)
+        {
+            return _context.Releases
+                .Include(release => release.Publication)
+                .FirstOrDefaultAsync(release => release.Id == id);
         }
 
         public ReleaseViewModel GetRelease(Guid id)
@@ -66,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public ReleaseViewModel GetLatestRelease(Guid id)
         {
-            var release = _context.Releases
+            var releases = _context.Releases
+                .Where(r => r.PublicationId == id)
                 .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(join => join.ContentSection)
@@ -75,8 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication).ThenInclude(p => p.Topic.Theme)
                 .Include(r => r.Publication).ThenInclude(p => p.Contact)
                 .Include(r => r.Updates)
-                .OrderBy(r => r.Published)
-                .Last(r => r.PublicationId == id);
+                .OrderBy(r => r.Published);
+                
+            var release = releases.Last();
 
             if (release != null)
             {
@@ -106,6 +116,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             return null;
+        }
+
+        public async Task SetPublishedDateAsync(Guid id)
+        {
+            var release = await _context.Releases
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (release == null)
+            {
+                throw new ArgumentException("Release does not exist", nameof(id));
+            }
+
+            release.Published = DateTime.UtcNow;
+            _context.Releases.Update(release);
+            await _context.SaveChangesAsync();
         }
 
         // TODO: This logic is flawed but will provide an accurate result with the current seed data
