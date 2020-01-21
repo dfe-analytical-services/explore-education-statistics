@@ -375,6 +375,27 @@
       }
     },
 
+    "publisherApplicationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application Client Id used for authentication requests"
+      }
+    },
+
+    "publisherAuthenticationKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application secret string used to prove its identity when requesting a token"
+      }
+    },
+
+    "publisherDirectoryTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Tenant Id used for authentication requests"
+      }
+    },
+
     "azureDataFactoryPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
@@ -2186,6 +2207,18 @@
             {
               "name": "PublishReleaseContentCronSchedule",
               "value": "[parameters('publishReleaseContentCronSchedule')]"
+            },
+            {
+              "name": "ApplicationClientId",
+              "value": "[parameters('publisherApplicationClientId')]"
+            },
+            {
+              "name": "AuthenticationKey",
+              "value": "[parameters('publisherAuthenticationKey')]"
+            },
+            {
+              "name": "DirectoryTenantId",
+              "value": "[parameters('publisherDirectoryTenantId')]"
             },
             {
               "name": "AzureDataFactoryName",
