@@ -19,7 +19,7 @@ interface ReleaseServiceStatus {
 
 const ReleaseServiceStatus = ({
   releaseId,
-  refreshPeriod = 5000,
+  refreshPeriod = 10000,
   exclude,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
@@ -100,7 +100,7 @@ const ReleaseServiceStatus = ({
                       <StatusBlock
                         color={statusDetailColor(val)}
                         text={`${key.replace('Stage', '')} - ${val}`}
-                      />{' '}
+                      />
                     </li>
                   ),
               )}

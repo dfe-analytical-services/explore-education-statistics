@@ -1,8 +1,9 @@
-import Link from '@admin/components/Link';
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
+import StatusBlock from '@admin/components/StatusBlock';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
+import appRouteList from '@admin/routes/dashboard/routes';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import withErrorControl, {
@@ -15,7 +16,6 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
-import appRouteList from '@admin/routes/dashboard/routes';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -29,11 +29,20 @@ interface Model {
   statusOptions: RadioOption[];
 }
 
+const statusMap: {
+  [keyof: string]: string;
+} = {
+  Draft: 'Draft',
+  HigherLevelReview: 'Awaiting higher review',
+  Approved: 'Approved',
+};
+
 const ReleaseStatusPage = ({
   history,
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
+  const [showForm, setShowForm] = useState<boolean>(false);
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
@@ -71,11 +80,27 @@ const ReleaseStatusPage = ({
 
   const formId = 'releaseStatusForm';
 
+  if (!model) return null;
   return (
     <>
-      <h2 className="govuk-heading-m">Release status</h2>
-
-      {model && model.releaseStatus !== 'Approved' && (
+      <h2 className="govuk-heading-m">Release Status</h2>
+      {!showForm ? (
+        <div>
+          <p>
+            The current release status is:{' '}
+            <StatusBlock text={statusMap[model.releaseStatus]} />
+            {model.releaseStatus === 'Approved' && (
+              <div className="govuk-!-margin-top-1">
+                Release process status:{' '}
+                <ReleaseServiceStatus releaseId={releaseId} />
+              </div>
+            )}
+          </p>
+          <Button onClick={() => setShowForm(true)}>
+            Update release status
+          </Button>
+        </div>
+      ) : (
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
@@ -122,24 +147,22 @@ const ReleaseStatusPage = ({
                   rows={2}
                   additionalClass="govuk-!-width-one-half"
                 />
-                <Button type="submit" className="govuk-!-margin-top-6">
-                  Update
-                </Button>
                 <div className="govuk-!-margin-top-6">
-                  <Link to="#" onClick={() => form.resetForm()}>
-                    Cancel update
-                  </Link>
+                  <Button
+                    onClick={() => {
+                      form.resetForm();
+                      setShowForm(false);
+                    }}
+                    className="govuk-!-margin-left-1 govuk-button--secondary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Update</Button>
                 </div>
               </Form>
             );
           }}
         />
-      )}
-      {model && model.releaseStatus === 'Approved' && (
-        <div>
-          <p>This release has been approved</p>
-          <ReleaseServiceStatus releaseId={releaseId} />
-        </div>
       )}
     </>
   );
