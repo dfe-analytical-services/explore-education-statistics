@@ -4,7 +4,7 @@ import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from './SummaryRenderer.module.scss';
 import { ChartMetaData } from './charts/ChartFunctions';
 
-interface KeyStatProps {
+export interface KeyStatProps {
   meta: ChartMetaData;
   measures: {
     [key: string]: string;

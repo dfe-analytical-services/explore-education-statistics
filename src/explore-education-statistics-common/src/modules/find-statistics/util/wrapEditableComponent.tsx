@@ -23,9 +23,13 @@ const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
   RenderComponent: ComponentType<RenderProps>,
 ) => {
   return function WrappedEditableComponent(props: EditableProps | RenderProps) {
-    const { isEditing } = useContext(EditingContext);
+    const { isEditing, ...context } = useContext(EditingContext);
     return isEditing ? (
-      <EditableComponent {...(props as EditableProps)} />
+      <EditableComponent
+        {...(props as EditableProps)}
+        isEditing={isEditing}
+        {...context}
+      />
     ) : (
       <RenderComponent {...(props as RenderProps)} />
     );
