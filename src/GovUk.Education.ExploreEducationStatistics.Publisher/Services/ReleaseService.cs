@@ -24,14 +24,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public Task<Release> GetAsync(Guid id)
+        public async Task<Release> GetAsync(Guid id)
         {
-            return _context.Releases
+            return await _context.Releases
                 .Include(release => release.Publication)
                 .FirstOrDefaultAsync(release => release.Id == id);
         }
 
-        public ReleaseViewModel GetRelease(Guid id)
+        public async Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids)
+        {
+            return await _context.Releases
+                .Where(release => ids.Contains(release.Id))
+                .Include(release => release.Publication)
+                .ToListAsync();
+        }
+        
+        public ReleaseViewModel GetReleaseViewModel(Guid id)
         {
             var release = _context.Releases
                 .Include(r => r.Type)
@@ -72,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseViewModel;
         }
 
-        public ReleaseViewModel GetLatestRelease(Guid id)
+        public ReleaseViewModel GetLatestRelease(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
             var releases = _context.Releases
                 .Where(r => r.PublicationId == id)

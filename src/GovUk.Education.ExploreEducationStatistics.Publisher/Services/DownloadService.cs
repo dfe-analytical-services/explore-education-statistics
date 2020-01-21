@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _fileStorageService = fileStorageService;
         }
 
-        public IEnumerable<ThemeTree> GetDownloadTree()
+        public IEnumerable<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             var tree = _context.Themes
                 .Include(theme => theme.Topics)

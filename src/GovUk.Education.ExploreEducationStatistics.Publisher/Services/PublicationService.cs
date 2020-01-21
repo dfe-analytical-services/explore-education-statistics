@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _context = context;
         }
 
-        public List<ThemeTree> GetPublicationsTree()
+        public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Where(IsThemePublished)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
-                var result = service.GetLatestRelease(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"));
+                var result = service.GetLatestRelease(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
 
                 Assert.IsType<ReleaseViewModel>(result);
             }
@@ -242,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
-                var result = service.GetRelease(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
+                var result = service.GetReleaseViewModel(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
 
                 Assert.Equal("Academic Year Q1", result.Title);
                 Assert.Equal(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), result.Publication.Id);

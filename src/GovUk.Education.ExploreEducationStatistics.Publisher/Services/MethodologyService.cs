@@ -25,15 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.Methodologies.FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public List<ThemeTree> GetTree()
+        public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Include(theme => theme.Topics)
-                    .ThenInclude(topic => topic.Publications)
-                    .ThenInclude(publication => publication.Releases)
+                .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Releases)
                 .Include(theme => theme.Topics)
-                    .ThenInclude(topic => topic.Publications)
-                    .ThenInclude(publication => publication.Methodology)
+                .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Methodology)
                 .Select(BuildThemeTree)
                 .Where(themeTree => themeTree.Topics.Any())
                 .OrderBy(theme => theme.Title)
@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
-                    .Where(publication => publication.Methodology != null && publication.Releases.Any(release => release.Live))
+                    .Where(publication =>
+                        publication.Methodology != null && publication.Releases.Any(release => release.Live))
                     .Select(BuildPublicationTree)
                     .OrderBy(publication => publication.Title)
                     .ToList()
