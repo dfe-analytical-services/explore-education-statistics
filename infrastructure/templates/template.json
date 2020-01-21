@@ -375,7 +375,21 @@
       }
     },
 
-    "azureDataFactoryPipelineName": {
+    "publisherClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application Client Id used for authentication requests"
+      }
+    },
+
+    "publisherClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
+      }
+    },
+
+    "publisherPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
       "metadata": {
@@ -434,7 +448,7 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2188,20 +2202,32 @@
               "value": "[parameters('publishReleaseContentCronSchedule')]"
             },
             {
-              "name": "AzureDataFactoryName",
-              "value": "[variables('azureDataFactoryName')]"
+              "name": "ClientId",
+              "value": "[parameters('publisherClientId')]"
             },
             {
-              "name": "AzureDataFactoryPipelineName",
-              "value": "[parameters('azureDataFactoryPipelineName')]"
+              "name": "ClientSecret",
+              "value": "[parameters('publisherClientSecret')]"
             },
             {
-              "name": "AzureSubscriptionId",
+              "name": "DataFactoryName",
+              "value": "[variables('dataFactoryName')]"
+            },
+            {
+              "name": "PipelineName",
+              "value": "[parameters('publisherPipelineName')]"
+            },
+            {
+              "name": "ResourceGroupName",
+              "value": "[resourceGroup().name]"
+            },
+            {
+              "name": "SubscriptionId",
               "value": "[subscription().subscriptionId]"
             },
             {
-              "name": "AzureResourceGroupName",
-              "value": "[resourceGroup().name]"
+              "name": "TenantId",
+              "value": "[subscription().tenantId]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
