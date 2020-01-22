@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrElse(() => _repository.GetThemesRelatedToUserAsync(_userService.GetUserId()));
         }
 
-        public Task<ThemeSummaryViewModel> GetSummaryAsync(Guid id)
+        public Task<TitleAndIdViewModel> GetSummaryAsync(Guid id)
         { 
             return _context
                 .Themes
                 .Where(th => th.Id == id)
-                .Select(th => new ThemeSummaryViewModel()
+                .Select(th => new TitleAndIdViewModel
             {
                 Id = th.Id,
                 Title = th.Title
