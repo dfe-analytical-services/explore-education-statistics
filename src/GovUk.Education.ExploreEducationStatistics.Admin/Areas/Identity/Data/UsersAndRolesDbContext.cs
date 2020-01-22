@@ -80,33 +80,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            const string applicationUserRoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7";
             const string bauUserRoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3";
-
-            modelBuilder.Entity<IdentityRole>()
-                .HasData(
-                    CreateRole(
-                        applicationUserRoleId,
-                        "Application User"
-                    )
-                );
-
-            modelBuilder.Entity<IdentityRoleClaim<string>>()
-                .HasData(
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -1,
-                        RoleId = applicationUserRoleId,
-                        ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
-                        ClaimValue = "",
-                    }
-                );
+            const string analystRoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425";
+            const string prereleaseUserRoleId = "17e634f4-7a2b-4a23-8636-b079877b4232";
 
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
                     CreateRole(
                         bauUserRoleId,
                         "BAU User"
+                    ),
+                    CreateRole(
+                        analystRoleId,
+                        "Analyst"
+                    ),
+                    CreateRole(
+                        prereleaseUserRoleId,
+                        "Prerelease User"
                     )
                 );
 
@@ -188,6 +178,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.ManageAnyMethodology.ToString(),
                         ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -13,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -14,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.AnalystPagesAccessGranted.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -15,
+                        RoleId = prereleaseUserRoleId,
+                        ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -16,
+                        RoleId = prereleaseUserRoleId,
+                        ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
+                        ClaimValue = "",
                     }
                 );
             
@@ -197,6 +215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 
             const string bauUser1Id = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd";
             const string bauUser2Id = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63";
+
+            const string prereleaseUser1Id = "d5c85378-df85-482c-a1ce-09654dae567d";
+            const string prereleaseUser2Id = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050";
             
             modelBuilder.Entity<ApplicationUser>()
                 .HasData(
@@ -229,6 +250,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         "bau2@example.com",
                         "Bau2",
                         "User2"
+                    ),
+                    CreateApplicationUser(
+                        prereleaseUser1Id,
+                        "prerelease1@example.com",
+                        "Prerelease1",
+                        "User1"
+                    ),
+                    CreateApplicationUser(
+                        prereleaseUser2Id,
+                        "prerelease2@example.com",
+                        "Prerelease2",
+                        "User2"
                     )
                 );
 
@@ -237,17 +270,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     new IdentityUserRole<string>
                     {
                         UserId = analystUser1Id,
-                        RoleId = applicationUserRoleId
+                        RoleId = analystRoleId
                     },
                     new IdentityUserRole<string>
                     {
                         UserId = analystUser2Id,
-                        RoleId = applicationUserRoleId
+                        RoleId = analystRoleId
                     },
                     new IdentityUserRole<string>
                     {
                         UserId = analystUser3Id,
-                        RoleId = applicationUserRoleId
+                        RoleId = analystRoleId
                     },
                     new IdentityUserRole<string>
                     {
@@ -258,6 +291,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     {
                         UserId = bauUser2Id,
                         RoleId = bauUserRoleId
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = prereleaseUser1Id,
+                        RoleId = prereleaseUserRoleId
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = prereleaseUser2Id,
+                        RoleId = prereleaseUserRoleId
                     }
                 );
 
@@ -282,6 +325,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     CreateUserLogin(
                         bauUser2Id,
                         "EKTK7hPGgxGVxRSBjgTv51XVJhtMo91sIcADfjSuJjw"
+                    ),
+                    CreateUserLogin(
+                        prereleaseUser1Id,
+                        "uLGzMPaxGz0nY6nbff7wkBP7ly2iLdephomGPFOP0k8"
+                    ),                    
+                    CreateUserLogin(
+                        prereleaseUser2Id,
+                        "s5vNxMDGwRCvg3MTtLEDomZqOKl7cvv2f8PW5NvJzbw"
                     )
                 );
         }

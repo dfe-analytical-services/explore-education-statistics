@@ -98,7 +98,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
             var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email) != null 
+                ? info.Principal.FindFirstValue(ClaimTypes.Email)
+                : info.Principal.FindFirstValue(ClaimTypes.Name);
 
             // Ensure names are set
             if (firstName == null && lastName == null)

@@ -5792,6 +5792,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             var analystMvcUser3Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a");
             var bauMvcUser1Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd");
             var bauMvcUser2Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63");
+            var prereleaseMvcUser1Id = new Guid("d5c85378-df85-482c-a1ce-09654dae567d");
+            var prereleaseMvcUser2Id = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050");
 
             modelBuilder.Entity<User>()
                 .HasData(
@@ -5829,6 +5831,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         FirstName = "Bau2",
                         LastName = "User2",
                         Email = "bau2@example.com"
+                    },
+                    new User
+                    {
+                        Id = prereleaseMvcUser1Id,
+                        FirstName = "Prerelease1",
+                        LastName = "User1",
+                        Email = "prerelease1@example.com"
+                    },
+                    new User
+                    {
+                        Id = prereleaseMvcUser2Id,
+                        FirstName = "Prerelease2",
+                        LastName = "User2",
+                        Email = "prerelease2@example.com"
                     }
                 );
             
@@ -5896,6 +5912,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         ReleaseId = applicationOffersReleaseId,
                         UserId = analystMvcUser3Id,
                         Role = ReleaseRole.Approver
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("69860a07-91d0-49d6-973d-98830fbbedfb"),
+                        ReleaseId = absenceReleaseId,
+                        UserId = prereleaseMvcUser1Id,
+                        Role = ReleaseRole.PrereleaseViewer
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("00cf98d9-c16c-4004-9fde-fe212b059845"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = prereleaseMvcUser1Id,
+                        Role = ReleaseRole.PrereleaseViewer
+                    },
+                    new UserReleaseRole
+                    {
+                        Id = new Guid("ef19a735-81b4-482c-b1e2-31616ca26f51"),
+                        ReleaseId = exclusionsReleaseId,
+                        UserId = prereleaseMvcUser2Id,
+                        Role = ReleaseRole.PrereleaseViewer
                     }
                 );
         }
