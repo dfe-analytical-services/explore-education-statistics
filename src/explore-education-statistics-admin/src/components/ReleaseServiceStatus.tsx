@@ -19,7 +19,7 @@ interface ReleaseServiceStatus {
 
 const ReleaseServiceStatus = ({
   releaseId,
-  refreshPeriod = 5000,
+  refreshPeriod = 10000,
   exclude,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
@@ -31,7 +31,7 @@ const ReleaseServiceStatus = ({
   const fetchReleaseServiceStatus = useCallback(() => {
     return dashboardService
       .getReleaseStatus(releaseId)
-      .then(setCurrentStatus)
+      .then(([status]) => setCurrentStatus(status))
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
@@ -49,31 +49,35 @@ const ReleaseServiceStatus = ({
     };
   }, [fetchReleaseServiceStatus, refreshPeriod]);
 
-  const statusDetailColor = (text: string) => {
+  const statusDetailColor = (
+    status: string,
+  ): { color: StatusBlockProps['color']; text: string } => {
     if (currentStatus) {
-      switch (text) {
+      switch (status) {
         case 'Scheduled':
-          return 'blue';
+          return { color: 'blue', text: status };
+        case 'NotStarted':
+          return { color: 'blue', text: 'Not Started' };
         case 'Invalid':
         case 'Failed':
         case 'Cancelled':
-          return 'red';
+          return { color: 'red', text: status };
         case 'Queued':
         case 'Started':
-          return 'orange';
+          return { color: 'orange', text: status };
         case 'Complete':
-          return 'green';
+          return { color: 'green', text: status };
         default:
-          return undefined;
+          return { color: undefined, text: '' };
       }
     }
-    return undefined;
+    return { color: undefined, text: '' };
   };
 
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {
-      const color = statusDetailColor(currentStatus.overallStage);
-      if (color === ('red' || 'green')) {
+      const { color } = statusDetailColor(currentStatus.overallStage);
+      if (color === 'red' || color === 'green') {
         cancelTimer();
       }
       setStatusColor(color);
@@ -84,25 +88,35 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock color={statusColor} text={currentStatus.overallStage} />
+        <StatusBlock
+          color={statusColor}
+          text={`Release Process - ${currentStatus.overallStage}`}
+        />
       )}
 
       {currentStatus &&
-        currentStatus.overallStage === 'Started' &&
+        currentStatus.overallStage !== 'Scheduled' &&
+        currentStatus.overallStage !== 'Invalid' &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
-              {Object.entries(currentStatus).map(
-                ([key, val]) =>
-                  statusDetailColor(val) !== undefined && (
-                    <li key={key}>
-                      <StatusBlock
-                        color={statusDetailColor(val)}
-                        text={`${key.replace('Stage', '')} - ${val}`}
-                      />{' '}
-                    </li>
-                  ),
-              )}
+              {Object.entries(currentStatus).map(([key, val]) => {
+                if (key === 'overallStage') return null;
+                const { color, text } = statusDetailColor(val);
+
+                if (!color) {
+                  return null;
+                }
+
+                return (
+                  <li key={key}>
+                    <StatusBlock
+                      color={color}
+                      text={`${key.replace('Stage', '')} - ${text}`}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </Details>
         )}

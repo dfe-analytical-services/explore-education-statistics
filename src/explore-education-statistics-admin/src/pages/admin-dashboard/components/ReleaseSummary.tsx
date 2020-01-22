@@ -56,7 +56,7 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
             </FormattedDate>
           )}
         </SummaryListItem>
-        <SummaryListItem term="Release status">
+        <SummaryListItem term="Release process status">
           <ReleaseServiceStatus releaseId={release.id} />
         </SummaryListItem>
         <SummaryListItem term="Lead statistician">
