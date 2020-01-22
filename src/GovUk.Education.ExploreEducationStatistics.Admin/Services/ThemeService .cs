@@ -1,49 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeService : IThemeService
     {
-        private readonly ContentDbContext _context;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IThemeRepository _repository;
 
-        public ThemeService(ContentDbContext context, IUserService userService, IThemeRepository repository)
+        public ThemeService(IUserService userService, IThemeRepository repository, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
-            _context = context;
             _userService = userService;
             _repository = repository;
+            _persistenceHelper = persistenceHelper;
         }
 
-        public Task<List<Theme>> GetMyThemesAsync()
+        public async Task<Either<ActionResult, List<Theme>>> GetMyThemesAsync()
         {
-            return _userService
-                .CheckCanViewAllTopics()
-                .OnSuccess(() => _repository.GetAllThemesAsync())
-                .OrElse(() => _repository.GetThemesRelatedToUserAsync(_userService.GetUserId()));
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllTopics()
+                        .OnSuccess(() => _repository.GetAllThemesAsync())
+                        .OrElse(() => _repository.GetThemesRelatedToUserAsync(_userService.GetUserId()));
+                });
         }
 
-        public Task<TitleAndIdViewModel> GetSummaryAsync(Guid id)
-        { 
-            return _context
-                .Themes
-                .Where(th => th.Id == id)
-                .Select(th => new TitleAndIdViewModel
-            {
-                Id = th.Id,
-                Title = th.Title
-            })
-                .FirstOrDefaultAsync();
+        public async Task<Either<ActionResult, TitleAndIdViewModel>> GetSummaryAsync(Guid id)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Theme>(id)
+                .OnSuccess(_userService.CheckCanViewTheme)
+                .OnSuccess(theme => new TitleAndIdViewModel
+                {
+                    Id = theme.Id,
+                    Title = theme.Title
+                });
         }
     }
 }

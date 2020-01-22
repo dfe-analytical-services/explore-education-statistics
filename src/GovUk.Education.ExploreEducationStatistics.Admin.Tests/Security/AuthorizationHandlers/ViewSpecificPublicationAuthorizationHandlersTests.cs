@@ -40,6 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 PublicationId = Guid.NewGuid()
             };
             
+            var releaseOnThisPublication = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = _publication.Id
+            };
+            
             var releaseRoleForDifferentPublication = new UserReleaseRole
             {
                 UserId = _userId,
@@ -49,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var releaseRoleForDifferentUser = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
-                Release = releaseOnAnotherPublication
+                Release = releaseOnThisPublication
             };
 
             await AssertHasRoleOnAnyChildReleaseHandlesOk(

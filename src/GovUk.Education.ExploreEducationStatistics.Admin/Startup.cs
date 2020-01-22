@@ -184,6 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
                 
+                // does this user have permission to view a specific Theme?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificThemeRequirement()));
+                
                 // does this user have permission to view all Releases across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
@@ -315,6 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();

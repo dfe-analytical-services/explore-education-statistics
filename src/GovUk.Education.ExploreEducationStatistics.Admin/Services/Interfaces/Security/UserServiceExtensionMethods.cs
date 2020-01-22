@@ -33,6 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanViewAllReleases);
         }
         
+        public static Task<Either<ActionResult, Theme>> CheckCanViewTheme(
+            this IUserService userService, Theme theme)
+        {
+            return userService.DoCheck(theme, SecurityPolicies.CanViewSpecificTheme);
+        }
+        
         public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
             this IUserService userService, Topic topic)
         {
