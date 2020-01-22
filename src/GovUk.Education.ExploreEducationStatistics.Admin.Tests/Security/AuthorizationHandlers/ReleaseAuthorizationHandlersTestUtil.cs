@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return scenarios;
         }
 
-        private static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
+        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
         {
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
