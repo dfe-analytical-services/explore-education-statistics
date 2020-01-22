@@ -666,6 +666,21 @@
           ],
           "properties": {
           }
+        },
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
         }
       ],
       "properties": {
