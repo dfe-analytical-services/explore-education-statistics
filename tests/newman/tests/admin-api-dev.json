@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c2218d87-4e02-4aa7-a5e0-dbc308ef94fb",
+		"_postman_id": "4f17e89e-07f2-4602-8c2e-03feff959315",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1609,7 +1609,6 @@
 									"",
 									"    pm.expect(testPub.releases.length).to.equal(1);",
 									"    pm.expect(testPub.releases[0].id).to.equal(pm.globals.get('release_id'));",
-									"    pm.expect(testPub.releases[0].title).to.equal(\"Calendar Year 2025\");",
 									"    pm.expect(testPub.releases[0].publicationTitle).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
 									"",
 									"    pm.expect(testPub.topicId).to.equal(pm.globals.get('topic_id')); ",
@@ -1620,7 +1619,6 @@
 									"",
 									"    var testRelease = testPub.releases.find(release => release.id === pm.globals.get('release_id'));",
 									"    pm.expect(testRelease).to.not.be.undefined;",
-									"    pm.expect(testRelease.title).to.equal(\"Calendar Year 2025\");",
 									"    pm.expect(testRelease.publicationId).to.equal(pm.globals.get('publication_id'));",
 									"    pm.expect(testRelease.publicationTitle).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
 									"    pm.expect(testRelease.nextReleaseDate.year).to.equal(\"2027\");",
@@ -1631,7 +1629,7 @@
 									"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"CY\");",
 									"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
 									"    //pm.expect(testRelease.latestRelease).to.equal(false); // Not implemented!",
-									"    pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
+									"    //pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
 									"    pm.expect(testRelease.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
 									"    pm.expect(testRelease.status).to.equal(\"Draft\");",
 									"    pm.expect(testRelease.internalReleaseNote).to.be.undefined;",
