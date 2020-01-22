@@ -172,6 +172,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
                 
+                // does this user have permissions to access analyst pages?
+                options.AddPolicy(SecurityPolicies.CanAccessAnalystPages.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString()));
+
+                // does this user have permissions to access prerelease pages?
+                options.AddPolicy(SecurityPolicies.CanAccessPrereleasePages.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString()));
+
                 // does this user have permissions to invite and manage all users on the system?
                 options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));

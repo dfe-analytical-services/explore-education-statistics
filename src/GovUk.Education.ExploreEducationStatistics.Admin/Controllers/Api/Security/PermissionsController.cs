@@ -40,6 +40,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 _userService.CheckCanManageAllMethodologies
             );
         }
+
+        [HttpGet("analyst/access")]
+        public Task<ActionResult<bool>> CanAccessAnalystPages()
+        {
+            return CheckPolicy(_userService.CheckCanAccessAnalystPages);
+        }
+
+        [HttpGet("prerelease/access")]
+        public Task<ActionResult<bool>> CanAccessPrereleasePages()
+        {
+            return CheckPolicy(_userService.CheckCanAccessPrereleasePages);
+        }
         
         [HttpGet("users/manage")]
         public Task<ActionResult<bool>> CanManageAllUsers()

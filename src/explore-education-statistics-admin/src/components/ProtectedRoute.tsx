@@ -1,3 +1,4 @@
+import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ErrorBoundary, {
   ErrorControlContext,
 } from '@admin/components/ErrorBoundary';
@@ -47,7 +48,13 @@ const AuthenticationCheckingComponent = ({
   }
 
   if (!allowAnonymousUsers && (!user || user.validToken === false)) {
-    return <Redirect to={signInService.getSignInLink()} />;
+    return (
+      <Redirect
+        to={`${signInService.getSignInLink()}?${
+          QueryParameterNames.ReturnUrl
+        }=${encodeURI(window.location.href)}`}
+      />
+    );
   }
 
   if (typeof protectedByAction !== 'undefined' && protectedByAction) {

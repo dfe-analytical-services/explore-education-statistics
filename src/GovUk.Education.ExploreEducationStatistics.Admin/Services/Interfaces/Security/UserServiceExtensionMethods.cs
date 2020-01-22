@@ -13,6 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanAccessSystem);
         }
         
+        public static Task<Either<ActionResult, bool>> CheckCanAccessAnalystPages(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessAnalystPages);
+        }
+        
+        public static Task<Either<ActionResult, bool>> CheckCanAccessPrereleasePages(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessPrereleasePages);
+        }
+        
         public static Task<Either<ActionResult, bool>> CheckCanManageAllUsers(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageUsersOnSystem);

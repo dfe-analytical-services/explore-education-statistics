@@ -13,6 +13,12 @@ const service = {
   canAccessAdministration: (): Promise<boolean> => {
     return client.get(`/permissions/administration/access`);
   },
+  canAccessAnalystPages: (): Promise<boolean> => {
+    return client.get(`/permissions/analyst/access`);
+  },
+  canAccessPrereleasePages: (): Promise<boolean> => {
+    return client.get(`/permissions/prerelease/access`);
+  },
   canUpdateRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
