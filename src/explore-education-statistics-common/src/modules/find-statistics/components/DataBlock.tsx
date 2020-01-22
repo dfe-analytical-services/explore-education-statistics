@@ -6,9 +6,7 @@ import ChartRenderer, {
 } from '@common/modules/find-statistics/components/ChartRenderer';
 
 import DataSource from '@common/modules/find-statistics/components/DataSource';
-import SummaryRenderer, {
-  SummaryRendererProps,
-} from '@common/modules/find-statistics/components/SummaryRenderer';
+import SummaryRenderer from '@common/modules/find-statistics/components/SummaryRenderer';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
@@ -56,7 +54,7 @@ interface DataBlockState {
   isError: boolean;
   charts?: ChartRendererProps[];
   tables?: TableRendererProps[];
-  summary?: SummaryRendererProps;
+  dataBlockResponse?: DataBlockResponse;
 }
 
 class DataBlock extends Component<DataBlockProps, DataBlockState> {
@@ -107,14 +105,18 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   private parseDataResponse(response: DataBlockResponse): void {
-    const newState: DataBlockState = { isLoading: false, isError: false };
+    const newState: DataBlockState = {
+      isLoading: false,
+      isError: false,
+      dataBlockResponse: response,
+    };
 
     const data: DataBlockData = response;
     const chartMetadata = parseMetaData(response.metaData);
 
     if (chartMetadata === undefined) return;
 
-    const { charts, summary, tables, heading } = this.props;
+    const { charts, tables, heading } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
@@ -145,13 +147,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       });
     }
 
-    if (summary) {
-      newState.summary = {
-        ...summary,
-        data,
-        meta: chartMetadata,
-      };
-    }
     this.setState(newState);
   }
 
@@ -165,7 +160,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       onSummaryDetailsToggle,
       id,
     } = this.props;
-    const { charts, summary, tables, isLoading, isError } = this.state;
+    const { charts, tables, isLoading, isError } = this.state;
     return (
       <>
         {heading && <h3>{heading}</h3>}
@@ -180,14 +175,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </TabsSection>
             )}
 
-            {summary && (
-              <TabsSection id={`${id}-summary`} title="Summary">
-                <SummaryRenderer
-                  onToggle={onSummaryDetailsToggle}
-                  {...summary}
-                />
-              </TabsSection>
-            )}
+            <TabsSection id={`${id}-summary`} title="Summary">
+              <SummaryRenderer
+                onToggle={onSummaryDetailsToggle}
+                datablocks={[{ ...this.props, type: undefined }]}
+              />
+            </TabsSection>
 
             {tables && showTables && (
               <TabsSection id={`${id}-tables`} title="Data tables">

@@ -8,8 +8,14 @@ import DataBlockService, {
 import React, { useEffect, useState } from 'react';
 import styles from './SummaryRenderer.module.scss';
 
-export interface KeyStatProps extends DataBlock {
+export interface KeyStatProps extends Omit<DataBlock, 'type'> {
+  type: string;
   dataBlockResponse?: DataBlockResponse;
+}
+
+interface KeyStatConfig {
+  indicatorLabel: string;
+  value: string;
 }
 
 const KeyStatTile = ({
@@ -20,9 +26,7 @@ const KeyStatTile = ({
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >(response);
-  const [config, setConfig] = useState<
-    { indicatorLabel: string; value: string } | undefined
-  >();
+  const [config, setConfig] = useState<KeyStatConfig | undefined>();
 
   useEffect(() => {
     if (!dataBlockResponse) {
@@ -42,32 +46,36 @@ const KeyStatTile = ({
     }
   }, [dataBlockResponse]);
 
-  return dataBlockResponse && config ? (
+  return (
     <div className={styles.keyStatTile}>
-      <div className={styles.keyStat}>
-        <h3 className="govuk-heading-s" data-testid="key-stat-tile-title">
-          {config.indicatorLabel}
-        </h3>
-        <p className="govuk-heading-xl" data-testid="key-stat-tile-value">
-          {config.value}
-        </p>
-        {summary && summary.dataSummary && (
-          <p className="govuk-body-s">{summary.dataSummary}</p>
-        )}
-      </div>
-      {summary && summary.dataDefinition && (
-        <Details
-          summary={
-            (summary && summary.dataDefinitionTitle) ||
-            `Define '${config.indicatorLabel}'`
-          }
-        >
-          <div>{summary.dataDefinition}</div>
-        </Details>
+      {dataBlockResponse && config ? (
+        <>
+          <div className={styles.keyStat}>
+            <h3 className="govuk-heading-s" data-testid="key-stat-tile-title">
+              {config.indicatorLabel}
+            </h3>
+            <p className="govuk-heading-xl" data-testid="key-stat-tile-value">
+              {config.value}
+            </p>
+            {summary && summary.dataSummary && (
+              <p className="govuk-body-s">{summary.dataSummary}</p>
+            )}
+          </div>
+          {summary && summary.dataDefinition && (
+            <Details
+              summary={
+                (summary && summary.dataDefinitionTitle) ||
+                `Define '${config.indicatorLabel}'`
+              }
+            >
+              <div>{summary.dataDefinition}</div>
+            </Details>
+          )}
+        </>
+      ) : (
+        <LoadingSpinner />
       )}
     </div>
-  ) : (
-    <LoadingSpinner />
   );
 };
 

@@ -203,12 +203,9 @@ export default class PrototypePublicationService {
 
             summary: {
               dataKeys: [],
-              dataSummary: [],
-              dataDefinition: [],
-              description: {
-                type: 'MarkDownBlock',
-                body: LOREM,
-              },
+              dataSummary: '',
+              dataDefinitionTitle: '',
+              dataDefinition: '',
             },
             comments: [
               {

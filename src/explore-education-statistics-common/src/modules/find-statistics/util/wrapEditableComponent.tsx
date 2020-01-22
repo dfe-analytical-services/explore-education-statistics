@@ -27,8 +27,7 @@ const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
     return isEditing ? (
       <EditableComponent
         {...(props as EditableProps)}
-        isEditing={isEditing}
-        {...context}
+        editingContext={{ isEditing, ...context }}
       />
     ) : (
       <RenderComponent {...(props as RenderProps)} />

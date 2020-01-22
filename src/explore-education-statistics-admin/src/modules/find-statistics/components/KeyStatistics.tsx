@@ -8,8 +8,8 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
+import EditableKeyStatTile from './EditableKeyStatTile';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
-import KeyStat from './KeyStat';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -38,7 +38,15 @@ const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
     <>
       <div className={styles.keyStatsContainer}>
         {keyStats.content &&
-          keyStats.content.map(stat => <KeyStat key={stat.id} {...stat} />)}
+          keyStats.content.map(stat => {
+            if (stat.dataBlockRequest !== undefined) {
+              return stat.type === 'DataBlock' && stat.dataBlockRequest ? (
+                // @ts-ignore
+                <EditableKeyStatTile key={stat.id} {...stat} />
+              ) : null;
+            }
+            return null;
+          })}
       </div>
       {isEditing && (
         <AddKeyStatistics release={release} setRelease={setRelease} />

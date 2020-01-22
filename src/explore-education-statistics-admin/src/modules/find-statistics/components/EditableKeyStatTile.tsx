@@ -6,16 +6,11 @@ import KeyStatTile, {
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStatTile';
 
-interface EditableKeyStatProps extends KeyStatProps, ReleaseContentContext {}
+interface EditableKeyStatProps extends KeyStatProps {
+  editingContext?: ReleaseContentContext;
+}
 
-const EditableKeyStatTile = ({
-  isEditing,
-  isCommenting,
-  isReviewing,
-  releaseId,
-  availableDataBlocks,
-  ...summary
-}: EditableKeyStatProps) => {
+const EditableKeyStatTile = (/* props: EditableKeyStatProps */) => {
   return <>EditableKeyStat</>;
 };
 
