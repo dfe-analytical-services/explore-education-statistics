@@ -469,6 +469,9 @@
       "name": "[variables('dataAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -658,6 +661,9 @@
       "name": "[variables('contentAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -838,6 +844,9 @@
       "name": "[variables('adminAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1075,6 +1084,9 @@
       "name": "[variables('publicAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1828,6 +1840,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('notificationsAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
@@ -2009,6 +2024,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('importerAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
@@ -2168,6 +2186,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('publisherAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
