@@ -5,9 +5,12 @@ import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import Link from '@frontend/components/Link';
+import classNames from 'classnames';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
 } from './components/SubscriptionForm';
+import styles from './SubscriptionPage.module.scss';
 
 interface Props {
   slug: string;
@@ -70,7 +73,6 @@ class SubscriptionPage extends Component<Props> {
   public render() {
     const { subscribed } = this.state;
     const { data, slug, unsubscribed, verified } = this.props;
-
     let message;
     let title;
 
@@ -96,9 +98,18 @@ class SubscriptionPage extends Component<Props> {
         ]}
       >
         {message ? (
-          <div className="govuk-panel govuk-panel--confirmation">
-            <h2 className="govuk-panel__title">{title}</h2>
+          <div
+            className={classNames(
+              'govuk-panel',
+              'govuk-panel--confirmation',
+              styles.panelContainer,
+            )}
+          >
+            <h1 className="govuk-panel__title">{title}</h1>
             <div className="govuk-panel__body">{message}</div>
+            {verified && (
+              <Link to={`/find-statistics/${slug}`}>View {data.title}</Link>
+            )}
           </div>
         ) : (
           <>
