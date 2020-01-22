@@ -2,8 +2,6 @@ import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage'
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
-import UserInvitePage from '@admin/pages/users/UserInvitePage';
-import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
@@ -22,10 +20,13 @@ import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
 import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
+import PrereleasePage from '@admin/pages/release/prerelease/PrereleasePage';
+import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
+import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
+import permissionService from '@admin/services/permissions/service';
 import { Dictionary } from '@admin/types';
 import { RouteProps } from 'react-router';
-import permissionService from '@admin/services/permissions/service';
 
 interface ProtectedRouteProps extends RouteProps {
   protectedAction?: () => Promise<boolean>;
@@ -104,6 +105,11 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   createRelease: {
     path: '/publication/:publicationId/create-release',
     component: CreateReleasePage,
+    exact: true,
+  },
+  prereleaseView: {
+    path: '/publication/:publicationId/release/:releaseId/prerelease',
+    component: PrereleasePage,
     exact: true,
   },
   manageRelease: {
