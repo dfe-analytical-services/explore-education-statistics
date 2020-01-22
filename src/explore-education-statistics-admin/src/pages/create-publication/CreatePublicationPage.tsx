@@ -167,6 +167,7 @@ const CreatePublicationPage = ({
                 <FormFieldRadioGroup
                   id={`${formId}-methodologyChoice`}
                   legend="Choose a methodology for this publication"
+                  legendSize="m"
                   name="methodologyChoice"
                   options={[
                     {
@@ -191,8 +192,10 @@ const CreatePublicationPage = ({
                   />
                 )}
                 <FormFieldset
+                  className="govuk-!-margin-top-9"
                   id={`${formId}-selectedContactIdFieldset`}
                   legend="Choose the contact for this publication"
+                  legendSize="m"
                   hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
                 >
                   <FormFieldSelect
