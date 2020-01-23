@@ -136,9 +136,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     name="timePeriodCoverageStartYear"
                     label={`
                       ${
-                        timePeriodLabel === 'Month' ||
-                        timePeriodLabel === 'Term' ||
-                        timePeriodLabel === 'Other'
+                        ['Month', 'Term', 'Other'].includes(timePeriodLabel)
                           ? 'Year'
                           : timePeriodLabel
                       }
