@@ -230,6 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
+        public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -356,6 +357,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<User>();
 
             modelBuilder.Entity<UserReleaseRole>()
+                .Property(r => r.Role)
+                .HasConversion(new EnumToStringConverter<ReleaseRole>());
+
+            modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
