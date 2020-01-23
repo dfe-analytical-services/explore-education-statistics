@@ -15,17 +15,17 @@ import DataBlockService, {
 import { Summary } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import { KeyStatisticsProps } from './KeyStatistics';
 
-interface EditableKeyStatProps extends KeyStatProps, KeyStatisticsProps {}
+interface EditableKeyStatProps extends KeyStatProps {
+  onRemove?: () => void;
+  isEditing?: boolean;
+}
 
 type KeyStatsFormValues = Omit<Summary, 'dataKeys'>;
 
 const EditableKeyStatTile = ({
-  release,
-  setRelease,
-  isEditing,
+  isEditing = false,
+  onRemove,
   dataBlockResponse: response,
   dataBlockRequest,
   id,
@@ -133,32 +133,12 @@ const EditableKeyStatTile = ({
                     >
                       Save
                     </Button>
-                    {release.id && id && (
+                    {onRemove && (
                       <Button
                         disabled={removing}
                         variant="secondary"
                         onClick={() => {
-                          setRemoving(true);
-                          releaseContentService
-                            .deleteContentSectionBlock(
-                              release.id,
-                              release.keyStatisticsSection.id || '',
-                              id,
-                            )
-                            .then(() => {
-                              setRelease({
-                                ...release,
-                                keyStatisticsSection: {
-                                  ...release.keyStatisticsSection,
-                                  content:
-                                    (release.keyStatisticsSection.content &&
-                                      release.keyStatisticsSection.content.filter(
-                                        contentBlock => contentBlock.id !== id,
-                                      )) ||
-                                    [],
-                                },
-                              });
-                            });
+                          onRemove();
                         }}
                       >
                         Remove

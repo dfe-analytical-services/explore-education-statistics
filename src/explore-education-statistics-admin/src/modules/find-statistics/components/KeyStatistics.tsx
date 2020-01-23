@@ -50,8 +50,27 @@ const KeyStatistics = ({
                   key={stat.id}
                   {...stat}
                   isEditing={isEditing}
-                  release={release}
-                  setRelease={setRelease}
+                  onRemove={() => {
+                    releaseContentService
+                      .deleteContentSectionBlock(
+                        release.id,
+                        release.keyStatisticsSection.id || '',
+                        stat.id,
+                      )
+                      .then(() => {
+                        setRelease({
+                          ...release,
+                          keyStatisticsSection: {
+                            ...release.keyStatisticsSection,
+                            content:
+                              release.keyStatisticsSection.content &&
+                              release.keyStatisticsSection.content.filter(
+                                contentBlock => contentBlock.id !== stat.id,
+                              ),
+                          },
+                        });
+                      });
+                  }}
                 />
               ) : null;
             }
