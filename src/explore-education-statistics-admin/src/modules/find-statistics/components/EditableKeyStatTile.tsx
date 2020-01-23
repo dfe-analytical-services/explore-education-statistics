@@ -106,7 +106,7 @@ const EditableKeyStatTile = ({
                       </p>
                       <div className="govuk-!-margin-top-1">
                         <FormFieldTextInput<KeyStatsFormValues>
-                          id="key-stat-dataSummary"
+                          id={`key-stat-dataSummary-${id}`}
                           name="dataSummary"
                           label={
                             <span className={styles.trendText}>Trend</span>
@@ -116,12 +116,12 @@ const EditableKeyStatTile = ({
                     </div>
                     <Details summary="Guidance text" open>
                       <FormFieldTextInput<KeyStatsFormValues>
-                        id="key-stat-dataDefinitionTitle"
+                        id={`key-stat-dataDefinitionTitle-${id}`}
                         name="dataDefinitionTitle"
                         label="Guidance title"
                       />
                       <FormFieldTextArea<KeyStatsFormValues>
-                        id="key-stat-dataDefinition"
+                        id={`key-stat-dataDefinition-${id}`}
                         name="dataDefinition"
                         label="Guidance text"
                       />
@@ -138,6 +138,7 @@ const EditableKeyStatTile = ({
                         disabled={removing}
                         variant="secondary"
                         onClick={() => {
+                          setRemoving(true);
                           onRemove();
                         }}
                       >

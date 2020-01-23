@@ -40,6 +40,9 @@ const KeyStatistics = ({
   if (!keyStats) return null;
   return (
     <>
+      {isEditing && (
+        <AddKeyStatistics release={release} setRelease={setRelease} />
+      )}
       <div className={styles.keyStatsContainer}>
         {keyStats.content &&
           keyStats.content.map(stat => {
@@ -72,6 +75,7 @@ const KeyStatistics = ({
                       });
                   }}
                   onSubmit={values => {
+                    console.log(values);
                     return new Promise(resolve =>
                       releaseContentService
                         .updateContentSectionDataBlock(
@@ -115,9 +119,6 @@ const KeyStatistics = ({
             return null;
           })}
       </div>
-      {isEditing && (
-        <AddKeyStatistics release={release} setRelease={setRelease} />
-      )}
     </>
   );
 };
