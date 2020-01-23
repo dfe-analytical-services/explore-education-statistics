@@ -2580,7 +2580,7 @@
       "apiVersion": "2018-02-14",
       "resources": [
         {
-          "type": "Microsoft.KeyVault/vaults/secrets",
+          "type": "secrets",
           "name": "ees-notify-api-key",
           "apiVersion": "2018-02-14",
           "dependsOn": [
