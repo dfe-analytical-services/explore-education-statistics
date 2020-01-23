@@ -451,7 +451,7 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "notifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
+    "notifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -942,10 +942,6 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKeyAdmin')]"
-            },
-            {
-              "name": "NotifyApiKeyKeyVaultDirectAccessTest",
               "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('notifyApiKeyKeyVaultSecretId'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
