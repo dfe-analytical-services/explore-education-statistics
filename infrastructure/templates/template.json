@@ -2575,12 +2575,20 @@
     },
 
     {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'),'/ees-notify-api-key')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('keyVaultName')]",
       "apiVersion": "2018-02-14",
-      "properties": {
+      "resources": [
+        {
+          "type": "Microsoft.KeyVault/vaults/secrets",
+          "name": "[concat(variables('keyVaultName'),'/ees-notify-api-key')]",
+          "apiVersion": "2018-02-14",
+          "properties": {
             "value": "test"
-      }
+          }
+        }
+      ]
     }
+
   ]
 }
