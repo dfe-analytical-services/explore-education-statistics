@@ -4,6 +4,8 @@
 
 [How do I run the tests?](#user-content-how-do-i-run-the-tests)
 
+[Authentication](#authentication)
+
 [How do I backup and restore the test data on my local environment?](#user-content-how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
 
 [Directory structure](#user-content-directory-structure)
@@ -48,7 +50,7 @@ OR
 python -m pipenv install
 ```
 
-If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.local", ".env.dev", ".env.test", and ".env.dev03". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
+If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.local", ".env.dev", ".env.test", and ".env.prod02". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
 
 
 # How do I run the tests?
@@ -62,6 +64,13 @@ Further instructions available options
 pipenv run python run_tests.py -h
 ```
 
+# Authentication
+
+To run the admin tests, the run_tests.py script uses ../../useful-scripts/auth-tokens/get_auth_tokens.py. The get_identity_info function logs in as a BAU user and then returns the relevant local storage and cookies for the authenticated user. This is done so that if an authenticated user is required, a test run only needs to log in once rather than once for each test suite.
+
+After the user has been logged in by the run_tests.py script, the local storage and cookie data for the authenticated user is saved in the IDENTITY_LOCAL_STORAGE.txt and IDENTITY_COOKIE.txt files. This is done so that if you're running the tests locally, you don't need to authenticate every time you rerun the tests, as the run_tests.py script will use the data they contain if they exist. This makes developing tests more efficient.
+
+
 # How do I backup and restore the test data on my local environment?
 
 You can currently only backup and restore data on your local environment using Windows. This is because currently you can only emulate Azure storage tables on Windows. At the time of writing [Azurite V3 only has support for blobs and queues, not tables](https://github.com/Azure/Azurite).
@@ -70,7 +79,7 @@ For the backup and restore scripts to work, you'll need:
 
 - to be running the MsSQL database in the docker container (as per explore-education-statistics/src/docker-compose.yml -- from the src directory, `docker-compose up db`)
 - to be running AzureStorageEmulator
-- to have AzCopy v7.3 installed (ideally at 'C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe' -- you can change where the backup and restore scripts if it's installed elsewhere)
+- to have AzCopy v7.3 installed (ideally at 'C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe' -- you can change where in the backup and restore scripts if it's installed elsewhere)
 - optionally, you might want Azure Data Studio and Azure Storage Explorer to inspect the MsSQL databases and your emulated blob and table storage.
 
 To use the scripts, you'll need to install the dev dependencies:
