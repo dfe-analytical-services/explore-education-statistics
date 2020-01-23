@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
-                var result = service.GetLatestRelease(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
+                var result = service.GetLatestReleaseViewModel(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
 
                 Assert.IsType<ReleaseViewModel>(result);
             }

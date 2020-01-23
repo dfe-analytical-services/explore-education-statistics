@@ -21,8 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
-                .Where(IsThemePublished)
-                .Select(BuildThemeTree)
+                .ToList()
+                .Where(theme => IsThemePublished(theme, includedReleaseIds))
+                .Select(theme => BuildThemeTree(theme, includedReleaseIds))
                 .OrderBy(theme => theme.Title)
                 .ToList();
         }
@@ -30,33 +31,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
             return _context.Publications
+                .Where(publication =>
+                    publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>())))
                 .Include(publication => publication.Releases)
-                .ToList()
-                .Where(publication => publication.Releases.Any(IsReleasePublished));
+                .ToList();
         }
 
-        private static ThemeTree BuildThemeTree(Theme theme)
+        private static ThemeTree BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
             return new ThemeTree
             {
                 Id = theme.Id,
                 Title = theme.Title,
                 Summary = theme.Summary,
-                Topics = theme.Topics.Where(IsTopicPublished)
-                    .Select(BuildTopicTree)
+                Topics = theme.Topics.Where(topic => IsTopicPublished(topic, includedReleaseIds))
+                    .Select(topic => BuildTopicTree(topic, includedReleaseIds))
                     .OrderBy(topic => topic.Title)
                     .ToList()
             };
         }
 
-        private static TopicTree BuildTopicTree(Topic topic)
+        private static TopicTree BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
             return new TopicTree
             {
                 Id = topic.Id,
                 Title = topic.Title,
                 Summary = topic.Summary,
-                Publications = topic.Publications.Where(IsPublicationPublished)
+                Publications = topic.Publications
+                    .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
                     .Select(BuildPublicationTree)
                     .OrderBy(publication => publication.Title)
                     .ToList()
@@ -75,25 +78,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static bool IsThemePublished(Theme theme)
+        private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return theme.Topics.Any(IsTopicPublished);
+            return theme.Topics.Any(topic => IsTopicPublished(topic, includedReleaseIds));
         }
 
-        private static bool IsTopicPublished(Topic topic)
+        private static bool IsTopicPublished(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
-            return topic.Publications.Any(IsPublicationPublished);
+            return topic.Publications.Any(publication => IsPublicationPublished(publication, includedReleaseIds));
         }
 
-        private static bool IsPublicationPublished(Publication publication)
+        private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
             return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
-                   publication.Releases.Any(IsReleasePublished);
+                   publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
         }
 
-        private static bool IsReleasePublished(Release release)
+        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
-            return release.Live;
+            return release.Live || includedReleaseIds.Contains(release.Id);
         }
     }
 }

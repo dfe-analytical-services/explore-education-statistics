@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task UpdateLatestReleaseAsync(Publication publication, IEnumerable<Guid> includedReleaseIds,
             bool staging = true)
         {
-            var viewModel = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            var viewModel = _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds);
             await UploadAsync(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }

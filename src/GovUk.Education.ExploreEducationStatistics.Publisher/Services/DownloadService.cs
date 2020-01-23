@@ -14,29 +14,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseService _releaseService;
 
         public DownloadService(ContentDbContext context,
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService,
+            IReleaseService releaseService)
         {
             _context = context;
             _fileStorageService = fileStorageService;
+            _releaseService = releaseService;
         }
 
         public IEnumerable<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
-        {
-            var tree = _context.Themes
+        { 
+            return _context.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
-                .Select(BuildThemeTree)
-                .Where(themeTree => themeTree.Topics.Any())
+                .ToList()
+                .Where(theme => IsThemePublished(theme, includedReleaseIds))
+                .Select(theme => BuildThemeTree(theme, includedReleaseIds))
                 .OrderBy(theme => theme.Title)
                 .ToList();
-
-            return tree;
         }
 
-        private ThemeTree BuildThemeTree(Theme theme)
+        private ThemeTree BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
             return new ThemeTree
             {
@@ -44,14 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = theme.Title,
                 Summary = theme.Summary,
                 Topics = theme.Topics
-                    .Select(BuildTopicTree)
-                    .Where(topicTree => topicTree.Publications.Any())
+                    .Where(topic => IsTopicPublished(topic, includedReleaseIds))
+                    .Select(topic => BuildTopicTree(topic, includedReleaseIds))
                     .OrderBy(topic => topic.Title)
                     .ToList()
             };
         }
 
-        private TopicTree BuildTopicTree(Topic topic)
+        private TopicTree BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
             return new TopicTree
             {
@@ -59,15 +61,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
-                    .Where(publication => publication.Releases.Any(release => release.Live))
-                    .Select(BuildPublicationTree)
+                    .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
+                    .Select(publication => BuildPublicationTree(publication, includedReleaseIds))
                     .Where(publicationTree => publicationTree.DownloadFiles.Any())
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private PublicationTree BuildPublicationTree(Publication publication)
+        private PublicationTree BuildPublicationTree(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
             return new PublicationTree
             {
@@ -75,19 +77,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                DownloadFiles = GetDownloadFiles(publication).ToList()
+                DownloadFiles = GetDownloadFiles(publication, includedReleaseIds).ToList()
             };
         }
 
-        private IEnumerable<FileInfo> GetDownloadFiles(Publication publication)
+        private IEnumerable<FileInfo> GetDownloadFiles(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            var mostRecentRelease = GetMostRecentRelease(publication);
-            return _fileStorageService.ListPublicFiles(publication.Slug, mostRecentRelease.Slug);
+            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            return _fileStorageService.ListPublicFiles(publication.Slug, latestRelease.Slug);
         }
 
-        private static Release GetMostRecentRelease(Publication publication)
+        private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return publication.Releases.OrderByDescending(release => release.Published).FirstOrDefault();
+            return theme.Topics.Any(topic => IsTopicPublished(topic, includedReleaseIds));
+        }
+
+        private static bool IsTopicPublished(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        {
+            return topic.Publications.Any(publication => IsPublicationPublished(publication, includedReleaseIds));
+        }
+
+        private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
+        {
+            return publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
+        }
+
+        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
+        {
+            return release.Live || includedReleaseIds.Contains(release.Id);
         }
     }
 }
