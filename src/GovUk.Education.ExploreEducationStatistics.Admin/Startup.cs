@@ -261,6 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new TableStorageService(Configuration.GetConnectionString("PublisherStorage"))));
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
+            services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
