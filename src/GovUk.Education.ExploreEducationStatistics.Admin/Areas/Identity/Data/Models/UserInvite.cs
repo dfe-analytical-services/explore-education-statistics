@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models

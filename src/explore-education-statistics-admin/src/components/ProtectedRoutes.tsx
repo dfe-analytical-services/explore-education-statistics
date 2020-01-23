@@ -33,7 +33,17 @@ const ProtectedRoutes = ({ children }: Props) => {
         const userProfile = await authService.getUser();
         const { profile } = userProfile;
         const userId = profile.sub;
-        const permissions = await permissionService.getGlobalPermissions();
+        const validToken = new Date() < new Date(userProfile.expires_at * 1000);
+
+        const permissions = validToken
+          ? await permissionService.getGlobalPermissions()
+          : {
+              canAccessSystem: false,
+              canAccessPrereleasePages: false,
+              canAccessAnalystPages: false,
+              canAccessUserAdministrationPages: false,
+              canAccessMethodologyAdministrationPages: false,
+            };
 
         const user: User = {
           id: userId,
