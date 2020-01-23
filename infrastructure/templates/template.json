@@ -446,8 +446,8 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
-    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '01')]",
-    "NotifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key-2')]",
+    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
+    "NotifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -2568,12 +2568,6 @@
           }
         ]
       }
-    },
-
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'),'/ees-notify-api-key-2')]",
-      "apiVersion": "2018-02-14"
     }
   ]
 }
