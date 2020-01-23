@@ -2568,6 +2568,12 @@
           }
         ]
       }
+    },
+
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'),'/ees-notify-api-key')]",
+      "apiVersion": "2018-02-14"
     }
   ]
 }
