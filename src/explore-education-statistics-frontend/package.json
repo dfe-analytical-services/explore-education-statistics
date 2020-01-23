@@ -111,6 +111,7 @@
     "build:dev02": "cross-env BUILD_ENV=dev02 next build ./src",
     "build:dev03": "cross-env BUILD_ENV=dev03 next build ./src",
     "build:test": "cross-env BUILD_ENV=test next build ./src",
+    "build:prod": "cross-env BUILD_ENV=prod next build ./src",
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint src/**/*.{ts,tsx}",
     "lint:style": "stylelint src/**/*.{scss,css}",

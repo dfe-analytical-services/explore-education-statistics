@@ -35,14 +35,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public Task<List<MyPublicationViewModel>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
+        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
         {
-            return _userService
-                .CheckCanViewAllReleases()
-                .OnSuccess(() => 
-                    _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
-                .OrElse(() => _publicationRepository.
-                    GetPublicationsForTopicRelatedToUserAsync(topicId, _userService.GetUserId()));
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllReleases()
+                        .OnSuccess(() =>
+                            _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
+                        .OrElse(() =>
+                            _publicationRepository.GetPublicationsForTopicRelatedToUserAsync(topicId,
+                                _userService.GetUserId()));
+                });
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
@@ -72,19 +78,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<PublicationViewModel> GetViewModelAsync(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModelAsync(Guid publicationId)
         {
-            var publication = await _context.Publications
-                .Where(p => p.Id == publicationId)
-                .HydratePublicationForPublicationViewModel()
-                .FirstOrDefaultAsync();
-            return _mapper.Map<PublicationViewModel>(publication);
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
+                .OnSuccess(_userService.CheckCanViewPublication)
+                .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
-    }
-    
-    public static class PublicationLinqExtensions
-    {
-        public static IQueryable<Publication> HydratePublicationForPublicationViewModel(this IQueryable<Publication> values)
+        
+        public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
         {
             return values.Include(p => p.Contact)
                 .Include(p => p.Releases)
