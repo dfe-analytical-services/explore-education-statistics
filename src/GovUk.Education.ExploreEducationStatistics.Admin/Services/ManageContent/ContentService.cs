@@ -566,6 +566,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<Either<ActionResult, IContentBlock>> UpdateDataBlock(DataBlock blockToUpdate,
             UpdateDataBlockRequest request)
         {
+            if (blockToUpdate.Summary == null)
+            {
+                blockToUpdate.Summary = new Summary();
+            }
+            
             blockToUpdate.Summary.dataDefinitionTitle = new List<string>
             {
                 request.DataDefinitionTitle
