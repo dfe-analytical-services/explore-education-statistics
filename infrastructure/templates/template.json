@@ -350,6 +350,10 @@
       "type": "bool",
       "defaultValue": true
     },
+    "deployKeyVaultSecrets": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -2571,9 +2575,13 @@
     },
 
     {
+      "condition": "[parameters('deployKeyVaultSecrets')]",
       "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(variables('keyVaultName'),'/ees-notify-api-key')]",
-      "apiVersion": "2018-02-14"
+      "apiVersion": "2018-02-14",
+      "properties": {
+            "value": ""
+      }
     }
   ]
 }
