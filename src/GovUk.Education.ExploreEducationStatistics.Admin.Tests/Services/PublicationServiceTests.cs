@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -22,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithoutMethodology()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (userService, repository, _) = Mocks();
             
             using (var context = InMemoryApplicationDbContext("Create"))
             {
@@ -34,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, persistenceHelper.Object);
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
                 // Service method under test
                 var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
@@ -55,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublicationWithMethodology()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (userService, repository, _) = Mocks();
             
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
@@ -75,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
                 var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, persistenceHelper.Object);
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
                 // Service method under test
                 var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
@@ -145,10 +143,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPublicationRepository>, 
             Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall<ContentDbContext, Topic>(persistenceHelper);
+            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
+
             return (
                 MockUtils.AlwaysTrueUserService(), 
                 new Mock<IPublicationRepository>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Topic>());
+                persistenceHelper);
         }
     }
 }

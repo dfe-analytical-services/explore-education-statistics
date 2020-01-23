@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -25,9 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
         {
-            var results = await _context
-                .Publications
-                .HydratePublicationForPublicationViewModel()
+            var results = await HydratePublicationForPublicationViewModel(_context.Publications)
                 .Where(publication => publication.TopicId == topicId)
                 .ToListAsync();
                 

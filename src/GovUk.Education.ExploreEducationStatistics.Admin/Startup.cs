@@ -184,6 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
                 
+                // does this user have permission to view a specific Theme?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificThemeRequirement()));
+                
                 // does this user have permission to view all Releases across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
@@ -196,6 +200,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
                     policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
                 
+                // does this user have permission to view a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
+
                 // does this user have permission to view a specific Release?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
@@ -253,7 +261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new TableStorageService(Configuration.GetConnectionString("PublisherStorage"))));
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
-            services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
@@ -312,6 +319,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These handlers enforce Resource-based access control
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
