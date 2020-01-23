@@ -1,4 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
+import permissionService from '@admin/services/permissions/service';
 import LoginContext from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -28,30 +29,29 @@ const ProtectedRoutes = ({ children }: Props) => {
     const authenticated = await authService.isAuthenticated();
 
     if (authenticated) {
-      await authService
-        .getUser()
-        .then(userProfile => {
-          const { profile } = userProfile;
-          const user: User = {
-            id: profile.sub,
-            name: profile.given_name,
-            permissions: profile.role
-              ? (profile.role as string).split(',')
-              : [],
-            validToken: new Date() < new Date(userProfile.expires_at * 1000),
-          };
+      try {
+        const userProfile = await authService.getUser();
+        const { profile } = userProfile;
+        const userId = profile.sub;
+        const permissions = await permissionService.getGlobalPermissions();
 
-          setAuthState({
-            ready: true,
-            user,
-          });
-        })
-        .catch(() => {
-          setAuthState({
-            ready: false,
-            user: undefined,
-          });
+        const user: User = {
+          id: userId,
+          name: profile.given_name,
+          permissions,
+          validToken: new Date() < new Date(userProfile.expires_at * 1000),
+        };
+
+        setAuthState({
+          ready: true,
+          user,
         });
+      } catch (_) {
+        setAuthState({
+          ready: false,
+          user: undefined,
+        });
+      }
     } else {
       setAuthState({
         ready: true,

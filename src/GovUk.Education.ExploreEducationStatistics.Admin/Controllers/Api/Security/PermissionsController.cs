@@ -27,42 +27,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         }
 
         [HttpGet("access")]
-        public Task<ActionResult<bool>> CanAccessSystem()
+        public ActionResult<GlobalPermissions> CanAccessSystem()
         {
-            return CheckPolicy(_userService.CheckCanAccessSystem);
-        }
-
-        [HttpGet("administration/access")]
-        public Task<ActionResult<bool>> CanAccessAdministration()
-        {
-            return CheckPolicy(
-                _userService.CheckCanManageAllUsers,
-                _userService.CheckCanManageAllMethodologies
-            );
-        }
-
-        [HttpGet("analyst/access")]
-        public Task<ActionResult<bool>> CanAccessAnalystPages()
-        {
-            return CheckPolicy(_userService.CheckCanAccessAnalystPages);
-        }
-
-        [HttpGet("prerelease/access")]
-        public Task<ActionResult<bool>> CanAccessPrereleasePages()
-        {
-            return CheckPolicy(_userService.CheckCanAccessPrereleasePages);
-        }
-        
-        [HttpGet("users/manage")]
-        public Task<ActionResult<bool>> CanManageAllUsers()
-        {
-            return CheckPolicy(_userService.CheckCanManageAllUsers);
-        }
-        
-        [HttpGet("methodologies/manage")]
-        public Task<ActionResult<bool>> CanManageAllMethodologies()
-        {
-            return CheckPolicy(_userService.CheckCanManageAllMethodologies);
+            return new GlobalPermissions
+            {
+                CanAccessSystem = _userService.CheckCanAccessSystem().Result.IsRight,
+                CanAccessAnalystPages = _userService.CheckCanAccessAnalystPages().Result.IsRight,
+                CanAccessPrereleasePages = _userService.CheckCanAccessPrereleasePages().Result.IsRight,
+                CanAccessUserAdministrationPages = _userService.CheckCanManageAllUsers().Result.IsRight,
+                CanAccessMethodologyAdministrationPages = _userService.CheckCanManageAllMethodologies().Result.IsRight
+            };
         }
 
         [HttpGet("topic/{topicId}/publication/create")]
@@ -94,6 +68,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         {
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanApproveRelease);
         }
+
+        public class GlobalPermissions
+        {
+            public bool CanAccessSystem { get; set; }
+            public bool CanAccessPrereleasePages { get; set; }
+            public bool CanAccessAnalystPages { get; set; }
+            public bool CanAccessUserAdministrationPages { get; set; }
+            public bool CanAccessMethodologyAdministrationPages { get; set; }
+        } 
 
         private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(
             Guid entityId, 

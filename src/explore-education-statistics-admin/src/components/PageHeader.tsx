@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
+import permissionService from '@admin/services/permissions/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
@@ -12,6 +13,7 @@ interface Props {
 
 const PageHeader = ({ wide }: Props) => {
   const { user } = useContext(LoginContext);
+
   return (
     <>
       <a href="#main-content" className="govuk-skip-link">
@@ -81,11 +83,13 @@ const PageHeader = ({ wide }: Props) => {
 
 const LoggedInLinks = ({ user }: Authentication) => (
   <>
-    <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="/documentation">
-        Administrators' guide
-      </a>
-    </li>
+    {user && user.permissions.canAccessAnalystPages && (
+      <li className="govuk-header__navigation-item">
+        <a className="govuk-header__link" href="/documentation">
+          Administrators' guide
+        </a>
+      </li>
+    )}
     <li className="govuk-header__navigation-item">
       <a className="govuk-header__link" href="/identity/account/manage">
         {user ? user.name : ''}

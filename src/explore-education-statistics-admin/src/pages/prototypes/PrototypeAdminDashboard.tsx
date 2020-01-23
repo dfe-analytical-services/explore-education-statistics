@@ -15,18 +15,15 @@ const UserType = () => {
 
   return (
     <>
-      {userContext.user &&
-        userContext.user.permissions.includes('team lead') && (
-          <span className="govuk-body-s"> (Team lead)</span>
-        )}
-      {userContext.user &&
-        userContext.user.permissions.includes('team member') && (
-          <span className="govuk-body-s"> (Team member)</span>
-        )}
-      {userContext.user &&
-        userContext.user.permissions.includes('responsible statistician') && (
-          <span className="govuk-body-s"> (Responsible statistician)</span>
-        )}
+      {userContext.user && userContext.user.name === 'John Smith' && (
+        <span className="govuk-body-s"> (Team lead)</span>
+      )}
+      {userContext.user && userContext.user.name === 'Ann Evans' && (
+        <span className="govuk-body-s"> (Team member)</span>
+      )}
+      {userContext.user && userContext.user.name === 'Stephen Doherty' && (
+        <span className="govuk-body-s"> (Responsible statistician)</span>
+      )}
     </>
   );
 };
@@ -37,8 +34,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
     ? 'readyApproval'
     : 'readyHigherReview';
   const user =
-    userContext.user &&
-    userContext.user.permissions.includes('responsible statistician')
+    userContext.user && userContext.user.name === 'Stephen Doherty'
       ? 'higherReviewUser'
       : 'standardUser';
 
@@ -97,8 +93,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
               setDashboardView('releases');
             }}
           >
-            {userContext.user &&
-            userContext.user.permissions.includes('team lead')
+            {userContext.user && userContext.user.name === 'John Smith'
               ? 'manage publications and releases'
               : 'manage releases'}
           </a>
@@ -118,8 +113,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       {dashboardView !== 'methodology' && (
         <>
           <h2 className="govuk-medium">
-            {userContext.user &&
-            userContext.user.permissions.includes('team lead')
+            {userContext.user && userContext.user.name === 'John Smith'
               ? 'Manage publications and releases'
               : 'Manage releases'}
           </h2>
@@ -127,8 +121,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
             <TabsSection
               id="publications"
               title={
-                userContext.user &&
-                userContext.user.permissions.includes('team lead')
+                userContext.user && userContext.user.name === 'John Smith'
                   ? 'Manage publications and releases'
                   : 'Manage releases'
               }

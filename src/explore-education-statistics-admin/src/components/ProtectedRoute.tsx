@@ -5,16 +5,17 @@ import ErrorBoundary, {
 import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
 import permissionService from '@admin/services/permissions/service';
+import { User } from '@admin/services/sign-in/types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 import ProtectedRoutes from './ProtectedRoutes';
 
 interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;
-  protectionAction?: () => Promise<boolean>;
+  protectionAction?: (user: User) => Promise<boolean>;
 }
 
-const basicAccessCheck = () => permissionService.canAccessSystem();
+const basicAccessCheck = permissionService.canAccessSystem;
 
 const AuthenticationCheckingComponent = ({
   component,
@@ -34,7 +35,7 @@ const AuthenticationCheckingComponent = ({
     if (user) {
       const accessCheck = protectionAction || basicAccessCheck;
 
-      accessCheck()
+      accessCheck(user)
         .then(result => setProtectedByAction(!result))
         .catch(handleApiErrors);
     } else {

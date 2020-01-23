@@ -1,8 +1,9 @@
+import LoginContext from '@admin/components/Login';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import permissionService from '@admin/services/permissions/service';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 
@@ -12,12 +13,13 @@ interface Permissions {
 }
 
 const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
+  const { user } = useContext(LoginContext);
   const [permissions, setPermissions] = useState<Permissions>();
 
   useEffect(() => {
     Promise.all([
-      permissionService.canManageAllUsers(),
-      permissionService.canManageAllMethodologies(),
+      permissionService.canManageAllUsers(user),
+      permissionService.canManageAllMethodologies(user),
     ])
       .then(([canManageUsers, canManageMethodologies]) =>
         setPermissions({
