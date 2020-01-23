@@ -24,13 +24,12 @@ import PrereleasePage from '@admin/pages/release/prerelease/PrereleasePage';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
-import permissionService from '@admin/services/permissions/service';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
 import { RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
-  protectedAction?: (user: User) => Promise<boolean>;
+  protectedAction?: (user: User) => boolean;
 }
 
 export const generateAdminDashboardThemeTopicLink: (
@@ -42,183 +41,158 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   home: {
     path: '/',
     component: AdminDashboardPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   adminDashboard: {
     path: '/dashboard',
     component: AdminDashboardPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   adminDashboardThemeTopic: {
     path: '/dashboard/:themeId/:topicId',
     component: AdminDashboardPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
   },
   administration: {
     path: '/administration',
     component: BauDashboardPage,
     protectedAction: user =>
-      Promise.resolve(
-        user.permissions.canAccessUserAdministrationPages ||
-          user.permissions.canAccessMethodologyAdministrationPages,
-      ),
+      user.permissions.canAccessUserAdministrationPages ||
+      user.permissions.canAccessMethodologyAdministrationPages,
     exact: true,
   },
   administrationMethodology: {
     path: '/administration/methodology',
     component: BauMethodologyPage,
     protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessMethodologyAdministrationPages),
+      user.permissions.canAccessMethodologyAdministrationPages,
     exact: true,
   },
   administrationUsers: {
     path: '/administration/users',
     component: BauUsersPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessUserAdministrationPages),
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
   administrationUserInvite: {
     path: '/administration/users/invite',
     component: UserInvitePage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessUserAdministrationPages),
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
   administrationPendingUsers: {
     path: '/administration/users/pending',
     component: PendingInvitesPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessUserAdministrationPages),
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
   methodology: {
     path: '/methodology',
     component: ListMethodologyPages,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   methodologyCreate: {
     path: '/methodology/create',
     component: CreateMethodologyPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   editMethodology: {
     path: '/methodology/:methodologyId',
     component: EditMethodologyPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   createPublication: {
     path: publicationRoutes.createPublication.route,
     component: CreatePublicationPage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   createRelease: {
     path: '/publication/:publicationId/create-release',
     component: CreateReleasePage,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   prereleaseView: {
     path: '/publication/:publicationId/release/:releaseId/prerelease',
     component: PrereleasePage,
-    protectedAction: permissionService.canAccessPrereleasePages,
+    protectedAction: user => user.permissions.canAccessPrereleasePages,
     exact: true,
   },
   manageRelease: {
     path: '/publication/:publicationId/release/:releaseId',
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     component: ManageReleasePageContainer,
   },
   documentation: {
     path: '/documentation',
     component: AdminDocumentationHome,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationContentStandards: {
     path: '/documentation/content-design-standards-guide',
     component: AdminDocumentationContentDesignStandards,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationGlossary: {
     path: '/documentation/glossary',
     component: AdminDocumentationGlossary,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationStyleGuide: {
     path: '/documentation/style-guide',
     component: AdminDocumentationStyle,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationUsingDashboard: {
     path: '/documentation/using-dashboard',
     component: AdminDocumentationUsingDashboard,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationCreateRelease: {
     path: '/documentation/create-new-release',
     component: AdminDocumentationCreateNewRelease,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationCreatePublication: {
     path: '/documentation/create-new-publication',
     component: AdminDocumentationCreateNewPublication,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationEditRelease: {
     path: '/documentation/edit-release',
     component: AdminDocumentationEditRelease,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationManageContent: {
     path: '/documentation/manage-content',
     component: AdminDocumentationManageContent,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationManageData: {
     path: '/documentation/manage-data',
     component: AdminDocumentationManageData,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   documentationManageDataBlock: {
     path: '/documentation/manage-data-block',
     component: AdminDocumentationManageDataBlocks,
-    protectedAction: user =>
-      Promise.resolve(user.permissions.canAccessAnalystPages),
+    protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   contactUs: {

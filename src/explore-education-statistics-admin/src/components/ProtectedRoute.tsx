@@ -4,18 +4,17 @@ import ErrorBoundary, {
 } from '@admin/components/ErrorBoundary';
 import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
-import permissionService from '@admin/services/permissions/service';
 import { User } from '@admin/services/sign-in/types';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 import ProtectedRoutes from './ProtectedRoutes';
 
 interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;
-  protectionAction?: (user: User) => Promise<boolean>;
+  protectionAction?: (user: User) => boolean;
 }
 
-const basicAccessCheck = permissionService.canAccessSystem;
+const basicAccessCheck = (user: User) => user.permissions.canAccessSystem;
 
 const AuthenticationCheckingComponent = ({
   component,
@@ -25,24 +24,17 @@ const AuthenticationCheckingComponent = ({
 }: ProtectedRouteProps) => {
   const { user } = useContext(LoginContext);
 
-  const { handleApiErrors, handleManualErrors } = useContext(
-    ErrorControlContext,
-  );
+  const { handleManualErrors } = useContext(ErrorControlContext);
 
-  const [protectedByAction, setProtectedByAction] = useState<boolean>();
+  let protectedByAction = false;
 
-  useEffect(() => {
-    if (user) {
-      const accessCheck = protectionAction || basicAccessCheck;
-
-      accessCheck(user)
-        .then(result => setProtectedByAction(!result))
-        .catch(handleApiErrors);
-    } else {
-      const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
-      setProtectedByAction(denyAccessToNonLoggedInUsers);
-    }
-  }, [protectionAction, handleApiErrors, allowAnonymousUsers, user]);
+  if (user) {
+    const accessCheck = protectionAction || basicAccessCheck;
+    protectedByAction = !accessCheck(user);
+  } else {
+    const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
+    protectedByAction = denyAccessToNonLoggedInUsers;
+  }
 
   if (!component) {
     return null;

@@ -1,47 +1,33 @@
+import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
+import Page from '@admin/components/Page';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import permissionService from '@admin/services/permissions/service';
-import React, { useContext, useEffect, useState } from 'react';
-import Page from '@admin/components/Page';
-import Link from '@admin/components/Link';
-
-interface Permissions {
-  canManageUsers: boolean;
-  canManageMethodologies: boolean;
-}
+import React, { useContext } from 'react';
 
 const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
   const { user } = useContext(LoginContext);
-  const [permissions, setPermissions] = useState<Permissions>();
 
-  useEffect(() => {
-    Promise.all([
-      permissionService.canManageAllUsers(user),
-      permissionService.canManageAllMethodologies(user),
-    ])
-      .then(([canManageUsers, canManageMethodologies]) =>
-        setPermissions({
-          canManageUsers,
-          canManageMethodologies,
-        }),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+  const canManageUsers = user
+    ? user.permissions.canAccessUserAdministrationPages
+    : false;
+  const canManageMethodologies = user
+    ? user.permissions.canAccessMethodologyAdministrationPages
+    : false;
 
   return (
     <Page wide>
       <h1 className="govuk-heading-xl">Platform administration</h1>
       <ul>
-        {permissions && permissions.canManageMethodologies && (
+        {canManageMethodologies && (
           <li>
             <Link to="/administration/methodology">
               View methodology status
             </Link>
           </li>
         )}
-        {permissions && permissions.canManageUsers && (
+        {canManageUsers && (
           <li>
             <Link to="/administration/users">View service users</Link>
           </li>
