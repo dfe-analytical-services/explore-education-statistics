@@ -447,7 +447,7 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '01')]",
-    "NotifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
+    "NotifyApiKeyKeyVaultSecretId": "[concat('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
     "ipWhiteList": {
       "copy": [
         {
