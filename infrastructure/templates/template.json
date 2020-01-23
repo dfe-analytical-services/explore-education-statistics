@@ -946,7 +946,7 @@
             },
             {
               "name": "NotifyApiKeyKeyVaultDirectAccessTest",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('NotifyApiKeyKeyVaultSecretId')).secretUriWithVersion, ')')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('NotifyApiKeyKeyVaultSecretId'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",
