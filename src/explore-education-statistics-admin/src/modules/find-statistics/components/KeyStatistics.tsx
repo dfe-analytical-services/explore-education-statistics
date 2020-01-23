@@ -71,6 +71,44 @@ const KeyStatistics = ({
                         });
                       });
                   }}
+                  onSubmit={values => {
+                    return new Promise(resolve =>
+                      releaseContentService
+                        .updateContentSectionDataBlock(
+                          release.id,
+                          release.keyStatisticsSection.id as string,
+                          stat.id,
+                          values,
+                        )
+                        .then(() => {
+                          /* setRelease({
+                            ...release,
+                            keyStatisticsSection: {
+                              ...release.keyStatisticsSection,
+                              content: release.keyStatisticsSection.content
+                                ? release.keyStatisticsSection.content.map(
+                                    contentBlock => {
+                                      if (contentBlock.id === stat.id) {
+                                        return {
+                                          ...stat,
+                                          summary: {
+                                            dataKeys:
+                                              (stat.summary &&
+                                                stat.summary.dataKeys) ||
+                                              [],
+                                            ...values,
+                                          },
+                                        };
+                                      }
+                                      return contentBlock;
+                                    },
+                                  )
+                                : [],
+                            },
+                          }); */
+                        }),
+                    );
+                  }}
                 />
               ) : null;
             }

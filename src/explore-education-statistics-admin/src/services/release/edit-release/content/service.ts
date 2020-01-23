@@ -3,6 +3,7 @@ import {
   AbstractRelease,
   BasicLink,
   ReleaseNote,
+  Summary,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import { ExtendedComment } from '@admin/services/publicationService';
@@ -87,6 +88,18 @@ export const releaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  updateContentSectionDataBlock(
+    releaseId: string,
+    contentSectionId: string,
+    contentBlockId: string,
+    newSummary: Omit<Summary, 'dataKeys'>,
+  ): Promise<ContentBlockViewModel> {
+    return client.put<ContentBlockViewModel>(
+      `/release/${releaseId}/content/section/${contentSectionId}/data-block/${contentBlockId}`,
+      newSummary,
     );
   },
 

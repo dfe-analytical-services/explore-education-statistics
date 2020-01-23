@@ -16,16 +16,18 @@ import { Summary } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
-interface EditableKeyStatProps extends KeyStatProps {
-  onRemove?: () => void;
-  isEditing?: boolean;
-}
-
 type KeyStatsFormValues = Omit<Summary, 'dataKeys'>;
+
+interface EditableKeyStatProps extends KeyStatProps {
+  isEditing?: boolean;
+  onRemove?: () => void;
+  onSubmit: (values: KeyStatsFormValues) => void;
+}
 
 const EditableKeyStatTile = ({
   isEditing = false,
   onRemove,
+  onSubmit,
   dataBlockResponse: response,
   dataBlockRequest,
   id,
@@ -84,9 +86,7 @@ const EditableKeyStatTile = ({
                   `Define '${config.indicatorLabel}'`,
                 dataDefinition: (summary && summary.dataDefinition) || '',
               }}
-              onSubmit={values => {
-                console.log(values);
-              }}
+              onSubmit={onSubmit}
               render={(form: FormikProps<KeyStatsFormValues>) => {
                 return (
                   <Form id={`key-stats-form-${id}`}>
