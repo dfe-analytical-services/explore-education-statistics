@@ -11,7 +11,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import EditableKeyStatTile from './EditableKeyStatTile';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 
-interface Props {
+export interface KeyStatisticsProps {
   release: AbstractRelease<EditableContentBlock, Publication>;
   setRelease: (
     newRelease: AbstractRelease<EditableContentBlock, Publication>,
@@ -19,7 +19,11 @@ interface Props {
   isEditing?: boolean;
 }
 
-const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
+const KeyStatistics = ({
+  release,
+  setRelease,
+  isEditing,
+}: KeyStatisticsProps) => {
   const [keyStats, setKeyStats] = useState<
     | AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
     | undefined
@@ -42,7 +46,13 @@ const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
             if (stat.dataBlockRequest !== undefined) {
               return stat.type === 'DataBlock' && stat.dataBlockRequest ? (
                 // @ts-ignore
-                <EditableKeyStatTile key={stat.id} {...stat} />
+                <EditableKeyStatTile
+                  key={stat.id}
+                  {...stat}
+                  isEditing={isEditing}
+                  release={release}
+                  setRelease={setRelease}
+                />
               ) : null;
             }
             return null;
@@ -55,7 +65,7 @@ const KeyStatistics = ({ release, setRelease, isEditing }: Props) => {
   );
 };
 
-const AddKeyStatistics = ({ release, setRelease }: Props) => {
+const AddKeyStatistics = ({ release, setRelease }: KeyStatisticsProps) => {
   const { updateAvailableDataBlocks } = useContext(EditingContext);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 

@@ -13,7 +13,7 @@ export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   dataBlockResponse?: DataBlockResponse;
 }
 
-interface KeyStatConfig {
+export interface KeyStatConfig {
   indicatorLabel: string;
   value: string;
 }
