@@ -384,7 +384,7 @@ jobs:
           command: 'custom'
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
-          customCommand: 'run build:dev03'
+          customCommand: 'run build:prod'
       - task: 'Bash@3'
         displayName: 'Remove dev dependencies'
         inputs:

@@ -350,6 +350,10 @@
       "type": "bool",
       "defaultValue": true
     },
+    "deployKeyVaultSecrets": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -430,11 +434,8 @@
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
-
-
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'logging')]",
     "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
-
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
@@ -449,6 +450,8 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
+    "notifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
     "ipWhiteList": {
       "copy": [
         {
@@ -940,6 +943,10 @@
             {
               "name": "NotifyApiKey",
               "value": "[parameters('notifyApiKeyAdmin')]"
+            },
+            {
+              "name": "NotifyApiKeyKeyVaultDirectAccessTest",
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('notifyApiKeyKeyVaultSecretId'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",
