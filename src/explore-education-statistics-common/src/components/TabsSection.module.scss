@@ -8,6 +8,10 @@
   }
 }
 
+.forceFullWidth {
+  width: 100% !important;
+}
+
 @media print {
   :global(.govuk-tabs__list) {
     list-style: none;
