@@ -29,6 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
+                .Include(theme => theme.Topics)
+                .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Releases)
                 .ToList()
                 .Where(theme => IsThemePublished(theme, includedReleaseIds))
                 .Select(theme => BuildThemeTree(theme, includedReleaseIds))
