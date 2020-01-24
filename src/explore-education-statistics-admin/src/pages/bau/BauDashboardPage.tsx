@@ -1,12 +1,9 @@
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import React, { useContext } from 'react';
 
-const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
+const BauDashboardPage = () => {
   const { user } = useContext(LoginContext);
 
   const canManageUsers = user
@@ -37,4 +34,4 @@ const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(BauDashboardPage);
+export default BauDashboardPage;

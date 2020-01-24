@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
-import permissionService from '@admin/services/permissions/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';

@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
@@ -6,7 +5,6 @@ import { ManageContentPageViewModel } from '@admin/services/release/edit-release
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
