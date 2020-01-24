@@ -3,9 +3,7 @@ import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import permalinkService from '@common/modules/full-table/services/permalinkService';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
+import TableHeadersForm, {TableHeadersFormValues,} from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   FinalStepProps,
   TableToolWizardProps,
@@ -14,8 +12,9 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import Link from '@frontend/components/Link';
-import React, { createRef, useEffect, useState } from 'react';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import React, {createRef, useEffect, useState} from 'react';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
+import {OmitStrict} from '@common/types';
 
 const TableToolFinalStep = ({
   table,
@@ -167,10 +166,7 @@ const TableToolFinalStep = ({
   );
 };
 
-type TableToolProps = Omit<
-  TableToolWizardProps,
-  'finalStep' | 'onTableConfigurationChange'
->;
+type TableToolProps = OmitStrict<TableToolWizardProps, 'finalStep'>;
 
 const TableTool = (props: TableToolProps) => (
   <TableToolWizard {...props} finalStep={TableToolFinalStep} />
