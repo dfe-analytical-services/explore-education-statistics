@@ -1,16 +1,118 @@
 # Explore education statistics service
 [![Build Status](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_apis/build/status/Explore%20Education%20Statistics?branchName=master)](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_build/latest?definitionId=200&branchName=master)
 
+## Project structure
+
+The project is primarily composed of two areas:
+
+### Public frontend (for general public users)
+
+- **UI** 
+    - NextJS React app
+- **Content API** 
+    - Depends on the **Admin's Publisher** function to generate its cache
+    - Depends on SQLServer `content` database
+- **Data API**
+    - Requires a SQLServer database
+    - Depends on SQLServer `statistics` database
+    
+### Admin (for admins and analysts)
+
+- **UI** 
+    - CRA React app
+- **Admin API**
+- **Publisher**
+    - Azure function for publishing admin content to the public frontend
+- **Notifier** 
+    - Azure function for sending notifications
+- **Data Processor** 
+    - Azure function for handling dataset imports into the admin
+     
 ## Getting started
 
 ### Requirements
 
-To run the application you require:
-- Docker / Docker compose 
+You will need the following groups of dependencies to run the project successfully:
 
-To develop the application you will require:
-- v9.0.0+ of Node.Js installed
-- Version 2.2 of the dotnet SDK installed
+1. To run applications in this service you will require the following:
+
+    - [NodeJS v12+](https://nodejs.org/)
+    - [.NET Core v3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0) 
+    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
+    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+
+2. To run the databases, you can use either:
+
+    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
+    - [Docker and Docker Compose](https://docs.docker.com/)
+
+Unfortunately you will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator 
+for development.
+
+### Running the backend
+
+1. Add the following to your `hosts` file:
+
+    ```
+   127.0.0.1    db
+   127.0.0.1    data-storage
+   ```
+   
+2. If using SQLServer (instead of Docker), you should create your public frontend databases:
+
+    - `content`
+    - `statistics`
+
+3. Ensure you have Azure Storage Emulator running.
+
+#### Running the applications
+
+The recommended way of running backend applications/functions is through the [Rider IDE](https://www.jetbrains.com/rider/).
+If this is not available to you then you will need to use one, or a combination, of the following:  
+
+##### Using `run` script
+
+The `run` script is a simple wrapper around the various CLI commands you need to run the applications. You will need to 
+ensure you have all the project dependencies as specified in [Requirements](#requirements).
+
+Examples:
+ 
+- To run the public frontend:
+
+    ```
+    cd useful-scripts
+    ./run.js data content publisher
+    ```
+
+- To run the admin:
+
+    ```
+    cd useful-scripts
+    ./run.js admin processor notifier
+    ```
+  
+##### Using Docker
+
+Parts (but not all) of the backend can be run using Docker. This was previously the preferred way of running backend
+applications as you could avoid needing to install some of the project's hard dependencies (e.g. Azure Storage Emulator).  
+
+Unfortunately, is **not maintained** currently.
+
+Examples:
+
+- To run public frontend services: 
+        
+    ```bash
+    cd src/
+    docker-compose up -d data-api content-api
+    ```
+
+- To run public frontend databases:
+
+    ```
+    cd src/
+    docker-compose up -d db
+    ```
 
 ### Running the frontend
 
@@ -21,18 +123,14 @@ To develop the application you will require:
     npm run bootstrap
     ```
 
-2. Startup required any required backend services:
-    
-    ```bash
-    cd src/
-    docker-compose up -d data-api content-api
-    ```
-       
+2. Startup any required backend services (see [Running the backend](#running-the-backend)) 
+  
 3. Run the frontend applications by running from the project root
 
     ```bash
     # Admin frontend
     npm run start:admin
+   
     # Public frontend
     npm run start:frontend
     ```
