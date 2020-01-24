@@ -227,6 +227,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                         ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -20,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -21,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
+                        ClaimValue = "",
                     }
                 );
             

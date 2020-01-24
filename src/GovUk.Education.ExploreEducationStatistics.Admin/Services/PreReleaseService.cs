@@ -1,88 +1,216 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class PreReleaseService : IPreReleaseService
     {
         private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IReleaseService _releaseService;
-        private readonly ILogger<PreReleaseService> _logger;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IUserService _userService;
         
-        // TODO remove when we have Users to link to a Release for its Pre Release Contacts
-        private static readonly Dictionary<Guid, List<UserDetailsViewModel>> PreReleaseContactsByRelease = new Dictionary<Guid, List<UserDetailsViewModel>>();
-        private static readonly List<UserDetailsViewModel> AvailablePreReleaseContacts = new List<UserDetailsViewModel>()
-        {
-            new UserDetailsViewModel()
-            {
-                Id = new Guid("9b057c20-687a-4734-9e0d-419ada88cde0"),
-                Name = "TODO Pre Release User 1",
-            },
-            new UserDetailsViewModel()
-            {
-                Id = new Guid("4606b997-cf60-4564-86d7-bfd6cd38e879"),
-                Name = "TODO Pre Release User 2",
-            },
-            new UserDetailsViewModel()
-            {
-                Id = new Guid("513e2657-d1a8-4d30-afb3-8d382cc4ddee"),
-                Name = "TODO Pre Release User 3",
-            },
-        };
-            
-        public PreReleaseService(ContentDbContext context, IMapper mapper, IReleaseService releaseService, ILogger<PreReleaseService> logger)
+        public PreReleaseService(ContentDbContext context, IUserService userService, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
-            _mapper = mapper;
-            _releaseService = releaseService;
-            _logger = logger;
+            _userService = userService;
+            _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<List<UserDetailsViewModel>> GetAvailablePreReleaseContactsAsync()
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContactsAsync()
         {
-            // TODO return a list of candidate Users once we have a concept of Users in the database
-            return await Task.FromResult(AvailablePreReleaseContacts);
+            return await _userService
+                .CheckCanViewPrereleaseContactsList()
+                .OnSuccess(async _ =>
+                {
+                    var activePrereleaseContacts = await _context
+                        .UserReleaseRoles
+                        .Include(r => r.User)
+                        .Where(r => r.Role == ReleaseRole.PrereleaseViewer)
+                        .Select(r => r.User.Email.ToLower())
+                        .Distinct()
+                        .Select(email => new PrereleaseCandidateViewModel
+                        {
+                            Email = email,
+                            Invited = false
+                        })
+                        .ToListAsync();
+
+                    var invitedPrereleaseContacts = await _context
+                        .UserReleaseInvites
+                        .Where(r => r.Role == ReleaseRole.PrereleaseViewer && !r.Accepted)
+                        .Select(i => i.Email.ToLower())
+                        .Distinct()
+                        .Select(email => new PrereleaseCandidateViewModel
+                        {
+                            Email = email,
+                            Invited = true
+                        })
+                        .ToListAsync();
+
+                    return activePrereleaseContacts
+                        .Concat(invitedPrereleaseContacts)
+                        .Distinct()
+                        .OrderBy(c => c.Email)
+                        .ToList();
+                });
         }
         
-        // TODO revisit when we have the concept of Users int the database
-        public async Task<List<UserDetailsViewModel>> GetPreReleaseContactsForReleaseAsync(Guid releaseId)
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForReleaseAsync(Guid releaseId)
         {
-            return await Task.FromResult(PreReleaseContactsByRelease.GetValueOrDefault(releaseId, new List<UserDetailsViewModel>()));
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccess(async _ =>
+                {
+                    var activePrereleaseContacts = await _context
+                        .UserReleaseRoles
+                        .Include(r => r.User)
+                        .Where(r => r.Role == ReleaseRole.PrereleaseViewer && r.ReleaseId == releaseId)
+                        .Select(r => r.User.Email.ToLower())
+                        .Distinct()
+                        .Select(email => new PrereleaseCandidateViewModel
+                        {
+                            Email = email,
+                            Invited = false
+                        })
+                        .ToListAsync();
+
+                    var invitedPrereleaseContacts = await _context
+                        .UserReleaseInvites
+                        .Where(r => r.Role == ReleaseRole.PrereleaseViewer && !r.Accepted && r.ReleaseId == releaseId)
+                        .Select(i => i.Email.ToLower())
+                        .Distinct()
+                        .Select(email => new PrereleaseCandidateViewModel
+                        {
+                            Email = email,
+                            Invited = true
+                        })
+                        .ToListAsync();
+
+                    return activePrereleaseContacts
+                        .Concat(invitedPrereleaseContacts)
+                        .Distinct()
+                        .OrderBy(c => c.Email)
+                        .ToList();
+                });
         }
         
-        // TODO revisit when we have the concept of Users int the database
-        public async Task<List<UserDetailsViewModel>> AddPreReleaseContactToReleaseAsync(Guid releaseId, Guid userId)
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToReleaseAsync(
+            Guid releaseId, string email)
         {
-            var chosenUser = AvailablePreReleaseContacts.Find(contact => contact.Id.Equals(userId));
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccessDo(async () =>
+                {
+                    if (!await _context
+                        .UserReleaseRoles
+                        .Include(r => r.User)
+                        .AnyAsync(r => 
+                            r.ReleaseId == releaseId 
+                                && r.User.Email.ToLower() == email.ToLower() 
+                                && r.Role == ReleaseRole.PrereleaseViewer))
+                    {
+                        var existingUser = await _context
+                            .Users
+                            .Where(u => u.Email.ToLower() == email.ToLower())
+                            .FirstOrDefaultAsync();
+
+                        if (existingUser != null)
+                        {
+                            _context.Add(new UserReleaseRole
+                            {
+                                ReleaseId = releaseId,
+                                Role = ReleaseRole.PrereleaseViewer,
+                                UserId = existingUser.Id
+                            });
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            var existingInvite = await _context
+                                .UserReleaseInvites
+                                .Where(i => 
+                                    i.ReleaseId == releaseId 
+                                        && i.Email.ToLower() == email.ToLower() 
+                                        && i.Role == ReleaseRole.PrereleaseViewer)
+                                .FirstOrDefaultAsync();
+
+                            if (existingInvite == null)
+                            {
+                                _context.Add(new UserReleaseInvite
+                                {
+                                    Email = email.ToLower(),
+                                    ReleaseId = releaseId,
+                                    Role = ReleaseRole.PrereleaseViewer,
+                                    CreatedById = _userService.GetUserId()
+                                });
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                })
+                .OnSuccess(_ => GetPreReleaseContactsForReleaseAsync(releaseId));
+        }
+        
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromReleaseAsync(
+            Guid releaseId, string email)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccessDo(async () =>
+                {
+                    var existingUserRole = await _context
+                        .UserReleaseRoles
+                        .Include(r => r.User)
+                        .Where(r => 
+                            r.ReleaseId == releaseId 
+                                && r.User.Email.ToLower() == email.ToLower() 
+                                && r.Role == ReleaseRole.PrereleaseViewer)
+                        .FirstOrDefaultAsync();
+                    
+                    if (existingUserRole != null)
+                    {
+                        _context.Remove(existingUserRole);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        var existingInvite = await _context
+                            .UserReleaseInvites
+                            .Where(i => 
+                                i.ReleaseId == releaseId 
+                                    && i.Email.ToLower() == email.ToLower() 
+                                    && i.Role == ReleaseRole.PrereleaseViewer)
+                            .FirstOrDefaultAsync();
+
+                        if (existingInvite != null)
+                        {
+                            _context.Remove(existingInvite);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                })
+                .OnSuccess(_ => GetPreReleaseContactsForReleaseAsync(releaseId));
+        }
+    }
+
+    public class PrereleaseCandidateViewModel
+    {
+        public string Email { get; set; }
             
-            if (PreReleaseContactsByRelease.ContainsKey(releaseId) && !PreReleaseContactsByRelease[releaseId].Contains(chosenUser)) {
-                PreReleaseContactsByRelease[releaseId].Add(chosenUser);
-            } else {
-                PreReleaseContactsByRelease.Add(releaseId, new List<UserDetailsViewModel>() { chosenUser });
-            }
-
-            _logger.Log(LogLevel.Debug, "Pre Release User " + userId + " added to Release " + releaseId);
-            return await Task.FromResult(PreReleaseContactsByRelease[releaseId]);
-        }
-        
-        // TODO revisit when we have the concept of Users int the database
-        public async Task<List<UserDetailsViewModel>> RemovePreReleaseContactFromReleaseAsync(Guid releaseId, Guid userId)
-        {
-            var chosenUser = AvailablePreReleaseContacts.Find(contact => contact.Id.Equals(userId));
-            
-            if (PreReleaseContactsByRelease.ContainsKey(releaseId)) {
-                PreReleaseContactsByRelease[releaseId].Remove(chosenUser);
-                _logger.Log(LogLevel.Debug, "Pre Release User " + userId + " removed from Release " + releaseId);
-            }
-
-            return await Task.FromResult(PreReleaseContactsByRelease[releaseId]);
-        }
+        public bool Invited { get; set; }
     }
 }

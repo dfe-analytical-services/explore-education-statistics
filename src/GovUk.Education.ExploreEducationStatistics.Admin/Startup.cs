@@ -180,6 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanAccessPrereleasePages.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString()));
 
+                // does this user have permissions to view the prerelease contacts list?
+                options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
+
                 // does this user have permissions to invite and manage all users on the system?
                 options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
@@ -231,6 +235,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // does this user have permission to approve a specific Release?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
+
+                // does this user have permission to assign prerelease contacts to a specific Release?
+                options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -334,6 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {

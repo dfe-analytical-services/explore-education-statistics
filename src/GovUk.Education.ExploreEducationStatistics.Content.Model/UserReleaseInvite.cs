@@ -20,5 +20,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         [Required]
         public ReleaseRole Role { get; set; }
+        
+        public bool Accepted { get; set; }
+
+        public DateTime Created { get; set; }
+        
+        public User CreatedBy { get; set; }
+
+        public Guid CreatedById { get; set; }
     }
 }
