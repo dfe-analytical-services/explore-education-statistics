@@ -6,7 +6,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -166,27 +165,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestReleaseAsync(Guid publicationId)
         {
-            return await
-                CheckCanViewPublication(publicationId)
-                    .OnSuccess(_ =>
-                    {
-                        var releases = _context
-                            .Releases
-                            .Where(r => r.PublicationId == publicationId && r.Published != null)
-                            .OrderBy(r => r.Published);
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanViewPublication)
+                .OnSuccess(_ =>
+                {
+                    var releases = _context
+                        .Releases
+                        .Where(r => r.PublicationId == publicationId && r.Published != null)
+                        .OrderBy(r => r.Published);
 
-                        if (!releases.Any())
-                        {
-                            return null;
-                        }
+                    if (!releases.Any())
+                    {
+                        return null;
+                    }
                         
-                        var latestRelease = releases.Last();
-                        return new TitleAndIdViewModel
-                        {
-                            Id = latestRelease.Id,
-                            Title = latestRelease.Title
-                        };
-                    });
+                    var latestRelease = releases.Last();
+                    return new TitleAndIdViewModel
+                    {
+                        Id = latestRelease.Id,
+                        Title = latestRelease.Title
+                    };
+                });
         }
         
         public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
@@ -194,11 +194,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanAccessSystem()
-                .OnSuccess(_userService.CheckCanViewAllReleases)
-                .OnSuccess(() => _repository.
-                    GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
-                .OrElse(() => _repository.
-                    GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(), releaseStatuses));
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllReleases()
+                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
+                        .OrElse(() =>
+                            _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
+                                releaseStatuses));
+                });
         }
         
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
@@ -281,27 +285,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
-        }
-
-        private async Task<Either<ActionResult, bool>> CheckCanViewPublication(Guid publicationId)
-        {
-            if (await _userService.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
-            {
-                return true;
-            }
-            
-            var userId = _userService.GetUserId();
-            
-            if (await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .Where(r => r.UserId == userId)
-                .AnyAsync(r => r.Release.PublicationId == publicationId))
-            {
-                return true;
-            }
-
-            return new ForbidResult();
         }
         
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

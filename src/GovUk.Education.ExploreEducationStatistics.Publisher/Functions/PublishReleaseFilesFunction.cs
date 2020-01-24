@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -32,31 +33,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await UpdateStage(message, Started);
-            try
+            
+            var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
+            foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
-                _publishingService.PublishReleaseFilesAsync(message.ReleaseId).Wait();
-                await _queueService.QueueGenerateReleaseContentMessageAsync(message.ReleaseId, message.ReleaseStatusId);
-                await UpdateContentStage(message, Queued);
-                await UpdateStage(message, Complete);
+                await UpdateFilesStage(releaseId, releaseStatusId, Started);
+                try
+                {
+                    _publishingService.PublishReleaseFilesAsync(releaseId).Wait();
+                    published.Add((releaseId, releaseStatusId));
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    await UpdateFilesStage(releaseId, releaseStatusId, Failed);
+                }
             }
-            catch (Exception e)
+            
+            await _queueService.QueueGenerateReleaseContentMessageAsync(published);
+            
+            foreach (var (releaseId, releaseStatusId) in published)
             {
-                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                await UpdateStage(message, Failed);
+                await UpdateFilesStage(releaseId, releaseStatusId, Complete);
+                await UpdateContentStage(releaseId, releaseStatusId, Queued);
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseFilesMessage message, Stage stage)
+        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, Stage stage)
         {
-            await _releaseStatusService.UpdateFilesStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
+            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage);
         }
-        
-        private async Task UpdateContentStage(PublishReleaseFilesMessage message, Stage stage)
+
+        private async Task UpdateContentStage(Guid releaseId, Guid releaseStatusId, Stage stage)
         {
-            await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
+            await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage);
         }
     }
 }

@@ -1,7 +1,6 @@
 import LoginContext from '@admin/components/Login';
-import permissionService from '@admin/services/permissions/service';
 import classNames from 'classnames';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import Link from './Link';
 
 interface Props {
@@ -10,20 +9,6 @@ interface Props {
 
 const PageFooter = ({ wide }: Props) => {
   const { user } = useContext(LoginContext);
-
-  const [canAccessAdministration, setCanAccessAdministration] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      permissionService
-        .canAccessAdministration()
-        .then(setCanAccessAdministration)
-        .catch(() => {
-          // do nothing, as it's not important if the footer links aren't quite working correctly - this should
-          // never happen anyway
-        });
-    }
-  }, [user]);
 
   return (
     <footer className="govuk-footer" role="contentinfo">
@@ -41,20 +26,22 @@ const PageFooter = ({ wide }: Props) => {
                   Prototypes
                 </Link>
               </li>
-              {canAccessAdministration && (
-                <>
-                  <li className="govuk-footer__inline-list-item">
-                    <Link className="govuk-footer__link" to="/administration">
-                      Platform administration
-                    </Link>
-                  </li>
-                  <li className="govuk-footer__inline-list-item">
-                    <a className="govuk-footer__link" href="/docs">
-                      API Documentation
-                    </a>
-                  </li>
-                </>
-              )}
+              {user &&
+                (user.permissions.canAccessUserAdministrationPages ||
+                  user.permissions.canAccessMethodologyAdministrationPages) && (
+                  <>
+                    <li className="govuk-footer__inline-list-item">
+                      <Link className="govuk-footer__link" to="/administration">
+                        Platform administration
+                      </Link>
+                    </li>
+                    <li className="govuk-footer__inline-list-item">
+                      <a className="govuk-footer__link" href="/docs">
+                        API Documentation
+                      </a>
+                    </li>
+                  </>
+                )}
               <li className="govuk-footer__inline-list-item">
                 <Link className="govuk-footer__link" to="/contact-us">
                   Contact us

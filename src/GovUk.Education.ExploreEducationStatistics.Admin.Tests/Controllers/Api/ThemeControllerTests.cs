@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
@@ -15,8 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public void Get_UserTheme_Returns_Ok()
         {
             var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.GetMyThemesAsync()).Returns(
-                Task.FromResult(new List<Theme>
+            themeService.Setup(s => s.GetMyThemesAsync()).ReturnsAsync(
+                new Either<ActionResult, List<Theme>>(new List<Theme>
                 {
                     new Theme
                     {
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             // Method under test
             var result = controller.GetMyThemes();
-            Assert.IsAssignableFrom<List<Theme>>(result.Result.Value);
+            Assert.IsAssignableFrom<List<Theme>>(((OkObjectResult) result.Result.Result).Value);
         }
     }
 }

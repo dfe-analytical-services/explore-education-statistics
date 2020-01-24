@@ -267,7 +267,7 @@ const PrototypeDashboardRelease = ({
           )}
         </div>
         <div className="govuk-grid-column-one-half dfe-align--right">
-          {userContext.user && userContext.user.permissions.includes('bau') && (
+          {userContext.user && userContext.user.name === 'BAU User' && (
             <a
               href="#"
               className="govuk-button govuk-button--warning govuk-!-margin-left-6"

@@ -1,9 +1,9 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
-import { Topic } from '@admin/services/edit-publication/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
@@ -21,12 +21,8 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-
-interface MatchProps {
-  topicId: string;
-}
 
 interface FormValues {
   publicationTitle: string;
@@ -38,25 +34,23 @@ interface FormValues {
 interface CreatePublicationModel {
   methodologies: IdTitlePair[];
   contacts: ContactDetails[];
-  topic: Topic;
+  topic: IdTitlePair;
 }
 
 const CreatePublicationPage = ({
-  match,
   history,
   handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
-  const { topicId } = match.params;
-
+}: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<CreatePublicationModel>();
+
+  const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
 
   useEffect(() => {
     Promise.all([
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
-      service.getTopic(topicId),
     ])
-      .then(([methodologies, contacts, topic]) => {
+      .then(([methodologies, contacts]) => {
         setModel({
           methodologies,
           contacts,
@@ -64,12 +58,12 @@ const CreatePublicationPage = ({
         });
       })
       .catch(handleApiErrors);
-  }, [topicId, handleApiErrors]);
+  }, [topic, handleApiErrors]);
 
   const submitFormHandler = submitWithFormikValidation(
     async (values: FormValues) => {
       await service.createPublication({
-        topicId,
+        topicId: (model as CreatePublicationModel).topic.id,
         ...values,
       });
 

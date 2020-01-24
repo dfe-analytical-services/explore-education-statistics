@@ -13,6 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanAccessSystem);
         }
         
+        public static Task<Either<ActionResult, bool>> CheckCanAccessAnalystPages(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessAnalystPages);
+        }
+        
+        public static Task<Either<ActionResult, bool>> CheckCanAccessPrereleasePages(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessPrereleasePages);
+        }
+        
         public static Task<Either<ActionResult, bool>> CheckCanManageAllUsers(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageUsersOnSystem);
@@ -33,6 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanViewAllReleases);
         }
         
+        public static Task<Either<ActionResult, Theme>> CheckCanViewTheme(
+            this IUserService userService, Theme theme)
+        {
+            return userService.DoCheck(theme, SecurityPolicies.CanViewSpecificTheme);
+        }
+        
         public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
             this IUserService userService, Topic topic)
         {
@@ -43,6 +59,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Publication publication)
         {
             return userService.DoCheck(publication, SecurityPolicies.CanCreateReleaseForSpecificPublication);
+        }
+        
+        public static Task<Either<ActionResult, Publication>> CheckCanViewPublication(
+            this IUserService userService, Publication publication)
+        {
+            return userService.DoCheck(publication, SecurityPolicies.CanViewSpecificPublication);
         }
         
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
@@ -97,6 +119,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanApproveSpecificRelease);
+        }
+        
+        public static Task<Either<ActionResult, bool>> CheckCanViewPrereleaseContactsList(
+            this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanViewPrereleaseContacts);
+        }
+        
+        public static Task<Either<ActionResult, Release>> CheckCanAssignPrereleaseContactsToRelease(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease);
         }
         
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 

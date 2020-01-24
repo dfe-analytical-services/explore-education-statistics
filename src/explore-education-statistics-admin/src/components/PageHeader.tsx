@@ -12,6 +12,7 @@ interface Props {
 
 const PageHeader = ({ wide }: Props) => {
   const { user } = useContext(LoginContext);
+
   return (
     <>
       <a href="#main-content" className="govuk-skip-link">
@@ -81,11 +82,13 @@ const PageHeader = ({ wide }: Props) => {
 
 const LoggedInLinks = ({ user }: Authentication) => (
   <>
-    <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="/documentation">
-        Administrators' guide
-      </a>
-    </li>
+    {user && user.permissions.canAccessAnalystPages && (
+      <li className="govuk-header__navigation-item">
+        <a className="govuk-header__link" href="/documentation">
+          Administrators' guide
+        </a>
+      </li>
+    )}
     <li className="govuk-header__navigation-item">
       <a className="govuk-header__link" href="/identity/account/manage">
         {user ? user.name : ''}
