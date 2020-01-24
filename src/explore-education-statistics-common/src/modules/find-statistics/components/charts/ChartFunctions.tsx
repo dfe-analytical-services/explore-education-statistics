@@ -34,6 +34,7 @@ import {
   YAxis,
   YAxisProps,
 } from 'recharts';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 
 export const colours: string[] = [
   '#4763a5',
@@ -390,7 +391,7 @@ function getChartDataForAxis(
         [name]: {
           name,
           [generateKeyFromDataSet(dataSet, groupBy)]:
-            result.measures[dataSet.indicator] || 'NaN',
+            formatPretty(result.measures[dataSet.indicator]) || 'NaN',
         },
       };
     }, nameDictionary),
