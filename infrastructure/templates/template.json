@@ -215,11 +215,11 @@
     },
     "notifyApiKey": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyApiKeyAdmin": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyInviteTemplateId": {
       "type": "securestring",
@@ -227,7 +227,7 @@
     },
     "notifyPreReleaseTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyTokenSecretKey": {
       "type": "securestring",
@@ -1965,7 +1965,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
+              "value": "[parameters('notifyApiKey')]"
             },
             {
               "name": "TokenSecretKey",
