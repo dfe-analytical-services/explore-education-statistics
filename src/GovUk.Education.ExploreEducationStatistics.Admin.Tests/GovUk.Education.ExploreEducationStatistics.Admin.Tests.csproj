@@ -26,4 +26,8 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas" />
+  </ItemGroup>
+
 </Project>
