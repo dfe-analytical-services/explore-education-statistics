@@ -173,17 +173,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                             .UserReleaseInvites
                             .Where(i => i.Email.ToLower() == user.Email.ToLower());
 
-                        await releaseInvites.ForEachAsync(i =>
-                            
+                        await releaseInvites.ForEachAsync(invite =>
+                        {
                             _contentDbContext.Add(new UserReleaseRole
                             {
-                                ReleaseId = i.ReleaseId,
-                                Role = i.Role,
+                                ReleaseId = invite.ReleaseId,
+                                Role = invite.Role,
                                 UserId = newUser.Id,
-                            })
-                        );
+                            });
+
+                            invite.Accepted = true;
+                        });
 
                         await _contentDbContext.SaveChangesAsync();
+                        await _usersAndRolesDbContext.SaveChangesAsync();
                         
                         return LocalRedirect(returnUrl);
                     }
