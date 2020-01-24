@@ -40,6 +40,12 @@ $border-width: 1px;
   }
 }
 
+@media print {
+  .table {
+    font-size: 0.8rem;
+  }
+}
+
 :global(.govuk-table) .cellVerticalMiddle {
   vertical-align: middle;
 }

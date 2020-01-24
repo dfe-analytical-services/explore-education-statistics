@@ -19,3 +19,31 @@
     outline: none;
   }
 }
+
+@media print {
+  .container {
+    max-height: none;
+    overflow: visible !important;
+    padding-right: 0;
+    width: auto;
+  }
+
+  thead {
+    display: table-row-group;
+  }
+
+  table {
+    break-inside: auto;
+  }
+
+  tr,
+  td {
+    break-after: auto;
+    break-inside: avoid;
+  }
+
+  thead tr th,
+  thead tr td {
+    transform: none !important;
+  }
+}
