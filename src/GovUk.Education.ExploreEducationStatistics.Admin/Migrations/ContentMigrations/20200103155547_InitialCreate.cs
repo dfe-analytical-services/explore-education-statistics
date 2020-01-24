@@ -533,8 +533,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     { new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f"), new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"), 0, "MarkDownBlock", @"The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year in the following state-funded school types:
 
 - primary schools
-                - secondary schools
-                - special schools
+- secondary schools
+- special schools
 
 They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
 
@@ -667,7 +667,7 @@ Although overall results are better at primary level than at secondary, for Lond
 
 * secondary first preference rate decreased to 66% - down from 68.% in 2017" },
                     { new Guid("8e10ad6c-9a68-4162-84f9-81fb6dc93ae3"), new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"), 0, "MarkDownBlock", @"**Primary offers**
-                In 2018, 97.1% of primary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.
+In 2018, 97.1% of primary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.
 
 As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level." },
                     { new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"), new Guid("4f30b382-ce28-4a3e-801a-ce76004f5eb4"), 1, "MarkDownBlock", @"Read national statistical summaries, view charts and tables and download data files.
@@ -680,9 +680,9 @@ Find out how and why these statistics are collected and published - [Permanent a
 
 Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)" },
                     { new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"), new Guid("93ef0486-479f-4013-8012-a66ed01f1880"), 1, "MarkDownBlock", @" * pupils missed on average 8.2 school days
-                 * overall and unauthorised absence rates up on 2015/16
-                 * unauthorised absence rise due to higher rates of unauthorised holidays
-                 * 10% of pupils persistently absent during 2016/17" }
+ * overall and unauthorised absence rates up on 2015/16
+ * unauthorised absence rise due to higher rates of unauthorised holidays
+ * 10% of pupils persistently absent during 2016/17" }
                 });
 
             migrationBuilder.InsertData(
@@ -709,13 +709,13 @@ Find out how and why these statistics are collected and published - [Secondary a
                 values: new object[,]
                 {
                     { new Guid("db00f19a-96b7-47c9-84eb-92d6ace41434"), new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"), 1, "MarkDownBlock", @"* majority of applicants received a preferred offer
-                * percentage of applicants receiving secondary first choice offers decreases as applications increase
-                * slight proportional increase in applicants receiving primary first choice offer as applications decrease
-                " },
+ * percentage of applicants receiving secondary first choice offers decreases as applications increase
+ * slight proportional increase in applicants receiving primary first choice offer as applications decrease
+" },
                     { new Guid("8a108b91-ff08-4866-9566-cf03e33cd4ec"), new Guid("8abdae8f-4119-41ac-8efd-2229b7ea31da"), 1, "MarkDownBlock", @"* majority of applicants received a preferred offer
-                * percentage of applicants receiving secondary first choice offers decreases as applications increase
-                * slight proportional increase in applicants receiving primary first choice offer as applications decrease
-                " }
+ * percentage of applicants receiving secondary first choice offers decreases as applications increase
+ * slight proportional increase in applicants receiving primary first choice offer as applications decrease
+" }
                 });
 
             migrationBuilder.InsertData(
@@ -865,7 +865,7 @@ Across all schools:
 
 * [unauthorised absence](../glossary#unauthorised-absence) - highest in summer" },
                     { new Guid("eb4318f9-11e0-46ea-9796-c36a9dc25014"), new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"), 0, "MarkDownBlock", @"The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
-                **Ethnic groups**
+**Ethnic groups**
 
 Overall absence rate:
 
