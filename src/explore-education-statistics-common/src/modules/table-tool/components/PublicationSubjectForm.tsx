@@ -5,7 +5,7 @@ import Yup from '@common/lib/validation/yup';
 import { PublicationSubject } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -61,7 +61,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     subjectId: initialSubjectId,
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formikRef.current) {
       formikRef.current.setValues({
         subjectId: `${initialSubjectId}`,
@@ -74,6 +74,10 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
+      initialValues={initialValues}
+      validationSchema={Yup.object<FormValues>({
+        subjectId: Yup.string().required('Choose a subject'),
+      })}
       onSubmit={async ({ subjectId }) => {
         await onSubmit({
           subjectId,
@@ -81,10 +85,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         });
         goToNextStep();
       }}
-      initialValues={initialValues}
-      validationSchema={Yup.object<FormValues>({
-        subjectId: Yup.string().required('Choose a subject'),
-      })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
