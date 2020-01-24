@@ -41,6 +41,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -291,7 +292,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
 
-            services.AddTransient<INotificationClient, NotificationClient>(n => new NotificationClient(Configuration.GetValue<string>("NotifyApiKey")));
+            services.AddTransient<INotificationClient>(s =>
+            {
+                var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
+                
+                if (!HostingEnvironment.IsDevelopment())
+                {
+                    return new NotificationClient(notifyApiKey);
+                }
+                
+                if (notifyApiKey != null && notifyApiKey != "change-me")
+                {
+                    return new NotificationClient(notifyApiKey);
+                }
+                
+                var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
+                return new LoggingNotificationClient(logger);
+            });
             services.AddTransient<IEmailService, EmailService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
