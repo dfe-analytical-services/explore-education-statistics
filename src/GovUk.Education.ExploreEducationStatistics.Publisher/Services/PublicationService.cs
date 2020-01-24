@@ -21,6 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
+                .Include(theme => theme.Topics)
+                .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Releases)
                 .ToList()
                 .Where(theme => IsThemePublished(theme, includedReleaseIds))
                 .Select(theme => BuildThemeTree(theme, includedReleaseIds))
@@ -31,9 +34,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
             return _context.Publications
+                .Include(publication => publication.Releases)
+                .ToList()
                 .Where(publication =>
                     publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>())))
-                .Include(publication => publication.Releases)
                 .ToList();
         }
 
