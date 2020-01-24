@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -19,19 +20,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
+        private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        
-        public PreReleaseService(ContentDbContext context, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper, UsersAndRolesDbContext usersAndRolesDbContext)
+
+        public PreReleaseService(ContentDbContext context, IUserService userService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper, UsersAndRolesDbContext usersAndRolesDbContext,
+            IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
             _usersAndRolesDbContext = usersAndRolesDbContext;
+            _emailService = emailService;
+            _configuration = configuration;
         }
 
-        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContactsAsync()
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>>
+            GetAvailablePreReleaseContactsAsync()
         {
             return await _userService
                 .CheckCanViewPrereleaseContactsList()
@@ -69,8 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
                 });
         }
-        
-        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForReleaseAsync(Guid releaseId)
+
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>>
+            GetPreReleaseContactsForReleaseAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -109,10 +117,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
                 });
         }
-        
+
         public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToReleaseAsync(
             Guid releaseId, string email)
         {
+            var newUser = false;
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
@@ -121,10 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (!await _context
                         .UserReleaseRoles
                         .Include(r => r.User)
-                        .AnyAsync(r => 
-                            r.ReleaseId == releaseId 
-                                && r.User.Email.ToLower() == email.ToLower() 
-                                && r.Role == ReleaseRole.PrereleaseViewer))
+                        .AnyAsync(r =>
+                            r.ReleaseId == releaseId
+                            && r.User.Email.ToLower() == email.ToLower()
+                            && r.Role == ReleaseRole.PrereleaseViewer))
                     {
                         var existingUser = await _context
                             .Users
@@ -145,14 +154,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var existingInvite = await _context
                                 .UserReleaseInvites
-                                .Where(i => 
-                                    i.ReleaseId == releaseId 
-                                        && i.Email.ToLower() == email.ToLower() 
-                                        && i.Role == ReleaseRole.PrereleaseViewer)
+                                .Where(i =>
+                                    i.ReleaseId == releaseId
+                                    && i.Email.ToLower() == email.ToLower()
+                                    && i.Role == ReleaseRole.PrereleaseViewer)
                                 .FirstOrDefaultAsync();
 
                             if (existingInvite == null)
                             {
+                                newUser = true;
+
                                 _context.Add(new UserReleaseInvite
                                 {
                                     Email = email.ToLower(),
@@ -168,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     // TODO represent Roles with an Enum
                                     .Where(r => r.Name == "Prerelease User")
                                     .FirstAsync();
-                                
+
                                 _usersAndRolesDbContext.Add(new UserInvite
                                 {
                                     Email = email.ToLower(),
@@ -180,13 +191,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _usersAndRolesDbContext.SaveChangesAsync();
                             }
                         }
+
+                        await SendPreReleaseInviteEmail(releaseId, email, newUser);
                     }
                 })
                 .OnSuccess(_ => GetPreReleaseContactsForReleaseAsync(releaseId));
         }
-        
-        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromReleaseAsync(
-            Guid releaseId, string email)
+
+
+        public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>>
+            RemovePreReleaseContactFromReleaseAsync(
+                Guid releaseId, string email)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -196,12 +211,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var existingUserRole = await _context
                         .UserReleaseRoles
                         .Include(r => r.User)
-                        .Where(r => 
-                            r.ReleaseId == releaseId 
-                                && r.User.Email.ToLower() == email.ToLower() 
-                                && r.Role == ReleaseRole.PrereleaseViewer)
+                        .Where(r =>
+                            r.ReleaseId == releaseId
+                            && r.User.Email.ToLower() == email.ToLower()
+                            && r.Role == ReleaseRole.PrereleaseViewer)
                         .FirstOrDefaultAsync();
-                    
+
                     if (existingUserRole != null)
                     {
                         _context.Remove(existingUserRole);
@@ -211,10 +226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var existingInvite = await _context
                             .UserReleaseInvites
-                            .Where(i => 
-                                i.ReleaseId == releaseId 
-                                    && i.Email.ToLower() == email.ToLower() 
-                                    && i.Role == ReleaseRole.PrereleaseViewer)
+                            .Where(i =>
+                                i.ReleaseId == releaseId
+                                && i.Email.ToLower() == email.ToLower()
+                                && i.Role == ReleaseRole.PrereleaseViewer)
                             .FirstOrDefaultAsync();
 
                         if (existingInvite != null)
@@ -228,12 +243,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(_ => GetPreReleaseContactsForReleaseAsync(releaseId));
         }
+
+        private async Task SendPreReleaseInviteEmail(Guid releaseId, string email, bool newUser)
+        {
+            var uri = _configuration.GetValue<string>("AdminUri");
+            var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
+
+            var release = await _context.Releases.Include(r => r.Publication)
+                .FirstOrDefaultAsync(r => r.Id == releaseId);
+
+            var emailValues = new Dictionary<string, dynamic>
+            {
+                {"newUser", newUser},
+                {"release name", release.ReleaseName},
+                {"publication name", release.Publication.Title},
+                {"prerelease link", "https://" + uri + "/{PRE_RELEASE_LINK}"}
+            };
+
+            _emailService.SendEmail(email, template, emailValues);
+        }
     }
 
     public class PrereleaseCandidateViewModel
     {
         public string Email { get; set; }
-            
+
         public bool Invited { get; set; }
     }
 }
