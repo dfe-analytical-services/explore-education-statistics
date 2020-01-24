@@ -35,6 +35,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
@@ -446,6 +447,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
+            
+            // deny access to all Identity routes other than /Identity/Account/Login and
+            // /Identity/Account/ExternalLogin
+            var options = new RewriteOptions()
+                .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login)", "/", skipRemainingRules: true);
+            app.UseRewriter(options);
 
             app.UseMvc(routes =>
             {
@@ -457,7 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
-
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
