@@ -213,7 +213,19 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
+    "notifyApiKey": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "notifyApiKeyAdmin": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
     "notifyInviteTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "notifyPreReleaseTemplateId": {
       "type": "securestring",
       "defaultValue": ""
     },
@@ -952,11 +964,15 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]"
+              "value": "[parameters('notifyApiKeyAdmin')]"
             },
             {
               "name": "NotifyInviteTemplateId",
               "value": "[parameters('notifyInviteTemplateId')]"
+            },
+            {
+              "name": "NotifyPreReleaseTemplateId",
+              "value": "[parameters('notifyPreReleaseTemplateId')]"
             },
             {
               "name": "AdminUri",
