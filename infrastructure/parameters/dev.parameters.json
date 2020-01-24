@@ -15,13 +15,13 @@
       "value": "S2 Standard"
     },
     "publishReleasesCronSchedule": {
-      "value": "0 0-58/2 * * * *"
+      "value": "0 0 * * * *"
     },
     "publishReleaseContentCronSchedule": {
-      "value": "0 1-59/2 * * * *"
+      "value": "0 30 * * * *"
     },
     "publishReleaseDataFunctionDisabled": {
-      "value": "true"
+      "value": "false"
     },
     "useSubnets": {
       "value": true
