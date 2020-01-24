@@ -451,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // deny access to all Identity routes other than /Identity/Account/Login and
             // /Identity/Account/ExternalLogin
             var options = new RewriteOptions()
-                .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login)", "/", skipRemainingRules: true);
+                .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login$)", "/", skipRemainingRules: true);
             app.UseRewriter(options);
 
             app.UseMvc(routes =>
