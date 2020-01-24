@@ -24,8 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Id = Guid.NewGuid()
         };
         
+        private readonly Publication _publication = new Publication
+        {
+            Id = Guid.NewGuid()
+        };
+        
         [Fact]
-        public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
+        public void GetMyPublicationsAndReleasesByTopicAsync_NoAccessOfSystem()
         {
             var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
 
@@ -33,6 +38,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var publicationService = new PublicationService(context.Object, mapper.Object, 
                 userService.Object, publicationRepository.Object, persistenceHelper.Object);
+
+            userService.
+                Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).
+                ReturnsAsync(false);
+
+            var list = new List<MyPublicationViewModel>()
+            {
+                new MyPublicationViewModel
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            publicationRepository.
+                Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).
+                ReturnsAsync(list);
+            
+            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Left;
+            Assert.IsAssignableFrom<ForbidResult>(result);
+            
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
+            userService.VerifyNoOtherCalls();
+
+            publicationRepository.VerifyNoOtherCalls();
+        }
+        
+        [Fact]
+        public void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
+        {
+            var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+
+            var topicId = Guid.NewGuid();
+            
+            var publicationService = new PublicationService(context.Object, mapper.Object, 
+                userService.Object, publicationRepository.Object, persistenceHelper.Object);
+
+            userService.
+                Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).
+                ReturnsAsync(true);
 
             userService.
                 Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
@@ -50,9 +94,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).
                 ReturnsAsync(list);
             
-            var result = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
+            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Right;
             Assert.Equal(list, result);
             
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.VerifyNoOtherCalls();
 
@@ -61,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
+        public void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
         {
             var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
 
@@ -70,6 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var publicationService = new PublicationService(context.Object, mapper.Object, 
                 userService.Object, publicationRepository.Object, persistenceHelper.Object);
+
+            userService.
+                Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).
+                ReturnsAsync(true);
 
             userService.
                 Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).
@@ -91,9 +140,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId)).
                 ReturnsAsync(list);
             
-            var result = await publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
+            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Right;
             Assert.Equal(list, result);
             
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.Verify(s => s.GetUserId());
             userService.VerifyNoOtherCalls();
@@ -112,6 +162,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }), 
                 _topic,
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
+        }
+        
+        [Fact]
+        public void GetViewModelAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.GetViewModelAsync(_publication.Id), 
+                _publication,
+                SecurityPolicies.CanViewSpecificPublication);
         }
         
         private void AssertSecurityPoliciesChecked<T, TEntity>(
@@ -135,6 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
+            MockUtils.SetupCall(persistenceHelper, _publication.Id, _publication);
 
             return (
                 new Mock<ContentDbContext>(),

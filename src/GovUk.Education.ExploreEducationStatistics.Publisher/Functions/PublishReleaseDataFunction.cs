@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Azure.Management.DataFactory;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Rest;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -26,14 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         public const string QueueName = "publish-release-data";
 
-        private const string SubscriptionId = "AzureSubscriptionId";
-        private const string ResourceGroupName = "AzureResourceGroupName";
-        private const string DataFactoryName = "AzureDataFactoryName";
-        private const string DataFactoryPipelineName = "AzureDataFactoryPipelineName";
-
-        public PublishReleaseDataFunction(
-            StatisticsDbContext context,
-            IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(StatisticsDbContext context, IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
             _context = context;
@@ -59,9 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     var subjects = GetSubjects(message.ReleaseId).ToList();
                     if (subjects.Any())
                     {
-                        var response = await TriggerDataFactoryReleasePipeline(executionContext, logger,
-                            subjects.First(), message.ReleaseStatusId);
-                        await UpdateStage(message, response.IsSuccessStatusCode ? Started : Failed);
+                        var configuration = LoadClientConfiguration(executionContext);
+                        var success = TriggerDataFactoryReleasePipeline(configuration, logger, subjects.First(),
+                            message.ReleaseStatusId);
+                        await UpdateStage(message, success ? Started : Failed);
                     }
                     else
                     {
@@ -92,31 +85,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ThenInclude(p => p.Topic);
         }
 
-        private static async Task<HttpResponseMessage> TriggerDataFactoryReleasePipeline(ExecutionContext context,
+        private static bool TriggerDataFactoryReleasePipeline(DataFactoryClientConfiguration configuration,
             ILogger logger, Subject subject, Guid releaseStatusId)
         {
-            var config = LoadAppSettings(context);
-            var subscriptionId = config.GetValue<string>(SubscriptionId);
-            var resourceGroupName = config.GetValue<string>(ResourceGroupName);
-            var dataFactoryName = config.GetValue<string>(DataFactoryName);
-            var dataFactoryPipelineName = config.GetValue<string>(DataFactoryPipelineName);
+            var parameters = BuildPipelineParameters(subject, releaseStatusId);
+            var client = GetDataFactoryClient(configuration);
 
-            var jsonBody = BuildPostParamsJson(subject, releaseStatusId);
-            logger.LogInformation($"Triggering data factory: {jsonBody}");
+            var runResponse = client.Pipelines.CreateRunWithHttpMessagesAsync(configuration.ResourceGroupName,
+                configuration.DataFactoryName, configuration.PipelineName, parameters: parameters).Result;
 
-            var data = new StringContent(jsonBody, Encoding.UTF8, MediaTypeNames.Application.Json);
-            var url =
-                $"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{dataFactoryName}/pipelines/{dataFactoryPipelineName}/createRun?api-version=2018-06-01";
-            using var client = new HttpClient();
+            logger.LogInformation(
+                $"Pipeline status code: {runResponse.Response.StatusCode}, run Id: {runResponse.Body.RunId}");
 
-            return await client.PostAsync(url, data);
+            return runResponse.Response.IsSuccessStatusCode;
         }
 
-        private static string BuildPostParamsJson(Subject subject, Guid releaseStatusId)
+        private static IDictionary<string, object> BuildPipelineParameters(Subject subject, Guid releaseStatusId)
         {
             var publication = subject.Release.Publication;
             var topic = publication.Topic;
-            var postParams = new Dictionary<string, Guid>
+            return new Dictionary<string, object>
             {
                 {"subjectId", subject.Id},
                 {"releaseId", subject.ReleaseId},
@@ -125,23 +113,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {"topicId", topic.Id},
                 {"themeId", topic.ThemeId}
             };
-
-            return JsonConvert.SerializeObject(postParams);
         }
 
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        private static DataFactoryManagementClient GetDataFactoryClient(DataFactoryClientConfiguration configuration)
         {
-            return new ConfigurationBuilder()
+            var context = new AuthenticationContext($"https://login.windows.net/{configuration.TenantId}");
+            var clientCredential = new ClientCredential(configuration.ClientId, configuration.ClientSecret);
+            var result = context.AcquireTokenAsync("https://management.azure.com/", clientCredential).Result;
+            ServiceClientCredentials credentials = new TokenCredentials(result.AccessToken);
+
+            return new DataFactoryManagementClient(credentials)
+            {
+                SubscriptionId = configuration.SubscriptionId
+            };
+        }
+
+        private static DataFactoryClientConfiguration LoadClientConfiguration(ExecutionContext context)
+        {
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(context.FunctionAppDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+            return new DataFactoryClientConfiguration(configuration);
         }
 
         private static bool IsDevelopment()
         {
             var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
             return environment?.Equals(EnvironmentName.Development) ?? false;
+        }
+
+        private class DataFactoryClientConfiguration
+        {
+            public string ClientId { get; }
+            public string ClientSecret { get; }
+            public string DataFactoryName { get; }
+            public string PipelineName { get; }
+            public string ResourceGroupName { get; }
+            public string SubscriptionId { get; }
+            public string TenantId { get; }
+
+            public DataFactoryClientConfiguration(IConfiguration configuration)
+            {
+                ClientId = configuration.GetValue<string>(nameof(ClientId));
+                ClientSecret = configuration.GetValue<string>(nameof(ClientSecret));
+                DataFactoryName = configuration.GetValue<string>(nameof(DataFactoryName));
+                PipelineName = configuration.GetValue<string>(nameof(PipelineName));
+                ResourceGroupName = configuration.GetValue<string>(nameof(ResourceGroupName));
+                SubscriptionId = configuration.GetValue<string>(nameof(SubscriptionId));
+                TenantId = configuration.GetValue<string>(nameof(TenantId));
+            }
         }
     }
 }

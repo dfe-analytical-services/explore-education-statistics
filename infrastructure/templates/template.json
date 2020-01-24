@@ -217,21 +217,6 @@
       "type": "securestring",
       "defaultValue": ""
     },
-
-    "notifyApiKey": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Gov UK Notify service API key"
-      }
-    },
-    "notifyApiKeyAdmin": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Gov UK Notify service API key"
-      }
-    },
     "notifyTokenSecretKey": {
       "type": "securestring",
       "defaultValue": ""
@@ -350,6 +335,10 @@
       "type": "bool",
       "defaultValue": true
     },
+    "deployKeyVaultSecrets": {
+      "type": "bool",
+      "defaultValue": false
+    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -375,7 +364,21 @@
       }
     },
 
-    "azureDataFactoryPipelineName": {
+    "publisherClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application Client Id used for authentication requests"
+      }
+    },
+
+    "publisherClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
+      }
+    },
+
+    "publisherPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
       "metadata": {
@@ -416,11 +419,8 @@
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
-
-
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'logging')]",
     "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
-
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
@@ -434,7 +434,34 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "azureDataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
+
+    "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
+    "ees-notify-apikey-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey-admin')]",
+    "ees-notify-token": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-token')]",
+
+    "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
+    "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
+    "ees-openidconnect-tenant": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-tenant')]",
+
+    "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
+    "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
+
+    "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
+    "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
+
+
+    "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
+    "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
+    "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
+    "ees-sql-public-data-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-data-password')]",
+
+    "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
+    "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
+    "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
+    "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
+
     "ipWhiteList": {
       "copy": [
         {
@@ -455,6 +482,9 @@
       "name": "[variables('dataAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -478,6 +508,21 @@
           ],
           "properties": {
           }
+        },
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('dataSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
         }
       ],
       "properties": {
@@ -629,6 +674,9 @@
       "name": "[variables('contentAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -652,6 +700,21 @@
           ],
           "properties": {
           }
+        },
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-02-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceid": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+          ]
         }
       ],
       "properties": {
@@ -696,11 +759,6 @@
             }
           ],
           "connectionStrings": [
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
-            },
             {
               "name": "PublicStorage",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
@@ -799,6 +857,9 @@
       "name": "[variables('adminAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -891,7 +952,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKeyAdmin')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",
@@ -1036,6 +1097,9 @@
       "name": "[variables('publicAppName')]",
       "apiVersion": "2019-08-01",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1684,7 +1748,27 @@
         "tier": "Standard"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('contentSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('dataSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1769,6 +1853,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('notificationsAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
@@ -1862,7 +1949,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "TokenSecretKey",
@@ -1950,6 +2037,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('importerAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
@@ -2109,6 +2199,9 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('publisherAppName')]",
       "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
@@ -2188,20 +2281,32 @@
               "value": "[parameters('publishReleaseContentCronSchedule')]"
             },
             {
-              "name": "AzureDataFactoryName",
-              "value": "[variables('azureDataFactoryName')]"
+              "name": "ClientId",
+              "value": "[parameters('publisherClientId')]"
             },
             {
-              "name": "AzureDataFactoryPipelineName",
-              "value": "[parameters('azureDataFactoryPipelineName')]"
+              "name": "ClientSecret",
+              "value": "[parameters('publisherClientSecret')]"
             },
             {
-              "name": "AzureSubscriptionId",
+              "name": "DataFactoryName",
+              "value": "[variables('dataFactoryName')]"
+            },
+            {
+              "name": "PipelineName",
+              "value": "[parameters('publisherPipelineName')]"
+            },
+            {
+              "name": "ResourceGroupName",
+              "value": "[resourceGroup().name]"
+            },
+            {
+              "name": "SubscriptionId",
               "value": "[subscription().subscriptionId]"
             },
             {
-              "name": "AzureResourceGroupName",
-              "value": "[resourceGroup().name]"
+              "name": "TenantId",
+              "value": "[subscription().tenantId]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",

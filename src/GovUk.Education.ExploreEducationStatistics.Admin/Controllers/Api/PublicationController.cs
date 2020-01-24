@@ -24,11 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<List<MyPublicationViewModel>> GetMyPublicationsAsync(
+        public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
-            return await _publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId);
+            return await _publicationService
+                .GetMyPublicationsAndReleasesByTopicAsync(topicId)
+                .HandleFailuresOr(Ok);
         }
 
         // GET api/publications/{publicationId}
@@ -36,15 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
             [Required] Guid publicationId)
         {
-            // var userId = new Guid(); // TODO get the Guid from AD
-            var result = await _publicationService.GetViewModelAsync(publicationId);
-
-            if (result != null)
-            {
-                return result;
-            }
-
-            return NoContent();
+            return await _publicationService
+                .GetViewModelAsync(publicationId)
+                .HandleFailuresOr(Ok);
         }
 
         // POST api/topic/{topicId}/publications
