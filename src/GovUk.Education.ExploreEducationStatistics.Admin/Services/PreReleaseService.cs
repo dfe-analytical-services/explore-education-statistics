@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,10 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IEmailService _emailService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PreReleaseService(ContentDbContext context, IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper, UsersAndRolesDbContext usersAndRolesDbContext,
-            IEmailService emailService, IConfiguration configuration)
+            IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userService = userService;
@@ -35,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _emailService = emailService;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>>
@@ -246,18 +249,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task SendPreReleaseInviteEmail(Guid releaseId, string email, bool newUser)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
 
             var release = await _context.Releases.Include(r => r.Publication)
                 .FirstOrDefaultAsync(r => r.Id == releaseId);
 
+            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            var host = _httpContextAccessor.HttpContext.Request.Host;
+            
+            var prereleaseUrl = $"{scheme}://{host}/publication/{release.PublicationId}/release/{releaseId}/prerelease";
+                
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"newUser", newUser},
+                {"newUser", newUser ? "yes" : "no"},
                 {"release name", release.ReleaseName},
                 {"publication name", release.Publication.Title},
-                {"prerelease link", "https://" + uri + "/{PRE_RELEASE_LINK}"}
+                {"prerelease link", prereleaseUrl}
             };
 
             _emailService.SendEmail(email, template, emailValues);
