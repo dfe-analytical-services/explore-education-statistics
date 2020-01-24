@@ -43,16 +43,13 @@ const HelpAndSupport = ({
         publicationTitle={publicationTitle}
       >
         <AccordionSection
-          heading={`${publicationTitle}: methodology`}
+          heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <p>
-            Read our{' '}
-            <Link to={methodologyUrl}>
-              {`${publicationTitle}: methodology`}
-            </Link>{' '}
-            guidance.
+          <p className="govuk-!-margin-bottom-9">
+            <Link to={methodologyUrl}>View methodology</Link> for{' '}
+            {publicationTitle}.
           </p>
         </AccordionSection>
         {releaseType === ReleaseType.NationalStatistics && (
