@@ -256,39 +256,11 @@ Save data block
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
-Refresh page, select new data block, verify selections
-    [Tags]  HappyPath   UnderConstruction
-    user reloads page
-    user selects from list by label  css:#selectDataBlock   UI Test create data block title
-    user waits until page contains element   xpath://h3[text()="Update data source"]
-    user checks previous table tool step contains  1   Subject   Absence in PRUs
-    user checks previous table tool step contains  2   Local Authority   Barnet
-    user checks previous table tool step contains  2   Local Authority   Barnsley
-    user checks previous table tool step contains  2   Local Authority   Bedford
-    user checks previous table tool step contains  3   Start date    2014/15
-    user checks previous table tool step contains  3   End date      2014/15
-    user checks subheaded indicator checkbox is selected  Absence fields   Authorised absence rate
-    user checks subheaded indicator checkbox is selected  Absence fields   Overall absence rate
-    user checks subheaded indicator checkbox is selected  Absence fields   Unauthorised absence rate
-    user checks category checkbox is selected   School type   Pupil Referral Unit
+Navigate to Create chart tab
+    [Tags]  HappyPath
+    sleep  1000000
+    user clicks element   xpath://a[text()="Configure content"]
+    user clicks element   xpath://a[text()="Create chart"]
+    user clicks element   css:[class^="graph-builder_chartContainer"] button:nth-child(1)  # Line chart button
+    sleep   1000000
 
-    user checks results table column heading contains  1  1  Pupil Referral Unit
-    user checks results table column heading contains  2  1  2014/15
-    user checks results table row heading contains   1   1   Barnet
-    user checks results table row heading contains   1   2   Unauthorised absence rate
-    user checks results table row heading contains   2   1   Authorised absence rate
-    user checks results table row heading contains   3   1   Overall absence rate
-    user checks results table cell contains   1     1     13.2%
-    user checks results table cell contains   2     1     26.9%
-    user checks results table cell contains   3     1     40.1%
-
-Edit data block
-    [Tags]  HappyPath  UnderConstruction
-
-Delete data block
-    [Tags]  HappyPath   UnderConstruction
-    user clicks button   Delete this data block
-    user waits until page contains heading   Delete data block
-    user clicks button   Confirm
-    user waits until page does not contain element   xpath:h1[text()="Delete data block"]
-    user checks list does not contain label   css:#selectDataBlock   UI Test create data block title

@@ -129,7 +129,7 @@ const ViewDataBlocks = ({
             {tableData && <TimePeriodDataTable {...tableData} />}
           </div>
         </TabsSection>
-        <TabsSection title="Create Chart">
+        <TabsSection title="Create chart">
           {chartBuilderData ? (
             <div style={{ position: 'relative' }}>
               <ChartBuilder
