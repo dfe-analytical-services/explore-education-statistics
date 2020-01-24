@@ -69,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         Description = "Related Information",
                         Url = "http://example.com"
                     }
-                }
+                },
+                Published = new DateTime(2020, 1, 02)
             },
             new Release
             {
@@ -195,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetLatest_ReturnsA_WithARelease()
+        public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
