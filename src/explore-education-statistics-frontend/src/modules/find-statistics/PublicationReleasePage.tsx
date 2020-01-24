@@ -139,9 +139,10 @@ class PublicationReleasePage extends Component<Props> {
               className="govuk-body"
               source={
                 data.summarySection.content &&
-                data.summarySection.content[0].body
+                data.summarySection.content[0].body.replace(/ {15} +/g, '')
               }
             />
+
             {data.downloadFiles && (
               <Details
                 summary="Download data files"
