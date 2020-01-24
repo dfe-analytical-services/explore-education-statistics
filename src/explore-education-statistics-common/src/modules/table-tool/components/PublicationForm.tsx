@@ -58,6 +58,8 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
       initialValues={{
         publicationId,
       }}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}

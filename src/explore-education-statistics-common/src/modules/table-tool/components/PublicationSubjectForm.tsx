@@ -75,6 +75,8 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={initialValues}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         subjectId: Yup.string().required('Choose a subject'),
       })}

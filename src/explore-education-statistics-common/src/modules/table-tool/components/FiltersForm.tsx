@@ -153,6 +153,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={initialFormValues}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())

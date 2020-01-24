@@ -115,6 +115,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={formInitialValues}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
@@ -177,6 +179,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           });
                         }}
                         onChange={(event, option) => {
+                          event.persist();
+
                           updateLocationLevels(draft => {
                             if (!draft[levelKey]) {
                               draft[levelKey] = [];
