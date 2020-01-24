@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                         var releaseInvites = _contentDbContext
                             .UserReleaseInvites
-                            .Where(i => string.Equals(i.Email, user.Email, CurrentCultureIgnoreCase));
+                            .Where(i => i.Email.ToLower() == user.Email.ToLower());
 
                         await releaseInvites.ForEachAsync(i =>
                             
@@ -182,6 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                                 UserId = newUser.Id,
                             })
                         );
+
+                        await _contentDbContext.SaveChangesAsync();
                         
                         return LocalRedirect(returnUrl);
                     }

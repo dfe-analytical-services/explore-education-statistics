@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.M
         
         public IdentityRole Role { get; set; }
         
-        public Guid RoleId { get; set; }
+        public string RoleId { get; set; }
         
         public DateTime Created { get; set; }
         

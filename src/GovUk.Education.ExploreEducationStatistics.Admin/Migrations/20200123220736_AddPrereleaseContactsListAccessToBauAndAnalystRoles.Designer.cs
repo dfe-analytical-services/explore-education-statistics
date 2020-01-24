@@ -36,14 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RoleId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Email");
 
-                    b.HasIndex("RoleId1");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("UserInvites");
                 });
@@ -714,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId1");
+                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

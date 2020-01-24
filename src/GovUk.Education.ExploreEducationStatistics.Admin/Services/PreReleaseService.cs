@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -16,15 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class PreReleaseService : IPreReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         
         public PreReleaseService(ContentDbContext context, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, UsersAndRolesDbContext usersAndRolesDbContext)
         {
             _context = context;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
+            _usersAndRolesDbContext = usersAndRolesDbContext;
         }
 
         public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContactsAsync()
@@ -154,9 +158,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Email = email.ToLower(),
                                     ReleaseId = releaseId,
                                     Role = ReleaseRole.PrereleaseViewer,
+                                    Created = DateTime.Now,
                                     CreatedById = _userService.GetUserId()
                                 });
                                 await _context.SaveChangesAsync();
+
+                                var prereleaseRole = await _usersAndRolesDbContext
+                                    .Roles
+                                    // TODO represent Roles with an Enum
+                                    .Where(r => r.Name == "Prerelease User")
+                                    .FirstAsync();
+                                
+                                _usersAndRolesDbContext.Add(new UserInvite
+                                {
+                                    Email = email.ToLower(),
+                                    Role = prereleaseRole,
+                                    Created = DateTime.Now,
+                                    // TODO
+                                    CreatedBy = ""
+                                });
+                                await _usersAndRolesDbContext.SaveChangesAsync();
                             }
                         }
                     }
@@ -198,6 +219,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         if (existingInvite != null)
                         {
+                            // TODO - also need to remove their overall UserInvite record if they have no more 
+                            // UserReleaseInvites available
                             _context.Remove(existingInvite);
                             await _context.SaveChangesAsync();
                         }
