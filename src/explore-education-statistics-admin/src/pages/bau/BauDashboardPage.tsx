@@ -1,45 +1,30 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import permissionService from '@admin/services/permissions/service';
-import React, { useEffect, useState } from 'react';
-import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
+import LoginContext from '@admin/components/Login';
+import Page from '@admin/components/Page';
+import React, { useContext } from 'react';
 
-interface Permissions {
-  canManageUsers: boolean;
-  canManageMethodologies: boolean;
-}
+const BauDashboardPage = () => {
+  const { user } = useContext(LoginContext);
 
-const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
-  const [permissions, setPermissions] = useState<Permissions>();
-
-  useEffect(() => {
-    Promise.all([
-      permissionService.canManageAllUsers(),
-      permissionService.canManageAllMethodologies(),
-    ])
-      .then(([canManageUsers, canManageMethodologies]) =>
-        setPermissions({
-          canManageUsers,
-          canManageMethodologies,
-        }),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+  const canManageUsers = user
+    ? user.permissions.canAccessUserAdministrationPages
+    : false;
+  const canManageMethodologies = user
+    ? user.permissions.canAccessMethodologyAdministrationPages
+    : false;
 
   return (
     <Page wide>
       <h1 className="govuk-heading-xl">Platform administration</h1>
       <ul>
-        {permissions && permissions.canManageMethodologies && (
+        {canManageMethodologies && (
           <li>
             <Link to="/administration/methodology">
               View methodology status
             </Link>
           </li>
         )}
-        {permissions && permissions.canManageUsers && (
+        {canManageUsers && (
           <li>
             <Link to="/administration/users">View service users</Link>
           </li>
@@ -49,4 +34,4 @@ const BauDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(BauDashboardPage);
+export default BauDashboardPage;

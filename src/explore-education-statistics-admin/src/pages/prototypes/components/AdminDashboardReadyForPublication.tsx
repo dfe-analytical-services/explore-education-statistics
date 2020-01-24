@@ -38,7 +38,17 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
             tag={tagLabel}
             review
             lastEdited={new Date('2019-03-20 17:37')}
-            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+            lastEditor={{
+              id: 'me',
+              name: 'me',
+              permissions: {
+                canAccessSystem: false,
+                canAccessPrereleasePages: false,
+                canAccessAnalystPages: false,
+                canAccessUserAdministrationPages: false,
+                canAccessMethodologyAdministrationPages: false,
+              },
+            }}
             published={new Date('2019-09-20 09:30')}
             nextRelease={new Date('2020-09-20 09:30')}
             task={task}

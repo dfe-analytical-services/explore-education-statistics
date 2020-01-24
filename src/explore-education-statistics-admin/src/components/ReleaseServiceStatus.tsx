@@ -13,7 +13,7 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
-interface ReleaseServiceStatus {
+export interface ReleaseStatus {
   overallStage: string;
 }
 
@@ -23,7 +23,7 @@ const ReleaseServiceStatus = ({
   exclude,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
-  const [currentStatus, setCurrentStatus] = useState<ReleaseServiceStatus>();
+  const [currentStatus, setCurrentStatus] = useState<ReleaseStatus>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
   );
@@ -31,7 +31,7 @@ const ReleaseServiceStatus = ({
   const fetchReleaseServiceStatus = useCallback(() => {
     return dashboardService
       .getReleaseStatus(releaseId)
-      .then(([status]) => setCurrentStatus(status))
+      .then(setCurrentStatus)
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 

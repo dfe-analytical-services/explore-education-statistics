@@ -1,4 +1,5 @@
-import { UserDetails } from '@admin/services/common/types';
+import { ReleaseStatus } from '@admin/components/ReleaseServiceStatus';
+import { PrereleaseContactDetails } from '@admin/services/common/types';
 import {
   publicationPolyfilla,
   releasePolyfilla,
@@ -35,35 +36,34 @@ const service = {
       .get<AdminDashboardRelease[]>('/releases/scheduled')
       .then(releases => releases.map(releasePolyfilla));
   },
-  getAvailablePreReleaseContacts(): Promise<UserDetails[]> {
-    return client.get<UserDetails[]>('/prerelease/contacts');
+  getAvailablePreReleaseContacts(): Promise<PrereleaseContactDetails[]> {
+    return client.get<PrereleaseContactDetails[]>('/prerelease/contacts');
   },
-  getPreReleaseContactsForRelease(releaseId: string): Promise<UserDetails[]> {
-    return client.get<UserDetails[]>(
+  getPreReleaseContactsForRelease(
+    releaseId: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.get<PrereleaseContactDetails[]>(
       `/release/${releaseId}/prerelease-contacts`,
     );
   },
   addPreReleaseContactToRelease(
     releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]> {
-    return client.post<UserDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${preReleaseContactId}`,
+    email: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.post<PrereleaseContactDetails[]>(
+      `/release/${releaseId}/prerelease-contact/${email}`,
     );
   },
   removePreReleaseContactFromRelease(
     releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]> {
-    return client.delete<UserDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${preReleaseContactId}`,
+    email: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.delete<PrereleaseContactDetails[]>(
+      `/release/${releaseId}/prerelease-contact/${email}`,
     );
   },
-  getReleaseStatus(
-    releaseId: string,
-    // @ts-ignore
-  ): Promise<any> {
-    return client.get<UserDetails[]>(`/releases/${releaseId}/status`);
+  getReleaseStatus(releaseId: string): Promise<ReleaseStatus> {
+    return client.get<ReleaseStatus>(`/releases/${releaseId}/status`);
   },
 };
 

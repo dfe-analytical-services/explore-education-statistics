@@ -1,9 +1,6 @@
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
-using System.Security.Policy;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -15,9 +12,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
 {
@@ -98,7 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
             var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email) != null 
+                ? info.Principal.FindFirstValue(ClaimTypes.Email)
+                : info.Principal.FindFirstValue(ClaimTypes.Name);
 
             // Ensure names are set
             if (firstName == null && lastName == null)
@@ -124,13 +123,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             }
 
             // Check if the user is invited
-            var invite = await _usersAndRolesDbContext.UserInvites
+            var inviteToSystem = await _usersAndRolesDbContext
+                .UserInvites
+                .Include(i => i.Role)
                 .FirstOrDefaultAsync(i =>
                     i.Email.ToLower() == email.ToLower()
                     && i.Accepted == false);
 
-            // If the user has a invite register them automatically
-            if (invite != null)
+            // If the user has an invite register them automatically
+            if (inviteToSystem != null)
             {
                 var user = new ApplicationUser
                 {
@@ -139,23 +140,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     FirstName = firstName,
                     LastName = lastName
                 };
+                
                 var createdUserResult = await _userManager.CreateAsync(user);
 
-                // TODO: For now we just assign invited users the default role
-                var addedUserRoles = await _userManager.AddToRoleAsync(user, "BAU User");
+                var addedUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
 
                 if (createdUserResult.Succeeded && addedUserRoles.Succeeded)
                 {
-                    _contentDbContext.Users.Add(new User
+                    var newUser = new User
                     {
                         Id = new Guid(user.Id),
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Email = user.Email
-                    });
+                    };
+                    
+                    _contentDbContext.Users.Add(newUser);
 
                     await _contentDbContext.SaveChangesAsync();
-
 
                     createdUserResult = await _userManager.AddLoginAsync(user, info);
                     if (createdUserResult.Succeeded)
@@ -163,10 +165,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        invite.Accepted = true;
-                        _usersAndRolesDbContext.UserInvites.Update(invite);
+                        inviteToSystem.Accepted = true;
+                        _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
                         await _usersAndRolesDbContext.SaveChangesAsync();
 
+                        var releaseInvites = _contentDbContext
+                            .UserReleaseInvites
+                            .Where(i => i.Email.ToLower() == user.Email.ToLower());
+
+                        await releaseInvites.ForEachAsync(invite =>
+                        {
+                            _contentDbContext.Add(new UserReleaseRole
+                            {
+                                ReleaseId = invite.ReleaseId,
+                                Role = invite.Role,
+                                UserId = newUser.Id,
+                            });
+
+                            invite.Accepted = true;
+                        });
+
+                        await _contentDbContext.SaveChangesAsync();
+                        await _usersAndRolesDbContext.SaveChangesAsync();
+                        
                         return LocalRedirect(returnUrl);
                     }
                 }

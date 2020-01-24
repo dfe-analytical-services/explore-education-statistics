@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200123204916_AddPrereleaseAndAnalystPageAccessToRoles")]
+    partial class AddPrereleaseAndAnalystPageAccessToRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -516,20 +518,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "PrereleasePagesAccessGranted",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -20,
-                            ClaimType = "CanViewPrereleaseContacts",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -21,
-                            ClaimType = "CanViewPrereleaseContacts",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         });
                 });
 

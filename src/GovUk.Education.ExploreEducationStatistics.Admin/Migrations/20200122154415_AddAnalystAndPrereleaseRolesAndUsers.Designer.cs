@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200122154415_AddAnalystAndPrereleaseRolesAndUsers")]
+    partial class AddAnalystAndPrereleaseRolesAndUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,12 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Email");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("UserInvites");
                 });
@@ -495,41 +492,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "PrereleasePagesAccessGranted",
                             ClaimValue = "",
                             RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
-                        },
-                        new
-                        {
-                            Id = -17,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -18,
-                            ClaimType = "AnalystPagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -19,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -20,
-                            ClaimType = "CanViewPrereleaseContacts",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -21,
-                            ClaimType = "CanViewPrereleaseContacts",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         });
                 });
 
@@ -703,13 +665,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models.UserInvite", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -41,6 +41,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -172,6 +173,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
                 
+                // does this user have permissions to access analyst pages?
+                options.AddPolicy(SecurityPolicies.CanAccessAnalystPages.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString()));
+
+                // does this user have permissions to access prerelease pages?
+                options.AddPolicy(SecurityPolicies.CanAccessPrereleasePages.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString()));
+
+                // does this user have permissions to view the prerelease contacts list?
+                options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
+
                 // does this user have permissions to invite and manage all users on the system?
                 options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
@@ -223,6 +236,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // does this user have permission to approve a specific Release?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
+
+                // does this user have permission to assign prerelease contacts to a specific Release?
+                options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
             });
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -275,7 +292,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
 
-            services.AddTransient<INotificationClient, NotificationClient>(n => new NotificationClient(Configuration.GetValue<string>("NotifyApiKey")));
+            services.AddTransient<INotificationClient>(s =>
+            {
+                var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
+                
+                if (!HostingEnvironment.IsDevelopment())
+                {
+                    return new NotificationClient(notifyApiKey);
+                }
+                
+                if (notifyApiKey != null && notifyApiKey != "change-me")
+                {
+                    return new NotificationClient(notifyApiKey);
+                }
+                
+                var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
+                return new LoggingNotificationClient(logger);
+            });
             services.AddTransient<IEmailService, EmailService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
@@ -326,6 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
             services.AddSwaggerGen(c =>
             {

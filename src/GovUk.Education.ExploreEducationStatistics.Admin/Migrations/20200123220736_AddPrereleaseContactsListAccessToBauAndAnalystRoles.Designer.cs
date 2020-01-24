@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200123220736_AddPrereleaseContactsListAccessToBauAndAnalystRoles")]
+    partial class AddPrereleaseContactsListAccessToBauAndAnalystRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Email");

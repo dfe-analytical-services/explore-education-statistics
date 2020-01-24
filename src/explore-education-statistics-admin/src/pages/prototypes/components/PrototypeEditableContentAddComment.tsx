@@ -31,7 +31,13 @@ const ContentAddComment = ({ initialComments }: Props) => {
     const user: User = context.user || {
       name: 'guest',
       id: 'guest',
-      permissions: [],
+      permissions: {
+        canAccessSystem: false,
+        canAccessPrereleasePages: false,
+        canAccessAnalystPages: false,
+        canAccessUserAdministrationPages: false,
+        canAccessMethodologyAdministrationPages: false,
+      },
     };
 
     setComments([

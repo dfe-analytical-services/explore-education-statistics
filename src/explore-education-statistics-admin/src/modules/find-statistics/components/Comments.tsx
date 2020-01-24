@@ -33,11 +33,7 @@ const Comments = ({
   const editingContext = React.useContext(EditingContentBlockContext);
 
   const addComment = (comment: string) => {
-    const user: User = context.user || {
-      name: 'guest',
-      id: 'guest',
-      permissions: [],
-    };
+    const user = context.user as User;
 
     const additionalComment: ExtendedComment = {
       id: '0',
