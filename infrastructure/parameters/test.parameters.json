@@ -19,12 +19,6 @@
     },
     "deploySubnets": {
       "value": true
-    },
-    "publishReleasesCronSchedule": {
-      "value": "0 0-58/2 * * * *"
-    },
-    "publishReleaseContentCronSchedule": {
-      "value": "0 1-59/2 * * * *"
     }
   }
 }
