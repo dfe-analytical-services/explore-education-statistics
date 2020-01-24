@@ -175,13 +175,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </TabsSection>
             )}
 
-            <TabsSection id={`${id}-summary`} title="Summary">
-              <SummaryRenderer
-                onToggle={onSummaryDetailsToggle}
-                datablocks={[{ ...this.props, type: undefined }]}
-              />
-            </TabsSection>
-
             {tables && showTables && (
               <TabsSection id={`${id}-tables`} title="Data tables">
                 {tables.map((table, idx) => {
