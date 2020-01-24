@@ -64,7 +64,9 @@ class PublicationReleasePage extends Component<Props> {
         title={data.publication.title}
         caption={data.title}
         description={
-          data.summarySection.content && data.summarySection.content[0].body
+          data.summarySection.content &&
+          data.summarySection.content[0] &&
+          data.summarySection.content[0].body
         }
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
@@ -76,8 +78,7 @@ class PublicationReleasePage extends Component<Props> {
               <div className="govuk-grid-column-three-quarters">
                 {data.latestRelease ? (
                   <strong className="govuk-tag govuk-!-margin-right-6">
-                    {' '}
-                    This is the latest data{' '}
+                    This is the latest data
                   </strong>
                 ) : (
                   <Link
@@ -92,14 +93,14 @@ class PublicationReleasePage extends Component<Props> {
                   </Link>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published:</dt>
+                  <dt className="govuk-caption-m">Published: </dt>
                   <dd data-testid="published-date">
                     <strong>
-                      <FormattedDate>{data.published}</FormattedDate>{' '}
+                      <FormattedDate>{data.published}</FormattedDate>
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update:</dt>
+                    <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -192,81 +193,85 @@ class PublicationReleasePage extends Component<Props> {
               <h2 className="govuk-heading-m">About these statistics</h2>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For {data.coverageTitle}:</dt>
+                <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
                 <dd data-testid="release-name">
                   <strong>{data.yearTitle}</strong>
                 </dd>
-                <dd>
-                  <Details
-                    summary={`See previous ${releaseCount} releases`}
-                    onToggle={(open: boolean) =>
-                      open &&
-                      logEvent(
-                        'Previous Releases',
-                        'Release page previous releases dropdown opened',
-                        window.location.pathname,
-                      )
-                    }
-                  >
-                    <ul className="govuk-list">
-                      {[
-                        ...data.publication.releases.map(
-                          ({ id, slug, releaseName }) => [
-                            releaseName,
-                            <li key={id} data-testid="previous-release-item">
-                              <Link
-                                to={`/find-statistics/${data.publication.slug}/${slug}`}
-                              >
-                                {releaseName}
-                              </Link>
-                            </li>,
-                          ],
-                        ),
-                        ...data.publication.legacyReleases.map(
-                          ({ id, description, url }) => [
-                            description,
-                            <li key={id} data-testid="previous-release-item">
-                              <a href={url}>{description}</a>
-                            </li>,
-                          ],
-                        ),
-                      ]
-                        .sort((a, b) =>
-                          b[0].toString().localeCompare(a[0].toString()),
+                {!!releaseCount && (
+                  <dd>
+                    <Details
+                      summary={`See previous ${releaseCount} releases`}
+                      onToggle={(open: boolean) =>
+                        open &&
+                        logEvent(
+                          'Previous Releases',
+                          'Release page previous releases dropdown opened',
+                          window.location.pathname,
                         )
-                        .map(items => items[1])}
-                    </ul>
-                  </Details>
-                </dd>
+                      }
+                    >
+                      <ul className="govuk-list">
+                        {[
+                          ...data.publication.releases.map(
+                            ({ id, slug, releaseName }) => [
+                              releaseName,
+                              <li key={id} data-testid="previous-release-item">
+                                <Link
+                                  to={`/find-statistics/${data.publication.slug}/${slug}`}
+                                >
+                                  {releaseName}
+                                </Link>
+                              </li>,
+                            ],
+                          ),
+                          ...data.publication.legacyReleases.map(
+                            ({ id, description, url }) => [
+                              description,
+                              <li key={id} data-testid="previous-release-item">
+                                <a href={url}>{description}</a>
+                              </li>,
+                            ],
+                          ),
+                        ]
+                          .sort((a, b) =>
+                            b[0].toString().localeCompare(a[0].toString()),
+                          )
+                          .map(items => items[1])}
+                      </ul>
+                    </Details>
+                  </dd>
+                )}
               </dl>
-              <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Last updated:</dt>
-                <dd data-testid="last-updated">
-                  <strong>
-                    <FormattedDate>{data.updates[0].on}</FormattedDate>
-                  </strong>
-                  <Details
-                    onToggle={(open: boolean) =>
-                      open &&
-                      logEvent(
-                        'Last Updates',
-                        'Release page last updates dropdown opened',
-                        window.location.pathname,
-                      )
-                    }
-                    summary={`See all ${data.updates.length} updates`}
-                  >
-                    {data.updates.map(elem => (
-                      <div data-testid="last-updated-element" key={elem.id}>
-                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                          {elem.on}
-                        </FormattedDate>
-                        <p>{elem.reason}</p>
-                      </div>
-                    ))}
-                  </Details>
-                </dd>
-              </dl>
+              {data.updates && data.updates.length > 0 && (
+                <dl className="dfe-meta-content">
+                  <dt className="govuk-caption-m">Last updated:</dt>
+                  <dd data-testid="last-updated">
+                    <strong>
+                      <FormattedDate>{data.updates[0].on}</FormattedDate>
+                    </strong>
+                    <Details
+                      onToggle={(open: boolean) =>
+                        open &&
+                        logEvent(
+                          'Last Updates',
+                          'Release page last updates dropdown opened',
+                          window.location.pathname,
+                        )
+                      }
+                      summary={`See all ${data.updates.length} updates`}
+                    >
+                      {data.updates.map(elem => (
+                        <div data-testid="last-updated-element" key={elem.id}>
+                          <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                            {elem.on}
+                          </FormattedDate>
+                          <p>{elem.reason}</p>
+                        </div>
+                      ))}
+                    </Details>
+                  </dd>
+                </dl>
+              )}
               <h2
                 className="govuk-heading-m govuk-!-margin-top-6"
                 id="related-content"
