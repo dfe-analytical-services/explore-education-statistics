@@ -75,8 +75,7 @@ const KeyStatistics = ({
                       });
                   }}
                   onSubmit={values => {
-                    console.log(values);
-                    return new Promise(resolve =>
+                    return new Promise(() =>
                       releaseContentService
                         .updateContentSectionDataBlock(
                           release.id,
@@ -85,7 +84,7 @@ const KeyStatistics = ({
                           values,
                         )
                         .then(() => {
-                          /* setRelease({
+                          setRelease({
                             ...release,
                             keyStatisticsSection: {
                               ...release.keyStatisticsSection,
@@ -109,7 +108,7 @@ const KeyStatistics = ({
                                   )
                                 : [],
                             },
-                          }); */
+                          });
                         }),
                     );
                   }}

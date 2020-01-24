@@ -5,12 +5,13 @@ import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   type: string;
   dataBlockResponse?: DataBlockResponse;
+  children?: ReactNode;
 }
 
 export interface KeyStatConfig {
@@ -22,6 +23,7 @@ const KeyStatTile = ({
   dataBlockRequest,
   summary,
   dataBlockResponse: response,
+  children,
 }: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
@@ -71,6 +73,7 @@ const KeyStatTile = ({
               <div>{summary.dataDefinition}</div>
             </Details>
           )}
+          {children}
         </>
       ) : (
         <LoadingSpinner />
