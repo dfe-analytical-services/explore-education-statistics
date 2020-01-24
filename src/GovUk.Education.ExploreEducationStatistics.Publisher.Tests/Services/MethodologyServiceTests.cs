@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new MethodologyService(context);
 
-                var result = service.GetTree();
+                var result = service.GetTree(Enumerable.Empty<Guid>());
 
                 Assert.True(result.Any());
                 Assert.Single(result);

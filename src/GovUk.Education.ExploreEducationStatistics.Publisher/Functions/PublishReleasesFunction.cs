@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var scheduled = (await QueryScheduledReleases()).Select(status => (status.ReleaseId, status.Id)).ToList();
             if (scheduled.Any())
             {
-                await _queueService.QueuePublishReleaseFilesMessagesAsync(scheduled);
+                await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
                 await _queueService.QueuePublishReleaseDataMessagesAsync(scheduled);
                 foreach (var (releaseId, releaseStatusId) in scheduled)
                 {
