@@ -19,6 +19,7 @@ export interface SelectOption {
 }
 
 export interface FormSelectProps {
+  disabled?: boolean;
   error?: string;
   id: string;
   label: ReactNode | string;
@@ -37,6 +38,7 @@ export interface FormSelectProps {
 }
 
 const FormSelect = ({
+  disabled,
   error,
   id,
   label,
@@ -63,6 +65,7 @@ const FormSelect = ({
         })}
         id={id}
         name={name}
+        disabled={disabled}
         onBlur={onBlur}
         onChange={onChange}
         value={value}

@@ -193,6 +193,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       hint="Select at least one indicator"
                       error={getError('indicators')}
                       selectAll
+                      disabled={form.isSubmitting}
                       options={Object.entries(subjectMeta.indicators).map(
                         ([_, group]) => {
                           return {
@@ -223,6 +224,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
                                 error={getError(filterName)}
+                                disabled={form.isSubmitting}
                                 selectAll
                                 options={Object.entries(
                                   filterGroup.options,
