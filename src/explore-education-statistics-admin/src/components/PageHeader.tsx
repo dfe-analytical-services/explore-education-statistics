@@ -90,11 +90,6 @@ const LoggedInLinks = ({ user }: Authentication) => (
       </li>
     )}
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="/identity/account/manage">
-        {user ? user.name : ''}
-      </a>
-    </li>
-    <li className="govuk-header__navigation-item">
       <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out
       </Link>
