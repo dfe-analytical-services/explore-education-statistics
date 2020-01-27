@@ -37,20 +37,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpPost("release/{releaseId}/prerelease-contact/{email}")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(Guid releaseId, string email)
+        [HttpPost("release/{releaseId}/prerelease-contact")]
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(
+            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
             return await _preReleaseService
-                .AddPreReleaseContactToReleaseAsync(releaseId, email)
+                .AddPreReleaseContactToReleaseAsync(releaseId, request.Email)
                 .HandleFailuresOr(Ok);
         }
 
         [HttpDelete("release/{releaseId}/prerelease-contact/{email}")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(Guid releaseId, string email)
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(
+            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
             return await _preReleaseService
-                .RemovePreReleaseContactFromReleaseAsync(releaseId, email)
+                .RemovePreReleaseContactFromReleaseAsync(releaseId, request.Email)
                 .HandleFailuresOr(Ok);
         }
+    }
+
+    public class PrereleaseAccessRequest
+    {
+        public string Email { get; set; }
     }
 }

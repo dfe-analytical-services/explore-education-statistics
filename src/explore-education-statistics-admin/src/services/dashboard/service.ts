@@ -40,7 +40,10 @@ const service = {
     email: string,
   ): Promise<PrereleaseContactDetails[]> {
     return client.post<PrereleaseContactDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${email}`,
+      `/release/${releaseId}/prerelease-contact`,
+      {
+        email,
+      },
     );
   },
   removePreReleaseContactFromRelease(
