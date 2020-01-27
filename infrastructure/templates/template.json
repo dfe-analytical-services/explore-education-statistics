@@ -376,20 +376,6 @@
       }
     },
 
-    "publisherClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "Publisher Active Directory Application Client Id used for authentication requests"
-      }
-    },
-
-    "publisherClientSecret": {
-      "type": "string",
-      "metadata": {
-        "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
-      }
-    },
-
     "publisherPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
@@ -2298,11 +2284,11 @@
             },
             {
               "name": "ClientId",
-              "value": "[parameters('publisherClientId')]"
+              "value": "[variables('ees-publisher-clientid')]"
             },
             {
               "name": "ClientSecret",
-              "value": "[parameters('publisherClientSecret')]"
+              "value": "[variables('ees-publisher-clientsecret')]"
             },
             {
               "name": "DataFactoryName",
