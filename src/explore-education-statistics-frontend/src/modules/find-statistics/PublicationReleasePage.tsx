@@ -22,6 +22,7 @@ import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
 import styles from './PublicationReleasePage.module.scss';
+import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 
 interface Props {
   publication: string;
@@ -54,7 +55,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data } = this.props;
+    const { data, release } = this.props;
 
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
@@ -303,12 +304,13 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        {data.keyStatisticsSection && data.keyStatisticsSection.content && (
-          <DataBlockWithAnalytics
-            {...data.keyStatisticsSection.content[0]}
-            id="keystats"
-          />
-        )}
+        <HeadlinesSection
+          releaseId={release}
+          publication={data.publication}
+          keyStatisticsSection={data.keyStatisticsSection}
+          headlinesSection={data.headlinesSection}
+          keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
+        />
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>

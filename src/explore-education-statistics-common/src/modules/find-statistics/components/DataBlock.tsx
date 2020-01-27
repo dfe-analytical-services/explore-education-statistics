@@ -216,7 +216,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               >
                 {charts.length === 0 ? (
                   <span>
-                    No Charts have been configured for this datablock.
+                    No charts have been configured for this datablock.
                   </span>
                 ) : (
                   charts.map((chart, idx) => {
