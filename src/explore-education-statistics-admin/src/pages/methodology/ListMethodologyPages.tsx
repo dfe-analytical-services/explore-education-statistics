@@ -48,13 +48,13 @@ const ListMethodologyPages = () => {
               <thead className="govuk-table__head">
                 <tr className="govuk-table__row">
                   <th scope="col" className="govuk-table__header">
-                    Methodology
+                    Methodology title
                   </th>
                   <th scope="col" className="govuk-table__header">
                     Status
                   </th>
                   <th scope="col" className="govuk-table__header">
-                    Publications
+                    Related publications
                   </th>
                 </tr>
               </thead>
