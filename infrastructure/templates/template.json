@@ -347,11 +347,10 @@
       "type": "bool",
       "defaultValue": true
     },
-    "deployKeyVaultSecrets": {
+    "disableSwagger": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
-
     "publishReleasesCronSchedule": {
       "type": "string",
       "defaultValue": "0 0 0 * * *",

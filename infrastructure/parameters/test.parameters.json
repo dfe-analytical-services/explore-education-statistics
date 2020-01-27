@@ -19,6 +19,9 @@
     },
     "deploySubnets": {
       "value": true
+    },
+    "disableSwagger": {
+      "value": false
     }
   }
 }
