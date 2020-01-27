@@ -36,10 +36,13 @@ const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
 const findThemeById = (
   themeId: string,
   availableThemes: ThemeAndTopicsIdsAndTitles[],
-) => availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
+) =>
+  availableThemes.find(
+    theme => theme.id === themeId,
+  ) as ThemeAndTopicsIdsAndTitles;
 
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
-  theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
+  theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
 export interface Props
   extends RouteComponentProps<{
@@ -100,7 +103,7 @@ const ManagePublicationsAndReleasesTab = ({
 
   useEffect(() => {
     if (themes) {
-      if (selectedThemeAndTopic.theme.id === '') {
+      if (selectedThemeAndTopic.theme.id === '' && themes.length) {
         setSelectedThemeAndTopic({
           theme: themes[0],
           topic: orderBy(themes[0].topics, topic => topic.title)[0],

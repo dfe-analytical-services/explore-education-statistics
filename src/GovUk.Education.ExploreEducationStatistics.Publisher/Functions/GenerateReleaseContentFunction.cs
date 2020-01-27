@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                await _contentService.UpdateContentAsync(message.ReleaseId);
+                await _contentService.UpdateContentAsync(message.Releases.Select(tuple => tuple.ReleaseId));
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)
@@ -46,7 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage)
         {
-            await _releaseStatusService.UpdateContentStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
+            foreach (var (releaseId, releaseStatusId) in message.Releases)
+            {
+                await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage);
+            }
         }
     }
 }

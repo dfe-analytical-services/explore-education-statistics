@@ -24,14 +24,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public Task<Release> GetAsync(Guid id)
+        public async Task<Release> GetAsync(Guid id)
         {
-            return _context.Releases
+            return await _context.Releases
                 .Include(release => release.Publication)
-                .FirstOrDefaultAsync(release => release.Id == id);
+                .SingleOrDefaultAsync(release => release.Id == id);
         }
 
-        public ReleaseViewModel GetRelease(Guid id)
+        public async Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids)
+        {
+            return await _context.Releases
+                .Where(release => ids.Contains(release.Id))
+                .Include(release => release.Publication)
+                .ToListAsync();
+        }
+        
+        public ReleaseViewModel GetReleaseViewModel(Guid id)
         {
             var release = _context.Releases
                 .Include(r => r.Type)
@@ -41,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
                 .Include(r => r.Updates)
-                .FirstOrDefault(r => r.Id == id);
+                .SingleOrDefault(r => r.Id == id);
 
             if (release != null)
             {
@@ -65,17 +73,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
             releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
-            releaseViewModel.LatestRelease = IsLatestRelease(release.PublicationId, releaseViewModel.Id);
+            releaseViewModel.LatestRelease =
+                GetLatestRelease(release.PublicationId, Enumerable.Empty<Guid>())?.Id == releaseViewModel.Id;
             releaseViewModel.DownloadFiles = _fileStorageService
                 .ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
 
             return releaseViewModel;
         }
 
-        public ReleaseViewModel GetLatestRelease(Guid id)
+        public Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
-            var releases = _context.Releases
-                .Where(r => r.PublicationId == id)
+            return _context.Releases
+                .Where(release => release.PublicationId == publicationId)
+                .ToList()
+                .Where(release => IsReleasePublished(release, includedReleaseIds))
+                .OrderByDescending(release => release.Published)
+                .FirstOrDefault();
+        }
+
+        public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        {
+            var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
+            var release = _context.Releases
                 .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(join => join.ContentSection)
@@ -84,9 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication).ThenInclude(p => p.Topic.Theme)
                 .Include(r => r.Publication).ThenInclude(p => p.Contact)
                 .Include(r => r.Updates)
-                .OrderBy(r => r.Published);
-                
-            var release = releases.Last();
+                .SingleOrDefault(r => r.Id == latestRelease.Id);
 
             if (release != null)
             {
@@ -121,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task SetPublishedDateAsync(Guid id)
         {
             var release = await _context.Releases
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .SingleOrDefaultAsync(r => r.Id == id);
 
             if (release == null)
             {
@@ -133,13 +150,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _context.SaveChangesAsync();
         }
 
-        // TODO: This logic is flawed but will provide an accurate result with the current seed data
-        private bool IsLatestRelease(Guid publicationId, Guid releaseId)
+        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
-            return (_context.Releases
-                        .Where(x => x.PublicationId == publicationId)
-                        .OrderBy(x => x.Published)
-                        .Last().Id == releaseId);
+            return release.Live || includedReleaseIds.Contains(release.Id);
         }
     }
 }

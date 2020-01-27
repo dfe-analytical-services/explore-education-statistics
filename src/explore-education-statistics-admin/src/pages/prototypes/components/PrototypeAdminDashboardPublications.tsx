@@ -17,18 +17,17 @@ const PrototypeAdminDashboardPublications = () => {
   return (
     <>
       {userContext.user &&
-        (userContext.user.permissions.includes('team lead') ||
-          userContext.user.permissions.includes('bau')) && (
+        (userContext.user.name === 'John Smith' ||
+          userContext.user.name === 'BAU User') && (
           <p className="govuk-body">
             View existing and create new publications and releases.
           </p>
         )}
-      {userContext.user &&
-        userContext.user.permissions.includes('team member') && (
-          <p className="govuk-body">
-            View existing publications and create new releases.
-          </p>
-        )}
+      {userContext.user && userContext.user.name === 'Ann Evans' && (
+        <p className="govuk-body">
+          View existing publications and create new releases.
+        </p>
+      )}
       <p className="govuk-body">Select publications to:</p>
       <ul className="govuk-list--bullet">
         <li>create new releases and methodologies</li>
@@ -42,8 +41,8 @@ const PrototypeAdminDashboardPublications = () => {
         </a>
       </p>
       {userContext.user &&
-        (userContext.user.permissions.includes('team lead') ||
-          userContext.user.permissions.includes('bau')) && (
+        (userContext.user.name === 'John Smith' ||
+          userContext.user.name === 'BAU User') && (
           <>
             <form>
               <div className="govuk-grid-row">
@@ -132,15 +131,23 @@ const PrototypeAdminDashboardPublications = () => {
                         years="2018 to 2019"
                         tag={
                           userContext.user &&
-                          userContext.user.permissions.includes(
-                            'responsible statistician',
-                          )
+                          userContext.user.name === 'Stephen Doherty'
                             ? 'Ready for final sign-off'
                             : 'In draft'
                         }
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
-                        lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                        lastEditor={{
+                          id: 'me',
+                          name: 'me',
+                          permissions: {
+                            canAccessSystem: false,
+                            canAccessPrereleasePages: false,
+                            canAccessAnalystPages: false,
+                            canAccessUserAdministrationPages: false,
+                            canAccessMethodologyAdministrationPages: false,
+                          },
+                        }}
                         published={new Date('2019-09-20 09:30')}
                         nextRelease={new Date('2020-09-20 09:30')}
                         showComments
@@ -160,7 +167,17 @@ const PrototypeAdminDashboardPublications = () => {
                         }
                         isNew
                         lastEdited={new Date('2019-03-20 17:37')}
-                        lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                        lastEditor={{
+                          id: 'me',
+                          name: 'me',
+                          permissions: {
+                            canAccessSystem: false,
+                            canAccessPrereleasePages: false,
+                            canAccessAnalystPages: false,
+                            canAccessUserAdministrationPages: false,
+                            canAccessMethodologyAdministrationPages: false,
+                          },
+                        }}
                         published={new Date('2019-09-24 09:30')}
                         nextRelease={new Date('2020-09-25 09:30')}
                       />
@@ -180,7 +197,17 @@ const PrototypeAdminDashboardPublications = () => {
                         window.location.search === '?status=editLiveRelease'
                       }
                       lastEdited={new Date('2018-03-20 17:37')}
-                      lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                      lastEditor={{
+                        id: 'me',
+                        name: 'me',
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
+                      }}
                       published={new Date('2018-09-24 09:30')}
                       nextRelease={new Date('2019-09-23 09:30')}
                     />
@@ -194,7 +221,17 @@ const PrototypeAdminDashboardPublications = () => {
                         window.location.search === '?status=editLiveRelease'
                       }
                       lastEdited={new Date('2018-03-20 14:23')}
-                      lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                      lastEditor={{
+                        id: 'me',
+                        name: 'me',
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
+                      }}
                       published={new Date('2017-09-25 09:30')}
                     />
                   </li>
@@ -207,7 +244,17 @@ const PrototypeAdminDashboardPublications = () => {
                         window.location.search === '?status=editLiveRelease'
                       }
                       lastEdited={new Date('2017-03-20 16:15')}
-                      lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                      lastEditor={{
+                        id: 'me',
+                        name: 'me',
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
+                      }}
                       published={new Date('2016-03-26 09:30')}
                     />
                   </li>
@@ -230,7 +277,7 @@ const PrototypeAdminDashboardPublications = () => {
                 Assign methodology
               </Link>
             </div>
-            {userContext.user && userContext.user.permissions.includes('bau') && (
+            {userContext.user && userContext.user.name === 'BAU User' && (
               <div className="govuk-grid-column-one-half dfe-align--right">
                 <a
                   href="#"
@@ -274,7 +321,17 @@ const PrototypeAdminDashboardPublications = () => {
                         window.location.search === '?status=editLiveRelease'
                       }
                       lastEdited={new Date('2019-03-20 17:37')}
-                      lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                      lastEditor={{
+                        id: 'me',
+                        name: 'me',
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
+                      }}
                       published={new Date('2018-01-08 09:30')}
                       nextRelease={new Date('2019-01-07 17:37')}
                     />
@@ -289,7 +346,13 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEditor={{
                         id: 'me',
                         name: 'Ann Evans',
-                        permissions: [],
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
                       }}
                       published={new Date('2017-01-06 09:30')}
                       lead="Ann Evans"
@@ -344,7 +407,17 @@ const PrototypeAdminDashboardPublications = () => {
                         window.location.search === '?status=editLiveRelease'
                       }
                       lastEdited={new Date('2019-03-20 17:37')}
-                      lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                      lastEditor={{
+                        id: 'me',
+                        name: 'me',
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
+                      }}
                       published={new Date('2019-09-24 09:30')}
                       nextRelease={new Date('2020-09-25 09:30')}
                     />
@@ -360,7 +433,13 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEditor={{
                         id: 'me',
                         name: 'Ann Evans',
-                        permissions: [],
+                        permissions: {
+                          canAccessSystem: false,
+                          canAccessPrereleasePages: false,
+                          canAccessAnalystPages: false,
+                          canAccessUserAdministrationPages: false,
+                          canAccessMethodologyAdministrationPages: false,
+                        },
                       }}
                       published={new Date('2019-03-20 09:30')}
                       lead="Ann Evans"
@@ -414,7 +493,7 @@ const PrototypeAdminDashboardPublications = () => {
           </AccordionSection>
         )}
       </Accordion>
-      {userContext.user && userContext.user.permissions.includes('team lead') && (
+      {userContext.user && userContext.user.name === 'John Smith' && (
         <Link to="/prototypes/publication-create-new" className="govuk-button">
           Create new publication
         </Link>

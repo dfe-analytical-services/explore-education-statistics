@@ -151,6 +151,29 @@
     <_ContentIncludedByDefault Remove="Views\Topics\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\_ViewImports.cshtml" />
     <_ContentIncludedByDefault Remove="Views\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publishing\PublishReleaseData.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publishing\ReleaseDataPublished.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotificationsSent.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotifySubscribers.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Home\Index.cshtml" />
   </ItemGroup>
   
   <ItemGroup>

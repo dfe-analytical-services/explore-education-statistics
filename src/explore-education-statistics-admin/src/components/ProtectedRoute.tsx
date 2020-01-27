@@ -1,19 +1,20 @@
+import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ErrorBoundary, {
   ErrorControlContext,
 } from '@admin/components/ErrorBoundary';
 import LoginContext from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
-import permissionService from '@admin/services/permissions/service';
-import React, { useContext, useEffect, useState } from 'react';
+import { User } from '@admin/services/sign-in/types';
+import React, { useContext } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 import ProtectedRoutes from './ProtectedRoutes';
 
 interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;
-  protectionAction?: () => Promise<boolean>;
+  protectionAction?: (user: User) => boolean;
 }
 
-const basicAccessCheck = () => permissionService.canAccessSystem();
+const basicAccessCheck = (user: User) => user.permissions.canAccessSystem;
 
 const AuthenticationCheckingComponent = ({
   component,
@@ -23,31 +24,30 @@ const AuthenticationCheckingComponent = ({
 }: ProtectedRouteProps) => {
   const { user } = useContext(LoginContext);
 
-  const { handleApiErrors, handleManualErrors } = useContext(
-    ErrorControlContext,
-  );
+  const { handleManualErrors } = useContext(ErrorControlContext);
 
-  const [protectedByAction, setProtectedByAction] = useState<boolean>();
+  let protectedByAction = false;
 
-  useEffect(() => {
-    if (user) {
-      const accessCheck = protectionAction || basicAccessCheck;
-
-      accessCheck()
-        .then(result => setProtectedByAction(!result))
-        .catch(handleApiErrors);
-    } else {
-      const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
-      setProtectedByAction(denyAccessToNonLoggedInUsers);
-    }
-  }, [protectionAction, handleApiErrors, allowAnonymousUsers, user]);
+  if (user) {
+    const accessCheck = protectionAction || basicAccessCheck;
+    protectedByAction = !accessCheck(user);
+  } else {
+    const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
+    protectedByAction = denyAccessToNonLoggedInUsers;
+  }
 
   if (!component) {
     return null;
   }
 
   if (!allowAnonymousUsers && (!user || user.validToken === false)) {
-    return <Redirect to={signInService.getSignInLink()} />;
+    return (
+      <Redirect
+        to={`${signInService.getSignInLink()}?${
+          QueryParameterNames.ReturnUrl
+        }=${encodeURI(window.location.href)}`}
+      />
+    );
   }
 
   if (typeof protectedByAction !== 'undefined' && protectedByAction) {
