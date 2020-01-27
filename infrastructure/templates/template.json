@@ -569,6 +569,10 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
+              "name": "DISABLE_SWAGGER",
+              "value": "[parameters('disableSwagger')]"
+            },
+            {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
             },
@@ -761,6 +765,10 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
+              "name": "DISABLE_SWAGGER",
+              "value": "[parameters('disableSwagger')]"
+            },
+            {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
             },
@@ -940,6 +948,10 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "DISABLE_SWAGGER",
+              "value": "[parameters('disableSwagger')]"
             },
             {
               "name": "AppInsights__InstrumentationKey",
