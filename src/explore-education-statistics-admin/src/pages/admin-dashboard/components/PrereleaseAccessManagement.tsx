@@ -56,7 +56,7 @@ const PrereleaseAccessManagement = ({
       .catch(handleApiErrors);
   }, [handleApiErrors, release.id]);
 
-  const formId = 'invitePrereleaseAccessUsers';
+  const formId = `invitePrereleaseAccessUsers-${release.id}`;
 
   const errorCodeMappings = [
     errorCodeToFieldError(
@@ -118,10 +118,10 @@ const PrereleaseAccessManagement = ({
                   <FormFieldset
                     legend="Manage pre release access"
                     legendSize="s"
-                    id="pre-release-selection"
+                    id={`pre-release-selection-${release.id}`}
                   >
                     <FormFieldSelect
-                      id="preReleaseAccessContact"
+                      id={`preReleaseAccessContact-${release.id}`}
                       name="preReleaseAccessContact"
                       label="Select user"
                       options={[
@@ -146,11 +146,13 @@ const PrereleaseAccessManagement = ({
                       onChange={event =>
                         inviteUserByEmail(event.target.value, form.resetForm)
                       }
+                      disabled={model.inviting || model.removing}
                     />
                     <FormFieldTextInput
                       id={`${formId}-email`}
                       label="or invite a new user"
                       name="email"
+                      disabled={model.inviting || model.removing}
                     />
                     <Button
                       type="submit"
