@@ -66,16 +66,16 @@ const PublicationSummary = ({ publication }: Props) => {
 
           {publication.methodology && (
             <ButtonLink
-              to="/prototypes/publication-assign-methodology"
+              to={`/methodology/${publication.methodology.id}`}
               className="govuk-button--secondary"
             >
-              Manage methodology
+              Edit methodology
             </ButtonLink>
           )}
 
           {!publication.methodology && (
             <ButtonLink
-              to="/prototypes/publication-assign-methodology"
+              to={`/methodology/create?publicationId=${publication.id}`}
               className="govuk-button--secondary"
             >
               Add methodology

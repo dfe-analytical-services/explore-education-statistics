@@ -89,7 +89,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
 
   const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
-    timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
+    timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
     scheduledPublishDate: validateMandatoryDayMonthYearField,
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
