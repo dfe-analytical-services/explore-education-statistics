@@ -123,7 +123,7 @@ export const transposeSpanColumnsToRows = (
 export const generateAggregatedGroups = (
   headerGroups: RowHeaderType[][],
   headerIsGroup: boolean[] = [],
-): (RowHeaderType)[][] => {
+): RowHeaderType[][] => {
   const aggrigatedDuplication = headerGroups.reduce<{
     finalGroups: RowHeaderType[][];
     total: number;

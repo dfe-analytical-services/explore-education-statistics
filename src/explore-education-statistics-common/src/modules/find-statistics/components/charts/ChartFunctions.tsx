@@ -211,7 +211,8 @@ export function filterResultsBySingleDataSet(
     r =>
       dataSet.indicator &&
       Object.keys(r.measures).includes(dataSet.indicator) &&
-      dataSet.filters && difference(r.filters, dataSet.filters).length === 0,
+      dataSet.filters &&
+      difference(r.filters, dataSet.filters).length === 0,
   );
 }
 
