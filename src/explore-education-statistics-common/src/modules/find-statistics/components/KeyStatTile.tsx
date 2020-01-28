@@ -49,7 +49,7 @@ const KeyStatTile = ({
         )}${theIndicator.unit}`,
       });
     }
-  }, [dataBlockResponse]);
+  }, [dataBlockResponse, dataBlockRequest, handleApiErrors]);
 
   return (
     <div className={styles.keyStatTile}>

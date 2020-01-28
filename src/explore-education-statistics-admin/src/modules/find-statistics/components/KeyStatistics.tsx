@@ -25,6 +25,7 @@ const KeyStatistics = ({
   setRelease,
   isEditing,
 }: KeyStatisticsProps) => {
+  const { updateAvailableDataBlocks } = useContext(EditingContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const [keyStats, setKeyStats] = useState<
     AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
@@ -73,6 +74,9 @@ const KeyStatistics = ({
                               ),
                           },
                         });
+                        if (updateAvailableDataBlocks) {
+                          updateAvailableDataBlocks();
+                        }
                       })
                       .catch(handleApiErrors);
                   }}

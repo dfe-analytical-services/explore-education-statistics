@@ -66,7 +66,7 @@ const EditableKeyStatTile = ({
         })
         .catch(handleApiErrors);
     }
-  }, [dataBlockRequest, handleApiErrors]);
+  }, [dataBlockRequest, dataBlockResponse, handleApiErrors]);
 
   if (!dataBlockResponse) {
     return (
