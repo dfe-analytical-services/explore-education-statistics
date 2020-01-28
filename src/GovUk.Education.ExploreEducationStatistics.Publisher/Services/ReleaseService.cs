@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderByDescending(release => release.Published)
+                .OrderByDescending(release => release.Published ?? release.PublishScheduled)
                 .FirstOrDefault();
         }
 
