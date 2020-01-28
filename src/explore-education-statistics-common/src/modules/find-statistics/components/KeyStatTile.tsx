@@ -10,7 +10,6 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
-  type: string;
   dataBlockResponse?: DataBlockResponse;
   children?: ReactNode;
   handleApiErrors?: (error: AxiosResponse) => void;

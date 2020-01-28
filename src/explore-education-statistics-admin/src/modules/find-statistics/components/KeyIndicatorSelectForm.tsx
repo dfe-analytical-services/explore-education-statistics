@@ -5,6 +5,7 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import Details from '@common/components/Details';
 import { TimePeriodQuery } from '@common/modules/full-table/services/tableBuilderService';
 import { DataBlock } from '@common/services/dataBlockService';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -57,7 +58,7 @@ const KeyIndicatorSelectForm = ({
           open
           onToggle={() => {}}
         >
-          // to do :)
+          <KeyStatTile {...selectedDataBlock} />
         </Details>
       </section>
     ) : null;

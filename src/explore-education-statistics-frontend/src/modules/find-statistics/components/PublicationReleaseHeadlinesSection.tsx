@@ -32,12 +32,17 @@ const HeadlinesSection = ({
             keyStatisticsSection.content.map(keyStat => {
               if (keyStat.type !== 'DataBlock') return null;
               const block = keyStat as DataBlock;
-              return <KeyStatTile key={block.id} {...block} type="DataBlock" />;
+              return <KeyStatTile key={block.id} {...block} />;
             })}
         </div>
 
         {(headlinesSection.content || [])
-          .sort((a, b) => a.order - b.order)
+          .sort((a, b) => {
+            if (a.order === undefined || b.order === undefined) {
+              return 0;
+            }
+            return a.order - b.order;
+          })
           .map((block, i) => (
             <ContentSubBlockRenderer
               key={block.id}

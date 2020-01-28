@@ -181,6 +181,7 @@ export type ContentBlockType =
 
 export interface ContentBlock {
   id: string;
+  order?: number;
   type: ContentBlockType;
   body: string;
   heading?: string;
