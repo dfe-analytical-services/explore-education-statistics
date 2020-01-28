@@ -100,6 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
             if (Content == Failed || Data == Failed || Files == Failed || Publishing == Failed)
             {
+                if (Content == Failed || Data == Failed || Files == Failed)
+                {
+                    Publishing = Cancelled;
+                }
                 Overall = Failed;
             }
 

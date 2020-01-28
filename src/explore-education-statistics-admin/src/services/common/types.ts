@@ -26,6 +26,11 @@ export interface UserDetails {
   name: string;
 }
 
+export interface PrereleaseContactDetails {
+  email: string;
+  invited: boolean;
+}
+
 export interface TimePeriodCoverageGroup {
   category: {
     label: string;

@@ -13,7 +13,7 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
-interface ReleaseServiceStatus {
+export interface ReleaseStatus {
   overallStage: string;
 }
 
@@ -23,31 +23,42 @@ const ReleaseServiceStatus = ({
   exclude,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
-  const [currentStatus, setCurrentStatus] = useState<ReleaseServiceStatus>();
+  const [currentStatus, setCurrentStatus] = useState<ReleaseStatus>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
   );
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchReleaseServiceStatus = useCallback(() => {
     return dashboardService
       .getReleaseStatus(releaseId)
-      .then(([status]) => setCurrentStatus(status))
+      .then(status => {
+        setCurrentStatus(status);
+        if (
+          status &&
+          (status.overallStage === 'Started' ||
+            status.overallStage === 'Queued')
+        ) {
+          timeoutRef.current = setTimeout(
+            fetchReleaseServiceStatus,
+            refreshPeriod,
+          );
+        }
+      })
       .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
-
-  const intervalRef = useRef<NodeJS.Timeout>();
+  }, [releaseId, handleApiErrors, refreshPeriod]);
 
   function cancelTimer() {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timeoutRef.current) clearInterval(timeoutRef.current);
   }
 
   useEffect(() => {
     fetchReleaseServiceStatus();
-    intervalRef.current = setInterval(fetchReleaseServiceStatus, refreshPeriod);
     return () => {
+      // cleans up the timeout
       cancelTimer();
     };
-  }, [fetchReleaseServiceStatus, refreshPeriod]);
+  }, [fetchReleaseServiceStatus]);
 
   const statusDetailColor = (
     status: string,
@@ -82,7 +93,7 @@ const ReleaseServiceStatus = ({
       }
       setStatusColor(color);
     }
-  }, [currentStatus]);
+  }, [currentStatus, statusDetailColor]);
 
   if (!currentStatus) return null;
   return (

@@ -55,11 +55,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 if (_context.UserInvites.Any(i => i.Email == email) == false)
                 {
+                    // TODO add role selection to Invite Users UI
+                    var analystRole = await _context
+                        .Roles
+                        // TODO represent roles with an enum
+                        .Where(r => r.Name == "Analyst")
+                        .FirstAsync();
+                    
                     var invite = new UserInvite
                     {
                         Email = email,
                         Created = DateTime.UtcNow,
-                        CreatedBy = user
+                        CreatedBy = user,
+                        Role = analystRole
                     };
 
                     await _context.UserInvites.AddAsync(invite);

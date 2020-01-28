@@ -15,8 +15,7 @@ const PublicationPage = ({ task }: Props) => {
   const userContext = React.useContext(PrototypeLoginContext);
 
   const reviewType =
-    userContext.user &&
-    userContext.user.permissions.includes('responsible statistician')
+    userContext.user && userContext.user.name === 'Stephen Doherty'
       ? 'level2'
       : 'level1';
 

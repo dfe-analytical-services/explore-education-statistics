@@ -45,6 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             context.IssuedClaims.AddRange(roleClaims);
             context.IssuedClaims.Add(new Claim(JwtClaimTypes.GivenName, user.FirstName));
             context.IssuedClaims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
+            
+            // Add the user's Roles, so we can optionally provide role-based authorization
+            roleNames.ToList().ForEach(roleName => 
+                context.IssuedClaims.Add(new Claim(JwtClaimTypes.Role, roleName)));
+            
         }
 
         public Task IsActiveAsync(IsActiveContext context)

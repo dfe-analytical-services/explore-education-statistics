@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IMethodologyService
     {
         Task<Methodology> GetAsync(Guid id);
-        List<ThemeTree> GetTree();
+        List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds);
     }
 }

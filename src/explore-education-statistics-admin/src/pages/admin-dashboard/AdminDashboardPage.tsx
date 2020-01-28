@@ -2,20 +2,17 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { UserDetails } from '@admin/services/common/types';
+import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import FormFieldset from '@common/components/form/FormFieldset';
-import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
@@ -25,8 +22,6 @@ import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAnd
 interface Model {
   draftReleases: AdminDashboardRelease[];
   scheduledReleases: AdminDashboardRelease[];
-  availablePreReleaseContacts: UserDetails[];
-  preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
 const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
@@ -36,36 +31,31 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
     Promise.all([
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
-      dashboardService.getAvailablePreReleaseContacts(),
     ])
-      .then(
-        ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
-          const contactResultsByRelease = scheduledReleases.map(release =>
-            dashboardService
-              .getPreReleaseContactsForRelease(release.id)
-              .then(contacts => ({
-                releaseId: release.id,
-                contacts,
-              })),
-          );
+      .then(([draftReleases, scheduledReleases]) => {
+        const contactResultsByRelease = scheduledReleases.map(release =>
+          dashboardService
+            .getPreReleaseContactsForRelease(release.id)
+            .then(contacts => ({
+              releaseId: release.id,
+              contacts,
+            })),
+        );
 
-          return Promise.all(contactResultsByRelease).then(contactResults => {
-            const preReleaseContactsByScheduledRelease: Dictionary<
-              UserDetails[]
-            > = {};
-            contactResults.forEach(result => {
-              const { releaseId, contacts } = result;
-              preReleaseContactsByScheduledRelease[releaseId] = contacts;
-            });
-            setModel({
-              draftReleases,
-              scheduledReleases,
-              availablePreReleaseContacts,
-              preReleaseContactsByScheduledRelease,
-            });
+        return Promise.all(contactResultsByRelease).then(contactResults => {
+          const preReleaseContactsByScheduledRelease: Dictionary<
+            PrereleaseContactDetails[]
+          > = {};
+          contactResults.forEach(result => {
+            const { releaseId, contacts } = result;
+            preReleaseContactsByScheduledRelease[releaseId] = contacts;
           });
-        },
-      )
+          setModel({
+            draftReleases,
+            scheduledReleases,
+          });
+        });
+      })
       .catch(handleApiErrors);
   }, [handleApiErrors]);
 
@@ -173,92 +163,7 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
                   </ButtonLink>
                 )}
               >
-                {release => (
-                  <>
-                    <FormFieldset
-                      legend="Manage pre release access"
-                      legendSize="s"
-                      id="pre-release-selection"
-                    >
-                      <FormSelect
-                        id="preReleaseAccessContact"
-                        name="preReleaseAccessContact"
-                        label="Select user"
-                        options={[
-                          {
-                            label: 'Please select',
-                            value: '',
-                          },
-                          ...model.availablePreReleaseContacts
-                            .filter(
-                              contact =>
-                                !model.preReleaseContactsByScheduledRelease[
-                                  release.id
-                                ].find(c => c.id === contact.id),
-                            )
-                            .map(contact => ({
-                              label: contact.name,
-                              value: contact.id,
-                            })),
-                        ]}
-                        order={[]}
-                        className="govuk-!-width-one-third"
-                        onChange={async event => {
-                          const updatedContacts = await dashboardService
-                            .addPreReleaseContactToRelease(
-                              release.id,
-                              event.target.value,
-                            )
-                            .catch(handleApiErrors);
-
-                          setModel({
-                            ...model,
-                            preReleaseContactsByScheduledRelease: {
-                              ...model.preReleaseContactsByScheduledRelease,
-                              [release.id]: updatedContacts,
-                            },
-                          });
-                        }}
-                      />
-                    </FormFieldset>
-
-                    <SummaryList>
-                      {model.preReleaseContactsByScheduledRelease[
-                        release.id
-                      ].map(existingContact => (
-                        <SummaryListItem
-                          key={existingContact.id}
-                          term="Pre release access"
-                          actions={
-                            <Link
-                              to=""
-                              onClick={async _ => {
-                                const updatedContacts = await dashboardService
-                                  .removePreReleaseContactFromRelease(
-                                    release.id,
-                                    existingContact.id,
-                                  )
-                                  .catch(handleApiErrors);
-
-                                setModel({
-                                  ...model,
-                                  preReleaseContactsByScheduledRelease: {
-                                    ...model.preReleaseContactsByScheduledRelease,
-                                    [release.id]: updatedContacts,
-                                  },
-                                });
-                              }}
-                            >
-                              Remove
-                            </Link>
-                          }
-                        >
-                          {existingContact.name}
-                        </SummaryListItem>
-                      ))}
-                    </SummaryList>
-                  </>
-                )}
+                {release => <PrereleaseAccessManagement release={release} />}
               </ReleasesTab>
             </TabsSection>
           </Tabs>

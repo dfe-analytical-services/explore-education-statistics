@@ -3,6 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
     public enum SecurityPolicies
     {
         CanAccessSystem,
+        CanAccessAnalystPages,
+        CanAccessPrereleasePages,
 
         CanManageUsersOnSystem,
         CanManageMethodologiesOnSystem,
@@ -23,5 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanMarkSpecificReleaseAsDraft,
         CanSubmitSpecificReleaseToHigherReview,
         CanApproveSpecificRelease,
+        
+        CanViewPrereleaseContacts,
+        CanAssignPrereleaseContactsToSpecificRelease
     }
 }

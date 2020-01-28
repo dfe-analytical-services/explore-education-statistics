@@ -46,3 +46,16 @@
     align-self: flex-end;
   }
 }
+
+@media print {
+  .recharts-legend-wrapper ul {
+    font-size: 0.7rem;
+    margin-left: -30px !important;
+  }
+
+  .recharts-legend-item {
+    .recharts-surface {
+      width: 20px !important;
+    }
+  }
+}
