@@ -1,0 +1,13 @@
+.printableDropdown {
+  display: none;
+  @media print {
+    display: block;
+  }
+}
+
+.hidePrint {
+  display: block;
+  @media print {
+    display: none;
+  }
+}

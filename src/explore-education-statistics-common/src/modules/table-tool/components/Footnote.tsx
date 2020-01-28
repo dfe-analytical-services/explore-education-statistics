@@ -1,6 +1,6 @@
 import React from 'react';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import Details from '@common/components/Details';
+import CollapsibleList from '@common/components/CollapsibleList';
 
 export interface FootnoteProps {
   content: FullTableMeta['footnotes'];
@@ -15,14 +15,10 @@ const Footnote = ({ content }: FootnoteProps) => {
       </li>
     );
   });
+
   return (
     <ol className="govuk-list">
-      {footnoteList.slice(0, 3)}
-      {footnoteList.length > 3 && (
-        <Details summary="View additional footnotes">
-          <ol className="govuk-list">{footnoteList.slice(3)}</ol>
-        </Details>
-      )}
+      <CollapsibleList cssDriven>{footnoteList}</CollapsibleList>
     </ol>
   );
 };
