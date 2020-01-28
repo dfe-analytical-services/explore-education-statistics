@@ -26,6 +26,7 @@ const CollapsibleList = ({
               if (React.isValidElement(child)) {
                 return React.cloneElement(child, {
                   ...child.props,
+                  'aria-hidden': collapsed,
                   className: `${child.props.className} ${
                     collapsed ? styles.printableDropdown : ''
                   }`,
