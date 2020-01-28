@@ -29,7 +29,15 @@ const ReleaseContentPage = ({
 
   useEffect(() => {
     Promise.all([releaseContentService.getContent(releaseId)])
-      .then(([newContent]) => {
+      .then(([content]) => {
+        const newContent = {
+          ...content,
+          release: {
+            ...content.release,
+            prerelease: true,
+          },
+        };
+
         setModel({
           content: newContent,
         });
