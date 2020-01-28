@@ -18,6 +18,18 @@ export interface DetailsProps {
   tag?: ReactNode[];
   children: ReactNode;
   id?: string;
+  /**
+   * When `jsRequired` is true, we assume that the browser has
+   * JS and will skip waiting for the component to mount.
+   * This means we render progressive enhancements automatically.
+   *
+   * This is a performance optimization and should only be used in
+   * situations where JS is mandatory anyway (e.g. table tool).
+   *
+   * Setting this to true will make Details **unusable**
+   * for anyone with JS disabled.
+   */
+  jsRequired?: boolean;
   onToggle?: DetailsToggleHandler;
   open?: boolean;
   summary: string | ReactNode;
@@ -27,6 +39,7 @@ const Details = ({
   className,
   children,
   id = `details-content-${(idCounter += 1)}`,
+  jsRequired = false,
   open = false,
   onToggle,
   summary,
@@ -34,7 +47,7 @@ const Details = ({
 }: DetailsProps) => {
   const ref = useRef<HTMLElement>(null);
 
-  const { onMounted } = useMounted();
+  const { onMounted } = useMounted(undefined, jsRequired);
   const [isOpened, setOpened] = useToggle(open);
 
   useEffect(() => {
