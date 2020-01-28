@@ -20,22 +20,22 @@ const CollapsibleList = ({
   if (Children.count(children) > collapseAfter) {
     if (cssDriven) {
       return (
-        <>
+        <div className={styles.footnotesContainer}>
           {React.Children.map(children, (child, i) => {
             if (i >= collapseAfter - 2) {
               if (React.isValidElement(child)) {
                 return React.cloneElement(child, {
                   ...child.props,
-                  'aria-hidden': collapsed,
+                  'aria-hidden': false,
                   className: `${child.props.className} ${
-                    collapsed ? styles.printableDropdown : ''
+                    collapsed ? 'govuk-visually-hidden' : ''
                   }`,
                 });
               }
             }
             return child;
           })}
-          <div className={styles.hidePrint}>
+          <div className={styles.hidePrint} aria-hidden="true">
             {collapsed && Children.count(children) - (collapseAfter - 2) && (
               <strong>
                 {`And ${React.Children.count(children) -
@@ -47,7 +47,7 @@ const CollapsibleList = ({
               {collapsed ? 'Show All' : 'Collapse List'}
             </ButtonText>
           </div>
-        </>
+        </div>
       );
     }
     if (collapsed) {
