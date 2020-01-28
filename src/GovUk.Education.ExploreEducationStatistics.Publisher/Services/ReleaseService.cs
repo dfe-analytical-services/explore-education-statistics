@@ -109,20 +109,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var otherReleases = _context.Releases
                     .Where(r => r.PublicationId == release.Publication.Id && r.Id != release.Id)
-                    .ToList();
-
-                release.Publication.Releases = new List<Release>();
-                otherReleases.ForEach(r => release.Publication.Releases.Add(new Release
-                {
-                    Id = r.Id,
-                    ReleaseName = r.ReleaseName,
-                    Published = r.Published,
-                    Slug = r.Slug,
-                    Publication = r.Publication,
-                    PublicationId = r.PublicationId,
-                    Updates = r.Updates
-                }));
-
+                    .ToList()
+                    .Where(r => IsReleasePublished(r, includedReleaseIds))
+                    .Select(r => new Release
+                    {
+                        Id = r.Id,
+                        ReleaseName = r.ReleaseName,
+                        Published = r.Published,
+                        Slug = r.Slug,
+                        Publication = r.Publication,
+                        PublicationId = r.PublicationId,
+                        Updates = r.Updates
+                    }).ToList();
+                
+                release.Publication.Releases = otherReleases;
+                
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
                 releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
                 releaseViewModel.DownloadFiles =
