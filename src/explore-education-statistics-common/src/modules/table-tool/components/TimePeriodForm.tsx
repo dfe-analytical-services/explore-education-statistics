@@ -113,6 +113,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 return true;
               }
 
+              // eslint-disable-next-line react/no-this-in-sfc
               const end: string = this.resolve(Yup.ref('end'));
 
               if (!end) {
@@ -139,6 +140,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 return true;
               }
 
+              // eslint-disable-next-line react/no-this-in-sfc
               const start: string = this.resolve(Yup.ref('start'));
 
               if (!start) {

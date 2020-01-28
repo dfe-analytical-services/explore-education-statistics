@@ -267,32 +267,28 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
-            {
-              <SummaryList noBorder>
-                <SummaryListItem term="Indicators" shouldCollapse>
-                  {form.values.indicators.map(indicator => (
-                    <div key={indicator}>
-                      {parsedMeta.indicators[indicator]}
-                    </div>
-                  ))}
-                </SummaryListItem>
-                {Object.entries(form.values.filters).map(
-                  ([filterGroupId, filterItemIds]) => (
-                    <SummaryListItem
-                      term={parsedMeta.filters[filterGroupId]}
-                      shouldCollapse
-                      key={filterGroupId}
-                    >
-                      {filterItemIds.map(filterItemId => (
-                        <div key={filterItemId}>
-                          {parsedMeta.filters[filterItemId]}
-                        </div>
-                      ))}
-                    </SummaryListItem>
-                  ),
-                )}
-              </SummaryList>
-            }
+            <SummaryList noBorder>
+              <SummaryListItem term="Indicators" shouldCollapse>
+                {form.values.indicators.map(indicator => (
+                  <div key={indicator}>{parsedMeta.indicators[indicator]}</div>
+                ))}
+              </SummaryListItem>
+              {Object.entries(form.values.filters).map(
+                ([filterGroupId, filterItemIds]) => (
+                  <SummaryListItem
+                    term={parsedMeta.filters[filterGroupId]}
+                    shouldCollapse
+                    key={filterGroupId}
+                  >
+                    {filterItemIds.map(filterItemId => (
+                      <div key={filterItemId}>
+                        {parsedMeta.filters[filterItemId]}
+                      </div>
+                    ))}
+                  </SummaryListItem>
+                ),
+              )}
+            </SummaryList>
           </>
         );
       }}

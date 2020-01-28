@@ -51,10 +51,7 @@ export const symbols: ChartSymbol[] = [
   'star',
 ];
 
-export function parseCondensedTimePeriodRange(
-  range: string,
-  separator: string = '/',
-) {
+export function parseCondensedTimePeriodRange(range: string, separator = '/') {
   return [range.substring(0, 4), range.substring(4, 6)].join(separator);
 }
 
@@ -143,8 +140,8 @@ export interface ChartDefinition {
 function calculateAxis(
   axis: Axis,
   position: PositionType,
-  angle: number = 0,
-  titleSize: number = 25,
+  angle = 0,
+  titleSize = 25,
 ) {
   let size = axis.size || 25;
   let title: ReactNode | '';
@@ -214,7 +211,7 @@ export function filterResultsBySingleDataSet(
     r =>
       dataSet.indicator &&
       Object.keys(r.measures).includes(dataSet.indicator) &&
-      (dataSet.filters && difference(r.filters, dataSet.filters).length === 0),
+      dataSet.filters && difference(r.filters, dataSet.filters).length === 0,
   );
 }
 
@@ -470,7 +467,7 @@ const FindFirstInDictionaries = (
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
-  keepOriginalValue: boolean = false,
+  keepOriginalValue = false,
   ...metaDataObjects: (Dictionary<LabelConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
@@ -514,7 +511,7 @@ export function createSortedAndMappedDataForAxis(
   results: Result[],
   meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
-  keepOriginalValue: boolean = false,
+  keepOriginalValue = false,
 ): ChartDataB[] {
   return createSortedDataForAxis(
     axisConfiguration,
@@ -626,7 +623,7 @@ function calculateMinorTicks(
   config: string | undefined,
   min: number,
   max: number,
-  spacing: string = '5',
+  spacing = '5',
 ): number[] | undefined {
   let spacingValue = +spacing;
 
@@ -672,7 +669,7 @@ function calculateMajorTicks(
   categories: string[],
   min: number,
   max: number,
-  spacing: string = '1',
+  spacing = '1',
 ): string[] | undefined {
   let spacingValue = parseInt(spacing, 10);
 

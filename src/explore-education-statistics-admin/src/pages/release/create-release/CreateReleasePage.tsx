@@ -61,7 +61,7 @@ const CreateReleasePage = ({
       .then(([templateRelease, publication]) => {
         setModel({
           templateRelease,
-          publication,
+          publication: publication as Publication,
         });
       })
       .catch(handleApiErrors);
