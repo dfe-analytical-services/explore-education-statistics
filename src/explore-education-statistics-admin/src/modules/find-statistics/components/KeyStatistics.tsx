@@ -1,3 +1,4 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import Button from '@common/components/Button';
@@ -24,10 +25,10 @@ const KeyStatistics = ({
   setRelease,
   isEditing,
 }: KeyStatisticsProps) => {
+  const { handleApiErrors } = useContext(ErrorControlContext);
   const [keyStats, setKeyStats] = useState<
-    | AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
-    | undefined
-  >(undefined);
+    AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
+  >();
 
   useEffect(() => {
     if (release.keyStatisticsSection) {
@@ -72,7 +73,8 @@ const KeyStatistics = ({
                               ),
                           },
                         });
-                      });
+                      })
+                      .catch(handleApiErrors);
                   }}
                   onSubmit={values => {
                     return new Promise(() =>
@@ -109,7 +111,8 @@ const KeyStatistics = ({
                                 : [],
                             },
                           });
-                        }),
+                        })
+                        .catch(handleApiErrors),
                     );
                   }}
                 />
@@ -123,6 +126,7 @@ const KeyStatistics = ({
 };
 
 const AddKeyStatistics = ({ release, setRelease }: KeyStatisticsProps) => {
+  const { handleApiErrors } = useContext(ErrorControlContext);
   const { updateAvailableDataBlocks } = useContext(EditingContext);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 
@@ -157,7 +161,8 @@ const AddKeyStatistics = ({ release, setRelease }: KeyStatisticsProps) => {
                     updateAvailableDataBlocks();
                   }
                   return v;
-                });
+                })
+                .catch(handleApiErrors);
 
               const keyStatisticsSection = await releaseContentService.getContentSection(
                 release.id,

@@ -5,13 +5,15 @@ import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useEffect, useState, ReactNode } from 'react';
+import { AxiosResponse } from 'axios';
+import React, { ReactNode, useEffect, useState } from 'react';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   type: string;
   dataBlockResponse?: DataBlockResponse;
   children?: ReactNode;
+  handleApiErrors?: (error: AxiosResponse) => void;
 }
 
 export interface KeyStatConfig {
@@ -24,17 +26,19 @@ const KeyStatTile = ({
   summary,
   dataBlockResponse: response,
   children,
+  handleApiErrors,
 }: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >(response);
+
   const [config, setConfig] = useState<KeyStatConfig | undefined>();
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(dataBlockRequest).then(
-        setDataBlockResponse,
-      );
+      DataBlockService.getDataBlockForSubject(dataBlockRequest)
+        .then(setDataBlockResponse)
+        .catch(handleApiErrors);
     } else {
       const [indicatorKey, theIndicator] = Object.entries(
         dataBlockResponse.metaData.indicators,

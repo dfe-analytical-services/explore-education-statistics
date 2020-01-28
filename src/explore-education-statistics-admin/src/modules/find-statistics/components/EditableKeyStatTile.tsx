@@ -1,3 +1,4 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
@@ -14,7 +15,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Summary } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 type KeyStatsFormValues = Omit<Summary, 'dataKeys'>;
 
@@ -35,6 +36,7 @@ const EditableKeyStatTile = ({
   summary,
   ...props
 }: EditableKeyStatProps) => {
+  const { handleApiErrors } = useContext(ErrorControlContext);
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >(response);
@@ -42,13 +44,13 @@ const EditableKeyStatTile = ({
     indicatorLabel: '',
     value: '',
   });
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [removing, setRemoving] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(dataBlockRequest).then(
-        newResponse => {
+      DataBlockService.getDataBlockForSubject(dataBlockRequest)
+        .then(newResponse => {
           if (newResponse) {
             setDataBlockResponse(newResponse);
             const [indicatorKey, theIndicator] = Object.entries(
@@ -61,10 +63,10 @@ const EditableKeyStatTile = ({
               )}${theIndicator.unit}`,
             });
           }
-        },
-      );
+        })
+        .catch(handleApiErrors);
     }
-  }, [dataBlockRequest]);
+  }, [dataBlockRequest, handleApiErrors]);
 
   if (!dataBlockResponse) {
     return (
@@ -86,6 +88,7 @@ const EditableKeyStatTile = ({
         {...props}
         dataBlockResponse={dataBlockResponse}
         summary={summary}
+        handleApiErrors={handleApiErrors}
       />
     );
   }
@@ -169,6 +172,7 @@ const EditableKeyStatTile = ({
           {...props}
           dataBlockResponse={dataBlockResponse}
           summary={summary}
+          handleApiErrors={handleApiErrors}
         >
           <div className="govuk-!-margin-top-2">
             <Button
