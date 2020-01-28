@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            //migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilter");
+            migrationBuilder.Sql("DROP PROCEDURE dbo.UpsertFilter");
             migrationBuilder.Sql("DROP TYPE dbo.FilterType");
             ExecuteFile(migrationBuilder, $"{MigrationId}_UpdateFilterTableType.sql");
             ExecuteFile(migrationBuilder, $"{PreviousVersionMigrationId}_Routine_UpsertFilter.sql");
