@@ -59,7 +59,8 @@ const Tabs = ({ children, id, onToggle }: Props) => {
         setSelectedTabIndex(tabIndex);
       }
     }
-  }, [sections]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="govuk-tabs">
