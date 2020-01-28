@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
@@ -7,6 +6,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -16,11 +16,14 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
   availablePreReleaseContacts: PrereleaseContactDetails[];
   preReleaseContactsForRelease: PrereleaseContactDetails[];
+  inviting: boolean;
+  removing: boolean;
 }
 
 interface FormValues {
@@ -46,6 +49,8 @@ const PrereleaseAccessManagement = ({
         setModel({
           availablePreReleaseContacts,
           preReleaseContactsForRelease,
+          inviting: false,
+          removing: false,
         }),
       )
       .catch(handleApiErrors);
@@ -61,18 +66,34 @@ const PrereleaseAccessManagement = ({
     ),
   ];
 
+  const inviteUserByEmail: (
+    email: string,
+    resetForm: () => void,
+  ) => Promise<void> = async (email, resetForm) => {
+    setModel({
+      ...(model as Model),
+      inviting: true,
+    });
+
+    await dashboardService
+      .addPreReleaseContactToRelease(release.id, email)
+      .then(updatedContacts => {
+        resetForm();
+
+        setModel({
+          availablePreReleaseContacts:
+            (model && model.availablePreReleaseContacts) || [],
+          preReleaseContactsForRelease: updatedContacts,
+          inviting: false,
+          removing: false,
+        });
+      })
+      .catch(handleApiErrors);
+  };
+
   const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      await dashboardService
-        .addPreReleaseContactToRelease(release.id, values.email)
-        .then(updatedContacts =>
-          setModel({
-            availablePreReleaseContacts:
-              (model && model.availablePreReleaseContacts) || [],
-            preReleaseContactsForRelease: updatedContacts,
-          }),
-        )
-        .catch(handleApiErrors);
+    async (values, actions) => {
+      await inviteUserByEmail(values.email, actions.resetForm);
     },
     handleApiErrors,
     ...errorCodeMappings,
@@ -88,10 +109,10 @@ const PrereleaseAccessManagement = ({
               email: '',
             }}
             validationSchema={Yup.object<FormValues>({
-              email: Yup.string().required('Enter an email address'),
+              email: Yup.string().email('Enter a valid email address'),
             })}
             onSubmit={submitFormHandler}
-            render={() => {
+            render={(form: FormikProps<FormValues>) => {
               return (
                 <Form id={formId}>
                   <FormFieldset
@@ -122,20 +143,9 @@ const PrereleaseAccessManagement = ({
                       ]}
                       order={[]}
                       className="govuk-!-width-one-third"
-                      onChange={event => {
-                        dashboardService
-                          .addPreReleaseContactToRelease(
-                            release.id,
-                            event.target.value,
-                          )
-                          .then(updatedContacts =>
-                            setModel({
-                              ...model,
-                              preReleaseContactsForRelease: updatedContacts,
-                            }),
-                          )
-                          .catch(handleApiErrors);
-                      }}
+                      onChange={event =>
+                        inviteUserByEmail(event.target.value, form.resetForm)
+                      }
                     />
                     <FormFieldTextInput
                       id={`${formId}-email`}
@@ -145,8 +155,11 @@ const PrereleaseAccessManagement = ({
                     <Button
                       type="submit"
                       className="govuk-!-margin-top-6 govuk-button--secondary"
+                      disabled={model.inviting || model.removing}
                     >
-                      Invite new user
+                      {model.inviting && 'Inviting new user'}
+                      {model.removing && 'Removing user'}
+                      {!model.inviting && !model.removing && 'Invite new user'}
                     </Button>
                   </FormFieldset>
                 </Form>
@@ -160,9 +173,13 @@ const PrereleaseAccessManagement = ({
                 key={existingContact.email}
                 term="Pre release access"
                 actions={
-                  <Link
-                    to="#"
+                  <ButtonText
                     onClick={() => {
+                      setModel({
+                        ...model,
+                        removing: true,
+                      });
+
                       dashboardService
                         .removePreReleaseContactFromRelease(
                           release.id,
@@ -172,13 +189,14 @@ const PrereleaseAccessManagement = ({
                           setModel({
                             ...model,
                             preReleaseContactsForRelease: updatedContacts,
+                            removing: false,
                           }),
                         )
                         .catch(handleApiErrors);
                     }}
                   >
                     Remove
-                  </Link>
+                  </ButtonText>
                 }
               >
                 {existingContact.email}

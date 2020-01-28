@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpDelete("release/{releaseId}/prerelease-contact/{email}")]
+        [HttpDelete("release/{releaseId}/prerelease-contact")]
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(
             Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {

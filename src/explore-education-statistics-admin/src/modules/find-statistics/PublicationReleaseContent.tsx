@@ -10,6 +10,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { generateIdList } from '@common/components/Accordion';
+import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
@@ -165,8 +166,7 @@ const PublicationReleaseContent = ({
                 {release.downloadFiles.map(
                   ({ extension, name, path, size }) => (
                     <li key={path}>
-                      <Link
-                        to="#"
+                      <ButtonText
                         onClick={() =>
                           service
                             .downloadFile(path, name)
@@ -175,7 +175,7 @@ const PublicationReleaseContent = ({
                         className="govuk-link"
                       >
                         {name}
-                      </Link>
+                      </ButtonText>
                       {` (${extension}, ${size})`}
                     </li>
                   ),

@@ -51,7 +51,12 @@ const service = {
     email: string,
   ): Promise<PrereleaseContactDetails[]> {
     return client.delete<PrereleaseContactDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${email}`,
+      `/release/${releaseId}/prerelease-contact`,
+      {
+        data: {
+          email,
+        },
+      },
     );
   },
   getReleaseStatus(releaseId: string): Promise<ReleaseStatus> {

@@ -28,8 +28,9 @@ const ReleaseContentPage = ({
   const { releaseId } = match.params;
 
   useEffect(() => {
-    Promise.all([releaseContentService.getContent(releaseId)])
-      .then(([content]) => {
+    releaseContentService
+      .getContent(releaseId)
+      .then(content => {
         const newContent = {
           ...content,
           release: {
