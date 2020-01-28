@@ -2,27 +2,26 @@ import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
-import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
+import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
+import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
-import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import ReactMarkdown from 'react-markdown';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
-import styles from './PublicationReleasePage.module.scss';
 import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
+import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
   publication: string;
@@ -137,13 +136,14 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            <ReactMarkdown
-              className="govuk-body"
-              source={
-                data.summarySection.content &&
-                data.summarySection.content[0].body
-              }
-            />
+            {(data.summarySection.content || []).map((block, i) => (
+              <ContentSubBlockRenderer
+                key={block.id}
+                id={`summary-section-${i}`}
+                publication={data.publication}
+                block={block}
+              />
+            ))}
             {data.downloadFiles && (
               <Details
                 summary="Download data files"

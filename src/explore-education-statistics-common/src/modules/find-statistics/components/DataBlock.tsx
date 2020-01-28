@@ -4,9 +4,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-
-import DataSource from '@common/modules/find-statistics/components/DataSource';
-import SummaryRenderer from '@common/modules/find-statistics/components/SummaryRenderer';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
@@ -21,18 +19,16 @@ import {
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, { Component, MouseEvent, ReactNode } from 'react';
-import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import DownloadDetails from './DownloadDetails';
+import React, { Component, ReactNode } from 'react';
 
 export interface DataBlockProps {
   id: string;
   type: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
-  charts?: Chart[];
-  tables?: Table[];
 
+  tables?: Table[];
+  charts?: Chart[];
   summary?: Summary;
 
   height?: number;
@@ -43,10 +39,10 @@ export interface DataBlockProps {
 
   dataBlockResponse?: DataBlockResponse;
 
-  onSummaryDetailsToggle?: (
-    isOpened: boolean,
-    event: MouseEvent<HTMLElement>,
-  ) => void;
+  // onSummaryDetailsToggle?: (
+  //   isOpened: boolean,
+  //   event: MouseEvent<HTMLElement>,
+  // ) => void;
 }
 
 interface DataBlockState {
@@ -157,7 +153,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       showTables,
       additionalTabContent,
       onToggle,
-      onSummaryDetailsToggle,
       id,
     } = this.props;
     const { charts, tables, isLoading, isError } = this.state;
@@ -176,17 +171,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             )}
 
             {tables && showTables && (
-              <TabsSection id={`${id}-tables`} title="Data tables">
+              <TabsSection id={`${id}-tables`} title="Table">
                 {tables.map((table, idx) => {
                   const key = `${id}0_table_${idx}`;
 
-                  return (
-                    <React.Fragment key={key}>
-                      <TimePeriodDataTableRenderer {...table} />
-                      <DataSource />
-                      <DownloadDetails />
-                    </React.Fragment>
-                  );
+                  return <TimePeriodDataTableRenderer key={key} {...table} />;
                 })}
 
                 {additionalTabContent}
@@ -214,10 +203,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                         chart.meta &&
                         chart.data.result.length > 0 ? (
                           <>
-                            <ChartRenderer {...chart} height={height}>
-                              <DataSource />
-                              <DownloadDetails />
-                            </ChartRenderer>
+                            <ChartRenderer {...chart} height={height} />
                           </>
                         ) : (
                           <div>

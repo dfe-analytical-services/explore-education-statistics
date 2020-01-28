@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Release, Publication } from '@common/services/publicationService';
-import TabsSection from '@common/components/TabsSection';
 import Tabs from '@common/components/Tabs';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import TabsSection from '@common/components/TabsSection';
 import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import { DataBlock } from '@common/services/dataBlockService';
+import { Publication, Release } from '@common/services/publicationService';
+import React from 'react';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 
 interface Props
   extends Pick<
@@ -12,55 +15,58 @@ interface Props
     | 'keyStatisticsSecondarySection'
     | 'headlinesSection'
   > {
-  releaseId: string;
   publication: Publication;
 }
 
 const HeadlinesSection = ({
-  releaseId,
   publication,
   keyStatisticsSection,
   headlinesSection,
   keyStatisticsSecondarySection,
 }: Props) => {
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {}, [
-    releaseId,
-    keyStatisticsSection,
-    headlinesSection,
-    keyStatisticsSecondarySection,
-  ]);
-
   return (
-    <Tabs id={`${releaseId}-headlines-section`}>
+    <Tabs id="headlines-section">
       <TabsSection title="Summary">
-        {loading ? (
-          <LoadingSpinner text="Loading content..." />
-        ) : (
-          <>
+        <div className={styles.keyStatsContainer}>
+          {keyStatisticsSection.content &&
+            keyStatisticsSection.content.map(keyStat => {
+              if (keyStat.type !== 'DataBlock') return null;
+              const block = keyStat as DataBlock;
+              return <KeyStatTile key={block.id} {...block} type="DataBlock" />;
+            })}
+        </div>
+
+        {(headlinesSection.content || [])
+          .sort((a, b) => a.order - b.order)
+          .map((block, i) => (
             <ContentSubBlockRenderer
-              id="headlines-section"
+              key={block.id}
+              id={`headlines-section-${i}`}
               publication={publication}
-              block={
-                headlinesSection.content &&
-                headlinesSection.content[0] &&
-                headlinesSection.content[0]
-              }
+              block={block}
             />
-          </>
-        )}
+          ))}
       </TabsSection>
-      {!loading && keyStatisticsSecondarySection && (
-        <TabsSection title="Table">Table</TabsSection>
-      )}
-      {!loading &&
-        keyStatisticsSecondarySection &&
+      {keyStatisticsSecondarySection &&
+        keyStatisticsSecondarySection.content &&
+        keyStatisticsSecondarySection.content[0] && (
+          <TabsSection title="Table">
+            <DataBlockRenderer
+              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
+              renderType="table"
+            />
+          </TabsSection>
+        )}
+      {keyStatisticsSecondarySection &&
         keyStatisticsSecondarySection.content &&
         keyStatisticsSecondarySection.content[0] &&
         keyStatisticsSecondarySection.content[0].charts &&
         keyStatisticsSecondarySection.content[0].charts[0] && (
           <TabsSection title="Chart">
-            {JSON.stringify(keyStatisticsSecondarySection.content[0].charts[0])}
+            <DataBlockRenderer
+              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
+              renderType="chart"
+            />
           </TabsSection>
         )}
     </Tabs>

@@ -180,6 +180,7 @@ export type ContentBlockType =
   | 'HtmlBlock';
 
 export interface ContentBlock {
+  id: string;
   type: ContentBlockType;
   body: string;
   heading?: string;
