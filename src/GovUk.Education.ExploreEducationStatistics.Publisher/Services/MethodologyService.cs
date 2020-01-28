@@ -31,6 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return _context.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Methodology)
+                .Include(theme => theme.Topics)
+                .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
                 .ToList()
                 .Where(theme => IsThemePublished(theme, includedReleaseIds))
@@ -91,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            return publication.Methodology != null &&
+            return publication.MethodologyId != null &&
                    publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
         }
 
