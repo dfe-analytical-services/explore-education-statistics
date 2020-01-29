@@ -401,7 +401,7 @@
       "defaultValue": true,
       "type": "bool",
       "metadata": {
-        "description": "Retain  blobs after delete"
+        "description": "Retain blobs after delete"
       }
     },
     "blobDeleteRetentionDays": {
