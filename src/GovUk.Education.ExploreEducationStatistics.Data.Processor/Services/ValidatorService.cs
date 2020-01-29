@@ -17,8 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         [EnumLabelValue("Meta header contains quotes")]
         MetaHeaderContainsQuotes,
 
-        [EnumLabelValue("Metafile has unexpected columns")]
-        MetaFileHasUnexpectedColumns,
+        [EnumLabelValue("Metafile is missing expected column")]
+        MetaFileMissingExpectedColumn,
 
         [EnumLabelValue("Metafile contains quotes")]
         MetaFileContainsQuotes,
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     if (!header.Contains(col))
                     {
-                        errors.Add(ValidationErrorMessages.MetaFileHasUnexpectedColumns.GetEnumLabel());
+                        errors.Add(ValidationErrorMessages.MetaFileMissingExpectedColumn.GetEnumLabel() + " : " + col);
                     }
                 });
             }
@@ -91,7 +91,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var idx = 2;
             var headers = lines.First().Split(',').ToList();
 
-            foreach (var line in lines.Skip(1)) ValidateMetaRow(line, idx++, headers, errors);
+            foreach (var line in lines.Skip(1))
+            {
+                ValidateMetaRow(line, idx++, headers, errors);
+            }
         }
 
         private static void ValidateObservations(IEnumerable<string> lines, List<string> errors)
@@ -99,7 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var idx = 2;
             var headers = lines.First().Split(',').ToList();
 
-            foreach (var line in lines.Skip(1)) ValidateObservationRow(line, idx++, headers, errors);
+            foreach (var line in lines.Skip(1))
+            {
+                if (errors.Count == 100)
+                {
+                    errors.Add("Only first 100 errors are returned");
+                    break;
+                }
+                ValidateObservationRow(line, idx++, headers, errors);
+            }
         }
 
         private static void ValidateMetaRow(string row, int rowNumber, List<string> headers, List<string> errors)

@@ -117,9 +117,7 @@ const ReleaseStatusPage = ({
                 });
               })
               .then(() => {
-                if (values.releaseStatus !== 'Approved') {
-                  history.push(appRouteList.adminDashboard.path as string);
-                }
+                history.push(appRouteList.adminDashboard.path as string);
               })
               .catch(handleApiErrors);
           }}

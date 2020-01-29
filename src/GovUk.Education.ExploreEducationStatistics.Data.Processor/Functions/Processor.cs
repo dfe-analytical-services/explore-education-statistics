@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -68,9 +68,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 }
                 catch (Exception e)
                 {
+                    await _batchService.FailImport(
+                        message.Release.Id.ToString(),
+                        message.DataFileName,
+                        new List<string> {e.Message}
+                    );
+                    
                     logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                    $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
-                    throw;
+                                    $"{message.DataFileName} : {e.Message}");
                 }
             }
             else
@@ -122,9 +127,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
         [FunctionName("ImportObservations")]
         public async Task ImportObservations(
-            [QueueTrigger("imports-available")] ImportMessage message)
+            [QueueTrigger("imports-available")] ImportMessage message,
+            ILogger logger)
         {
-            await _fileImportService.ImportObservations(message, DbUtils.CreateDbContext());
+            try
+            {
+                await _fileImportService.ImportObservations(message, DbUtils.CreateDbContext());
+            }
+            catch (Exception e)
+            {
+                await _batchService.FailImport(
+                    message.Release.Id.ToString(),
+                    message.DataFileName,
+                    new List<string> {e.Message}
+                );
+                    
+                logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
+                                $"{message.DataFileName} : {e.Message}");
+            }
         }
         
         private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext, bool isSeeding)

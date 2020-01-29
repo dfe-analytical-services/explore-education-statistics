@@ -169,7 +169,8 @@ const CreatePublicationPage = ({
                     },
                     {
                       value: 'new',
-                      label: 'Create new methodology',
+                      label:
+                        'Create new methodology / select methodology later',
                     },
                   ]}
                 />
