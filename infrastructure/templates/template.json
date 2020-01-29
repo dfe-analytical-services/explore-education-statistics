@@ -396,6 +396,20 @@
       "metadata": {
         "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
       }
+    },
+    "blobDeleteRetentionEnabled": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Retain blobs after delete"
+      }
+    },
+    "blobDeleteRetentionDays": {
+      "defaultValue": 90,
+      "type": "int",
+      "metadata": {
+        "description": "Number of days to retain blobs after delete"
+      }
     }
   },
   "variables": {
@@ -1283,6 +1297,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1739,6 +1766,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1786,6 +1826,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1798,17 +1851,7 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "name": "default/downloads",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ]
+      }
     },
     {
       "apiVersion": "2015-05-01",
@@ -2405,6 +2448,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2432,6 +2488,19 @@
       "properties": {
         "supportsHttpsTrafficOnly": true
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2446,7 +2515,6 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     },
-
     {
       "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",

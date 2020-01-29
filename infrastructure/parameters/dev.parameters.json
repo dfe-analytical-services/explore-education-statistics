@@ -28,6 +28,12 @@
     },
     "deploySubnets": {
       "value": true
+    },
+    "blobDeleteRetentionEnabled": {
+      "value": true
+    },
+    "blobDeleteRetentionDays": {
+      "value": 3
     }
   }
 }
