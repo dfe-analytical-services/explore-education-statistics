@@ -1,0 +1,8 @@
+CREATE TYPE FilterType AS TABLE
+(
+    Id        UNIQUEIDENTIFIER NOT NULL,
+    Hint      VARCHAR(MAX),
+    Label     VARCHAR(MAX)     NOT NULL,
+    Name      VARCHAR(MAX)     NOT NULL,
+    SubjectId UNIQUEIDENTIFIER NOT NULL
+);
