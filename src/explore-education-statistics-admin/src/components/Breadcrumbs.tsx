@@ -1,5 +1,4 @@
 import LoginContext from '@admin/components/Login';
-import React, { useContext } from 'react';
 import Link from './Link';
 
 export interface BreadcrumbsProps {
@@ -12,18 +11,14 @@ export interface BreadcrumbsProps {
 const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
-  const { user } = useContext(LoginContext);
-
   return (
     <div className="govuk-breadcrumbs">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
-        {user && user.permissions.canAccessAnalystPages && (
-          <li className="govuk-breadcrumbs__list-item">
-            <Link className="govuk-breadcrumbs__link" to="/">
-              Home
-            </Link>
-          </li>
-        )}
+        <li className="govuk-breadcrumbs__list-item">
+          <Link className="govuk-breadcrumbs__link" to="/">
+            Home
+          </Link>
+        </li>
         {breadcrumbs.map((breadcrumb, index) => {
           return (
             <li
