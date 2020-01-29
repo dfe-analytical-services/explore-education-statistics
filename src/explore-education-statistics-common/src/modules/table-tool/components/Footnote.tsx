@@ -1,6 +1,8 @@
 import React from 'react';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import CollapsibleList from '@common/components/CollapsibleList';
+import classNames from 'classnames';
+import styles from './Footnote.module.scss';
 
 export interface FootnoteProps {
   content: FullTableMeta['footnotes'];
@@ -17,8 +19,8 @@ const Footnote = ({ content }: FootnoteProps) => {
   });
 
   return (
-    <ol className="govuk-list">
-      <CollapsibleList cssDriven>{footnoteList}</CollapsibleList>
+    <ol className={classNames('govuk-list', styles.footnotesContainer)}>
+      <CollapsibleList>{footnoteList}</CollapsibleList>
     </ol>
   );
 };

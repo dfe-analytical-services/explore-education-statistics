@@ -1,17 +1,3 @@
-.footnotesContainer {
-  :global(.govuk-visually-hidden) {
-    @media print {
-      clip: unset !important;
-      clip-path: unset !important;
-      display: block !important;
-      height: auto !important;
-      overflow: visible !important;
-      position: static !important;
-      width: auto !important;
-    }
-  }
-}
-
 .hidePrint {
   display: block;
   @media print {
