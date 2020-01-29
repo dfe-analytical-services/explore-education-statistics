@@ -10,6 +10,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
@@ -205,9 +206,7 @@ const CreateMethodologyPage = ({
                   Create methodology
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <Link to="#" onClick={cancelHandler}>
-                    Cancel
-                  </Link>
+                  <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
                 </div>
               </Form>
             );

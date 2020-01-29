@@ -1,7 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
-import Link from '@admin/components/Link';
-import service from '@admin/services/release/edit-release/data/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
@@ -9,6 +8,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -223,13 +223,12 @@ const ReleaseDataUploadsSection = ({
                 >
                   Upload data files
                 </Button>
-                <Link
-                  to="#"
+                <ButtonText
                   className="govuk-button govuk-button--secondary"
                   onClick={() => resetPage(form)}
                 >
                   Cancel
-                </Link>
+                </ButtonText>
               </>
             )}
 
@@ -249,8 +248,7 @@ const ReleaseDataUploadsSection = ({
                   <h4 className="govuk-heading-m">{dataFile.title}</h4>
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  <Link
-                    to="#"
+                  <ButtonText
                     onClick={() =>
                       service
                         .downloadDataFile(releaseId, dataFile.filename)
@@ -258,11 +256,10 @@ const ReleaseDataUploadsSection = ({
                     }
                   >
                     {dataFile.filename}
-                  </Link>
+                  </ButtonText>
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  <Link
-                    to="#"
+                  <ButtonText
                     onClick={() =>
                       service
                         .downloadDataMetadataFile(
@@ -273,7 +270,7 @@ const ReleaseDataUploadsSection = ({
                     }
                   >
                     {dataFile.metadataFilename}
-                  </Link>
+                  </ButtonText>
                 </SummaryListItem>
                 <SummaryListItem term="Data file size">
                   {dataFile.fileSize.size.toLocaleString()}{' '}
@@ -300,9 +297,9 @@ const ReleaseDataUploadsSection = ({
                   <SummaryListItem
                     term="Actions"
                     actions={
-                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
+                      <ButtonText onClick={() => setDeleteDataFile(dataFile)}>
                         Delete files
-                      </Link>
+                      </ButtonText>
                     }
                   />
                 )}

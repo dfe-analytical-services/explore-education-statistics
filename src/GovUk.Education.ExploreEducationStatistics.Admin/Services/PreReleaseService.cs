@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -14,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -124,6 +127,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToReleaseAsync(
             Guid releaseId, string email)
         {
+            if (!new EmailAddressAttribute().IsValid(email))
+            {
+                return ValidationActionResult(InvalidEmailAddress);
+            }
+            
             var newUser = false;
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -177,21 +185,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 });
                                 await _context.SaveChangesAsync();
 
-                                var prereleaseRole = await _usersAndRolesDbContext
-                                    .Roles
-                                    // TODO represent Roles with an Enum
-                                    .Where(r => r.Name == "Prerelease User")
-                                    .FirstAsync();
+                                var existingInviteToSystem = await _usersAndRolesDbContext
+                                    .UserInvites
+                                    .Where(i => i.Email.ToLower() == email.ToLower())
+                                    .FirstOrDefaultAsync();
 
-                                _usersAndRolesDbContext.Add(new UserInvite
+                                // TODO EES-1181 - allow multiple invites per email address to allow people to 
+                                // be assigned multiple roles upon first login
+                                if (existingInviteToSystem == null)
                                 {
-                                    Email = email.ToLower(),
-                                    Role = prereleaseRole,
-                                    Created = DateTime.Now,
-                                    // TODO
-                                    CreatedBy = ""
-                                });
-                                await _usersAndRolesDbContext.SaveChangesAsync();
+                                    var prereleaseRole = await _usersAndRolesDbContext
+                                        .Roles
+                                        // TODO represent Roles with an Enum
+                                        .Where(r => r.Name == "Prerelease User")
+                                        .FirstAsync();
+
+                                    _usersAndRolesDbContext.Add(new UserInvite
+                                    {
+                                        Email = email.ToLower(),
+                                        Role = prereleaseRole,
+                                        Created = DateTime.Now,
+                                        // TODO
+                                        CreatedBy = ""
+                                    });
+                                    await _usersAndRolesDbContext.SaveChangesAsync();
+                                }
                             }
                         }
 
@@ -227,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                     else
                     {
-                        var existingInvite = await _context
+                        var existingInviteToRelease = await _context
                             .UserReleaseInvites
                             .Where(i =>
                                 i.ReleaseId == releaseId
@@ -235,11 +253,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 && i.Role == ReleaseRole.PrereleaseViewer)
                             .FirstOrDefaultAsync();
 
-                        if (existingInvite != null)
+                        if (existingInviteToRelease != null)
                         {
                             // TODO - also need to remove their overall UserInvite record if they have no more 
                             // UserReleaseInvites available
-                            _context.Remove(existingInvite);
+                            _context.Remove(existingInviteToRelease);
                             await _context.SaveChangesAsync();
                         }
                     }
