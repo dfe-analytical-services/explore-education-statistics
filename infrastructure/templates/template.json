@@ -1283,6 +1283,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": true,
+              "days": 90
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
