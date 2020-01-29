@@ -1826,6 +1826,19 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          }
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1838,23 +1851,7 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "name": "default/downloads",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ]
+      }
     },
     {
       "apiVersion": "2015-05-01",
