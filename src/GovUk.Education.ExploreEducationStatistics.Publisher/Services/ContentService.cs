@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var viewModel = _releaseService.GetReleaseViewModel(release.Id);
             await UploadAsync(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix),
-                staging, viewModel, _jsonSerializerSettingsLowerCase);
+                staging, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
         private async Task UpdateTreesAsync(IEnumerable<Guid> includedReleaseIds, bool staging = true)
