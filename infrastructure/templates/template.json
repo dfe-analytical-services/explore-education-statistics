@@ -1307,7 +1307,10 @@
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
-          }
+          },
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -1776,7 +1779,10 @@
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
-          }
+          },
+          "dependsOn": [
+            "[variables('notificationsstorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -1836,7 +1842,10 @@
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
-          }
+          },
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -2458,7 +2467,10 @@
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
-          }
+          },
+          "dependsOn": [
+            "[variables('publisherStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -2498,7 +2510,10 @@
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
-          }
+          },
+          "dependsOn": [
+            "[variables('loggingStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
