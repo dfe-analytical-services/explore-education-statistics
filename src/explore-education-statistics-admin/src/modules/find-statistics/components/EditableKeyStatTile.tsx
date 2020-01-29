@@ -22,7 +22,7 @@ type KeyStatsFormValues = Omit<Summary, 'dataKeys'>;
 interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
   onRemove?: () => void;
-  onSubmit: (values: KeyStatsFormValues) => void;
+  onSubmit: (values: KeyStatsFormValues) => Promise<undefined>;
 }
 
 const EditableKeyStatTile = ({
@@ -105,7 +105,11 @@ const EditableKeyStatTile = ({
                 `Define '${config.indicatorLabel}'`,
               dataDefinition: (summary && summary.dataDefinition) || '',
             }}
-            onSubmit={onSubmit}
+            onSubmit={values => {
+              onSubmit(values).then(() => {
+                setShowForm(false);
+              });
+            }}
             render={(form: FormikProps<KeyStatsFormValues>) => {
               return (
                 <Form id={`key-stats-form-${id}`}>

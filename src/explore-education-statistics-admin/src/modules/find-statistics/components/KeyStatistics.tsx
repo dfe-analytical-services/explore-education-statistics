@@ -81,7 +81,7 @@ const KeyStatistics = ({
                       .catch(handleApiErrors);
                   }}
                   onSubmit={values => {
-                    return new Promise(() =>
+                    return new Promise(resolve =>
                       releaseContentService
                         .updateContentSectionDataBlock(
                           release.id,
@@ -115,6 +115,7 @@ const KeyStatistics = ({
                                 : [],
                             },
                           });
+                          resolve();
                         })
                         .catch(handleApiErrors),
                     );
