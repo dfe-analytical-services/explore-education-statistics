@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -47,34 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     var subjectData = await _fileStorageService.GetSubjectData(message);
                     var subject = GetSubject(message, subjectData.Name, context);
 
-                    try
-                    {
-                        _importerService.ImportObservations(
-                            subjectData.GetCsvLines().ToList(),
-                            subject,
-                            _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
-                            message.BatchNo,
-                            message.RowsPerBatch,
-                            context
-                        );
+                    _importerService.ImportObservations(
+                        subjectData.GetCsvLines().ToList(),
+                        subject,
+                        _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
+                        message.BatchNo,
+                        message.RowsPerBatch,
+                        context
+                    );
 
-                        await _batchService.UpdateBatchCount(releaseId, message.OrigDataFileName, message.BatchNo);
-                    }
-                    catch (Exception e)
-                    {
-                        await _batchService.LogErrors(
-                            releaseId,
-                            message.OrigDataFileName,
-                            new List<string> {e.Message}
-                        );
-
-                        _logger.LogError(
-                            $"{GetType().Name} function FAILED: : Batch: " +
-                            $"{message.BatchNo} of {message.NumBatches} with Datafile: " +
-                            $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
-
-                        throw e;
-                    }
+                    await _batchService.UpdateBatchCount(releaseId, message.OrigDataFileName, message.BatchNo);
                 }
             }
             else
