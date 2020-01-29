@@ -22,9 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
 
-        private readonly JsonSerializerSettings _jsonSerializerSettingsLowerCase =
-            GetJsonSerializerSettings(new LowerCaseNamingStrategy());
-
         public ContentService(IDownloadService downloadService,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
@@ -134,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var viewModel = await _publicationService.GetTitleViewModelAsync(publication.Id);
             await UploadAsync(prefix => PublicContentPublicationPath(publication.Slug, prefix), staging, viewModel,
-                _jsonSerializerSettingsLowerCase);
+                _jsonSerializerSettingsCamelCase);
         }
 
         private async Task UpdateReleaseAsync(Release release, bool staging = true)
