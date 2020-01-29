@@ -203,9 +203,9 @@ export default class PrototypePublicationService {
 
             summary: {
               dataKeys: [],
-              dataSummary: '',
-              dataDefinitionTitle: '',
-              dataDefinition: '',
+              dataSummary: [],
+              dataDefinitionTitle: [],
+              dataDefinition: [],
             },
             comments: [
               {

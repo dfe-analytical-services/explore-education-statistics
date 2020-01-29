@@ -89,7 +89,7 @@ const KeyStatistics = ({
                           stat.id,
                           values,
                         )
-                        .then(() => {
+                        .then(updatedBlock => {
                           setRelease({
                             ...release,
                             keyStatisticsSection: {
@@ -97,17 +97,8 @@ const KeyStatistics = ({
                               content: release.keyStatisticsSection.content
                                 ? release.keyStatisticsSection.content.map(
                                     contentBlock => {
-                                      if (contentBlock.id === stat.id) {
-                                        return {
-                                          ...stat,
-                                          summary: {
-                                            dataKeys:
-                                              (stat.summary &&
-                                                stat.summary.dataKeys) ||
-                                              [],
-                                            ...values,
-                                          },
-                                        };
+                                      if (contentBlock.id === updatedBlock.id) {
+                                        return updatedBlock;
                                       }
                                       return contentBlock;
                                     },

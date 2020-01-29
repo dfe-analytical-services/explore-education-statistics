@@ -13,11 +13,14 @@ import styles from '@common/modules/find-statistics/components/SummaryRenderer.m
 import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Summary } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
-type KeyStatsFormValues = Omit<Summary, 'dataKeys'>;
+export interface KeyStatsFormValues {
+  dataSummary: string;
+  dataDefinitionTitle: string;
+  dataDefinition: string;
+}
 
 interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
@@ -99,11 +102,19 @@ const EditableKeyStatTile = ({
         <div className={styles.keyStatTile}>
           <Formik<KeyStatsFormValues>
             initialValues={{
-              dataSummary: (summary && summary.dataSummary) || '',
+              dataSummary:
+                (summary && summary.dataSummary && summary.dataSummary[0]) ||
+                '',
               dataDefinitionTitle:
-                (summary && summary.dataDefinitionTitle) ||
+                (summary &&
+                  summary.dataDefinitionTitle &&
+                  summary.dataDefinitionTitle[0]) ||
                 `Define '${config.indicatorLabel}'`,
-              dataDefinition: (summary && summary.dataDefinition) || '',
+              dataDefinition:
+                (summary &&
+                  summary.dataDefinition &&
+                  summary.dataDefinition[0]) ||
+                '',
             }}
             onSubmit={values => {
               onSubmit(values).then(() => {
