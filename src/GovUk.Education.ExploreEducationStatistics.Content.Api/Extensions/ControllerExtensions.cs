@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions
                 return notFoundResult;
             }
 
-            return controller.Content(download, "application/json");
+            return controller.Content(download, MediaTypeNames.Application.Json);
         }
     }
 }
