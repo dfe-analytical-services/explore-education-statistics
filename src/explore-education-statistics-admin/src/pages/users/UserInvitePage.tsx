@@ -1,3 +1,4 @@
+import ButtonText from '@common/components/ButtonText';
 import React from 'react';
 import Page from '@admin/components/Page';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -111,9 +112,7 @@ const UserInvitePage = ({
                     Send invite
                   </Button>
                   <div className="govuk-!-margin-top-6">
-                    <Link to="#" onClick={cancelHandler}>
-                      Cancel
-                    </Link>
+                    <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
                   </div>
                 </Form>
               );

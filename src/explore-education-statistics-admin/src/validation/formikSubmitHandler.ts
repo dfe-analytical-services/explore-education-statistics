@@ -5,7 +5,7 @@ import handleServerSideValidation, {
 } from '@common/components/form/util/serverValidationHandler';
 import { FormikActions } from 'formik';
 
-type FormikSubmitHandler<FormValues> = (
+export type FormikSubmitHandler<FormValues> = (
   values: FormValues,
   formikActions: FormikActions<FormValues>,
 ) => Promise<void>;

@@ -1,12 +1,12 @@
-import Link from '@admin/components/Link';
-import service from '@admin/services/release/edit-release/data/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/data/service';
 import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -134,13 +134,12 @@ const ReleaseFileUploadsSection = ({
                   Upload file
                 </Button>
 
-                <Link
-                  to="#"
+                <ButtonText
                   className="govuk-button govuk-button--secondary"
                   onClick={() => resetPage(form)}
                 >
                   Cancel
-                </Link>
+                </ButtonText>
               </>
             )}
 
@@ -158,8 +157,7 @@ const ReleaseFileUploadsSection = ({
                     <h4 className="govuk-heading-m">{file.title}</h4>
                   </SummaryListItem>
                   <SummaryListItem term="File">
-                    <Link
-                      to="#"
+                    <ButtonText
                       onClick={() =>
                         service
                           .downloadAncillaryFile(releaseId, file.filename)
@@ -167,7 +165,7 @@ const ReleaseFileUploadsSection = ({
                       }
                     >
                       {file.filename}
-                    </Link>
+                    </ButtonText>
                   </SummaryListItem>
                   <SummaryListItem term="Filesize">
                     {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
@@ -176,12 +174,11 @@ const ReleaseFileUploadsSection = ({
                     <SummaryListItem
                       term="Actions"
                       actions={
-                        <Link
-                          to="#"
+                        <ButtonText
                           onClick={() => setDeleteFileName(file.filename)}
                         >
                           Delete file
-                        </Link>
+                        </ButtonText>
                       }
                     />
                   )}

@@ -256,6 +256,7 @@ export interface AbstractRelease<
     path: string;
     size: string;
   }[];
+  prerelease?: boolean;
 }
 
 export interface DayMonthYearValues {

@@ -79,6 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
         CommentNotFound,
-        UserAlreadyExists
+        UserAlreadyExists,
+        InvalidEmailAddress,
     }
 }

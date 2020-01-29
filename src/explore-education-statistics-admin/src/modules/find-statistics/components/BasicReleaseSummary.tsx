@@ -9,6 +9,7 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useEffect, useState } from 'react';
+import styles from './BasicReleaseSummary.module.scss';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -52,9 +53,15 @@ const BasicReleaseSummary = ({ release }: Props) => {
       {releaseTypeIdsToIcons && (
         <>
           <div className="govuk-grid-column-three-quarters">
-            <span className="govuk-tag">
-              {getReleaseStatusLabel(release.status)}
-            </span>
+            {release.prerelease ? (
+              <span className={`govuk-tag ${styles.ragStatusRed}`}>
+                Pre Release
+              </span>
+            ) : (
+              <span className="govuk-tag">
+                {getReleaseStatusLabel(release.status)}
+              </span>
+            )}
 
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">Publish date: </dt>
