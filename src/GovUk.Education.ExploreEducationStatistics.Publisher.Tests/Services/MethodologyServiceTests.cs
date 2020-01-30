@@ -1,29 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        private readonly MapperConfiguration _config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new MappingProfiles());
-        });
-        
-        private readonly IMapper _mapper;
-
-        public MethodologyServiceTests()
-        {
-            _mapper = _config.CreateMapper();
-        }
-        
         [Fact(Skip = "Bug with in memory database")]
         public void MethodologyService_GetTree()
         {
@@ -105,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new MethodologyService(context, _mapper);
+                var service = new MethodologyService(context, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 

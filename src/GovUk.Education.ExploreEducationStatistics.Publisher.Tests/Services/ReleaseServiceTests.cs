@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -11,16 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private readonly MapperConfiguration _config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new MappingProfiles());
-        });
-
         private static readonly Contact Contact = new Contact
         {
             Id = new Guid("9bf9cc0b-e85f-466b-b90f-354944dcc82e")
@@ -188,13 +183,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
-        private readonly IMapper _mapper;
-
-        public ReleaseServiceTests()
-        {
-            _mapper = _config.CreateMapper();
-        }
-
         [Fact]
         public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
         {
@@ -213,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
+                var service = new ReleaseService(context, fileStorageService.Object, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetLatestReleaseViewModel(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
 
@@ -242,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
+                var service = new ReleaseService(context, fileStorageService.Object, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetReleaseViewModel(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
 
