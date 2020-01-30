@@ -15,7 +15,17 @@ const AdminDashboardInProgress = () => {
                 editing={window.location.search === '?status=editNewRelease'}
                 isNew
                 lastEdited={new Date('2019-03-20 17:37')}
-                lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                lastEditor={{
+                  id: 'me',
+                  name: 'me',
+                  permissions: {
+                    canAccessSystem: false,
+                    canAccessPrereleasePages: false,
+                    canAccessAnalystPages: false,
+                    canAccessUserAdministrationPages: false,
+                    canAccessMethodologyAdministrationPages: false,
+                  },
+                }}
                 published={new Date('2019-03-20 09:30')}
               />
             </li>
@@ -30,7 +40,17 @@ const AdminDashboardInProgress = () => {
             years="2017 to 2018"
             editing
             lastEdited={new Date('2019-03-20 17:37')}
-            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+            lastEditor={{
+              id: 'me',
+              name: 'me',
+              permissions: {
+                canAccessSystem: false,
+                canAccessPrereleasePages: false,
+                canAccessAnalystPages: false,
+                canAccessUserAdministrationPages: false,
+                canAccessMethodologyAdministrationPages: false,
+              },
+            }}
             published={new Date('2019-03-20 09:30')}
           />
         </li>

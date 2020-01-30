@@ -26,6 +26,7 @@ export interface FormTextInputProps {
   min?: string;
   max?: string;
   list?: string;
+  disabled?: boolean;
 }
 
 const FormTextInput = ({

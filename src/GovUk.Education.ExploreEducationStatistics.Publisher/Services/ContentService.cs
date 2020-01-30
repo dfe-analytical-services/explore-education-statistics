@@ -1,9 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -21,9 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
-
-        private readonly JsonSerializerSettings _jsonSerializerSettingsLowerCase =
-            GetJsonSerializerSettings(new LowerCaseNamingStrategy());
 
         public ContentService(IDownloadService downloadService,
             IFileStorageService fileStorageService,
@@ -43,11 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
          */
         public async Task UpdateAllContentAsync()
         {
-            // Content is not staged when performing a full refresh
+            // Content is not staged when performing a full refresh and there are no additional releases included
+            var includedReleaseIds = Enumerable.Empty<Guid>();
             const bool staging = false;
 
             await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
-            await UpdateTreesAsync(staging);
+            await UpdateTreesAsync(includedReleaseIds, staging);
 
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
@@ -57,10 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var releases = publication.Releases.Where(release => release.Live);
                 await UpdatePublicationAsync(publication, staging);
-                await UpdateLatestReleaseAsync(publication, staging);
+                await UpdateLatestReleaseAsync(publication, includedReleaseIds, staging);
                 foreach (var release in releases)
                 {
-                    await UpdateReleaseAsync(release.Id, staging);
+                    await UpdateReleaseAsync(release, staging);
                 }
             }
 
@@ -70,43 +68,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContentAsync(Guid releaseId)
+        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds)
         {
-            await UpdateTreesAsync();
+            await UpdateTreesAsync(releaseIds);
 
-            var release = _releaseService.GetRelease(releaseId);
-            var publication = release.Publication;
-            await UpdatePublicationAsync(publication);
-            await UpdateLatestReleaseAsync(publication);
-            await UpdateReleaseAsync(releaseId);
-            if (publication.MethodologyId.HasValue)
+            var releases = await _releaseService.GetAsync(releaseIds);
+            var publications = releases.Select(release => release.Publication).ToList();
+            var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
+                .Select(publication => publication.MethodologyId.Value).Distinct();
+
+            foreach (var publication in publications)
             {
-                await UpdateMethodologyAsync(publication.MethodologyId.Value);
+                await UpdatePublicationAsync(publication);
+                await UpdateLatestReleaseAsync(publication, releaseIds);
+                foreach (var release in releases)
+                {
+                    await UpdateReleaseAsync(release);
+                }
+            }
+
+            foreach (var methodologyId in methodologyIds)
+            {
+                await UpdateMethodologyAsync(methodologyId);
             }
         }
 
-        private async Task UpdateDownloadTreeAsync(bool staging)
+        private async Task UpdateDownloadTreeAsync(IEnumerable<Guid> includedReleaseIds, bool staging)
         {
-            // This is assuming the files have been copied first
-            var tree = _downloadService.GetDownloadTree();
+            // This assumes the files have been copied first
+            var tree = _downloadService.GetTree(includedReleaseIds);
             await UploadAsync(PublicContentDownloadTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodologyTreeAsync(bool staging)
+        private async Task UpdateMethodologyTreeAsync(IEnumerable<Guid> includedReleaseIds, bool staging)
         {
-            var tree = _methodologyService.GetTree();
+            var tree = _methodologyService.GetTree(includedReleaseIds);
             await UploadAsync(PublicContentMethodologyTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublicationTreeAsync(bool staging)
+        private async Task UpdatePublicationTreeAsync(IEnumerable<Guid> includedReleaseIds, bool staging)
         {
-            var tree = _publicationService.GetPublicationsTree();
+            var tree = _publicationService.GetTree(includedReleaseIds);
             await UploadAsync(PublicContentPublicationsTreePath, staging, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateLatestReleaseAsync(Publication publication, bool staging = true)
+        private async Task UpdateLatestReleaseAsync(Publication publication, IEnumerable<Guid> includedReleaseIds,
+            bool staging = true)
         {
-            var viewModel = _releaseService.GetLatestRelease(publication.Id);
+            var viewModel = _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds);
             await UploadAsync(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }
@@ -120,32 +129,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task UpdatePublicationAsync(Publication publication, bool staging = true)
         {
-            var viewModel = BuildPublicationViewModel(publication);
+            var viewModel = await _publicationService.GetTitleViewModelAsync(publication.Id);
             await UploadAsync(prefix => PublicContentPublicationPath(publication.Slug, prefix), staging, viewModel,
-                _jsonSerializerSettingsLowerCase);
+                _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateReleaseAsync(Guid releaseId, bool staging = true)
+        private async Task UpdateReleaseAsync(Release release, bool staging = true)
         {
-            var viewModel = _releaseService.GetRelease(releaseId);
-            await UploadAsync(prefix => PublicContentReleasePath(viewModel.Publication.Slug, viewModel.Slug, prefix),
-                staging, viewModel, _jsonSerializerSettingsLowerCase);
+            var viewModel = _releaseService.GetReleaseViewModel(release.Id);
+            await UploadAsync(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix),
+                staging, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateTreesAsync(bool staging = true)
+        private async Task UpdateTreesAsync(IEnumerable<Guid> includedReleaseIds, bool staging = true)
         {
-            await UpdateDownloadTreeAsync(staging);
-            await UpdateMethodologyTreeAsync(staging);
-            await UpdatePublicationTreeAsync(staging);
-        }
-
-        private static PublicationViewModel BuildPublicationViewModel(Publication publication)
-        {
-            return new PublicationViewModel
-            {
-                Id = publication.Id,
-                Title = publication.Title
-            };
+            await UpdateDownloadTreeAsync(includedReleaseIds, staging);
+            await UpdateMethodologyTreeAsync(includedReleaseIds, staging);
+            await UpdatePublicationTreeAsync(includedReleaseIds, staging);
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)

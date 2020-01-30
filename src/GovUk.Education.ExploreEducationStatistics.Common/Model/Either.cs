@@ -58,6 +58,18 @@ public class Either<Tl, Tr> {
             return firstResult.Right;
         }
         
+        public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> successTask)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            await successTask();
+            return firstResult.Right;
+        }
+        
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
         {
             var firstResult = await task;

@@ -33,7 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Email");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("UserInvites");
                 });
@@ -193,6 +198,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
                             UserName = "bau2@example.com"
+                        },
+                        new
+                        {
+                            Id = "d5c85378-df85-482c-a1ce-09654dae567d",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
+                            Email = "prerelease1@example.com",
+                            EmailConfirmed = false,
+                            FirstName = "Prerelease1",
+                            LastName = "User1",
+                            LockoutEnabled = true,
+                            NormalizedEmail = "PRERELEASE1@EXAMPLE.COM",
+                            NormalizedUserName = "PRERELEASE1@EXAMPLE.COM",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
+                            TwoFactorEnabled = false,
+                            UserName = "prerelease1@example.com"
+                        },
+                        new
+                        {
+                            Id = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
+                            Email = "prerelease2@example.com",
+                            EmailConfirmed = false,
+                            FirstName = "Prerelease2",
+                            LastName = "User2",
+                            LockoutEnabled = true,
+                            NormalizedEmail = "PRERELEASE2@EXAMPLE.COM",
+                            NormalizedUserName = "PRERELEASE2@EXAMPLE.COM",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
+                            TwoFactorEnabled = false,
+                            UserName = "prerelease2@example.com"
                         });
                 });
 
@@ -307,17 +346,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7",
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Name = "Application User",
-                            NormalizedName = "APPLICATION USER"
-                        },
-                        new
-                        {
                             Id = "cf67b697-bddd-41bd-86e0-11b7e11d99b3",
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
                             Name = "BAU User",
                             NormalizedName = "BAU USER"
+                        },
+                        new
+                        {
+                            Id = "f9ddb43e-aa9e-41ed-837d-3062e130c425",
+                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
+                            Name = "Analyst",
+                            NormalizedName = "ANALYST"
+                        },
+                        new
+                        {
+                            Id = "17e634f4-7a2b-4a23-8636-b079877b4232",
+                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
+                            Name = "Prerelease User",
+                            NormalizedName = "PRERELEASE USER"
                         });
                 });
 
@@ -345,13 +391,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.ToTable("AspNetRoleClaims");
 
                     b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            ClaimType = "ApplicationAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7"
-                        },
                         new
                         {
                             Id = -2,
@@ -428,6 +467,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "ManageAnyMethodology",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -13,
+                            ClaimType = "ApplicationAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -14,
+                            ClaimType = "AnalystPagesAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -15,
+                            ClaimType = "ApplicationAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
+                        },
+                        new
+                        {
+                            Id = -16,
+                            ClaimType = "PrereleasePagesAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
+                        },
+                        new
+                        {
+                            Id = -17,
+                            ClaimType = "PrereleasePagesAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -18,
+                            ClaimType = "AnalystPagesAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -19,
+                            ClaimType = "PrereleasePagesAccessGranted",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -20,
+                            ClaimType = "CanViewPrereleaseContacts",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -21,
+                            ClaimType = "CanViewPrereleaseContacts",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         });
                 });
 
@@ -513,6 +615,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ProviderKey = "EKTK7hPGgxGVxRSBjgTv51XVJhtMo91sIcADfjSuJjw",
                             ProviderDisplayName = "OpenIdConnect",
                             UserId = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63"
+                        },
+                        new
+                        {
+                            LoginProvider = "OpenIdConnect",
+                            ProviderKey = "uLGzMPaxGz0nY6nbff7wkBP7ly2iLdephomGPFOP0k8",
+                            ProviderDisplayName = "OpenIdConnect",
+                            UserId = "d5c85378-df85-482c-a1ce-09654dae567d"
+                        },
+                        new
+                        {
+                            LoginProvider = "OpenIdConnect",
+                            ProviderKey = "s5vNxMDGwRCvg3MTtLEDomZqOKl7cvv2f8PW5NvJzbw",
+                            ProviderDisplayName = "OpenIdConnect",
+                            UserId = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050"
                         });
                 });
 
@@ -534,17 +650,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         new
                         {
                             UserId = "e7f7c82e-aaf3-43db-a5ab-755678f67d04",
-                            RoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7"
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },
                         new
                         {
                             UserId = "6620bccf-2433-495e-995d-fc76c59d9c62",
-                            RoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7"
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },
                         new
                         {
                             UserId = "b390b405-ef90-4b9d-8770-22948e53189a",
-                            RoleId = "bd1ed6af-6c0b-4550-90d6-bcce74d2e7a7"
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },
                         new
                         {
@@ -555,6 +671,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         {
                             UserId = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            UserId = "d5c85378-df85-482c-a1ce-09654dae567d",
+                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
+                        },
+                        new
+                        {
+                            UserId = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050",
+                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
                         });
                 });
 
@@ -577,6 +703,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models.UserInvite", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

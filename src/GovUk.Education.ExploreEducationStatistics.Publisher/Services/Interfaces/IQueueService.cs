@@ -6,10 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IQueueService
     {
-        Task QueueGenerateReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId);
+        Task QueueGenerateReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
         Task QueuePublishReleaseDataMessagesAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
-        Task QueuePublishReleaseFilesMessagesAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
+        Task QueuePublishReleaseFilesMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
     }
 }

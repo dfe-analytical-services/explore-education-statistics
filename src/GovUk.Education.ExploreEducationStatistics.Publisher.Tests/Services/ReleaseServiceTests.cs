@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -68,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         Description = "Related Information",
                         Url = "http://example.com"
                     }
-                }
+                },
+                Published = new DateTime(2020, 1, 02)
             },
             new Release
             {
@@ -194,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetLatest_ReturnsA_WithARelease()
+        public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
@@ -213,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
-                var result = service.GetLatestRelease(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"));
+                var result = service.GetLatestReleaseViewModel(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
 
                 Assert.IsType<ReleaseViewModel>(result);
             }
@@ -242,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
-                var result = service.GetRelease(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
+                var result = service.GetReleaseViewModel(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
 
                 Assert.Equal("Academic Year Q1", result.Title);
                 Assert.Equal(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), result.Publication.Id);

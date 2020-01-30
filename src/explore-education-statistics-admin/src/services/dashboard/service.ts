@@ -1,8 +1,5 @@
-import { UserDetails } from '@admin/services/common/types';
-import {
-  publicationPolyfilla,
-  releasePolyfilla,
-} from '@admin/services/dashboard/polyfillas';
+import { ReleaseStatus } from '@admin/components/ReleaseServiceStatus';
+import { PrereleaseContactDetails } from '@admin/services/common/types';
 import client from '@admin/services/util/service';
 
 import {
@@ -18,52 +15,52 @@ const service = {
   getMyPublicationsByTopic(
     topicId: string,
   ): Promise<AdminDashboardPublication[]> {
-    return client
-      .get<AdminDashboardPublication[]>('/me/publications', {
-        params: { topicId },
-      })
-      .then(publications => publications || [])
-      .then(publications => publications.map(publicationPolyfilla));
+    return client.get<AdminDashboardPublication[]>('/me/publications', {
+      params: { topicId },
+    });
   },
   getDraftReleases(): Promise<AdminDashboardRelease[]> {
-    return client
-      .get<AdminDashboardRelease[]>('/releases/draft')
-      .then(releases => releases.map(releasePolyfilla));
+    return client.get<AdminDashboardRelease[]>('/releases/draft');
   },
   getScheduledReleases(): Promise<AdminDashboardRelease[]> {
-    return client
-      .get<AdminDashboardRelease[]>('/releases/scheduled')
-      .then(releases => releases.map(releasePolyfilla));
+    return client.get<AdminDashboardRelease[]>('/releases/scheduled');
   },
-  getAvailablePreReleaseContacts(): Promise<UserDetails[]> {
-    return client.get<UserDetails[]>('/prerelease/contacts');
+  getAvailablePreReleaseContacts(): Promise<PrereleaseContactDetails[]> {
+    return client.get<PrereleaseContactDetails[]>('/prerelease/contacts');
   },
-  getPreReleaseContactsForRelease(releaseId: string): Promise<UserDetails[]> {
-    return client.get<UserDetails[]>(
+  getPreReleaseContactsForRelease(
+    releaseId: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.get<PrereleaseContactDetails[]>(
       `/release/${releaseId}/prerelease-contacts`,
     );
   },
   addPreReleaseContactToRelease(
     releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]> {
-    return client.post<UserDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${preReleaseContactId}`,
+    email: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.post<PrereleaseContactDetails[]>(
+      `/release/${releaseId}/prerelease-contact`,
+      {
+        email,
+      },
     );
   },
   removePreReleaseContactFromRelease(
     releaseId: string,
-    preReleaseContactId: string,
-  ): Promise<UserDetails[]> {
-    return client.delete<UserDetails[]>(
-      `/release/${releaseId}/prerelease-contact/${preReleaseContactId}`,
+    email: string,
+  ): Promise<PrereleaseContactDetails[]> {
+    return client.delete<PrereleaseContactDetails[]>(
+      `/release/${releaseId}/prerelease-contact`,
+      {
+        data: {
+          email,
+        },
+      },
     );
   },
-  getReleaseStatus(
-    releaseId: string,
-    // @ts-ignore
-  ): Promise<any> {
-    return client.get<UserDetails[]>(`/releases/${releaseId}/status`);
+  getReleaseStatus(releaseId: string): Promise<ReleaseStatus> {
+    return client.get<ReleaseStatus>(`/releases/${releaseId}/status`);
   },
 };
 

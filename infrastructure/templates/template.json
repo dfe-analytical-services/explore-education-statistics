@@ -213,24 +213,21 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
+    "notifyApiKey": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
+    "notifyApiKeyAdmin": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
     "notifyInviteTemplateId": {
       "type": "securestring",
       "defaultValue": ""
     },
-
-    "notifyApiKey": {
+    "notifyPreReleaseTemplateId": {
       "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Gov UK Notify service API key"
-      }
-    },
-    "notifyApiKeyAdmin": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Gov UK Notify service API key"
-      }
+      "defaultValue": "change-me"
     },
     "notifyTokenSecretKey": {
       "type": "securestring",
@@ -399,6 +396,20 @@
       "metadata": {
         "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
       }
+    },
+    "blobDeleteRetentionEnabled": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Retain blobs after delete"
+      }
+    },
+    "blobDeleteRetentionDays": {
+      "defaultValue": 90,
+      "type": "int",
+      "metadata": {
+        "description": "Number of days to retain blobs after delete"
+      }
     }
   },
   "variables": {
@@ -451,7 +462,32 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "notifyApiKeyKeyVaultSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-api-key')]",
+
+    "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
+    "ees-notify-apikey-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey-admin')]",
+    "ees-notify-token": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-token')]",
+
+    "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
+    "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
+    "ees-openidconnect-tenant": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-tenant')]",
+
+    "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
+    "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
+
+    "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
+    "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
+
+
+    "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
+    "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
+    "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
+    "ees-sql-public-data-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-data-password')]",
+
+    "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
+    "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
+    "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
+    "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
+
     "ipWhiteList": {
       "copy": [
         {
@@ -945,12 +981,12 @@
               "value": "[parameters('notifyApiKeyAdmin')]"
             },
             {
-              "name": "NotifyApiKeyKeyVaultDirectAccessTest",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('notifyApiKeyKeyVaultSecretId'), '2018-02-14').secretUriWithVersion, ')')]"
-            },
-            {
               "name": "NotifyInviteTemplateId",
               "value": "[parameters('notifyInviteTemplateId')]"
+            },
+            {
+              "name": "NotifyPreReleaseTemplateId",
+              "value": "[parameters('notifyPreReleaseTemplateId')]"
             },
             {
               "name": "AdminUri",
@@ -1261,6 +1297,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1717,6 +1769,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('notificationsstorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1764,6 +1832,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1776,17 +1860,7 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "name": "default/downloads",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ]
+      }
     },
     {
       "apiVersion": "2015-05-01",
@@ -2383,6 +2457,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publisherStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2410,6 +2500,22 @@
       "properties": {
         "supportsHttpsTrafficOnly": true
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('loggingStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2424,7 +2530,6 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     },
-
     {
       "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",

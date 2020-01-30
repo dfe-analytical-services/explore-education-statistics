@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,32 +21,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _preReleaseService = preReleaseService;
         }
 
-        // TODO Authorisation will be required when users are introduced
         [HttpGet("prerelease/contacts")]
-        public async Task<ActionResult<List<UserDetailsViewModel>>> GetAvailablePreReleaseContacts()
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContacts()
         {
-            return await _preReleaseService.GetAvailablePreReleaseContactsAsync();
+            return await _preReleaseService
+                .GetAvailablePreReleaseContactsAsync()
+                .HandleFailuresOr(Ok);
         }
 
-        // TODO Authorisation will be required when users are introduced
         [HttpGet("release/{releaseId}/prerelease-contacts")]
-        public async Task<ActionResult<List<UserDetailsViewModel>>> GetPreReleaseContactsForRelease(Guid releaseId)
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForRelease(Guid releaseId)
         {
-            return await _preReleaseService.GetPreReleaseContactsForReleaseAsync(releaseId);
+            return await _preReleaseService
+                .GetPreReleaseContactsForReleaseAsync(releaseId)
+                .HandleFailuresOr(Ok);
         }
 
-        // TODO Authorisation will be required when users are introduced
-        [HttpPost("release/{releaseId}/prerelease-contact/{contactId}")]
-        public async Task<ActionResult<List<UserDetailsViewModel>>> AddPreReleaseContactToRelease(Guid releaseId, Guid contactId)
+        [HttpPost("release/{releaseId}/prerelease-contact")]
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(
+            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
-            return await _preReleaseService.AddPreReleaseContactToReleaseAsync(releaseId, contactId);
+            return await _preReleaseService
+                .AddPreReleaseContactToReleaseAsync(releaseId, request.Email)
+                .HandleFailuresOr(Ok);
         }
 
-        // TODO Authorisation will be required when users are introduced
-        [HttpDelete("release/{releaseId}/prerelease-contact/{contactId}")]
-        public async Task<ActionResult<List<UserDetailsViewModel>>> RemovePreReleaseContactFromRelease(Guid releaseId, Guid contactId)
+        [HttpDelete("release/{releaseId}/prerelease-contact")]
+        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(
+            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
-            return await _preReleaseService.RemovePreReleaseContactFromReleaseAsync(releaseId, contactId);
+            return await _preReleaseService
+                .RemovePreReleaseContactFromReleaseAsync(releaseId, request.Email)
+                .HandleFailuresOr(Ok);
         }
+    }
+
+    public class PrereleaseAccessRequest
+    {
+        public string Email { get; set; }
     }
 }

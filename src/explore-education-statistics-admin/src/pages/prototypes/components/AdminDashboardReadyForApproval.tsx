@@ -32,14 +32,12 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
       )}
       {checkStatus === 'checkReleases' && (
         <>
-          {userContext.user &&
-            userContext.user.permissions.includes('team member') && (
-              <p>Level 1: peer review</p>
-            )}
-          {userContext.user &&
-            userContext.user.permissions.includes(
-              'responsible statistician',
-            ) && <p>Level 2: higher review</p>}
+          {userContext.user && userContext.user.name === 'Ann Evans' && (
+            <p>Level 1: peer review</p>
+          )}
+          {userContext.user && userContext.user.name === 'Stephen Doherty' && (
+            <p>Level 2: higher review</p>
+          )}
 
           {/* <p className="govuk-body">
             {task === 'readyReview' ? (
@@ -68,7 +66,17 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
             tag={tagLabel}
             review
             lastEdited={new Date('2019-03-20 17:37')}
-            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+            lastEditor={{
+              id: 'me',
+              name: 'me',
+              permissions: {
+                canAccessSystem: false,
+                canAccessPrereleasePages: false,
+                canAccessAnalystPages: false,
+                canAccessUserAdministrationPages: false,
+                canAccessMethodologyAdministrationPages: false,
+              },
+            }}
             published={new Date('2019-09-20 09:30')}
             nextRelease={new Date('2020-09-20 09:30')}
             showComments

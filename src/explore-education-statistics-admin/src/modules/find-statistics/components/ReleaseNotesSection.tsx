@@ -1,28 +1,28 @@
+import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
+import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
+import Details from '@common/components/Details';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormattedDate from '@common/components/FormattedDate';
+import ModalConfirm from '@common/components/ModalConfirm';
+import Yup from '@common/lib/validation/yup';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
-  ReleaseNote,
+  dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
-  dateToDayMonthYear,
+  ReleaseNote,
 } from '@common/services/publicationService';
-import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import Details from '@common/components/Details';
-import FormattedDate from '@common/components/FormattedDate';
-import Link from '@admin/components/Link';
-import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import Button from '@common/components/Button';
-import { Formik, FormFieldset, Form } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
-import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
-import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import ModalConfirm from '@common/components/ModalConfirm';
+import React, { useContext, useState } from 'react';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
@@ -138,8 +138,7 @@ const ReleaseNotesSection = ({
               >
                 Add note
               </Button>
-              <Link
-                to="#"
+              <ButtonText
                 className="govuk-button govuk-button--secondary"
                 onClick={() => {
                   form.resetForm();
@@ -147,7 +146,7 @@ const ReleaseNotesSection = ({
                 }}
               >
                 Cancel
-              </Link>
+              </ButtonText>
             </Form>
           );
         }}
@@ -216,8 +215,7 @@ const ReleaseNotesSection = ({
               >
                 Update
               </Button>
-              <Link
-                to="#"
+              <ButtonText
                 className="govuk-button govuk-button--secondary"
                 onClick={() => {
                   form.resetForm();
@@ -225,7 +223,7 @@ const ReleaseNotesSection = ({
                 }}
               >
                 Cancel
-              </Link>
+              </ButtonText>
             </Form>
           );
         }}
@@ -267,20 +265,18 @@ const ReleaseNotesSection = ({
 
                     {isEditing && (
                       <>
-                        <Link
-                          to="#"
+                        <ButtonText
                           className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
                           onClick={() => openEditForm(elem)}
                         >
                           Edit
-                        </Link>
-                        <Link
-                          to="#"
+                        </ButtonText>
+                        <ButtonText
                           className="govuk-button govuk-button--warning"
                           onClick={() => setDeletedReleaseNote(elem)}
                         >
                           Remove
-                        </Link>
+                        </ButtonText>
                       </>
                     )}
                   </div>

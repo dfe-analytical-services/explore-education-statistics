@@ -9,6 +9,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -169,7 +170,8 @@ const CreatePublicationPage = ({
                     },
                     {
                       value: 'new',
-                      label: 'Create new methodology',
+                      label:
+                        'Create new methodology / select methodology later',
                     },
                   ]}
                 />
@@ -223,9 +225,9 @@ const CreatePublicationPage = ({
                   Create publication
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <Link to="#" onClick={cancelHandler}>
+                  <ButtonText onClick={cancelHandler}>
                     Cancel publication
-                  </Link>
+                  </ButtonText>
                 </div>
               </Form>
             );

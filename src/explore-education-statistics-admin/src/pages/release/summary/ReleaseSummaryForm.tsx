@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
 import {
@@ -10,6 +9,7 @@ import {
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
@@ -89,7 +89,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
 
   const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
-    timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
+    timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
     scheduledPublishDate: validateMandatoryDayMonthYearField,
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
@@ -168,9 +168,9 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   {submitButtonText}
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <Link to="#" onClick={onCancelHandler}>
+                  <ButtonText onClick={onCancelHandler}>
                     Cancel update
-                  </Link>
+                  </ButtonText>
                 </div>
               </Form>
             );
