@@ -20,6 +20,8 @@ import Yup from '@common/lib/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 
 interface FormValues {
   subjectTitle: string;
@@ -53,6 +55,7 @@ const ReleaseDataUploadsSection = ({
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
+  const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -239,73 +242,93 @@ const ReleaseDataUploadsSection = ({
               </>
             )}
 
-            {dataFiles.map(dataFile => (
-              <SummaryList
-                key={dataFile.filename}
-                additionalClassName="govuk-!-margin-bottom-9"
-              >
-                <SummaryListItem term="Subject title">
-                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                </SummaryListItem>
-                <SummaryListItem term="Data file">
-                  <ButtonText
-                    onClick={() =>
-                      service
-                        .downloadDataFile(releaseId, dataFile.filename)
-                        .catch(handleApiErrors)
-                    }
+            <Accordion id="data-files">
+              {dataFiles.map((dataFile, index) => (
+                <AccordionSection
+                  /* eslint-disable-next-line react/no-array-index-key */
+                  key={`${dataFile.title}-${index}`}
+                  headingId={`${dataFile.title}-${index}`}
+                  heading={`${dataFile.title}`}
+                  onToggle={() => {
+                    const accId = `${dataFile.title}-${index}`;
+                    const opened = openedAccordions;
+                    // eslint-disable-next-line no-unused-expressions
+                    opened.includes(accId)
+                      ? opened.splice(opened.indexOf(accId), 1)
+                      : opened.push(accId);
+                    setOpenedAccordions(opened);
+                  }}
+                  open={openedAccordions.includes(`${dataFile.title}-${index}`)}
+                >
+                  <SummaryList
+                    key={dataFile.filename}
+                    additionalClassName="govuk-!-margin-bottom-9"
                   >
-                    {dataFile.filename}
-                  </ButtonText>
-                </SummaryListItem>
-                <SummaryListItem term="Metadata file">
-                  <ButtonText
-                    onClick={() =>
-                      service
-                        .downloadDataMetadataFile(
-                          releaseId,
-                          dataFile.metadataFilename,
-                        )
-                        .catch(handleApiErrors)
-                    }
-                  >
-                    {dataFile.metadataFilename}
-                  </ButtonText>
-                </SummaryListItem>
-                <SummaryListItem term="Data file size">
-                  {dataFile.fileSize.size.toLocaleString()}{' '}
-                  {dataFile.fileSize.unit}
-                </SummaryListItem>
-                <SummaryListItem term="Number of rows">
-                  {dataFile.rows.toLocaleString()}
-                </SummaryListItem>
-
-                <ImporterStatus
-                  releaseId={releaseId}
-                  dataFile={dataFile}
-                  onStatusChangeHandler={statusChangeHandler}
-                />
-                <SummaryListItem term="Uploaded by">
-                  <a href={`mailto:${dataFile.userName}`}>
-                    {dataFile.userName}
-                  </a>
-                </SummaryListItem>
-                <SummaryListItem term="Date uploaded">
-                  {format(dataFile.created, 'd/M/yyyy HH:mm')}
-                </SummaryListItem>
-                {canUpdateRelease && dataFile.canDelete && (
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <ButtonText onClick={() => setDeleteDataFile(dataFile)}>
-                        Delete files
+                    <SummaryListItem term="Subject title">
+                      <h4 className="govuk-heading-m">{dataFile.title}</h4>
+                    </SummaryListItem>
+                    <SummaryListItem term="Data file">
+                      <ButtonText
+                        onClick={() =>
+                          service
+                            .downloadDataFile(releaseId, dataFile.filename)
+                            .catch(handleApiErrors)
+                        }
+                      >
+                        {dataFile.filename}
                       </ButtonText>
-                    }
-                  />
-                )}
-              </SummaryList>
-            ))}
+                    </SummaryListItem>
+                    <SummaryListItem term="Metadata file">
+                      <ButtonText
+                        onClick={() =>
+                          service
+                            .downloadDataMetadataFile(
+                              releaseId,
+                              dataFile.metadataFilename,
+                            )
+                            .catch(handleApiErrors)
+                        }
+                      >
+                        {dataFile.metadataFilename}
+                      </ButtonText>
+                    </SummaryListItem>
+                    <SummaryListItem term="Data file size">
+                      {dataFile.fileSize.size.toLocaleString()}{' '}
+                      {dataFile.fileSize.unit}
+                    </SummaryListItem>
+                    <SummaryListItem term="Number of rows">
+                      {dataFile.rows.toLocaleString()}
+                    </SummaryListItem>
 
+                    <ImporterStatus
+                      releaseId={releaseId}
+                      dataFile={dataFile}
+                      onStatusChangeHandler={statusChangeHandler}
+                    />
+                    <SummaryListItem term="Uploaded by">
+                      <a href={`mailto:${dataFile.userName}`}>
+                        {dataFile.userName}
+                      </a>
+                    </SummaryListItem>
+                    <SummaryListItem term="Date uploaded">
+                      {format(dataFile.created, 'd/M/yyyy HH:mm')}
+                    </SummaryListItem>
+                    {canUpdateRelease && dataFile.canDelete && (
+                      <SummaryListItem
+                        term="Actions"
+                        actions={
+                          <ButtonText
+                            onClick={() => setDeleteDataFile(dataFile)}
+                          >
+                            Delete files
+                          </ButtonText>
+                        }
+                      />
+                    )}
+                  </SummaryList>
+                </AccordionSection>
+              ))}
+            </Accordion>
             <ModalConfirm
               mounted={deleteDataFile && deleteDataFile.title.length > 0}
               title="Confirm deletion of selected data files"
