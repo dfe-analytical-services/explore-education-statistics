@@ -282,7 +282,9 @@ class PublicationReleasePage extends Component<Props> {
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
                   <li>
-                    <Link to={`/methodology/${data.publication.slug}`}>
+                    <Link
+                      to={`/methodology/${data.publication.methodology.slug}`}
+                    >
                       {`${data.publication.title}: methodology`}
                     </Link>
                   </li>
@@ -340,7 +342,8 @@ class PublicationReleasePage extends Component<Props> {
         <HelpAndSupport
           accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          methodologyUrl={`/methodology/${data.publication.slug}`}
+          methodologyUrl={`/methodology/${data.publication.methodology.slug}`}
+          methodologySummary={data.publication.methodology.summary}
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
           releaseType={data.type.title}
