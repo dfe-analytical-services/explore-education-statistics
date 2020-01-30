@@ -64,9 +64,9 @@ class PublicationReleasePage extends Component<Props> {
         title={data.publication.title}
         caption={data.title}
         description={
-          data.summarySection.content &&
-          data.summarySection.content[0] &&
-          data.summarySection.content[0].body
+          data.summarySection.content && data.summarySection.content.length > 0
+            ? data.summarySection.content[0].body
+            : ''
         }
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
@@ -140,7 +140,9 @@ class PublicationReleasePage extends Component<Props> {
               className="govuk-body"
               source={
                 data.summarySection.content &&
-                data.summarySection.content[0].body
+                data.summarySection.content.length > 0
+                  ? data.summarySection.content[0].body
+                  : ''
               }
             />
             {data.downloadFiles && (
