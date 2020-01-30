@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
         
         public DateTime? NextUpdate { get; set; }
         
-        public List<PreviousReleaseViewModel> Releases { get; set; }
+        public List<OtherReleaseViewModel> Releases { get; set; }
         
         public List<BasicLink> LegacyReleases { get; set; }
 
@@ -28,6 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
         
         public ContactViewModel Contact { get; set; }
         
-        public MethodologyViewModel Methodology { get; set; }
+        public MethodologySummaryViewModel Methodology { get; set; }
     }
 }

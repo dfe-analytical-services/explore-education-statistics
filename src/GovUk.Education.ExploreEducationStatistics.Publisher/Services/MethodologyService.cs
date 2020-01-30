@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -13,17 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class MethodologyService : IMethodologyService
     {
         private readonly ContentDbContext _context;
+        private readonly IMapper _mapper;
 
-        public MethodologyService(
-            ContentDbContext context)
+        public MethodologyService(ContentDbContext context,
+            IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<Methodology> GetAsync(Guid id)
+        public async Task<MethodologyViewModel> GetViewModelAsync(Guid id)
         {
-            return await _context.Methodologies
-                .SingleOrDefaultAsync(methodology => methodology.Id == id);
+            var methodology = await _context.Methodologies
+                .SingleOrDefaultAsync(m => m.Id == id);
+
+            return _mapper.Map<MethodologyViewModel>(methodology);
         }
 
         public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
