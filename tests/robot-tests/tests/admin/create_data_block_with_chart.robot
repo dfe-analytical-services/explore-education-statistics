@@ -256,11 +256,11 @@ Save data block
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
-Navigate to Create chart tab
-    [Tags]  HappyPath
-    sleep  1000000
-    user clicks element   xpath://a[text()="Configure content"]
-    user clicks element   xpath://a[text()="Create chart"]
-    user clicks element   css:[class^="graph-builder_chartContainer"] button:nth-child(1)  # Line chart button
-    sleep   1000000
+#Navigate to Create chart tab
+#    [Tags]  HappyPath
+#    sleep  1000000
+#    user clicks element   xpath://a[text()="Configure content"]
+#    user clicks element   xpath://a[text()="Create chart"]
+#    user clicks element   css:[class^="graph-builder_chartContainer"] button:nth-child(1)  # Line chart button
+#    sleep   1000000
 
