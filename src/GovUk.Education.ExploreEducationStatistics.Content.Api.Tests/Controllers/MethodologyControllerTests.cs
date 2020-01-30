@@ -1,40 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
     public class MethodologyControllerTests
     {
+        private const string Text = "result";
+        
         [Fact]
         public void Get_MethodologyTree_Returns_Ok()
         {
             var fileStorageService = new Mock<IFileStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/tree.json")).ReturnsAsync(
-                JsonConvert.SerializeObject(new List<ThemeTree>
-                    {
-                        new ThemeTree
-                        {
-                            Title = "Theme A"
-                        }
-                    }
-                ));
+            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/tree.json")).ReturnsAsync(Text);
 
             var controller = new MethodologyController(fileStorageService.Object);
 
             var result = controller.GetMethodologyTree();
             var content = result.Result.Result as ContentResult;
-
-            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
-            Assert.Contains("Theme A", content.Content);
+            Assert.Contains(Text, content.Content);
+            Assert.Equal(MediaTypeNames.Application.Json, content.ContentType);
         }
 
         [Fact]
@@ -54,19 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var fileStorageService = new Mock<IFileStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/methodologies/test-slug.json")).ReturnsAsync(
-                JsonConvert.SerializeObject(new Methodology
-                    {
-                        Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488")
-                    }
-                ));
+            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/methodologies/test-slug.json")).ReturnsAsync(Text);
 
             var controller = new MethodologyController(fileStorageService.Object);
 
             var result = controller.Get("test-slug");
             var content = result.Result.Result as ContentResult;
-
-            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", content.Content);
+            Assert.Contains(Text, content.Content);
+            Assert.Equal(MediaTypeNames.Application.Json, content.ContentType);
         }
 
         [Fact]
