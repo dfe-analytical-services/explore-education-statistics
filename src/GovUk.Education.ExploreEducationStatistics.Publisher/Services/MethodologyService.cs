@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Id = publication.Methodology.Id,
                 Title = publication.Methodology.Title,
                 Summary = publication.Methodology.Summary,
-                Slug = publication.Slug
+                Slug = publication.Methodology.Slug
             };
         }
 
