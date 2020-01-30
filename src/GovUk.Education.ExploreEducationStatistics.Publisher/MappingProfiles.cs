@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Link, BasicLink>();
 
+            CreateMap<Methodology, MethodologySummaryViewModel>();
+
             CreateMap<Methodology, MethodologyViewModel>();
 
             CreateMap<Publication, PublicationTitleViewModel>();
@@ -24,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
-            CreateMap<Release, PreviousReleaseViewModel>();
+            CreateMap<Release, OtherReleaseViewModel>();
 
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(

@@ -122,8 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task UpdateMethodologyAsync(Guid methodologyId, bool staging = true)
         {
-            var methodology = await _methodologyService.GetAsync(methodologyId);
-            await UploadAsync(prefix => PublicContentMethodologyPath(methodology.Slug, prefix), staging, methodology,
+            var viewModel = await _methodologyService.GetViewModelAsync(methodologyId);
+            await UploadAsync(prefix => PublicContentMethodologyPath(viewModel.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }
 
@@ -165,8 +165,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var pathPrefix = staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
-            await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json,
-                JsonConvert.SerializeObject(value, null, settings));
+            var json = JsonConvert.SerializeObject(value, null, settings);
+            await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json, json);
         }
     }
 
