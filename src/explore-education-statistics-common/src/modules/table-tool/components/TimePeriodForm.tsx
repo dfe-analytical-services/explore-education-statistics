@@ -54,8 +54,13 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       value: '',
     },
     ...options.map(option => {
+      const timeOptionLabelSplit = option.label.split('/');
+      const timeOptionLabel =
+        timeOptionLabelSplit[1].length === 1
+          ? `${timeOptionLabelSplit[0]}/0${timeOptionLabelSplit[1]}`
+          : option.label;
       return {
-        label: option.label,
+        label: timeOptionLabel,
         value: `${option.year}_${option.code}`,
       };
     }),

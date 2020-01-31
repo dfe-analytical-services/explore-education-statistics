@@ -18,6 +18,7 @@ import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -181,7 +182,7 @@ const ManagePublicationsAndReleasesTab = ({
           </a>
         </p>
 
-        {themes && selectedThemeAndTopic && myPublications && (
+        {themes && selectedThemeAndTopic && myPublications ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-half">
@@ -258,6 +259,8 @@ const ManagePublicationsAndReleasesTab = ({
               </Link>
             )}
           </>
+        ) : (
+          <LoadingSpinner />
         )}
       </section>
     </>

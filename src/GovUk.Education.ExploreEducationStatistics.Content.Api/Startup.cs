@@ -59,11 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 
                 GenerateReleaseContent();
             }
-            else
-            {
-                app.UseHttpsRedirection();
-                app.UseHsts();
-            }
+            
+            app.UseHttpsRedirection();
+            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
