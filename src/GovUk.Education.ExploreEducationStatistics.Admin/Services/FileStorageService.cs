@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -27,23 +27,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileStorageService : IFileStorageService
     {
+        private static readonly Regex[] CsvFileTypes = {
+            new Regex(@"^(application|text)/csv$"),
+            new Regex(@"text/plain$")
+        };
+        
         private readonly string _storageConnectionString;
 
         private readonly ISubjectService _subjectService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly IFileTypeService _fileTypeService;
 
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
+            _fileTypeService = fileTypeService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
@@ -100,11 +107,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
-            IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
+            IFormFile file, string name, ReleaseFileTypes type, bool overwrite, IEnumerable<Regex> allowedMimeTypes)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(() => ValidateUploadFileType(file, allowedMimeTypes))
                 .OnSuccess(async release =>
                 {
                     if (type == ReleaseFileTypes.Data)
@@ -244,12 +252,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
 
-            if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
+            if (!IsCsvFile(dataFilePath, dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!IsCsvFile(metadataFilePath, metaFile.OpenReadStream()))
+            if (!IsCsvFile(metadataFilePath, metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
@@ -267,6 +275,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (_subjectService.Exists(releaseId, name))
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
+            }
+
+            return true;
+        }
+        
+        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
+        private async Task<Either<ActionResult, bool>> ValidateUploadFileType(
+            IFormFile file, IEnumerable<Regex> allowedMimeTypes)
+        {
+            if (!_fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
+            {
+                return ValidationActionResult(FileTypeInvalid);
             }
 
             return true;
@@ -369,15 +389,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await blob.SetMetadataAsync();
         }
 
-        private static bool IsCsvFile(string filePath, Stream fileStream)
+        private bool IsCsvFile(string filePath, IFormFile file)
         {
             if (!filePath.EndsWith(".csv"))
             {
                 return false;
             }
 
-            using var reader = new StreamReader(fileStream);
-            return reader.BaseStream.IsTextFile();
+            return _fileTypeService.HasMatchingMimeType(file, CsvFileTypes);
         }
 
         private static int CalculateNumberOfRows(Stream fileStream)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -33,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Mock<IFormFile>().Object, 
                     "", 
                     ReleaseFileTypes.Ancillary, 
-                    false
+                    false,
+                    new Regex[] {}
                     ), 
                 CanUpdateSpecificRelease);
         }
