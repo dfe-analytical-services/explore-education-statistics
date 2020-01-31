@@ -57,6 +57,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
           styles.panel,
           {
             [classes.panelHidden]: tabProps.hidden,
+            [styles.forceFullWidth]: tabProps.hidden,
           },
         )}
         id={id}

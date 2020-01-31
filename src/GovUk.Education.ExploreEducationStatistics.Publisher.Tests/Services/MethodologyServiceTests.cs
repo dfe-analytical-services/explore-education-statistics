@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -92,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new MethodologyService(context);
+                var service = new MethodologyService(context, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 

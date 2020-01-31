@@ -37,6 +37,8 @@ export interface Publication {
   contact: PublicationContact;
   methodology: {
     id: string;
+    slug: string;
+    summary: string;
     title: string;
   };
 }
@@ -258,6 +260,7 @@ export interface AbstractRelease<
     path: string;
     size: string;
   }[];
+  prerelease?: boolean;
 }
 
 export interface DayMonthYearValues {

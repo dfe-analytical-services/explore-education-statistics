@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -12,10 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _context;
+        private readonly IMapper _mapper;
 
-        public PublicationService(ContentDbContext context)
+        public PublicationService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<PublicationTitleViewModel> GetTitleViewModelAsync(Guid id)
+        {
+            var publication = await _context.Publications.SingleOrDefaultAsync(p => p.Id == id);
+            return _mapper.Map<PublicationTitleViewModel>(publication);
         }
 
         public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)

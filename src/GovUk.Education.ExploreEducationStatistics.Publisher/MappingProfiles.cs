@@ -1,8 +1,6 @@
-using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
@@ -13,13 +11,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public MappingProfiles()
         {
+            CreateMap<Contact, ContactViewModel>();
+
+            CreateMap<ContentSection, ContentSectionViewModel>();
+
+            CreateMap<Link, BasicLink>();
+
+            CreateMap<Methodology, MethodologySummaryViewModel>();
+
+            CreateMap<Methodology, MethodologyViewModel>();
+
+            CreateMap<Publication, PublicationTitleViewModel>();
+
+            CreateMap<Publication, PublicationViewModel>()
+                .ForMember(dest => dest.Releases, m => m.Ignore());
+
+            CreateMap<Release, OtherReleaseViewModel>();
+
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent));
 
-            CreateMap<Theme, ThemeTree>()
-                .ForMember(dest => dest.Topics, m => m.MapFrom(theme => theme.Topics));
+            CreateMap<Theme, ThemeViewModel>();
+
+            CreateMap<Topic, TopicViewModel>();
+
+            CreateMap<Update, ReleaseNoteViewModel>();
         }
     }
 }

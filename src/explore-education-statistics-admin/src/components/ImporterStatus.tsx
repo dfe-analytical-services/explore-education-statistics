@@ -14,13 +14,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
-interface State {
-  isFetching: boolean;
-  current?: ImportStatus | undefined;
-  running: boolean;
-  errorMessage: string;
-}
-
 interface Props extends ErrorControlProps {
   releaseId: string;
   dataFile: DataFile;
