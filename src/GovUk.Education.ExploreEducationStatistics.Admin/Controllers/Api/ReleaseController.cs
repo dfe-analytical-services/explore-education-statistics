@@ -33,6 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             new Regex(@"^image/.*"),
             new Regex(@"^(application|text)/csv$"),
             new Regex(@"text/plain$"),
+            new Regex(@"application/pdf$"),
+            new Regex(@"application/msword$"),
+            new Regex(@"application/vnd.openxmlformats-officedocument.wordprocessingml.document$"),
+            new Regex(@"application/vnd.ms-excel$"),
+            new Regex(@"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet$")
         };
         
         private readonly IImportService _importService;
