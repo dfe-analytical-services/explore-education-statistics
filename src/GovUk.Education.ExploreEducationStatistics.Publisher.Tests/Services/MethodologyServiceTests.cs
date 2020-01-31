@@ -6,13 +6,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        [Fact(Skip = "Bug with in memory database")]
+        [Fact]
         public void MethodologyService_GetTree()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
@@ -21,73 +23,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var methodologies = new List<Methodology>
+                var theme = new Theme
                 {
-                    new Methodology
-                    {
-                        Id = new Guid("ddcb9b8a-c071-4d19-a315-f742682b1e18"),
-                        Title = "Methodology A",
-                        Summary = "first methodology"
-                    },
-                    new Methodology
-                    {
-                        Id = new Guid("22a27c18-3d09-41e5-88ea-b85eb3268ccc"),
-                        Title = "Methodology B",
-                        Summary = "second methodology"
-                    }
+                    Id = Guid.NewGuid(),
+                    Title = "Theme A",
+                    Slug = "theme-a",
+                    Summary = "The first theme",
                 };
 
-                var publications = new List<Publication>
+                var topic = new Topic
                 {
-                    new Publication
-                    {
-                        Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
-                        Title = "Publication A",
-                        TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
-                        Slug = "publication-a",
-                        Summary = "first publication",
-                        MethodologyId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
-                    },
-                    new Publication
-                    {
-                        Id = new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0"),
-                        Title = "Publication B",
-                        TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
-                        Slug = "publication-b",
-                        Summary = "second publication",
-                        MethodologyId = new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0"),
-                    },
+                    Id = Guid.NewGuid(),
+                    Title = "Topic A",
+                    ThemeId = theme.Id,
+                    Slug = "topic-a",
+                    Summary = "The first topic"
                 };
 
-                var topics = new List<Topic>
+                var methodologyA = new Methodology
                 {
-                    new Topic
-                    {
-                        Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
-                        Title = "Topic A",
-                        ThemeId = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
-                        Slug = "topic-a",
-                        Summary = "The first topic",
-                        Publications = publications
-                    }
+                    Id = Guid.NewGuid(),
+                    Title = "Methodology A",
+                    Summary = "first methodology"
                 };
 
-                var themes = new List<Theme>
+                var methodologyB = new Methodology
                 {
-                    new Theme
-                    {
-                        Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
-                        Title = "Theme A",
-                        Slug = "theme-a",
-                        Summary = "The first theme",
-                        Topics = topics
-                    }
+                    Id = Guid.NewGuid(),
+                    Title = "Methodology B",
+                    Summary = "second methodology"
                 };
 
-                context.AddRange(methodologies);
-                context.AddRange(themes);
-                context.AddRange(topics);
-                context.AddRange(publications);
+                var publicationA = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication A",
+                    TopicId = topic.Id,
+                    Slug = "publication-a",
+                    Summary = "first publication",
+                    MethodologyId = methodologyA.Id,
+                };
+
+                var publicationB = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication B",
+                    TopicId = topic.Id,
+                    Slug = "publication-b",
+                    Summary = "second publication",
+                    MethodologyId = methodologyB.Id,
+                };
+
+                var publicationARelease1 = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    PublicationId = publicationA.Id,
+                    ReleaseName = "2018",
+                    TimePeriodCoverage = AcademicYearQ1,
+                    Published = new DateTime(2019, 1, 01),
+                    Status = Approved
+                };
+
+                var publicationBRelease1 = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    PublicationId = publicationB.Id,
+                    ReleaseName = "2018",
+                    TimePeriodCoverage = AcademicYearQ1,
+                    Published = null,
+                    Status = Draft
+                };
+
+                context.AddRange(new List<Methodology>
+                {
+                    methodologyA, methodologyB
+                });
+
+                context.Add(theme);
+                context.Add(topic);
+
+                context.AddRange(new List<Publication>
+                {
+                    publicationA, publicationB
+                });
+
+                context.AddRange(new List<Release>
+                {
+                    publicationARelease1, publicationBRelease1
+                });
+
                 context.SaveChanges();
             }
 
@@ -97,12 +121,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
-                Assert.True(result.Any());
                 Assert.Single(result);
-                Assert.Equal("Theme A", result.FirstOrDefault().Title);
-                Assert.Single(result.FirstOrDefault().Topics);
-                Assert.Equal("Topic A", result.FirstOrDefault().Topics.FirstOrDefault().Title);
-                Assert.Single(result.FirstOrDefault().Topics.FirstOrDefault().Publications);
+                var theme = result.First();
+                Assert.Equal("Theme A", theme.Title);
+
+                Assert.Single(theme.Topics);
+                var topic = theme.Topics.First();
+                Assert.Equal("Topic A", topic.Title);
+
+                Assert.Single(topic.Publications);
+                var publication = topic.Publications.First();
+                Assert.Equal("Methodology A", publication.Title);
             }
         }
     }
