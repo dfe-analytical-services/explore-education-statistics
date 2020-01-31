@@ -37,6 +37,8 @@ export interface Publication {
   contact: PublicationContact;
   methodology: {
     id: string;
+    slug: string;
+    summary: string;
     title: string;
   };
 }
