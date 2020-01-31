@@ -20,7 +20,6 @@ export interface Publication {
   nextUpdate: string;
   releases: {
     id: string;
-    releaseName: string;
     slug: string;
     title: string;
   }[];
