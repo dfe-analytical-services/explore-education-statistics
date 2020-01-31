@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         public void GetTree()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetTree");
+            builder.UseInMemoryDatabase(databaseName: "GetMethodologyTree");
             var options = builder.Options;
 
             using (var context = new ContentDbContext(options))
