@@ -10,7 +10,7 @@ export type SectionToggleHandler = (section: {
 }) => void;
 
 interface Props {
-  block: ContentBlock;
+  block?: ContentBlock;
   id: string;
   publication: Publication;
   onToggle?: SectionToggleHandler;
@@ -22,6 +22,7 @@ const ContentSubBlockRenderer = ({
   publication,
   onToggle,
 }: Props) => {
+  if (block === undefined) return null;
   switch (block.type) {
     case 'MarkDownBlock':
       return <ReactMarkdown className="govuk-body" source={block.body} />;

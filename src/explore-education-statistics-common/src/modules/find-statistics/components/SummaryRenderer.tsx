@@ -1,23 +1,13 @@
-/* eslint-disable react/no-danger */
-import Details, { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import { DataBlockData, Result } from '@common/services/dataBlockService';
-import formatPretty from '@common/lib/utils/number/formatPretty';
-import { ChartMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { Result } from '@common/services/dataBlockService';
 import styles from './SummaryRenderer.module.scss';
+import KeyStatTile, { KeyStatProps } from './KeyStatTile';
 
-export interface SummaryRendererProps {
-  data: DataBlockData;
-  meta: ChartMetaData;
-  dataKeys: string[];
-  dataSummary: string[];
-  dataDefinition: string[];
-  description: { type: string; body: string };
-  onToggle?: DetailsToggleHandler;
+interface SummaryRendererProps {
+  datablocks: KeyStatProps[];
 }
 
-function getLatestMeasures(result: Result[]) {
+export function getLatestMeasures(result: Result[]) {
   const copiedResult = [...result];
 
   copiedResult.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -28,69 +18,14 @@ function getLatestMeasures(result: Result[]) {
   return measures;
 }
 
-export default function SummaryRenderer({
-  meta,
-  description,
-  data,
-  dataKeys,
-  dataSummary,
-  dataDefinition,
-  onToggle,
-}: SummaryRendererProps) {
-  let measures: { [key: string]: string } = {};
-
-  if (meta === undefined) {
-    return <div>Unable to render summary, invalid data configured</div>;
-  }
-
-  if (data) {
-    measures = getLatestMeasures(data.result);
-  } else {
-    dataKeys.forEach(key => {
-      measures[key] = '';
-    });
-  }
-
+export default function SummaryRenderer({ datablocks }: SummaryRendererProps) {
   return (
     <>
       <div className={styles.keyStatsContainer}>
-        {dataKeys.map((key, index) => {
-          const indicatorKey = `${key}_${index}`;
-
-          return (
-            <div className={styles.keyStatTile} key={indicatorKey}>
-              <div className={styles.keyStat}>
-                <h3
-                  className="govuk-heading-s"
-                  data-testid="key-stat-tile-title"
-                >
-                  {meta.indicators[key].label}
-                </h3>
-                <p
-                  className="govuk-heading-xl"
-                  data-testid="key-stat-tile-value"
-                >
-                  {`${formatPretty(measures[key])}${meta.indicators[key].unit}`}
-                </p>
-                {dataSummary && (
-                  <p className="govuk-body-s">{dataSummary[index]}</p>
-                )}
-              </div>
-              <Details
-                onToggle={onToggle}
-                summary={`Define '${meta.indicators[key].label}'`}
-              >
-                <div
-                  dangerouslySetInnerHTML={{ __html: dataDefinition[index] }}
-                />
-              </Details>
-            </div>
-          );
+        {datablocks.map(datablock => {
+          return <KeyStatTile key={datablock.id} {...datablock} />;
         })}
       </div>
-      {description && description.body !== '' && (
-        <ReactMarkdown source={description.body} />
-      )}
     </>
   );
 }

@@ -288,15 +288,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -343,28 +336,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -399,11 +383,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -468,15 +448,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -522,28 +495,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -652,15 +616,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -707,28 +664,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -761,11 +709,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -786,11 +730,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -1002,15 +942,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -1057,28 +990,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -1113,11 +1037,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -1182,15 +1102,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -1236,28 +1149,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -1366,15 +1270,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -1421,28 +1318,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -1475,11 +1363,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -1500,11 +1384,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -1734,15 +1614,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -1789,28 +1662,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -1845,11 +1709,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -1914,15 +1774,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -1968,28 +1821,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -2083,15 +1927,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -2138,28 +1975,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -2192,11 +2020,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -2217,11 +2041,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -2273,15 +2093,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -2328,28 +2141,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -2384,11 +2188,7 @@
           "summary": null,
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -2601,15 +2401,8 @@
                         "endYear": "2017",
                         "endCode": "AY"
                       },
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
-                      "indicators": [
-                        "23",
-                        "26",
-                        "28"
-                      ],
+                      "filters": ["1", "58"],
+                      "indicators": ["23", "26", "28"],
                       "country": null,
                       "localAuthority": null,
                       "region": null
@@ -2655,28 +2448,19 @@
                             "dataSets": [
                               {
                                 "indicator": "23",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               },
                               {
                                 "indicator": "26",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               },
                               {
                                 "indicator": "28",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               }
@@ -2785,15 +2569,8 @@
                   "endYear": "2016",
                   "endCode": "AY"
                 },
-                "filters": [
-                  "1",
-                  "58"
-                ],
-                "indicators": [
-                  "23",
-                  "26",
-                  "28"
-                ],
+                "filters": ["1", "58"],
+                "indicators": ["23", "26", "28"],
                 "country": null,
                 "localAuthority": null,
                 "region": null
@@ -2840,28 +2617,19 @@
                       "dataSets": [
                         {
                           "indicator": "23",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "26",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "28",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         }
@@ -2894,11 +2662,7 @@
                 }
               ],
               "summary": {
-                "dataKeys": [
-                  "26",
-                  "28",
-                  "23"
-                ],
+                "dataKeys": ["26", "28", "23"],
                 "dataSummary": [
                   "Up from 4.6% in 2015/16",
                   "Similar to previous years",
@@ -2919,11 +2683,7 @@
               },
               "tables": [
                 {
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "indicators": ["23", "26", "28"],
                   "tableHeaders": null
                 }
               ],
@@ -3168,15 +2928,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -3222,28 +2975,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -3352,15 +3096,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -3407,28 +3144,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -3461,11 +3189,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -3486,11 +3210,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -3723,15 +3443,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -3778,28 +3491,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -3834,11 +3538,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -3903,15 +3603,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -3957,28 +3650,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -4066,15 +3750,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -4121,28 +3798,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -4175,11 +3843,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -4200,11 +3864,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -4437,15 +4097,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -4492,28 +4145,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -4548,11 +4192,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -4596,15 +4236,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -4650,28 +4283,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -4780,15 +4404,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -4835,28 +4452,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -4889,11 +4497,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -4914,11 +4518,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -5130,15 +4730,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -5185,28 +4778,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -5241,11 +4825,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -5310,15 +4890,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -5364,28 +4937,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -5494,15 +5058,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -5549,28 +5106,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -5603,11 +5151,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -5628,11 +5172,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -5859,15 +5399,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -5914,28 +5447,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -5970,11 +5494,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -6039,15 +5559,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -6093,28 +5606,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -6208,15 +5712,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -6263,28 +5760,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -6317,11 +5805,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -6342,11 +5826,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -6558,15 +6038,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -6613,28 +6086,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -6669,11 +6133,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -6738,15 +6198,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -6792,28 +6245,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -6922,15 +6366,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -6977,28 +6414,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -7031,11 +6459,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -7056,11 +6480,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -7272,15 +6692,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -7327,28 +6740,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -7383,11 +6787,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -7452,15 +6852,8 @@
                     "endYear": "2017",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -7506,28 +6899,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -7636,15 +7020,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -7691,28 +7068,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -7745,11 +7113,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -7770,11 +7134,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -7826,15 +7186,8 @@
               "endYear": "2017",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -7880,28 +7233,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -8123,15 +7467,8 @@
                         "endYear": "2016",
                         "endCode": "AY"
                       },
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
-                      "indicators": [
-                        "23",
-                        "26",
-                        "28"
-                      ],
+                      "filters": ["1", "58"],
+                      "indicators": ["23", "26", "28"],
                       "country": null,
                       "localAuthority": null,
                       "region": null
@@ -8178,28 +7515,19 @@
                             "dataSets": [
                               {
                                 "indicator": "23",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               },
                               {
                                 "indicator": "26",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               },
                               {
                                 "indicator": "28",
-                                "filters": [
-                                  "1",
-                                  "58"
-                                ],
+                                "filters": ["1", "58"],
                                 "location": null,
                                 "timePeriod": null
                               }
@@ -8234,11 +7562,7 @@
                     "summary": null,
                     "tables": [
                       {
-                        "indicators": [
-                          "23",
-                          "26",
-                          "28"
-                        ],
+                        "indicators": ["23", "26", "28"],
                         "tableHeaders": null
                       }
                     ],
@@ -8344,15 +7668,8 @@
                   "endYear": "2016",
                   "endCode": "AY"
                 },
-                "filters": [
-                  "1",
-                  "58"
-                ],
-                "indicators": [
-                  "23",
-                  "26",
-                  "28"
-                ],
+                "filters": ["1", "58"],
+                "indicators": ["23", "26", "28"],
                 "country": null,
                 "localAuthority": null,
                 "region": null
@@ -8399,28 +7716,19 @@
                       "dataSets": [
                         {
                           "indicator": "23",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "26",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "28",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         }
@@ -8453,11 +7761,7 @@
                 }
               ],
               "summary": {
-                "dataKeys": [
-                  "26",
-                  "28",
-                  "23"
-                ],
+                "dataKeys": ["26", "28", "23"],
                 "dataSummary": [
                   "Up from 4.6% in 2015/16",
                   "Similar to previous years",
@@ -8478,11 +7782,7 @@
               },
               "tables": [
                 {
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "indicators": ["23", "26", "28"],
                   "tableHeaders": null
                 }
               ],
@@ -8700,15 +8000,8 @@
                     "endYear": "2016",
                     "endCode": "AY"
                   },
-                  "filters": [
-                    "1",
-                    "58"
-                  ],
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "filters": ["1", "58"],
+                  "indicators": ["23", "26", "28"],
                   "country": null,
                   "localAuthority": null,
                   "region": null
@@ -8755,28 +8048,19 @@
                         "dataSets": [
                           {
                             "indicator": "23",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "26",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           },
                           {
                             "indicator": "28",
-                            "filters": [
-                              "1",
-                              "58"
-                            ],
+                            "filters": ["1", "58"],
                             "location": null,
                             "timePeriod": null
                           }
@@ -8811,11 +8095,7 @@
                 "summary": null,
                 "tables": [
                   {
-                    "indicators": [
-                      "23",
-                      "26",
-                      "28"
-                    ],
+                    "indicators": ["23", "26", "28"],
                     "tableHeaders": null
                   }
                 ],
@@ -8921,15 +8201,8 @@
               "endYear": "2016",
               "endCode": "AY"
             },
-            "filters": [
-              "1",
-              "58"
-            ],
-            "indicators": [
-              "23",
-              "26",
-              "28"
-            ],
+            "filters": ["1", "58"],
+            "indicators": ["23", "26", "28"],
             "country": null,
             "localAuthority": null,
             "region": null
@@ -8976,28 +8249,19 @@
                   "dataSets": [
                     {
                       "indicator": "23",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "26",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     },
                     {
                       "indicator": "28",
-                      "filters": [
-                        "1",
-                        "58"
-                      ],
+                      "filters": ["1", "58"],
                       "location": null,
                       "timePeriod": null
                     }
@@ -9030,11 +8294,7 @@
             }
           ],
           "summary": {
-            "dataKeys": [
-              "26",
-              "28",
-              "23"
-            ],
+            "dataKeys": ["26", "28", "23"],
             "dataSummary": [
               "Up from 4.6% in 2015/16",
               "Similar to previous years",
@@ -9055,11 +8315,7 @@
           },
           "tables": [
             {
-              "indicators": [
-                "23",
-                "26",
-                "28"
-              ],
+              "indicators": ["23", "26", "28"],
               "tableHeaders": null
             }
           ],
@@ -9086,7 +8342,7 @@
       "releaseId": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
     }
   ],
-  "keyStatistics": {
+  "keyStatisticsSection": {
     "heading": null,
     "customFootnotes": null,
     "name": null,
@@ -9100,15 +8356,8 @@
         "endYear": "2016",
         "endCode": "AY"
       },
-      "filters": [
-        "1",
-        "58"
-      ],
-      "indicators": [
-        "23",
-        "26",
-        "28"
-      ],
+      "filters": ["1", "58"],
+      "indicators": ["23", "26", "28"],
       "country": null,
       "localAuthority": null,
       "region": null
@@ -9155,28 +8404,19 @@
             "dataSets": [
               {
                 "indicator": "23",
-                "filters": [
-                  "1",
-                  "58"
-                ],
+                "filters": ["1", "58"],
                 "location": null,
                 "timePeriod": null
               },
               {
                 "indicator": "26",
-                "filters": [
-                  "1",
-                  "58"
-                ],
+                "filters": ["1", "58"],
                 "location": null,
                 "timePeriod": null
               },
               {
                 "indicator": "28",
-                "filters": [
-                  "1",
-                  "58"
-                ],
+                "filters": ["1", "58"],
                 "location": null,
                 "timePeriod": null
               }
@@ -9209,11 +8449,7 @@
       }
     ],
     "summary": {
-      "dataKeys": [
-        "26",
-        "28",
-        "23"
-      ],
+      "dataKeys": ["26", "28", "23"],
       "dataSummary": [
         "Up from 4.6% in 2015/16",
         "Similar to previous years",
@@ -9234,11 +8470,7 @@
     },
     "tables": [
       {
-        "indicators": [
-          "23",
-          "26",
-          "28"
-        ],
+        "indicators": ["23", "26", "28"],
         "tableHeaders": null
       }
     ],
@@ -9430,15 +8662,8 @@
                   "endYear": "2016",
                   "endCode": "AY"
                 },
-                "filters": [
-                  "1",
-                  "58"
-                ],
-                "indicators": [
-                  "23",
-                  "26",
-                  "28"
-                ],
+                "filters": ["1", "58"],
+                "indicators": ["23", "26", "28"],
                 "country": null,
                 "localAuthority": null,
                 "region": null
@@ -9485,28 +8710,19 @@
                       "dataSets": [
                         {
                           "indicator": "23",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "26",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "28",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         }
@@ -9541,11 +8757,7 @@
               "summary": null,
               "tables": [
                 {
-                  "indicators": [
-                    "23",
-                    "26",
-                    "28"
-                  ],
+                  "indicators": ["23", "26", "28"],
                   "tableHeaders": null
                 }
               ],
@@ -9610,15 +8822,8 @@
                   "endYear": "2017",
                   "endCode": "AY"
                 },
-                "filters": [
-                  "1",
-                  "58"
-                ],
-                "indicators": [
-                  "23",
-                  "26",
-                  "28"
-                ],
+                "filters": ["1", "58"],
+                "indicators": ["23", "26", "28"],
                 "country": null,
                 "localAuthority": null,
                 "region": null
@@ -9664,28 +8869,19 @@
                       "dataSets": [
                         {
                           "indicator": "23",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "26",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         },
                         {
                           "indicator": "28",
-                          "filters": [
-                            "1",
-                            "58"
-                          ],
+                          "filters": ["1", "58"],
                           "location": null,
                           "timePeriod": null
                         }
@@ -9800,5 +8996,6 @@
     "contentSection": null,
     "contentSectionId": null
   },
-  "downloadFiles": []
+  "downloadFiles": [],
+  "headlinesSection": {}
 }

@@ -14,7 +14,7 @@ interface Props {
   includeAnalytics?: boolean;
   accordionId: string;
   publicationTitle: string;
-  methodologyUrl: string;
+  methodologyUrl?: string;
   methodologySummary?: string;
   releaseType?: string;
   themeTitle: string;
