@@ -80,10 +80,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return new PublicationTree
             {
-                Id = publication.Methodology.Id,
-                Title = publication.Methodology.Title,
-                Summary = publication.Methodology.Summary,
-                Slug = publication.Methodology.Slug
+                Id = publication.Id,
+                Title = publication.Title,
+                Summary = publication.Summary,
+                Slug = publication.Slug,
+                Methodology = BuildMethodology(publication.Methodology)
+            };
+        }
+
+        private static MethodologySummaryViewModel BuildMethodology(Methodology methodology)
+        {
+            return new MethodologySummaryViewModel
+            {
+                Id = methodology.Id,
+                Slug = methodology.Slug,
+                Summary = methodology.Summary,
+                Title = methodology.Title
             };
         }
 

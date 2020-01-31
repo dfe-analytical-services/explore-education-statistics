@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
         public string LegacyPublicationUrl { get; set; }
 
         public List<FileInfo> DownloadFiles { get; set; }
+        
+        public MethodologySummaryViewModel Methodology { get; set; }
     }
 }
