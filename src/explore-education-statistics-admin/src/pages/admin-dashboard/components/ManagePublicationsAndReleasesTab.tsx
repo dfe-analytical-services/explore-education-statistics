@@ -92,6 +92,23 @@ const ManagePublicationsAndReleasesTab = ({
     });
   };
 
+  const sortPublications = (
+    a: AdminDashboardPublication,
+    b: AdminDashboardPublication,
+  ) => {
+    const pubA = a.title.toUpperCase();
+    const pubB = b.title.toUpperCase();
+
+    let comparison = 0;
+    if (pubA > pubB) {
+      comparison = 1;
+    } else if (pubA < pubB) {
+      comparison = -1;
+    }
+
+    return comparison;
+  };
+
   useEffect(() => {
     dashboardService
       .getMyThemesAndTopics()
@@ -214,7 +231,7 @@ const ManagePublicationsAndReleasesTab = ({
             <h3>{selectedThemeAndTopic.topic.title}</h3>
             {myPublications.length > 0 && (
               <Accordion id="publications">
-                {myPublications.map(publication => (
+                {myPublications.sort(sortPublications).map(publication => (
                   <AccordionSection
                     key={publication.id}
                     heading={publication.title}
