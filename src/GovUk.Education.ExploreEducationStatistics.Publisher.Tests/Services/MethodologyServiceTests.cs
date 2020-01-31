@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Id = Guid.NewGuid(),
                     Title = "Theme A",
                     Slug = "theme-a",
-                    Summary = "The first theme",
+                    Summary = "The first theme"
                 };
 
                 var topic = new Topic

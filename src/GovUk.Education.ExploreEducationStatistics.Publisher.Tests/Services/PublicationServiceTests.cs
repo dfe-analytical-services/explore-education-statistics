@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Id = Guid.NewGuid(),
                     Title = "Theme A",
                     Slug = "theme-a",
-                    Summary = "The first theme",
+                    Summary = "The first theme"
                 };
 
                 var topic = new Topic
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Slug = "publication-b",
                     Summary = "second publication"
                 };
-                
+
                 var publicationC = new Publication
                 {
                     Id = Guid.NewGuid(),
