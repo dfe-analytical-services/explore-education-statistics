@@ -54,7 +54,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data, release } = this.props;
+    const { data } = this.props;
 
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
@@ -280,13 +280,15 @@ class PublicationReleasePage extends Component<Props> {
               </h2>
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
-                  <li>
-                    <Link
-                      to={`/methodology/${data.publication.methodology.slug}`}
-                    >
-                      {`${data.publication.title}: methodology`}
-                    </Link>
-                  </li>
+                  {data.publication.methodology && (
+                    <li>
+                      <Link
+                        to={`/methodology/${data.publication.methodology.slug}`}
+                      >
+                        {`${data.publication.title}: methodology`}
+                      </Link>
+                    </li>
+                  )}
                   {data.relatedInformation &&
                     data.relatedInformation.map(link => (
                       <li key={link.id}>
@@ -305,7 +307,6 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
 
         <HeadlinesSection
-          releaseId={release}
           publication={data.publication}
           keyStatisticsSection={data.keyStatisticsSection}
           headlinesSection={data.headlinesSection}
@@ -342,8 +343,13 @@ class PublicationReleasePage extends Component<Props> {
         <HelpAndSupport
           accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          methodologyUrl={`/methodology/${data.publication.methodology.slug}`}
-          methodologySummary={data.publication.methodology.summary}
+          methodologyUrl={
+            data.publication.methodology &&
+            `/methodology/${data.publication.methodology.slug}`
+          }
+          methodologySummary={
+            data.publication.methodology && data.publication.methodology.summary
+          }
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
           releaseType={data.type.title}

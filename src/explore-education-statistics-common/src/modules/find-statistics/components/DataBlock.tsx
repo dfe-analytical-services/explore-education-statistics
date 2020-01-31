@@ -19,7 +19,7 @@ import {
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode, MouseEvent } from 'react';
 
 export interface DataBlockProps {
   id: string;
@@ -39,10 +39,10 @@ export interface DataBlockProps {
 
   dataBlockResponse?: DataBlockResponse;
 
-  // onSummaryDetailsToggle?: (
-  //   isOpened: boolean,
-  //   event: MouseEvent<HTMLElement>,
-  // ) => void;
+  onSummaryDetailsToggle?: (
+    isOpened: boolean,
+    event: MouseEvent<HTMLElement>,
+  ) => void;
 }
 
 interface DataBlockState {
