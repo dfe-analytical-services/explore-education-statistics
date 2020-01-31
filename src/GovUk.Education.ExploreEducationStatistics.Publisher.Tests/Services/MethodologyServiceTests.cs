@@ -132,7 +132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("Topic A", topic.Title);
 
                 Assert.Single(topic.Publications);
-                var methodology = topic.Publications.First();
+                var publication = topic.Publications.First();
+                Assert.Equal("Publication A", publication.Title);
+
+                var methodology = publication.Methodology;
                 Assert.Equal("methodology-a", methodology.Slug);
                 Assert.Equal("first methodology", methodology.Summary);
                 Assert.Equal("Methodology A", methodology.Title);
