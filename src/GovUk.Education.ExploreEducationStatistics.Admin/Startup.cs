@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.Secure = CookieSecurePolicy.Always;
             });
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
@@ -439,6 +440,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
+            app.UseHsts(options =>
+            {
+                options.MaxAge(365);
+                options.IncludeSubdomains();
+                options.UpgradeInsecureRequests();
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
