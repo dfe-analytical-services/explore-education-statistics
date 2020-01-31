@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
+                    service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", 
+                        ReleaseFileTypes.Ancillary, false, ReleasesController.AllowedAncillaryFileTypes))
                 .ReturnsAsync(new List<FileInfo>());
             var controller = ReleasesControllerWithMocks(mocks);
 
