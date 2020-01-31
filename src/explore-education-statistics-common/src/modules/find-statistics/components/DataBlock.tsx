@@ -207,41 +207,35 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </TabsSection>
             )}
 
-            {charts && (
+            {charts && charts.length > 0 && (
               <TabsSection
                 datablockId={id}
                 id={`${id}-charts`}
                 title="Charts"
                 lazy={false}
               >
-                {charts.length === 0 ? (
-                  <span>
-                    No Charts have been configured for this datablock.
-                  </span>
-                ) : (
-                  charts.map((chart, idx) => {
-                    const key = `${id}_chart_${idx}`;
+                {charts.map((chart, idx) => {
+                  const key = `${id}_chart_${idx}`;
 
-                    return (
-                      <React.Fragment key={key}>
-                        {chart.data &&
-                        chart.meta &&
-                        chart.data.result.length > 0 ? (
-                          <>
-                            <ChartRenderer {...chart} height={height}>
-                              <DataSource />
-                              <DownloadDetails />
-                            </ChartRenderer>
-                          </>
-                        ) : (
-                          <div>
-                            Unable to render chart, invalid data configured
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })
-                )}
+                  return (
+                    <React.Fragment key={key}>
+                      {chart.data &&
+                      chart.meta &&
+                      chart.data.result.length > 0 ? (
+                        <>
+                          <ChartRenderer {...chart} height={height}>
+                            <DataSource />
+                            <DownloadDetails />
+                          </ChartRenderer>
+                        </>
+                      ) : (
+                        <div>
+                          Unable to render chart, invalid data configured
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
 
                 {additionalTabContent}
               </TabsSection>
