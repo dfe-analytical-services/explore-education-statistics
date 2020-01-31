@@ -2,25 +2,25 @@ import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
-import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
+import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
+import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
-import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import ReactMarkdown from 'react-markdown';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
+import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
@@ -136,15 +136,14 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            <ReactMarkdown
-              className="govuk-body"
-              source={
-                data.summarySection.content &&
-                data.summarySection.content.length > 0
-                  ? data.summarySection.content[0].body
-                  : ''
-              }
-            />
+            {(data.summarySection.content || []).map((block, i) => (
+              <ContentSubBlockRenderer
+                key={block.id}
+                id={`summary-section-${i}`}
+                publication={data.publication}
+                block={block}
+              />
+            ))}
             {data.downloadFiles && (
               <Details
                 summary="Download data files"
@@ -281,11 +280,15 @@ class PublicationReleasePage extends Component<Props> {
               </h2>
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
-                  <li>
-                    <Link to={`/methodology/${data.publication.slug}`}>
-                      {`${data.publication.title}: methodology`}
-                    </Link>
-                  </li>
+                  {data.publication.methodology && (
+                    <li>
+                      <Link
+                        to={`/methodology/${data.publication.methodology.slug}`}
+                      >
+                        {`${data.publication.title}: methodology`}
+                      </Link>
+                    </li>
+                  )}
                   {data.relatedInformation &&
                     data.relatedInformation.map(link => (
                       <li key={link.id}>
@@ -303,12 +306,12 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        {data.keyStatisticsSection && data.keyStatisticsSection.content && (
-          <DataBlockWithAnalytics
-            {...data.keyStatisticsSection.content[0]}
-            id="keystats"
-          />
-        )}
+        <HeadlinesSection
+          publication={data.publication}
+          keyStatisticsSection={data.keyStatisticsSection}
+          headlinesSection={data.headlinesSection}
+          keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
+        />
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>
@@ -340,7 +343,13 @@ class PublicationReleasePage extends Component<Props> {
         <HelpAndSupport
           accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          methodologyUrl={`/methodology/${data.publication.slug}`}
+          methodologyUrl={
+            data.publication.methodology &&
+            `/methodology/${data.publication.methodology.slug}`
+          }
+          methodologySummary={
+            data.publication.methodology && data.publication.methodology.summary
+          }
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
           releaseType={data.type.title}

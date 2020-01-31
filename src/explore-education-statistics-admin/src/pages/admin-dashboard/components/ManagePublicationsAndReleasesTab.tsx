@@ -18,6 +18,7 @@ import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -92,6 +93,23 @@ const ManagePublicationsAndReleasesTab = ({
     });
   };
 
+  const sortPublications = (
+    a: AdminDashboardPublication,
+    b: AdminDashboardPublication,
+  ) => {
+    const pubA = a.title.toUpperCase();
+    const pubB = b.title.toUpperCase();
+
+    let comparison = 0;
+    if (pubA > pubB) {
+      comparison = 1;
+    } else if (pubA < pubB) {
+      comparison = -1;
+    }
+
+    return comparison;
+  };
+
   useEffect(() => {
     dashboardService
       .getMyThemesAndTopics()
@@ -164,7 +182,7 @@ const ManagePublicationsAndReleasesTab = ({
           </a>
         </p>
 
-        {themes && selectedThemeAndTopic && myPublications && (
+        {themes && selectedThemeAndTopic && myPublications ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-half">
@@ -214,7 +232,7 @@ const ManagePublicationsAndReleasesTab = ({
             <h3>{selectedThemeAndTopic.topic.title}</h3>
             {myPublications.length > 0 && (
               <Accordion id="publications">
-                {myPublications.map(publication => (
+                {myPublications.sort(sortPublications).map(publication => (
                   <AccordionSection
                     key={publication.id}
                     heading={publication.title}
@@ -241,6 +259,8 @@ const ManagePublicationsAndReleasesTab = ({
               </Link>
             )}
           </>
+        ) : (
+          <LoadingSpinner />
         )}
       </section>
     </>

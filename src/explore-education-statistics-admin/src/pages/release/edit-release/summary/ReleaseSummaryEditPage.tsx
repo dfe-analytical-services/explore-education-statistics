@@ -79,7 +79,7 @@ const ReleaseSummaryEditPage = ({
     <>
       {releaseSummaryDetails && (
         <>
-          <h2 className="govuk-heading-m">Edit release summary</h2>
+          <h2 className="govuk-heading-l">Edit release summary</h2>
 
           <ReleaseSummaryForm
             submitButtonText="Update release summary"
