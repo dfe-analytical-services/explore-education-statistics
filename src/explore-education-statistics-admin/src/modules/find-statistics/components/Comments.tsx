@@ -126,7 +126,9 @@ const Comments = ({
         className={classNames('dfe-comment-block', [styles.addComment])}
       >
         <Details
-          summary={`${canComment ? `Add / ` : ''}View comments for section`}
+          summary={`${canComment ? `Add / ` : ''}View comments for section (${
+            comments.length
+          })`}
           className="govuk-!-margin-bottom-1 govuk-body-s"
           onToggle={isOpen => {
             if (ref.current) {
