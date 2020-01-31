@@ -410,6 +410,10 @@
       "metadata": {
         "description": "Number of days to retain blobs after delete"
       }
+    },
+    "deployDatafactory": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -608,8 +612,10 @@
               "type": "Custom"
             }
           ]
-        }
+        },
+
       },
+
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
@@ -2677,6 +2683,28 @@
           }
         ]
       }
+    },
+    {
+      "condition": "[parameters('deployDatafactory')]",
+      "name": "datafactory",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2018-02-01",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[uri(deployment().properties.templateLink.uri, 'datafactory/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          }
+        }
+      },
+      "dependsOn": []
     }
   ]
 }
