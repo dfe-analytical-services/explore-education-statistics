@@ -3,8 +3,9 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import React from 'react';
+import React, { useState } from 'react';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
+import ButtonText from '@common/components/ButtonText';
 
 export function generateTableTitle({
   timePeriodRange,
@@ -58,9 +59,24 @@ const DataTableCaption = ({
     publicationName,
   });
 
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const captionLimit = 300;
   return (
     <>
-      <strong id={id}>{caption}</strong>
+      <strong id={id}>
+        {caption.length > captionLimit && !expanded
+          ? `${caption.substring(0, captionLimit)}...`
+          : caption}{' '}
+      </strong>
+      {caption.length > captionLimit && (
+        <ButtonText
+          onClick={() => {
+            return expanded ? setExpanded(false) : setExpanded(true);
+          }}
+        >
+          {expanded ? 'View less' : 'View more'}
+        </ButtonText>
+      )}
 
       <ul>
         <li>
