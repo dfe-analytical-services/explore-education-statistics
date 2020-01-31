@@ -82,6 +82,8 @@ export default class PrototypePublicationService {
         },
         methodology: {
           id: '00000000-0000-0000-0000-000000000000',
+          slug: 'slug',
+          summary: 'Methodology summary',
           title: 'methodology link title',
         },
       },
