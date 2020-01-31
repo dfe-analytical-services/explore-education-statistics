@@ -41,12 +41,13 @@ interface CreatePublicationModel {
 const CreatePublicationPage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps<{ topicId: string }> & ErrorControlProps) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
 
   useEffect(() => {
+    console.log(topic);
     Promise.all([
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
@@ -131,10 +132,7 @@ const CreatePublicationPage = ({
               contact => contact.contactName,
             )[0].id,
             methodologyChoice: undefined,
-            selectedMethodologyId: orderBy(
-              model.methodologies,
-              methodology => methodology.title,
-            )[0].id,
+            selectedMethodologyId: '',
           }}
           validationSchema={Yup.object<FormValues>({
             publicationTitle: Yup.string().required(
@@ -170,11 +168,27 @@ const CreatePublicationPage = ({
                       label: 'Add existing methodology',
                     },
                     {
-                      value: 'new',
-                      label:
-                        'Create new methodology / select methodology later',
+                      value: 'later',
+                      label: 'Select methodology later',
                     },
                   ]}
+                  onChange={e => {
+                    if (e.target.value === 'later') {
+                      form.setValues({
+                        ...form.values,
+                        selectedMethodologyId: '',
+                      });
+                    }
+                    if (e.target.value === 'existing') {
+                      form.setValues({
+                        ...form.values,
+                        selectedMethodologyId: orderBy(
+                          model.methodologies,
+                          methodology => methodology.title,
+                        )[0].id,
+                      });
+                    }
+                  }}
                 />
                 {form.values.methodologyChoice === 'existing' && (
                   <FormFieldSelect
