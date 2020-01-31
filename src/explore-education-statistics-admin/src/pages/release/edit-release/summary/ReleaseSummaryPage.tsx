@@ -68,7 +68,7 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
 
   return (
     <>
-      <h2 className="govuk-heading-m">Release summary</h2>
+      <h2 className="govuk-heading-l">Release summary</h2>
       <p>These details will be shown to users to help identify this release.</p>
       {model && (
         <>
