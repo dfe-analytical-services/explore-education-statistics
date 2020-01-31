@@ -161,7 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Id = otherRelease.Id,
                                 Slug = otherRelease.Slug,
                                 Title = otherRelease.Title,
-                                ReleaseName = otherRelease.ReleaseName
                             })
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases

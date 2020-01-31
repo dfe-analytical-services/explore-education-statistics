@@ -223,13 +223,13 @@ const PublicationReleaseContent = ({
                     <ul className="govuk-list">
                       {[
                         ...release.publication.releases.map(
-                          ({ id, slug, releaseName }) => [
-                            releaseName,
+                          ({ id, slug, title }) => [
+                            title,
                             <li key={id} data-testid="previous-release-item">
                               <Link
                                 to={`/find-statistics/${release.publication.slug}/${slug}`}
                               >
-                                {releaseName}
+                                {title}
                               </Link>
                             </li>,
                           ],
