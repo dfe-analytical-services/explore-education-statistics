@@ -8,7 +8,10 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
+import {
+  HeaderGroup,
+  HeaderSubGroup,
+} from '@common/modules/table-tool/components/MultiHeaderTable';
 import camelCase from 'lodash/camelCase';
 import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
@@ -25,68 +28,67 @@ interface Props {
   tableHeadersConfig: TableHeadersFormValues;
 }
 
-const selectFilterGroup = (
-  group?: string,
-  previousGroup?: string,
-): RowHeaderType => {
-  if (group) {
-    if (group === previousGroup) return undefined;
-    if (group !== 'Default') return group;
-  }
-  return '';
-};
+const createFilterGroupHeaders = (
+  group: SortableOptionWithGroup[],
+): HeaderSubGroup[] =>
+  group.reduce<HeaderSubGroup[]>((acc, filter) => {
+    if (!filter.filterGroup) {
+      return acc;
+    }
 
-export const createHeadersFromGroups = (
+    const lastFilterGroupHeader = last(acc);
+
+    if (!lastFilterGroupHeader) {
+      acc.push({
+        text: filter.filterGroup,
+      });
+
+      return acc;
+    }
+
+    if (lastFilterGroupHeader.text === filter.filterGroup) {
+      lastFilterGroupHeader.span =
+        typeof lastFilterGroupHeader.span !== 'undefined'
+          ? lastFilterGroupHeader.span + 1
+          : 2;
+    } else {
+      acc.push({
+        text: filter.filterGroup,
+      });
+    }
+
+    return acc;
+  }, []);
+
+export const createGroupHeaders = (
   groups: SortableOptionWithGroup[][],
-): RowHeaderType[][] => {
-  return groups.flatMap(rowGroup =>
-    rowGroup
-      .reduce<[RowHeaderType[], RowHeaderType[]]>(
-        ([b, c], group, index) => [
-          (group.filterGroup && [
-            ...b,
-            selectFilterGroup(
-              group.filterGroup,
-              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
-            ),
-          ]) ||
-            b,
-          [
-            ...c,
-            group instanceof LocationFilter && rowGroup.length === 1
-              ? ''
-              : group.label,
-          ],
-        ],
-        [[], []],
-      )
-      .filter(
-        ary => ary.length > 0 && ary.filter(cell => !!cell).join('').length > 0,
-      ),
-  );
-};
+): HeaderGroup[] => {
+  return groups.reduce((acc, group) => {
+    const filterGroupHeaders = createFilterGroupHeaders(group);
 
-export const createHeaderIgnoreFromGroups = (
-  groups: SortableOptionWithGroup[][],
-): boolean[] => {
-  return groups
-    .flatMap(rowGroup =>
-      rowGroup
-        .reduce<[boolean[], boolean[]]>(
-          ([b, c], group, index) => [
-            (selectFilterGroup(
-              group.filterGroup,
-              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
-            ) && [...b, true]) ||
-              b,
-            [...c, false],
-          ],
-          [[], []],
-        )
+    const groupHeaders = group.map(filter => {
+      return {
+        text: filter.label,
+      };
+    });
 
-        .filter(ary => ary.length > 0),
-    )
-    .map(group => group.includes(true));
+    const hasHeaderFilterGroup =
+      filterGroupHeaders.length &&
+      filterGroupHeaders.some(header => header.text !== 'Default');
+
+    acc.push(
+      hasHeaderFilterGroup
+        ? {
+            groups: filterGroupHeaders,
+            headers: groupHeaders,
+          }
+        : {
+            headers: groupHeaders,
+          },
+    );
+
+    return acc;
+  }, [] as HeaderGroup[]);
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
@@ -108,24 +110,22 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: RowHeaderType[][] = [
-      ...createHeadersFromGroups(tableHeadersConfig.columnGroups),
-      tableHeadersConfig.columns.map(column => column.label),
+    const columnHeaders: HeaderGroup[] = [
+      ...createGroupHeaders(tableHeadersConfig.columnGroups),
+      {
+        headers: tableHeadersConfig.columns.map(column => ({
+          text: column.label,
+        })),
+      },
     ];
 
-    const columnHeaderIsGroup: boolean[] = [
-      ...createHeaderIgnoreFromGroups(tableHeadersConfig.columnGroups),
-      false,
-    ];
-
-    const rowHeaders: RowHeaderType[][] = [
-      ...createHeadersFromGroups(tableHeadersConfig.rowGroups),
-      tableHeadersConfig.rows.map(row => row.label),
-    ];
-
-    const rowHeaderIsGroup: boolean[] = [
-      ...createHeaderIgnoreFromGroups(tableHeadersConfig.rowGroups),
-      false,
+    const rowHeaders: HeaderGroup[] = [
+      ...createGroupHeaders(tableHeadersConfig.rowGroups),
+      {
+        headers: tableHeadersConfig.rows.map(row => ({
+          text: row.label,
+        })),
+      },
     ];
 
     const rowHeadersCartesian = cartesian(
@@ -203,9 +203,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       <FixedMultiHeaderDataTable
         caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
-        columnHeaderIsGroup={columnHeaderIsGroup}
         rowHeaders={rowHeaders}
-        rowHeaderIsGroup={rowHeaderIsGroup}
         rows={rows}
         ref={dataTableRef}
         footnotes={subjectMeta.footnotes}
