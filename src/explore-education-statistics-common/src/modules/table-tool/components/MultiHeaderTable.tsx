@@ -170,10 +170,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                   <td
                     colSpan={expandedRowHeaders.length}
                     rowSpan={expandedColumnHeaders.length}
-                    className={classNames(
-                      styles.borderBottom,
-                      styles.borderRight,
-                    )}
+                    className={styles.borderBottom}
                   />
                 )}
 
