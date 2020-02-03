@@ -3,7 +3,7 @@ import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import FormattedDate from '@common/components/FormattedDate';
@@ -25,6 +25,8 @@ const Comments = ({
   canComment = false,
 }: Props) => {
   const [newComment, setNewComment] = React.useState<string>('');
+  const [editableCommentId, setEditableCommentId] = useState<string>('');
+  const [editableComment, setEditableComment] = useState<string>('');
   const [comments, setComments] = React.useState<ExtendedComment[]>(
     initialComments,
   );
@@ -116,8 +118,32 @@ const Comments = ({
     }
   };
 
-  const ref = React.createRef<HTMLDivElement>();
+  const updateComment = (index: number, newContent: string) => {
+    const editedComment = { ...comments[index] };
+    editedComment.commentText = newContent;
+    if (editingContext.releaseId && editingContext.sectionId) {
+      service
+        .updateContentSectionComment(
+          editingContext.releaseId,
+          editingContext.sectionId,
+          contentBlockId,
+          editedComment,
+        )
+        .then(() => {
+          const newComments = [...comments];
 
+          newComments[index] = editedComment;
+
+          onCommentsChange(newComments).then(() => {
+            setComments(newComments);
+          });
+          setEditableCommentId('');
+          setEditableComment('');
+        });
+    }
+  };
+
+  const ref = React.createRef<HTMLDivElement>();
   return (
     <>
       <div
@@ -191,9 +217,30 @@ const Comments = ({
                         {name} <FormattedDate>{time}</FormattedDate>
                       </strong>
                     </h2>
-                    <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                      {commentText}
-                    </p>
+                    {editableCommentId && editableCommentId === id ? (
+                      <form>
+                        <textarea
+                          name="editComment"
+                          id={`edit_comment_${id}`}
+                          value={editableComment}
+                          onChange={e => setEditableComment(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="govuk-button"
+                          disabled={editableComment.length === 0}
+                          onClick={() => {
+                            updateComment(index, editableComment);
+                          }}
+                        >
+                          Update
+                        </button>
+                      </form>
+                    ) : (
+                      <p className="govuk-body-xs govuk-!-margin-bottom-1">
+                        {commentText}
+                      </p>
+                    )}
                     {state === 'open' &&
                       (canResolve ? (
                         <button
@@ -223,13 +270,34 @@ const Comments = ({
                       <>
                         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                         <a
-                          className="govuk-body-xs"
+                          className="govuk-body-xs govuk-!-margin-right-3"
                           role="button"
                           tabIndex={0}
                           onClick={() => removeComment(index)}
                           style={{ cursor: 'pointer' }}
                         >
                           Remove
+                        </a>
+                      </>
+                    )}
+                    {canComment && (
+                      <>
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                        <a
+                          className="govuk-body-xs govuk-!-margin-right-3"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => {
+                            setEditableComment(commentText);
+                            return editableCommentId
+                              ? setEditableCommentId('')
+                              : setEditableCommentId(id);
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {editableCommentId && editableCommentId === id
+                            ? 'Cancel'
+                            : 'Edit'}
                         </a>
                         <hr />
                       </>
