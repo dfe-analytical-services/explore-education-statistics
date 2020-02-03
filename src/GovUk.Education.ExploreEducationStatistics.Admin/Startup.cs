@@ -41,6 +41,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -75,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.Secure = CookieSecurePolicy.Always;
             });
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
@@ -363,6 +365,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
+            services.AddSingleton(HostingEnvironment.ContentRootFileProvider);
+            services.AddTransient<IFileTypeService, FileTypeService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
@@ -439,6 +444,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
+            app.UseHsts(options =>
+            {
+                options.MaxAge(365);
+                options.IncludeSubdomains();
+                options.Preload();
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

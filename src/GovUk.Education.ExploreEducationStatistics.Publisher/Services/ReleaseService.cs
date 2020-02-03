@@ -50,8 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderByDescending(release => release.Published ?? release.PublishScheduled)
-                .FirstOrDefault();
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimePeriodCoverage)
+                .LastOrDefault();
         }
 
         public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
