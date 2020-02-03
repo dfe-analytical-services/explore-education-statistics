@@ -16,6 +16,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import Link from '@frontend/components/Link';
 import React, { createRef, useEffect, useState } from 'react';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { OmitStrict } from '@common/types';
 
 const TableToolFinalStep = ({
   table,
@@ -167,10 +168,7 @@ const TableToolFinalStep = ({
   );
 };
 
-type TableToolProps = Omit<
-  TableToolWizardProps,
-  'finalStep' | 'onTableConfigurationChange'
->;
+type TableToolProps = OmitStrict<TableToolWizardProps, 'finalStep'>;
 
 const TableTool = (props: TableToolProps) => (
   <TableToolWizard {...props} finalStep={TableToolFinalStep} />

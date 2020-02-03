@@ -58,13 +58,15 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
       initialValues={{
         publicationId,
       }}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validationSchema={Yup.object<FormValues>({
+        publicationId: Yup.string().required('Choose publication'),
+      })}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      validationSchema={Yup.object<FormValues>({
-        publicationId: Yup.string().required('Choose publication'),
-      })}
       render={(form: FormikProps<FormValues>) => {
         const { values } = form;
         const { getError } = createErrorHelper(form);
