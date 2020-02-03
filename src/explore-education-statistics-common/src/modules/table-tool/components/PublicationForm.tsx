@@ -112,6 +112,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                         .map(group => {
                           return (
                             <DetailsMenu
+                              jsRequired
                               summary={group.title}
                               key={group.id}
                               open={
