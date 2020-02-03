@@ -2687,7 +2687,7 @@
       "condition": "[parameters('deployDatafactory')]",
       "name": "datafactory",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2017-05-10",
       "properties": {
         "mode": "incremental",
         "templateLink": {
