@@ -612,8 +612,7 @@
               "type": "Custom"
             }
           ]
-        },
-
+        }
       },
 
       "dependsOn": [
