@@ -110,9 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            app.UseHttpsRedirection();
-            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            else
+            {
+                app.UseHttpsRedirection();
+                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            }
             
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing

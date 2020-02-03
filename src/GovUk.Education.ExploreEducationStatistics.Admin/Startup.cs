@@ -41,6 +41,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -363,6 +364,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
+
+            services.AddSingleton(HostingEnvironment.ContentRootFileProvider);
+            services.AddTransient<IFileTypeService, FileTypeService>();
 
             services.AddSwaggerGen(c =>
             {

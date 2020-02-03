@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
@@ -19,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListPublicFilesPreview(Guid releaseId);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile dataFile,
-            string name, ReleaseFileTypes type, bool overwrite);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file,
+            string name, ReleaseFileTypes type, bool overwrite, IEnumerable<Regex> allowedMimeTypes);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId, ReleaseFileTypes type,
             string fileName);

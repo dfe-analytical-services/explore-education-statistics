@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -24,6 +25,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleasesController : ControllerBase
     {
+        public static readonly Regex[] AllowedChartFileTypes = {
+            new Regex(@"^image/.*") 
+        };
+        
+        public static readonly Regex[] AllowedAncillaryFileTypes = {
+            new Regex(@"^image/.*"),
+            new Regex(@"^(application|text)/csv$"),
+            new Regex(@"text/plain$"),
+            new Regex(@"application/pdf$"),
+            new Regex(@"application/msword$"),
+            new Regex(@"application/vnd.openxmlformats-officedocument.wordprocessingml.document$"),
+            new Regex(@"application/vnd.ms-excel$"),
+            new Regex(@"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet$")
+        };
+        
         private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
@@ -130,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false, AllowedAncillaryFileTypes)
                 .HandleFailuresOr(Ok);
         }
 
@@ -145,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false, AllowedChartFileTypes)
                 .HandleFailuresOr(Ok);
         }
 
