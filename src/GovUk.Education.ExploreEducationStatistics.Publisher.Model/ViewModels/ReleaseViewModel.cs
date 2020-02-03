@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
     public class ReleaseViewModel
     {
@@ -27,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
         
         public bool LatestRelease { get; set; }
         
-        public ReleaseType Type { get; set; }
+        public ReleaseTypeViewModel Type { get; set; }
 
         public List<ReleaseNoteViewModel> Updates { get; set; }
         
@@ -43,6 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
         
         public List<FileInfo> DownloadFiles { get; set; }
         
-        public List<BasicLink> RelatedInformation { get; set; }
+        public List<LinkViewModel> RelatedInformation { get; set; }
     }
 }

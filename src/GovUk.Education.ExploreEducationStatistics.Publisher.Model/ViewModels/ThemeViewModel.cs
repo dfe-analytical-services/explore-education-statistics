@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
+﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
     public class ThemeViewModel
     {

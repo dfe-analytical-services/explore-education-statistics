@@ -9,29 +9,29 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/content")]
     [Produces(MediaTypeNames.Application.Json)]
-    public class MethodologyController : ControllerBase
+    public class PublicationController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
 
-        public MethodologyController(IFileStorageService fileStorageService)
+        public PublicationController(IFileStorageService fileStorageService)
         {
             _fileStorageService = fileStorageService;
         }
 
         [HttpGet("tree")]
-        public async Task<ActionResult<IEnumerable<ThemeTree<PublicationTreeNode>>>> GetMethodologyTree()
+        public async Task<ActionResult<IEnumerable<ThemeTree<PublicationTreeNode>>>> GetPublicationTree()
         {
             return await this.JsonContentResultAsync<IEnumerable<ThemeTree<PublicationTreeNode>>>(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentMethodologyTreePath()), NoContent());
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationsTreePath()), NoContent());
         }
 
-        [HttpGet("{slug}")]
-        public async Task<ActionResult<MethodologyViewModel>> Get(string slug)
+        [HttpGet("publication/{slug}")]
+        public async Task<ActionResult<PublicationTitleViewModel>> GetPublication(string slug)
         {
-            return await this.JsonContentResultAsync<MethodologyViewModel>(() =>
-                _fileStorageService.DownloadTextAsync(PublicContentMethodologyPath(slug)), NotFound());
+            return await this.JsonContentResultAsync<PublicationTitleViewModel>(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)), NotFound());
         }
     }
 }

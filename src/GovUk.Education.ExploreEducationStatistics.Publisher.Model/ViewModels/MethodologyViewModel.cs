@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
     public class MethodologyViewModel
     {

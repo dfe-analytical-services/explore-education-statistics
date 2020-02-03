@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
     public class ContentSectionViewModel
     {
@@ -14,6 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels
 
         public string Caption { get; set; }
 
-        public List<IContentBlock> Content { get; set; }
+        public List<IContentBlockViewModel> Content { get; set; }
     }
 }
