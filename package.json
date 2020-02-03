@@ -5,6 +5,8 @@
     "@types/jest": "^24.0.15",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
+    "chalk": "^3.0.0",
+    "cross-spawn": "^7.0.1",
     "eslint": "^6.0.1",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-config-prettier": "^6.0.0",
@@ -17,6 +19,7 @@
     "lerna": "^3.15.0",
     "lint-staged": "^9.1.0",
     "prettier": "^1.18.2",
+    "scramjet": "^4.27.6",
     "stylelint": "^10.1.0",
     "stylelint-config-prettier": "^5.2.0",
     "stylelint-config-sass-guidelines": "^6.0.0",
@@ -63,5 +66,6 @@
       "prettier --write",
       "git add"
     ]
-  }
+  },
+  "dependencies": {}
 }

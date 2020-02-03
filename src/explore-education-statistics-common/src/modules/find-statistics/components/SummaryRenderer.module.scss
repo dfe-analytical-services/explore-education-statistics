@@ -74,7 +74,7 @@
   details {
     font-size: 1rem;
     margin: 0 0.5rem 0 0;
-    min-height: 7.5rem;
+    min-height: 3.5rem;
     padding-top: 0.5rem;
 
     @include govuk-media-query($until: tablet) {
@@ -85,4 +85,8 @@
 
 .keyStatTile :global(.govuk-details__text) {
   padding: 0 20px;
+}
+
+.trendText {
+  color: govuk-colour('white');
 }

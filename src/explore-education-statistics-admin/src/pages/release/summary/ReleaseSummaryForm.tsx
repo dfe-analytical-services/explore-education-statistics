@@ -110,11 +110,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
           )}
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
+            const timePeriodLabel = findTimePeriodCoverageGroup(
+              form.values.timePeriodCoverageCode,
+              model.timePeriodCoverageGroups,
+            ).category.label;
+
             return (
               <Form id={formId}>
                 <FormFieldset
+                  className="govuk-!-margin-bottom-9"
                   id={`${formId}-timePeriodCoverageFieldset`}
                   legend="Select time period coverage"
+                  legendSize="m"
                 >
                   <FormFieldSelect<FormValues>
                     id={`${formId}-timePeriodCoverage`}
@@ -127,12 +134,13 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-timePeriodCoverageStartYear`}
                     name="timePeriodCoverageStartYear"
-                    label={
-                      findTimePeriodCoverageGroup(
-                        form.values.timePeriodCoverageCode,
-                        model.timePeriodCoverageGroups,
-                      ).category.label
-                    }
+                    label={`
+                      ${
+                        ['Month', 'Term', 'Other'].includes(timePeriodLabel)
+                          ? 'Year'
+                          : timePeriodLabel
+                      }
+                    `}
                     width={4}
                     type="number"
                     pattern="[0-9]*"
@@ -142,6 +150,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   formId={formId}
                   fieldName="scheduledPublishDate"
                   fieldsetLegend="Schedule publish date"
+                  fieldsetLegendSize="m"
                   day={form.values.scheduledPublishDate.day}
                   month={form.values.scheduledPublishDate.month}
                   year={form.values.scheduledPublishDate.year}
@@ -150,21 +159,24 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   formId={formId}
                   fieldName="nextReleaseDate"
                   fieldsetLegend="Next release expected (optional)"
+                  fieldsetLegendSize="m"
                   day={form.values.nextReleaseDate.day}
                   month={form.values.nextReleaseDate.month}
                   year={form.values.nextReleaseDate.year}
                 />
-                <FormFieldRadioGroup<FormValues>
-                  id={`${formId}-releaseTypeId`}
-                  legend="Release Type"
-                  name="releaseTypeId"
-                  options={model.releaseTypes.map(type => ({
-                    label: type.title,
-                    value: `${type.id}`,
-                  }))}
-                />
+                <div className="govuk-!-margin-top-9">
+                  <FormFieldRadioGroup<FormValues>
+                    id={`${formId}-releaseTypeId`}
+                    legend="Release Type"
+                    name="releaseTypeId"
+                    options={model.releaseTypes.map(type => ({
+                      label: type.title,
+                      value: `${type.id}`,
+                    }))}
+                  />
+                </div>
                 {additionalFields}
-                <Button type="submit" className="govuk-!-margin-top-6">
+                <Button type="submit" className="govuk-!-margin-top-9">
                   {submitButtonText}
                 </Button>
                 <div className="govuk-!-margin-top-6">

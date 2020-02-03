@@ -50,8 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderByDescending(release => release.Published ?? release.PublishScheduled)
-                .FirstOrDefault();
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimePeriodCoverage)
+                .LastOrDefault();
         }
 
         public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
@@ -96,18 +97,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 GetLatestRelease(release.PublicationId, includedReleaseIds)?.Id == releaseViewModel.Id;
             releaseViewModel.DownloadFiles =
                 _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
-            releaseViewModel.Publication.Releases = GetPreviousReleaseViewModels(release, includedReleaseIds);
+            releaseViewModel.Publication.Releases = GetOtherReleaseViewModels(release, includedReleaseIds);
             return releaseViewModel;
         }
 
-        private List<PreviousReleaseViewModel> GetPreviousReleaseViewModels(Release release,
+        private List<OtherReleaseViewModel> GetOtherReleaseViewModels(Release release,
             IEnumerable<Guid> includedReleaseIds)
         {
             var releases = _context.Releases
                 .Where(r => r.PublicationId == release.Publication.Id && r.Id != release.Id)
                 .ToList()
                 .Where(r => IsReleasePublished(r, includedReleaseIds));
-            return _mapper.Map<List<PreviousReleaseViewModel>>(releases);
+            return _mapper.Map<List<OtherReleaseViewModel>>(releases);
         }
 
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)

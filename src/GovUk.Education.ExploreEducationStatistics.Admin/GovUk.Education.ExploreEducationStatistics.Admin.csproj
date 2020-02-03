@@ -12,6 +12,10 @@
     <Content Include="Migrations\ContentMigrations\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Remove="magic.mgc" />
+    <Content Include="magic.mgc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
   <ItemGroup>
