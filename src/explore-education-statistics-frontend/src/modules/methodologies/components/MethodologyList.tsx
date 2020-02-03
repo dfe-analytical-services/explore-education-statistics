@@ -1,37 +1,38 @@
-import Link from '@frontend/components/Link';
 import React from 'react';
 import { Publication } from '@common/services/publicationService';
+import Link from '@frontend/components/Link';
 
 interface Props {
   publications: Publication[];
 }
 
 function MethodologyList({ publications }: Props) {
+  const methodologySlugs: string[] = [];
+  const methodologies = publications.map(({ methodology }) => {
+    if (methodology && !methodologySlugs.includes(methodology.slug)) {
+      methodologySlugs.push(methodology.slug);
+      return methodology;
+    }
+    return null;
+  });
   return (
     <ul className="govuk-list govuk-list--bullet">
-      {publications.length > 0 ? (
-        publications.map(({ title, slug, id }, index, array) => {
-          const previousItem = array[index - 1];
-          if (index === 0 || previousItem.slug !== slug) {
-            return (
-              <div key={id}>
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                  {title}
-                </h3>
-                <div className="govuk-!-margin-bottom-1">
-                  <Link to={`/methodology/${slug}`}>
-                    View methodology
-                    <span className="govuk-visually-hidden">for {title}</span>
-                  </Link>
-                </div>
+      {methodologies.map(methodology => {
+        return (
+          methodology && (
+            <div key={methodology.id}>
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                {methodology.title}
+              </h3>
+              <div className="govuk-!-margin-bottom-1">
+                <Link to={`/methodology/${methodology.slug}`}>
+                  View methodology
+                </Link>
               </div>
-            );
-          }
-          return null;
-        })
-      ) : (
-        <></>
-      )}
+            </div>
+          )
+        );
+      })}
     </ul>
   );
 }
