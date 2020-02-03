@@ -25,8 +25,8 @@ const Comments = ({
   canComment = false,
 }: Props) => {
   const [newComment, setNewComment] = React.useState<string>('');
-  const [editableCommentId, setEditableCommentId] = useState<string>('');
   const [editableComment, setEditableComment] = useState<string>('');
+  const [editableCommentText, setEditableCommentText] = useState<string>('');
   const [comments, setComments] = React.useState<ExtendedComment[]>(
     initialComments,
   );
@@ -137,8 +137,8 @@ const Comments = ({
           onCommentsChange(newComments).then(() => {
             setComments(newComments);
           });
-          setEditableCommentId('');
           setEditableComment('');
+          setEditableCommentText('');
         });
     }
   };
@@ -217,20 +217,20 @@ const Comments = ({
                         {name} <FormattedDate>{time}</FormattedDate>
                       </strong>
                     </h2>
-                    {editableCommentId && editableCommentId === id ? (
+                    {editableComment && editableComment === id ? (
                       <form>
                         <textarea
                           name="editComment"
                           id={`edit_comment_${id}`}
-                          value={editableComment}
-                          onChange={e => setEditableComment(e.target.value)}
+                          value={editableCommentText}
+                          onChange={e => setEditableCommentText(e.target.value)}
                         />
                         <button
                           type="button"
                           className="govuk-button"
-                          disabled={editableComment.length === 0}
+                          disabled={editableCommentText.length === 0}
                           onClick={() => {
-                            updateComment(index, editableComment);
+                            updateComment(index, editableCommentText);
                           }}
                         >
                           Update
@@ -288,14 +288,14 @@ const Comments = ({
                           role="button"
                           tabIndex={0}
                           onClick={() => {
-                            setEditableComment(commentText);
-                            return editableCommentId
-                              ? setEditableCommentId('')
-                              : setEditableCommentId(id);
+                            setEditableCommentText(commentText);
+                            return editableComment
+                              ? setEditableComment('')
+                              : setEditableComment(id);
                           }}
                           style={{ cursor: 'pointer' }}
                         >
-                          {editableCommentId && editableCommentId === id
+                          {editableComment && editableComment === id
                             ? 'Cancel'
                             : 'Edit'}
                         </a>
