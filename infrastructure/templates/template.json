@@ -505,7 +505,7 @@
         }
       ]
     },
-    "templateBaseUrl": "https://github.com/dfe-analytical-services/explore-education-statistics/tree/master/infrastructure/templates/"
+    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources": [
     {
