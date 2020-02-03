@@ -5,18 +5,12 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import Details from '@common/components/Details';
-import classNames from 'classnames';
 import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
 
 interface Props {
   themes: Theme[];
-}
-
-interface Methodology {
-  title: string;
-  slug: string;
 }
 
 class MethodologyIndexPage extends Component<Props> {
