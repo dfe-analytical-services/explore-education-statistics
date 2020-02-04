@@ -34,7 +34,6 @@ export interface FormSelectProps {
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
   className?: string;
-  disabled?: boolean;
 }
 
 const FormSelect = ({
@@ -51,7 +50,6 @@ const FormSelect = ({
   orderDirection = ['asc'],
   value,
   className,
-  disabled = false,
 }: FormSelectProps) => {
   return (
     <>
@@ -69,7 +67,6 @@ const FormSelect = ({
         onBlur={onBlur}
         onChange={onChange}
         value={value}
-        disabled={disabled}
       >
         {options &&
           (order === undefined || order.length === 0
