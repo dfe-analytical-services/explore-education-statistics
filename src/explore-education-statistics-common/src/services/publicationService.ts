@@ -20,7 +20,6 @@ export interface Publication {
   nextUpdate: string;
   releases: {
     id: string;
-    releaseName: string;
     slug: string;
     title: string;
   }[];
@@ -35,7 +34,7 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
-  methodology: {
+  methodology?: {
     id: string;
     slug: string;
     summary: string;
@@ -171,8 +170,8 @@ export interface Table {
 export interface Summary {
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinitionTitle: string[];
   dataDefinition: string[];
-  description: { type: string; body: string };
 }
 
 export type ContentBlockType =
@@ -182,6 +181,8 @@ export type ContentBlockType =
   | 'HtmlBlock';
 
 export interface ContentBlock {
+  id: string;
+  order?: number;
   type: ContentBlockType;
   body: string;
   heading?: string;

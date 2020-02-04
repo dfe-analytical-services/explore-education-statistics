@@ -154,7 +154,11 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
               'dfe-hide-comments': model.pageMode === 'preview',
             })}
           >
-            <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
+            <div
+              className={
+                model.pageMode === 'edit' ? 'page-editing' : 'page-preview'
+              }
+            >
               <PublicationReleaseContent
                 editing={model.pageMode === 'edit'}
                 content={model.content}

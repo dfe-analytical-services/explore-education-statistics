@@ -38,7 +38,7 @@ export const AddSecondaryStats = ({
   updating = false,
 }: Props) => {
   const { isEditing, updateAvailableDataBlocks } = useContext(EditingContext);
-  const [isPicking, setIsPicking] = useState<boolean>(false);
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   async function removeSecondarySectionBlock() {
@@ -81,13 +81,13 @@ export const AddSecondaryStats = ({
   }
 
   if (!isEditing) return null;
-  if (!isPicking)
+  if (!isFormOpen)
     return (
       <>
         <Button
           className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
           onClick={() => {
-            setIsPicking(true);
+            setIsFormOpen(true);
           }}
         >
           {updating ? 'Change' : 'Add'} Secondary Stats
@@ -159,12 +159,12 @@ export const AddSecondaryStats = ({
                 ...release,
                 keyStatisticsSecondarySection,
               });
-              setIsPicking(false);
+              setIsFormOpen(false);
             }
           }
         }}
         onCancel={() => {
-          setIsPicking(false);
+          setIsFormOpen(false);
         }}
       />
     </>

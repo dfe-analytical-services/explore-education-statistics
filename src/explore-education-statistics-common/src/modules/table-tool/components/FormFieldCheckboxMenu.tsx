@@ -22,6 +22,7 @@ const FormFieldCheckboxMenu = <T extends {}>(
   return (
     <DetailsMenu
       open={open}
+      jsRequired
       summary={
         <>
           {legend}

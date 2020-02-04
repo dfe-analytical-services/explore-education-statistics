@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Form, FormikProps } from 'formik';
 import classNames from 'classnames';
@@ -38,7 +38,7 @@ const TableHeadersForm = ({
     rows: [],
   },
 }: Props) => {
-  const formInitialValues = React.useMemo(() => ({ ...initialValues }), [
+  const formInitialValues = useMemo(() => ({ ...initialValues }), [
     initialValues,
   ]);
 

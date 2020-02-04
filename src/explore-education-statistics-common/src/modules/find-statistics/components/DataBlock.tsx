@@ -4,11 +4,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-
-import DataSource from '@common/modules/find-statistics/components/DataSource';
-import SummaryRenderer, {
-  SummaryRendererProps,
-} from '@common/modules/find-statistics/components/SummaryRenderer';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
@@ -23,18 +19,16 @@ import {
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, { Component, MouseEvent, ReactNode } from 'react';
-import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import DownloadDetails from './DownloadDetails';
+import React, { Component, ReactNode, MouseEvent } from 'react';
 
 export interface DataBlockProps {
   id: string;
   type: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
-  charts?: Chart[];
-  tables?: Table[];
 
+  tables?: Table[];
+  charts?: Chart[];
   summary?: Summary;
 
   height?: number;
@@ -56,7 +50,7 @@ interface DataBlockState {
   isError: boolean;
   charts?: ChartRendererProps[];
   tables?: TableRendererProps[];
-  summary?: SummaryRendererProps;
+  dataBlockResponse?: DataBlockResponse;
 }
 
 class DataBlock extends Component<DataBlockProps, DataBlockState> {
@@ -107,14 +101,18 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   private parseDataResponse(response: DataBlockResponse): void {
-    const newState: DataBlockState = { isLoading: false, isError: false };
+    const newState: DataBlockState = {
+      isLoading: false,
+      isError: false,
+      dataBlockResponse: response,
+    };
 
     const data: DataBlockData = response;
     const chartMetadata = parseMetaData(response.metaData);
 
     if (chartMetadata === undefined) return;
 
-    const { charts, summary, tables, heading } = this.props;
+    const { charts, tables, heading } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
@@ -145,13 +143,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       });
     }
 
-    if (summary) {
-      newState.summary = {
-        ...summary,
-        data,
-        meta: chartMetadata,
-      };
-    }
     this.setState(newState);
   }
 
@@ -162,10 +153,9 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       showTables,
       additionalTabContent,
       onToggle,
-      onSummaryDetailsToggle,
       id,
     } = this.props;
-    const { charts, summary, tables, isLoading, isError } = this.state;
+    const { charts, tables, isLoading, isError } = this.state;
     return (
       <>
         {heading && <h3>{heading}</h3>}
@@ -180,27 +170,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </TabsSection>
             )}
 
-            {summary && (
-              <TabsSection id={`${id}-summary`} title="Summary">
-                <SummaryRenderer
-                  onToggle={onSummaryDetailsToggle}
-                  {...summary}
-                />
-              </TabsSection>
-            )}
-
             {tables && showTables && (
-              <TabsSection id={`${id}-tables`} title="Data tables">
+              <TabsSection id={`${id}-tables`} title="Table">
                 {tables.map((table, idx) => {
                   const key = `${id}0_table_${idx}`;
 
-                  return (
-                    <React.Fragment key={key}>
-                      <TimePeriodDataTableRenderer {...table} />
-                      <DataSource />
-                      <DownloadDetails />
-                    </React.Fragment>
-                  );
+                  return <TimePeriodDataTableRenderer key={key} {...table} />;
                 })}
 
                 {additionalTabContent}
@@ -222,12 +197,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                       {chart.data &&
                       chart.meta &&
                       chart.data.result.length > 0 ? (
-                        <>
-                          <ChartRenderer {...chart} height={height}>
-                            <DataSource />
-                            <DownloadDetails />
-                          </ChartRenderer>
-                        </>
+                        <ChartRenderer {...chart} height={height} />
                       ) : (
                         <div>
                           Unable to render chart, invalid data configured

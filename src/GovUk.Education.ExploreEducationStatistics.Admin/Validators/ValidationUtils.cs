@@ -71,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
+        FileTypeInvalid,
         SubjectTitleMustBeUnique,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,

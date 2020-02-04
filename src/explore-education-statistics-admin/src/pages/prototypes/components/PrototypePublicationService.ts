@@ -85,6 +85,8 @@ export default class PrototypePublicationService {
           slug: 'slug',
           summary: 'Methodology summary',
           title: 'methodology link title',
+          slug: 'slug',
+          summary: 'summary',
         },
       },
       latestRelease: true,
@@ -206,11 +208,8 @@ export default class PrototypePublicationService {
             summary: {
               dataKeys: [],
               dataSummary: [],
+              dataDefinitionTitle: [],
               dataDefinition: [],
-              description: {
-                type: 'MarkDownBlock',
-                body: LOREM,
-              },
             },
             comments: [
               {
