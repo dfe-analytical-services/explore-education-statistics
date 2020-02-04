@@ -111,36 +111,60 @@ else:
     assert os.getenv('ADMIN_PASSWORD') is not None
 
 if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    if os.path.exists('IDENTITY_LOCAL_STORAGE.txt') and os.path.exists('IDENTITY_COOKIE.txt'):
-        print('Getting authentication information from local files...', end='')
-        with open('IDENTITY_LOCAL_STORAGE.txt', 'r') as ls_file:
-            os.environ['IDENTITY_LOCAL_STORAGE'] = ls_file.read()
-        with open('IDENTITY_COOKIE.txt', 'r') as cookie_file:
-            os.environ['IDENTITY_COOKIE'] = cookie_file.read()
+    print('Getting get_identity_info function from get_auth_tokens.py script...', end='')
+    # NOTE(mark): Because you cannot import from a parent dir, we do this...
+    if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
+        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
+    elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):  # For pipeline
+        f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
+    assert f is not None, 'Failed to open file get_auth_tokens.py!'
+    get_auth_tokens_script = f.read()
+    globals()['__name__'] = '__test_runner__'
+    exec(get_auth_tokens_script, globals(), locals())
+    assert callable(get_identity_info)
+    print('done!')
+
+    # For BAU user
+    if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists('IDENTITY_COOKIE_BAU.txt'):
+        print('Getting BAU user authentication information from local files...', end='')
+        with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
+            os.environ['IDENTITY_LOCAL_STORAGE_BAU'] = ls_file.read()
+        with open('IDENTITY_COOKIE_BAU.txt', 'r') as cookie_file:
+            os.environ['IDENTITY_COOKIE_BAU'] = cookie_file.read()
         print('done!')
     else:
-        print('Logging in to obtain authentication information...', end='', flush=True)
-        # NOTE(mark): Because you cannot import from a parent dir, we do this...
-        if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
-            f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
-        elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):  # For pipeline
-            f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
-        assert f is not None, 'Failed to open file get_auth_tokens.py!'
-        get_auth_tokens_script = f.read()
-        globals()['__name__'] = '__test_runner__'
-        exec(get_auth_tokens_script, globals(), locals())
-        assert callable(get_identity_info)
-        os.environ["IDENTITY_LOCAL_STORAGE"], os.environ['IDENTITY_COOKIE'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), args.chromedriver_version)
+        print('Logging in to obtain BAU user authentication information...', end='', flush=True)
+        os.environ["IDENTITY_LOCAL_STORAGE_BAU"], os.environ['IDENTITY_COOKIE_BAU'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
 
         # Save auth info to files for efficiency
-        with open('IDENTITY_LOCAL_STORAGE.txt', 'w') as ls_file:
-            ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE'])
-        with open('IDENTITY_COOKIE.txt', 'w') as cookie_file:
-            cookie_file.write(os.environ['IDENTITY_COOKIE'])
+        with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'w') as ls_file:
+            ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])
+        with open('IDENTITY_COOKIE_BAU.txt', 'w') as cookie_file:
+            cookie_file.write(os.environ['IDENTITY_COOKIE_BAU'])
         print(' done!')
+    assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+    assert os.getenv('IDENTITY_COOKIE_BAU') is not None
 
-    assert os.getenv('IDENTITY_LOCAL_STORAGE') is not None
-    assert os.getenv('IDENTITY_COOKIE') is not None
+    # For Prerelease user
+    #if os.path.exists('IDENTITY_LOCAL_STORAGE_PR.txt') and os.path.exists('IDENTITY_COOKIE_PR.txt'):
+    #    print('Getting prerelease user authentication information from local files...', end='')
+    #    with open('IDENTITY_LOCAL_STORAGE_PR.txt', 'r') as ls_file:
+    #        os.environ['IDENTITY_LOCAL_STORAGE_PR'] = ls_file.read()
+    #    with open('IDENTITY_COOKIE_PR.txt', 'r') as cookie_file:
+    #        os.environ['IDENTITY_COOKIE_PR'] = cookie_file.read()
+    #    print('done!')
+    #else:
+    #    print('Logging in to obtain prerelease user authentication information...', end='', flush=True)
+    #    os.environ["IDENTITY_LOCAL_STORAGE_PR"], os.environ['IDENTITY_COOKIE_PR'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('PRERELEASE_EMAIL'), os.getenv('PRERELEASE_PASSWORD'), first_name="Prerelease3", last_name="EESADMIN", chromedriver_version=args.chromedriver_version)
+
+    #    # Save auth info to files for efficiency
+    #    with open('IDENTITY_LOCAL_STORAGE_PR.txt', 'w') as ls_file:
+    #        ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_PR'])
+    #    with open('IDENTITY_COOKIE_PR.txt', 'w') as cookie_file:
+    #        cookie_file.write(os.environ['IDENTITY_COOKIE_PR'])
+    #    print(' done!')
+    #assert os.getenv('IDENTITY_LOCAL_STORAGE_PR') is not None
+    #assert os.getenv('IDENTITY_COOKIE_PR') is not None
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments
     if args.env in ['local', 'dev']:
@@ -148,7 +172,7 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
         # Create topic to be used by UI tests
         run_identifier = str(time.time()).split('.')[0]
         create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
-        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE'])['access_token']
+        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',

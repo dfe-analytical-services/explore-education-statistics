@@ -30,10 +30,10 @@ user signs in
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading     Sign-in
 
-  environment variable should be set   IDENTITY_LOCAL_STORAGE
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE}
-  environment variable should be set   IDENTITY_COOKIE
-  set cookie from json   %{IDENTITY_COOKIE}
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
+  environment variable should be set   IDENTITY_COOKIE_BAU
+  set cookie from json   %{IDENTITY_COOKIE_BAU}
 
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading   Bau1

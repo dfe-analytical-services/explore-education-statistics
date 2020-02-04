@@ -125,19 +125,29 @@ def user_checks_page_contains_methodology_link(topic, methodology, link_url):
 
 def user_clicks_methodology_link(topic, methodology):
     try:
-        sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
+        elem = sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
     except:
         raise AssertionError(f'Cannot find theme "{topic}" on page')
 
     try:
-        elem = sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]/../..//h3[text()="{methodology}"]')
+        elem.find_element_by_xpath(f'./../..//h3[text()="{methodology}"]')
     except:
         raise AssertionError(f'Topic "{topic}" doesn\'t contain methodology "{methodology}"!')
 
     try:
-        sl.driver.find_element_by_xpath(f'//h3[text()="{methodology}"]/..//a[text()="View methodology"]').click()
+        elem.find_element_by_xpath(f'./../..//h3[text()="{methodology}"]/..//a[text()="View methodology"]').click()
     except:
         raise AssertionError(f'Cannot click "View methodology" link for "{methodology}"!')
+
+    #try:
+    #    elem = sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]/../..//h3[text()="{methodology}"]')
+    #except:
+    #    raise AssertionError(f'Topic "{topic}" doesn\'t contain methodology "{methodology}"!')
+
+    #try:
+    #    sl.driver.find_element_by_xpath(f'//h3[text()="{methodology}"]/..//a[text()="View methodology"]').click()
+    #except:
+    #    raise AssertionError(f'Cannot click "View methodology" link for "{methodology}"!')
 
 
 # Table tool

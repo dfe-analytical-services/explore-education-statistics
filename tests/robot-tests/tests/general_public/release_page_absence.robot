@@ -83,11 +83,14 @@ Validate absence_in_prus.csv file can be downloaded
 Validate Key Statistics data block -- Summary tab
     [Documentation]  DFE-915   EES-806
     [Tags]  HappyPath
-    user waits until page contains element   css:#keystats-summary    90
-    user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
-    # EES-806
-    #user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
-    #user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
+    #user waits until page contains element   css:#keystats-summary    90
+    user waits until page contains element   xpath://h3[text()="Overall absence rate"]    90
+    user waits until page contains element   xpath://h3[text()="Authorised absence rate"]    90
+    user waits until page contains element   xpath://h3[text()="Unauthorised absence rate"]    90
+
+    user checks key stat tile contents   Overall absence rate         4.6%   Up from 4.6% in 2015/16
+    user checks key stat tile contents   Authorised absence rate      3.5%   Similar to previous years
+    user checks key stat tile contents   Unauthorised absence rate    1.1%   Up from 1.1% in 2015/16
 
     #user checks key stat bullet exists   pupils missed on average 8.2 school days
     #user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
@@ -96,13 +99,13 @@ Validate Key Statistics data block -- Summary tab
 
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
-   user clicks element   css:#keystats-tables-tab
+   user clicks element   css:#headlines-section-2-tab   # Click Table tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
    # TODO Verify table
 
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
-   user clicks element   css:#keystats-charts-tab
+   user clicks element   css:#headlines-section-3-tab   # Click Chart tab
    user checks element is visible  css:.recharts-responsive-container
    # TODO: Possible to verify chart?
 
@@ -117,7 +120,7 @@ Validate accordion sections order
     user checks accordion is in position  Absence for 4-year-olds           7
     user checks accordion is in position  Pupil referral unit absence       8
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
-    user checks accordion is in position  Pupil absence in schools in England: methodology     10
+    user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
