@@ -1,4 +1,4 @@
-using System.Net.Mime;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,21 +9,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class DownloadControllerTests
     {
-        private const string Text = "result";
-
         [Fact]
         public void Get_DownloadTree_Returns_Ok()
         {
             var fileStorageService = new Mock<IFileStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("download/tree.json")).ReturnsAsync(Text);
+            fileStorageService.Setup(s => s.DownloadTextAsync("download/tree.json")).ReturnsAsync(@"
+            [
+            {
+                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""title"": ""string"",
+                ""summary"": ""string"",
+                ""topics"": [
+                {
+                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""title"": ""string"",
+                    ""summary"": ""string"",
+                    ""publications"": [
+                    {
+                        ""downloadFiles"": [
+                        {
+                            ""extension"": ""string"",
+                            ""name"": ""string"",
+                            ""path"": ""string"",
+                            ""size"": ""string""
+                        }
+                        ],
+                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""title"": ""string"",
+                        ""slug"": ""string"",
+                        ""summary"": ""string""
+                    }
+                    ]
+                }
+                ]
+            }
+            ]");
 
             var controller = new DownloadController(fileStorageService.Object);
-
             var result = controller.GetDownloadTree();
-            var content = result.Result.Result as ContentResult;
-            Assert.Contains(Text, content.Content);
-            Assert.Equal(MediaTypeNames.Application.Json, content.ContentType);
+            Assert.Single(result.Result.Value);
+            var theme = result.Result.Value.First();
+            Assert.Single(theme.Topics);
+            var topic = theme.Topics.First();
+            Assert.Single(topic.Publications);
+            var publication = topic.Publications.First();
+            Assert.Single(publication.DownloadFiles);
         }
 
         [Fact]
