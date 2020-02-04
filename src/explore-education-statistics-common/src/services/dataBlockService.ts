@@ -108,7 +108,7 @@ export interface BoundaryLevel {
 }
 
 export interface FootnoteMetadata {
-  id: number;
+  id: string;
   label: string;
 }
 

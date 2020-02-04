@@ -34,7 +34,7 @@ interface UnmappedFullTableSubjectMeta {
   }>;
   indicators: IndicatorOption[];
   footnotes: {
-    id: number;
+    id: string;
     label: string;
   }[];
 }

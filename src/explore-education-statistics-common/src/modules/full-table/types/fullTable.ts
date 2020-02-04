@@ -19,12 +19,13 @@ export interface FullTableMeta {
   }>;
   indicators: Indicator[];
   footnotes: {
-    id: number;
+    id: string;
     label: string;
   }[];
 }
 
-export interface TableData {
+export interface FullTable {
+  title?: string;
   subjectMeta: FullTableMeta;
   results: {
     filters: string[];
@@ -36,8 +37,4 @@ export interface TableData {
     measures: Dictionary<string>;
     timePeriod: string;
   }[];
-}
-
-export interface FullTable extends TableData {
-  title?: string;
 }
