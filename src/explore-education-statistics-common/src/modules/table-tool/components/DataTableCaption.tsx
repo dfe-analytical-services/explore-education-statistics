@@ -3,10 +3,11 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import React, { useState } from 'react';
+import React from 'react';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
+import useToggle from '@common/hooks/useToggle';
 
 export function generateTableTitle({
   timePeriodRange,
@@ -35,15 +36,14 @@ export function generateTableTitle({
 
   const locationsString = ` in ${commaList(
     locations.length > 10 && !expanded
-      ? locations.slice(0, 10).map(location => location.label)
+      ? locations
+          .slice(0, 10)
+          .map(location => location.label)
+          .concat(`${locations.length - 10} other locations...`)
       : locations.map(location => location.label),
   )}`;
 
-  return `Table showing '${subjectName}' from '${publicationName}'${
-    !expanded && locations.length > 10
-      ? `${locationsString} and ${locations.length} other locations...`
-      : locationsString
-  }${timePeriodString}`;
+  return `Table showing '${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
 interface Props {
@@ -61,7 +61,7 @@ const DataTableCaption = ({
   subjectName,
   publicationName,
 }: Props) => {
-  const [expanded, setExpanded] = useState<boolean>(false);
+  const [expanded, toggleExpanded] = useToggle(false);
   const caption = generateTableTitle({
     timePeriodRange,
     locations,
@@ -77,7 +77,7 @@ const DataTableCaption = ({
         <ButtonText
           className={classNames('govuk-!-display-block govuk-!-margin-top-2')}
           onClick={() => {
-            return expanded ? setExpanded(false) : setExpanded(true);
+            toggleExpanded();
           }}
         >
           {`${expanded ? 'Hide' : 'View'} full table title`}
