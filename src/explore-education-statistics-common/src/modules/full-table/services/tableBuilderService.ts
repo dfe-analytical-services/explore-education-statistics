@@ -1,4 +1,4 @@
-import { Dictionary, PartialRecord, KeysRemap } from '@common/types';
+import { Dictionary, PartialRecord } from '@common/types';
 import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
 import { dataApi } from '@common/services/api';
 
@@ -79,20 +79,23 @@ export interface PublicationSubjectMeta {
   };
 }
 
-export type LocationLevelKeys =
-  | 'country'
-  | 'institution'
-  | 'localAuthority'
-  | 'localAuthorityDistrict'
-  | 'localEnterprisePartnership'
-  | 'multiAcademyTrust'
-  | 'mayoralCombinedAuthority'
-  | 'opportunityArea'
-  | 'parliamentaryConstituency'
-  | 'region'
-  | 'rscRegion'
-  | 'sponsor'
-  | 'ward';
+export const locationLevelKeys = [
+  'country',
+  'institution',
+  'localAuthority',
+  'localAuthorityDistrict',
+  'localEnterprisePartnership',
+  'mayoralCombinedAuthority',
+  'multiAcademyTrust',
+  'opportunityArea',
+  'parliamentaryConstituency',
+  'region',
+  'rscRegion',
+  'sponsor',
+  'ward',
+] as const;
+
+export type LocationLevelKeys = typeof locationLevelKeys[number];
 
 export type TimeIdentifier =
   | 'AY'
@@ -165,24 +168,6 @@ export interface TimePeriodQuery {
   endYear: number;
   endCode: TimeIdentifier;
 }
-
-export const LocationLevelKeysEnum: KeysRemap<LocationLevelKeys, boolean> = {
-  country: true,
-  institution: true,
-  localAuthority: true,
-  localAuthorityDistrict: true,
-  localEnterprisePartnership: true,
-  mayoralCombinedAuthority: true,
-  multiAcademyTrust: true,
-  opportunityArea: true,
-  parliamentaryConstituency: true,
-  region: true,
-  rscRegion: true,
-  sponsor: true,
-  ward: true,
-};
-
-export const LocationLevelKeysNames = Object.keys(LocationLevelKeysEnum);
 
 export type TableDataQuery = {
   publicationId?: string;

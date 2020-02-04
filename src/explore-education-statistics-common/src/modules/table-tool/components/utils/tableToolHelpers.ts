@@ -1,9 +1,9 @@
-import sortBy from 'lodash/sortBy';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
   IndicatorOption,
-  LocationLevelKeysEnum,
+  locationLevelKeys,
+  LocationLevelKeys,
   PublicationSubjectMeta,
   TableDataQuery,
   TimeIdentifier,
@@ -23,14 +23,13 @@ import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/full-table/utils/tableHeaders';
 import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
-import { LocationsFormValues } from '@common/modules/table-tool/components/LocationFiltersForm';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
-import { Dictionary } from '@common/types';
+import { DataBlockMetadata } from '@common/services/dataBlockService';
+import { Dictionary, PartialRecord } from '@common/types';
 
 import mapValues from 'lodash/mapValues';
-import { SortableOption } from '@common/modules/table-tool/components/FormSortableList';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import sortBy from 'lodash/sortBy';
 
 export interface DateRangeState {
   startYear?: number;
@@ -126,7 +125,7 @@ export const reverseMapTableHeadersConfig = (
   ];
 
   const mapOptionGroupsToFilterGroups = (
-    optionsGroups: SortableOption[][],
+    optionsGroups: FilterOption[][],
   ): (LocationFilter | CategoryFilter)[][] =>
     optionsGroups.map(optionGroup => {
       const currentIndex = locationAndFilterGroups.findIndex(options =>
@@ -173,7 +172,7 @@ export const createQuery = (
     locations,
   }: {
     subjectId: string;
-    locations: Dictionary<LocationFilter[]>;
+    locations: PartialRecord<LocationLevelKeys, string[]>;
   } & DateRangeState,
 ): TableDataQuery => {
   if (!startYear || !startCode || !endYear || !endCode) {
@@ -181,9 +180,7 @@ export const createQuery = (
   }
 
   return {
-    ...mapValues(locations, locationLevel =>
-      locationLevel.map(location => location.value),
-    ),
+    ...locations,
     subjectId,
     indicators: indicators.map(indicator => indicator.value),
     filters: Object.values(filters).flatMap(categoryFilters =>
@@ -198,34 +195,6 @@ export const createQuery = (
   };
 };
 
-export const mapLocations = (
-  selectedLocations: LocationsFormValues,
-  locationsMeta: PublicationSubjectMeta['locations'],
-) => {
-  return mapValuesWithKeys(
-    selectedLocations,
-    (locationLevel, locationOptions) =>
-      locationOptions
-        .map(location =>
-          locationsMeta[locationLevel].options.find(
-            option => option.value === location,
-          ),
-        )
-        .filter(option => typeof option !== 'undefined')
-        .map(
-          option => new LocationFilter(option as FilterOption, locationLevel),
-        ),
-  );
-};
-
-export const getSelectedLocationsForQuery = (
-  locationQuery: Dictionary<string[] | undefined>,
-) =>
-  mapValuesWithKeys(
-    LocationLevelKeysEnum,
-    (key, _) => locationQuery[key] || [],
-  );
-
 export const getFiltersForTableGeneration = (
   { filters: metaFilters }: PublicationSubjectMeta,
   { filters }: FormValues,
@@ -234,7 +203,7 @@ export const getFiltersForTableGeneration = (
     mapOptionValues(value.options),
   );
 
-  return mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
+  return mapValues(filters, (selectedFilters, filterGroup) =>
     selectedFilters.map(
       filter =>
         new CategoryFilter(
@@ -271,7 +240,7 @@ export const tableGeneration = async (
   subjectMeta: PublicationSubjectMeta,
   values: FormValues,
   subjectId: string,
-  locations: Dictionary<LocationFilter[]>,
+  locations: PartialRecord<LocationLevelKeys, string[]>,
   releaseId: string | undefined,
 ): Promise<{
   table: FullTable;
@@ -300,9 +269,7 @@ export const tableGeneration = async (
   };
 };
 
-export type OptionalTableDataQuery =
-  | { [K in keyof TableDataQuery]?: TableDataQuery[K] }
-  | undefined;
+export type OptionalTableDataQuery = Partial<TableDataQuery> | undefined;
 
 export const initialiseQuery = (_: TableDataQuery): OptionalTableDataQuery => {
   return {};
@@ -318,27 +285,29 @@ export const validateAndPopulateSubject = (
   };
 };
 
-export const validateAndPopulateLocations = (
-  initialQuery: TableDataQuery,
-): OptionalTableDataQuery => {
-  const initialLocations: Dictionary<string[]> = Object.entries(
-    mapValuesWithKeys(
-      LocationLevelKeysEnum,
-      keyName => (initialQuery as Dictionary<string[]>)[keyName],
+const getLocationOptions = (
+  initialQuery?: TableDataQuery,
+): PartialRecord<LocationLevelKeys, string[]> => {
+  if (!initialQuery) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(initialQuery).filter(([key]) =>
+      locationLevelKeys.includes(key as LocationLevelKeys),
     ),
-  ).reduce(
-    (filtered, [key, value]) =>
-      value ? { ...filtered, [key]: [...value] } : filtered,
-    {},
   );
+};
 
-  // check if any are actually set to validate if it's actually valid
-  const allLocations = ([] as string[]).concat(
-    ...Object.values(initialLocations),
-  );
-  if (allLocations.length === 0) return undefined;
-
-  return initialLocations;
+export const validateAndPopulateLocations = (
+  locations: PartialRecord<LocationLevelKeys, string[]>,
+) => {
+  return (): OptionalTableDataQuery => {
+    // Validate there are any locations at all
+    return Object.values(locations).some(level => level?.length)
+      ? locations
+      : undefined;
+  };
 };
 
 export const validateAndPopulateDateRange = (
@@ -371,14 +340,6 @@ export const validateAndPopulateFiltersAndIndicators = (
   };
 };
 
-const validationFunctions = [
-  initialiseQuery,
-  validateAndPopulateSubject,
-  validateAndPopulateLocations,
-  validateAndPopulateDateRange,
-  validateAndPopulateFiltersAndIndicators,
-];
-
 export const getDefaultSubjectMeta = () => ({
   timePeriod: {
     hint: '',
@@ -398,7 +359,11 @@ export const initialiseFromInitialQuery = async (
   let createdTable: FullTable | undefined;
 
   let subjectId = '';
-  let locations: Dictionary<LocationFilter[]> = {};
+  const locations: PartialRecord<
+    LocationLevelKeys,
+    string[]
+  > = getLocationOptions(initialQuery);
+
   let dateRange: DateRangeState = {};
   let initialStep = 1;
   let subjectMeta: PublicationSubjectMeta;
@@ -410,7 +375,13 @@ export const initialiseFromInitialQuery = async (
       indicators: [],
     };
 
-    validationFunctions.every((fn, idx) => {
+    [
+      initialiseQuery,
+      validateAndPopulateSubject,
+      validateAndPopulateLocations(locations),
+      validateAndPopulateDateRange,
+      validateAndPopulateFiltersAndIndicators,
+    ].every((fn, idx) => {
       const q = fn(initialQuery);
 
       if (q === undefined) return false;
@@ -435,12 +406,6 @@ export const initialiseFromInitialQuery = async (
 
     // eslint-disable-next-line prefer-destructuring
     if (initialStep > 1) subjectId = buildNewQuery.subjectId;
-
-    if (initialStep > 2)
-      locations = mapLocations(
-        getSelectedLocationsForQuery(buildNewQuery),
-        subjectMeta.locations,
-      );
 
     if (initialStep > 3) dateRange = { ...buildNewQuery.timePeriod };
 

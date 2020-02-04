@@ -1,12 +1,12 @@
 /* eslint-disable no-shadow */
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import tableBuilderService, {
+  LocationLevelKeys,
   PublicationSubject,
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { LocationFilter } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
@@ -28,14 +28,13 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import { Dictionary } from '@common/types/util';
-import mapValues from 'lodash/mapValues';
-import React, { ReactElement } from 'react';
+import { PartialRecord } from '@common/types/util';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useImmer } from 'use-immer';
 import {
   DateRangeState,
   getDefaultSubjectMeta,
   initialiseFromInitialQuery,
-  mapLocations,
   tableGeneration,
 } from './utils/tableToolHelpers';
 
@@ -51,9 +50,9 @@ export interface TableToolState {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
-  validInitialQuery: TableDataQuery | undefined;
+  validInitialQuery?: TableDataQuery;
   dateRange: DateRangeState;
-  locations: Dictionary<LocationFilter[]>;
+  locations: PartialRecord<LocationLevelKeys, string[]>;
   subjectId: string;
   subjectMeta: PublicationSubjectMeta;
 }
@@ -88,29 +87,21 @@ const TableToolWizard = ({
   onTableCreated,
   onInitialQueryLoaded,
 }: TableToolWizardProps) => {
-  const [publication, setPublication] = React.useState<Publication>();
-  const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
+  const [publication, setPublication] = useState<Publication>();
+  const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
 
-  const [initialStep, setInitialStep] = React.useState(1);
+  const [initialStep, setInitialStep] = useState(1);
 
-  const getInitialState = () => {
-    return {
-      initialStep: 1,
-      subjectId: '',
-      subjectMeta: getDefaultSubjectMeta(),
-      locations: {},
-      dateRange: {},
-      createdTable: undefined,
-      query: undefined,
-      validInitialQuery: undefined,
-    };
-  };
+  const [tableToolState, updateTableToolState] = useImmer<TableToolState>({
+    subjectId: '',
+    subjectMeta: getDefaultSubjectMeta(),
+    locations: {},
+    dateRange: {},
+  });
 
-  const [tableToolState, setTableToolState] = React.useState<TableToolState>(
-    getInitialState(),
-  );
+  console.log(tableToolState);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (releaseId) {
       tableBuilderService
         .getReleaseMeta(releaseId)
@@ -120,19 +111,19 @@ const TableToolWizard = ({
     }
   }, [releaseId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const currentlyLoadingQuery = {
       releaseId,
       initialQuery,
     };
     setInitialStep(1);
-    setTableToolState({
+
+    updateTableToolState(() => ({
       subjectMeta: getDefaultSubjectMeta(),
       dateRange: {},
       locations: {},
       subjectId: '',
-      validInitialQuery: undefined,
-    });
+    }));
 
     initialiseFromInitialQuery(releaseId, initialQuery).then(state => {
       // make sure nothing changed in the component while we were processing the initialisation
@@ -144,12 +135,12 @@ const TableToolWizard = ({
 
         setInitialStep(initialStep);
 
-        setTableToolState(state);
+        updateTableToolState(() => state);
 
         if (onInitialQueryLoaded) onInitialQueryLoaded();
       }
     });
-  }, [initialQuery, onInitialQueryLoaded, releaseId]);
+  }, [initialQuery, onInitialQueryLoaded, releaseId, updateTableToolState]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -174,37 +165,29 @@ const TableToolWizard = ({
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
-    const selectedSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
+    const subjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       selectedSubjectId,
     );
 
-    setTableToolState({
-      ...tableToolState,
-      subjectId: selectedSubjectId,
-      subjectMeta: selectedSubjectMeta,
+    updateTableToolState(draft => {
+      draft.subjectId = selectedSubjectId;
+      draft.subjectMeta = subjectMeta;
     });
   };
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
-    locations: selectedLocations,
+    locations,
   }) => {
     const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...selectedLocations,
+        ...locations,
         subjectId: tableToolState.subjectId,
       },
     );
 
-    setTableToolState({
-      ...tableToolState,
-      subjectMeta: {
-        ...tableToolState.subjectMeta,
-        timePeriod: selectedSubjectMeta.timePeriod,
-      },
-      locations: mapLocations(
-        selectedLocations,
-        tableToolState.subjectMeta.locations,
-      ),
+    updateTableToolState(draft => {
+      draft.subjectMeta.timePeriod = selectedSubjectMeta.timePeriod;
+      draft.locations = locations;
     });
   };
 
@@ -214,9 +197,7 @@ const TableToolWizard = ({
 
     const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...mapValues(tableToolState.locations, locationLevel =>
-          locationLevel.map(location => location.value),
-        ),
+        ...tableToolState.locations,
         subjectId: tableToolState.subjectId,
         timePeriod: {
           startYear,
@@ -227,18 +208,15 @@ const TableToolWizard = ({
       },
     );
 
-    setTableToolState({
-      ...tableToolState,
-      subjectMeta: {
-        ...tableToolState.subjectMeta,
-        filters: selectedSubjectMeta.filters,
-      },
-      dateRange: {
+    updateTableToolState(draft => {
+      draft.subjectMeta.filters = selectedSubjectMeta.filters;
+
+      draft.dateRange = {
         startYear,
         startCode,
         endYear,
         endCode,
-      },
+      };
     });
   };
 
@@ -258,7 +236,7 @@ const TableToolWizard = ({
         response: tableQueryResponse,
       };
 
-      setTableToolState(newState);
+      updateTableToolState(() => newState);
       if (onTableCreated) {
         onTableCreated(tableQueryResponse);
       }
