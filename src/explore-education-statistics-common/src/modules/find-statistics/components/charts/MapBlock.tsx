@@ -1,5 +1,6 @@
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
   ChartDataB,
   ChartDefinition,
@@ -20,16 +21,15 @@ import {
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
-import React from 'react';
-import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import styles from './MapBlock.module.scss';
-import stylesIndicators from '../SummaryRenderer.module.scss';
 
 import 'leaflet/dist/leaflet.css';
+import React from 'react';
+import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import stylesIndicators from '../SummaryRenderer.module.scss';
+import styles from './MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;
@@ -659,8 +659,9 @@ const MapBlock = ({
                       </span>
                       {` ${formatPretty(min)}${
                         labels[selectedDataSetKey].unit
-                      } to
-                      ${formatPretty(max)}${labels[selectedDataSetKey].unit}`}
+                      } to ${formatPretty(max)}${
+                        labels[selectedDataSetKey].unit
+                      }`}
                     </dd>
                   ))}
               </dl>
