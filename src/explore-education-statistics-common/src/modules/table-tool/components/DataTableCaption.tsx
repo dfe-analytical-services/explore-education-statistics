@@ -76,9 +76,7 @@ const DataTableCaption = ({
       {locations.length > 10 && (
         <ButtonText
           className={classNames('govuk-!-display-block govuk-!-margin-top-2')}
-          onClick={() => {
-            toggleExpanded();
-          }}
+          onClick={toggleExpanded}
         >
           {`${expanded ? 'Hide' : 'View'} full table title`}
         </ButtonText>
