@@ -9,7 +9,6 @@ import {
   Result,
 } from '@common/services/dataBlockService';
 import {
-  Axis,
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
@@ -18,22 +17,12 @@ import {
   ChartType,
   DataSetConfiguration,
   LabelConfiguration,
-  ReferenceLine,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
 import React, { ReactNode } from 'react';
-import {
-  AxisDomain,
-  Label,
-  PositionType,
-  ReferenceLine as RechartsReferenceLine,
-  TooltipProps,
-  XAxis,
-  XAxisProps,
-  YAxis,
-  YAxisProps,
-} from 'recharts';
+import { AxisDomain, TooltipProps } from 'recharts';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 
 export const colours: string[] = [
   '#4763a5',
@@ -50,13 +39,6 @@ export const symbols: ChartSymbol[] = [
   'cross',
   'star',
 ];
-
-export function parseCondensedTimePeriodRange(
-  range: string,
-  separator: string = '/',
-) {
-  return [range.substring(0, 4), range.substring(4, 6)].join(separator);
-}
 
 export interface ChartMetaData {
   filters: Dictionary<LabelValueMetadata>;
@@ -89,19 +71,6 @@ export interface ChartProps extends AbstractChartProps {
 
 export interface StackedBarProps extends ChartProps {
   stacked?: boolean;
-}
-
-export interface ChartDataOld {
-  name: string;
-  indicator: string | undefined;
-  data?: ChartDataOld[];
-  value?: string;
-}
-
-export interface DataSetResult {
-  dataSet: ChartDataSet;
-
-  results: Result[];
 }
 
 export interface ChartCapabilities {
@@ -138,84 +107,6 @@ export interface ChartDefinition {
     defaultDataType?: AxisGroupBy;
     forcedDataType?: AxisGroupBy;
   }[];
-}
-
-function calculateAxis(
-  axis: Axis,
-  position: PositionType,
-  angle: number = 0,
-  titleSize: number = 25,
-) {
-  let size = axis.size || 25;
-  let title: ReactNode | '';
-
-  if (axis.title) {
-    size += titleSize;
-    title = (
-      <Label position={position} angle={angle}>
-        {axis.title}
-      </Label>
-    );
-  }
-
-  return { size, title };
-}
-
-export function calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
-  const { size: height, title } = calculateAxis(xAxis, 'insideBottom');
-  return (
-    <XAxis {...axisProps} height={height}>
-      {title}
-    </XAxis>
-  );
-}
-
-export function calculateYAxis(yAxis: Axis, axisProps: YAxisProps): ReactNode {
-  const { size: width, title } = calculateAxis(yAxis, 'left', 270, 90);
-  return (
-    <YAxis {...axisProps} width={width}>
-      {title}
-    </YAxis>
-  );
-}
-
-export function generateReferenceLines(
-  referenceLines: ReferenceLine[],
-): ReactNode {
-  const generateReferenceLine = (line: ReferenceLine, idx: number) => {
-    const referenceLineProps = {
-      key: `ref_${idx}`,
-      ...line,
-      stroke: 'black',
-      strokeWidth: '2px',
-
-      label: {
-        position: 'top',
-        value: line.label,
-      },
-    };
-
-    // Using <Label> in the label property is causing an infinite loop
-    // forcing the use of the properties directly as per https://github.com/recharts/recharts/issues/730
-    // appears to be a fix, but this is not valid for the types.
-    // issue raised https://github.com/recharts/recharts/issues/1710
-    // @ts-ignore
-    return <RechartsReferenceLine {...referenceLineProps} />;
-  };
-
-  return referenceLines.map(generateReferenceLine);
-}
-
-export function filterResultsBySingleDataSet(
-  dataSet: ChartDataSet,
-  results: Result[],
-) {
-  return results.filter(
-    r =>
-      dataSet.indicator &&
-      Object.keys(r.measures).includes(dataSet.indicator) &&
-      (dataSet.filters && difference(r.filters, dataSet.filters).length === 0),
-  );
 }
 
 function existAndCodesDoNotMatch(a?: Location, b?: Location) {
@@ -390,7 +281,7 @@ function getChartDataForAxis(
         [name]: {
           name,
           [generateKeyFromDataSet(dataSet, groupBy)]:
-            result.measures[dataSet.indicator] || 'NaN',
+            formatPretty(result.measures[dataSet.indicator]) || 'NaN',
         },
       };
     }, nameDictionary),
