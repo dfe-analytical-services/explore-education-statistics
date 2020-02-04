@@ -19,7 +19,7 @@ export function generateTableTitle({
   locations: FullTableMeta['locations'];
   subjectName: FullTableMeta['subjectName'];
   publicationName: FullTableMeta['publicationName'];
-  expanded: boolean;
+  expanded?: boolean;
 }) {
   let timePeriodString = '';
 
