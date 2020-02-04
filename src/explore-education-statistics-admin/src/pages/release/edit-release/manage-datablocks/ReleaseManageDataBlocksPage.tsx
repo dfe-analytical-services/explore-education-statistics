@@ -261,17 +261,17 @@ const ReleaseManageDataBlocksPage = ({
                 </>
               )}
 
-              {deleteDataBlock && (
-                <ModalConfirm
-                  title="Delete data block"
-                  mounted={deleteDataBlock !== undefined}
-                  onConfirm={() => onDeleteDataBlock(deleteDataBlock)}
-                  onExit={() => setDeleteDataBlock(undefined)}
-                  onCancel={() => setDeleteDataBlock(undefined)}
-                >
-                  <p>Are you sure you wish to delete this data block?</p>
-                </ModalConfirm>
-              )}
+              <ModalConfirm
+                title="Delete data block"
+                mounted={deleteDataBlock !== undefined}
+                onConfirm={() =>
+                  deleteDataBlock && onDeleteDataBlock(deleteDataBlock)
+                }
+                onExit={() => setDeleteDataBlock(undefined)}
+                onCancel={() => setDeleteDataBlock(undefined)}
+              >
+                <p>Are you sure you wish to delete this data block?</p>
+              </ModalConfirm>
 
               <div style={{ overflow: 'hidden' }}>
                 <CreateDataBlocks
