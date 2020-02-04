@@ -504,7 +504,8 @@
           }
         }
       ]
-    }
+    },
+    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources": [
     {
@@ -2691,7 +2692,7 @@
       "properties": {
         "mode": "incremental",
         "templateLink": {
-          "uri": "[uri(deployment().properties.templateLink.uri, 'datafactory/template.json')]",
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
