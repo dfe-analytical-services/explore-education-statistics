@@ -1,16 +1,17 @@
-import React, { useMemo } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Form, FormikProps } from 'formik';
-import classNames from 'classnames';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
+import { FilterOption } from '@common/modules/full-table/services/tableBuilderService';
+import { Filter } from '@common/modules/full-table/types/filters';
 import { PickByType } from '@common/types';
+import classNames from 'classnames';
+import { Form, FormikProps } from 'formik';
+import React, { useMemo } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
-import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
@@ -18,15 +19,11 @@ interface Props {
   onSubmit: (values: TableHeadersFormValues) => void;
 }
 
-export interface SortableOptionWithGroup extends SortableOption {
-  filterGroup?: string;
-}
-
 export interface TableHeadersFormValues {
-  columnGroups: SortableOptionWithGroup[][];
-  columns: SortableOptionWithGroup[];
-  rowGroups: SortableOptionWithGroup[][];
-  rows: SortableOptionWithGroup[];
+  columnGroups: Filter[][];
+  columns: Filter[];
+  rowGroups: Filter[][];
+  rows: Filter[];
 }
 
 const TableHeadersForm = ({
@@ -61,7 +58,7 @@ const TableHeadersForm = ({
           rowGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOptionWithGroup>(Yup.object())
+                .of<FilterOption>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -75,7 +72,7 @@ const TableHeadersForm = ({
           columnGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOptionWithGroup>(Yup.object())
+                .of<FilterOption>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -87,10 +84,10 @@ const TableHeadersForm = ({
               'Must have at least one column group',
             ),
           columns: Yup.array()
-            .of<SortableOptionWithGroup>(Yup.object())
+            .of<FilterOption>(Yup.object())
             .ensure(),
           rows: Yup.array()
-            .of<SortableOptionWithGroup>(Yup.object())
+            .of<FilterOption>(Yup.object())
             .ensure(),
         })}
         onSubmit={onSubmit}
@@ -152,7 +149,7 @@ const TableHeadersForm = ({
                     >
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, SortableOption[][]>
+                          PickByType<TableHeadersFormValues, Filter[][]>
                         >
                           name="rowGroups"
                           legend="Row groups"
@@ -162,7 +159,7 @@ const TableHeadersForm = ({
 
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, SortableOption[][]>
+                          PickByType<TableHeadersFormValues, Filter[][]>
                         >
                           name="columnGroups"
                           legend="Column groups"

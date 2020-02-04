@@ -3,6 +3,7 @@ import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
   CategoryFilter,
+  Filter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
@@ -17,10 +18,7 @@ import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import {
-  SortableOptionWithGroup,
-  TableHeadersFormValues,
-} from './TableHeadersForm';
+import { TableHeadersFormValues } from './TableHeadersForm';
 import { reverseMapTableHeadersConfig } from './utils/tableToolHelpers';
 
 interface Props {
@@ -28,9 +26,7 @@ interface Props {
   tableHeadersConfig: TableHeadersFormValues;
 }
 
-const createFilterGroupHeaders = (
-  group: SortableOptionWithGroup[],
-): HeaderSubGroup[] =>
+const createFilterGroupHeaders = (group: Filter[]): HeaderSubGroup[] =>
   group.reduce<HeaderSubGroup[]>((acc, filter) => {
     if (!filter.filterGroup) {
       return acc;
@@ -60,9 +56,7 @@ const createFilterGroupHeaders = (
     return acc;
   }, []);
 
-export const createGroupHeaders = (
-  groups: SortableOptionWithGroup[][],
-): HeaderGroup[] => {
+export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
   return groups.reduce((acc, group) => {
     const filterGroupHeaders = createFilterGroupHeaders(group);
 

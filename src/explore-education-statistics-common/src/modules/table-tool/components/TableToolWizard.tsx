@@ -99,8 +99,6 @@ const TableToolWizard = ({
     dateRange: {},
   });
 
-  console.log(tableToolState);
-
   useEffect(() => {
     if (releaseId) {
       tableBuilderService
