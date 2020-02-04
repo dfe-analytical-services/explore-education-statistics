@@ -167,6 +167,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
+                        disabled={form.isSubmitting}
                         onAllChange={() => {
                           updateLocationLevels(draft => {
                             if (!draft[levelKey]) {
