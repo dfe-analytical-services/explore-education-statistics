@@ -83,7 +83,7 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
     case 'HigherLevelReview':
       return 'In Review';
     case 'Approved':
-      return 'Approved for Publication';
+      return 'Approved';
     default:
       return undefined;
   }
