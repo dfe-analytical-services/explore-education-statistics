@@ -1,6 +1,9 @@
-﻿using System.Net.Mime;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -9,20 +12,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class PublicationControllerTests
     {
-        private const string Text = "result";
-
         [Fact]
         public void Get_PublicationTree_Returns_Ok()
         {
             var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/tree.json")).ReturnsAsync(Text);
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/tree.json")).ReturnsAsync(@"
+            [
+            {
+                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""title"": ""string"",
+                ""summary"": ""string"",
+                ""topics"": [
+                {
+                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""title"": ""string"",
+                    ""summary"": ""string"",
+                    ""publications"": [
+                    {
+                        ""legacyPublicationUrl"": ""string"",
+                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""title"": ""string"",
+                        ""slug"": ""string"",
+                        ""summary"": ""string""
+                    }
+                    ]
+                }
+            ]
+        }
+        ]");
 
             var controller = new PublicationController(fileStorageService.Object);
 
             var result = controller.GetPublicationTree();
-            var content = result.Result.Result as ContentResult;
-            Assert.Contains(Text, content.Content);
-            Assert.Equal(MediaTypeNames.Application.Json, content.ContentType);
+            Assert.Single(result.Result.Value);
+            var theme = result.Result.Value.First();
+            Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
+            Assert.Single((IEnumerable) theme.Topics);
+            var topic = theme.Topics.First();
+            Assert.Single((IEnumerable) topic.Publications);
         }
 
         [Fact]
@@ -39,14 +66,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var fileStorageService = new Mock<IFileStorageService>();
             fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
-                .ReturnsAsync(Text);
+                .ReturnsAsync(@"
+            {
+                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""title"": ""string""
+            }");
 
             var controller = new PublicationController(fileStorageService.Object);
 
-            var result = controller.GetPublication("publication-a");
-            var content = result.Result.Result as ContentResult;
-            Assert.Contains(Text, content.Content);
-            Assert.Equal(MediaTypeNames.Application.Json, content.ContentType);
+            var publicationTitleViewModel = controller.GetPublication("publication-a").Result.Value;
+            Assert.Equal(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"), publicationTitleViewModel.Id);
+            Assert.Equal("string", publicationTitleViewModel.Title);
         }
 
         [Fact]
