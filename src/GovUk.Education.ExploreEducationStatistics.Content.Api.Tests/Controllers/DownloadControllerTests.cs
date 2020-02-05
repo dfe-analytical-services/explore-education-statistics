@@ -1,6 +1,7 @@
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetDownloadTree();
             Assert.Single(result.Result.Value);
             var theme = result.Result.Value.First();
+            Assert.IsAssignableFrom<ThemeTree<PublicationDownloadTreeNode>>(theme);
             Assert.Single(theme.Topics);
             var topic = theme.Topics.First();
             Assert.Single(topic.Publications);

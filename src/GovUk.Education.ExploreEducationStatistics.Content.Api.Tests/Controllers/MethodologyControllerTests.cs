@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetMethodologyTree();
             Assert.Single(result.Result.Value);
             var theme = result.Result.Value.First();
+            Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
             Assert.Single(theme.Topics);
             var topic = theme.Topics.First();
             Assert.Single(topic.Publications);
