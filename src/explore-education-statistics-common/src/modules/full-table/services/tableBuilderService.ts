@@ -1,6 +1,6 @@
-import { Dictionary, PartialRecord } from '@common/types';
 import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
 import { dataApi } from '@common/services/api';
+import { Dictionary, PartialRecord } from '@common/types';
 
 export interface FilterOption {
   label: string;
@@ -202,13 +202,17 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<FullTable> {
-    return dataApi.post('/tablebuilder', query);
-  },
-  getTableDataForRelease(
-    query: TableDataQuery,
-    releaseId: string,
-  ): Promise<FullTable> {
-    return dataApi.post(`/tablebuilder?releaseId=${releaseId}`, query);
+  getTableData(query: TableDataQuery, releaseId?: string): Promise<FullTable> {
+    return dataApi.post(
+      '/tablebuilder',
+      query,
+      releaseId
+        ? {
+            params: {
+              releaseId,
+            },
+          }
+        : undefined,
+    );
   },
 };

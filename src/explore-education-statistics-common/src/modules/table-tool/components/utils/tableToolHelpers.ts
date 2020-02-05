@@ -1,12 +1,10 @@
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
-  IndicatorOption,
   locationLevelKeys,
   LocationLevelKeys,
   PublicationSubjectMeta,
   TableDataQuery,
-  TimeIdentifier,
 } from '@common/modules/full-table/services/tableBuilderService';
 import {
   CategoryFilter,
@@ -14,29 +12,16 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import {
-  FullTable,
-  FullTableMeta,
-} from '@common/modules/full-table/types/fullTable';
+import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/full-table/utils/tableHeaders';
-import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
+import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { Dictionary, PartialRecord } from '@common/types';
-
-import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
-
-export interface DateRangeState {
-  startYear?: number;
-  startCode?: TimeIdentifier;
-  endYear?: number;
-  endCode?: TimeIdentifier;
-}
 
 export const transformTableMetaFiltersToCategoryFilters = (
   filters: DataBlockMetadata['filters'] | FullTableMeta['filters'],
@@ -160,131 +145,6 @@ export const reverseMapTableHeadersConfig = (
   };
 };
 
-export const createQuery = (
-  filters: Dictionary<CategoryFilter[]>,
-  indicators: Indicator[],
-  {
-    subjectId,
-    startYear,
-    startCode,
-    endYear,
-    endCode,
-    locations,
-  }: {
-    subjectId: string;
-    locations: PartialRecord<LocationLevelKeys, string[]>;
-  } & DateRangeState,
-): TableDataQuery => {
-  if (!startYear || !startCode || !endYear || !endCode) {
-    throw new Error('Missing required timePeriod parameters');
-  }
-
-  return {
-    ...locations,
-    subjectId,
-    indicators: indicators.map(indicator => indicator.value),
-    filters: Object.values(filters).flatMap(categoryFilters =>
-      categoryFilters.flatMap(filter => filter.value),
-    ),
-    timePeriod: {
-      startYear,
-      startCode,
-      endYear,
-      endCode,
-    },
-  };
-};
-
-export const getFiltersForTableGeneration = (
-  { filters: metaFilters }: PublicationSubjectMeta,
-  { filters }: FormValues,
-) => {
-  const filtersByValue = mapValues(metaFilters, value =>
-    mapOptionValues(value.options),
-  );
-
-  return mapValues(filters, (selectedFilters, filterGroup) =>
-    selectedFilters.map(
-      filter =>
-        new CategoryFilter(
-          filtersByValue[filterGroup][filter],
-          filter === metaFilters[filterGroup].totalValue,
-        ),
-    ),
-  );
-};
-
-export const getIndicatorsForTableGeneration = (
-  { indicators: indicatorsMeta }: PublicationSubjectMeta,
-  { indicators }: FormValues,
-) => {
-  const indicatorsByValue = mapOptionValues<IndicatorOption>(indicatorsMeta);
-
-  return indicators.map(
-    indicator => new Indicator(indicatorsByValue[indicator]),
-  );
-};
-
-export const queryForTable = async (
-  query: TableDataQuery,
-  releaseId?: string,
-): Promise<FullTable> => {
-  if (releaseId) {
-    return tableBuilderService.getTableDataForRelease(query, releaseId);
-  }
-  return tableBuilderService.getTableData(query);
-};
-
-export const tableGeneration = async (
-  dateRange: DateRangeState,
-  subjectMeta: PublicationSubjectMeta,
-  values: FormValues,
-  subjectId: string,
-  locations: PartialRecord<LocationLevelKeys, string[]>,
-  releaseId: string | undefined,
-): Promise<{
-  table: FullTable;
-  tableHeaders: TableHeadersConfig;
-  query: TableDataQuery;
-}> => {
-  const query: TableDataQuery = createQuery(
-    getFiltersForTableGeneration(subjectMeta, values),
-    getIndicatorsForTableGeneration(subjectMeta, values),
-    {
-      subjectId,
-      locations,
-      ...dateRange,
-    },
-  );
-
-  const unmappedCreatedTable = await queryForTable(query, releaseId);
-  const table = mapFullTable(unmappedCreatedTable);
-
-  const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
-
-  return {
-    table,
-    tableHeaders,
-    query,
-  };
-};
-
-export type OptionalTableDataQuery = Partial<TableDataQuery> | undefined;
-
-export const initialiseQuery = (_: TableDataQuery): OptionalTableDataQuery => {
-  return {};
-};
-
-export const validateAndPopulateSubject = (
-  initialQuery: TableDataQuery,
-): OptionalTableDataQuery => {
-  if (!initialQuery.subjectId) return undefined;
-
-  return {
-    subjectId: initialQuery.subjectId,
-  };
-};
-
 const getLocationOptions = (
   initialQuery?: TableDataQuery,
 ): PartialRecord<LocationLevelKeys, string[]> => {
@@ -299,48 +159,60 @@ const getLocationOptions = (
   );
 };
 
-export const validateAndPopulateLocations = (
-  locations: PartialRecord<LocationLevelKeys, string[]>,
-) => {
-  return (): OptionalTableDataQuery => {
-    // Validate there are any locations at all
-    return Object.values(locations).some(level => level?.length)
-      ? locations
-      : undefined;
+export type PartialTableDataQuery = Partial<TableDataQuery> | undefined;
+
+const validateAndPopulateSubject = (
+  initialQuery: TableDataQuery,
+): PartialTableDataQuery => {
+  if (!initialQuery.subjectId) return undefined;
+
+  return {
+    subjectId: initialQuery.subjectId,
   };
 };
 
-export const validateAndPopulateDateRange = (
+const validateAndPopulateLocations = (
   initialQuery: TableDataQuery,
-): OptionalTableDataQuery => {
-  const newDateRange: DateRangeState = {
-    ...initialQuery.timePeriod,
-  };
+): PartialTableDataQuery => {
+  const locations = getLocationOptions(initialQuery);
+
+  // Validate there are any locations at all
+  return Object.values(locations).some(level => level?.length)
+    ? locations
+    : undefined;
+};
+
+const validateAndPopulateDateRange = (
+  initialQuery: TableDataQuery,
+): PartialTableDataQuery => {
+  const { timePeriod } = initialQuery;
 
   if (
-    newDateRange.endCode === undefined ||
-    newDateRange.endYear === undefined ||
-    newDateRange.startCode === undefined ||
-    newDateRange.startYear === undefined
+    timePeriod?.endCode === undefined ||
+    timePeriod?.endYear === undefined ||
+    timePeriod?.startCode === undefined ||
+    timePeriod?.startYear === undefined
   ) {
     return undefined;
   }
 
   return {
-    timePeriod: initialQuery.timePeriod,
+    timePeriod: {
+      ...timePeriod,
+    },
   };
 };
 
-export const validateAndPopulateFiltersAndIndicators = (
+const validateAndPopulateFiltersAndIndicators = (
   initialQuery: TableDataQuery,
-): OptionalTableDataQuery => {
+): PartialTableDataQuery => {
   return {
     filters: [...(initialQuery.filters || [])],
     indicators: [...(initialQuery.indicators || [])],
   };
 };
 
-export const getDefaultSubjectMeta = () => ({
+export const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
   timePeriod: {
     hint: '',
     legend: '',
@@ -351,78 +223,70 @@ export const getDefaultSubjectMeta = () => ({
   filters: {},
 });
 
-export const initialiseFromInitialQuery = async (
+export const executeTableQuery = async (
+  query: TableDataQuery,
   releaseId?: string,
-  initialQuery?: TableDataQuery,
 ) => {
-  let query: TableDataQuery | undefined;
-  let createdTable: FullTable | undefined;
+  const rawTableData = await tableBuilderService.getTableData(query, releaseId);
 
-  let subjectId = '';
-  const locations: PartialRecord<
-    LocationLevelKeys,
-    string[]
-  > = getLocationOptions(initialQuery);
+  const table = mapFullTable(rawTableData);
+  const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
 
-  let dateRange: DateRangeState = {};
-  let initialStep = 1;
-  let subjectMeta: PublicationSubjectMeta;
+  return {
+    table,
+    tableHeaders,
+  };
+};
+
+export const initialiseFromQuery = async (
+  initialQuery?: TableDataQuery,
+  releaseId?: string,
+): Promise<TableToolState> => {
+  const state: TableToolState = {
+    initialStep: 1,
+    query: {
+      subjectId: '',
+      indicators: [],
+      filters: [],
+    },
+    subjectMeta: getDefaultSubjectMeta(),
+  };
 
   if (initialQuery) {
-    let buildNewQuery: TableDataQuery = {
+    let newQuery: TableDataQuery = {
       subjectId: '',
       filters: [],
       indicators: [],
     };
 
     [
-      initialiseQuery,
       validateAndPopulateSubject,
-      validateAndPopulateLocations(locations),
+      validateAndPopulateLocations,
       validateAndPopulateDateRange,
       validateAndPopulateFiltersAndIndicators,
-    ].every((fn, idx) => {
-      const q = fn(initialQuery);
+    ].every(fn => {
+      const result = fn(initialQuery);
 
-      if (q === undefined) return false;
+      if (result === undefined) {
+        return false;
+      }
 
-      initialStep = idx + 1;
-      buildNewQuery = { ...buildNewQuery, ...q };
+      state.initialStep += 1;
+      newQuery = { ...newQuery, ...result };
 
       return true;
     });
 
-    if (initialStep === 5) {
-      createdTable = await queryForTable(buildNewQuery, releaseId);
+    state.query = newQuery;
+
+    if (state.initialStep === 5) {
+      state.response = await executeTableQuery(newQuery, releaseId);
     }
 
-    const queryForEntireSubject = {
+    state.subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
       subjectId: initialQuery.subjectId,
-    };
-
-    subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-      queryForEntireSubject,
-    );
-
-    // eslint-disable-next-line prefer-destructuring
-    if (initialStep > 1) subjectId = buildNewQuery.subjectId;
-
-    if (initialStep > 3) dateRange = { ...buildNewQuery.timePeriod };
-
-    query = buildNewQuery;
-  } else {
-    query = undefined;
-    subjectMeta = getDefaultSubjectMeta();
+    });
   }
 
-  return {
-    query,
-    validInitialQuery: query,
-    subjectId,
-    locations,
-    dateRange,
-    subjectMeta,
-    createdTable,
-    initialStep,
-  };
+  return state;
 };
