@@ -35,6 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
         
+        public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
+        {
+            var encodingType = GuessMagicInfo(file.OpenReadStream(), MagicOpenFlags.MAGIC_MIME_ENCODING);
+            return encodingTypes.Any(pattern => pattern.Equals(encodingType));
+        }
+        
         private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
         {
             using var reader = new StreamReader(fileStream);

@@ -410,6 +410,10 @@
       "metadata": {
         "description": "Number of days to retain blobs after delete"
       }
+    },
+    "deployDatafactory": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -500,7 +504,8 @@
           }
         }
       ]
-    }
+    },
+    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources": [
     {
@@ -610,6 +615,7 @@
           ]
         }
       },
+
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
@@ -943,6 +949,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
@@ -2677,6 +2684,28 @@
           }
         ]
       }
+    },
+    {
+      "condition": "[parameters('deployDatafactory')]",
+      "name": "datafactory",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          }
+        }
+      },
+      "dependsOn": []
     }
   ]
 }

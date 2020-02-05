@@ -26,13 +26,18 @@
     "prettier/@typescript-eslint"
   ],
   "rules": {
+    "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       { "argsIgnorePattern": "^_$" }
     ],
+    "@typescript-eslint/triple-slash-reference": "off",
+    "import/extensions": "off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "import/no-unresolved": "off",
     "react/no-unescaped-entities": [
       "error",
       {
@@ -66,7 +71,8 @@
           "childContextTypes",
           "mixins",
           "defaultProps",
-          "statics",
+          "static-variables",
+          "static-methods",
           "state",
           "instance-variables",
           "lifecycle",

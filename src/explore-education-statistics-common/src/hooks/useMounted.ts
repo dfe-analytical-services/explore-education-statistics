@@ -8,8 +8,8 @@ import { EffectCallback, useEffect, useState } from 'react';
  * enhancing components in SSR where not all attributes
  * should be set until the client-side JS loads.
  */
-function useMounted(effect?: EffectCallback) {
-  const [isMounted, setMounted] = useState(false);
+function useMounted(effect?: EffectCallback, initialState = false) {
+  const [isMounted, setMounted] = useState(initialState);
 
   useEffect(() => {
     setMounted(true);

@@ -27,9 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private static readonly Regex[] CsvFileTypes = {
+        private static readonly Regex[] CsvMimeTypes = {
             new Regex(@"^(application|text)/csv$"),
             new Regex(@"text/plain$")
+        };
+        
+        private static readonly string[] CsvEncodingTypes = {
+            "us-ascii",
+            "utf-8"
         };
         
         private readonly string _storageConnectionString;
@@ -395,8 +400,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return false;
             }
-
-            return _fileTypeService.HasMatchingMimeType(file, CsvFileTypes);
+            
+            return _fileTypeService.HasMatchingMimeType(file, CsvMimeTypes) && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
         private static int CalculateNumberOfRows(Stream fileStream)

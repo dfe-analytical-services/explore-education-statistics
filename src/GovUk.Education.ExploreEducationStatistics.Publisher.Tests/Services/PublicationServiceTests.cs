@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,13 +13,13 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSta
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
-    public class MethodologyServiceTests
+    public class PublicationServiceTests
     {
         [Fact]
         public void GetTree()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetMethodologyTree");
+            builder.UseInMemoryDatabase(databaseName: "GetPublicationTree");
             var options = builder.Options;
 
             using (var context = new ContentDbContext(options))
@@ -40,30 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Summary = "The first topic"
                 };
 
-                var methodologyA = new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = "methodology-a",
-                    Title = "Methodology A",
-                    Summary = "first methodology"
-                };
-
-                var methodologyB = new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = "methodology-b",
-                    Title = "Methodology B",
-                    Summary = "second methodology"
-                };
-
                 var publicationA = new Publication
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
                     TopicId = topic.Id,
                     Slug = "publication-a",
-                    Summary = "first publication",
-                    MethodologyId = methodologyA.Id
+                    Summary = "first publication"
                 };
 
                 var publicationB = new Publication
@@ -72,8 +56,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Title = "Publication B",
                     TopicId = topic.Id,
                     Slug = "publication-b",
-                    Summary = "second publication",
-                    MethodologyId = methodologyB.Id
+                    Summary = "second publication"
+                };
+
+                var publicationC = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication C",
+                    TopicId = topic.Id,
+                    Slug = "publication-c",
+                    Summary = "third publication",
+                    LegacyPublicationUrl = new Uri("http://legacy.url/")
                 };
 
                 var publicationARelease1 = new Release
@@ -96,17 +89,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Status = Draft
                 };
 
-                context.AddRange(new List<Methodology>
-                {
-                    methodologyA, methodologyB
-                });
-
                 context.Add(theme);
                 context.Add(topic);
 
                 context.AddRange(new List<Publication>
                 {
-                    publicationA, publicationB
+                    publicationA, publicationB, publicationC
                 });
 
                 context.AddRange(new List<Release>
@@ -119,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new MethodologyService(context, MapperForProfile<MappingProfiles>());
+                var service = new PublicationService(context, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
@@ -127,15 +115,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var theme = result.First();
                 Assert.Equal("Theme A", theme.Title);
 
-                Assert.Single(theme.Topics);
+                Assert.Single((IEnumerable) theme.Topics);
                 var topic = theme.Topics.First();
                 Assert.Equal("Topic A", topic.Title);
 
-                Assert.Single(topic.Publications);
-                var methodology = topic.Publications.First();
-                Assert.Equal("methodology-a", methodology.Slug);
-                Assert.Equal("first methodology", methodology.Summary);
-                Assert.Equal("Methodology A", methodology.Title);
+                var publications = topic.Publications;
+                Assert.Equal(2, publications.Count);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("first publication", publications[0].Summary);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Null(publications[0].LegacyPublicationUrl);
+                Assert.Equal("publication-c", publications[1].Slug);
+                Assert.Equal("third publication", publications[1].Summary);
+                Assert.Equal("Publication C", publications[1].Title);
+                Assert.Equal("http://legacy.url/", publications[1].LegacyPublicationUrl);
             }
         }
     }

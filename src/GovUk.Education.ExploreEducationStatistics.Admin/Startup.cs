@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 options.MaxAge(365);
                 options.IncludeSubdomains();
-                options.UpgradeInsecureRequests();
+                options.Preload();
             });
 
             app.UseHttpsRedirection();
