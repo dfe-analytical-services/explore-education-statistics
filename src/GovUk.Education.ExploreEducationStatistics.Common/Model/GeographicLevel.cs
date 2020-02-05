@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public enum GeographicLevel
     {
@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Mayoral Combined Authority", "MCA")]
         MayoralCombinedAuthority,
 
-        [EnumLabelValue("MAT", "MAT")]
-        MultiAcademyTrust,
+        [EnumLabelValue("MAT", "MAT")] MultiAcademyTrust,
 
         [EnumLabelValue("National", "NAT")] Country,
 

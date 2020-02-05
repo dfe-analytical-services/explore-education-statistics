@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
