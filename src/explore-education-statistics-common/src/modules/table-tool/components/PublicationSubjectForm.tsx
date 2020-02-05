@@ -99,6 +99,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
                 value: `${option.id}`,
               }))}
               id={`${formId}-subjectId`}
+              disabled={form.isSubmitting}
               onChange={(event, option) => {
                 setSubjectName(option.label);
               }}

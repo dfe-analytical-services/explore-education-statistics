@@ -170,6 +170,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 name="start"
                 id={`${formId}-start`}
                 label="Start date"
+                disabled={form.isSubmitting}
                 options={timePeriodOptions}
                 order={[]}
               />
@@ -177,6 +178,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 name="end"
                 id={`${formId}-end`}
                 label="End date"
+                disabled={form.isSubmitting}
                 options={timePeriodOptions}
                 order={[]}
               />

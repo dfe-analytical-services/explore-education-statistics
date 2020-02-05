@@ -15,6 +15,7 @@ export type RadioOption = PartialBy<
 >;
 
 export type FormRadioGroupProps = {
+  disabled?: boolean;
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler;
@@ -65,6 +66,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   public render() {
     const {
+      disabled,
       id,
       inline,
       name,
@@ -91,6 +93,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
         >
           {orderedOptions.map(option => (
             <FormRadio
+              disabled={disabled}
               {...option}
               id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
               checked={value === option.value}

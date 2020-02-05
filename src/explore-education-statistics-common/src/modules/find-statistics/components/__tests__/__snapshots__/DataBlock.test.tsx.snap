@@ -244,13 +244,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
                
             </span>
-             
-            -3
-            %
-              to 
-            -3
-            %
-             
+             -3% to -3%
           </dd>
           <dd
             class="legend"
@@ -261,13 +255,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
                
             </span>
-             
-            -3
-            %
-              to 
-            -3
-            %
-             
+             -3% to -3%
           </dd>
           <dd
             class="legend"
@@ -278,13 +266,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
                
             </span>
-             
-            -3
-            %
-              to 
-            -2
-            %
-             
+             -3% to -2%
           </dd>
           <dd
             class="legend"
@@ -295,13 +277,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
                
             </span>
-             
-            -2
-            %
-              to 
-            -2
-            %
-             
+             -2% to -2%
           </dd>
           <dd
             class="legend"
@@ -312,13 +288,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
                
             </span>
-             
-            -2
-            %
-              to 
-            -2
-            %
-             
+             -2% to -2%
           </dd>
         </dl>
       </div>
