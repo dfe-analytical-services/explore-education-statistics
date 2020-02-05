@@ -27,7 +27,7 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
-  ) as (ReactElement[]);
+  ) as ReactElement[];
 
   const lastStep = filteredChildren.length;
 
