@@ -100,7 +100,7 @@
     "react-testing-library": "^7.0.1",
     "sass-loader": "^7.1.0",
     "stylelint": "^13.0.0",
-    "stylelint-webpack-plugin": "^0.10.5",
+    "stylelint-webpack-plugin": "^1.2.1",
     "typescript": "^3.7.5",
     "webpack-dev-server": "^3.7.2"
   },
