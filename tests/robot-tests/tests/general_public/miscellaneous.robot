@@ -123,6 +123,18 @@ Validate Contact page
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Contact
 
+Validate Accessibility statement page
+    [Tags]  HappyPath
+    user clicks link  Accessibility statement
+    user waits until page contains heading  Accessibility statement for explore education statistics
+    user checks page contains heading 2  What we’re doing to improve accessibility
+
+    user checks url contains  %{PUBLIC_URL}/accessibility-statement
+
+    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Accessibility statement
+
 Validate Help and support page
     [Tags]  HappyPath
     user clicks link    Help and support
@@ -136,9 +148,10 @@ Validate Help and support page
 
 Validate Feedback page
     [Documentation]  EES-942
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     user clicks link  feedback
     user selects newly opened window
-    user waits until page contains      Explore Education Statistics - Beta banner feedback survey
+    user waits until page contains element      xpath://span[text()="Explore Education Statistics"]
+    user waits until page contains element      xpath://span[text()="Beta Feedback Survey"]
 
-    user checks url contains    www.smartsurvey.co.uk
+    user checks url contains    forms.office.com/Pages/ResponsePage.aspx
