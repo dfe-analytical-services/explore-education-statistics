@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
     public class ObservationQueryContext
     {
@@ -26,31 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
-
-        public SubjectMetaQueryContext ToSubjectMetaQueryContext()
-        {
-            return new SubjectMetaQueryContext
-            {
-                SubjectId = SubjectId,
-                TimePeriod = TimePeriod,
-                BoundaryLevel = BoundaryLevel,
-                GeographicLevel = GeographicLevel,
-                Indicators = Indicators,
-                Country = Country,
-                Institution = Institution,
-                LocalAuthority = LocalAuthority,
-                LocalAuthorityDistrict = LocalAuthorityDistrict,
-                LocalEnterprisePartnership = LocalEnterprisePartnership,
-                MultiAcademyTrust = MultiAcademyTrust,
-                MayoralCombinedAuthority = MayoralCombinedAuthority,
-                OpportunityArea = OpportunityArea,
-                ParliamentaryConstituency = ParliamentaryConstituency,
-                Region = Region,
-                RscRegion = RscRegion,
-                Sponsor = Sponsor,
-                Ward = Ward
-            };
-        }
 
         public override string ToString()
         {

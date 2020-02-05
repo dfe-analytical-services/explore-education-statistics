@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
@@ -17,11 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Source { get; set; }
 
-        // TODO
+        public ObservationQueryContext DataBlockRequest { get; set; }
 
-//        public DataBlockRequest DataBlockRequest { get; set; }
-//
-//        public List<IContentBlockChart> Charts { get; set; }
+        public List<IContentBlockChart> Charts { get; set; }
 
         public DataBlockSummaryViewModel Summary { get; set; }
 

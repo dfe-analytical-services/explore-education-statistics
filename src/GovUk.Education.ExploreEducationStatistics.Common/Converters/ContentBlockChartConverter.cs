@@ -1,21 +1,22 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
     public class ContentBlockChartConverter : JsonConverter
     {
-        
         public override bool CanWrite => false;
         public override bool CanRead => true;
-        
+
         public override bool CanConvert(Type objectType)
         {
             return (objectType == typeof(IContentBlockChart));
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             try
             {
@@ -50,19 +51,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
 
                 return contentBlock;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
         }
- 
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new InvalidOperationException("Use default serialization.");
-            // serializer.Serialize(writer, value, typeof(MarkDownBlock));
         }
-
-        
-        
     }
 }
