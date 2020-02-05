@@ -67,7 +67,7 @@ export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
     });
 
     const hasHeaderFilterGroup =
-      filterGroupHeaders.length &&
+      filterGroupHeaders.length > 1 &&
       filterGroupHeaders.some(header => header.text !== 'Default');
 
     acc.push(
