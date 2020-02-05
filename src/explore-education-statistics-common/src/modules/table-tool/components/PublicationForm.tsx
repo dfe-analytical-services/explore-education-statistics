@@ -157,6 +157,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                       id={`${formId}-publicationId-${camelCase(
                                         topic.title,
                                       )}`}
+                                      disabled={form.isSubmitting}
                                       options={topic.publications
                                         .filter(
                                           publication =>
