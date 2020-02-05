@@ -1,7 +1,7 @@
 import {
   CategoryFilter,
+  Filter,
   Indicator,
-  LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
@@ -10,10 +10,10 @@ import sortBy from 'lodash/sortBy';
 import { FullTableMeta } from '../types/fullTable';
 
 export interface TableHeadersConfig {
-  columns: (Indicator | TimePeriodFilter)[];
-  columnGroups: (LocationFilter | CategoryFilter)[][];
-  rows: (Indicator | TimePeriodFilter)[];
-  rowGroups: (LocationFilter | CategoryFilter)[][];
+  columns: Filter[];
+  columnGroups: Filter[][];
+  rows: Filter[];
+  rowGroups: Filter[][];
 }
 
 const removeSiblinglessTotalRows = (

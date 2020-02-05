@@ -11,7 +11,7 @@ import {
   TableDataQuery,
   TimeIdentifier,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { ReactNode } from 'react';
@@ -21,7 +21,7 @@ interface Props {
   children?: ReactNode;
   initialValues?: DataBlockDetailsFormValues;
   query: TableDataQuery;
-  tableHeaders: TableHeadersFormValues;
+  tableHeaders: TableHeadersConfig;
   releaseId: string;
   initialDataBlock?: DataBlock;
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;

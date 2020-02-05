@@ -1,24 +1,20 @@
-import { dataApi } from '@common/services/api';
 import {
-  TableDataQuery,
-  IndicatorOption,
-  TimePeriodOption,
+  FilterOption,
   GroupedFilterOptions,
+  IndicatorOption,
+  TableDataQuery,
+  TimePeriodOption,
 } from '@common/modules/full-table/services/tableBuilderService';
+import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { FullTable } from '../types/fullTable';
 import { TableHeadersConfig } from '../utils/tableHeaders';
 
-export interface SortableOption {
-  label: string;
-  value: string;
-}
-
 export interface UnmappedTableHeadersConfig {
-  columnGroups: SortableOption[][];
-  columns: SortableOption[];
-  rowGroups: SortableOption[][];
-  rows: SortableOption[];
+  columnGroups: FilterOption[][];
+  columns: FilterOption[];
+  rowGroups: FilterOption[][];
+  rows: FilterOption[];
 }
 
 interface UnmappedFullTableSubjectMeta {

@@ -3,8 +3,8 @@ import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
-import { FilterOption } from '@common/modules/full-table/services/tableBuilderService';
 import { Filter } from '@common/modules/full-table/types/filters';
+import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
 import { PickByType } from '@common/types';
 import classNames from 'classnames';
 import { Form, FormikProps } from 'formik';
@@ -15,15 +15,8 @@ import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues?: TableHeadersFormValues;
-  onSubmit: (values: TableHeadersFormValues) => void;
-}
-
-export interface TableHeadersFormValues {
-  columnGroups: Filter[][];
-  columns: Filter[];
-  rowGroups: Filter[][];
-  rows: Filter[];
+  initialValues?: TableHeadersConfig;
+  onSubmit: (values: TableHeadersConfig) => void;
 }
 
 const TableHeadersForm = ({
@@ -51,14 +44,14 @@ const TableHeadersForm = ({
         use the arrow keys to move a selected item. If you are using a screen
         reader disable scan mode.
       </div>
-      <Formik<TableHeadersFormValues>
+      <Formik<TableHeadersConfig>
         enableReinitialize
         initialValues={formInitialValues}
-        validationSchema={Yup.object<TableHeadersFormValues>({
+        validationSchema={Yup.object<TableHeadersConfig>({
           rowGroups: Yup.array()
             .of(
               Yup.array()
-                .of<FilterOption>(Yup.object())
+                .of<Filter>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -72,7 +65,7 @@ const TableHeadersForm = ({
           columnGroups: Yup.array()
             .of(
               Yup.array()
-                .of<FilterOption>(Yup.object())
+                .of<Filter>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -84,14 +77,14 @@ const TableHeadersForm = ({
               'Must have at least one column group',
             ),
           columns: Yup.array()
-            .of<FilterOption>(Yup.object())
+            .of<Filter>(Yup.object())
             .ensure(),
           rows: Yup.array()
-            .of<FilterOption>(Yup.object())
+            .of<Filter>(Yup.object())
             .ensure(),
         })}
         onSubmit={onSubmit}
-        render={(form: FormikProps<TableHeadersFormValues>) => {
+        render={(form: FormikProps<TableHeadersConfig>) => {
           return (
             <Form>
               <FormGroup>
@@ -149,7 +142,7 @@ const TableHeadersForm = ({
                     >
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, Filter[][]>
+                          PickByType<TableHeadersConfig, Filter[][]>
                         >
                           name="rowGroups"
                           legend="Row groups"
@@ -159,7 +152,7 @@ const TableHeadersForm = ({
 
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, Filter[][]>
+                          PickByType<TableHeadersConfig, Filter[][]>
                         >
                           name="columnGroups"
                           legend="Column groups"
@@ -212,7 +205,7 @@ const TableHeadersForm = ({
                                       draggableSnapshot.isDragging,
                                   })}
                                 >
-                                  <FormFieldSortableList<TableHeadersFormValues>
+                                  <FormFieldSortableList<TableHeadersConfig>
                                     name="rows"
                                     id="sort-rows"
                                     legend="Rows"
@@ -232,7 +225,7 @@ const TableHeadersForm = ({
                                       draggableSnapshot.isDragging,
                                   })}
                                 >
-                                  <FormFieldSortableList<TableHeadersFormValues>
+                                  <FormFieldSortableList<TableHeadersConfig>
                                     name="columns"
                                     id="sort-columns"
                                     legend="Columns"

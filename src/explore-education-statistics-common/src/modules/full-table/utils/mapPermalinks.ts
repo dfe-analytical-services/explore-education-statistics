@@ -1,19 +1,19 @@
+import { FilterOption } from '@common/modules/full-table/services/tableBuilderService';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import {
+  Permalink,
+  UnmappedFullTable,
+  UnmappedPermalink,
+  UnmappedTableHeadersConfig,
+} from '../services/permalinkService';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '../types/filters';
-import {
-  Permalink,
-  SortableOption,
-  UnmappedFullTable,
-  UnmappedPermalink,
-  UnmappedTableHeadersConfig,
-} from '../services/permalinkService';
-import { TableHeadersConfig } from './tableHeaders';
 import { FullTable, FullTableMeta } from '../types/fullTable';
+import { TableHeadersConfig } from './tableHeaders';
 
 const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,
@@ -62,7 +62,7 @@ const reverseMapTableHeadersConfig = (
   ];
 
   const mapOptionGroupsToFilterGroups = (
-    optionsGroups: SortableOption[][],
+    optionsGroups: FilterOption[][],
   ): (LocationFilter | CategoryFilter)[][] =>
     optionsGroups.map(optionGroup => {
       const currentIndex = locationAndFilterGroups.findIndex(options =>
