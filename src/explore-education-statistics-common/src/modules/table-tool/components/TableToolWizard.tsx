@@ -32,7 +32,6 @@ import { useImmer } from 'use-immer';
 import {
   executeTableQuery,
   getDefaultSubjectMeta,
-  initialiseFromQuery,
 } from './utils/tableToolHelpers';
 
 interface Publication {
@@ -62,38 +61,37 @@ export interface TableToolWizardProps {
   themeMeta: ThemeMeta[];
   publicationId?: string;
   releaseId?: string;
-  initialQuery?: TableDataQuery;
+  initialState?: TableToolState;
   finalStep?: (props: FinalStepProps) => ReactElement;
   onTableCreated?: (response: {
     query: TableDataQuery;
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   }) => void;
-  onInitialQueryLoaded?: () => void;
 }
 
 const TableToolWizard = ({
   themeMeta,
   publicationId,
   releaseId,
-  initialQuery,
+  initialState,
   finalStep,
   onTableCreated,
-  onInitialQueryLoaded,
 }: TableToolWizardProps) => {
   const [publication, setPublication] = useState<Publication>();
   const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
-  const [isInitialising, setInitialising] = useState(false);
 
-  const [tableToolState, updateTableToolState] = useImmer<TableToolState>({
-    initialStep: 1,
-    subjectMeta: getDefaultSubjectMeta(),
-    query: {
-      subjectId: '',
-      indicators: [],
-      filters: [],
+  const [tableToolState, updateTableToolState] = useImmer<TableToolState>(
+    initialState ?? {
+      initialStep: 1,
+      subjectMeta: getDefaultSubjectMeta(),
+      query: {
+        subjectId: '',
+        indicators: [],
+        filters: [],
+      },
     },
-  });
+  );
 
   useEffect(() => {
     if (releaseId) {
@@ -104,29 +102,6 @@ const TableToolWizard = ({
         });
     }
   }, [releaseId]);
-
-  useEffect(() => {
-    if (!isInitialising) {
-      return;
-    }
-
-    setInitialising(true);
-
-    initialiseFromQuery(initialQuery, releaseId).then(state => {
-      setInitialising(false);
-      updateTableToolState(() => state);
-
-      if (onInitialQueryLoaded) {
-        onInitialQueryLoaded();
-      }
-    });
-  }, [
-    initialQuery,
-    isInitialising,
-    onInitialQueryLoaded,
-    releaseId,
-    updateTableToolState,
-  ]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
