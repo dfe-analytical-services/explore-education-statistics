@@ -242,13 +242,7 @@ exports[`MapBlock renders 1`] = `
             >
                
             </span>
-             
-            3.0
-            %
-              to 
-            3.3
-            %
-             
+             3.0% to 3.3%
           </dd>
           <dd
             class="legend"
@@ -259,13 +253,7 @@ exports[`MapBlock renders 1`] = `
             >
                
             </span>
-             
-            3.3
-            %
-              to 
-            3.5
-            %
-             
+             3.3% to 3.5%
           </dd>
           <dd
             class="legend"
@@ -276,13 +264,7 @@ exports[`MapBlock renders 1`] = `
             >
                
             </span>
-             
-            3.5
-            %
-              to 
-            3.8
-            %
-             
+             3.5% to 3.8%
           </dd>
           <dd
             class="legend"
@@ -293,13 +275,7 @@ exports[`MapBlock renders 1`] = `
             >
                
             </span>
-             
-            3.8
-            %
-              to 
-            4.0
-            %
-             
+             3.8% to 4.0%
           </dd>
           <dd
             class="legend"
@@ -310,13 +286,7 @@ exports[`MapBlock renders 1`] = `
             >
                
             </span>
-             
-            4.0
-            %
-              to 
-            4.3
-            %
-             
+             4.0% to 4.3%
           </dd>
         </dl>
       </div>

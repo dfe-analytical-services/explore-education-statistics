@@ -11,7 +11,7 @@
  */
 export default function formatPretty(
   value: string | number,
-  maxDecimals = 3,
+  maxDecimals = 2,
 ): string {
   if (typeof value === 'string') {
     const numberValue = Number(value);

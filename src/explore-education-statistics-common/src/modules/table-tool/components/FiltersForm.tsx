@@ -193,6 +193,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       hint="Select at least one indicator"
                       error={getError('indicators')}
                       selectAll
+                      disabled={form.isSubmitting}
                       options={Object.entries(subjectMeta.indicators).map(
                         ([_, group]) => {
                           return {
@@ -203,39 +204,42 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       )}
                     />
 
-                    <FormFieldset
-                      id={`${formId}-filters`}
-                      legend="Categories"
-                      legendSize="s"
-                      hint="Select at least one option from all categories"
-                      error={getError('filters')}
-                    >
-                      {Object.entries(subjectMeta.filters).map(
-                        ([filterKey, filterGroup]) => {
-                          const filterName = `filters.${filterKey}`;
+                    {Object.entries(subjectMeta.filters).length > 0 && (
+                      <FormFieldset
+                        id={`${formId}-filters`}
+                        legend="Categories"
+                        legendSize="s"
+                        hint="Select at least one option from all categories"
+                        error={getError('filters')}
+                      >
+                        {Object.entries(subjectMeta.filters).map(
+                          ([filterKey, filterGroup]) => {
+                            const filterName = `filters.${filterKey}`;
 
-                          return (
-                            <FormFieldCheckboxGroupsMenu<FormValues>
-                              key={filterKey}
-                              name={filterName}
-                              id={`${formId}-${camelCase(filterName)}`}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              error={getError(filterName)}
-                              selectAll
-                              options={Object.entries(filterGroup.options).map(
-                                ([_, group]) => {
+                            return (
+                              <FormFieldCheckboxGroupsMenu<FormValues>
+                                key={filterKey}
+                                name={filterName}
+                                id={`${formId}-${camelCase(filterName)}`}
+                                legend={filterGroup.legend}
+                                hint={filterGroup.hint}
+                                error={getError(filterName)}
+                                disabled={form.isSubmitting}
+                                selectAll
+                                options={Object.entries(
+                                  filterGroup.options,
+                                ).map(([_, group]) => {
                                   return {
                                     legend: group.label,
                                     options: group.options,
                                   };
-                                },
-                              )}
-                            />
-                          );
-                        },
-                      )}
-                    </FormFieldset>
+                                })}
+                              />
+                            );
+                          },
+                        )}
+                      </FormFieldset>
+                    )}
                   </div>
                 </div>
               </FormGroup>

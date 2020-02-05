@@ -11,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         string GetMimeEncoding(IFormFile file);
 
         bool HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes);
+        
+        bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
     }
 }
