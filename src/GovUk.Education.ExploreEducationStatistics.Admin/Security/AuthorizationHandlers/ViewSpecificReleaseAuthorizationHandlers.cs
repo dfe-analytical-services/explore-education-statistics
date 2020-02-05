@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 }
 
                 var windowStatus = preReleaseService.GetPreReleaseWindowStatus(ctx.Release, Now);
-                return windowStatus == PreReleaseWindowStatus.Within;
+                return windowStatus.PreReleaseAccess == PreReleaseAccess.Within;
             })
         {}
     }

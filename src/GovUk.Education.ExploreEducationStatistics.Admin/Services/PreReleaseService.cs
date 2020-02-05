@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Options;
-using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -17,26 +16,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
         {
-            if (!release.PublishScheduled.HasValue || release.Status != ReleaseStatus.Approved)
-            {
-                return PreReleaseWindowStatus.NoneSet;
-            }
-            
             var publishDate = release.PublishScheduled.GetValueOrDefault();
             var accessWindowStart = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
             var accessWindowEnd = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
 
-            if (Now.CompareTo(accessWindowStart) < 0)
+            return new PreReleaseWindowStatus
             {
-                return PreReleaseWindowStatus.Before;
+                PreReleaseWindowStartTime = accessWindowStart,
+                PreReleaseWindowEndTime = accessWindowEnd,
+                PreReleaseAccess = GetPreReleaseAccess(release, accessWindowStart, accessWindowEnd, referenceTime)
+            };
+        }
+
+        private PreReleaseAccess GetPreReleaseAccess(
+            Release release,
+            DateTime accessWindowStart, 
+            DateTime accessWindowEnd, 
+            DateTime referenceTime)
+        {
+            if (!release.PublishScheduled.HasValue || release.Status != ReleaseStatus.Approved)
+            {
+                return PreReleaseAccess.NoneSet;
+            }
+            
+            if (referenceTime.CompareTo(accessWindowStart) < 0)
+            {
+                return PreReleaseAccess.Before;
             }
 
-            if (Now.CompareTo(accessWindowEnd) >= 0)
+            if (referenceTime.CompareTo(accessWindowEnd) >= 0)
             {
-                return PreReleaseWindowStatus.After;
+                return PreReleaseAccess.After;
             }
 
-            return PreReleaseWindowStatus.Within;
+            return PreReleaseAccess.Within;
         }
     }
     

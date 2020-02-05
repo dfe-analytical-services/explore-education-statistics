@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,13 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly IPreReleaseService _preReleaseService;
 
         public PermissionsController(
             IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IPreReleaseService preReleaseService)
         {
             _userService = userService;
             _persistenceHelper = persistenceHelper;
+            _preReleaseService = preReleaseService;
         }
 
         [HttpGet("access")]
@@ -69,6 +73,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanApproveRelease);
         }
 
+        [HttpGet("release/{releaseId}/prerelease/status")]
+        public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, DateTime.Now))
+                .HandleFailuresOr(Ok);
+        }
+
         public class GlobalPermissions
         {
             public bool CanAccessSystem { get; set; }
@@ -76,11 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             public bool CanAccessAnalystPages { get; set; }
             public bool CanAccessUserAdministrationPages { get; set; }
             public bool CanAccessMethodologyAdministrationPages { get; set; }
-        } 
+        }
 
         private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(
-            Guid entityId, 
-            Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck) 
+            Guid entityId,
+            Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck)
             where TEntity : class
         {
             return await _persistenceHelper
@@ -88,21 +101,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(policyCheck.Invoke)
                 .OnSuccess(_ => new OkObjectResult(true))
                 .OrElse(() => new OkObjectResult(false));
-        }
-
-        private async Task<ActionResult<bool>> CheckPolicy(params Func<Task<Either<ActionResult, bool>>>[] policyChecks) 
-        {
-            foreach (var policyCheck in policyChecks)
-            {
-                var result = await policyCheck();
-
-                if (result.IsRight)
-                {
-                    return new OkObjectResult(true);
-                }
-            }
-
-            return new OkObjectResult(false);
         }
     }
 }
