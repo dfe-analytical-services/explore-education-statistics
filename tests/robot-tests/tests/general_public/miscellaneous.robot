@@ -7,7 +7,7 @@ Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify Public Page Loads
+Verify public page loads
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}
