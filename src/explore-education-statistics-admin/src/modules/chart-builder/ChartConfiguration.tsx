@@ -85,7 +85,7 @@ const InfographicChartOptions = ({
     SelectOption[]
   >([]);
 
-  const [uploading, setUploading] = React.useState<boolean>(false);
+  const [uploading, setUploading] = React.useState(false);
 
   const formId = 'fileUploadForm';
 
