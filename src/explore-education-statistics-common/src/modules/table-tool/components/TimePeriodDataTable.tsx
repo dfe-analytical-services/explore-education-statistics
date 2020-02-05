@@ -9,6 +9,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
 import {
   HeaderGroup,
   HeaderSubGroup,
@@ -18,12 +19,10 @@ import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import { TableHeadersFormValues } from './TableHeadersForm';
-import { reverseMapTableHeadersConfig } from './utils/tableToolHelpers';
 
 interface Props {
   fullTable: FullTable;
-  tableHeadersConfig: TableHeadersFormValues;
+  tableHeadersConfig: TableHeadersConfig;
 }
 
 const createFilterGroupHeaders = (group: Filter[]): HeaderSubGroup[] =>
@@ -86,14 +85,8 @@ export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
-  (props: Props, dataTableRef) => {
-    const { fullTable, tableHeadersConfig: unmappedHeaderConfig } = props;
+  ({ fullTable, tableHeadersConfig }: Props, dataTableRef) => {
     const { subjectMeta, results } = fullTable;
-
-    const tableHeadersConfig = reverseMapTableHeadersConfig(
-      unmappedHeaderConfig,
-      fullTable.subjectMeta,
-    ) as TableHeadersFormValues;
 
     if (results.length === 0) {
       return (
@@ -124,12 +117,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     const rowHeadersCartesian = cartesian(
       ...tableHeadersConfig.rowGroups,
-      tableHeadersConfig.rows,
+      tableHeadersConfig.rows as Filter[],
     );
 
     const columnHeadersCartesian = cartesian(
       ...tableHeadersConfig.columnGroups,
-      tableHeadersConfig.columns,
+      tableHeadersConfig.columns as Filter[],
     );
 
     const rows = rowHeadersCartesian.map(rowFilterCombination => {
