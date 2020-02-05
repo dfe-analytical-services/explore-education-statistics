@@ -57,7 +57,7 @@ const ReleaseContentAccordion = ({
       if (releaseId === rid) setContent(newContent);
     };
     f(releaseId);
-  }, [releaseId, handleApiErrors]);
+  }, [releaseId, handleApiErrors, setContent]);
 
   const onAddSection = React.useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
