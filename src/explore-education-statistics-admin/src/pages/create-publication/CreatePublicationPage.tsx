@@ -40,6 +40,7 @@ interface CreatePublicationModel {
 
 const CreatePublicationPage = ({
   history,
+  match,
   handleApiErrors,
 }: RouteComponentProps<{ topicId: string }> & ErrorControlProps) => {
   const [model, setModel] = useState<CreatePublicationModel>();
@@ -47,7 +48,6 @@ const CreatePublicationPage = ({
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
 
   useEffect(() => {
-    console.log(topic);
     Promise.all([
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
@@ -65,7 +65,7 @@ const CreatePublicationPage = ({
   const submitFormHandler = submitWithFormikValidation(
     async (values: FormValues) => {
       await service.createPublication({
-        topicId: (model as CreatePublicationModel).topic.id,
+        topicId: match.params.topicId,
         ...values,
       });
 
