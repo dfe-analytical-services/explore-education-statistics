@@ -167,9 +167,6 @@ const service = {
       responseType: 'blob',
     });
   },
-  createDownloadChartFileLink(releaseId: string, fileName: string): string {
-    return `/api/release/${releaseId}/chart/${fileName}`;
-  },
 };
 
 export default service;
