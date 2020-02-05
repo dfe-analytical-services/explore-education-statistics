@@ -39,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             using var reader = new StreamReader(fileStream);
             var magic = new Magic(flag, _magicFilePath);
-            return magic.Read(reader.BaseStream, 1024);
+            var bufferSize = reader.BaseStream.Length >= 1024 ? 1024 : (int) reader.BaseStream.Length;
+            return magic.Read(reader.BaseStream, bufferSize);
         }
     }
 }
