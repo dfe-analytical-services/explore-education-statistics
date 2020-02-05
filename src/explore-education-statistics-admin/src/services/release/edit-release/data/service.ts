@@ -162,15 +162,10 @@ const service = {
       data,
     );
   },
-  downloadChartFile(releaseId: string, fileName: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile(response, fileName));
-  },
-  createDownloadChartFileLink(releaseId: string, fileName: string): string {
-    return `/api/release/${releaseId}/chart/${fileName}`;
+  downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
+    return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
+      responseType: 'blob',
+    });
   },
 };
 
