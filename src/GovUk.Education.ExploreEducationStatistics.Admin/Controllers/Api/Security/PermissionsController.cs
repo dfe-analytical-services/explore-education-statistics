@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security
 {
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, DateTime.Now))
+                .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow))
                 .HandleFailuresOr(Ok);
         }
 

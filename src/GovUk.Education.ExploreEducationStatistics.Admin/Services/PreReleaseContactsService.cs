@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Email = email.ToLower(),
                                     ReleaseId = releaseId,
                                     Role = ReleaseRole.PrereleaseViewer,
-                                    Created = Now,
+                                    Created = UtcNow,
                                     CreatedById = _userService.GetUserId()
                                 });
                                 await _context.SaveChangesAsync();
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     {
                                         Email = email.ToLower(),
                                         Role = prereleaseRole,
-                                        Created = Now,
+                                        Created = UtcNow,
                                         // TODO
                                         CreatedBy = ""
                                     });
