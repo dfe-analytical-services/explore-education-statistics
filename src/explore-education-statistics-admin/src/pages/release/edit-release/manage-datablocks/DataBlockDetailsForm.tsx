@@ -103,7 +103,9 @@ const DataBlockDetailsForm = ({
     }
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<DataBlockDetailsFormValues> = {
+  const baseValidationRules: ObjectSchemaDefinition<
+    DataBlockDetailsFormValues
+  > = {
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),

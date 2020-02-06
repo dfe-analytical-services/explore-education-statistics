@@ -43,7 +43,9 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
         );
 
         return Promise.all(contactResultsByRelease).then(contactResults => {
-          const preReleaseContactsByScheduledRelease: Dictionary<PrereleaseContactDetails[]> = {};
+          const preReleaseContactsByScheduledRelease: Dictionary<
+            PrereleaseContactDetails[]
+          > = {};
           contactResults.forEach(result => {
             const { releaseId, contacts } = result;
             preReleaseContactsByScheduledRelease[releaseId] = contacts;

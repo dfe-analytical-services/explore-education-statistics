@@ -11,14 +11,8 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          ['A', 'B'],
-          ['C', 'D'],
-        ]}
-        rowHeaders={[
-          ['1', '2'],
-          ['3', '4'],
-        ]}
+        columnHeaders={[['A', 'B'], ['C', 'D']]}
+        rowHeaders={[['1', '2'], ['3', '4']]}
         rows={[
           ['AC13', 'AD13', 'BC13', 'BD13'],
           ['AC14', 'AD14', 'BC14', 'BD14'],
@@ -56,16 +50,8 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2x2 table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          ['A', 'B'],
-          ['C', 'D'],
-          ['E', 'F'],
-        ]}
-        rowHeaders={[
-          ['1', '2'],
-          ['3', '4'],
-          ['5', '6'],
-        ]}
+        columnHeaders={[['A', 'B'], ['C', 'D'], ['E', 'F']]}
+        rowHeaders={[['1', '2'], ['3', '4'], ['5', '6']]}
         rows={[
           [
             'ACE135',
@@ -280,14 +266,8 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2 with row group table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          ['A', 'B'],
-          ['C', 'D'],
-        ]}
-        rowHeaders={[
-          ['1', '2'],
-          [undefined, '4'],
-        ]}
+        columnHeaders={[['A', 'B'], ['C', 'D']]}
+        rowHeaders={[['1', '2'], [undefined, '4']]}
         rowHeaderIsGroup={[true, false]}
         rows={[
           ['AC13', 'AD13', 'BC13', 'BD13'],
@@ -324,15 +304,9 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2 with column group table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          ['A', undefined],
-          ['C', 'D'],
-        ]}
+        columnHeaders={[['A', undefined], ['C', 'D']]}
         columnHeaderIsGroup={[true, false]}
-        rowHeaders={[
-          ['1', '2'],
-          ['3', '4'],
-        ]}
+        rowHeaders={[['1', '2'], ['3', '4']]}
         rows={[
           ['AC13', 'AD13'],
           ['AC14', 'AD14'],

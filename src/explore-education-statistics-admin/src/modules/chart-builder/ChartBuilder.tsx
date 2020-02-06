@@ -407,9 +407,9 @@ const ChartBuilder = ({
     }
 
     if (initial.axes && initial.labels) {
-      setAxesConfiguration(
-        (initial.axes as unknown) as Dictionary<AxisConfiguration>,
-      );
+      setAxesConfiguration((initial.axes as unknown) as Dictionary<
+        AxisConfiguration
+      >);
 
       if (initial.axes.major && initial.axes.major.dataSets && initial.labels) {
         const dataSetAndConfig = initial.axes.major.dataSets
