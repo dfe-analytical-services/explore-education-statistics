@@ -49,6 +49,11 @@ export interface PublicationContact {
   contactTelNo: string;
 }
 
+export interface PublicationTitle {
+  id: string;
+  title: string;
+}
+
 export interface DataQuery {
   method: string;
   path: string;
@@ -332,8 +337,8 @@ export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
 export type Release = AbstractRelease<ContentBlock>;
 
 export default {
-  getPublication(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}`);
+  getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
+    return contentApi.get(`content/publication/${publicationSlug}/title`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);
