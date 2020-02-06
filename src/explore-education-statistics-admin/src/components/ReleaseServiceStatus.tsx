@@ -100,10 +100,7 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock
-          color={statusColor}
-          text={`Release Process - ${currentStatus.overallStage}`}
-        />
+        <StatusBlock color={statusColor} text={currentStatus.overallStage} />
       )}
 
       {currentStatus &&

@@ -36,7 +36,7 @@ const statusMap: {
 } = {
   Draft: 'In Draft',
   HigherLevelReview: 'Awaiting higher review',
-  Approved: 'Approved for publication',
+  Approved: 'Approved',
 };
 
 const ReleaseStatusPage = ({

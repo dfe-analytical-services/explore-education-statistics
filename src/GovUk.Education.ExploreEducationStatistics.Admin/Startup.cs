@@ -421,7 +421,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+                app.UseHsts(options =>
+                {
+                    options.MaxAge(365);
+                    options.IncludeSubdomains();
+                    options.Preload();
+                });
             }
 
             // Security Headers
@@ -446,12 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
-            app.UseHsts(options =>
-            {
-                options.MaxAge(365);
-                options.IncludeSubdomains();
-                options.Preload();
-            });
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -243,7 +243,7 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
-        chartFileDownloadService: service.createDownloadChartFileLink,
+        chartFileDownloadService: service.downloadChartFile,
 
         ...chartOptions,
       });
