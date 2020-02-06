@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
             allScenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
-
+        
         public static async void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
             IAuthorizationHandler handler, 
             ReleaseHandlerTestScenario scenario) 

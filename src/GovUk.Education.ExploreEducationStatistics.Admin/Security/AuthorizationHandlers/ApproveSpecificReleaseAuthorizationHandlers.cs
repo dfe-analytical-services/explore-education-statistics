@@ -18,18 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
     }
     
-    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
+    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
         ApproveSpecificReleaseRequirement>
     {
         public ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler() 
-            : base(SecurityClaimTypes.ApproveAllReleases) {}
+            : base(ctx => 
+                ctx.Release.Status != ReleaseStatus.Approved 
+                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllReleases)) {}
     }
 
     public class ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler
         : HasRoleOnReleaseAuthorizationHandler<ApproveSpecificReleaseRequirement>
     {
         public ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ContainsApproverRole(ctx.Roles))
+            : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsApproverRole(ctx.Roles))
         {}
     }
     
