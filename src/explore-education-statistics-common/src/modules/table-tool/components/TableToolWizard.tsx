@@ -1,14 +1,5 @@
 /* eslint-disable no-shadow */
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
-import tableBuilderService, {
-  PublicationSubject,
-  PublicationSubjectMeta,
-  TableDataQuery,
-  ThemeMeta,
-} from '@common/modules/table-tool/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -27,6 +18,18 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import tableBuilderService, {
+  LocationLevelKeys,
+  locationLevelKeys,
+  PublicationSubject,
+  PublicationSubjectMeta,
+  TableDataQuery,
+  ThemeMeta,
+} from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import omitBy from 'lodash/omitBy';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
 import {
@@ -93,6 +96,8 @@ const TableToolWizard = ({
     },
   );
 
+  console.log(tableToolState);
+
   useEffect(() => {
     if (releaseId) {
       tableBuilderService
@@ -151,9 +156,11 @@ const TableToolWizard = ({
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
       draft.query = {
+        ...omitBy(draft.query, (values, level) =>
+          locationLevelKeys.includes(level as LocationLevelKeys),
+        ),
         ...locations,
-        ...draft.query,
-      };
+      } as TableDataQuery;
     });
   };
 
