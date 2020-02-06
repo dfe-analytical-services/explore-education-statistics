@@ -27,7 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public Methodology Methodology { get; set; }
 
-        public Uri MethodologyUrl { get; set; }
+        public ExternalMethodology ExternalMethodology {
+            get;
+            set;
+        }
 
         public Uri LegacyPublicationUrl { get; set; }
 
