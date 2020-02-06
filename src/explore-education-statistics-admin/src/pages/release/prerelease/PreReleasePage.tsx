@@ -1,13 +1,12 @@
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import permissionService from '@admin/services/permissions/service';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import FormattedDate from '@common/components/FormattedDate';
 import { format } from 'date-fns';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
