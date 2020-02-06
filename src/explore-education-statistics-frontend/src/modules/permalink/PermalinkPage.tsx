@@ -2,7 +2,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import permalinkService, {
   Permalink,
 } from '@common/modules/table-tool/services/permalinkService';
-import { mapPermalink } from '@common/modules/table-tool/utils/mapPermalinks';
+import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import { NextContext } from 'next';

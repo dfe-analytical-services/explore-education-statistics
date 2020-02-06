@@ -1,5 +1,5 @@
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
-import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -7,12 +7,12 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import mapTableHeadersConfig from '@common/modules/table-tool/components/utils/mapTableHeadersConfig';
 import dataBlockService, {
   DataBlock,
   DataBlockRerequest,

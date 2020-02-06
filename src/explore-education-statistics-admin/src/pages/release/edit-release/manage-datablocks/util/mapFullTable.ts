@@ -6,9 +6,9 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 
-export const mapFullTable = (
+export default function mapFullTable(
   unmappedFullTable: DataBlockResponse,
-): FullTable => {
+): FullTable {
   const subjectMeta = unmappedFullTable.metaData || {
     indicators: {},
     locations: {},
@@ -35,5 +35,3 @@ export const mapFullTable = (
     },
   };
 };
-
-export default {};

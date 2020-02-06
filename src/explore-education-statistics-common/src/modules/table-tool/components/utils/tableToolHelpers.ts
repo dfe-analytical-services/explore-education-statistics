@@ -5,7 +5,7 @@ import tableBuilderService, {
 } from '@common/modules/table-tool/services/tableBuilderService';
 import { CategoryFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { mapFullTable } from '@common/modules/table-tool/utils/mapPermalinks';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
