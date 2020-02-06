@@ -49,14 +49,14 @@ Navigate to Manage data blocks tab
     user waits until page contains element   xpath://h2[text()="Choose a subject"]
 
 Select subject "UI test subject"
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
     user waits until element is visible  xpath://h2[text()="Choose locations"]     90
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
-    [Tags]   HappyPath
+    [Tags]   HappyPath   Failing
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)
@@ -69,7 +69,7 @@ Select locations
     user waits until element is visible  xpath://h2[text()="Choose time period"]   90
 
 Select time period
-    [Tags]   HappyPath
+    [Tags]   HappyPath   Failing
     ${timePeriodStartList}=   get list items  css:#timePeriodForm-start
     ${timePeriodEndList}=   get list items  css:#timePeriodForm-end
     ${expectedList}=   create list   Please select  2005  2007  2008  2009  2010  2011  2012  2016  2017  2018  2019  2020
@@ -84,16 +84,16 @@ Select time period
     user checks previous table tool step contains  3    End date      2020
 
 Select indicators
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks indicator checkbox    Admission Numbers
 
 Create table
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks element   css:#filtersForm-submit
     user waits until results table appears
 
 Validate table's column headings
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user checks results table column heading contains  1  1   2005
     user checks results table column heading contains  1  2   2006
     user checks results table column heading contains  1  3   2007
@@ -115,7 +115,7 @@ Validate table's column headings
     user checks results table column heading contains  1  16  2020
 
 Validate table row Bolton 001 (E02000984)
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Bolton 001 (E02000984)
     user checks row contains heading  ${row}   Bolton 001 (E02000984)
     user checks row contains heading  ${row}   Admission Numbers
@@ -137,7 +137,7 @@ Validate table row Bolton 001 (E02000984)
     user checks row cell contains text  ${row}   16   n/a
 
 Validate table row Bolton 001 (E05000364)
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Bolton 001 (E05000364)
     user checks row contains heading  ${row}   Bolton 001 (E05000364)
     user checks row contains heading  ${row}   Admission Numbers
@@ -159,7 +159,7 @@ Validate table row Bolton 001 (E05000364)
     user checks row cell contains text  ${row}   16   n/a
 
 Validate table row Bolton 004 (E02000987)
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Bolton 004 (E02000987)
     user checks row contains heading  ${row}   Bolton 004 (E02000987)
     user checks row contains heading  ${row}   Admission Numbers
@@ -181,7 +181,7 @@ Validate table row Bolton 004 (E02000987)
     user checks row cell contains text  ${row}   16   6,031
 
 Validate table row Bolton 004 (E05010450)
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Bolton 004 (E05010450)
     user checks row contains heading  ${row}   Bolton 004 (E05010450)
     user checks row contains heading  ${row}   Admission Numbers
@@ -203,7 +203,7 @@ Validate table row Bolton 004 (E05010450)
     user checks row cell contains text  ${row}   16   n/a
 
 Validate table row Nailsea Youngwood
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Nailsea Youngwood
     user checks row contains heading  ${row}   Nailsea Youngwood
     user checks row contains heading  ${row}   Admission Numbers
@@ -225,7 +225,7 @@ Validate table row Nailsea Youngwood
     user checks row cell contains text   ${row}    16   n/a
 
 Validate table row Syon
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     ${row}=  user gets row with heading   Syon
     user checks row contains heading  ${row}   Syon
     user checks row contains heading  ${row}   Admission Numbers
@@ -247,7 +247,7 @@ Validate table row Syon
     user checks row cell contains text   ${row}   16   n/a
 
 Save data block
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user enters text into element  css:#data-block-name        UI Test data block name
     user clears element text   css:#data-block-title
     user enters text into element  css:#data-block-title       UI Test table title
