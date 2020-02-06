@@ -25,7 +25,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
 
       <Accordion id="static-content-section" canReorder={false}>
         <AccordionSection
-          heading={`${publication.title}: methodology`}
+          heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >

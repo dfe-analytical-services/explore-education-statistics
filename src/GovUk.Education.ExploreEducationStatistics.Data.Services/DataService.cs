@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger.LogTrace("Built Observation results in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var metaData = _subjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations);
+            var metaData = _subjectMetaService.GetSubjectMeta(SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations);
 
             _logger.LogTrace("Got meta data for Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Stop();

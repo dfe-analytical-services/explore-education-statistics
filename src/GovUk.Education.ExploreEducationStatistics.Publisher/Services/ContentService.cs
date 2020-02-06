@@ -156,7 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = namingStrategy
-                }
+                },
+                TypeNameHandling = TypeNameHandling.Auto
             };
         }
 
