@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return _mapper.Map<MethodologyViewModel>(methodology);
         }
 
-        public List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
+        public List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Include(theme => theme.Topics)
@@ -47,9 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
+        private static ThemeTree<MethodologyTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return new ThemeTree<PublicationTreeNode>
+            return new ThemeTree<MethodologyTreeNode>
             {
                 Id = theme.Id,
                 Title = theme.Title,
@@ -61,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static TopicTree<PublicationTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        private static TopicTree<MethodologyTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
-            return new TopicTree<PublicationTreeNode>
+            return new TopicTree<MethodologyTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
@@ -76,14 +76,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static PublicationTreeNode BuildPublicationNode(Publication publication)
+        private static MethodologyTreeNode BuildPublicationNode(Publication publication)
         {
-            return new PublicationTreeNode
+            return new MethodologyTreeNode
             {
-                Id = publication.Methodology.Id,
-                Title = publication.Methodology.Title,
-                Summary = publication.Methodology.Summary,
-                Slug = publication.Methodology.Slug
+                Id = publication.Id,
+                Title = publication.Title,
+                Summary = publication.Summary,
+                Slug = publication.Slug,
+                Methodology = BuildMethodology(publication.Methodology)
+            };
+        }
+
+        private static MethodologySummaryViewModel BuildMethodology(Methodology methodology)
+        {
+            return new MethodologySummaryViewModel
+            {
+                Id = methodology.Id,
+                Slug = methodology.Slug,
+                Summary = methodology.Summary,
+                Title = methodology.Title
             };
         }
 

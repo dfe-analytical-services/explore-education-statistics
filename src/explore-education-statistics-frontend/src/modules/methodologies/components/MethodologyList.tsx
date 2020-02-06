@@ -1,6 +1,6 @@
-import Link from '@frontend/components/Link';
 import React from 'react';
 import { Publication } from '@common/services/publicationService';
+import Link from '@frontend/components/Link';
 
 interface Props {
   publications: Publication[];
@@ -9,21 +9,24 @@ interface Props {
 function MethodologyList({ publications }: Props) {
   return (
     <ul className="govuk-list govuk-list--bullet">
-      {publications.length > 0 ? (
-        publications.map(({ title, slug }) => (
+      {publications.map(publication => {
+        return (
           <>
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">{title}</h3>
-            <div className="govuk-!-margin-bottom-1">
-              <Link to={`/methodology/${slug}`}>
-                View methodology
-                <span className="govuk-visually-hidden">for {title}</span>
-              </Link>
-            </div>
+            {publication.methodology && (
+              <li className="govuk-!-margin-bottom-2" key={publication.id}>
+                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                  {publication.title}
+                </h3>
+                <div>
+                  <Link to={`/methodology/${publication.methodology.slug}`}>
+                    View methodology
+                  </Link>
+                </div>
+              </li>
+            )}
           </>
-        ))
-      ) : (
-        <></>
-      )}
+        );
+      })}
     </ul>
   );
 }

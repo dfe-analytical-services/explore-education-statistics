@@ -21,9 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("tree")]
-        public async Task<ActionResult<IEnumerable<ThemeTree<PublicationTreeNode>>>> GetMethodologyTree()
+        public async Task<ActionResult<IEnumerable<ThemeTree<MethodologyTreeNode>>>> GetMethodologyTree()
         {
-            return await this.JsonContentResultAsync<IEnumerable<ThemeTree<PublicationTreeNode>>>(() =>
+            return await this.JsonContentResultAsync<IEnumerable<ThemeTree<MethodologyTreeNode>>>(() =>
                 _fileStorageService.DownloadTextAsync(PublicContentMethodologyTreePath()), NoContent());
         }
 
