@@ -2,23 +2,9 @@ import tableBuilderService, {
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
 import Page from '@frontend/components/Page';
-import TableTool from '@frontend/components/TableTool';
+import TableTool from '@frontend/modules/table-tool/components/TableTool';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-
-export interface PublicationOptions {
-  id: string;
-  title: string;
-  topics: {
-    id: string;
-    title: string;
-    publications: {
-      id: string;
-      title: string;
-      slug: string;
-    }[];
-  }[];
-}
 
 interface Props {
   themeMeta: ThemeMeta[];

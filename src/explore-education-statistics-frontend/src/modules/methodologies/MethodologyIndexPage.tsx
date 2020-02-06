@@ -14,8 +14,6 @@ interface Props {
 }
 
 class MethodologyIndexPage extends Component<Props> {
-  private accId: string[] = generateIdList(1);
-
   public static defaultProps = {
     themes: [],
   };
@@ -24,6 +22,8 @@ class MethodologyIndexPage extends Component<Props> {
     const themes = await methodologyService.getMethodologies();
     return { themes };
   }
+
+  private accId: string[] = generateIdList(1);
 
   public render() {
     const { themes } = this.props;

@@ -17,7 +17,7 @@ import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import CreateDataBlocks from './CreateDataBlocks';
 import ViewDataBlocks from './ViewDataBlocks';
 
@@ -45,16 +45,19 @@ const ReleaseManageDataBlocksPage = ({
 
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
-  const updateDataBlocks = (rId: string) => {
-    return dataBlocksService
-      .getDataBlocks(rId)
-      .then(setDataBlocks)
-      .catch(handleApiErrors);
-  };
+  const updateDataBlocks = useCallback(
+    (rId: string) => {
+      return dataBlocksService
+        .getDataBlocks(rId)
+        .then(setDataBlocks)
+        .catch(handleApiErrors);
+    },
+    [handleApiErrors],
+  );
 
   React.useEffect(() => {
     updateDataBlocks(releaseId);
-  }, [releaseId]);
+  }, [releaseId, updateDataBlocks]);
 
   React.useEffect(() => {
     permissionService
@@ -82,39 +85,42 @@ const ReleaseManageDataBlocksPage = ({
     }
   };
 
-  const load = async (
-    dataBlocks: DataBlock[],
-    releaseId: string,
-    selectedDataBlockId: string,
-  ) => {
-    // Load's the datablock of 'selectedDataBlockId' in datablock form
+  const load = useCallback(
+    async (
+      dataBlocks: DataBlock[],
+      releaseId: string,
+      selectedDataBlockId: string,
+    ) => {
+      // Load's the datablock of 'selectedDataBlockId' in datablock form
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    if (!selectedDataBlockId) return {};
+      if (!selectedDataBlockId) return {};
 
-    const db = dataBlocks.find(({ id }) => selectedDataBlockId === id);
+      const db = dataBlocks.find(({ id }) => selectedDataBlockId === id);
 
-    if (db === undefined) return {};
+      if (db === undefined) return {};
 
-    const request = db.dataBlockRequest;
-    if (request === undefined) return {};
+      const request = db.dataBlockRequest;
+      if (request === undefined) return {};
 
-    const response = await dataBlockService
-      .getDataBlockForSubject(request)
-      .catch(handleApiErrors);
+      const response = await dataBlockService
+        .getDataBlockForSubject(request)
+        .catch(handleApiErrors);
 
-    if (response === undefined) return {};
+      if (response === undefined) return {};
 
-    return {
-      dataBlock: db,
-      request,
-      response: {
-        ...response,
-        releaseId,
-      },
-    };
-  };
+      return {
+        dataBlock: db,
+        request,
+        response: {
+          ...response,
+          releaseId,
+        },
+      };
+    },
+    [handleApiErrors],
+  );
 
   const currentlyLoadingDataBlockId = React.useRef<string>();
 
@@ -157,7 +163,7 @@ const ReleaseManageDataBlocksPage = ({
         );
       }
     },
-    [],
+    [load],
   );
 
   const onDataBlockSave = React.useMemo(
@@ -261,17 +267,17 @@ const ReleaseManageDataBlocksPage = ({
                 </>
               )}
 
-              {deleteDataBlock && (
-                <ModalConfirm
-                  title="Delete data block"
-                  mounted={deleteDataBlock !== undefined}
-                  onConfirm={() => onDeleteDataBlock(deleteDataBlock)}
-                  onExit={() => setDeleteDataBlock(undefined)}
-                  onCancel={() => setDeleteDataBlock(undefined)}
-                >
-                  <p>Are you sure you wish to delete this data block?</p>
-                </ModalConfirm>
-              )}
+              <ModalConfirm
+                title="Delete data block"
+                mounted={deleteDataBlock !== undefined}
+                onConfirm={() =>
+                  deleteDataBlock && onDeleteDataBlock(deleteDataBlock)
+                }
+                onExit={() => setDeleteDataBlock(undefined)}
+                onCancel={() => setDeleteDataBlock(undefined)}
+              >
+                <p>Are you sure you wish to delete this data block?</p>
+              </ModalConfirm>
 
               <div style={{ overflow: 'hidden' }}>
                 <CreateDataBlocks

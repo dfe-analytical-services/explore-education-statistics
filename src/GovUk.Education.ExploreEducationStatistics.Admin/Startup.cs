@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -41,7 +43,6 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -169,6 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             });
+            
+            services.Configure<PreReleaseOptions>(Configuration);
 
             services.AddAuthorization(options =>
             {
@@ -290,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
+            services.AddTransient<IPreReleaseContactsService, PreReleaseContactsService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
@@ -419,7 +423,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+                app.UseHsts(options =>
+                {
+                    options.MaxAge(365);
+                    options.IncludeSubdomains();
+                    options.Preload();
+                });
             }
 
             // Security Headers
@@ -444,12 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
-            app.UseHsts(options =>
-            {
-                options.MaxAge(365);
-                options.IncludeSubdomains();
-                options.Preload();
-            });
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

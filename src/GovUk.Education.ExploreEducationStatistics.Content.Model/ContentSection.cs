@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
 
@@ -133,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public string Source { get; set; }
 
-        public DataBlockRequest DataBlockRequest { get; set; }
+        public ObservationQueryContext DataBlockRequest { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 

@@ -14,7 +14,7 @@ import {
 } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -66,7 +66,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     }),
   ];
 
-  const formInitialValues = React.useMemo(() => {
+  const formInitialValues = useMemo(() => {
     let start = '';
     let end = '';
 
@@ -99,11 +99,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      onSubmit={async values => {
-        await onSubmit(values);
-        goToNextStep();
-      }}
       initialValues={formInitialValues}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         start: Yup.string()
           .required('Start date required')
@@ -115,6 +113,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 return true;
               }
 
+              // eslint-disable-next-line react/no-this-in-sfc
               const end: string = this.resolve(Yup.ref('end'));
 
               if (!end) {
@@ -141,6 +140,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 return true;
               }
 
+              // eslint-disable-next-line react/no-this-in-sfc
               const start: string = this.resolve(Yup.ref('start'));
 
               if (!start) {
@@ -158,6 +158,10 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             },
           ),
       })}
+      onSubmit={async values => {
+        await onSubmit(values);
+        goToNextStep();
+      }}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form id={formId} displayErrorMessageOnUncaughtErrors>
@@ -166,6 +170,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 name="start"
                 id={`${formId}-start`}
                 label="Start date"
+                disabled={form.isSubmitting}
                 options={timePeriodOptions}
                 order={[]}
               />
@@ -173,6 +178,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 name="end"
                 id={`${formId}-end`}
                 label="End date"
+                disabled={form.isSubmitting}
                 options={timePeriodOptions}
                 order={[]}
               />

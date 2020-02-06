@@ -1,14 +1,16 @@
-﻿using System.Net.Mime;
+﻿using System.Collections.Generic;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
     public class DownloadController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
@@ -17,12 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         {
             _fileStorageService = fileStorageService;
         }
-        
+
         [HttpGet("tree")]
-        [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<string>> GetDownloadTree()
+        public async Task<ActionResult<IEnumerable<ThemeTree<PublicationDownloadTreeNode>>>> GetDownloadTree()
         {
-            return await this.JsonContentResultAsync(() =>
+            return await this.JsonContentResultAsync<IEnumerable<ThemeTree<PublicationDownloadTreeNode>>>(() =>
                 _fileStorageService.DownloadTextAsync(PublicContentDownloadTreePath()), NoContent());
         }
     }
