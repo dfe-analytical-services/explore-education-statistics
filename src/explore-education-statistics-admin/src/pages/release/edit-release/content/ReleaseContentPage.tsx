@@ -19,6 +19,7 @@ import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import { DataBlock } from '@common/services/dataBlockService';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 type PageMode = 'edit' | 'preview';
 
@@ -103,7 +104,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
 
   return (
     <>
-      {model && (
+      {model ? (
         <>
           {model.canUpdateRelease && (
             <div className="govuk-form-group">
@@ -168,6 +169,8 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
             </div>
           </div>
         </>
+      ) : (
+        <LoadingSpinner />
       )}
     </>
   );
