@@ -12,7 +12,7 @@ type Props = {
   pageTitle?: string;
 } & BreadcrumbsProps;
 
-const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
+const Page = ({ children, wide, pageTitle, ...breadcrumbProps }: Props) => {
   return (
     <>
       <Helmet>
@@ -32,7 +32,7 @@ const Page = ({ breadcrumbs = [], children, wide, pageTitle }: Props) => {
       >
         <PageBanner />
 
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <Breadcrumbs {...breadcrumbProps} />
 
         <main
           className="app-main-class govuk-main-wrapper"
