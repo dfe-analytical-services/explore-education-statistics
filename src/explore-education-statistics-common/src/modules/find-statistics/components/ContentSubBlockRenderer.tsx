@@ -45,26 +45,7 @@ const ContentSubBlockRenderer = ({
       );
     case 'DataBlock':
       return (
-        <DataBlock
-          {...block}
-          id={`${id}_datablock`}
-          additionalTabContent={
-            <div className="dfe-print-hidden">
-              <h2 className="govuk-heading-m">
-                Explore and edit this data online
-              </h2>
-              <p>Use our table tool to explore this data.</p>
-              <ButtonLink
-                as={`/data-tables/${publication.slug}`}
-                to={`/data-tables?publicationSlug=${publication.slug}`}
-                href={`/data-tables?publicationSlug=${publication.slug}`}
-              >
-                Explore data
-              </ButtonLink>
-            </div>
-          }
-          onToggle={onToggle}
-        />
+        <DataBlock {...block} id={`${id}_datablock`} onToggle={onToggle} />
       );
     default:
       return null;
