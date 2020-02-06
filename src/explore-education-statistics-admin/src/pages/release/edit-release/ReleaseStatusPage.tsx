@@ -113,8 +113,8 @@ const ReleaseStatusPage = ({
     <>
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
-        <div>
-          <p>
+        <>
+          <div>
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -123,11 +123,14 @@ const ReleaseStatusPage = ({
                 <ReleaseServiceStatus releaseId={releaseId} />
               </div>
             )}
-          </p>
-          <Button onClick={() => setShowForm(true)}>
+          </div>
+          <Button
+            className="govuk-!-margin-top-2"
+            onClick={() => setShowForm(true)}
+          >
             Update release status
           </Button>
-        </div>
+        </>
       ) : (
         <Formik<FormValues>
           enableReinitialize
