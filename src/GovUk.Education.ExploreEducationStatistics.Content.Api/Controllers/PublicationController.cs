@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 _fileStorageService.DownloadTextAsync(PublicContentPublicationsTreePath()), NoContent());
         }
 
-        [HttpGet("publication/{slug}")]
-        public async Task<ActionResult<PublicationTitleViewModel>> GetPublication(string slug)
+        [HttpGet("publication/{slug}/title")]
+        public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
         {
             return await this.JsonContentResultAsync<PublicationTitleViewModel>(() =>
                 _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)), NotFound());
