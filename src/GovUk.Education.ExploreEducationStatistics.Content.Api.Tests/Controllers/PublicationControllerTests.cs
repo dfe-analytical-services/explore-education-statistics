@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -47,9 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             Assert.Single(result.Result.Value);
             var theme = result.Result.Value.First();
             Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
-            Assert.Single((IEnumerable) theme.Topics);
+            Assert.Single(theme.Topics);
             var topic = theme.Topics.First();
-            Assert.Single((IEnumerable) topic.Publications);
+            Assert.Single(topic.Publications);
         }
 
         [Fact]
