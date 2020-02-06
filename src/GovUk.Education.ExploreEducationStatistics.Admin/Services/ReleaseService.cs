@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -262,6 +263,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
                 .OnSuccess(async release => {
+
+                    if (status == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
+                    {
+                        return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
+                    }
+                    
                     release.Status = status;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);

@@ -14,17 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class PreReleaseController : ControllerBase
     {
-        private readonly IPreReleaseService _preReleaseService;
+        private readonly IPreReleaseContactsService _preReleaseContactsService;
 
-        public PreReleaseController(IPreReleaseService preReleaseService)
+        public PreReleaseController(IPreReleaseContactsService preReleaseContactsService)
         {
-            _preReleaseService = preReleaseService;
+            _preReleaseContactsService = preReleaseContactsService;
         }
 
         [HttpGet("prerelease/contacts")]
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContacts()
         {
-            return await _preReleaseService
+            return await _preReleaseContactsService
                 .GetAvailablePreReleaseContactsAsync()
                 .HandleFailuresOr(Ok);
         }
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/prerelease-contacts")]
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForRelease(Guid releaseId)
         {
-            return await _preReleaseService
+            return await _preReleaseContactsService
                 .GetPreReleaseContactsForReleaseAsync(releaseId)
                 .HandleFailuresOr(Ok);
         }
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(
             Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
-            return await _preReleaseService
+            return await _preReleaseContactsService
                 .AddPreReleaseContactToReleaseAsync(releaseId, request.Email)
                 .HandleFailuresOr(Ok);
         }
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(
             Guid releaseId, [FromBody] PrereleaseAccessRequest request)
         {
-            return await _preReleaseService
+            return await _preReleaseContactsService
                 .RemovePreReleaseContactFromReleaseAsync(releaseId, request.Email)
                 .HandleFailuresOr(Ok);
         }

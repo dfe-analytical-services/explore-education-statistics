@@ -43,7 +43,6 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -171,6 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             });
+            
+            services.Configure<PreReleaseOptions>(Configuration);
 
             services.AddAuthorization(options =>
             {
@@ -292,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
+            services.AddTransient<IPreReleaseContactsService, PreReleaseContactsService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();

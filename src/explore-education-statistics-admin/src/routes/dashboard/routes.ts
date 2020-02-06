@@ -20,7 +20,7 @@ import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
 import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
-import PrereleasePage from '@admin/pages/release/prerelease/PrereleasePage';
+import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
@@ -120,7 +120,7 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   },
   prereleaseView: {
     path: '/publication/:publicationId/release/:releaseId/prerelease',
-    component: PrereleasePage,
+    component: PreReleasePage,
     protectedAction: user => user.permissions.canAccessPrereleasePages,
     exact: true,
   },
