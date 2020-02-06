@@ -6,7 +6,7 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <td colspan="2"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -152,7 +152,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <td colspan="3"
           rowspan="3"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -548,7 +548,7 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <td colspan="2"
           rowspan="3"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -660,7 +660,7 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <td colspan="2"
           rowspan="3"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -778,7 +778,7 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
     <tr>
       <td colspan="3"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -884,7 +884,7 @@ exports[`MultiHeaderTable renders table with single row header group at start 1`
     <tr>
       <td colspan="3"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -990,7 +990,7 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <td colspan="2"
           rowspan="3"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -1126,7 +1126,7 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <td colspan="2"
           rowspan="3"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -1274,7 +1274,7 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
     <tr>
       <td colspan="3"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -1406,7 +1406,7 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
     <tr>
       <td colspan="3"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
@@ -1550,7 +1550,7 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
     <tr>
       <td colspan="4"
           rowspan="2"
-          class="borderBottom borderRight"
+          class="borderBottom"
       >
       </td>
       <th class="cellHorizontalMiddle"
