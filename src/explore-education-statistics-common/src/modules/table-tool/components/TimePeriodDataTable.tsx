@@ -97,23 +97,29 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: HeaderGroup[] = [
-      ...createGroupHeaders(tableHeadersConfig.columnGroups),
-      {
-        headers: tableHeadersConfig.columns.map(column => ({
-          text: column.label,
-        })),
-      },
-    ];
+    const columnHeaders: HeaderGroup[] =
+      tableHeadersConfig.columns.length > 1
+        ? [
+            ...createGroupHeaders(tableHeadersConfig.columnGroups),
+            {
+              headers: tableHeadersConfig.columns.map(column => ({
+                text: column.label,
+              })),
+            },
+          ]
+        : createGroupHeaders(tableHeadersConfig.columnGroups);
 
-    const rowHeaders: HeaderGroup[] = [
-      ...createGroupHeaders(tableHeadersConfig.rowGroups),
-      {
-        headers: tableHeadersConfig.rows.map(row => ({
-          text: row.label,
-        })),
-      },
-    ];
+    const rowHeaders: HeaderGroup[] =
+      tableHeadersConfig.rows.length > 1
+        ? [
+            ...createGroupHeaders(tableHeadersConfig.rowGroups),
+            {
+              headers: tableHeadersConfig.rows.map(row => ({
+                text: row.label,
+              })),
+            },
+          ]
+        : createGroupHeaders(tableHeadersConfig.rowGroups);
 
     const rowHeadersCartesian = cartesian(
       ...tableHeadersConfig.rowGroups,

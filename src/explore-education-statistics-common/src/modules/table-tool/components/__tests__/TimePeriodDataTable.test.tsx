@@ -1,6 +1,188 @@
-import { createGroupHeaders } from '@common/modules/table-tool/components/TimePeriodDataTable';
+import {
+  testData1,
+  testData2,
+  testData3,
+} from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
+import TimePeriodDataTable, {
+  createGroupHeaders,
+} from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import React from 'react';
+import { render } from 'react-testing-library';
 
 describe('TimePeriodDataTable', () => {
+  test('renders table with two of every option', () => {
+    const fullTable = mapFullTable(testData1.fullTable);
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData1.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(8);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(14);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(8);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(32);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders title without indicator when there is more than one', () => {
+    const fullTable = mapFullTable(testData1.fullTable);
+
+    const { findByText } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData1.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(
+      findByText(
+        "Table showing 'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
+      ),
+    ).not.toBeNull();
+  });
+
+  test('renders table without indicators when there is only one', () => {
+    const fullTable = mapFullTable(testData2.fullTable);
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData2.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(16);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders title with indicator when there is only one', () => {
+    const fullTable = mapFullTable(testData2.fullTable);
+
+    const { findByText } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData2.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(
+      findByText(
+        "Table showing Authorised absence rate for 'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
+      ),
+    ).not.toBeNull();
+  });
+
+  test('renders table without time period when there is only one', () => {
+    const fullTable = mapFullTable(testData3.fullTable);
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData3.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(2);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(8);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders title with time period when there is only one', () => {
+    const fullTable = mapFullTable(testData3.fullTable);
+
+    const { findByText } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData3.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(
+      findByText(
+        "Table showing 'Absence by characteristic' from 'Pupil absence' for 2014/15 for Barnet and Barnsley",
+      ),
+    ).not.toBeNull();
+  });
+
   describe('createGroupHeaders', () => {
     test('creates extra filter group headers', () => {
       const data = [
