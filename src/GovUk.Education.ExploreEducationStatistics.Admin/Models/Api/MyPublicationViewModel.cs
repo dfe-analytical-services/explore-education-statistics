@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public MethodologyViewModel Methodology { get; set; }
 
-        private ExternalMethodology ExternalMethodology { get; set; }
+        public ExternalMethodology ExternalMethodology { get; set; }
         
         public Guid TopicId { get; set; }
         
