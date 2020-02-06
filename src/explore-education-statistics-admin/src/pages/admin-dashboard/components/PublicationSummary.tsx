@@ -19,11 +19,21 @@ const PublicationSummary = ({ publication }: Props) => {
       <SummaryList>
         <SummaryListItem term="Methodology" smallKey>
           {publication.methodology && (
-            <Link to={`/methodology/${publication.methodology.id}`}>
+            <Link
+              to={`/methodology/${publication.methodology.id}`}
+              target="_blank"
+            >
               {publication.methodology.title}
             </Link>
           )}
-          {!publication.methodology && <>No methodology available</>}
+          {publication.methodologyUrl && (
+            <Link to={publication.methodologyUrl}>
+              {publication.methodologyUrl}
+            </Link>
+          )}
+          {!publication.methodology && !publication.methodologyUrl && (
+            <>No methodology assigned</>
+          )}
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">
