@@ -21,8 +21,6 @@ interface Props {
 }
 
 class FindStatisticsPage extends Component<Props> {
-  private accId: string[] = generateIdList(1);
-
   public static defaultProps = {
     themes: [],
   };
@@ -34,6 +32,8 @@ class FindStatisticsPage extends Component<Props> {
       themes,
     };
   }
+
+  private accId: string[] = generateIdList(1);
 
   public render() {
     const { themes } = this.props;

@@ -949,6 +949,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
@@ -1400,10 +1401,10 @@
             "[variables('sqlserverName')]"
           ],
           "properties": {
-            "edition": "Basic",
+            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "Basic"
+            "requestedServiceObjectiveName": "S1"
           }
         },
         {

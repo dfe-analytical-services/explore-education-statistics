@@ -60,30 +60,31 @@ const ReleaseServiceStatus = ({
     };
   }, [fetchReleaseServiceStatus]);
 
-  const statusDetailColor = (
-    status: string,
-  ): { color: StatusBlockProps['color']; text: string } => {
-    if (currentStatus) {
-      switch (status) {
-        case 'Scheduled':
-          return { color: 'blue', text: status };
-        case 'NotStarted':
-          return { color: 'blue', text: 'Not Started' };
-        case 'Invalid':
-        case 'Failed':
-        case 'Cancelled':
-          return { color: 'red', text: status };
-        case 'Queued':
-        case 'Started':
-          return { color: 'orange', text: status };
-        case 'Complete':
-          return { color: 'green', text: status };
-        default:
-          return { color: undefined, text: '' };
+  const statusDetailColor = useCallback(
+    (status: string): { color: StatusBlockProps['color']; text: string } => {
+      if (currentStatus) {
+        switch (status) {
+          case 'Scheduled':
+            return { color: 'blue', text: status };
+          case 'NotStarted':
+            return { color: 'blue', text: 'Not Started' };
+          case 'Invalid':
+          case 'Failed':
+          case 'Cancelled':
+            return { color: 'red', text: status };
+          case 'Queued':
+          case 'Started':
+            return { color: 'orange', text: status };
+          case 'Complete':
+            return { color: 'green', text: status };
+          default:
+            return { color: undefined, text: '' };
+        }
       }
-    }
-    return { color: undefined, text: '' };
-  };
+      return { color: undefined, text: '' };
+    },
+    [currentStatus],
+  );
 
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {
@@ -99,10 +100,7 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock
-          color={statusColor}
-          text={`Release Process - ${currentStatus.overallStage}`}
-        />
+        <StatusBlock color={statusColor} text={currentStatus.overallStage} />
       )}
 
       {currentStatus &&

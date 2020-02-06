@@ -43,7 +43,7 @@ export const logEvent = (
   }
 };
 
-export const logException = (description: string, fatal: boolean = false) => {
+export const logException = (description: string, fatal = false) => {
   if (initialised) {
     ReactGA.exception({ description, fatal });
   }

@@ -473,7 +473,7 @@ const MapBlock = ({
 
   const updateSelectedLocation = (
     newSelectedLocation: string,
-    panTo: boolean = true,
+    panTo = true,
   ) => {
     const oldSelectedLocation = selectedLocation;
 
