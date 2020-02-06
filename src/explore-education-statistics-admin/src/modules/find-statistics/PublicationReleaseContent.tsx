@@ -226,11 +226,7 @@ const PublicationReleaseContent = ({
                           ({ id, slug, title }) => [
                             title,
                             <li key={id} data-testid="previous-release-item">
-                              <Link
-                                to={`/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
+                              <Link to="#">{title}</Link>
                             </li>,
                           ],
                         ),
