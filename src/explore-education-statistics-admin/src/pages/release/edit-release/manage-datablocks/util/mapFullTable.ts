@@ -1,9 +1,9 @@
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 
 export default function mapFullTable(
@@ -34,4 +34,4 @@ export default function mapFullTable(
       ),
     },
   };
-};
+}

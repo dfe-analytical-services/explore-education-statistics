@@ -96,8 +96,6 @@ const TableToolWizard = ({
     },
   );
 
-  console.log(tableToolState);
-
   useEffect(() => {
     if (releaseId) {
       tableBuilderService
