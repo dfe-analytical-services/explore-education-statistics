@@ -1,4 +1,5 @@
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var subjectMetaViewModel =
-                _resultSubjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations);
+                _resultSubjectMetaService.GetSubjectMeta(SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations);
 
             return new TableBuilderResultViewModel
             {
