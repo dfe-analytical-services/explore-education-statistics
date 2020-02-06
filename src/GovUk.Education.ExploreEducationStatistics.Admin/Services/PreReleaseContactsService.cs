@@ -270,8 +270,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
 
-            var release = await _context.Releases.Include(r => r.Publication)
-                .FirstOrDefaultAsync(r => r.Id == releaseId);
+            var release = await _context
+                .Releases
+                .Include(r => r.Publication)
+                .FirstAsync(r => r.Id == releaseId);
 
             var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host;
