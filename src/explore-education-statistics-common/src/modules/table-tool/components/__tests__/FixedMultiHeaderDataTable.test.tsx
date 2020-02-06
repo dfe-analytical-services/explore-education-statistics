@@ -12,7 +12,10 @@ describe('FixedMultiHeaderDataTable', () => {
           ['Col group C', 'Col group D'],
         ]}
         rowHeaders={[['Row group A', 'Row group B']]}
-        rows={[['1', '2', '3', '4'], ['5', '6', '7', '8']]}
+        rows={[
+          ['1', '2', '3', '4'],
+          ['5', '6', '7', '8'],
+        ]}
       />,
     );
 
