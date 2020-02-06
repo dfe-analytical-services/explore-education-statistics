@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public string Summary { get; set; }
 
         public DateTime? NextUpdate { get; set; }
+        
+        public Guid LatestReleaseId { get; set; }
 
         public List<OtherReleaseViewModel> Releases { get; set; }
 

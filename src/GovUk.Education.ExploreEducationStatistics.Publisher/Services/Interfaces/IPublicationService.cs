@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IPublicationService
     {
-        Task<PublicationTitleViewModel> GetTitleViewModelAsync(Guid id);
+        Task<PublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds);
         List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
         IEnumerable<Publication> ListPublicationsWithPublishedReleases();
     }

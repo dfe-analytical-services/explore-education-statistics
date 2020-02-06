@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             foreach (var publication in publications)
             {
                 var releases = publication.Releases.Where(release => release.Live);
-                await UpdatePublicationAsync(publication, staging);
+                await UpdatePublicationAsync(publication, includedReleaseIds, staging);
                 await UpdateLatestReleaseAsync(publication, includedReleaseIds, staging);
                 foreach (var release in releases)
                 {
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await UpdatePublicationAsync(publication);
+                await UpdatePublicationAsync(publication, releaseIds);
                 await UpdateLatestReleaseAsync(publication, releaseIds);
                 foreach (var release in releases)
                 {
@@ -127,9 +127,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublicationAsync(Publication publication, bool staging = true)
+        private async Task UpdatePublicationAsync(Publication publication, IEnumerable<Guid> includedReleaseIds,
+            bool staging = true)
         {
-            var viewModel = await _publicationService.GetTitleViewModelAsync(publication.Id);
+            var viewModel = await _publicationService.GetViewModelAsync(publication.Id, includedReleaseIds);
             await UploadAsync(prefix => PublicContentPublicationPath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }

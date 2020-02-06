@@ -14,18 +14,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _context;
+        private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
-        public PublicationService(ContentDbContext context, IMapper mapper)
+        public PublicationService(ContentDbContext context, IMapper mapper, IReleaseService releaseService)
         {
             _context = context;
             _mapper = mapper;
+            _releaseService = releaseService;
         }
 
-        public async Task<PublicationTitleViewModel> GetTitleViewModelAsync(Guid id)
+        public async Task<PublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
-            var publication = await _context.Publications.SingleOrDefaultAsync(p => p.Id == id);
-            return _mapper.Map<PublicationTitleViewModel>(publication);
+            var publication = await _context.Publications
+                .Include(p => p.Contact)
+                .Include(p => p.LegacyReleases)
+                // include topic?
+                // then include theme?
+                .SingleOrDefaultAsync(p => p.Id == id);
+
+            var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            publicationViewModel.LatestReleaseId = latestRelease.Id;
+            publicationViewModel.Releases = GetReleaseViewModels(id, includedReleaseIds);
+            return publicationViewModel;
         }
 
         public List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
@@ -90,6 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Slug = publication.Slug,
                 LegacyPublicationUrl = publication.LegacyPublicationUrl?.ToString()
             };
+        }
+
+        private List<OtherReleaseViewModel> GetReleaseViewModels(Guid publicationId,
+            IEnumerable<Guid> includedReleaseIds)
+        {
+            var releases = _context.Releases
+                .Where(release => release.PublicationId == publicationId)
+                .ToList()
+                .Where(release => IsReleasePublished(release, includedReleaseIds));
+            return _mapper.Map<List<OtherReleaseViewModel>>(releases);
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)
