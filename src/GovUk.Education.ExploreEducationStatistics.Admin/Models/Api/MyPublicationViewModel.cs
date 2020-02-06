@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public MethodologyViewModel Methodology { get; set; }
         
+        public Uri MethodologyUrl { get; set; }
+        
         public Guid TopicId { get; set; }
         
         public Guid ThemeId { get; set; }
