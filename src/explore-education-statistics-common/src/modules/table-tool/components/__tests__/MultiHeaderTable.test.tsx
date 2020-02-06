@@ -216,7 +216,9 @@ describe('MultiHeaderTable', () => {
       container.querySelectorAll('thead tr:nth-child(2) th[scope="col"]'),
     ).toHaveLength(4);
 
+    // Body
     expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(8);
 
     // Row 1
     expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
@@ -239,13 +241,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
     ).toHaveAttribute('rowspan', '1');
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      4,
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -283,6 +278,7 @@ describe('MultiHeaderTable', () => {
     ).toHaveLength(4);
 
     expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(8);
 
     // Row 1
     expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
@@ -305,13 +301,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
     ).toHaveAttribute('rowspan', '1');
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      4,
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -348,6 +337,7 @@ describe('MultiHeaderTable', () => {
     ).toHaveLength(4);
 
     expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
 
     // Row 1
     expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
@@ -381,16 +371,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(3) th:nth-child(1)'),
     ).toHaveAttribute('rowspan', '1');
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      4,
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -434,6 +414,7 @@ describe('MultiHeaderTable', () => {
     ).toHaveLength(4);
 
     expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(16);
 
     expect(
       container.querySelectorAll('tbody tr:nth-child(1) th[rowspan="2"]'),
@@ -455,9 +436,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(1) th:nth-child(4)'),
     ).toHaveAttribute('rowspan', '1');
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      4,
-    );
 
     // Row 2
     expect(container.querySelectorAll('tbody tr:nth-child(2) th')).toHaveLength(
@@ -472,9 +450,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(2) th:nth-child(3)'),
     ).toHaveAttribute('rowspan', '1');
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      4,
-    );
 
     // Row 3
     expect(container.querySelectorAll('tbody tr:nth-child(3) th')).toHaveLength(
@@ -486,9 +461,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(3) th:nth-child(2)'),
     ).toHaveAttribute('rowspan', '1');
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      4,
-    );
 
     // Row 4
     expect(container.querySelectorAll('tbody tr:nth-child(4) th')).toHaveLength(
@@ -500,9 +472,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(4) th:nth-child(2)'),
     ).toHaveAttribute('rowspan', '1');
-    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
-      4,
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -541,6 +510,7 @@ describe('MultiHeaderTable', () => {
     ).toHaveLength(4);
 
     expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
 
     // Row 1
     expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
@@ -580,16 +550,6 @@ describe('MultiHeaderTable', () => {
     expect(
       container.querySelector('tbody tr:nth-child(3) th:nth-child(2)'),
     ).toHaveAttribute('rowspan', '1');
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      4,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      4,
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -648,19 +608,7 @@ describe('MultiHeaderTable', () => {
 
     // Body
     expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
-      2,
-    );
+    expect(container.querySelectorAll('tbody td')).toHaveLength(8);
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -722,19 +670,7 @@ describe('MultiHeaderTable', () => {
 
     // Body
     expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      2,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
-      2,
-    );
+    expect(container.querySelectorAll('tbody td')).toHaveLength(8);
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -799,19 +735,7 @@ describe('MultiHeaderTable', () => {
 
     // Body
     expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
-      3,
-    );
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -831,10 +755,10 @@ describe('MultiHeaderTable', () => {
           { headers: [{ text: '3' }, { text: '4' }] },
         ]}
         rows={[
-          ['AD13', 'AE13', 'AF13'],
-          ['AD14', 'AE14', 'AF14'],
-          ['AD23', 'AE23', 'AF23'],
-          ['AD24', 'AE24', 'AF24'],
+          ['CF13', 'DF13', 'EF13'],
+          ['CF14', 'DF14', 'EF14'],
+          ['CF23', 'DF23', 'EF23'],
+          ['CF24', 'DF24', 'EF24'],
         ]}
       />,
     );
@@ -882,23 +806,7 @@ describe('MultiHeaderTable', () => {
 
     // Body
     expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
-
-    expect(
-      container.querySelectorAll('tbody tr:nth-child(1) th[rowspan="2"]'),
-    ).toBeDefined();
-
-    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
-      3,
-    );
-    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
-      3,
-    );
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
 
     expect(container.innerHTML).toMatchSnapshot();
   });
