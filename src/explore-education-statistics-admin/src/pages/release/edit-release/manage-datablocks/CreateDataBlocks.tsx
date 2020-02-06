@@ -12,7 +12,7 @@ import TableToolWizard, {
   TableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { initialiseFromQuery } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import {
