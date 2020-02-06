@@ -1,7 +1,5 @@
-import {
-  Permalink,
-  UnmappedPermalink,
-} from '@common/modules/table-tool/services/permalinkService';
+import { UnmappedPermalink } from '@common/modules/table-tool/services/permalinkService';
+import { Permalink } from '@common/modules/table-tool/types/permalink';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 

@@ -1,4 +1,4 @@
-import { UnmappedFullTable } from '@common/modules/table-tool/services/permalinkService';
+import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   Indicator,
   LocationFilter,

@@ -1,4 +1,4 @@
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   CategoryFilter,
@@ -8,8 +8,14 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import compact from 'lodash/compact';
+
+export interface UnmappedTableHeadersConfig {
+  columnGroups: FilterOption[][];
+  columns: FilterOption[];
+  rowGroups: FilterOption[][];
+  rows: FilterOption[];
+}
 
 /**
  * This function remaps the config filters into

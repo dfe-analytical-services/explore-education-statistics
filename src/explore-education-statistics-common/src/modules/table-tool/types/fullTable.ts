@@ -1,10 +1,10 @@
-import { Dictionary } from '@common/types';
 import { GroupedFilterOptions } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { Dictionary } from '@common/types';
 
 export interface FullTableMeta {
   publicationName: string;

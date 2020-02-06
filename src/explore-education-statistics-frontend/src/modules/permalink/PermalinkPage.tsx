@@ -1,15 +1,14 @@
 import FormattedDate from '@common/components/FormattedDate';
-import permalinkService, {
-  Permalink,
-} from '@common/modules/table-tool/services/permalinkService';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import { Permalink } from '@common/modules/table-tool/types/permalink';
 import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 
 interface Props {
   permalink: string;

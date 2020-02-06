@@ -178,6 +178,29 @@ export type TableDataQuery = {
   geographicLevel?: string;
 } & PartialRecord<LocationLevelKeys, string[]>;
 
+interface UnmappedFullTableSubjectMeta {
+  publicationName: string;
+  subjectName: string;
+  locations: { label: string; value: string; level: string }[];
+  timePeriodRange: TimePeriodOption[];
+  filters: Dictionary<{
+    legend: string;
+    hint?: string;
+    options: GroupedFilterOptions;
+    totalValue?: string;
+  }>;
+  indicators: IndicatorOption[];
+  footnotes: {
+    id: string;
+    label: string;
+  }[];
+}
+
+export interface UnmappedFullTable {
+  results: FullTable['results'];
+  subjectMeta: UnmappedFullTableSubjectMeta;
+}
+
 export default {
   getThemes(): Promise<ThemeMeta[]> {
     return dataApi.get(`/meta/themes`);
@@ -202,7 +225,10 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery, releaseId?: string): Promise<FullTable> {
+  getTableData(
+    query: TableDataQuery,
+    releaseId?: string,
+  ): Promise<UnmappedFullTable> {
     return dataApi.post(
       '/tablebuilder',
       query,
