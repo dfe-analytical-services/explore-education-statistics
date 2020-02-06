@@ -3,7 +3,6 @@ import StatusBlock from '@admin/components/StatusBlock';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import appRouteList from '@admin/routes/dashboard/routes';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
@@ -103,7 +102,7 @@ const ReleaseStatusPage = ({
           });
         })
         .then(() => {
-          history.push(appRouteList.adminDashboard.path as string);
+          setShowForm(false);
         });
     },
     handleApiErrors,
@@ -114,8 +113,8 @@ const ReleaseStatusPage = ({
     <>
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
-        <div>
-          <p>
+        <>
+          <div>
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -124,11 +123,14 @@ const ReleaseStatusPage = ({
                 <ReleaseServiceStatus releaseId={releaseId} />
               </div>
             )}
-          </p>
-          <Button onClick={() => setShowForm(true)}>
+          </div>
+          <Button
+            className="govuk-!-margin-top-2"
+            onClick={() => setShowForm(true)}
+          >
             Update release status
           </Button>
-        </div>
+        </>
       ) : (
         <Formik<FormValues>
           enableReinitialize
