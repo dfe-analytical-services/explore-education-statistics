@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             allScenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
-        private static async void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
+        public static async void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
             IAuthorizationHandler handler, 
             ReleaseHandlerTestScenario scenario) 
             where TRequirement : IAuthorizationRequirement
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return user;
         }
 
-        private static void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
+        public static void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier, 
             ReleaseHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
         {
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        private class ReleaseHandlerTestScenario
+        public class ReleaseHandlerTestScenario
         {
             public Release Release { get; set; }
             
