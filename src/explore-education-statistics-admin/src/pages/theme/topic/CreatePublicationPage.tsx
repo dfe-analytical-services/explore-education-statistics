@@ -68,7 +68,7 @@ const CreatePublicationPage = ({
   const submitFormHandler = submitWithFormikValidation(
     async (values: FormValues) => {
       await service.createPublication({
-        topicId: match.params.topicId,
+        topicId: topic.id,
         ...values,
       });
 
