@@ -23,16 +23,16 @@ const PublicationSummary = ({ publication }: Props) => {
               {publication.methodology.title}
             </Link>
           )}
-          {publication.methodologyUrl && (
+          {publication.ExternalMethodology && (
             <a
-              href={publication.methodologyUrl}
+              href={publication.ExternalMethodology}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {publication.methodologyUrl}
+              {publication.ExternalMethodology}
             </a>
           )}
-          {!publication.methodology && !publication.methodologyUrl && (
+          {!publication.methodology && !publication.ExternalMethodology && (
             <>No methodology assigned</>
           )}
         </SummaryListItem>

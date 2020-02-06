@@ -51,7 +51,7 @@ export interface AdminDashboardPublication {
   id: string;
   title: string;
   methodology?: IdTitlePair;
-  methodologyUrl: string;
+  ExternalMethodology: string;
   releases: AdminDashboardRelease[];
   contact: ContactDetails;
   permissions: {
