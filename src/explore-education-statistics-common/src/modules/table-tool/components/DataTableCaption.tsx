@@ -2,9 +2,9 @@ import commaList from '@common/lib/utils/string/commaList';
 import {
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+} from '@common/modules/table-tool/types/filters';
 import React from 'react';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
 import useToggle from '@common/hooks/useToggle';

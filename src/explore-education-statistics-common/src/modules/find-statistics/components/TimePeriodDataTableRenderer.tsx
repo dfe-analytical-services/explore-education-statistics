@@ -1,7 +1,7 @@
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
-} from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';

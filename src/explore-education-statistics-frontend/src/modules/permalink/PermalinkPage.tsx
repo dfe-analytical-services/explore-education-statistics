@@ -1,13 +1,13 @@
 import FormattedDate from '@common/components/FormattedDate';
 import permalinkService, {
   Permalink,
-} from '@common/modules/full-table/services/permalinkService';
-import { mapPermalink } from '@common/modules/full-table/utils/mapPermalinks';
+} from '@common/modules/table-tool/services/permalinkService';
+import { mapPermalink } from '@common/modules/table-tool/utils/mapPermalinks';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 

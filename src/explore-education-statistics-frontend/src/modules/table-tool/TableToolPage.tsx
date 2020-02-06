@@ -1,6 +1,6 @@
 import tableBuilderService, {
   ThemeMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import Page from '@frontend/components/Page';
 import TableTool from '@frontend/modules/table-tool/components/TableTool';
 import { NextContext } from 'next';

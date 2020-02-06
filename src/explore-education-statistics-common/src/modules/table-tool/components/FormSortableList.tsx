@@ -1,7 +1,7 @@
 import { FormFieldset } from '@common/components/form';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import reorder from '@common/lib/utils/reorder';
-import { Filter } from '@common/modules/full-table/types/filters';
+import { Filter } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';

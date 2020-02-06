@@ -5,10 +5,10 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
-import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
+} from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';

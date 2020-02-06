@@ -1,13 +1,13 @@
-import { UnmappedTableHeadersConfig } from '@common/modules/full-table/services/permalinkService';
-import { FilterOption } from '@common/modules/full-table/services/tableBuilderService';
+import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
+import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import compact from 'lodash/compact';
 

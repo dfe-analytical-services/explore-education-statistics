@@ -1,19 +1,19 @@
-import { FilterOption } from '@common/modules/full-table/services/tableBuilderService';
+import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import {
   Permalink,
   UnmappedFullTable,
   UnmappedPermalink,
   UnmappedTableHeadersConfig,
-} from '../services/permalinkService';
+} from '@common/modules/table-tool/services/permalinkService';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '../types/filters';
-import { FullTable, FullTableMeta } from '../types/fullTable';
-import { TableHeadersConfig } from './tableHeaders';
+} from '@common/modules/table-tool/types/filters';
+import { FullTable, FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 
 const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,

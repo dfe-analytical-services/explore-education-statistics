@@ -10,8 +10,8 @@ import Yup from '@common/lib/validation/yup';
 import {
   TableDataQuery,
   TimeIdentifier,
-} from '@common/modules/full-table/services/tableBuilderService';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/services/tableBuilderService';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { ReactNode } from 'react';

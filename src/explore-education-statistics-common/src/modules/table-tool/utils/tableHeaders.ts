@@ -3,11 +3,11 @@ import {
   Filter,
   Indicator,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+} from '@common/modules/table-tool/types/filters';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
-import { FullTableMeta } from '../types/fullTable';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 
 export interface TableHeadersConfig {
   columns: Filter[];

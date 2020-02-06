@@ -7,9 +7,9 @@ import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/types/filters';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   HeaderGroup,
   HeaderSubGroup,

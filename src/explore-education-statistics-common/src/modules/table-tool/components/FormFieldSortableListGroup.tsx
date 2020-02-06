@@ -1,6 +1,6 @@
 import { FormFieldset } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { Filter } from '@common/modules/full-table/types/filters';
+import { Filter } from '@common/modules/table-tool/types/filters';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Field, FieldProps } from 'formik';

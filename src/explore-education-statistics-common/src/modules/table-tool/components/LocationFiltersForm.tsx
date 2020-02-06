@@ -6,7 +6,7 @@ import {
   FilterOption,
   LocationLevelKeys,
   PublicationSubjectMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { Dictionary, PartialRecord } from '@common/types/util';
 import { FormikProps } from 'formik';

@@ -10,7 +10,7 @@ import Yup from '@common/lib/validation/yup';
 import {
   FilterOption,
   PublicationSubjectMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';

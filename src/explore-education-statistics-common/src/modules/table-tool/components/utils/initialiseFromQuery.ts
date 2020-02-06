@@ -2,7 +2,7 @@ import tableBuilderService, {
   locationLevelKeys,
   LocationLevelKeys,
   TableDataQuery,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import {
   executeTableQuery,

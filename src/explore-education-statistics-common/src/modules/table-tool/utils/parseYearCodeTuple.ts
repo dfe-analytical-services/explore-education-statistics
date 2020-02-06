@@ -1,4 +1,4 @@
-import { TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
+import { TimeIdentifier } from '@common/modules/table-tool/services/tableBuilderService';
 
 export default function parseYearCodeTuple(
   value: string,

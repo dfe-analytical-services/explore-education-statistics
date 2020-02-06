@@ -2,11 +2,11 @@ import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
-} from '@common/modules/full-table/services/tableBuilderService';
-import { CategoryFilter } from '@common/modules/full-table/types/filters';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/services/tableBuilderService';
+import { CategoryFilter } from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { mapFullTable } from '@common/modules/table-tool/utils/mapPermalinks';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import sortBy from 'lodash/sortBy';

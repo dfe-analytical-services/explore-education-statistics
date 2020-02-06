@@ -7,10 +7,10 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
-} from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/components/utils/mapTableHeadersConfig';
 import dataBlockService, {

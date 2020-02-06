@@ -2,11 +2,11 @@ import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
-} from '@common/modules/full-table/utils/tableHeaders';
+} from '@common/modules/table-tool/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableToolWizard, {
   TableToolState,

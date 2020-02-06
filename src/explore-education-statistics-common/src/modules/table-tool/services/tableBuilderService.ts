@@ -1,4 +1,4 @@
-import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
+import { FullTable } from '@common/modules/table-tool/types/fullTable.js';
 import { dataApi } from '@common/services/api';
 import { Dictionary, PartialRecord } from '@common/types';
 

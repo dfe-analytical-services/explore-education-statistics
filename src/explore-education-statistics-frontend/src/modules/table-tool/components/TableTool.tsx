@@ -1,9 +1,9 @@
 import ButtonText from '@common/components/ButtonText';
 import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import permalinkService from '@common/modules/full-table/services/permalinkService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {

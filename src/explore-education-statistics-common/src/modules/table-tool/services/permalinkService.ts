@@ -4,11 +4,11 @@ import {
   IndicatorOption,
   TableDataQuery,
   TimePeriodOption,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
-import { FullTable } from '../types/fullTable';
-import { TableHeadersConfig } from '../utils/tableHeaders';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 
 export interface UnmappedTableHeadersConfig {
   columnGroups: FilterOption[][];

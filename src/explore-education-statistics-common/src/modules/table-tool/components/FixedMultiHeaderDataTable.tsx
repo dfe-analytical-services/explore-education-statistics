@@ -1,4 +1,4 @@
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Footnote from '@common/modules/table-tool/components/Footnote';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';

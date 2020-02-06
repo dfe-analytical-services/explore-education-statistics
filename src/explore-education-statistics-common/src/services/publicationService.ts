@@ -1,5 +1,5 @@
 import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlockLocation,
   DataBlockRequest,

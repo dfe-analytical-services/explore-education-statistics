@@ -1,9 +1,9 @@
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+} from '@common/modules/table-tool/types/filters';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 
 export const mapFullTable = (
