@@ -29,6 +29,19 @@ const service = {
       `/permissions/publication/${publicationId}/release/create`,
     );
   },
+  getPreReleaseWindowStatus: (
+    releaseId: string,
+  ): Promise<PreReleaseWindowStatus> => {
+    return client
+      .get<PreReleaseWindowStatus>(
+        `/permissions/release/${releaseId}/prerelease/status`,
+      )
+      .then(status => ({
+        ...status,
+        preReleaseWindowStartTime: new Date(status.preReleaseWindowStartTime),
+        preReleaseWindowEndTime: new Date(status.preReleaseWindowEndTime),
+      }));
+  },
 };
 
 export default service;
