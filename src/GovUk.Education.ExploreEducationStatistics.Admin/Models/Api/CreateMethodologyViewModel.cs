@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         [Required]
         public Guid ContactId { get; set; }
         
+        public Guid? PublicationId { get; set; }
+        
         public string Slug => SlugFromTitle(Title);
     }
 }
