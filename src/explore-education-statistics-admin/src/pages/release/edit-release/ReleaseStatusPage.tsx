@@ -19,6 +19,7 @@ import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import ButtonText from '@common/components/ButtonText';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -116,7 +117,7 @@ const ReleaseStatusPage = ({
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
         <>
-          <div>
+          <div className="govuk-!-margin-bottom-6">
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -169,16 +170,18 @@ const ReleaseStatusPage = ({
                   additionalClass="govuk-!-width-one-half"
                 />
                 <div className="govuk-!-margin-top-6">
-                  <Button
+                  <Button type="submit" className="govuk-!-margin-right-6">
+                    Update
+                  </Button>
+                  <ButtonText
                     onClick={() => {
                       form.resetForm();
                       setShowForm(false);
                     }}
-                    className="govuk-!-margin-left-1 govuk-button--secondary"
+                    className="govuk-button govuk-button--secondary"
                   >
                     Cancel
-                  </Button>
-                  <Button type="submit">Update</Button>
+                  </ButtonText>
                 </div>
               </Form>
             );

@@ -17,13 +17,13 @@
   }
   &:global(.govuk-button) {
     box-shadow: none;
-    padding: 10px 0;
+    margin: 0;
+    padding: 10px;
   }
   &:global(.govuk-button):hover {
     background: none;
   }
   &:global(.govuk-button):focus {
-    @include govuk-focused-text;
     background: none;
     box-shadow: none;
   }
