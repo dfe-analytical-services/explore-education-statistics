@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Release, OtherReleaseViewModel>();
 
-            CreateMap<Release, ReleaseViewModel>()
+            CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent));

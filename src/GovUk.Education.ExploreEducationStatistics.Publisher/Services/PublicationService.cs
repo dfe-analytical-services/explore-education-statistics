@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private List<OtherReleaseViewModel> GetReleaseViewModels(Guid publicationId,
             IEnumerable<Guid> includedReleaseIds)
         {
+            // TODO rename this view model?
             var releases = _context.Releases
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()

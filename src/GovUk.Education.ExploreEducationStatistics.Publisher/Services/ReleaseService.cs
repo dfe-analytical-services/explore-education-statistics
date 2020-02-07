@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public ReleaseViewModel GetReleaseViewModel(Guid id)
+        public CachedReleaseViewModel GetReleaseViewModel(Guid id)
         {
             var release = _context.Releases
                 .Include(r => r.Type)
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Updates)
                 .Single(r => r.Id == id);
 
-            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+            var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
             releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
             releaseViewModel.DownloadFiles =
                 _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .LastOrDefault();
         }
 
-        public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
             var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
             return GetReleaseViewModel(latestRelease.Id);

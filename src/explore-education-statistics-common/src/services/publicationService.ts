@@ -239,7 +239,6 @@ export interface AbstractRelease<
   keyStatisticsSection: ContentSection<ContentBlockType>;
   keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
-  publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
