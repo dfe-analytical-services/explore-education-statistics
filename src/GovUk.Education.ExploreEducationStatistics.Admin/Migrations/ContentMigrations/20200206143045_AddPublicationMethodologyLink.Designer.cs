@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200206143045_AddPublicationMethodologyLink")]
+    partial class AddPublicationMethodologyLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -750,6 +752,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid?>("MethodologyId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MethodologyUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("NextUpdate")
                         .HasColumnType("datetime2");
@@ -3710,25 +3715,6 @@ Find out how and why these statistics are collected and published - [Secondary a
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ExternalMethodology", "ExternalMethodology", b1 =>
-                        {
-                            b1.Property<Guid>("PublicationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Title")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Url")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("PublicationId");
-
-                            b1.ToTable("Publications");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PublicationId");
-                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>

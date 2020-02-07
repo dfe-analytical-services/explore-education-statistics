@@ -28,6 +28,7 @@ interface FormValues {
 interface Model {
   releaseStatus: ReleaseStatus;
   statusOptions: RadioOption[];
+  editable: boolean;
 }
 
 const statusMap: {
@@ -50,14 +51,16 @@ const ReleaseStatusPage = ({
   useEffect(() => {
     Promise.all([
       service.getReleaseStatus(releaseId),
+      permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
     ])
-      .then(([releaseStatus, canSubmit, canApprove]) => {
+      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
         const statusOptions: RadioOption[] = [
           {
             label: 'In draft',
             value: 'Draft',
+            disabled: !canMarkAsDraft,
           },
           {
             label: 'Ready for higher review',
@@ -74,10 +77,11 @@ const ReleaseStatusPage = ({
         setModel({
           releaseStatus,
           statusOptions,
+          editable: statusOptions.some(option => !option.disabled),
         });
       })
       .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+  }, [releaseId, handleApiErrors, showForm]);
 
   if (!model) return null;
 
@@ -93,17 +97,15 @@ const ReleaseStatusPage = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
-      await service
-        .updateReleaseStatus(releaseId, values)
-        .then(() => {
-          setModel({
-            releaseStatus: values.releaseStatus,
-            statusOptions: model.statusOptions,
-          });
-        })
-        .then(() => {
-          setShowForm(false);
+      await service.updateReleaseStatus(releaseId, values).then(() => {
+        setModel({
+          ...model,
+          releaseStatus: values.releaseStatus,
+          statusOptions: model.statusOptions,
         });
+
+        setShowForm(false);
+      });
     },
     handleApiErrors,
     ...errorCodeMappings,
@@ -124,12 +126,15 @@ const ReleaseStatusPage = ({
               </div>
             )}
           </div>
-          <Button
-            className="govuk-!-margin-top-2"
-            onClick={() => setShowForm(true)}
-          >
-            Update release status
-          </Button>
+
+          {model.editable && (
+            <Button
+              className="govuk-!-margin-top-2"
+              onClick={() => setShowForm(true)}
+            >
+              Update release status
+            </Button>
+          )}
         </>
       ) : (
         <Formik<FormValues>

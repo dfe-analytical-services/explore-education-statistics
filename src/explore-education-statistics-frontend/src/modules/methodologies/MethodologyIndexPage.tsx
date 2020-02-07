@@ -1,13 +1,13 @@
 import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import Details from '@common/components/Details';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React, { Component } from 'react';
-import MethodologyList from './components/MethodologyList';
+import Details from '@common/components/Details';
+import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
 
 interface Props {
   themes: Theme[];
@@ -74,9 +74,15 @@ class MethodologyIndexPage extends Component<Props> {
                 >
                   {topics.map(
                     ({ id: topicId, title: topicTitle, publications }) => (
-                      <Details key={topicId} summary={topicTitle}>
-                        <MethodologyList publications={publications} />
-                      </Details>
+                      <>
+                        <Details
+                          key={topicId}
+                          id={topicId}
+                          summary={topicTitle}
+                        >
+                          <MethodologyList publications={publications} />
+                        </Details>
+                      </>
                     ),
                   )}
                 </AccordionSection>
