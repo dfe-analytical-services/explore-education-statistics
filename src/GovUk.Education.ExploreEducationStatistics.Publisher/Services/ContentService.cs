@@ -153,11 +153,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return new JsonSerializerSettings
             {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = namingStrategy
                 },
+                NullValueHandling = NullValueHandling.Ignore,
                 TypeNameHandling = TypeNameHandling.Auto
             };
         }

@@ -1,3 +1,4 @@
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
@@ -32,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
                 publication.Summary,
                 publication.NextUpdate,
                 publication.LatestReleaseId,
-                // TODO should be releases excluding this one, not releases
-                publication.Releases,
+                publication.Releases.Where(model => Id != model.Id).ToList(),
                 publication.LegacyReleases,
                 publication.Topic,
                 publication.Contact,
