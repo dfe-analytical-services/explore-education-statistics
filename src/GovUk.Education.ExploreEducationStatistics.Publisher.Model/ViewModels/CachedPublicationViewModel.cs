@@ -31,6 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public MethodologySummaryViewModel Methodology { get; set; }
         
-        public string ExternalMethodology { get; set; }
+        public ExternalMethodologyViewModel ExternalMethodology { get; set; }
     }
 }

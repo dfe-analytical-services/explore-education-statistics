@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<ContentSection, ContentSectionViewModel>();
 
+            CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
+
             CreateMap<Link, LinkViewModel>();
 
             CreateMap<Methodology, MethodologySummaryViewModel>();

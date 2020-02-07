@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             List<LinkViewModel> legacyReleases,
             TopicViewModel topic,
             ContactViewModel contact,
-            string externalMethodology,
+            ExternalMethodologyViewModel externalMethodology,
             MethodologySummaryViewModel methodology)
         {
             Id = id;
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public ContactViewModel Contact { get; set; }
 
-        public string ExternalMethodology { get; set; }
+        public ExternalMethodologyViewModel ExternalMethodology { get; set; }
 
         public MethodologySummaryViewModel Methodology { get; set; }
     }
