@@ -62,6 +62,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanUpdateRelease);
         }
 
+        [HttpGet("release/{releaseId}/status/draft")]
+        public Task<ActionResult<bool>> CanMarkReleaseAsDraft(Guid releaseId)
+        {
+            return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanMarkReleaseAsDraft);
+        }
+
         [HttpGet("release/{releaseId}/status/submit")]
         public Task<ActionResult<bool>> CanSubmitReleaseToHigherReview(Guid releaseId)
         {

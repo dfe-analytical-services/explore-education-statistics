@@ -18,6 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
         
         [Fact]
+        public void SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler_ReleaseApproved()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved
+            };
+            
+            // Assert that no users can submit an approved Release to higher review
+            AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
+                new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(),
+                release);
+        }
+        
+        [Fact]
         public void SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler()
         {
             // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a Release can submit the Release
@@ -26,6 +40,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<SubmitSpecificReleaseToHigherReviewRequirement>(
                 contentDbContext => new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(contentDbContext),
                 ReleaseRole.Contributor, ReleaseRole.Lead, ReleaseRole.Approver);
+        }
+        
+        [Fact]
+        public void SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler_ReleaseApproved()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved
+            };
+            
+            // Assert that no User can submit the Release to higher review if it is already Approved
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<SubmitSpecificReleaseToHigherReviewRequirement>(
+                contentDbContext => new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(contentDbContext),
+                release);
         }
     }
 }
