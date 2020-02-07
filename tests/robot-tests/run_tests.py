@@ -124,26 +124,47 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
     assert callable(get_identity_info)
     print('done!')
 
-    # For BAU user
-    if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists('IDENTITY_COOKIE_BAU.txt'):
-        print('Getting BAU user authentication information from local files...', end='')
-        with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
-            os.environ['IDENTITY_LOCAL_STORAGE_BAU'] = ls_file.read()
-        with open('IDENTITY_COOKIE_BAU.txt', 'r') as cookie_file:
-            os.environ['IDENTITY_COOKIE_BAU'] = cookie_file.read()
-        print('done!')
-    else:
-        print('Logging in to obtain BAU user authentication information...', end='', flush=True)
-        os.environ["IDENTITY_LOCAL_STORAGE_BAU"], os.environ['IDENTITY_COOKIE_BAU'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
+    if f"admin{os.sep}analyst" not in args.tests:  # Don't need BAU user if running admin/analyst tests
+        if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists('IDENTITY_COOKIE_BAU.txt'):
+            print('Getting BAU user authentication information from local files...', end='')
+            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
+                os.environ['IDENTITY_LOCAL_STORAGE_BAU'] = ls_file.read()
+            with open('IDENTITY_COOKIE_BAU.txt', 'r') as cookie_file:
+                os.environ['IDENTITY_COOKIE_BAU'] = cookie_file.read()
+            print('done!')
+        else:
+            print('Logging in to obtain BAU user authentication information...', end='', flush=True)
+            os.environ["IDENTITY_LOCAL_STORAGE_BAU"], os.environ['IDENTITY_COOKIE_BAU'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
 
-        # Save auth info to files for efficiency
-        with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'w') as ls_file:
-            ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])
-        with open('IDENTITY_COOKIE_BAU.txt', 'w') as cookie_file:
-            cookie_file.write(os.environ['IDENTITY_COOKIE_BAU'])
-        print(' done!')
-    assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
-    assert os.getenv('IDENTITY_COOKIE_BAU') is not None
+            # Save auth info to files for efficiency
+            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'w') as ls_file:
+                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])
+            with open('IDENTITY_COOKIE_BAU.txt', 'w') as cookie_file:
+                cookie_file.write(os.environ['IDENTITY_COOKIE_BAU'])
+            print(' done!')
+        assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+        assert os.getenv('IDENTITY_COOKIE_BAU') is not None
+
+    if f"admin{os.sep}bau" not in args.tests:  # Don't need analyst user if running admin/bau tests
+        if os.path.exists('IDENTITY_LOCAL_STORAGE_ANALYST.txt') and os.path.exists('IDENTITY_COOKIE_ANALYST.txt'):
+            print('Getting ANALYST user authentication information from local files...', end='')
+            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'r') as ls_file:
+                os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'] = ls_file.read()
+            with open('IDENTITY_COOKIE_ANALYST.txt', 'r') as cookie_file:
+                os.environ['IDENTITY_COOKIE_ANALYST'] = cookie_file.read()
+            print('done!')
+        else:
+            print('Logging in to obtain ANALYST user authentication information...', end='', flush=True)
+            os.environ["IDENTITY_LOCAL_STORAGE_ANALYST"], os.environ['IDENTITY_COOKIE_ANALYST'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
+
+            # Save auth info to files for efficiency
+            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'w') as ls_file:
+                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'])
+            with open('IDENTITY_COOKIE_ANALYST.txt', 'w') as cookie_file:
+                cookie_file.write(os.environ['IDENTITY_COOKIE_ANALYST'])
+            print(' done!')
+        assert os.getenv('IDENTITY_LOCAL_STORAGE_ANALYST') is not None
+        assert os.getenv('IDENTITY_COOKIE_ANALYST') is not None
 
     # For Prerelease user
     #if os.path.exists('IDENTITY_LOCAL_STORAGE_PR.txt') and os.path.exists('IDENTITY_COOKIE_PR.txt'):

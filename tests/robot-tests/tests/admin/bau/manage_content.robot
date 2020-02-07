@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/admin-common.robot
+Resource    ../../libs/admin-common.robot
 Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
