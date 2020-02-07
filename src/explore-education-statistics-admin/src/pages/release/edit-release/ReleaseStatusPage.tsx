@@ -39,7 +39,6 @@ const statusMap: {
 };
 
 const ReleaseStatusPage = ({
-  history,
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();

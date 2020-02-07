@@ -30,16 +30,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           headingTag="h3"
         >
           <p>
-            Read our{' '}
-            <Link
-              to={`/methodology/${
-                release.publication.methodology
-                  ? release.publication.methodology.id
-                  : 'no-methodology'
-              }`}
-            >
-              {`${publication.title}: methodology`}
-            </Link>{' '}
+            Read our <Link to="#">{`${publication.title}: methodology`}</Link>{' '}
             guidance.
           </p>
         </AccordionSection>
