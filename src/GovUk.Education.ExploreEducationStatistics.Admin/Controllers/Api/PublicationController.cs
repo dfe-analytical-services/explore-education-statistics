@@ -42,7 +42,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .GetViewModelAsync(publicationId)
                 .HandleFailuresOr(Ok);
         }
-
+        
+        // PUT api/publications/{publicationId}/methodology
+        [HttpPut("api/publications/{publicationId}/methodology")]
+        public async Task<ActionResult<PublicationViewModel>> UpdatePublicationMethodology(
+            UpdatePublicationMethodologyViewModel model, Guid publicationId)
+        {
+            return Ok();
+        }
+        
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
         public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(
