@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
-    public class OtherReleaseViewModel
+    public class ReleaseTitleViewModel
     {
         public Guid Id { get; set; }
 

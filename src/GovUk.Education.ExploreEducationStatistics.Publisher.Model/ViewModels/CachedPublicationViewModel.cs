@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
-    public class PublicationViewModel
+    public class CachedPublicationViewModel
     {
         public Guid Id { get; set; }
 
@@ -19,7 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public DateTime? NextUpdate { get; set; }
 
-        public List<OtherReleaseViewModel> Releases { get; set; }
+        public Guid LatestReleaseId { get; set; }
+
+        public List<ReleaseTitleViewModel> Releases { get; set; }
 
         public List<LinkViewModel> LegacyReleases { get; set; }
 
@@ -28,5 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public ContactViewModel Contact { get; set; }
 
         public MethodologySummaryViewModel Methodology { get; set; }
+        
+        public ExternalMethodologyViewModel ExternalMethodology { get; set; }
     }
 }

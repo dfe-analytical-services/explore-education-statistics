@@ -57,7 +57,8 @@ class PublicationReleasePage extends Component<Props> {
     const { data } = this.props;
 
     const releaseCount =
-      data.publication.releases.length + data.publication.legacyReleases.length;
+      data.publication.otherReleases.length +
+      data.publication.legacyReleases.length;
 
     return (
       <Page
@@ -88,7 +89,7 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     View latest data:{' '}
                     <span className="govuk-!-font-weight-bold">
-                      {data.publication.releases.slice(-1)[0].title}
+                      {data.publication.otherReleases.slice(-1)[0].title}
                     </span>
                   </Link>
                 )}
@@ -200,22 +201,22 @@ class PublicationReleasePage extends Component<Props> {
                 {!!releaseCount && (
                   <dd>
                     <Details
-                      summary={`See previous ${releaseCount} releases`}
+                      summary={`See ${releaseCount} other releases`}
                       onToggle={(open: boolean) =>
                         open &&
                         logEvent(
-                          'Previous Releases',
-                          'Release page previous releases dropdown opened',
+                          'Other Releases',
+                          'Release page other releases dropdown opened',
                           window.location.pathname,
                         )
                       }
                     >
                       <ul className="govuk-list">
                         {[
-                          ...data.publication.releases.map(
+                          ...data.publication.otherReleases.map(
                             ({ id, slug, title }) => [
                               title,
-                              <li key={id} data-testid="previous-release-item">
+                              <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${data.publication.slug}/${slug}`}
                                 >
@@ -227,7 +228,7 @@ class PublicationReleasePage extends Component<Props> {
                           ...data.publication.legacyReleases.map(
                             ({ id, description, url }) => [
                               description,
-                              <li key={id} data-testid="previous-release-item">
+                              <li key={id} data-testid="other-release-item">
                                 <a href={url}>{description}</a>
                               </li>,
                             ],
