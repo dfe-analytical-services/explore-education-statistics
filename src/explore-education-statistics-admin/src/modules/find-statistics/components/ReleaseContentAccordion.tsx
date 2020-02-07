@@ -1,12 +1,13 @@
 import Accordion from '@admin/components/EditableAccordion';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import { ContentSectionViewModel } from '@admin/services/release/edit-release/content/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
@@ -27,39 +28,44 @@ const ReleaseContentAccordion = ({
   onContentChange,
   handleApiErrors,
 }: ReleaseContentAccordionProps & ErrorControlProps) => {
-  const [content, _setContent] = React.useState<ContentType[]>([]);
+  const [content, setContent] = useState<ContentType[]>([]);
 
-  const setContent = React.useCallback(
-    (newContent: ContentType[]) => {
-      if (onContentChange) onContentChange(newContent);
-      _setContent(newContent);
+  const setContentAndTriggerOnContentChange = useCallback(
+    (newContent: AbstractRelease<EditableContentBlock>['content']) => {
+      setContent(newContent);
+
+      if (onContentChange) {
+        onContentChange(newContent);
+      }
     },
-    [onContentChange],
+    [onContentChange, setContent],
   );
 
-  const onReorder = React.useCallback(
+  const onReorder = useCallback(
     async (ids: Dictionary<number>) => {
       const newContent = await releaseContentService
         .updateContentSectionsOrder(releaseId, ids)
         .catch(handleApiErrors);
 
-      setContent(newContent);
+      setContentAndTriggerOnContentChange(newContent);
     },
     [releaseId, setContent, handleApiErrors],
   );
 
-  React.useEffect(() => {
-    const f = async (rid: string) => {
-      const newContent = await releaseContentService
-        .getContentSections(rid)
-        .catch(handleApiErrors);
+  useEffect(() => {
+    releaseContentService
+      .getContentSections(releaseId)
+      .then(newContent => {
+        setContent(newContent);
 
-      if (releaseId === rid) setContent(newContent);
-    };
-    f(releaseId);
+        if (onContentChange) {
+          onContentChange(newContent);
+        }
+      })
+      .catch(handleApiErrors);
   }, [releaseId, handleApiErrors, setContent]);
 
-  const onAddSection = React.useCallback(async () => {
+  const onAddSection = useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
       await releaseContentService
@@ -67,10 +73,10 @@ const ReleaseContentAccordion = ({
         .catch(handleApiErrors),
     ];
 
-    setContent(newContent);
+    setContentAndTriggerOnContentChange(newContent);
   }, [content, releaseId, setContent, handleApiErrors]);
 
-  const onUpdateHeading = React.useCallback(
+  const onUpdateHeading = useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
       let result;
       if (block.id) {
@@ -80,18 +86,20 @@ const ReleaseContentAccordion = ({
 
         const newContent = [...content];
         newContent[index].heading = newTitle;
-        setContent(newContent);
+
+        setContentAndTriggerOnContentChange(newContent);
       }
       return result;
     },
     [content, releaseId, setContent, handleApiErrors],
   );
 
-  const updateContentSection = React.useCallback(
+  const updateContentSection = useCallback(
     (index: number, contentBlock?: EditableContentBlock[]) => {
       const newContent = [...content];
       newContent[index].content = contentBlock;
-      setContent(newContent);
+
+      setContentAndTriggerOnContentChange(newContent);
     },
     [content, setContent],
   );

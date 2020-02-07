@@ -4,26 +4,25 @@ import BasicReleaseSummary from '@admin/modules/find-statistics/components/Basic
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import service from '@admin/services/release/edit-release/data/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import { generateIdList } from '@common/components/Accordion';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import RelatedInformationSection from './components/RelatedInformationSection';
-import ReleaseNotesSection from './components/ReleaseNotesSection';
-import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ContentBlocks from './components/EditableContentBlocks';
+import RelatedInformationSection from './components/RelatedInformationSection';
+import ReleaseHeadlines from './components/ReleaseHeadlines';
+import ReleaseNotesSection from './components/ReleaseNotesSection';
 
 export interface RendererProps {
   contentId?: string;
@@ -63,8 +62,6 @@ const PublicationReleaseContent = ({
     },
     [onReleaseChange],
   );
-
-  const accId: string[] = generateIdList(2);
 
   const [availableDataBlocks, setAvailableDataBlocks] = React.useState(
     initialAvailableDataBlocks,
@@ -265,9 +262,9 @@ const PublicationReleaseContent = ({
       <ReleaseContentAccordion
         releaseId={release.id}
         publication={publication}
-        accordionId={accId[0]}
+        accordionId="contents-accordion"
         sectionName="Contents"
-        onContentChange={c => onAccordionContentChange(c)}
+        onContentChange={onAccordionContentChange}
       />
 
       <AdminPublicationReleaseHelpAndSupportSection
