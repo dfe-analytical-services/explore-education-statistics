@@ -219,14 +219,12 @@ const PublicationReleaseContent = ({
                   >
                     <ul className="govuk-list">
                       {[
-                        ...release.publication.releases.map(
-                          ({ id, slug, title }) => [
-                            title,
-                            <li key={id} data-testid="previous-release-item">
-                              <Link to="#">{title}</Link>
-                            </li>,
-                          ],
-                        ),
+                        ...release.publication.releases.map(({ id, title }) => [
+                          title,
+                          <li key={id} data-testid="previous-release-item">
+                            <Link to="#">{title}</Link>
+                          </li>,
+                        ]),
                         ...release.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
