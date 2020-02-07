@@ -57,7 +57,8 @@ class PublicationReleasePage extends Component<Props> {
     const { data } = this.props;
 
     const releaseCount =
-      data.publication.releases.length + data.publication.legacyReleases.length;
+      data.publication.otherReleases.length +
+      data.publication.legacyReleases.length;
 
     return (
       <Page
@@ -212,7 +213,7 @@ class PublicationReleasePage extends Component<Props> {
                     >
                       <ul className="govuk-list">
                         {[
-                          ...data.publication.releases.map(
+                          ...data.publication.otherReleases.map(
                             ({ id, slug, title }) => [
                               title,
                               <li key={id} data-testid="other-release-item">

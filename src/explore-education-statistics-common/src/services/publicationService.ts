@@ -18,7 +18,7 @@ export interface Publication {
   dataSource: string;
   summary: string;
   nextUpdate: string;
-  releases: {
+  otherReleases: {
     id: string;
     slug: string;
     title: string;
