@@ -29,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var publication = await _context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.LegacyReleases)
-                // include topic?
-                // then include theme?
+                .Include(p => p.Topic)
+                .ThenInclude(topic => topic.Theme)
                 .SingleOrDefaultAsync(p => p.Id == id);
 
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
@@ -104,15 +104,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private List<OtherReleaseViewModel> GetReleaseViewModels(Guid publicationId,
+        private List<ReleaseTitleViewModel> GetReleaseViewModels(Guid publicationId,
             IEnumerable<Guid> includedReleaseIds)
         {
-            // TODO rename this view model?
             var releases = _context.Releases
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds));
-            return _mapper.Map<List<OtherReleaseViewModel>>(releases);
+            return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)

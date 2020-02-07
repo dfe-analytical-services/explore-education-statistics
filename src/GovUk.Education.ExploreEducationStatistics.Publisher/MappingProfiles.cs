@@ -30,12 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
-            CreateMap<Release, OtherReleaseViewModel>();
-
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent));
+
+            CreateMap<Release, ReleaseTitleViewModel>();
 
             CreateMap<ReleaseType, ReleaseTypeViewModel>();
 

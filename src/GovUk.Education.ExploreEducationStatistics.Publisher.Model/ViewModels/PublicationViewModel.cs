@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         
         public Guid LatestReleaseId { get; set; }
 
-        public List<OtherReleaseViewModel> Releases { get; set; }
+        public List<ReleaseTitleViewModel> Releases { get; set; }
 
         public List<LinkViewModel> LegacyReleases { get; set; }
 
