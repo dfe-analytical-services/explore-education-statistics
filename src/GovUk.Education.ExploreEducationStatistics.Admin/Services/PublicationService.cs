@@ -70,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Title = publication.Title,
                         TopicId = publication.TopicId,
                         MethodologyId = publication.MethodologyId,
-                        Slug = publication.Slug
+                        Slug = publication.Slug,
+                        ExternalMethodology = publication.ExternalMethodology
                     });
                     
                     _context.SaveChanges();
