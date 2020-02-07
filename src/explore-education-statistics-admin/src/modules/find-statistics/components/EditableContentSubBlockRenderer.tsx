@@ -62,17 +62,6 @@ function EditableContentSubBlockRenderer({
             canDelete={canDelete}
             onDelete={onDelete}
             {...block}
-            additionalTabContent={
-              <>
-                <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                  Explore and edit this data online
-                </h2>
-                <p>Use our table tool to explore this data.</p>
-                <a href="/table-tool/" className="govuk-button">
-                  Explore data
-                </a>
-              </>
-            }
           />
         </div>
       );

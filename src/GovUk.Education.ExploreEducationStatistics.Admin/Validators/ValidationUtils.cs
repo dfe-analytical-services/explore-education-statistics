@@ -83,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserAlreadyExists,
         InvalidEmailAddress,
         ApprovedReleaseMustHavePublishScheduledDate,
-        PublicationDoesNotExist
+        PublicationDoesNotExist,
+        PublicationHasMethodologyAssigned
     }
 }

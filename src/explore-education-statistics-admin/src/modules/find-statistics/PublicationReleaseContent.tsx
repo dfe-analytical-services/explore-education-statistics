@@ -77,11 +77,11 @@ const PublicationReleaseContent = ({
 
   const releaseCount = React.useMemo(
     () =>
-      release.publication.releases.length +
+      release.publication.otherReleases.length +
       release.publication.legacyReleases.length,
     [
       release.publication.legacyReleases.length,
-      release.publication.releases.length,
+      release.publication.otherReleases.length,
     ],
   );
 
@@ -219,8 +219,8 @@ const PublicationReleaseContent = ({
                   >
                     <ul className="govuk-list">
                       {[
-                        ...release.publication.releases.map(
-                          ({ id, slug, title }) => [
+                        ...release.publication.otherReleases.map(
+                          ({ id, title }) => [
                             title,
                             <li key={id} data-testid="other-release-item">
                               <Link to="#">{title}</Link>

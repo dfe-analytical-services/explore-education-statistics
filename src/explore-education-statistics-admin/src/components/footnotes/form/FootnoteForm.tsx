@@ -209,7 +209,7 @@ const FootnoteForm = ({
                 />
                 <Button
                   type="submit"
-                  className="govuk-button govuk-!-margin-right-3"
+                  className="govuk-button govuk-!-margin-right-6"
                 >
                   {!footnote ? 'Create' : 'Update'} footnote
                 </Button>

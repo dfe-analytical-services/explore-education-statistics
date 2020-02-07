@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CreateMethodologyViewModel methodology)
         {
             return await ValidateMethodologySlugUnique(methodology.Slug)
-                .OnSuccess(async () => ValidatePublicationExistsOrIsNull(methodology.PublicationId))
+                .OnSuccess(async () => ValidateAssignedPublication(methodology.PublicationId))
                 .OnSuccess(async () =>
                 {
                     var model = new Methodology
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private async Task<Either<ValidationResult, bool>> ValidatePublicationExistsOrIsNull(Guid? publicationId)
+        private async Task<Either<ValidationResult, bool>> ValidateAssignedPublication(Guid? publicationId)
         {
             if (publicationId != null)
             {
@@ -109,6 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (publication == null)
                 {
                     return new ValidationResult(ValidationErrorMessages.PublicationDoesNotExist.ToString());
+                }
+                
+                if (publication.MethodologyId != null)
+                {
+                    return new ValidationResult(ValidationErrorMessages.PublicationHasMethodologyAssigned.ToString());
                 }
             }
 

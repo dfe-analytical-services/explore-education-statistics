@@ -104,4 +104,27 @@ describe('Breadcrumbs', () => {
     expect(lastBreadcrumb).toBeDefined();
     expect(lastBreadcrumb.querySelector('a')).toBeNull();
   });
+
+  test('does not render Home breadcrumb if explicitly asked to exclude', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              link: '/publications',
+              name: 'Publications',
+            },
+          ]}
+          includeHomeBreadcrumb={false}
+        />
+        ,
+      </MemoryRouter>,
+    );
+
+    const breadcrumbs = container.querySelectorAll('li');
+
+    expect(breadcrumbs).toHaveLength(1);
+    expect(breadcrumbs[0].textContent).toBe('Publications');
+    expect(breadcrumbs[0].querySelector('a')).toBe(null);
+  });
 });
