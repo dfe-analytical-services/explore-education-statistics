@@ -15,11 +15,8 @@ export function generateTableTitle({
 }: FullTableMeta & {
   expanded?: boolean;
 }) {
-  let indicatorString = '';
-
-  if (indicators.length === 1) {
-    indicatorString = `${indicators[0].label} for `;
-  }
+  const indicatorString =
+    indicators.length === 1 ? `${indicators[0].label} for ` : '';
 
   let timePeriodString = '';
 
