@@ -89,7 +89,7 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     View latest data:{' '}
                     <span className="govuk-!-font-weight-bold">
-                      {data.publication.releases.slice(-1)[0].title}
+                      {data.publication.otherReleases.slice(-1)[0].title}
                     </span>
                   </Link>
                 )}
