@@ -24,6 +24,11 @@ export interface Comment {
   createdDate: string;
 }
 
+export interface ExternalMethodology {
+  title: string;
+  url: string;
+}
+
 export interface AdminDashboardRelease {
   id: string;
   status: ReleaseStatus;
@@ -51,7 +56,7 @@ export interface AdminDashboardPublication {
   id: string;
   title: string;
   methodology?: IdTitlePair;
-  ExternalMethodology: string;
+  externalMethodology: ExternalMethodology;
   releases: AdminDashboardRelease[];
   contact: ContactDetails;
   permissions: {
