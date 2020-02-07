@@ -113,14 +113,7 @@ const RelatedInformationSection = ({
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
           <li>
-            <Link
-              to={`/methodology/${
-                release.publication.methodology
-                  ? release.publication.methodology.id
-                  : 'no-methodology'
-              }`}
-              target="_blank"
-            >
+            <Link to="#">
               {release.publication.methodology
                 ? release.publication.methodology.title
                 : 'Methodology title'}

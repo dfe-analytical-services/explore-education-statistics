@@ -10,7 +10,7 @@ import { Dictionary } from '@common/types/util';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
-import React, { useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useImmer } from 'use-immer';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
@@ -67,14 +67,14 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
-  const formOptions = React.useMemo(() => options, [options]);
+  const formOptions = useMemo(() => options, [options]);
 
-  const formInitialValues = React.useMemo(
+  const formInitialValues = useMemo(
     () => calculateInitialValues(initialValues, options),
     [initialValues, options],
   );
 
-  const initialLocationLevels = React.useMemo(() => {
+  const initialLocationLevels = useMemo(() => {
     return mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
       formInitialValues.locations,
       (locationKey: string, locations: string[]) => {
@@ -94,7 +94,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     Dictionary<{ label: string; value: string }[]>
   >(initialLocationLevels);
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateLocationLevels(() => initialLocationLevels);
   }, [initialLocationLevels, updateLocationLevels]);
 
@@ -114,6 +114,17 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
+      initialValues={formInitialValues}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validationSchema={Yup.object<FormValues>({
+        locations: Yup.mixed().test(
+          'required',
+          'Select at least one location',
+          (value: Dictionary<string[]>) =>
+            Object.values(value).some(groupOptions => groupOptions.length > 0),
+        ),
+      })}
       onSubmit={async values => {
         const locations = Object.entries(values.locations).reduce(
           (acc, [level, levelOptions]) => {
@@ -132,15 +143,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         await onSubmit({ locations });
         goToNextStep();
       }}
-      initialValues={formInitialValues}
-      validationSchema={Yup.object<FormValues>({
-        locations: Yup.mixed().test(
-          'required',
-          'Select at least one location',
-          (value: Dictionary<string[]>) =>
-            Object.values(value).some(groupOptions => groupOptions.length > 0),
-        ),
-      })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
@@ -165,6 +167,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
+                        disabled={form.isSubmitting}
                         onAllChange={() => {
                           updateLocationLevels(draft => {
                             if (!draft[levelKey]) {
@@ -177,6 +180,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           });
                         }}
                         onChange={(event, option) => {
+                          event.persist();
+
                           updateLocationLevels(draft => {
                             if (!draft[levelKey]) {
                               draft[levelKey] = [];

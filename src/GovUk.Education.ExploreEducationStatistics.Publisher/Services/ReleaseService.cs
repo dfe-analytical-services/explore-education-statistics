@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -50,8 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderByDescending(release => release.Published ?? release.PublishScheduled)
-                .FirstOrDefault();
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimePeriodCoverage)
+                .LastOrDefault();
         }
 
         public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)

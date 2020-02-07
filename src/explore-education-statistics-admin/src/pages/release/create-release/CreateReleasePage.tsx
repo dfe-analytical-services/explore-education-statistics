@@ -61,7 +61,7 @@ const CreateReleasePage = ({
       .then(([templateRelease, publication]) => {
         setModel({
           templateRelease,
-          publication,
+          publication: publication as Publication,
         });
       })
       .catch(handleApiErrors);
@@ -160,21 +160,23 @@ const CreateReleasePage = ({
         additionalFields={
           model &&
           model.templateRelease && (
-            <FormFieldRadioGroup<FormValues>
-              id="releaseSummaryForm-templateReleaseId"
-              legend="Select template"
-              name="templateReleaseId"
-              options={[
-                {
-                  label: 'Create new template',
-                  value: 'new',
-                },
-                {
-                  label: `Copy existing template (${model.templateRelease.title})`,
-                  value: `${model.templateRelease.id}`,
-                },
-              ]}
-            />
+            <div className="govuk-!-margin-top-9">
+              <FormFieldRadioGroup<FormValues>
+                id="releaseSummaryForm-templateReleaseId"
+                legend="Select template"
+                name="templateReleaseId"
+                options={[
+                  {
+                    label: 'Create new template',
+                    value: 'new',
+                  },
+                  {
+                    label: `Copy existing template (${model.templateRelease.title})`,
+                    value: `${model.templateRelease.id}`,
+                  },
+                ]}
+              />
+            </div>
           )
         }
       />

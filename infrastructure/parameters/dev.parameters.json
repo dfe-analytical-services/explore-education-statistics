@@ -34,6 +34,9 @@
     },
     "blobDeleteRetentionDays": {
       "value": 3
+    },
+    "deployDatafactory": {
+      "value": true
     }
   }
 }

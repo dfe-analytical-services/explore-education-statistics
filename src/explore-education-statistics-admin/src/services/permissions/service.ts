@@ -13,6 +13,9 @@ const service = {
   canUpdateRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
+  canMarkReleaseAsDraft: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/status/draft`);
+  },
   canSubmitReleaseForHigherLevelReview: (
     releaseId: string,
   ): Promise<boolean> => {
@@ -28,6 +31,19 @@ const service = {
     return client.get(
       `/permissions/publication/${publicationId}/release/create`,
     );
+  },
+  getPreReleaseWindowStatus: (
+    releaseId: string,
+  ): Promise<PreReleaseWindowStatus> => {
+    return client
+      .get<PreReleaseWindowStatus>(
+        `/permissions/release/${releaseId}/prerelease/status`,
+      )
+      .then(status => ({
+        ...status,
+        preReleaseWindowStartTime: new Date(status.preReleaseWindowStartTime),
+        preReleaseWindowEndTime: new Date(status.preReleaseWindowEndTime),
+      }));
   },
 };
 

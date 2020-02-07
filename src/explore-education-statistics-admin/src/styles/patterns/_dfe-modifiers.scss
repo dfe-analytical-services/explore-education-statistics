@@ -142,3 +142,11 @@ h1.govuk-panel__title {
 .dfe-header--white {
   color: govuk-colour('white') !important;
 }
+
+// Hide page status tag from admin pages
+.page-editing,
+.page-preview {
+  .govuk-tag {
+    display: none;
+  }
+}

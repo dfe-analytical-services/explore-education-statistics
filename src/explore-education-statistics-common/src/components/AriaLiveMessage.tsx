@@ -55,7 +55,13 @@ const Message = ({
     return () => {
       removeMessage(liveMessage.id);
     };
-  }, []);
+  }, [
+    announceMessage,
+    liveMessage,
+    messageSent,
+    removeMessage,
+    setMessageSent,
+  ]);
   return null;
 };
 

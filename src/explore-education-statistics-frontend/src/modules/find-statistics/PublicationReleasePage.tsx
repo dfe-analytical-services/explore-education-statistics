@@ -213,13 +213,13 @@ class PublicationReleasePage extends Component<Props> {
                       <ul className="govuk-list">
                         {[
                           ...data.publication.releases.map(
-                            ({ id, slug, releaseName }) => [
-                              releaseName,
+                            ({ id, slug, title }) => [
+                              title,
                               <li key={id} data-testid="previous-release-item">
                                 <Link
                                   to={`/find-statistics/${data.publication.slug}/${slug}`}
                                 >
-                                  {releaseName}
+                                  {title}
                                 </Link>
                               </li>,
                             ],

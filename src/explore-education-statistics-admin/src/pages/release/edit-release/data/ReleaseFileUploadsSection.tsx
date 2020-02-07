@@ -75,6 +75,11 @@ const ReleaseFileUploadsSection = ({
       'file',
       'Choose a file that is not empty',
     ),
+    errorCodeToFieldError(
+      'FILE_TYPE_INVALID',
+      'file',
+      'Choose a file of an allowed format',
+    ),
   ];
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
