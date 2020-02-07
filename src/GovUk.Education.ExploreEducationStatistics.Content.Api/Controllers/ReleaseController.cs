@@ -1,6 +1,7 @@
 using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     throw new ArgumentException();
                 }
 
-                return JsonConvert.DeserializeObject<PublicationViewModel>(text,
+                return JsonConvert.DeserializeObject<CachedPublicationViewModel>(text,
                     new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Auto

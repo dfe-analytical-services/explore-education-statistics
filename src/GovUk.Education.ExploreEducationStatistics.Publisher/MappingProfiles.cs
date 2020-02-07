@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Publication, PublicationTitleViewModel>();
 
-            CreateMap<Publication, PublicationViewModel>()
+            CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()

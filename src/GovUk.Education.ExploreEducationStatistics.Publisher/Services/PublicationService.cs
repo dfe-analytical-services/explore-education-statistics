@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
         }
 
-        public async Task<PublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
+        public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
             var publication = await _context.Publications
                 .Include(p => p.Contact)
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ThenInclude(topic => topic.Theme)
                 .SingleOrDefaultAsync(p => p.Id == id);
 
-            var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+            var publicationViewModel = _mapper.Map<CachedPublicationViewModel>(publication);
             var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
             publicationViewModel.LatestReleaseId = latestRelease.Id;
             publicationViewModel.Releases = GetReleaseViewModels(id, includedReleaseIds);
