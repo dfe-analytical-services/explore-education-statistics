@@ -43,11 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var saved = _context.Methodologies.Add(model);
                     await _context.SaveChangesAsync();
 
-                    var publication = await _context.Publications.FirstOrDefaultAsync(p => p.Id == methodology.PublicationId);
+                    if (methodology.PublicationId != null)
+                    {
+                        var publication =
+                            await _context.Publications.FirstOrDefaultAsync(p => p.Id == methodology.PublicationId);
 
-                    publication.MethodologyId = saved.Entity.Id;
-                    _context.Publications.Update(publication);
-                    await _context.SaveChangesAsync();
+                        publication.MethodologyId = saved.Entity.Id;
+                        _context.Publications.Update(publication);
+                        await _context.SaveChangesAsync();
+                    }
 
                     return await GetAsync(saved.Entity.Id);
                 });
