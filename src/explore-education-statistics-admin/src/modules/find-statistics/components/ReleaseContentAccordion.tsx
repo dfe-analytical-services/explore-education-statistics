@@ -1,7 +1,6 @@
 import Accordion from '@admin/components/EditableAccordion';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import { ContentSectionViewModel } from '@admin/services/release/edit-release/content/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -31,7 +30,7 @@ const ReleaseContentAccordion = ({
   const [content, setContent] = useState<ContentType[]>([]);
 
   const setContentAndTriggerOnContentChange = useCallback(
-    (newContent: AbstractRelease<EditableContentBlock>['content']) => {
+    (newContent: ContentType[]) => {
       setContent(newContent);
 
       if (onContentChange) {
@@ -56,11 +55,7 @@ const ReleaseContentAccordion = ({
     releaseContentService
       .getContentSections(releaseId)
       .then(newContent => {
-        setContent(newContent);
-
-        if (onContentChange) {
-          onContentChange(newContent);
-        }
+        setContentAndTriggerOnContentChange(newContent);
       })
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors, setContent]);
