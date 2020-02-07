@@ -58,6 +58,41 @@ const createExpandedHeaders = (
       const previousGroupLength = last(acc)?.length ?? 1;
       const span = maxSpan / (headerGroup.headers.length * previousGroupLength);
 
+      if (headerGroup.groups && headerGroup.groups.length) {
+        const hasMultipleGroups = headerGroup.groups.length > 1;
+
+        // Header subgroups can have different sizes depending
+        // on the `span` that is specified.
+        // It should not be bigger or smaller than it's parent
+        // header group's span as this will break the table.
+        // If we have a single header subgroup, then we just
+        // make it span the entire header group.
+        const groupSpan = hasMultipleGroups
+          ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
+          : maxSpan;
+
+        const expandedHeaderGroups = times(
+          maxSpan / groupSpan,
+          repeat =>
+            headerGroup.groups?.reduce((headerSubGroups, header) => {
+              const previous = last(headerSubGroups);
+
+              headerSubGroups.push({
+                text: header.text,
+                span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
+                start: previous
+                  ? previous.start + previous.span
+                  : repeat * groupSpan,
+                isGroup: true,
+              });
+
+              return headerSubGroups;
+            }, [] as ExpandedHeader[]) ?? [],
+        ).flat();
+
+        acc.push(expandedHeaderGroups);
+      }
+
       const expandedHeaders = times(previousGroupLength, repeat =>
         headerGroup.headers.map((header, headerIndex) => {
           return {
@@ -72,43 +107,7 @@ const createExpandedHeaders = (
         }),
       ).flat();
 
-      if (!headerGroup.groups || !headerGroup.groups.length) {
-        acc.push(expandedHeaders);
-        return acc;
-      }
-
-      const hasMultipleGroups = headerGroup.groups.length > 1;
-
-      // Header subgroups can have different sizes depending
-      // on the `span` that is specified.
-      // It should not be bigger or smaller than it's parent
-      // header group's span as this will break the table.
-      // If we have a single header subgroup, then we just
-      // make it span the entire header group.
-      const groupSpan = hasMultipleGroups
-        ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
-        : maxSpan;
-
-      const expandedHeaderGroups = times(
-        maxSpan / groupSpan,
-        repeat =>
-          headerGroup.groups?.reduce((headerGroupGroups, header) => {
-            const previous = last(headerGroupGroups);
-
-            headerGroupGroups.push({
-              text: header.text,
-              span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
-              start: previous
-                ? previous.start + previous.span
-                : repeat * groupSpan,
-              isGroup: true,
-            });
-
-            return headerGroupGroups;
-          }, [] as ExpandedHeader[]) ?? [],
-      ).flat();
-
-      acc.push(expandedHeaderGroups, expandedHeaders);
+      acc.push(expandedHeaders);
 
       return acc;
     },
