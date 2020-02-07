@@ -210,12 +210,12 @@ const PublicationReleaseContent = ({
               {releaseCount > 0 && (
                 <dd>
                   <Details
-                    summary={`See previous ${releaseCount} releases`}
+                    summary={`See ${releaseCount} other releases`}
                     onToggle={(open: boolean) =>
                       open &&
                       logEvent(
-                        'Previous Releases',
-                        'Release page previous releases dropdown opened',
+                        'Other Releases',
+                        'Release page other releases dropdown opened',
                         window.location.pathname,
                       )
                     }
@@ -225,7 +225,7 @@ const PublicationReleaseContent = ({
                         ...release.publication.releases.map(
                           ({ id, slug, title }) => [
                             title,
-                            <li key={id} data-testid="previous-release-item">
+                            <li key={id} data-testid="other-release-item">
                               <Link
                                 to={`/find-statistics/${release.publication.slug}/${slug}`}
                               >
@@ -237,7 +237,7 @@ const PublicationReleaseContent = ({
                         ...release.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
-                            <li key={id} data-testid="previous-release-item">
+                            <li key={id} data-testid="other-release-item">
                               <a href={url}>{description}</a>
                             </li>,
                           ],

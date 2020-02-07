@@ -200,12 +200,12 @@ class PublicationReleasePage extends Component<Props> {
                 {!!releaseCount && (
                   <dd>
                     <Details
-                      summary={`See previous ${releaseCount} releases`}
+                      summary={`See ${releaseCount} other releases`}
                       onToggle={(open: boolean) =>
                         open &&
                         logEvent(
-                          'Previous Releases',
-                          'Release page previous releases dropdown opened',
+                          'Other Releases',
+                          'Release page other releases dropdown opened',
                           window.location.pathname,
                         )
                       }
@@ -215,7 +215,7 @@ class PublicationReleasePage extends Component<Props> {
                           ...data.publication.releases.map(
                             ({ id, slug, title }) => [
                               title,
-                              <li key={id} data-testid="previous-release-item">
+                              <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${data.publication.slug}/${slug}`}
                                 >
@@ -227,7 +227,7 @@ class PublicationReleasePage extends Component<Props> {
                           ...data.publication.legacyReleases.map(
                             ({ id, description, url }) => [
                               description,
-                              <li key={id} data-testid="previous-release-item">
+                              <li key={id} data-testid="other-release-item">
                                 <a href={url}>{description}</a>
                               </li>,
                             ],
