@@ -3,7 +3,6 @@ import StatusBlock from '@admin/components/StatusBlock';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import appRouteList from '@admin/routes/dashboard/routes';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
@@ -29,6 +28,7 @@ interface FormValues {
 interface Model {
   releaseStatus: ReleaseStatus;
   statusOptions: RadioOption[];
+  editable: boolean;
 }
 
 const statusMap: {
@@ -51,14 +51,16 @@ const ReleaseStatusPage = ({
   useEffect(() => {
     Promise.all([
       service.getReleaseStatus(releaseId),
+      permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
     ])
-      .then(([releaseStatus, canSubmit, canApprove]) => {
+      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
         const statusOptions: RadioOption[] = [
           {
             label: 'In draft',
             value: 'Draft',
+            disabled: !canMarkAsDraft,
           },
           {
             label: 'Ready for higher review',
@@ -75,10 +77,11 @@ const ReleaseStatusPage = ({
         setModel({
           releaseStatus,
           statusOptions,
+          editable: statusOptions.some(option => !option.disabled),
         });
       })
       .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+  }, [releaseId, handleApiErrors, showForm]);
 
   if (!model) return null;
 
@@ -94,17 +97,15 @@ const ReleaseStatusPage = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
-      await service
-        .updateReleaseStatus(releaseId, values)
-        .then(() => {
-          setModel({
-            releaseStatus: values.releaseStatus,
-            statusOptions: model.statusOptions,
-          });
-        })
-        .then(() => {
-          history.push(appRouteList.adminDashboard.path as string);
+      await service.updateReleaseStatus(releaseId, values).then(() => {
+        setModel({
+          ...model,
+          releaseStatus: values.releaseStatus,
+          statusOptions: model.statusOptions,
         });
+
+        setShowForm(false);
+      });
     },
     handleApiErrors,
     ...errorCodeMappings,
@@ -114,8 +115,8 @@ const ReleaseStatusPage = ({
     <>
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
-        <div>
-          <p>
+        <>
+          <div>
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -124,11 +125,17 @@ const ReleaseStatusPage = ({
                 <ReleaseServiceStatus releaseId={releaseId} />
               </div>
             )}
-          </p>
-          <Button onClick={() => setShowForm(true)}>
-            Update release status
-          </Button>
-        </div>
+          </div>
+
+          {model.editable && (
+            <Button
+              className="govuk-!-margin-top-2"
+              onClick={() => setShowForm(true)}
+            >
+              Update release status
+            </Button>
+          )}
+        </>
       ) : (
         <Formik<FormValues>
           enableReinitialize

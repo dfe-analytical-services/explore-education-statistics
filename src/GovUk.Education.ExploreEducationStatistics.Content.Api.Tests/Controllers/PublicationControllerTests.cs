@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -47,9 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             Assert.Single(result.Result.Value);
             var theme = result.Result.Value.First();
             Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
-            Assert.Single((IEnumerable) theme.Topics);
+            Assert.Single(theme.Topics);
             var topic = theme.Topics.First();
-            Assert.Single((IEnumerable) topic.Publications);
+            Assert.Single(topic.Publications);
         }
 
         [Fact]
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public void Get_Publication_Returns_Ok()
+        public void Get_PublicationTitle_Returns_Ok()
         {
             var fileStorageService = new Mock<IFileStorageService>();
             fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
@@ -74,17 +73,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var controller = new PublicationController(fileStorageService.Object);
 
-            var publicationTitleViewModel = controller.GetPublication("publication-a").Result.Value;
+            var publicationTitleViewModel = controller.GetPublicationTitle("publication-a").Result.Value;
             Assert.Equal(new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"), publicationTitleViewModel.Id);
             Assert.Equal("string", publicationTitleViewModel.Title);
         }
 
         [Fact]
-        public void Get_Publication_Returns_NotFound()
+        public void Get_PublicationTitle_Returns_NotFound()
         {
             var fileStorageService = new Mock<IFileStorageService>();
             var controller = new PublicationController(fileStorageService.Object);
-            var result = controller.GetPublication("missing-publication");
+            var result = controller.GetPublicationTitle("missing-publication");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
         }
     }

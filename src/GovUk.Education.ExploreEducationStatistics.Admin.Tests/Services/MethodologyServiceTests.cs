@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Http;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
@@ -84,7 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Methodology
                     {
                         Id = new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"),
-                        Title = "Methodology 1"
+                        Title = "Methodology 1",
+                        Published = DateTime.UtcNow
                     },
                     new Methodology
                     {
@@ -103,8 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 // Method under test
                 var methodologies = new MethodologyService(context, AdminMapper()).ListAsync();
-                Assert.Contains(methodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1");
-                Assert.Contains(methodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2");
+                Assert.Contains(methodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1" && m.Status == "Live");
+                Assert.Contains(methodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2" && m.Status == "Draft");
             }
         }
 

@@ -28,7 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     ""summary"": ""string"",
                     ""publications"": [
                     {
-                        ""legacyPublicationUrl"": ""string"",
+                        ""methodology"": {
+                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""slug"": ""string"",
+                        ""summary"": ""string"",
+                        ""title"": ""string""
+                    },
                         ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
                         ""title"": ""string"",
                         ""slug"": ""string"",
@@ -45,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetMethodologyTree();
             Assert.Single(result.Result.Value);
             var theme = result.Result.Value.First();
-            Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
+            Assert.IsAssignableFrom<ThemeTree<MethodologyTreeNode>>(theme);
             Assert.Single(theme.Topics);
             var topic = theme.Topics.First();
             Assert.Single(topic.Publications);
