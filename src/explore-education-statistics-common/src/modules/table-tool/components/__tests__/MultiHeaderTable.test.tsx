@@ -225,19 +225,25 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 2
-    expect(container.querySelectorAll('tbody tr:nth-child(2) th')).toHaveLength(
-      1,
-    );
+    expect(
+      container.querySelectorAll('tbody tr:nth-child(2) th[scope="row"]'),
+    ).toHaveLength(1);
     expect(
       container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
     ).toHaveAttribute('rowspan', '1');
@@ -285,13 +291,19 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 2
@@ -299,7 +311,9 @@ describe('MultiHeaderTable', () => {
       1,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -344,13 +358,19 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '3');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 2
@@ -358,10 +378,14 @@ describe('MultiHeaderTable', () => {
       2,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 3
@@ -369,7 +393,9 @@ describe('MultiHeaderTable', () => {
       1,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="row"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -425,16 +451,24 @@ describe('MultiHeaderTable', () => {
       4,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '4');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(4)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(4)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 2
@@ -442,13 +476,19 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '3');
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 3
@@ -456,10 +496,14 @@ describe('MultiHeaderTable', () => {
       2,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="row"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 4
@@ -467,10 +511,14 @@ describe('MultiHeaderTable', () => {
       2,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(4) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(4) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(4) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(4) th[scope="row"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -517,13 +565,19 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(1) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 2
@@ -531,13 +585,19 @@ describe('MultiHeaderTable', () => {
       3,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '2');
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(2) th:nth-child(3)'),
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(3)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     // Row 3
@@ -545,10 +605,14 @@ describe('MultiHeaderTable', () => {
       2,
     );
     expect(
-      container.querySelector('tbody tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="rowgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('rowspan', '1');
     expect(
-      container.querySelector('tbody tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="row"]:nth-child(2)',
+      ),
     ).toHaveAttribute('rowspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -580,30 +644,38 @@ describe('MultiHeaderTable', () => {
     expect(container.querySelectorAll('thead tr')).toHaveLength(3);
 
     // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      1,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
-    ).toHaveLength(1);
-    expect(
-      container.querySelector('thead tr:nth-child(1) th:nth-of-type(1)'),
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '2');
 
     // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      1,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(2) th[scope="colgroup"]'),
-    ).toHaveLength(1);
-    expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '2');
 
     // Row 3
+    expect(container.querySelectorAll('thead tr:nth-child(3) th')).toHaveLength(
+      2,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(3) th[scope="col"]'),
-    ).toHaveLength(2);
-    expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Body
@@ -639,33 +711,43 @@ describe('MultiHeaderTable', () => {
     expect(container.querySelectorAll('thead tr')).toHaveLength(3);
 
     // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      1,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
-    ).toHaveLength(1);
-    expect(
-      container.querySelector('thead tr:nth-child(1) th:nth-of-type(1)'),
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '2');
 
     // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      2,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(2) th[scope="colgroup"]'),
-    ).toHaveLength(2);
-    expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Row 3
+    expect(container.querySelectorAll('thead tr:nth-child(3) th')).toHaveLength(
+      2,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(3) th[scope="col"]'),
-    ).toHaveLength(2);
-    expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Body
@@ -701,36 +783,48 @@ describe('MultiHeaderTable', () => {
     expect(container.querySelectorAll('thead tr')).toHaveLength(3);
 
     // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      1,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
-    ).toHaveLength(1);
-    expect(
-      container.querySelector('thead tr:nth-child(1) th:nth-of-type(1)'),
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '3');
 
     // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      2,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(2) th[scope="colgroup"]'),
-    ).toHaveLength(2);
-    expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '2');
 
     // Row 3
+    expect(container.querySelectorAll('thead tr:nth-child(3) th')).toHaveLength(
+      3,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(3) th[scope="col"]'),
-    ).toHaveLength(3);
-    expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(3)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(3)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Body
@@ -766,42 +860,58 @@ describe('MultiHeaderTable', () => {
     expect(container.querySelectorAll('thead tr')).toHaveLength(3);
 
     // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      2,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
-    ).toHaveLength(2);
-    expect(
-      container.querySelector('thead tr:nth-child(1) th:nth-of-type(1)'),
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(1) th:nth-of-type(2)'),
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(3)',
+      ),
     ).toHaveAttribute('colspan', '2');
 
     // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      3,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(2) th[scope="colgroup"]'),
-    ).toHaveLength(3);
-    expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(2) th:nth-child(3)'),
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="colgroup"]:nth-child(3)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Row 3
+    expect(container.querySelectorAll('thead tr:nth-child(3) th')).toHaveLength(
+      3,
+    );
     expect(
-      container.querySelectorAll('thead tr:nth-child(3) th[scope="col"]'),
-    ).toHaveLength(3);
-    expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(1)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(1)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(2)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(2)',
+      ),
     ).toHaveAttribute('colspan', '1');
     expect(
-      container.querySelector('thead tr:nth-child(3) th:nth-child(3)'),
+      container.querySelector(
+        'thead tr:nth-child(3) th[scope="col"]:nth-child(3)',
+      ),
     ).toHaveAttribute('colspan', '1');
 
     // Body
