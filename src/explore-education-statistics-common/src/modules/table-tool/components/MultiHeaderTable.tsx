@@ -35,6 +35,7 @@ export interface HeaderGroup {
 interface ExpandedHeader {
   text: string;
   span: number;
+  crossSpan: number;
   start: number;
   isGroup: boolean;
 }
@@ -58,6 +59,8 @@ const createExpandedHeaders = (
       const previousGroupLength = last(acc)?.length ?? 1;
       const span = maxSpan / (headerGroup.headers.length * previousGroupLength);
 
+      let expandedHeaderGroups: ExpandedHeader[] = [];
+
       if (headerGroup.groups && headerGroup.groups.length) {
         const hasMultipleGroups = headerGroup.groups.length > 1;
 
@@ -71,7 +74,7 @@ const createExpandedHeaders = (
           ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
           : maxSpan;
 
-        const expandedHeaderGroups = times(
+        expandedHeaderGroups = times(
           maxSpan / groupSpan,
           repeat =>
             headerGroup.groups?.reduce((headerSubGroups, header) => {
@@ -80,6 +83,7 @@ const createExpandedHeaders = (
               headerSubGroups.push({
                 text: header.text,
                 span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
+                crossSpan: 1,
                 start: previous
                   ? previous.start + previous.span
                   : repeat * groupSpan,
@@ -93,19 +97,46 @@ const createExpandedHeaders = (
         acc.push(expandedHeaderGroups);
       }
 
-      const expandedHeaders = times(previousGroupLength, repeat =>
-        headerGroup.headers.map((header, headerIndex) => {
-          return {
-            text: header.text,
-            // Headers are expected to have equal sizes
-            // within their group (unlike header subgroups)
-            span,
-            start:
-              repeat * headerGroup.headers.length * span + headerIndex * span,
-            isGroup: headerGroupIndex !== headerGroups.length - 1,
-          };
-        }),
-      ).flat();
+      const expandedHeaders: ExpandedHeader[] = times(
+        previousGroupLength,
+        repeat =>
+          headerGroup.headers.map((header, headerIndex) => {
+            return {
+              text: header.text,
+              // Headers are expected to have equal sizes
+              // within their group (unlike header subgroups)
+              span,
+              crossSpan: 1,
+              start:
+                repeat * headerGroup.headers.length * span + headerIndex * span,
+              isGroup: headerGroupIndex !== headerGroups.length - 1,
+            };
+          }),
+      )
+        .flat()
+        .filter(expandedHeader => {
+          // We want to filter out any headers that duplicate
+          // their corresponding header group to clean up the headers.
+          const matchingHeaderGroup = expandedHeaderGroups.find(
+            expandedHeaderGroup =>
+              expandedHeaderGroup.start === expandedHeader.start &&
+              expandedHeaderGroup.text === expandedHeader.text &&
+              expandedHeaderGroup.span === 1,
+          );
+
+          // We are simply making the header group take
+          // up the space that the removed header
+          // would have taken in the table.
+          if (matchingHeaderGroup) {
+            // A bit naughty, but we mutate the header group
+            // to re-use the current context and avoid
+            // having to perform any further complex loops.
+            matchingHeaderGroup.isGroup = false;
+            matchingHeaderGroup.crossSpan = 2;
+          }
+
+          return !matchingHeaderGroup;
+        });
 
       acc.push(expandedHeaders);
 
@@ -135,7 +166,9 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
     const transposeToRows = (
       headerGroups: ExpandedHeader[][],
     ): ExpandedHeader[][] => {
-      const totalRows = last(headerGroups)?.length ?? 0;
+      const totalRows = sumBy(headerGroups, headerGroup =>
+        sumBy(headerGroup, header => (header.isGroup ? 0 : 1)),
+      );
 
       const reversedHeaderGroups = headerGroups.map(headers =>
         [...headers].reverse(),
@@ -184,6 +217,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         [styles.borderBottom]: !column.isGroup,
                       })}
                       colSpan={column.span}
+                      rowSpan={column.crossSpan}
                       scope={column.isGroup ? 'colgroup' : 'col'}
                       key={key}
                     >
@@ -209,6 +243,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                       [styles.borderBottom]: row.isGroup,
                     })}
                     rowSpan={row.span}
+                    colSpan={row.crossSpan}
                     scope={row.isGroup ? 'rowgroup' : 'row'}
                   >
                     {row.text}
