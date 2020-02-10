@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             new Regex(@"^application/pdf$"),
             new Regex(@"^application/msword$"),
             new Regex(@"^application/vnd.ms-excel$"),
-            new Regex(@"^application/vnd.openxmlformats\.\*$"),
-            new Regex(@"^application/vnd.oasis.opendocument.\.\*$"),
+            new Regex(@"^application/vnd.openxmlformats(.*)$"),
+            new Regex(@"^application/vnd.oasis.opendocument(.*)$"),
             new Regex(@"^application/CDFV2$"), 
         };
         

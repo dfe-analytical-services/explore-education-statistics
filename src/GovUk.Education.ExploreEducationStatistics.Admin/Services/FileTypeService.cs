@@ -3,26 +3,29 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.FileProviders;
+using MimeDetective.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileTypeService : IFileTypeService
     {
-        private readonly string _magicFilePath;
-
-        public FileTypeService(IFileProvider fileProvider)
+        public string? GetMimeType(IFormFile file)
         {
-            var magicFile = fileProvider.GetFileInfo("magic.mgc");
-            _magicFilePath = magicFile.PhysicalPath;
-        }
+            // The Mime project is generally very good at determining mime types from file contents
+            var mimeType = GuessMagicInfo(file.OpenReadStream(), MagicOpenFlags.MAGIC_MIME_TYPE);
 
-        public string GetMimeType(IFormFile file)
-        {
-            return file.OpenReadStream().GetFileType().Mime;
+            if (mimeType != null && mimeType != "application/octet-stream")
+            {
+                return mimeType;
+            }
+            
+            // However, it does not determine zipped types particularly well, like some of the open doc and spreadsheet
+            // formats.  Mime Detective is much better at doing this.
+            var fileType = file.OpenReadStream().GetFileType();
+
+            return fileType?.Mime;
         }
         
         public string GetMimeEncoding(IFormFile file)
@@ -33,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public bool HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
             var mimeType = GetMimeType(file);
-            return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
+            return mimeType != null && mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
         
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
