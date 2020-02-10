@@ -12,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             string description,
             string dataSource,
             string summary,
-            DateTime? nextUpdate,
             Guid latestReleaseId,
             List<ReleaseTitleViewModel> otherReleases,
             List<LinkViewModel> legacyReleases,
@@ -27,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             Description = description;
             DataSource = dataSource;
             Summary = summary;
-            NextUpdate = nextUpdate;
             LatestReleaseId = latestReleaseId;
             OtherReleases = otherReleases;
             LegacyReleases = legacyReleases;
@@ -48,8 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public string DataSource { get; set; }
 
         public string Summary { get; set; }
-
-        public DateTime? NextUpdate { get; set; }
 
         public Guid LatestReleaseId { get; set; }
 

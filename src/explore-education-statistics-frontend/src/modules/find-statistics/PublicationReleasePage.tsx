@@ -7,6 +7,8 @@ import ContentBlock from '@common/modules/find-statistics/components/ContentBloc
 import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
@@ -103,11 +105,13 @@ class PublicationReleasePage extends Component<Props> {
                   <div>
                     <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
-                      <strong>
-                        <FormattedDate format="MMMM yyyy">
-                          {data.publication.nextUpdate}
-                        </FormattedDate>
-                      </strong>
+                      {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                        <strong>
+                          <FormattedDate>
+                            {dayMonthYearToDate(data.nextReleaseDate)}
+                          </FormattedDate>
+                        </strong>
+                      )}
                     </dd>
                   </div>
                 </dl>
