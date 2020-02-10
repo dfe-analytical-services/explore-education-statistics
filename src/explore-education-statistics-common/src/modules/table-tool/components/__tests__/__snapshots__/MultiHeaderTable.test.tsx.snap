@@ -11,12 +11,14 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -25,24 +27,28 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -53,12 +59,14 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -79,6 +87,7 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -99,12 +108,14 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -125,6 +136,7 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -157,12 +169,14 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="4"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="4"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -171,24 +185,28 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         C
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         D
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         C
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         D
@@ -197,48 +215,56 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
@@ -249,18 +275,21 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="4"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         3
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -293,6 +322,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -325,12 +355,14 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         4
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -363,6 +395,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -395,18 +428,21 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="4"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         3
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -439,6 +475,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -471,12 +508,14 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         4
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -509,6 +548,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -569,12 +609,14 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -585,12 +627,14 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -608,6 +652,7 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -625,12 +670,14 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -648,6 +695,7 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -700,18 +748,21 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
@@ -722,12 +773,14 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -748,6 +801,7 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -768,12 +822,14 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -794,6 +850,7 @@ exports[`MultiHeaderTable renders table with column header group identical to it
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -826,12 +883,14 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -840,24 +899,28 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -896,6 +959,7 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -916,6 +980,7 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -948,12 +1013,14 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -962,24 +1029,28 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -997,6 +1068,7 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1045,6 +1117,7 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -1065,6 +1138,7 @@ exports[`MultiHeaderTable renders table with row header group identical to its s
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -1097,6 +1171,7 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
@@ -1114,12 +1189,14 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -1130,12 +1207,14 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1150,6 +1229,7 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1164,12 +1244,14 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1184,6 +1266,7 @@ exports[`MultiHeaderTable renders table with single column header group 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1219,12 +1302,14 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="cellHorizontalMiddle"
           colspan="1"
+          rowspan="1"
           scope="colgroup"
       >
         B
       </th>
       <th class="cellHorizontalMiddle"
           colspan="1"
+          rowspan="1"
           scope="colgroup"
       >
         C
@@ -1233,12 +1318,14 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -1249,12 +1336,14 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1269,6 +1358,7 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1283,12 +1373,14 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1303,6 +1395,7 @@ exports[`MultiHeaderTable renders table with single column header group at start
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1329,12 +1422,14 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -1343,24 +1438,28 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -1371,6 +1470,7 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
@@ -1384,6 +1484,7 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1404,6 +1505,7 @@ exports[`MultiHeaderTable renders table with single row header group 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1436,12 +1538,14 @@ exports[`MultiHeaderTable renders table with single row header group at start 1`
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -1450,24 +1554,28 @@ exports[`MultiHeaderTable renders table with single row header group at start 1`
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -1485,12 +1593,14 @@ exports[`MultiHeaderTable renders table with single row header group at start 1`
       </th>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1511,6 +1621,7 @@ exports[`MultiHeaderTable renders table with single row header group at start 1`
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1543,6 +1654,7 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="3"
+          rowspan="1"
           scope="colgroup"
       >
         A
@@ -1567,18 +1679,21 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
@@ -1589,12 +1704,14 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1612,6 +1729,7 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1629,12 +1747,14 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1652,6 +1772,7 @@ exports[`MultiHeaderTable renders table with two column header groups 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1697,18 +1818,21 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="cellHorizontalMiddle"
           colspan="1"
+          rowspan="1"
           scope="colgroup"
       >
         C
       </th>
       <th class="cellHorizontalMiddle"
           colspan="1"
+          rowspan="1"
           scope="colgroup"
       >
         D
       </th>
       <th class="cellHorizontalMiddle"
           colspan="1"
+          rowspan="1"
           scope="colgroup"
       >
         E
@@ -1717,18 +1841,21 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         F
@@ -1739,12 +1866,14 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         1
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1762,6 +1891,7 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1779,12 +1909,14 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="borderBottom"
           rowspan="2"
+          colspan="1"
           scope="rowgroup"
       >
         2
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         3
@@ -1802,6 +1934,7 @@ exports[`MultiHeaderTable renders table with two column header groups at start 1
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1831,12 +1964,14 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -1845,24 +1980,28 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -1873,6 +2012,7 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
     <tr>
       <th class="borderBottom"
           rowspan="3"
+          colspan="1"
           scope="rowgroup"
       >
         1
@@ -1886,6 +2026,7 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         4
@@ -1913,6 +2054,7 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         5
@@ -1933,6 +2075,7 @@ exports[`MultiHeaderTable renders table with two row header groups 1`] = `
     <tr>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -1965,12 +2108,14 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -1979,24 +2124,28 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -2014,12 +2163,14 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
       </th>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         3
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -2047,12 +2198,14 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
       </th>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         4
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -2073,12 +2226,14 @@ exports[`MultiHeaderTable renders table with two row header groups at start 1`] 
     <tr>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         5
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         6
@@ -2111,12 +2266,14 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
       </td>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         A
       </th>
       <th class="cellHorizontalMiddle"
           colspan="2"
+          rowspan="1"
           scope="colgroup"
       >
         B
@@ -2125,24 +2282,28 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
     <tr>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         C
       </th>
       <th class="govuk-table__header--numeric borderBottom"
           colspan="1"
+          rowspan="1"
           scope="col"
       >
         D
@@ -2153,6 +2314,7 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
     <tr>
       <th class="borderBottom"
           rowspan="4"
+          colspan="1"
           scope="rowgroup"
       >
         1
@@ -2166,12 +2328,14 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
       </th>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         4
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         8
@@ -2199,12 +2363,14 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
       </th>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         5
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         8
@@ -2225,12 +2391,14 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
     <tr>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         6
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         8
@@ -2251,12 +2419,14 @@ exports[`MultiHeaderTable renders table with two row header groups with 4 row he
     <tr>
       <th class="borderBottom"
           rowspan="1"
+          colspan="1"
           scope="rowgroup"
       >
         7
       </th>
       <th class="govuk-table__cell--numeric"
           rowspan="1"
+          colspan="1"
           scope="row"
       >
         8
