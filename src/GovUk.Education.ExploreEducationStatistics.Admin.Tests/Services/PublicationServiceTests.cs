@@ -138,6 +138,167 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
         
+        [Fact]
+        public async void UpdatePublicationMethodologyWithId()
+        {
+            var (userService, repository, _) = Mocks();
+            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
+            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
+            
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
+            {
+                context.Add(new Publication { Id = testPublicationId});
+                context.Add(new Methodology { Id = testMethodologyId});
+
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
+            {
+                var publicationService = new PublicationService(context, AdminMapper(),
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+                
+                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                {
+                    ExternalMethodology = null,
+                    MethodologyId = testMethodologyId
+                });
+
+                var publication = context.Publications.Single(p => p.Id == testPublicationId);
+                
+                Assert.Equal(testMethodologyId, publication.MethodologyId);
+            }
+        }
+        
+        [Fact]
+        public async void UpdatePublicationMethodologyWithId_Draft()
+        {
+            var (userService, repository, _) = Mocks();
+            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
+            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
+            
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_Draft"))
+            {
+                context.Add(new Publication { Id = testPublicationId});
+                context.Add(new Methodology { Id = testMethodologyId, Published = DateTime.UtcNow});
+
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_Draft"))
+            {
+                var publicationService = new PublicationService(context, AdminMapper(),
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+                
+                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                {
+                    ExternalMethodology = null,
+                    MethodologyId = testMethodologyId
+                });
+
+                var publication = context.Publications.Single(p => p.Id == testPublicationId);
+                
+                Assert.Null(publication.MethodologyId);
+            }
+        }
+        
+        [Fact]
+        public async void UpdatePublicationMethodologyWithId_NotExists()
+        {
+            var (userService, repository, _) = Mocks();
+            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
+            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
+            
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_NotExists"))
+            {
+                context.Add(new Publication { Id = testPublicationId});
+
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_NotExists"))
+            {
+                var publicationService = new PublicationService(context, AdminMapper(),
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+                
+                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                {
+                    ExternalMethodology = null,
+                    MethodologyId = testMethodologyId
+                });
+
+                var publication = context.Publications.Single(p => p.Id == testPublicationId);
+                
+                Assert.Null(publication.MethodologyId);
+            }
+        }
+        
+        [Fact]
+        public async void UpdatePublicationMethodologyWithExternal()
+        {
+            var (userService, repository, _) = Mocks();
+            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
+            
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithExternal"))
+            {
+                context.Add(new Publication { Id = testPublicationId});
+
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithExternal"))
+            {
+                var publicationService = new PublicationService(context, AdminMapper(),
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+                
+                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                {
+                    ExternalMethodology = new ExternalMethodology
+                    {
+                        Title = "title",
+                        Url = new Uri("https://example.com")
+                    },
+                    MethodologyId = null
+                });
+
+                var publication = context.Publications.Single(p => p.Id == testPublicationId);
+                
+                Assert.Null(publication.MethodologyId);
+            }
+        }
+        
+        [Fact]
+        public async void UpdatePublicationMethodologyInvalidRequest()
+        {
+            var (userService, repository, _) = Mocks();
+            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
+            
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyInvalidRequest"))
+            {
+                context.Add(new Publication { Id = testPublicationId});
+
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("UpdateMethodologyInvalidRequest"))
+            {
+                var publicationService = new PublicationService(context, AdminMapper(),
+                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+                
+                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                {
+                    ExternalMethodology = null,
+                    MethodologyId = null
+                });
+
+                var publication = context.Publications.Single(p => p.Id == testPublicationId);
+                
+                Assert.Null(publication.MethodologyId);
+                Assert.Null(publication.ExternalMethodology);
+
+            }
+        }
+        
         private (
             Mock<IUserService>, 
             Mock<IPublicationRepository>, 
