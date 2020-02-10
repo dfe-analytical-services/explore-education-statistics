@@ -6,14 +6,13 @@ import React, {
   useState,
 } from 'react';
 import classNames from 'classnames';
-import ButtonText from './ButtonText';
+import ButtonText from '@common/components/ButtonText';
 import styles from './CollapsibleList.module.scss';
 
 interface Props {
   children: ReactNode;
   collapseAfter?: number;
   isCollapsed?: boolean;
-  ordered?: boolean;
   listStyle?: 'none' | 'number' | 'bullet';
 }
 
@@ -21,7 +20,6 @@ const CollapsibleList = ({
   children,
   collapseAfter = 5,
   isCollapsed = true,
-  ordered = false,
   listStyle = 'none',
 }: Props) => {
   const [collapsed, setCollapsed] = useState<boolean>(isCollapsed);
@@ -43,20 +41,21 @@ const CollapsibleList = ({
       return child;
     });
 
-    const listClasses = classNames(
-      'govuk-list',
-      styles.listContainer,
-      listStyle === 'number' && 'govuk-list--number',
-      listStyle === 'bullet' && 'govuk-list--bullet',
-    );
+    const listClasses = classNames('govuk-list', styles.listContainer, {
+      'govuk-list--number': listStyle === 'number',
+      'govuk-list--bullet': listStyle === 'bullet',
+    });
     return (
       <>
-        {ordered ? (
+        {listStyle === 'number' ? (
           <ol className={listClasses}>{listItems}</ol>
         ) : (
           <ul className={listClasses}>{listItems}</ul>
         )}
-        <div className={styles.hidePrint} aria-hidden="true">
+        <div
+          className={classNames(styles.hidePrint, 'govuk-!-margin-bottom-4')}
+          aria-hidden="true"
+        >
           {collapsed && Children.count(children) - (collapseAfter - 2) && (
             <strong>
               {`And ${Children.count(children) - (collapseAfter - 2)} more...`}

@@ -7,13 +7,11 @@ export interface FootnoteProps {
 }
 
 const Footnote = ({ content }: FootnoteProps) => {
-  const footnoteList = content.map(function createFootnotes(footnotes) {
-    return <li key={footnotes.id}>{footnotes.label}</li>;
-  });
-
   return (
-    <CollapsibleList ordered listStyle="number">
-      {footnoteList}
+    <CollapsibleList listStyle="number">
+      {content.map(footnotes => {
+        return <li key={footnotes.id}>{footnotes.label}</li>;
+      })}
     </CollapsibleList>
   );
 };
