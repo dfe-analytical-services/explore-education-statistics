@@ -10,7 +10,7 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, Formik, FormGroup } from '@common/components/form';
+import { FormFieldset, FormGroup, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -30,8 +30,7 @@ interface FormValues {
   methodologyChoice?: 'existing' | 'external' | 'later';
   selectedMethodologyId?: string;
   selectedContactId: string;
-  externalLinkTitle?: string;
-  externalLinkUrl?: string;
+  externalMethodology: { title: string; url: string };
 }
 
 interface CreatePublicationModel {
@@ -42,12 +41,10 @@ interface CreatePublicationModel {
 
 const CreatePublicationPage = ({
   history,
-  match,
   handleApiErrors,
 }: RouteComponentProps<{ topicId: string }> & ErrorControlProps) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
-  // TODO: Could be undefined
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
 
   useEffect(() => {
@@ -81,7 +78,6 @@ const CreatePublicationPage = ({
       'Choose a unique title',
     ),
   );
-
   const cancelHandler = () => {
     history.push(appRouteList.adminDashboard.path as string);
   };
@@ -136,8 +132,7 @@ const CreatePublicationPage = ({
             )[0].id,
             methodologyChoice: undefined,
             selectedMethodologyId: '',
-            externalLinkTitle: '',
-            externalLinkUrl: 'https://',
+            externalMethodology: { title: '', url: 'https://' },
           }}
           validationSchema={Yup.object<FormValues>({
             publicationTitle: Yup.string().required(
@@ -152,8 +147,16 @@ const CreatePublicationPage = ({
               then: Yup.string().required('Choose a methodology'),
               otherwise: Yup.string(),
             }),
-            externalLinkTitle: Yup.string(),
-            externalLinkUrl: Yup.string(),
+            externalMethodology: Yup.object<{
+              title: string;
+              url: string;
+            }>().when('methodologyChoice', {
+              is: 'external',
+              then: Yup.object().shape({
+                title: Yup.string().required('Enter a link title'),
+                url: Yup.string().url('Enter a valid URL'),
+              }),
+            }),
           })}
           onSubmit={submitFormHandler}
           render={(form: FormikProps<FormValues>) => {
@@ -172,7 +175,7 @@ const CreatePublicationPage = ({
                   options={[
                     {
                       value: 'existing',
-                      label: 'Add existing methodology',
+                      label: 'Choose an existing methodology',
                       conditional: (
                         <FormFieldSelect
                           id={`${formId}-selectedMethodologyId`}
@@ -187,25 +190,25 @@ const CreatePublicationPage = ({
                     },
                     {
                       value: 'external',
-                      label: 'Link to externally hosted methodology',
+                      label: 'Link to an externally hosted methodology',
                       conditional: (
                         <FormGroup>
                           <FormFieldTextInput
                             label="Link title"
-                            id="externalLinkTitle"
-                            name="externalLinkTitle"
+                            id="externalMethodology.title"
+                            name="externalMethodology.title"
                           />
                           <FormFieldTextInput
                             label="URL"
-                            id="externalLinkUrl"
-                            name="externalLinkUrl"
+                            id="externalMethodology.url"
+                            name="externalMethodology.url"
                           />
                         </FormGroup>
                       ),
                     },
                     {
                       value: 'later',
-                      label: 'Select methodology later',
+                      label: 'Select a methodology later',
                     },
                   ]}
                   onChange={e => {
@@ -216,11 +219,25 @@ const CreatePublicationPage = ({
                           model.methodologies,
                           methodology => methodology.title,
                         )[0].id,
+                        externalMethodology: {
+                          title: '',
+                          url: '',
+                        },
+                      });
+                    }
+                    if (e.target.value === 'external') {
+                      return form.setValues({
+                        ...form.values,
+                        selectedMethodologyId: '',
                       });
                     }
                     return form.setValues({
                       ...form.values,
                       selectedMethodologyId: '',
+                      externalMethodology: {
+                        title: '',
+                        url: '',
+                      },
                     });
                   }}
                 />

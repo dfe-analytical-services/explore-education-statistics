@@ -59,7 +59,6 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   themeTopicWrapper: {
     path: themeTopicPath,
     component: ThemeTopicWrapper,
-    // protectedAction: user => user.permissions.canAccessAnalystPages,
   },
   administration: {
     path: '/administration',
