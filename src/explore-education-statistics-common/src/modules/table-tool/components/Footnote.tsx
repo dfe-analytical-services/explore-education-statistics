@@ -1,6 +1,6 @@
-import React from 'react';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import CollapsibleList from '@common/components/CollapsibleList';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import React from 'react';
 
 export interface FootnoteProps {
   content: FullTableMeta['footnotes'];

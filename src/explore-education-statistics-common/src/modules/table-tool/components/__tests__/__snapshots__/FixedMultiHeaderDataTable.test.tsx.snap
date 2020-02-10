@@ -8,7 +8,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
   <thead>
     <tr>
       <td
-        class="borderBottom borderRight"
+        class="borderBottom"
         colspan="1"
         rowspan="2"
       />
