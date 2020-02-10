@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             // However, it does not determine zipped types particularly well, like some of the open doc and spreadsheet
             // formats.  Mime Detective is much better at doing this.
+            //
+            // TODO EES-1283 - change GetFileType() to GetFileTypeAsync()
             var fileType = file.OpenReadStream().GetFileType();
 
             return fileType?.Mime ?? mimeType;
