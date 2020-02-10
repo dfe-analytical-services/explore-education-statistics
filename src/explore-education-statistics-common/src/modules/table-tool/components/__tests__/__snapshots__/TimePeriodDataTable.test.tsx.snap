@@ -8,14 +8,14 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         class="borderBottom"
     >
     </td>
-    <th class="columnHeaderGroup borderRightNone"
+    <th class="columnHeaderGroup"
         colspan="2"
         rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Asian Total
     </th>
-    <th class="columnHeaderGroup"
+    <th class="columnHeaderGroup borderRightNone"
         colspan="2"
         rowspan="1"
         scope="colgroup"
@@ -31,7 +31,7 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+    <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
         rowspan="1"
         scope="col"
@@ -45,7 +45,7 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom"
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
         rowspan="1"
         scope="col"
@@ -276,14 +276,14 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         class="borderBottom"
     >
     </td>
-    <th class="columnHeaderGroup borderRightNone"
+    <th class="columnHeaderGroup"
         colspan="2"
         rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Asian Total
     </th>
-    <th class="columnHeaderGroup"
+    <th class="columnHeaderGroup borderRightNone"
         colspan="2"
         rowspan="1"
         scope="colgroup"
@@ -299,7 +299,7 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+    <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
         rowspan="1"
         scope="col"
@@ -313,7 +313,7 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom"
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
         rowspan="1"
         scope="col"

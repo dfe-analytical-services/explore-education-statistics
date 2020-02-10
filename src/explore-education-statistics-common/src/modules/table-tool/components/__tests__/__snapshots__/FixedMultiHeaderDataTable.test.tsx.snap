@@ -13,7 +13,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="2"
       />
       <th
-        class="columnHeaderGroup borderRightNone"
+        class="columnHeaderGroup"
         colspan="2"
         rowspan="1"
         scope="colgroup"
@@ -21,7 +21,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         Col group A
       </th>
       <th
-        class="columnHeaderGroup"
+        class="columnHeaderGroup borderRightNone"
         colspan="2"
         rowspan="1"
         scope="colgroup"
@@ -39,7 +39,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom borderRightNone"
+        class="govuk-table__header--numeric borderBottom"
         colspan="1"
         rowspan="1"
         scope="col"
@@ -55,7 +55,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom"
+        class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
         rowspan="1"
         scope="col"
