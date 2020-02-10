@@ -304,7 +304,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var result = service.GetReleaseViewModel(PublicationARelease1.Id);
 
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
-                Assert.Equal(PublicationA.Id, result.Publication.Id);
                 Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
                     result.KeyStatisticsSection.Content[0].Id);
 

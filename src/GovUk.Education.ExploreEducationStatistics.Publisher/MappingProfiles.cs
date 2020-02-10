@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<ContentSection, ContentSectionViewModel>();
 
+            CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
+
             CreateMap<Link, LinkViewModel>();
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
@@ -27,15 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Publication, PublicationTitleViewModel>();
 
-            CreateMap<Publication, PublicationViewModel>()
+            CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
-            CreateMap<Release, OtherReleaseViewModel>();
-
-            CreateMap<Release, ReleaseViewModel>()
+            CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent));
+
+            CreateMap<Release, ReleaseTitleViewModel>();
 
             CreateMap<ReleaseType, ReleaseTypeViewModel>();
 

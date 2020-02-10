@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
@@ -107,7 +108,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new PublicationService(context, MapperForProfile<MappingProfiles>());
+                var releaseService = new Mock<IReleaseService>();
+
+                var service = new PublicationService(context, MapperForProfile<MappingProfiles>(), releaseService.Object);
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
@@ -115,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var theme = result.First();
                 Assert.Equal("Theme A", theme.Title);
 
-                Assert.Single((IEnumerable) theme.Topics);
+                Assert.Single(theme.Topics);
                 var topic = theme.Topics.First();
                 Assert.Equal("Topic A", topic.Title);
 

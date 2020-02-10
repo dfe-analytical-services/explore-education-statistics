@@ -77,11 +77,11 @@ const PublicationReleaseContent = ({
 
   const releaseCount = React.useMemo(
     () =>
-      release.publication.releases.length +
+      release.publication.otherReleases.length +
       release.publication.legacyReleases.length,
     [
       release.publication.legacyReleases.length,
-      release.publication.releases.length,
+      release.publication.otherReleases.length,
     ],
   );
 
@@ -207,28 +207,30 @@ const PublicationReleaseContent = ({
               {releaseCount > 0 && (
                 <dd>
                   <Details
-                    summary={`See previous ${releaseCount} releases`}
+                    summary={`See ${releaseCount} other releases`}
                     onToggle={(open: boolean) =>
                       open &&
                       logEvent(
-                        'Previous Releases',
-                        'Release page previous releases dropdown opened',
+                        'Other Releases',
+                        'Release page other releases dropdown opened',
                         window.location.pathname,
                       )
                     }
                   >
                     <ul className="govuk-list">
                       {[
-                        ...release.publication.releases.map(({ id, title }) => [
-                          title,
-                          <li key={id} data-testid="previous-release-item">
-                            <Link to="#">{title}</Link>
-                          </li>,
-                        ]),
+                        ...release.publication.otherReleases.map(
+                          ({ id, title }) => [
+                            title,
+                            <li key={id} data-testid="other-release-item">
+                              <Link to="#">{title}</Link>
+                            </li>,
+                          ],
+                        ),
                         ...release.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
-                            <li key={id} data-testid="previous-release-item">
+                            <li key={id} data-testid="other-release-item">
                               <a href={url}>{description}</a>
                             </li>,
                           ],

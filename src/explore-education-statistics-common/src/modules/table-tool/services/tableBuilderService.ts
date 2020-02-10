@@ -1,6 +1,6 @@
-import { Dictionary, PartialRecord, KeysRemap } from '@common/types';
-import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
+import { FullTable } from '@common/modules/table-tool/types/fullTable.js';
 import { dataApi } from '@common/services/api';
+import { Dictionary, PartialRecord } from '@common/types';
 
 export interface FilterOption {
   label: string;
@@ -79,20 +79,23 @@ export interface PublicationSubjectMeta {
   };
 }
 
-export type LocationLevelKeys =
-  | 'country'
-  | 'institution'
-  | 'localAuthority'
-  | 'localAuthorityDistrict'
-  | 'localEnterprisePartnership'
-  | 'multiAcademyTrust'
-  | 'mayoralCombinedAuthority'
-  | 'opportunityArea'
-  | 'parliamentaryConstituency'
-  | 'region'
-  | 'rscRegion'
-  | 'sponsor'
-  | 'ward';
+export const locationLevelKeys = [
+  'country',
+  'institution',
+  'localAuthority',
+  'localAuthorityDistrict',
+  'localEnterprisePartnership',
+  'mayoralCombinedAuthority',
+  'multiAcademyTrust',
+  'opportunityArea',
+  'parliamentaryConstituency',
+  'region',
+  'rscRegion',
+  'sponsor',
+  'ward',
+] as const;
+
+export type LocationLevelKeys = typeof locationLevelKeys[number];
 
 export type TimeIdentifier =
   | 'AY'
@@ -166,24 +169,6 @@ export interface TimePeriodQuery {
   endCode: TimeIdentifier;
 }
 
-export const LocationLevelKeysEnum: KeysRemap<LocationLevelKeys, boolean> = {
-  country: true,
-  institution: true,
-  localAuthority: true,
-  localAuthorityDistrict: true,
-  localEnterprisePartnership: true,
-  mayoralCombinedAuthority: true,
-  multiAcademyTrust: true,
-  opportunityArea: true,
-  parliamentaryConstituency: true,
-  region: true,
-  rscRegion: true,
-  sponsor: true,
-  ward: true,
-};
-
-export const LocationLevelKeysNames = Object.keys(LocationLevelKeysEnum);
-
 export type TableDataQuery = {
   publicationId?: string;
   subjectId: string;
@@ -192,6 +177,29 @@ export type TableDataQuery = {
   timePeriod?: TimePeriodQuery;
   geographicLevel?: string;
 } & PartialRecord<LocationLevelKeys, string[]>;
+
+interface UnmappedFullTableSubjectMeta {
+  publicationName: string;
+  subjectName: string;
+  locations: { label: string; value: string; level: string }[];
+  timePeriodRange: TimePeriodOption[];
+  filters: Dictionary<{
+    legend: string;
+    hint?: string;
+    options: GroupedFilterOptions;
+    totalValue?: string;
+  }>;
+  indicators: IndicatorOption[];
+  footnotes: {
+    id: string;
+    label: string;
+  }[];
+}
+
+export interface UnmappedFullTable {
+  results: FullTable['results'];
+  subjectMeta: UnmappedFullTableSubjectMeta;
+}
 
 export default {
   getThemes(): Promise<ThemeMeta[]> {
@@ -217,13 +225,20 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<FullTable> {
-    return dataApi.post('/tablebuilder', query);
-  },
-  getTableDataForRelease(
+  getTableData(
     query: TableDataQuery,
-    releaseId: string,
-  ): Promise<FullTable> {
-    return dataApi.post(`/tablebuilder?releaseId=${releaseId}`, query);
+    releaseId?: string,
+  ): Promise<UnmappedFullTable> {
+    return dataApi.post(
+      '/tablebuilder',
+      query,
+      releaseId
+        ? {
+            params: {
+              releaseId,
+            },
+          }
+        : undefined,
+    );
   },
 };

@@ -116,7 +116,7 @@
     "no-console": "warn",
     "no-param-reassign": ["error", {
       "props": true,
-      "ignorePropertyModificationsFor": ["draft"]
+      "ignorePropertyModificationsFor": ["draft", "acc"]
     }],
     "no-use-before-define": "off",
     "no-useless-constructor": "off",

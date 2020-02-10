@@ -281,8 +281,9 @@ const ReleaseManageDataBlocksPage = ({
 
               <div style={{ overflow: 'hidden' }}>
                 <CreateDataBlocks
-                  releaseId={releaseId}
                   {...dataBlockData}
+                  releaseId={releaseId}
+                  loading={isLoading}
                   onDataBlockSave={onDataBlockSave}
                   onTableToolLoaded={unsetIsLoading}
                 />

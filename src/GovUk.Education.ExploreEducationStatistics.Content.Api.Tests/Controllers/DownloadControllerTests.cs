@@ -18,12 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             fileStorageService.Setup(s => s.DownloadTextAsync("download/tree.json")).ReturnsAsync(@"
             [
             {
-                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""id"": ""057bfc2f-2e23-4775-be1d-de9700569183"",
                 ""title"": ""string"",
                 ""summary"": ""string"",
                 ""topics"": [
                 {
-                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""id"": ""f287aa31-95e2-4c13-bb23-6782ea411726"",
                     ""title"": ""string"",
                     ""summary"": ""string"",
                     ""publications"": [
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                             ""size"": ""string""
                         }
                         ],
-                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""id"": ""b2aeb86f-1213-47d7-b863-942e4fd080da"",
                         ""title"": ""string"",
                         ""slug"": ""string"",
                         ""summary"": ""string""
