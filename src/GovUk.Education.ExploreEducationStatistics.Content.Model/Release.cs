@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 
+        public int Year => int.Parse(_releaseName);
+        
         public string YearTitle => TimePeriodLabelFormatter.FormatYear(ReleaseName, TimePeriodCoverage);
 
         public string CoverageTitle => TimePeriodCoverage.GetEnumLabel();

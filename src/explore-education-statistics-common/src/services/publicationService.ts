@@ -20,7 +20,6 @@ export interface Publication {
   nextUpdate: string;
   releases: {
     id: string;
-    releaseName: string;
     slug: string;
     title: string;
   }[];
@@ -48,6 +47,11 @@ export interface PublicationContact {
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+}
+
+export interface PublicationTitle {
+  id: string;
+  title: string;
 }
 
 export interface DataQuery {
@@ -333,8 +337,8 @@ export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
 export type Release = AbstractRelease<ContentBlock>;
 
 export default {
-  getPublication(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}`);
+  getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
+    return contentApi.get(`content/publication/${publicationSlug}/title`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);

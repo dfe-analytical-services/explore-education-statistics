@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters":{
+    "subscription": {
+      "type": "string",
+      "metadata": {
+        "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "ees",
+      "metadata": {
+        "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+      }
+    }
+  },
+  "variables":{
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
+    "factoryId":"[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'))]"
+  },
+  "resources":[
+    {
+      "name":"[variables('dataFactoryName')]",
+      "apiVersion":"2018-06-01",
+      "type":"Microsoft.DataFactory/factories",
+      "location":"[resourceGroup().location]",
+      "identity":{
+        "type":"SystemAssigned"
+      },
+      "properties": {}
+    }
+  ]
+}

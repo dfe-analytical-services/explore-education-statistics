@@ -13,4 +13,8 @@ module.exports = {
     ],
     '@zeit/next-typescript/babel',
   ],
+  plugins: [
+    '@babel/plugin-proposal-nullish-coalescing-operator',
+    '@babel/plugin-proposal-optional-chaining',
+  ],
 };

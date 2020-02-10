@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
@@ -110,9 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            app.UseHttpsRedirection();
-            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            else
+            {
+                app.UseHttpsRedirection();
+                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            }
             
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing

@@ -1,5 +1,5 @@
 import publicationService, {
-  Release,
+  PublicationTitle,
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
@@ -14,7 +14,7 @@ import styles from './SubscriptionPage.module.scss';
 
 interface Props {
   slug: string;
-  data: Release;
+  data: PublicationTitle;
   unsubscribed: string;
   verified: string;
 }
@@ -37,7 +37,7 @@ class SubscriptionPage extends Component<Props> {
   }>) {
     const { slug, unsubscribed, verified } = query;
 
-    const request = publicationService.getPublication(slug);
+    const request = publicationService.getPublicationTitle(slug);
 
     const data = await request;
 

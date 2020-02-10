@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -33,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Mock<IFormFile>().Object, 
                     "", 
                     ReleaseFileTypes.Ancillary, 
-                    false
+                    false,
+                    new Regex[] {}
                     ), 
                 CanUpdateSpecificRelease);
         }
@@ -112,10 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (contentDbContext, subjectService, userService, releaseHelper) = Mocks();
+            var (contentDbContext, subjectService, userService, releaseHelper, fileTypeService) = Mocks();
 
             var service = new FileStorageService(contentDbContext.Object, subjectService.Object, 
-                userService.Object, releaseHelper.Object);
+                userService.Object, releaseHelper.Object, fileTypeService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
@@ -124,13 +127,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IConfiguration>,
             Mock<ISubjectService>,
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>>,
+            Mock<IFileTypeService>) Mocks()
         {
             return (
                 new Mock<IConfiguration>(), 
                 new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release));
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
+                new Mock<IFileTypeService>());
         }
     }
 }
