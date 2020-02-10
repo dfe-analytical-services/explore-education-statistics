@@ -165,7 +165,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
     const expandedColumnHeaders = createExpandedHeaders(columnHeaders);
     const expandedRowHeaders = createExpandedHeaders(rowHeaders);
-    const firstRowLength = expandedRowHeaders[0].length;
+    const firstRowHeaderLength = expandedRowHeaders[0].length;
 
     // Expanded headers need to be transposed so that
     // they are compatible with HTML table rows.
@@ -219,8 +219,11 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                       <th
                         className={classNames({
                           'govuk-table__header--numeric': !column.isGroup,
-                          [styles.cellHorizontalMiddle]: column.isGroup,
+                          [styles.columnHeaderGroup]:
+                            column.isGroup || column.crossSpan > 1,
                           [styles.borderBottom]: !column.isGroup,
+                          [styles.borderRightNone]:
+                            column.start + column.span === rows[0].length,
                         })}
                         colSpan={column.span}
                         rowSpan={column.crossSpan}
@@ -274,7 +277,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         key={cellIndex}
                         className={classNames('govuk-table__cell--numeric', {
                           [styles.borderBottom]:
-                            (rowIndex + 1) % firstRowLength === 0,
+                            (rowIndex + 1) % firstRowHeaderLength === 0,
                         })}
                       >
                         {cell}
