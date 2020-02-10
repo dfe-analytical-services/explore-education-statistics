@@ -376,7 +376,7 @@ class EditablePublicationPage extends Component<Props, State> {
                   </dd>
 
                   <dd>
-                    <Details summary="See previous 7 releases">
+                    <Details summary="See 7 other releases">
                       <ul className="govuk-list">
                         <li>
                           <a

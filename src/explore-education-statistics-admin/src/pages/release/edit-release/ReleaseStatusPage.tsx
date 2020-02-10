@@ -19,6 +19,7 @@ import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import ButtonText from '@common/components/ButtonText';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -28,6 +29,7 @@ interface FormValues {
 interface Model {
   releaseStatus: ReleaseStatus;
   statusOptions: RadioOption[];
+  editable: boolean;
 }
 
 const statusMap: {
@@ -39,7 +41,6 @@ const statusMap: {
 };
 
 const ReleaseStatusPage = ({
-  history,
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
@@ -50,14 +51,16 @@ const ReleaseStatusPage = ({
   useEffect(() => {
     Promise.all([
       service.getReleaseStatus(releaseId),
+      permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
     ])
-      .then(([releaseStatus, canSubmit, canApprove]) => {
+      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
         const statusOptions: RadioOption[] = [
           {
             label: 'In draft',
             value: 'Draft',
+            disabled: !canMarkAsDraft,
           },
           {
             label: 'Ready for higher review',
@@ -74,10 +77,11 @@ const ReleaseStatusPage = ({
         setModel({
           releaseStatus,
           statusOptions,
+          editable: statusOptions.some(option => !option.disabled),
         });
       })
       .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+  }, [releaseId, handleApiErrors, showForm]);
 
   if (!model) return null;
 
@@ -93,17 +97,15 @@ const ReleaseStatusPage = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
-      await service
-        .updateReleaseStatus(releaseId, values)
-        .then(() => {
-          setModel({
-            releaseStatus: values.releaseStatus,
-            statusOptions: model.statusOptions,
-          });
-        })
-        .then(() => {
-          setShowForm(false);
+      await service.updateReleaseStatus(releaseId, values).then(() => {
+        setModel({
+          ...model,
+          releaseStatus: values.releaseStatus,
+          statusOptions: model.statusOptions,
         });
+
+        setShowForm(false);
+      });
     },
     handleApiErrors,
     ...errorCodeMappings,
@@ -114,7 +116,7 @@ const ReleaseStatusPage = ({
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
         <>
-          <div>
+          <div className="govuk-!-margin-bottom-6">
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -124,12 +126,15 @@ const ReleaseStatusPage = ({
               </div>
             )}
           </div>
-          <Button
-            className="govuk-!-margin-top-2"
-            onClick={() => setShowForm(true)}
-          >
-            Update release status
-          </Button>
+
+          {model.editable && (
+            <Button
+              className="govuk-!-margin-top-2"
+              onClick={() => setShowForm(true)}
+            >
+              Update release status
+            </Button>
+          )}
         </>
       ) : (
         <Formik<FormValues>
@@ -164,16 +169,18 @@ const ReleaseStatusPage = ({
                   additionalClass="govuk-!-width-one-half"
                 />
                 <div className="govuk-!-margin-top-6">
-                  <Button
+                  <Button type="submit" className="govuk-!-margin-right-6">
+                    Update
+                  </Button>
+                  <ButtonText
                     onClick={() => {
                       form.resetForm();
                       setShowForm(false);
                     }}
-                    className="govuk-!-margin-left-1 govuk-button--secondary"
+                    className="govuk-button govuk-button--secondary"
                   >
                     Cancel
-                  </Button>
-                  <Button type="submit">Update</Button>
+                  </ButtonText>
                 </div>
               </Form>
             );

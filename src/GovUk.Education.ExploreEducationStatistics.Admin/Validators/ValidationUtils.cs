@@ -82,6 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CommentNotFound,
         UserAlreadyExists,
         InvalidEmailAddress,
-        ApprovedReleaseMustHavePublishScheduledDate
+        ApprovedReleaseMustHavePublishScheduledDate,
+        PublicationDoesNotExist,
+        PublicationHasMethodologyAssigned
     }
 }

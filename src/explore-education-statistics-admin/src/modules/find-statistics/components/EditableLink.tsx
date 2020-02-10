@@ -40,7 +40,7 @@ const EditableLink = ({
         </Link>
       </div>
       <Button
-        className="govuk-!-margin-bottom-1"
+        className="govuk-!-margin-bottom-3"
         variant="secondary"
         onClick={() => removeOnClick()}
       >

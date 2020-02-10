@@ -20,7 +20,7 @@
     "lint-staged": "^9.1.0",
     "prettier": "^1.19.1",
     "scramjet": "^4.27.6",
-    "stylelint": "^13.0.0",
+    "stylelint": "^12.0.0",
     "stylelint-config-prettier": "^8.0.1",
     "stylelint-config-sass-guidelines": "^6.2.0",
     "stylelint-prettier": "^1.1.2",

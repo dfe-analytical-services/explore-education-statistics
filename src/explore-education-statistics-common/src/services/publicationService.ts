@@ -18,7 +18,7 @@ export interface Publication {
   dataSource: string;
   summary: string;
   nextUpdate: string;
-  releases: {
+  otherReleases: {
     id: string;
     slug: string;
     title: string;
@@ -239,7 +239,6 @@ export interface AbstractRelease<
   keyStatisticsSection: ContentSection<ContentBlockType>;
   keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
-  publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;

@@ -13,6 +13,9 @@ const service = {
   canUpdateRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
+  canMarkReleaseAsDraft: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/status/draft`);
+  },
   canSubmitReleaseForHigherLevelReview: (
     releaseId: string,
   ): Promise<boolean> => {

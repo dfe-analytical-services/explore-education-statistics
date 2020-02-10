@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public DateTime? NextUpdate { get; set; }
         
-        public List<PreviousReleaseViewModel> Releases { get; set; }
+        public List<PreviousReleaseViewModel> OtherReleases { get; set; }
         
         public List<BasicLink> LegacyReleases { get; set; }
 

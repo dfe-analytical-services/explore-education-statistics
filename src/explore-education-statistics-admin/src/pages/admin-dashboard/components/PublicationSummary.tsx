@@ -23,7 +23,18 @@ const PublicationSummary = ({ publication }: Props) => {
               {publication.methodology.title}
             </Link>
           )}
-          {!publication.methodology && <>No methodology available</>}
+          {publication.externalMethodology && (
+            <a
+              href={publication.externalMethodology.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {publication.externalMethodology.url}
+            </a>
+          )}
+          {!publication.methodology && !publication.externalMethodology && (
+            <>No methodology assigned</>
+          )}
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">

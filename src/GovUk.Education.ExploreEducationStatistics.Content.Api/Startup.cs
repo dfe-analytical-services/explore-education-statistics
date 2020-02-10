@@ -35,7 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         {
             services.AddMvc(options => { options.EnableEndpointRouting = false; })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(options => {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
