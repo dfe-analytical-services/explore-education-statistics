@@ -22,6 +22,7 @@ import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import remove from 'lodash/remove';
 
 interface FormValues {
   subjectTitle: string;
@@ -277,12 +278,15 @@ const ReleaseDataUploadsSection = ({
                   heading={`${dataFile.title}`}
                   onToggle={() => {
                     const accId = `${dataFile.title}-${index}`;
-                    const opened = openedAccordions;
-                    // eslint-disable-next-line no-unused-expressions
-                    opened.includes(accId)
-                      ? opened.splice(opened.indexOf(accId), 1)
-                      : opened.push(accId);
-                    setOpenedAccordions(opened);
+                    let opened = [];
+                    if (openedAccordions.includes(accId)) {
+                      opened = remove(openedAccordions, (item: string) => {
+                        return item !== accId;
+                      });
+                    } else {
+                      return setOpenedAccordions([...openedAccordions, accId]);
+                    }
+                    return setOpenedAccordions(opened);
                   }}
                   open={openedAccordions.includes(`${dataFile.title}-${index}`)}
                 >
