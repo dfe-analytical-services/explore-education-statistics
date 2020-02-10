@@ -191,12 +191,36 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && (
+            {canUpdateRelease ? (
               <>
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Add new data to release"
                 >
+                  <div className="govuk-inset-text">
+                    <h2 className="govuk-heading-m">Before you start</h2>
+                    <div className="govuk-list--bullet">
+                      <li>
+                        make sure your data has passed the screening checks in
+                        our{' '}
+                        <a href="https://github.com/dfe-analytical-services/ees-data-screener">
+                          R Project
+                        </a>{' '}
+                      </li>
+                      <li>
+                        if your data doesn’t meet these standards, you won’t be
+                        able to upload it to your release
+                      </li>
+                      <li>
+                        if you have any issues uploading data and files, or
+                        questions about data standards contact:{' '}
+                        <a href="mailto:explore.statistics@education.gov.uk">
+                          explore.statistics@education.gov.uk
+                        </a>
+                      </li>
+                    </div>
+                  </div>
+
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-subjectTitle`}
                     name="subjectTitle"
@@ -233,6 +257,8 @@ const ReleaseDataUploadsSection = ({
                   Cancel
                 </ButtonText>
               </>
+            ) : (
+              'Release has been approved, and can no longer be updated.'
             )}
 
             {dataFiles.length > 0 && (

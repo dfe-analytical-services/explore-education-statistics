@@ -24,10 +24,6 @@ interface State {
 }
 
 class PrototypeEditableContent extends React.Component<Props, State> {
-  private ref = createRef<HTMLDivElement>();
-
-  private temporaryContent: string = '';
-
   public static defaultProps = {
     editable: false,
     reviewing: false,
@@ -39,6 +35,10 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     editing: false,
     unsaved: false,
   };
+
+  private ref = createRef<HTMLDivElement>();
+
+  private temporaryContent = '';
 
   public componentDidMount() {
     const { content } = this.props;

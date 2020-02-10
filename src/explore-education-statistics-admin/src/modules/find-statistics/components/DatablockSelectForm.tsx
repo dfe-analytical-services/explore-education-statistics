@@ -23,9 +23,9 @@ const DatablockSelectForm = ({
   const { availableDataBlocks } = useContext(EditingContext);
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  function getDBPreview() {
+  const getDBPreview = (datablockId: string) => {
     const selectedDataBlock = availableDataBlocks.find(
-      datablock => datablock.id === selectedDataBlockId,
+      datablock => datablock.id === datablockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -39,7 +39,7 @@ const DatablockSelectForm = ({
         </Details>
       </section>
     ) : null;
-  }
+  };
 
   return (
     <>
@@ -62,7 +62,7 @@ const DatablockSelectForm = ({
           })),
         ]}
       />
-      {getDBPreview()}
+      {getDBPreview(selectedDataBlockId)}
       {selectedDataBlockId !== '' && (
         <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
       )}

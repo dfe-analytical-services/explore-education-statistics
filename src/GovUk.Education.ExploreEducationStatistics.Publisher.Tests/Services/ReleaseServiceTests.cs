@@ -1,90 +1,123 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private readonly MapperConfiguration _config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new MappingProfiles());
-        });
-
         private static readonly Contact Contact = new Contact
         {
-            Id = new Guid("9bf9cc0b-e85f-466b-b90f-354944dcc82e")
+            Id = Guid.NewGuid()
+        };
+
+        private static readonly Theme Theme = new Theme
+        {
+            Id = Guid.NewGuid(),
+            Title = "Theme A",
+            Slug = "theme-a",
+            Summary = "The first theme"
         };
 
         private static readonly Topic Topic = new Topic
         {
-            Id = new Guid("7b781f47-d305-4204-b7cd-ea49c23273fa"),
-            Theme = new Theme
-            {
-                Id = new Guid("1982dec8-b724-4e15-887d-f473fe667826"),
-                Title = "Title X"
-            }
+            Id = Guid.NewGuid(),
+            Title = "Topic A",
+            ThemeId = Theme.Id,
+            Slug = "topic-a",
+            Summary = "The first topic"
+        };
+
+        private static readonly Publication PublicationA = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication A",
+            Contact = Contact,
+            Topic = Topic
+        };
+
+        private static readonly Publication PublicationB = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication B",
+            Contact = Contact,
+            Topic = Topic
         };
 
         private static readonly List<Publication> Publications = new List<Publication>
         {
-            new Publication
+            PublicationA, PublicationB
+        };
+
+        private static readonly Release PublicationARelease1 = new Release
+        {
+            Id = Guid.NewGuid(),
+            PublicationId = PublicationA.Id,
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            RelatedInformation = new List<BasicLink>
             {
-                Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-                Title = "Publication A",
-                Contact = Contact,
-                Topic = Topic
+                new BasicLink
+                {
+                    Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
+                    Description = "Related Information",
+                    Url = "http://example.com"
+                }
             },
-            new Publication
+            Published = new DateTime(2019, 1, 01),
+            Status = Approved
+        };
+
+        private static readonly Release PublicationARelease2 = new Release
+        {
+            Id = Guid.NewGuid(),
+            PublicationId = PublicationA.Id,
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ2,
+            RelatedInformation = new List<BasicLink>
             {
-                Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                Title = "Publication B",
-                Contact = Contact,
-                Topic = Topic
-            }
+                new BasicLink
+                {
+                    Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
+                    Description = "Related Information",
+                    Url = "http://example.com"
+                }
+            },
+            Published = new DateTime(2019, 1, 01),
+            Status = Approved
         };
 
         private static readonly List<Release> Releases = new List<Release>
         {
+            PublicationARelease1,
+            PublicationARelease2,
             new Release
             {
-                Id = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
-                PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-                TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
-                RelatedInformation = new List<BasicLink>
-                {
-                    new BasicLink
-                    {
-                        Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
-                        Description = "Related Information",
-                        Url = "http://example.com"
-                    }
-                },
-                Published = new DateTime(2020, 1, 02)
+                Id = Guid.NewGuid(),
+                PublicationId = PublicationA.Id,
+                ReleaseName = "2017",
+                TimePeriodCoverage = AcademicYearQ4,
+                Published = new DateTime(2019, 1, 01),
+                Status = Approved
             },
             new Release
             {
-                Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-		RelatedInformation = new List<BasicLink>
-                {
-                    new BasicLink
-                    {
-                        Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
-                        Description = "Related Information",
-                        Url = "http://example.com"
-                    }
-                }
+                Id = Guid.NewGuid(),
+                PublicationId = PublicationA.Id,
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ3,
+                Published = null,
+                Status = Draft
             }
         };
 
@@ -144,32 +177,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ReleaseId = PublicationARelease1.Id,
                 ContentSectionId = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd")
             },
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ReleaseId = PublicationARelease1.Id,
                 ContentSectionId = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240")
             },
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"),
+                ReleaseId = PublicationARelease1.Id,
                 ContentSectionId = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5")
             },
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ReleaseId = PublicationARelease2.Id,
                 ContentSectionId = new Guid("99c28757-bf61-490e-a51f-98dd58afb578")
             },
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ReleaseId = PublicationARelease2.Id,
                 ContentSectionId = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238")
             },
             new ReleaseContentSection
             {
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                ReleaseId = PublicationARelease2.Id,
                 ContentSectionId = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766")
             }
         };
@@ -188,18 +221,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
-        private readonly IMapper _mapper;
-
-        public ReleaseServiceTests()
-        {
-            _mapper = _config.CreateMapper();
-        }
-
         [Fact]
-        public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
+        public void GetLatestRelease()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
+            builder.UseInMemoryDatabase(databaseName: "LatestRelease");
             var options = builder.Options;
 
             var fileStorageService = new Mock<IFileStorageService>();
@@ -213,16 +239,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
+                var service = new ReleaseService(context, fileStorageService.Object,
+                    MapperForProfile<MappingProfiles>());
 
-                var result = service.GetLatestReleaseViewModel(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Enumerable.Empty<Guid>());
+                var result = service.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>());
 
-                Assert.IsType<ReleaseViewModel>(result);
+                Assert.Equal(PublicationARelease2.Id, result.Id);
+                Assert.Equal("Academic Year Q2 2018/19", result.Title);
             }
         }
 
         [Fact]
-        public void GetId_ReturnsA_WithATheme()
+        public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
+        {
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
+            builder.UseInMemoryDatabase(databaseName: "LatestReleaseViewModel");
+            var options = builder.Options;
+
+            var fileStorageService = new Mock<IFileStorageService>();
+
+            using (var context = new ContentDbContext(options))
+            {
+                context.AddRange(Publications);
+                context.AddRange(Releases);
+                context.SaveChanges();
+            }
+
+            using (var context = new ContentDbContext(options))
+            {
+                var service = new ReleaseService(context, fileStorageService.Object,
+                    MapperForProfile<MappingProfiles>());
+
+                var result = service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
+
+                Assert.Equal(PublicationARelease2.Id, result.Id);
+                Assert.Equal("Academic Year Q2 2018/19", result.Title);
+            }
+        }
+
+        [Fact]
+        public void GetReleaseViewModel_ReturnsA_WithATheme()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase("ReleaseTheme");
@@ -242,13 +298,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
+                var service = new ReleaseService(context, fileStorageService.Object,
+                    MapperForProfile<MappingProfiles>());
 
-                var result = service.GetReleaseViewModel(new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379"));
+                var result = service.GetReleaseViewModel(PublicationARelease1.Id);
 
-                Assert.Equal("Academic Year Q1", result.Title);
-                Assert.Equal(new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), result.Publication.Id);
-                Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"), result.KeyStatisticsSection.Content[0].Id);
+                Assert.Equal("Academic Year Q1 2018/19", result.Title);
+                Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
+                    result.KeyStatisticsSection.Content[0].Id);
 
                 var content = result.Content;
                 Assert.Equal(2, content.Count);

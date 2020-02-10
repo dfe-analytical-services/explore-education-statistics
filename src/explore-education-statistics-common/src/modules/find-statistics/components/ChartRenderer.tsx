@@ -41,7 +41,7 @@ function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
     default:
       return (
         <div>
-          Unable to render chart, an unimplemented chart type was requested '$
+          Unable to render chart, an unimplemented chart type was requested '
           {type}'
         </div>
       );

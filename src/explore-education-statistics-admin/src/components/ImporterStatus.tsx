@@ -40,6 +40,8 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
 };
 
 class ImporterStatus extends Component<Props> {
+  private static refreshPeriod = 5000;
+
   public state = {
     isFetching: true,
     current: undefined,
@@ -56,8 +58,6 @@ class ImporterStatus extends Component<Props> {
   public componentWillUnmount() {
     this.cancelTimer();
   }
-
-  private static refreshPeriod = 5000;
 
   private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
     switch (importstatusCode) {

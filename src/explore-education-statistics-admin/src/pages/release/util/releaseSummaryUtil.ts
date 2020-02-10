@@ -83,7 +83,7 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
     case 'HigherLevelReview':
       return 'In Review';
     case 'Approved':
-      return 'Approved for Publication';
+      return 'Approved';
     default:
       return undefined;
   }
@@ -91,7 +91,7 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
 
 export const getTimePeriodCoverageDateRangeStringLong = (
   releaseName: string,
-  separatorString: string = ' to ',
+  separatorString = ' to ',
 ) => {
   const numberRegex = /[0-9]+/;
   const results = numberRegex.exec(releaseName);
@@ -102,7 +102,7 @@ export const getTimePeriodCoverageDateRangeStringLong = (
 
 export const getTimePeriodCoverageDateRangeStringShort = (
   releaseName: string,
-  separatorString: string = '/',
+  separatorString = '/',
 ) => {
   const fourYearRegex = /[0-9]*([0-9]{2})/;
   const results = fourYearRegex.exec(releaseName);

@@ -7,7 +7,10 @@ import * as React from 'react';
 export interface InfographicChartProps extends AbstractChartProps {
   fileId?: string;
 
-  chartFileDownloadService?: (releaseId: string, fileName: string) => string;
+  chartFileDownloadService?: (
+    releaseId: string,
+    fileName: string,
+  ) => Promise<Blob>;
 }
 
 const Infographic = ({
@@ -22,7 +25,12 @@ const Infographic = ({
 
   React.useEffect(() => {
     if (fileId && chartFileDownloadService) {
-      setFile(chartFileDownloadService(data.releaseId, fileId));
+      chartFileDownloadService(data.releaseId, fileId).then(blob => {
+        const a = new FileReader();
+        // @ts-ignore
+        a.onload = (e: ProgressEvent) => setFile(e.target.result);
+        a.readAsDataURL(blob);
+      });
     }
   }, [chartFileDownloadService, data.releaseId, fileId]);
 
@@ -31,7 +39,9 @@ const Infographic = ({
 
   return (
     <>
-      <img alt="infographic" src={file} width={width} height={height} />
+      {file && (
+        <img alt="infographic" src={file} width={width} height={height} />
+      )}
       {children}
     </>
   );

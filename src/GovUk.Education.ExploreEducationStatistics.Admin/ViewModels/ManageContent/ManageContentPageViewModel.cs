@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public DateTime? NextUpdate { get; set; }
         
-        public List<PreviousReleaseViewModel> Releases { get; set; }
+        public List<PreviousReleaseViewModel> OtherReleases { get; set; }
         
         public List<BasicLink> LegacyReleases { get; set; }
 
@@ -110,8 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     public class PreviousReleaseViewModel
     {
         public Guid Id { get; set; }
-        
-        public string ReleaseName { get; set; }
 
         public string Slug { get; set; }
 

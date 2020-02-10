@@ -1,19 +1,28 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import service from '@admin/services/release/edit-release/data/service';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import {
   FormCheckbox,
   FormGroup,
+  Formik,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
+import Form from '@common/components/form/Form';
+import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
+import { FormikProps } from 'formik';
 import React from 'react';
 
 interface Props {
@@ -60,6 +69,12 @@ const loadChartFilesAndMapToSelectOptionAsync = (
   });
 };
 
+interface FormValues {
+  name: string;
+  file: File | null;
+  fileId: string;
+}
+
 const InfographicChartOptions = ({
   releaseId,
   fileId,
@@ -70,39 +85,40 @@ const InfographicChartOptions = ({
     SelectOption[]
   >([]);
 
-  const [currentFileId, setCurrentFileId] = React.useState(fileId);
+  const [uploading, setUploading] = React.useState(false);
 
-  const [uploadName, setUploadName] = React.useState<string>('');
+  const formId = 'fileUploadForm';
 
-  const [uploadFile, setUploadFile] = React.useState<File>();
+  const errorCodeMappings = [
+    errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
+    errorCodeToFieldError(
+      'CANNOT_OVERWRITE_FILE',
+      'file',
+      'Choose a unique file',
+    ),
+  ];
 
-  const [uploading, setUploading] = React.useState<boolean>(false);
+  const submitFormHandler = submitWithFormikValidation<FormValues>(
+    async values => {
+      if (values.file) {
+        setUploading(true);
 
-  const doUpload = () => {
-    if (uploadFile) {
-      setUploading(true);
-      service
-        .uploadChartFile(releaseId, {
-          name: uploadName,
-          file: uploadFile,
-        })
-        .then(() =>
-          loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
-            setChartFileOptions,
-          ),
-        )
-        .then(() => {
-          onChange(uploadFile.name);
-          setCurrentFileId(uploadFile.name);
-          setUploadName('');
-          setUploadFile(undefined);
-        })
-        .catch(handleApiErrors)
-        .finally(() => {
-          setUploading(false);
-        });
-    }
-  };
+        await service
+          .uploadChartFile(releaseId, {
+            name: values.name,
+            file: values.file as File,
+          })
+          .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
+          .then(setChartFileOptions)
+          .then(() => onChange((values.file as File).name))
+          .finally(() => {
+            setUploading(false);
+          });
+      }
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
+  );
 
   React.useEffect(() => {
     loadChartFilesAndMapToSelectOptionAsync(releaseId)
@@ -111,56 +127,63 @@ const InfographicChartOptions = ({
   }, [releaseId, handleApiErrors]);
 
   return (
-    <FormGroup>
-      <FormSelect
-        id="infographic-fileid"
-        name="infographic-fileid"
-        label="Select the file to show"
-        order={[]}
-        options={chartFileOptions}
-        value={fileId}
-        onChange={e => {
-          setCurrentFileId(e.target.value);
-          return onChange(e.target.value);
-        }}
-      />
-      {currentFileId === '' && (
-        <FormGroup>
-          <FormTextInput
-            id="upload-name"
-            name="upload-name"
-            label="Select a name to give the file"
-            defaultValue={uploadName}
-            onChange={e => setUploadName(e.target.value)}
-            width={10}
-          />
+    <Formik<FormValues>
+      enableReinitialize
+      initialValues={{
+        name: '',
+        file: null,
+        fileId: fileId || '',
+      }}
+      validationSchema={Yup.object<FormValues>({
+        name: Yup.string().required('Enter a name'),
+        file: Yup.mixed().required('Choose a file'),
+        fileId: Yup.string(),
+      })}
+      onSubmit={submitFormHandler}
+      render={(form: FormikProps<FormValues>) => {
+        return (
+          <Form id={formId}>
+            <FormFieldSelect
+              id={`${formId}-fileId`}
+              name="fileId"
+              label="Select the file to show"
+              order={[]}
+              options={chartFileOptions}
+              value={fileId}
+              onChange={e => {
+                form.setFieldValue('fileId', e.target.value);
+                return onChange(e.target.value);
+              }}
+            />
 
-          <FormTextInput
-            id="upload-chart"
-            name="upload-chrt"
-            label="Select a file to upload"
-            type="file"
-            onChange={e => {
-              if (e.target.files && e.target.files.length > 0) {
-                setUploadFile(e.target.files[0]);
-              } else {
-                setUploadFile(undefined);
-              }
-            }}
-          />
+            {!form.values.fileId && (
+              <>
+                <FormFieldTextInput
+                  id={`${formId}-name`}
+                  name="name"
+                  label="Select a name to give the file"
+                  width={10}
+                />
 
-          <Button
-            type="button"
-            disabled={
-              uploadName.length === 0 || uploadFile === undefined || uploading
-            }
-            onClick={() => doUpload()}
-          >
-            Upload
-          </Button>
-        </FormGroup>
-      )}
-    </FormGroup>
+                <FormFieldFileSelector<FormValues>
+                  id={`${formId}-file`}
+                  name="file"
+                  label="Select a file to upload"
+                  form={form}
+                />
+
+                <Button
+                  type="submit"
+                  disabled={!form.values.file || !form.values.name || uploading}
+                >
+                  Upload
+                </Button>
+              </>
+            )}
+          </Form>
+        );
+      }}
+    />
   );
 };
 const ChartConfiguration = ({

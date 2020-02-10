@@ -43,6 +43,7 @@ if (!Element.prototype.matches) {
 
 if (!Element.prototype.closest) {
   Element.prototype.closest = function closest(s) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let el = this;
 
     do {

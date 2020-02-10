@@ -59,6 +59,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
         setSelectedTabIndex(tabIndex);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

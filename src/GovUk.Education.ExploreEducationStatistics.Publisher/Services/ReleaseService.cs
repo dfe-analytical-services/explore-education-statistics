@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -39,9 +39,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public ReleaseViewModel GetReleaseViewModel(Guid id)
+        public CachedReleaseViewModel GetReleaseViewModel(Guid id)
         {
-            return GetReleaseViewModel(id, Enumerable.Empty<Guid>());
+            var release = _context.Releases
+                .Include(r => r.Type)
+                .Include(r => r.Content)
+                .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
+                .ThenInclude(section => section.Content)
+                .Include( r => r.Publication)
+                .Include(r => r.Updates)
+                .Single(r => r.Id == id);
+
+            var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
+            releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
+            releaseViewModel.DownloadFiles =
+                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
+            return releaseViewModel;
         }
 
         public Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
@@ -50,14 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderByDescending(release => release.Published ?? release.PublishScheduled)
-                .FirstOrDefault();
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimePeriodCoverage)
+                .LastOrDefault();
         }
 
-        public ReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
             var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
-            return GetReleaseViewModel(latestRelease.Id, includedReleaseIds);
+            return GetReleaseViewModel(latestRelease.Id);
         }
 
         public async Task SetPublishedDateAsync(Guid id)
@@ -73,41 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             release.Published = DateTime.UtcNow;
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
-        }
-
-        private ReleaseViewModel GetReleaseViewModel(Guid id, IEnumerable<Guid> includedReleaseIds)
-        {
-            var release = _context.Releases
-                .Include(r => r.Type)
-                .Include(r => r.Content)
-                .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
-                .ThenInclude(section => section.Content)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.LegacyReleases)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Updates)
-                .Single(r => r.Id == id);
-
-            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-
-            releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
-            releaseViewModel.LatestRelease =
-                GetLatestRelease(release.PublicationId, includedReleaseIds)?.Id == releaseViewModel.Id;
-            releaseViewModel.DownloadFiles =
-                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
-            releaseViewModel.Publication.Releases = GetPreviousReleaseViewModels(release, includedReleaseIds);
-            return releaseViewModel;
-        }
-
-        private List<PreviousReleaseViewModel> GetPreviousReleaseViewModels(Release release,
-            IEnumerable<Guid> includedReleaseIds)
-        {
-            var releases = _context.Releases
-                .Where(r => r.PublicationId == release.Publication.Id && r.Id != release.Id)
-                .ToList()
-                .Where(r => IsReleasePublished(r, includedReleaseIds));
-            return _mapper.Map<List<PreviousReleaseViewModel>>(releases);
         }
 
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)

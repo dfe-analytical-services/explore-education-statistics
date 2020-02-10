@@ -71,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
+        FileTypeInvalid,
         SubjectTitleMustBeUnique,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
@@ -81,5 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CommentNotFound,
         UserAlreadyExists,
         InvalidEmailAddress,
+        ApprovedReleaseMustHavePublishScheduledDate,
+        PublicationDoesNotExist,
+        PublicationHasMethodologyAssigned
     }
 }

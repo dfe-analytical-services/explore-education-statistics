@@ -13,7 +13,7 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import FootnotesList from '@admin/components/footnotes/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
@@ -44,7 +44,7 @@ const ReleaseFootnotesSection = ({
   const [hasSufficientData, setHasSufficientData] = useState<boolean>(true);
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
-  function getFootnoteData() {
+  const getFootnoteData = useCallback(() => {
     setLoading(true);
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
@@ -59,10 +59,11 @@ const ReleaseFootnotesSection = ({
         setCanUpdateRelease(canUpdateReleaseResult);
       })
       .catch(handleApiErrors);
-  }
+  }, [handleApiErrors, releaseId]);
+
   useEffect(() => {
     getFootnoteData();
-  }, [publicationId, releaseId, handleApiErrors]);
+  }, [publicationId, releaseId, handleApiErrors, getFootnoteData]);
 
   const footnoteFormControls = {
     footnoteForm,

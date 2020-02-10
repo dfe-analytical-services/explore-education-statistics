@@ -149,7 +149,7 @@ const TableToolWizard = ({
         if (onInitialQueryLoaded) onInitialQueryLoaded();
       }
     });
-  }, [initialQuery, releaseId]);
+  }, [initialQuery, onInitialQueryLoaded, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
