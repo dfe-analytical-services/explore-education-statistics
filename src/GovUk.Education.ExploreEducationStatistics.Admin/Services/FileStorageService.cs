@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private static readonly Regex[] CsvMimeTypes = {
+        public static readonly Regex[] CsvMimeTypes = {
             new Regex(@"^(application|text)/csv$"),
             new Regex(@"text/plain$")
         };

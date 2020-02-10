@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileTypeService : IFileTypeService
     {
-        public string? GetMimeType(IFormFile file)
+        public string GetMimeType(IFormFile file)
         {
             // The Mime project is generally very good at determining mime types from file contents
             var mimeType = GuessMagicInfo(file.OpenReadStream(), MagicOpenFlags.MAGIC_MIME_TYPE);
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // formats.  Mime Detective is much better at doing this.
             var fileType = file.OpenReadStream().GetFileType();
 
-            return fileType?.Mime;
+            return fileType?.Mime ?? mimeType;
         }
         
         public string GetMimeEncoding(IFormFile file)
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public bool HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
             var mimeType = GetMimeType(file);
-            return mimeType != null && mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
+            return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
         
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
