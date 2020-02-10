@@ -3,7 +3,6 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
-import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationContentDesignStandards from '@admin/pages/documentation/DocumentationDesignStandards';
@@ -21,9 +20,11 @@ import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages'
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
+import ThemeTopicWrapper, {
+  themeTopicPath,
+} from '@admin/pages/theme/ThemeTopicWrapper';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
-import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
 import { RouteProps } from 'react-router';
@@ -54,6 +55,10 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     path: '/dashboard/:themeId/:topicId',
     component: AdminDashboardPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
+  },
+  themeTopicWrapper: {
+    path: themeTopicPath,
+    component: ThemeTopicWrapper,
   },
   administration: {
     path: '/administration',
@@ -103,12 +108,6 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   editMethodology: {
     path: '/methodology/:methodologyId',
     component: EditMethodologyPage,
-    protectedAction: user => user.permissions.canAccessAnalystPages,
-    exact: true,
-  },
-  createPublication: {
-    path: publicationRoutes.createPublication.route,
-    component: CreatePublicationPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },

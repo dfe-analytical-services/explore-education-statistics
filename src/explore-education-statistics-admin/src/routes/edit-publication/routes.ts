@@ -1,6 +1,7 @@
 export default {
   createPublication: {
-    route: '/topic/:topicId/create-publication',
-    generateLink: (topicId: string) => `/topic/${topicId}/create-publication`,
+    route: '/theme/:themeId/topic/:topicId/create-publication',
+    generateLink: (themeId: string, topicId: string) =>
+      `/theme/${themeId}/topic/${topicId}/create-publication`,
   },
 };
