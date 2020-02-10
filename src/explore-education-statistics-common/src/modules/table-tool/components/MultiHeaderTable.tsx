@@ -248,7 +248,6 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${rowIndex}_${headerGroupIndex}`}
                         className={classNames({
-                          'govuk-table__cell--numeric': !row.isGroup,
                           [styles.borderBottom]: row.isGroup,
                         })}
                         rowSpan={row.span}
