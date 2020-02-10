@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
@@ -16,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public string Source { get; set; }
 
-        public DataBlockRequest DataBlockRequest { get; set; }
+        public ObservationQueryContext DataBlockRequest { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 

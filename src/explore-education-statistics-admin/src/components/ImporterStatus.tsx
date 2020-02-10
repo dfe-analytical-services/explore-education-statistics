@@ -14,13 +14,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
-interface State {
-  isFetching: boolean;
-  current?: ImportStatus | undefined;
-  running: boolean;
-  errorMessage: string;
-}
-
 interface Props extends ErrorControlProps {
   releaseId: string;
   dataFile: DataFile;
@@ -47,6 +40,8 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
 };
 
 class ImporterStatus extends Component<Props> {
+  private static refreshPeriod = 5000;
+
   public state = {
     isFetching: true,
     current: undefined,
@@ -63,8 +58,6 @@ class ImporterStatus extends Component<Props> {
   public componentWillUnmount() {
     this.cancelTimer();
   }
-
-  private static refreshPeriod = 5000;
 
   private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
     switch (importstatusCode) {

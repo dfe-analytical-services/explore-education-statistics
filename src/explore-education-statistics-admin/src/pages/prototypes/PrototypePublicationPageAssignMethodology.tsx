@@ -108,7 +108,7 @@ const PublicationPage = () => {
         </button>
       </form>
       <div className="govuk-!-margin-top-6">
-        <Link to="/prototypes/admin-dashboard">Cancel </Link>
+        <Link to="/prototypes/admin-dashboard">Cancel</Link>
       </div>
     </PrototypePage>
   );

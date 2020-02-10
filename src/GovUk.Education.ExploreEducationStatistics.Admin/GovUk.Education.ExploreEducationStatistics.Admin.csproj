@@ -12,6 +12,10 @@
     <Content Include="Migrations\ContentMigrations\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Remove="magic.mgc" />
+    <Content Include="magic.mgc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
   <ItemGroup>
@@ -45,13 +49,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="10.0.3" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
     <PackageReference Include="Notify" Version="2.5.1" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
-    <PackageReference Include="MimeMapping" Version="1.0.1.17" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
     <PackageReference Include="WindowsAzure.StorageExtensions" Version="1.2.0" />
   </ItemGroup>

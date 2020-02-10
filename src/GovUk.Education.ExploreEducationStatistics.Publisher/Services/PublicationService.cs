@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,13 +14,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _context;
+        private readonly IReleaseService _releaseService;
+        private readonly IMapper _mapper;
 
-        public PublicationService(ContentDbContext context)
+        public PublicationService(ContentDbContext context, IMapper mapper, IReleaseService releaseService)
         {
             _context = context;
+            _mapper = mapper;
+            _releaseService = releaseService;
         }
 
-        public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
+        public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
+        {
+            var publication = await _context.Publications
+                .Include(p => p.Contact)
+                .Include(p => p.LegacyReleases)
+                .Include(p => p.Topic)
+                .ThenInclude(topic => topic.Theme)
+                .SingleOrDefaultAsync(p => p.Id == id);
+
+            var publicationViewModel = _mapper.Map<CachedPublicationViewModel>(publication);
+            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            publicationViewModel.LatestReleaseId = latestRelease.Id;
+            publicationViewModel.Releases = GetReleaseViewModels(id, includedReleaseIds);
+            return publicationViewModel;
+        }
+
+        public List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Include(theme => theme.Topics)
@@ -41,9 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        private static ThemeTree BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
+        private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return new ThemeTree
+            return new ThemeTree<PublicationTreeNode>
             {
                 Id = theme.Id,
                 Title = theme.Title,
@@ -55,24 +77,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static TopicTree BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        private static TopicTree<PublicationTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
-            return new TopicTree
+            return new TopicTree<PublicationTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(BuildPublicationTree)
+                    .Select(BuildPublicationNode)
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private static PublicationTree BuildPublicationTree(Publication publication)
+        private static PublicationTreeNode BuildPublicationNode(Publication publication)
         {
-            return new PublicationTree
+            return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
@@ -80,6 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Slug = publication.Slug,
                 LegacyPublicationUrl = publication.LegacyPublicationUrl?.ToString()
             };
+        }
+
+        private List<ReleaseTitleViewModel> GetReleaseViewModels(Guid publicationId,
+            IEnumerable<Guid> includedReleaseIds)
+        {
+            var releases = _context.Releases
+                .Where(release => release.PublicationId == publicationId)
+                .ToList()
+                .Where(release => IsReleasePublished(release, includedReleaseIds));
+            return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)

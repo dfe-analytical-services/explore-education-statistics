@@ -396,6 +396,24 @@
       "metadata": {
         "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
       }
+    },
+    "blobDeleteRetentionEnabled": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Retain blobs after delete"
+      }
+    },
+    "blobDeleteRetentionDays": {
+      "defaultValue": 90,
+      "type": "int",
+      "metadata": {
+        "description": "Number of days to retain blobs after delete"
+      }
+    },
+    "deployDatafactory": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -486,7 +504,8 @@
           }
         }
       ]
-    }
+    },
+    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources": [
     {
@@ -596,6 +615,7 @@
           ]
         }
       },
+
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
@@ -929,6 +949,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
@@ -1283,6 +1304,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1364,10 +1401,10 @@
             "[variables('sqlserverName')]"
           ],
           "properties": {
-            "edition": "Basic",
+            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "Basic"
+            "requestedServiceObjectiveName": "S1"
           }
         },
         {
@@ -1739,6 +1776,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('notificationsstorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1786,6 +1839,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1798,17 +1867,7 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "name": "default/downloads",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ]
+      }
     },
     {
       "apiVersion": "2015-05-01",
@@ -2405,6 +2464,22 @@
           "defaultAction": "Deny"
         }
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publisherStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2432,6 +2507,22 @@
       "properties": {
         "supportsHttpsTrafficOnly": true
       },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('loggingStorageAccountName')]"
+          ]
+        }
+      ],
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -2446,7 +2537,6 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     },
-
     {
       "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2018-10-01",
@@ -2594,6 +2684,28 @@
           }
         ]
       }
+    },
+    {
+      "condition": "[parameters('deployDatafactory')]",
+      "name": "datafactory",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          }
+        }
+      },
+      "dependsOn": []
     }
   ]
 }

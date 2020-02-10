@@ -1,12 +1,16 @@
+import { KeyStatsFormValues } from '@admin/modules/find-statistics/components/EditableKeyStatTile';
+import {
+  EditableContentBlock,
+  ExtendedComment,
+} from '@admin/services/publicationService';
 import client from '@admin/services/util/service';
+import { DataBlock } from '@common/services/dataBlockService';
 import {
   AbstractRelease,
   BasicLink,
   ReleaseNote,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
-import { ExtendedComment } from '@admin/services/publicationService';
-import { DataBlock } from '@common/services/dataBlockService';
 import {
   ContentBlockAttachRequest,
   ContentBlockAttachResponse,
@@ -87,6 +91,18 @@ export const releaseContentService = {
     return client.put<ContentBlockViewModel>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
+    );
+  },
+
+  updateContentSectionDataBlock(
+    releaseId: string,
+    contentSectionId: string,
+    contentBlockId: string,
+    newSummary: KeyStatsFormValues,
+  ): Promise<EditableContentBlock> {
+    return client.put<EditableContentBlock>(
+      `/release/${releaseId}/content/section/${contentSectionId}/data-block/${contentBlockId}`,
+      newSummary,
     );
   },
 

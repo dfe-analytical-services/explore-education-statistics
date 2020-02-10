@@ -18,9 +18,8 @@ export interface Publication {
   dataSource: string;
   summary: string;
   nextUpdate: string;
-  releases: {
+  otherReleases: {
     id: string;
-    releaseName: string;
     slug: string;
     title: string;
   }[];
@@ -35,8 +34,10 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
-  methodology: {
+  methodology?: {
     id: string;
+    slug: string;
+    summary: string;
     title: string;
   };
 }
@@ -46,6 +47,11 @@ export interface PublicationContact {
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+}
+
+export interface PublicationTitle {
+  id: string;
+  title: string;
 }
 
 export interface DataQuery {
@@ -169,8 +175,8 @@ export interface Table {
 export interface Summary {
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinitionTitle: string[];
   dataDefinition: string[];
-  description: { type: string; body: string };
 }
 
 export type ContentBlockType =
@@ -180,6 +186,8 @@ export type ContentBlockType =
   | 'HtmlBlock';
 
 export interface ContentBlock {
+  id: string;
+  order?: number;
   type: ContentBlockType;
   body: string;
   heading?: string;
@@ -231,7 +239,6 @@ export interface AbstractRelease<
   keyStatisticsSection: ContentSection<ContentBlockType>;
   keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
-  publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
@@ -256,6 +263,7 @@ export interface AbstractRelease<
     path: string;
     size: string;
   }[];
+  prerelease?: boolean;
 }
 
 export interface DayMonthYearValues {
@@ -328,8 +336,8 @@ export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
 export type Release = AbstractRelease<ContentBlock>;
 
 export default {
-  getPublication(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}`);
+  getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
+    return contentApi.get(`content/publication/${publicationSlug}/title`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);

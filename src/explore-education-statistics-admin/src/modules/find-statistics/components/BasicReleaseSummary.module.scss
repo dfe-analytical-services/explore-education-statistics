@@ -1,0 +1,5 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+:global(.govuk-tag).ragStatusRed {
+  background: $govuk-error-colour;
+}

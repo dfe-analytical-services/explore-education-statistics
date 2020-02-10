@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import {
   Footnote,
   FootnoteMeta,
@@ -8,17 +7,18 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
-import { FormikProps } from 'formik';
 import React from 'react';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
-import styles from './FootnoteForm.module.scss';
 import FilterGroupDetails from './FilterGroupDetails';
+import styles from './FootnoteForm.module.scss';
 import IndicatorDetails from './IndicatorDetails';
 
 export interface FootnoteFormConfig {
@@ -209,17 +209,16 @@ const FootnoteForm = ({
                 />
                 <Button
                   type="submit"
-                  className="govuk-button govuk-!-margin-right-3"
+                  className="govuk-button govuk-!-margin-right-6"
                 >
                   {!footnote ? 'Create' : 'Update'} footnote
                 </Button>
-                <Link
-                  to="#"
+                <ButtonText
                   className="govuk-button govuk-button--secondary"
                   onClick={onCancel}
                 >
                   Cancel
-                </Link>
+                </ButtonText>
               </Form>
             </div>
           );

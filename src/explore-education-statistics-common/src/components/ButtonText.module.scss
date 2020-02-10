@@ -15,6 +15,18 @@
   &:focus {
     @include govuk-focused-text;
   }
+  &:global(.govuk-button) {
+    box-shadow: none;
+    margin: 0;
+    padding: 10px;
+  }
+  &:global(.govuk-button):hover {
+    background: none;
+  }
+  &:global(.govuk-button):focus {
+    background: none;
+    box-shadow: none;
+  }
 }
 
 .noUnderline {

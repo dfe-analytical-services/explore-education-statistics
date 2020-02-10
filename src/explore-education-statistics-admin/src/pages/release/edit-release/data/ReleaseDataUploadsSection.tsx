@@ -1,7 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
-import Link from '@admin/components/Link';
-import service from '@admin/services/release/edit-release/data/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
@@ -9,6 +8,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -188,12 +188,36 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && (
+            {canUpdateRelease ? (
               <>
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Add new data to release"
                 >
+                  <div className="govuk-inset-text">
+                    <h2 className="govuk-heading-m">Before you start</h2>
+                    <div className="govuk-list--bullet">
+                      <li>
+                        make sure your data has passed the screening checks in
+                        our{' '}
+                        <a href="https://github.com/dfe-analytical-services/ees-data-screener">
+                          R Project
+                        </a>{' '}
+                      </li>
+                      <li>
+                        if your data doesn’t meet these standards, you won’t be
+                        able to upload it to your release
+                      </li>
+                      <li>
+                        if you have any issues uploading data and files, or
+                        questions about data standards contact:{' '}
+                        <a href="mailto:explore.statistics@education.gov.uk">
+                          explore.statistics@education.gov.uk
+                        </a>
+                      </li>
+                    </div>
+                  </div>
+
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-subjectTitle`}
                     name="subjectTitle"
@@ -223,14 +247,15 @@ const ReleaseDataUploadsSection = ({
                 >
                   Upload data files
                 </Button>
-                <Link
-                  to="#"
+                <ButtonText
                   className="govuk-button govuk-button--secondary"
                   onClick={() => resetPage(form)}
                 >
                   Cancel
-                </Link>
+                </ButtonText>
               </>
+            ) : (
+              'Release has been approved, and can no longer be updated.'
             )}
 
             {dataFiles.length > 0 && (
@@ -249,8 +274,7 @@ const ReleaseDataUploadsSection = ({
                   <h4 className="govuk-heading-m">{dataFile.title}</h4>
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  <Link
-                    to="#"
+                  <ButtonText
                     onClick={() =>
                       service
                         .downloadDataFile(releaseId, dataFile.filename)
@@ -258,11 +282,10 @@ const ReleaseDataUploadsSection = ({
                     }
                   >
                     {dataFile.filename}
-                  </Link>
+                  </ButtonText>
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  <Link
-                    to="#"
+                  <ButtonText
                     onClick={() =>
                       service
                         .downloadDataMetadataFile(
@@ -273,7 +296,7 @@ const ReleaseDataUploadsSection = ({
                     }
                   >
                     {dataFile.metadataFilename}
-                  </Link>
+                  </ButtonText>
                 </SummaryListItem>
                 <SummaryListItem term="Data file size">
                   {dataFile.fileSize.size.toLocaleString()}{' '}
@@ -300,9 +323,9 @@ const ReleaseDataUploadsSection = ({
                   <SummaryListItem
                     term="Actions"
                     actions={
-                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
+                      <ButtonText onClick={() => setDeleteDataFile(dataFile)}>
                         Delete files
-                      </Link>
+                      </ButtonText>
                     }
                   />
                 )}

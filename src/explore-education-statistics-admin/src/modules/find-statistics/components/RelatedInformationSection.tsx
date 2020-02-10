@@ -1,6 +1,7 @@
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
+import ButtonText from '@common/components/ButtonText';
 import { BasicLink } from '@common/services/publicationService';
 import React, { useState, useContext } from 'react';
 import { FormikProps } from 'formik';
@@ -88,8 +89,7 @@ const RelatedInformationSection = ({
               >
                 Create link
               </Button>
-              <Link
-                to="#"
+              <ButtonText
                 className="govuk-button govuk-button--secondary"
                 onClick={() => {
                   form.resetForm();
@@ -97,7 +97,7 @@ const RelatedInformationSection = ({
                 }}
               >
                 Cancel
-              </Link>
+              </ButtonText>
             </Form>
           );
         }}
@@ -113,14 +113,7 @@ const RelatedInformationSection = ({
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
           <li>
-            <Link
-              to={`/methodology/${
-                release.publication.methodology
-                  ? release.publication.methodology.id
-                  : 'no-methodology'
-              }`}
-              target="_blank"
-            >
+            <Link to="#">
               {release.publication.methodology
                 ? release.publication.methodology.title
                 : 'Methodology title'}

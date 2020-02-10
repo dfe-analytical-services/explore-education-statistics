@@ -154,14 +154,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = r.Publication.Topic.Theme.Title
                             } 
                         },
-                        Releases = r.Publication.Releases
+                        OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => otherRelease.Id != r.Id)    
                             .Select(otherRelease => new PreviousReleaseViewModel
                             {
                                 Id = otherRelease.Id,
                                 Slug = otherRelease.Slug,
                                 Title = otherRelease.Title,
-                                ReleaseName = otherRelease.ReleaseName
                             })
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases

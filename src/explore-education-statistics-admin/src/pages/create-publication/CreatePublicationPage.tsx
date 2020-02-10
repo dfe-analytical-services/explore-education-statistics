@@ -9,6 +9,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -161,6 +162,7 @@ const CreatePublicationPage = ({
                 <FormFieldRadioGroup
                   id={`${formId}-methodologyChoice`}
                   legend="Choose a methodology for this publication"
+                  legendSize="m"
                   name="methodologyChoice"
                   options={[
                     {
@@ -186,8 +188,10 @@ const CreatePublicationPage = ({
                   />
                 )}
                 <FormFieldset
+                  className="govuk-!-margin-top-9"
                   id={`${formId}-selectedContactIdFieldset`}
                   legend="Choose the contact for this publication"
+                  legendSize="m"
                   hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
                 >
                   <FormFieldSelect
@@ -224,9 +228,9 @@ const CreatePublicationPage = ({
                   Create publication
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <Link to="#" onClick={cancelHandler}>
+                  <ButtonText onClick={cancelHandler}>
                     Cancel publication
-                  </Link>
+                  </ButtonText>
                 </div>
               </Form>
             );

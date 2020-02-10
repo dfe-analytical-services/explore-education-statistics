@@ -26,7 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? MethodologyId { get; set; }
         
         public Methodology Methodology { get; set; }
-        
+
+        public ExternalMethodology ExternalMethodology {
+            get;
+            set;
+        }
+
         public Uri LegacyPublicationUrl { get; set; }
 
         public List<Link> LegacyReleases { get; set; }

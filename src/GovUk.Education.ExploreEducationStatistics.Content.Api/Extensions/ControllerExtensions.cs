@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions
 {
     public static class ControllerExtensions
     {
-        public static async Task<ActionResult<string>> JsonContentResultAsync(this ControllerBase controller,
+        public static async Task<ActionResult<T>> JsonContentResultAsync<T>(this ControllerBase controller,
             Func<Task<string>> downloadAction, StatusCodeResult notFoundResult)
         {
             var download = await downloadAction.Invoke();
@@ -16,7 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions
                 return notFoundResult;
             }
 
-            return controller.Content(download, "application/json");
+            return JsonConvert.DeserializeObject<T>(download, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            });
         }
     }
 }
