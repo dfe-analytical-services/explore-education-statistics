@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             else if (model.ExternalMethodology != null && model.MethodologyId == null)
             {
-                // TODO: External methodology must be external link check
+                // TODO: EES-1287 External methodology must be external link to the service
             }
             else
             {
