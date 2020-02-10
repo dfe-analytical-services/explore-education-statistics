@@ -18,6 +18,11 @@ const { StringStream } = require('scramjet');
 
 const args = process.argv.slice(2);
 
+// Set environment variables
+if (!process.env.ASPNETCORE_ENVIRONMENT) {
+  process.env.ASPNETCORE_ENVIRONMENT = 'Development';
+}
+
 const projectRoot = path.resolve(__dirname, '..');
 
 const projects = {
