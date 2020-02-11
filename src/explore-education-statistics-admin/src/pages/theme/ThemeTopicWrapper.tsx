@@ -10,6 +10,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, Switch, Route } from 'react-router';
 import PageNotFoundPage from '../errors/PageNotFoundPage';
+import PublicationAssignMethodologyPage from './topic/publication/PublicationAssignMethodologyPage';
 
 export const themeTopicPath = '/theme/:themeId/topic/:topicId';
 
@@ -62,6 +63,11 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
           <Route
             path={`${themeTopicPath}/create-publication`}
             component={CreatePublicationPage}
+            exact
+          />
+          <Route
+            path={`${themeTopicPath}/publication/:publicationId/assign-methodology`}
+            component={PublicationAssignMethodologyPage}
             exact
           />
           {page404}

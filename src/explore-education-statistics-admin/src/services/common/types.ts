@@ -40,10 +40,16 @@ export interface TimePeriodCoverageGroup {
   }[];
 }
 
+export interface BasicMethodology {
+  id: string;
+  title: string;
+  status: 'Live' | 'Draft' | 'Approved' | string;
+  externalLink?: string;
+}
 export interface BasicPublicationDetails {
   id: string;
   title: string;
   contact?: ContactDetails;
-  methodologyId?: string;
+  methodology?: BasicMethodology;
   themeId: string;
 }
