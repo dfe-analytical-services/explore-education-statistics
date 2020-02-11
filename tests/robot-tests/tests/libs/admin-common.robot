@@ -17,7 +17,7 @@ user creates publication
     [Arguments]   ${title}   ${methodology}   ${contact}
     user waits until page contains heading    Create new publication
     user enters text into element  css:#createPublicationForm-publicationTitle   ${title}
-    user clicks element          xpath://label[text()="Add existing methodology"]
+    user clicks element          xpath://label[text()="Choose an existing methodology"]
     user checks element is visible    xpath://label[text()="Select methodology"]
     user selects from list by label  css:#createPublicationForm-selectedMethodologyId   ${methodology}
     user selects from list by label  css:#createPublicationForm-selectedContactId   ${contact}
