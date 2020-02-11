@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
             {
                 context.Add(new Publication { Id = testPublicationId});
-                context.Add(new Methodology { Id = testMethodologyId});
+                context.Add(new Methodology { Id = testMethodologyId, Published = DateTime.UtcNow.AddDays(-1)});
 
                 context.SaveChanges();
             }
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_Draft"))
             {
                 context.Add(new Publication { Id = testPublicationId});
-                context.Add(new Methodology { Id = testMethodologyId, Published = DateTime.UtcNow});
+                context.Add(new Methodology { Id = testMethodologyId});
 
                 context.SaveChanges();
             }

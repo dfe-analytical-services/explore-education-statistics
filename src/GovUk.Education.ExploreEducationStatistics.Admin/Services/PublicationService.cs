@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -96,7 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                //.OnSuccess(_userService.CheckCanUpdatePublicationMethodology)
                 .OnSuccess(_ => ValidateMethodologyCanBeAssigned(methodology))
                 .OnSuccess(async _ =>
                 {
@@ -141,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
 
                 // TODO: this will want updating when methodology status is fully implemented
-                if (methodology.Status != "Draft")
+                if (methodology.Status == "Draft")
                 {
                     return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
                 }
