@@ -102,7 +102,6 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
             {release.headlinesSection && (
               <ContentBlocks
                 sectionId={release.headlinesSection.id}
-                publication={release.publication}
                 id={release.headlinesSection.id as string}
                 content={release.headlinesSection.content}
                 canAddSingleBlock

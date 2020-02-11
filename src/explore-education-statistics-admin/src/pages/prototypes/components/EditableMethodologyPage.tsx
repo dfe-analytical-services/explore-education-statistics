@@ -157,7 +157,6 @@ class EditableMethodologyPage extends Component<Props, State> {
                 content={content}
                 resolveComments={resolveComments}
                 id={`editable-block-${index}`}
-                publication={data.publication}
               />
             </EditableAccordionSection>
           ))}

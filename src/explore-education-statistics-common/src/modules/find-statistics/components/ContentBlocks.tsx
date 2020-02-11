@@ -1,4 +1,4 @@
-import { Publication, Release } from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 import React from 'react';
 import ContentSubBlockRenderer, {
   SectionToggleHandler,
@@ -7,16 +7,10 @@ import ContentSubBlockRenderer, {
 export interface ContentBlockProps {
   content: Release['content'][0]['content'];
   id: string;
-  publication: Publication;
   onToggle?: SectionToggleHandler;
 }
 
-const ContentBlocks = ({
-  content,
-  id,
-  publication,
-  onToggle,
-}: ContentBlockProps) => {
+const ContentBlocks = ({ content, id, onToggle }: ContentBlockProps) => {
   return content && content.length > 0 ? (
     <>
       {content.map((block, index) => {
@@ -26,7 +20,6 @@ const ContentBlocks = ({
             id={id}
             block={block}
             key={key}
-            publication={publication}
             onToggle={onToggle}
           />
         );

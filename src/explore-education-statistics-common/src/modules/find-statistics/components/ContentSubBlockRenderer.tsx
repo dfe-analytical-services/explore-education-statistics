@@ -1,6 +1,5 @@
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import { ContentBlock, Publication } from '@common/services/publicationService';
-import ButtonLink from '@common/components/ButtonLink';
+import { ContentBlock } from '@common/services/publicationService';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -12,16 +11,10 @@ export type SectionToggleHandler = (section: {
 interface Props {
   block?: ContentBlock;
   id: string;
-  publication: Publication;
   onToggle?: SectionToggleHandler;
 }
 
-const ContentSubBlockRenderer = ({
-  block,
-  id,
-  publication,
-  onToggle,
-}: Props) => {
+const ContentSubBlockRenderer = ({ block, id, onToggle }: Props) => {
   if (block === undefined) return null;
   switch (block.type) {
     case 'MarkDownBlock':

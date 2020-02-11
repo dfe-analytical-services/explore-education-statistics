@@ -13,7 +13,6 @@ export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
   releaseId: string;
-  publication: AbstractRelease<EditableContentBlock>['publication'];
   accordionId: string;
   sectionName: string;
   onContentChange?: (content: ContentType[]) => void;
@@ -21,7 +20,6 @@ interface ReleaseContentAccordionProps {
 
 const ReleaseContentAccordion = ({
   releaseId,
-  publication,
   accordionId,
   sectionName,
   onContentChange,
@@ -48,17 +46,19 @@ const ReleaseContentAccordion = ({
 
       setContentAndTriggerOnContentChange(newContent);
     },
-    [releaseId, setContent, handleApiErrors],
+    [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
   );
 
-  useEffect(() => {
-    releaseContentService
-      .getContentSections(releaseId)
-      .then(newContent => {
-        setContentAndTriggerOnContentChange(newContent);
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, setContent]);
+  useEffect(
+    () => {
+      releaseContentService
+        .getContentSections(releaseId)
+        .then(setContentAndTriggerOnContentChange)
+        .catch(handleApiErrors);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const onAddSection = useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
@@ -69,7 +69,12 @@ const ReleaseContentAccordion = ({
     ];
 
     setContentAndTriggerOnContentChange(newContent);
-  }, [content, releaseId, setContent, handleApiErrors]);
+  }, [
+    content,
+    releaseId,
+    handleApiErrors,
+    setContentAndTriggerOnContentChange,
+  ]);
 
   const onUpdateHeading = useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
@@ -86,7 +91,7 @@ const ReleaseContentAccordion = ({
       }
       return result;
     },
-    [content, releaseId, setContent, handleApiErrors],
+    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
   );
 
   const updateContentSection = useCallback(
@@ -96,7 +101,7 @@ const ReleaseContentAccordion = ({
 
       setContentAndTriggerOnContentChange(newContent);
     },
-    [content, setContent],
+    [content, setContentAndTriggerOnContentChange],
   );
 
   return (
@@ -114,7 +119,6 @@ const ReleaseContentAccordion = ({
             key={contentItem.order}
             contentItem={contentItem}
             index={index}
-            publication={publication}
             onHeadingChange={title =>
               onUpdateHeading(contentItem, index, title)
             }
