@@ -75,6 +75,7 @@ const PreReleasePage = ({
               ? [{ name: 'Pre Release access' }]
               : []
           }
+          includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
         >
           {model.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
             model.content && (

@@ -4,11 +4,11 @@ import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/ro
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import permissionService from '@admin/services/permissions/service';
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
+import permissionService from '@admin/services/permissions/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -251,6 +251,7 @@ const ManagePublicationsAndReleasesTab = ({
             {canCreatePublication && (
               <Link
                 to={publicationRoutes.createPublication.generateLink(
+                  selectedThemeAndTopic.theme.id,
                   selectedThemeAndTopic.topic.id,
                 )}
                 className="govuk-button"

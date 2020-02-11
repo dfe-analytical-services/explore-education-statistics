@@ -57,7 +57,6 @@ export default class PrototypePublicationService {
           },
         ],
       },
-      publicationId: '00000000-0000-0000-0000-000000000000',
       publication: {
         id: '00000000-0000-0000-0000-000000000000',
         slug: 'pupil-absence-in-schools-in-england',
@@ -67,7 +66,7 @@ export default class PrototypePublicationService {
           '[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)',
         summary: LOREM,
         nextUpdate: '2018-03-22T00:00:00',
-        releases: [],
+        otherReleases: [],
         legacyReleases: [],
         contact: {
           contactName: 'Mr Smith',

@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(typeof(MethodologyViewModel), 200)]
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [HttpPost("api/methodologies")]
-        public async Task<ActionResult<MethodologyViewModel>> CreatePublicationAsync(
+        public async Task<ActionResult<MethodologyViewModel>> CreateMethodologyAsync(
             CreateMethodologyViewModel methodology)
         {
             var result = await _methodologyService.CreateMethodologyAsync(methodology);

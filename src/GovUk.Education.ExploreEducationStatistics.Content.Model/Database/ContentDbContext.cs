@@ -253,6 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     p => p.ToString(),
                     p => new Uri(p));
 
+            modelBuilder.Entity<Publication>()
+                .OwnsOne(p => p.ExternalMethodology);
+
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())

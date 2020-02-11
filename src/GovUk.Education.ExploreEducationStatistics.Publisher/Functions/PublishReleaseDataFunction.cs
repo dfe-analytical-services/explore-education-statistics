@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     if (subjects.Any())
                     {
                         var configuration = LoadClientConfiguration(executionContext);
-                        var success = TriggerDataFactoryReleasePipeline(configuration, logger, subjects.First(),
+                        var success = TriggerDataFactoryReleasePipeline(configuration, logger, subjects,
                             message.ReleaseStatusId);
                         await UpdateStage(message, success ? Started : Failed);
                     }
@@ -86,9 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private static bool TriggerDataFactoryReleasePipeline(DataFactoryClientConfiguration configuration,
-            ILogger logger, Subject subject, Guid releaseStatusId)
+            ILogger logger, List<Subject> subjects, Guid releaseStatusId)
         {
-            var parameters = BuildPipelineParameters(subject, releaseStatusId);
+            var parameters = BuildPipelineParameters(subjects, releaseStatusId);
             var client = GetDataFactoryClient(configuration);
 
             var runResponse = client.Pipelines.CreateRunWithHttpMessagesAsync(configuration.ResourceGroupName,
@@ -100,14 +100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return runResponse.Response.IsSuccessStatusCode;
         }
 
-        private static IDictionary<string, object> BuildPipelineParameters(Subject subject, Guid releaseStatusId)
+        private static IDictionary<string, object> BuildPipelineParameters(List<Subject> subjects, Guid releaseStatusId)
         {
-            var publication = subject.Release.Publication;
+            var publication = subjects.First().Release.Publication;
             var topic = publication.Topic;
             return new Dictionary<string, object>
             {
-                {"subjectId", subject.Id},
-                {"releaseId", subject.ReleaseId},
+                {"subjectIds", subjects.Select(s => s.Id).ToArray()},
+                {"releaseId", subjects.First().ReleaseId},
                 {"releaseStatusId", releaseStatusId},
                 {"publicationId", publication.Id},
                 {"topicId", topic.Id},

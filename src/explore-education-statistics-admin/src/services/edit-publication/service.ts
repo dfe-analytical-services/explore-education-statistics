@@ -9,11 +9,18 @@ const service = {
   getPublicationAndReleaseContacts(): Promise<ContactDetails[]> {
     return client.get<ContactDetails[]>('/contacts');
   },
-  createPublication(createRequest: CreatePublicationRequest) {
-    return client.post(`/topic/${createRequest.topicId}/publications`, {
-      title: createRequest.publicationTitle,
-      contactId: createRequest.selectedContactId,
-      methodologyId: createRequest.selectedMethodologyId,
+  createPublication({
+    topicId,
+    publicationTitle: title,
+    selectedContactId: contactId,
+    selectedMethodologyId: methodologyId,
+    externalMethodology,
+  }: CreatePublicationRequest) {
+    return client.post(`/topic/${topicId}/publications`, {
+      title,
+      contactId,
+      methodologyId,
+      externalMethodology,
     });
   },
 };

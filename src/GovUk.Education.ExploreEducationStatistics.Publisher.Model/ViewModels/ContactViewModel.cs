@@ -1,11 +1,7 @@
-﻿using System;
-
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
+﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
     public class ContactViewModel
     {
-        public Guid Id { get; set; }
-
         public string TeamName { get; set; }
 
         public string TeamEmail { get; set; }

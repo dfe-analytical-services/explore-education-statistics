@@ -3,7 +3,7 @@ import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Details from '@common/components/Details';
-import { TimePeriodQuery } from '@common/modules/full-table/services/tableBuilderService';
+import { TimePeriodQuery } from '@common/modules/table-tool/services/tableBuilderService';
 import { DataBlock } from '@common/services/dataBlockService';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 

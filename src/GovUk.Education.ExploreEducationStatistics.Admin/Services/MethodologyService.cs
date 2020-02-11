@@ -30,21 +30,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CreateMethodologyViewModel methodology)
         {
             return await ValidateMethodologySlugUnique(methodology.Slug)
+                .OnSuccess(async () => ValidateAssignedPublication(methodology.PublicationId))
                 .OnSuccess(async () =>
                 {
-            var model = new Methodology
-            {
-                Title = methodology.Title,
-                Slug = methodology.Slug,
-                PublishScheduled = methodology.PublishScheduled
-            };
+                    var model = new Methodology
+                    {
+                        Title = methodology.Title,
+                        Slug = methodology.Slug,
+                        PublishScheduled = methodology.PublishScheduled
+                    };
 
-            var saved = _context.Methodologies.Add(model);
-            await _context.SaveChangesAsync();
+                    var saved = _context.Methodologies.Add(model);
+                    await _context.SaveChangesAsync();
 
-            return await GetAsync(saved.Entity.Id);
+                    if (methodology.PublicationId != null)
+                    {
+                        var publication =
+                            await _context.Publications.FirstOrDefaultAsync(p => p.Id == methodology.PublicationId);
+
+                        publication.MethodologyId = saved.Entity.Id;
+                        _context.Publications.Update(publication);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    return await GetAsync(saved.Entity.Id);
                 });
-
         }
 
         public async Task<MethodologyViewModel> GetAsync(Guid id)
@@ -79,12 +89,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
             return _mapper.Map<List<MethodologyViewModel>>(methodologies);
         }
-        
+
         private async Task<Either<ValidationResult, bool>> ValidateMethodologySlugUnique(string slug)
         {
             if (await _context.Methodologies.AnyAsync(r => r.Slug == slug))
             {
                 return new ValidationResult(ValidationErrorMessages.SlugNotUnique.ToString());
+            }
+
+            return true;
+        }
+
+        private async Task<Either<ValidationResult, bool>> ValidateAssignedPublication(Guid? publicationId)
+        {
+            if (publicationId != null)
+            {
+                var publication = await _context.Publications.FirstOrDefaultAsync(p => p.Id == publicationId);
+
+                if (publication == null)
+                {
+                    return new ValidationResult(ValidationErrorMessages.PublicationDoesNotExist.ToString());
+                }
+                
+                if (publication.MethodologyId != null)
+                {
+                    return new ValidationResult(ValidationErrorMessages.PublicationHasMethodologyAssigned.ToString());
+                }
             }
 
             return true;

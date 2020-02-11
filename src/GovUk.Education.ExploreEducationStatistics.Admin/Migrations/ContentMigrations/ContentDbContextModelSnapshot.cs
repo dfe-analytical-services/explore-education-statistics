@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -3710,6 +3710,25 @@ Find out how and why these statistics are collected and published - [Secondary a
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ExternalMethodology", "ExternalMethodology", b1 =>
+                        {
+                            b1.Property<Guid>("PublicationId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Title")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Url")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("PublicationId");
+
+                            b1.ToTable("Publications");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PublicationId");
+                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>

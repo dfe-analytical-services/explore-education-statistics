@@ -1,5 +1,5 @@
 import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlockLocation,
   DataBlockRequest,
@@ -18,7 +18,7 @@ export interface Publication {
   dataSource: string;
   summary: string;
   nextUpdate: string;
-  releases: {
+  otherReleases: {
     id: string;
     slug: string;
     title: string;
@@ -47,6 +47,11 @@ export interface PublicationContact {
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+}
+
+export interface PublicationTitle {
+  id: string;
+  title: string;
 }
 
 export interface DataQuery {
@@ -164,7 +169,7 @@ export interface Chart {
 
 export interface Table {
   indicators: string[];
-  tableHeaders: TableHeadersFormValues;
+  tableHeaders: TableHeadersConfig;
 }
 
 export interface Summary {
@@ -234,7 +239,6 @@ export interface AbstractRelease<
   keyStatisticsSection: ContentSection<ContentBlockType>;
   keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
-  publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
@@ -332,8 +336,8 @@ export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
 export type Release = AbstractRelease<ContentBlock>;
 
 export default {
-  getPublication(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}`);
+  getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
+    return contentApi.get(`content/publication/${publicationSlug}/title`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);

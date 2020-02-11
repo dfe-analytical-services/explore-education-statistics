@@ -18,6 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
         
         [Fact]
+        public void ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler_ReleaseApproved()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved
+            };
+            
+            // Assert that no users can approve an approved Release
+            AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
+                new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(),
+                release);
+        }
+        
+        [Fact]
         public void ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler()
         {
             // Assert that a User who has the "Approver" role on a Release can approve the Release
@@ -25,6 +39,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ApproveSpecificReleaseRequirement>(
                 contentDbContext => new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(contentDbContext), 
                 ReleaseRole.Approver);
+        }
+        
+        [Fact]
+        public void ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler_ReleaseApproved()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved
+            };
+            
+            // Assert that no User can mark the Release as Draft if it is already Approved
+            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ApproveSpecificReleaseRequirement>(
+                contentDbContext => new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(contentDbContext),
+                release);
         }
     }
 }

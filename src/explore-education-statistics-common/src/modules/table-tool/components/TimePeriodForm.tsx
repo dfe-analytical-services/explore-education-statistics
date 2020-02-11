@@ -11,7 +11,7 @@ import Yup from '@common/lib/validation/yup';
 import {
   PublicationSubjectMeta,
   TimePeriodQuery,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import React, { useMemo, useRef } from 'react';
@@ -54,13 +54,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       value: '',
     },
     ...options.map(option => {
-      const timeOptionLabelSplit = option.label.split('/');
-      const timeOptionLabel =
-        timeOptionLabelSplit[1].length === 1
-          ? `${timeOptionLabelSplit[0]}/0${timeOptionLabelSplit[1]}`
-          : option.label;
       return {
-        label: timeOptionLabel,
+        label: option.label,
         value: `${option.year}_${option.code}`,
       };
     }),

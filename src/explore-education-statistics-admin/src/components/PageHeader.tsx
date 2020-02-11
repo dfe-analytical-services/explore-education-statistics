@@ -46,7 +46,7 @@ const PageHeader = ({ wide }: Props) => {
           </div>
           <div className="govuk-header__content">
             <a
-              href="/"
+              href={user && user.permissions.canAccessAnalystPages ? '/' : '#'}
               className="govuk-header__link govuk-header__link--service-name"
             >
               Explore education statistics

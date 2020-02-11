@@ -16,7 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
         {
-            var publishDate = release.PublishScheduled.GetValueOrDefault();
+            if (!release.PublishScheduled.HasValue)
+            {
+                return new PreReleaseWindowStatus
+                {
+                    PreReleaseAccess = PreReleaseAccess.NoneSet
+                };
+            }
+            
+            var publishDate = release.PublishScheduled.Value;
             var accessWindowStart = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
             var accessWindowEnd = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
 

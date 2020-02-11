@@ -1,11 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import permalinkService from '@common/modules/full-table/services/permalinkService';
+import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
+import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   FinalStepProps,
   TableToolWizardProps,
@@ -13,10 +13,9 @@ import TableToolWizard, {
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
 import React, { createRef, useEffect, useState } from 'react';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { OmitStrict } from '@common/types';
 
 const TableToolFinalStep = ({
   table,
@@ -29,7 +28,7 @@ const TableToolFinalStep = ({
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
   const [currentTable, setCurrentTable] = useState<FullTable>();
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersFormValues
+    TableHeadersConfig
   >();
 
   useEffect(() => {
