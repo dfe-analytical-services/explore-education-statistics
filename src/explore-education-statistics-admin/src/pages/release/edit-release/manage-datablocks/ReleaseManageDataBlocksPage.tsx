@@ -105,9 +105,7 @@ const ReleaseManageDataBlocksPage = ({
       if (request === undefined) return {};
 
       const response = await dataBlockService
-        .getDataBlockForSubject({
-          ...request,
-        })
+        .getDataBlockForSubject(request)
         .catch(handleApiErrors);
 
       if (response === undefined) return {};
