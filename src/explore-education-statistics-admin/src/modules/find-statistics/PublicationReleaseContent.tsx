@@ -140,6 +140,7 @@ const PublicationReleaseContent = ({
               sectionId={release.summarySection.id}
               publication={publication}
               id={release.summarySection.id as string}
+              addContentButtonText="Add summary content"
               content={release.summarySection.content}
               canAddSingleBlock
               textOnly
