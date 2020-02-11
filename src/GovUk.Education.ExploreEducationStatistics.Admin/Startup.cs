@@ -369,7 +369,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
-            services.AddSingleton(HostingEnvironment.ContentRootFileProvider);
             services.AddTransient<IFileTypeService, FileTypeService>();
 
             services.AddSwaggerGen(c =>
