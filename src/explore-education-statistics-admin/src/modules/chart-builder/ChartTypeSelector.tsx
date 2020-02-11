@@ -36,8 +36,10 @@ const ChartTypeSelector = ({
               />
             </button>
           ) : (
-            <div className="chartTypeUnavailable">
-              <p>{chartType.name}</p>
+            <div className={styles.chartTypeUnavailable}>
+              <span className={styles.title}>
+                <strong>{chartType.name}</strong>
+              </span>
               <p>This chart type is not available.</p>
               <p>There is no map data for this data block.</p>
             </div>
