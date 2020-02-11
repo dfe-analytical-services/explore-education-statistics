@@ -1,27 +1,23 @@
-import commaList from '@common/lib/utils/string/commaList';
-import {
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import React from 'react';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import ButtonText from '@common/components/ButtonText';
-import classNames from 'classnames';
 import useToggle from '@common/hooks/useToggle';
+import commaList from '@common/lib/utils/string/commaList';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import classNames from 'classnames';
+import React from 'react';
 
 export function generateTableTitle({
+  indicators,
   timePeriodRange,
   locations,
   subjectName,
   publicationName,
   expanded,
-}: {
-  timePeriodRange: FullTableMeta['timePeriodRange'];
-  locations: FullTableMeta['locations'];
-  subjectName: FullTableMeta['subjectName'];
-  publicationName: FullTableMeta['publicationName'];
+}: FullTableMeta & {
   expanded?: boolean;
 }) {
+  const indicatorString =
+    indicators.length === 1 ? `${indicators[0].label} for ` : '';
+
   let timePeriodString = '';
 
   if (timePeriodRange.length > 0) {
@@ -43,30 +39,20 @@ export function generateTableTitle({
       : locations.map(location => location.label),
   )}`;
 
-  return `Table showing '${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+  return `Table showing ${indicatorString}'${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
-interface Props {
+interface Props extends FullTableMeta {
   id: string;
-  timePeriodRange: TimePeriodFilter[];
-  locations: LocationFilter[];
-  subjectName: string;
-  publicationName: string;
 }
 
-const DataTableCaption = ({
-  id = 'dataTableCaption',
-  timePeriodRange,
-  locations,
-  subjectName,
-  publicationName,
-}: Props) => {
+const DataTableCaption = ({ id = 'dataTableCaption', ...props }: Props) => {
+  const { locations } = props;
+
   const [expanded, toggleExpanded] = useToggle(false);
+
   const caption = generateTableTitle({
-    timePeriodRange,
-    locations,
-    subjectName,
-    publicationName,
+    ...props,
     expanded,
   });
 

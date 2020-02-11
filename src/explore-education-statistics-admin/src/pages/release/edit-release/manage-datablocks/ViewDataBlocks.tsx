@@ -1,14 +1,18 @@
-import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/table-tool/utils/tableHeaders';
 import dataBlockService, {
   DataBlock,
   DataBlockRequest,
@@ -16,10 +20,7 @@ import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { Chart, ChartType } from '@common/services/publicationService';
-import React from 'react';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   dataBlock: DataBlock;
@@ -34,23 +35,23 @@ const ViewDataBlocks = ({
   handleApiErrors,
 }: Props & ErrorControlProps) => {
   // we want to modify this internally as our own data, copying it
-  const [chartBuilderData, setChartBuilderData] = React.useState<
-    DataBlockResponse
-  >(() => {
-    return { ...dataBlockResponse };
-  });
+  const [chartBuilderData, setChartBuilderData] = useState<DataBlockResponse>(
+    () => {
+      return { ...dataBlockResponse };
+    },
+  );
 
   // only update it if the external reference changes
-  React.useEffect(() => {
+  useEffect(() => {
     setChartBuilderData({ ...dataBlockResponse });
   }, [dataBlockResponse]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialConfiguration, setInitialConfiguration] = React.useState<
+  const [initialConfiguration, setInitialConfiguration] = useState<
     Chart | undefined
   >();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dataBlock && dataBlock.charts) {
       setInitialConfiguration({
         ...dataBlock.charts[0],
@@ -58,12 +59,12 @@ const ViewDataBlocks = ({
     }
   }, [dataBlock]);
 
-  const [tableData, setTableData] = React.useState<{
+  const [tableData, setTableData] = useState<{
     fullTable: FullTable;
-    tableHeadersConfig: TableHeadersFormValues;
+    tableHeadersConfig: TableHeadersConfig;
   }>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
@@ -72,7 +73,7 @@ const ViewDataBlocks = ({
 
     setTableData({
       fullTable,
-      tableHeadersConfig: reverseMapTableHeadersConfig(
+      tableHeadersConfig: mapTableHeadersConfig(
         tableHeadersConfig,
         fullTable.subjectMeta,
       ),

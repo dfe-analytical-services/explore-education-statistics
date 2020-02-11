@@ -8,7 +8,7 @@ import {
   PublicationSubjectMeta,
   TableDataQuery,
   TimePeriodOption,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import { Table, Chart, Summary } from '@common/services/publicationService';
 
 export enum GeographicLevel {
@@ -108,7 +108,7 @@ export interface BoundaryLevel {
 }
 
 export interface FootnoteMetadata {
-  id: number;
+  id: string;
   label: string;
 }
 

@@ -1,10 +1,10 @@
-import { Dictionary } from '@common/types';
-import { GroupedFilterOptions } from '@common/modules/full-table/services/tableBuilderService';
+import { GroupedFilterOptions } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+} from '@common/modules/table-tool/types/filters';
+import { Dictionary } from '@common/types';
 
 export interface FullTableMeta {
   publicationName: string;
@@ -19,13 +19,14 @@ export interface FullTableMeta {
   }>;
   indicators: Indicator[];
   footnotes: {
-    id: number;
+    id: string;
     label: string;
   }[];
   geoJsonAvailable: boolean;
 }
 
-export interface TableData {
+export interface FullTable {
+  title?: string;
   subjectMeta: FullTableMeta;
   results: {
     filters: string[];
@@ -37,8 +38,4 @@ export interface TableData {
     measures: Dictionary<string>;
     timePeriod: string;
   }[];
-}
-
-export interface FullTable extends TableData {
-  title?: string;
 }

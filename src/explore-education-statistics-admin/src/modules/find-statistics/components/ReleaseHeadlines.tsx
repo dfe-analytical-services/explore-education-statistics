@@ -9,9 +9,9 @@ import ChartRenderer, {
 import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlock,

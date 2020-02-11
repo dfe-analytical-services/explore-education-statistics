@@ -4,54 +4,33 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import {
   FilterOption,
+  LocationLevelKeys,
   PublicationSubjectMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import { Dictionary, PartialRecord } from '@common/types/util';
 import { FormikProps } from 'formik';
+import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { useImmer } from 'use-immer';
-import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
+import React, { useMemo, useRef } from 'react';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-export type LocationsFormValues = Dictionary<string[]>;
-
 interface FormValues {
-  locations: LocationsFormValues;
+  locations: Dictionary<string[]>;
 }
 
-export type LocationFiltersFormSubmitHandler = (values: FormValues) => void;
+export type LocationFiltersFormSubmitHandler = (values: {
+  locations: PartialRecord<LocationLevelKeys, string[]>;
+}) => void;
 
 interface Props {
   options: PublicationSubjectMeta['locations'];
-  initialValues?: Dictionary<string[] | undefined>;
+  initialValues?: PartialRecord<LocationLevelKeys, string[]>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
-
-export const calculateInitialValues = (
-  initial: Dictionary<string[] | undefined> | undefined,
-  opts: PublicationSubjectMeta['locations'],
-): FormValues => {
-  const initialNotUndef = initial || {};
-
-  return {
-    locations: Object.entries(opts).reduce((acc, [level, levelOptions]) => {
-      const initialLevel = initialNotUndef[level] || [];
-      return {
-        ...acc,
-        [level]: initialLevel.filter(
-          initialId =>
-            levelOptions.options.find(({ value }) => value === initialId) !==
-            undefined,
-        ),
-      };
-    }, {}),
-  };
-};
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -61,7 +40,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    initialValues,
+    initialValues = {},
   } = props;
 
   const formikRef = useRef<Formik<FormValues>>(null);
@@ -69,52 +48,32 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
   const formOptions = useMemo(() => options, [options]);
 
-  const formInitialValues = useMemo(
-    () => calculateInitialValues(initialValues, options),
-    [initialValues, options],
-  );
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
-  const initialLocationLevels = useMemo(() => {
-    return mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
-      formInitialValues.locations,
-      (locationKey: string, locations: string[]) => {
-        const locationOptions =
-          (options[locationKey] && options[locationKey].options) || [];
-
-        return locations.reduce<FilterOption[]>((v, n) => {
-          const found = locationOptions.find(i => i.value === n);
-          if (found) return [...v, found];
-          return v;
-        }, []);
-      },
-    );
-  }, [formInitialValues.locations, options]);
-
-  const [locationLevels, updateLocationLevels] = useImmer<
-    Dictionary<{ label: string; value: string }[]>
-  >(initialLocationLevels);
-
-  useEffect(() => {
-    updateLocationLevels(() => initialLocationLevels);
-  }, [initialLocationLevels, updateLocationLevels]);
-
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
-    updateLocationLevels(() => {
-      return initialLocationLevels;
-    });
-  });
-
-  const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
-      Choose locations
-    </WizardStepHeading>
+  const stepHeading = useMemo(
+    () => (
+      <WizardStepHeading {...props} fieldsetHeading>
+        Choose locations
+      </WizardStepHeading>
+    ),
+    [props],
   );
 
   return (
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={formInitialValues}
+      initialValues={{
+        locations: mapValues(options, (levelOptions, level) => {
+          const initialLevel = initialValues[level as LocationLevelKeys] ?? [];
+
+          return initialLevel.filter(
+            initialId =>
+              levelOptions.options.find(({ value }) => value === initialId) !==
+              undefined,
+          );
+        }),
+      }}
       validateOnBlur={false}
       validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
@@ -126,95 +85,76 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         ),
       })}
       onSubmit={async values => {
-        const locations = Object.entries(values.locations).reduce(
-          (acc, [level, levelOptions]) => {
-            if (levelOptions.length === 0) {
-              return acc;
-            }
+        const locations = Object.entries(values.locations).reduce<
+          PartialRecord<LocationLevelKeys, string[]>
+        >((acc, [level, levelOptions]) => {
+          if (levelOptions.length > 0) {
+            acc[level as LocationLevelKeys] = levelOptions;
+          }
 
-            return {
-              ...acc,
-              [level]: levelOptions,
-            };
-          },
-          {},
-        );
+          return acc;
+        }, {});
 
         await onSubmit({ locations });
         goToNextStep();
       }}
       render={(form: FormikProps<FormValues>) => {
-        return isActive ? (
-          <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
-            <FormFieldset
-              id={`${formId}-levels`}
-              legend={stepHeading}
-              hint="Select at least one"
-              error={
-                typeof form.errors.locations === 'string'
-                  ? form.errors.locations
-                  : ''
-              }
-            >
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half-from-desktop">
-                  {Object.entries(formOptions).map(([levelKey, level]) => {
-                    return (
-                      <FormFieldCheckboxMenu
-                        name={`locations.${levelKey}`}
-                        key={levelKey}
-                        options={level.options}
-                        id={`${formId}-levels-${levelKey}`}
-                        legend={level.legend}
-                        legendHidden
-                        disabled={form.isSubmitting}
-                        onAllChange={() => {
-                          updateLocationLevels(draft => {
-                            if (!draft[levelKey]) {
-                              draft[levelKey] = [];
-                            }
-                            draft[levelKey] =
-                              draft[levelKey].length < level.options.length
-                                ? level.options
-                                : [];
-                          });
-                        }}
-                        onChange={(event, option) => {
-                          event.persist();
-
-                          updateLocationLevels(draft => {
-                            if (!draft[levelKey]) {
-                              draft[levelKey] = [];
-                            }
-
-                            const { value } = event.target;
-
-                            const matchingOption = draft[levelKey].find(
-                              levelOption => levelOption.value === value,
-                            );
-
-                            if (matchingOption) {
-                              draft[levelKey] = draft[levelKey].filter(
-                                levelOption => levelOption.value !== value,
-                              );
-                            } else {
-                              draft[levelKey].push({
-                                value,
-                                label: option.label,
-                              });
-                            }
-                          });
-                        }}
-                      />
-                    );
-                  })}
+        if (isActive) {
+          return (
+            <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+              <FormFieldset
+                id={`${formId}-levels`}
+                legend={stepHeading}
+                hint="Select at least one"
+                error={
+                  typeof form.errors.locations === 'string'
+                    ? form.errors.locations
+                    : ''
+                }
+              >
+                <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-one-half-from-desktop">
+                    {Object.entries(formOptions).map(([levelKey, level]) => {
+                      return (
+                        <FormFieldCheckboxMenu
+                          name={`locations.${levelKey}`}
+                          key={levelKey}
+                          options={level.options}
+                          id={`${formId}-levels-${levelKey}`}
+                          legend={level.legend}
+                          legendHidden
+                          disabled={form.isSubmitting}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </FormFieldset>
+              </FormFieldset>
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
-          </Form>
-        ) : (
+              <WizardStepFormActions {...props} form={form} formId={formId} />
+            </Form>
+          );
+        }
+
+        const locationLevels: Dictionary<FilterOption[]> = mapValues(
+          form.values.locations,
+          (locations, locationKey) => {
+            const locationOptions =
+              (options[locationKey] && options[locationKey].options) || [];
+
+            return locations.reduce<FilterOption[]>((acc, n) => {
+              const found = locationOptions.find(option => option.value === n);
+
+              if (found) {
+                acc.push(found);
+              }
+
+              return acc;
+            }, []);
+          },
+        );
+
+        return (
           <>
             {stepHeading}
             <SummaryList noBorder>
