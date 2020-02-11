@@ -13,6 +13,7 @@ export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
   releaseId: string;
+  publication: AbstractRelease<EditableContentBlock>['publication'];
   accordionId: string;
   sectionName: string;
   onContentChange?: (content: ContentType[]) => void;
@@ -20,6 +21,7 @@ interface ReleaseContentAccordionProps {
 
 const ReleaseContentAccordion = ({
   releaseId,
+  publication,
   accordionId,
   sectionName,
   onContentChange,
@@ -119,6 +121,7 @@ const ReleaseContentAccordion = ({
             key={contentItem.order}
             contentItem={contentItem}
             index={index}
+            publication={publication}
             onHeadingChange={title =>
               onUpdateHeading(contentItem, index, title)
             }

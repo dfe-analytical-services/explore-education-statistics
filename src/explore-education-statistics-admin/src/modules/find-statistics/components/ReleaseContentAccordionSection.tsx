@@ -1,19 +1,21 @@
-import AccordionSection, {
-  EditableAccordionSectionProps,
-} from '@admin/components/EditableAccordionSection';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import React, { MouseEventHandler, ReactNode } from 'react';
 import ContentBlock, {
   ReorderHook,
 } from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import styles from '@admin/modules/find-statistics/components/ReleaseContentAccordion.module.scss';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import AccordionSection, {
+  EditableAccordionSectionProps,
+} from '@admin/components/EditableAccordionSection';
 import classnames from 'classnames';
-import React, { MouseEventHandler, ReactNode } from 'react';
+import styles from '@admin/modules/find-statistics/components/ReleaseContentAccordion.module.scss';
+import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
+import { AbstractRelease } from '@common/services/publicationService';
 
 export interface ReleaseContentAccordionSectionProps {
   id?: string;
   contentItem: ContentType;
   index: number;
+  publication: AbstractRelease<EditableContentBlock>['publication'];
   headingButtons?: ReactNode[];
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   onContentChange?: (content?: EditableContentBlock[]) => void;
@@ -24,6 +26,7 @@ const ReleaseContentAccordionSection = ({
   id,
   index,
   contentItem,
+  publication,
   headingButtons,
   canToggle = true,
   onHeadingChange,
@@ -93,6 +96,7 @@ const ReleaseContentAccordionSection = ({
         sectionId={id}
         content={content}
         id={`content_${order}`}
+        publication={publication}
         onContentChange={newContent => contentChange(newContent)}
         onReorderHook={s => {
           saveOrder.current = s;

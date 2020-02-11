@@ -1,5 +1,6 @@
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import { ContentBlock } from '@common/services/publicationService';
+import { ContentBlock, Publication } from '@common/services/publicationService';
+import ButtonLink from '@common/components/ButtonLink';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -11,10 +12,16 @@ export type SectionToggleHandler = (section: {
 interface Props {
   block?: ContentBlock;
   id: string;
+  publication: Publication;
   onToggle?: SectionToggleHandler;
 }
 
-const ContentSubBlockRenderer = ({ block, id, onToggle }: Props) => {
+const ContentSubBlockRenderer = ({
+  block,
+  id,
+  publication,
+  onToggle,
+}: Props) => {
   if (block === undefined) return null;
   switch (block.type) {
     case 'MarkDownBlock':
@@ -38,7 +45,26 @@ const ContentSubBlockRenderer = ({ block, id, onToggle }: Props) => {
       );
     case 'DataBlock':
       return (
-        <DataBlock {...block} id={`${id}_datablock`} onToggle={onToggle} />
+        <DataBlock
+          {...block}
+          id={`${id}_datablock`}
+          additionalTabContent={
+            <div className="dfe-print-hidden">
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                Explore and edit this data online
+              </h2>
+              <p>Use our table tool to explore this data.</p>master
+              <ButtonLink
+                as={`/data-tables/${publication.slug}`}
+                to={`/data-tables?publicationSlug=${publication.slug}`}
+                href={`/data-tables?publicationSlug=${publication.slug}`}
+              >
+                Explore data
+              </ButtonLink>
+            </div>
+          }
+          onToggle={onToggle}
+        />
       );
     default:
       return null;

@@ -138,6 +138,7 @@ const PublicationReleaseContent = ({
           {release.summarySection && (
             <ContentBlocks
               sectionId={release.summarySection.id}
+              publication={publication}
               id={release.summarySection.id as string}
               content={release.summarySection.content}
               canAddSingleBlock
@@ -259,6 +260,7 @@ const PublicationReleaseContent = ({
 
       <ReleaseContentAccordion
         releaseId={release.id}
+        publication={publication}
         accordionId="contents-accordion"
         sectionName="Contents"
         onContentChange={onAccordionContentChange}
