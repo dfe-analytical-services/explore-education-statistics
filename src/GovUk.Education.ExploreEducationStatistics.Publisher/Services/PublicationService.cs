@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var publication = await _context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.LegacyReleases)
+                .Include(p => p.Methodology)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .SingleOrDefaultAsync(p => p.Id == id);
