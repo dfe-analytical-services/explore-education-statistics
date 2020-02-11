@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
               ""description"": ""string"",
               ""dataSource"": ""string"",
               ""summary"": ""string"",
-              ""nextUpdate"": ""2020-02-05T10:43:58.736Z"",
               ""latestReleaseId"": ""2ca4bbbc-e52d-4cb7-8dd2-541623973d68"",
               ""releases"": [
                 {
@@ -65,6 +64,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
               ""yearTitle"": ""string"",
               ""coverageTitle"": ""string"",
               ""releaseName"": ""string"",
+              ""nextReleaseDate"": {
+                ""year"": ""string"",
+                ""month"": ""string"",
+                ""day"": ""string""
+              },
               ""published"": ""2020-02-05T10:43:58.736Z"",
               ""slug"": ""string"",
               ""type"": {
