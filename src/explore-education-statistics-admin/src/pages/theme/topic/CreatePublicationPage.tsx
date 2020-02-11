@@ -10,7 +10,7 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, Formik } from '@common/components/form';
+import { FormFieldset, FormGroup, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -27,9 +27,10 @@ import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   publicationTitle: string;
-  methodologyChoice?: 'existing' | 'new';
+  methodologyChoice?: 'existing' | 'external' | 'later';
   selectedMethodologyId?: string;
   selectedContactId: string;
+  externalMethodology: { title: string; url: string };
 }
 
 interface CreatePublicationModel {
@@ -41,7 +42,7 @@ interface CreatePublicationModel {
 const CreatePublicationPage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps<{ topicId: string }> & ErrorControlProps) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
@@ -64,7 +65,7 @@ const CreatePublicationPage = ({
   const submitFormHandler = submitWithFormikValidation(
     async (values: FormValues) => {
       await service.createPublication({
-        topicId: (model as CreatePublicationModel).topic.id,
+        topicId: topic.id,
         ...values,
       });
 
@@ -77,7 +78,6 @@ const CreatePublicationPage = ({
       'Choose a unique title',
     ),
   );
-
   const cancelHandler = () => {
     history.push(appRouteList.adminDashboard.path as string);
   };
@@ -131,10 +131,8 @@ const CreatePublicationPage = ({
               contact => contact.contactName,
             )[0].id,
             methodologyChoice: undefined,
-            selectedMethodologyId: orderBy(
-              model.methodologies,
-              methodology => methodology.title,
-            )[0].id,
+            selectedMethodologyId: '',
+            externalMethodology: { title: '', url: 'https://' },
           }}
           validationSchema={Yup.object<FormValues>({
             publicationTitle: Yup.string().required(
@@ -148,6 +146,16 @@ const CreatePublicationPage = ({
               is: 'existing',
               then: Yup.string().required('Choose a methodology'),
               otherwise: Yup.string(),
+            }),
+            externalMethodology: Yup.object<{
+              title: string;
+              url: string;
+            }>().when('methodologyChoice', {
+              is: 'external',
+              then: Yup.object().shape({
+                title: Yup.string().required('Enter a link title'),
+                url: Yup.string().url('Enter a valid URL'),
+              }),
             }),
           })}
           onSubmit={submitFormHandler}
@@ -167,26 +175,72 @@ const CreatePublicationPage = ({
                   options={[
                     {
                       value: 'existing',
-                      label: 'Add existing methodology',
+                      label: 'Choose an existing methodology',
+                      conditional: (
+                        <FormFieldSelect
+                          id={`${formId}-selectedMethodologyId`}
+                          name="selectedMethodologyId"
+                          label="Select methodology"
+                          options={model.methodologies.map(methodology => ({
+                            label: methodology.title,
+                            value: methodology.id,
+                          }))}
+                        />
+                      ),
                     },
                     {
-                      value: 'new',
-                      label:
-                        'Create new methodology / select methodology later',
+                      value: 'external',
+                      label: 'Link to an externally hosted methodology',
+                      conditional: (
+                        <FormGroup>
+                          <FormFieldTextInput
+                            label="Link title"
+                            id="externalMethodology.title"
+                            name="externalMethodology.title"
+                          />
+                          <FormFieldTextInput
+                            label="URL"
+                            id="externalMethodology.url"
+                            name="externalMethodology.url"
+                          />
+                        </FormGroup>
+                      ),
+                    },
+                    {
+                      value: 'later',
+                      label: 'Select a methodology later',
                     },
                   ]}
+                  onChange={e => {
+                    if (e.target.value === 'existing') {
+                      return form.setValues({
+                        ...form.values,
+                        selectedMethodologyId: orderBy(
+                          model.methodologies,
+                          methodology => methodology.title,
+                        )[0].id,
+                        externalMethodology: {
+                          title: '',
+                          url: '',
+                        },
+                      });
+                    }
+                    if (e.target.value === 'external') {
+                      return form.setValues({
+                        ...form.values,
+                        selectedMethodologyId: '',
+                      });
+                    }
+                    return form.setValues({
+                      ...form.values,
+                      selectedMethodologyId: '',
+                      externalMethodology: {
+                        title: '',
+                        url: '',
+                      },
+                    });
+                  }}
                 />
-                {form.values.methodologyChoice === 'existing' && (
-                  <FormFieldSelect
-                    id={`${formId}-selectedMethodologyId`}
-                    name="selectedMethodologyId"
-                    label="Select methodology"
-                    options={model.methodologies.map(methodology => ({
-                      label: methodology.title,
-                      value: methodology.id,
-                    }))}
-                  />
-                )}
                 <FormFieldset
                   className="govuk-!-margin-top-9"
                   id={`${formId}-selectedContactIdFieldset`}
