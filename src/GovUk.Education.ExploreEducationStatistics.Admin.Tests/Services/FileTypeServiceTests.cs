@@ -45,7 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly FileInfo Csv = new FileInfo("test.csv", "application/csv");
         private static readonly FileInfo Txt = new FileInfo("test.txt", "text/plain");
         private static readonly FileInfo Pdf = new FileInfo("test.pdf", "application/pdf");
-        private static readonly FileInfo Rtf = new FileInfo("test.rtf", "text/plain", "text/rtf");
         private static readonly FileInfo Bmp = new FileInfo("test.bmp", "image/bmp");
         private static readonly FileInfo Gif = new FileInfo("test.gif", "image/gif");
         private static readonly FileInfo Jpg = new FileInfo("test.jpg", "image/jpeg");
@@ -63,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Csv,
             Txt,
-            Rtf,
         };
         
         private static readonly List<FileInfo> AllTypes = new List<FileInfo>
@@ -76,7 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Csv,
             Txt,
             Pdf,
-            Rtf,
             Bmp,
             Gif,
             Jpg,
@@ -123,12 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetMimeType_Pdf()
         {
             AssertMimeTypeCorrect(Pdf);
-        }
-        
-        [Fact]
-        public void GetMimeType_Rtf()
-        {
-            AssertMimeTypeCorrect(Rtf);
         }
         
         [Fact]
