@@ -107,7 +107,6 @@ const ReleaseManageDataBlocksPage = ({
       const response = await dataBlockService
         .getDataBlockForSubject({
           ...request,
-          includeGeoJson: false,
         })
         .catch(handleApiErrors);
 

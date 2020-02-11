@@ -19,11 +19,10 @@ const ChartTypeSelector = ({
   return (
     <div className={styles.chartContainer}>
       {chartTypes.map(chartType => (
-        <>
+        <React.Fragment key={chartType.type}>
           {!chartType.requiresGeoJson || geoJsonAvailable ? (
             <button
               type="button"
-              key={chartType.type}
               className={classnames(styles.chart, {
                 [styles.selected]: chartType === selectedChartType,
               })}
@@ -43,7 +42,7 @@ const ChartTypeSelector = ({
               <p>There is no map data for this data block.</p>
             </div>
           )}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );
