@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             new Regex(@"^image/.*"),
             new Regex(@"^(application|text)/csv$"),
             new Regex(@"^text/plain$"),
+            new Regex(@"^text/rtf"),
             new Regex(@"^application/pdf$"),
             new Regex(@"^application/msword$"),
             new Regex(@"^application/vnd.ms-excel$"),

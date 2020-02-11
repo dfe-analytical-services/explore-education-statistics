@@ -14,12 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     class FileInfo
     {
         public readonly string Filename;
-        public readonly string ExpectedMimeType;
+        
+        // we have a possible list of matching mime types that we'd expect to see, that potentially change when run
+        // on different operating systems, but are considered valid either way 
+        public readonly string[] ExpectedMimeTypes;
 
-        public FileInfo(string filename, string expectedMimeType)
+        public FileInfo(string filename, params string[] expectedMimeTypes)
         {
             Filename = filename;
-            ExpectedMimeType = expectedMimeType;
+            ExpectedMimeTypes = expectedMimeTypes;
         }
     }
     
@@ -42,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly FileInfo Csv = new FileInfo("test.csv", "application/csv");
         private static readonly FileInfo Txt = new FileInfo("test.txt", "text/plain");
         private static readonly FileInfo Pdf = new FileInfo("test.pdf", "application/pdf");
-        private static readonly FileInfo Rtf = new FileInfo("test.rtf", "text/plain");
+        private static readonly FileInfo Rtf = new FileInfo("test.rtf", "text/plain", "text/rtf");
         private static readonly FileInfo Bmp = new FileInfo("test.bmp", "image/bmp");
         private static readonly FileInfo Gif = new FileInfo("test.gif", "image/gif");
         private static readonly FileInfo Jpg = new FileInfo("test.jpg", "image/jpeg");
@@ -205,7 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var result = service.GetMimeType(formFile.Object);
             
-            Assert.Equal(fileInfo.ExpectedMimeType, result);
+            Assert.True(fileInfo.ExpectedMimeTypes.Contains(result), 
+                "Expected " + result + " to be contained in the expected mime types list");
         }
         
         private static void AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes, 
