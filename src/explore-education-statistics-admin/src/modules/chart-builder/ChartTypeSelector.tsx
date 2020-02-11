@@ -7,29 +7,42 @@ interface Props {
   chartTypes: ChartDefinition[];
   selectedChartType?: ChartDefinition;
   onSelectChart: (chart: ChartDefinition) => void | undefined;
+  geoJsonAvailable: boolean;
 }
 
 const ChartTypeSelector = ({
   chartTypes,
   onSelectChart,
   selectedChartType,
+  geoJsonAvailable,
 }: Props) => {
   return (
     <div className={styles.chartContainer}>
       {chartTypes.map(chartType => (
-        <button
-          type="button"
-          key={chartType.type}
-          className={classnames(styles.chart, {
-            [styles.selected]: chartType === selectedChartType,
-          })}
-          onClick={() => {
-            if (onSelectChart) onSelectChart(chartType);
-          }}
-        >
-          <span className={styles.title}>{chartType.name}</span>
-          <span className={classnames(styles.img, styles[chartType.type])} />
-        </button>
+        <>
+          {!chartType.requiresGeoJson || geoJsonAvailable ? (
+            <button
+              type="button"
+              key={chartType.type}
+              className={classnames(styles.chart, {
+                [styles.selected]: chartType === selectedChartType,
+              })}
+              onClick={() => {
+                if (onSelectChart) onSelectChart(chartType);
+              }}
+            >
+              <span className={styles.title}>{chartType.name}</span>
+              <span
+                className={classnames(styles.img, styles[chartType.type])}
+              />
+            </button>
+          ) : (
+            <div className="chartTypeUnavailable">
+              <p>{chartType.name} chart is not available.</p>
+              <p>There is no map data available.</p>
+            </div>
+          )}
+        </>
       ))}
     </div>
   );

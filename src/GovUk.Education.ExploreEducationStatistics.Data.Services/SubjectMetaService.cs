@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -54,8 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(
-            SubjectMetaQueryContext query,
+        public SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
             var subject = _subjectService.Find(query.SubjectId,
@@ -83,10 +81,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel);
+            var geoJsonAvailable = HasBoundaryLevelDataForAllObservationalUnits(observationalUnits);
+            
+            Dictionary<string, ObservationalUnitGeoJsonMeta> locations;
+            
+            if (query.IncludeGeoJson)
+            {
+                locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel);
 
-            _logger.LogTrace("Got GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                _logger.LogTrace("Got GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
+            }
+            else
+            {
+                locations = new Dictionary<string, ObservationalUnitGeoJsonMeta>();
+                observationalUnits.ToList().ForEach(pair =>
+                {
+                    var units = pair.Value;
+                    
+                    units.ToList().ForEach(unit =>
+                    {
+                        var unitCode = unit is LocalAuthority localAuthority ?
+                            localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
+                        
+                        locations.Add(unitCode, new ObservationalUnitGeoJsonMeta
+                        {
+                            Label = unit.Name,
+                            Level = pair.Key,
+                            Value = unitCode 
+                        });
+                    });
+
+                });
+
+                _logger.LogTrace("Got Plain locations without GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
+            }
 
             var boundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys);
 
@@ -112,8 +142,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 PublicationName = subject.Release.Publication.Title,
                 SubjectName = subject.Name,
                 TimePeriod = timePeriod,
-                Footnotes = footnotes
+                Footnotes = footnotes,
+                IsGeoJsonAvailable = geoJsonAvailable
             };
+        }
+        
+        private bool HasBoundaryLevelDataForAllObservationalUnits(Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+        {
+            var boundaryLevelAvailablePerGeographicLevel =
+                observationalUnits.Select(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
+            return boundaryLevelAvailablePerGeographicLevel.All(available => available);
+        }
+        
+        private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
+        {
+            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel) != null;
         }
 
         private Dictionary<string, IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
@@ -143,12 +186,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 model => model.Value,
                 model => model);
         }
-
+        
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
-            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
-        }
+            var boundaryLevel = _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
+            
+            if (boundaryLevel == null)
+            {
+                throw new ArgumentException($"Boundary Level does not exist for geographic level {geographicLevel}",
+                    nameof(geographicLevel));
+            }
 
+            return boundaryLevel;
+        }
+        
         private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
             IEnumerable<GeographicLevel> geographicLevels)
         {

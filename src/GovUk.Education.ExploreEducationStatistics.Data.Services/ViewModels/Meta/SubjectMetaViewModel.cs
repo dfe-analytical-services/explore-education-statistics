@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public string SubjectName { get; set; }
 
         public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
+        
+        public bool IsGeoJsonAvailable { get; set; }
 
     }
 }

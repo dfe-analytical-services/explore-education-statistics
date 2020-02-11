@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
+        public bool IncludeGeoJson { get; set; }
 
         public override string ToString()
         {
@@ -33,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                    $"{nameof(Filters)}: [{(Filters == null ? string.Empty : string.Join(", ", Filters))}], " +
                    $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
                    $"{nameof(GeographicLevel)}: {GeographicLevel?.GetEnumValue()}, " +
-                   $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : string.Join(", ", Indicators))}]";
+                   $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : string.Join(", ", Indicators))}], " + 
+                   $"IncludeGeoJson: {IncludeGeoJson}";
         }
     }
 }

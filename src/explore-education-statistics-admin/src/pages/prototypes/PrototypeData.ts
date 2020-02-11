@@ -45,6 +45,7 @@ const tables: Dictionary<PrototypeTable> = {
 
 const testResponse: DataBlockResponse = {
   metaData: {
+    geoJsonAvailable: true,
     publicationName: 'test',
     subjectName: 'test',
     footnotes: [],

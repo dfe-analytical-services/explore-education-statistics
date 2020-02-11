@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
