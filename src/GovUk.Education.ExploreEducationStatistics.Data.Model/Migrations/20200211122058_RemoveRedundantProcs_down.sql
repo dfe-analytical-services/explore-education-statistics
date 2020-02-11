@@ -1,3 +1,7 @@
+-- Remove the new procedure & revert the table types that were dropped - note that FilterType is the latest version
+
+DROP PROCEDURE dbo.DropAndCreateRelease;
+
 CREATE TYPE FilterType AS TABLE
 (
     Id        UNIQUEIDENTIFIER NOT NULL,

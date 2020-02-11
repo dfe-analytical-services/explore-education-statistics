@@ -56,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TYPE dbo.IndicatorGroupType");
             migrationBuilder.Sql("DROP TYPE dbo.SubjectType");
             migrationBuilder.Sql("DROP TYPE dbo.SubjectFootnoteType");
+            
+            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
         }
 
         private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
