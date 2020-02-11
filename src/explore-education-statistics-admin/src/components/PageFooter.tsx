@@ -21,11 +21,6 @@ const PageFooter = ({ wide }: Props) => {
           <div className="govuk-footer__meta-item govuk-footer__meta-item--grow">
             <h2 className="govuk-visually-hidden">Support links</h2>
             <ul className="govuk-footer__inline-list">
-              <li className="govuk-footer__inline-list-item">
-                <Link className="govuk-footer__link" to="/prototypes">
-                  Prototypes
-                </Link>
-              </li>
               {user &&
                 (user.permissions.canAccessUserAdministrationPages ||
                   user.permissions.canAccessMethodologyAdministrationPages) && (
