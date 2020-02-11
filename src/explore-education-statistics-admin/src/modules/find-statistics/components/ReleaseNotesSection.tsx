@@ -267,12 +267,12 @@ const ReleaseNotesSection = ({
 
                         {isEditing && (
                           <>
-                            <ButtonText
-                              className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+                            <Button
+                              className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-6"
                               onClick={() => openEditForm(elem)}
                             >
                               Edit
-                            </ButtonText>
+                            </Button>
                             <ButtonText
                               className="govuk-button govuk-button--warning"
                               onClick={() => setDeletedReleaseNote(elem)}

@@ -3,7 +3,7 @@ import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import React from 'react';
 import tableBuilderService, {
   ThemeMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 
 const PrototypeTableTool = () => {

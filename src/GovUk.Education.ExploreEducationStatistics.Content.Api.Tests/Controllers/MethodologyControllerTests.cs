@@ -18,23 +18,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             fileStorageService.Setup(s => s.DownloadTextAsync("methodology/tree.json")).ReturnsAsync(@"
             [
             {
-                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""id"": ""5dde1ee6-34b6-41f5-bdc0-10f7fe0c46fe"",
                 ""title"": ""string"",
                 ""summary"": ""string"",
                 ""topics"": [
                 {
-                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""id"": ""46dae1b0-b2ec-4759-b04e-84d184afe6db"",
                     ""title"": ""string"",
                     ""summary"": ""string"",
                     ""publications"": [
                     {
                         ""methodology"": {
-                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
-                        ""slug"": ""string"",
-                        ""summary"": ""string"",
-                        ""title"": ""string""
-                    },
-                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                            ""id"": ""c3fc42f6-996a-4d8b-9b8d-98a536197ea7"",
+                            ""slug"": ""string"",
+                            ""summary"": ""string"",
+                            ""title"": ""string""
+                        },
+                        ""id"": ""c00e6006-e82e-409d-920e-51860df6e076"",
                         ""title"": ""string"",
                         ""slug"": ""string"",
                         ""summary"": ""string""
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             fileStorageService.Setup(s => s.DownloadTextAsync("methodology/methodologies/test-slug.json"))
                 .ReturnsAsync(@"
             {
-                ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                ""id"": ""c04e6613-1f98-4998-86a0-7570c2034d3a"",
                 ""title"": ""string"",
                 ""slug"": ""string"",
                 ""summary"": ""string"",
@@ -84,14 +84,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 ""lastUpdated"": ""2020-02-03T17:19:09.892Z"",
                 ""content"": [
                 {
-                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""id"": ""28ada0ae-504d-480a-8757-a752d2994c89"",
                     ""order"": 0,
                     ""heading"": ""string"",
                     ""caption"": ""string"",
                     ""content"": [
                     {
                         ""$type"": ""GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels.HtmlBlockViewModel, GovUk.Education.ExploreEducationStatistics.Publisher.Model"",
-                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""id"": ""382fa9aa-0fc6-4f00-957d-195862b01272"",
                         ""order"": 0,
                         ""body"": ""string"",
                         ""type"": ""string""
@@ -101,14 +101,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 ],
                 ""annexes"": [
                 {
-                    ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                    ""id"": ""305dd865-47b4-4e05-988c-01e36fa15a95"",
                     ""order"": 0,
                     ""heading"": ""string"",
                     ""caption"": ""string"",
                     ""content"": [
                     {
                         ""$type"": ""GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels.MarkDownBlockViewModel, GovUk.Education.ExploreEducationStatistics.Publisher.Model"",
-                        ""id"": ""3fa85f64-5717-4562-b3fc-2c963f66afa6"",
+                        ""id"": ""32daa5e8-0ee9-4134-9fef-f2ed79a49144"",
                         ""order"": 0,
                         ""body"": ""string"",
                         ""type"": ""string""

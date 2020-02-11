@@ -2,8 +2,8 @@ import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+} from '@common/modules/table-tool/types/filters';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';

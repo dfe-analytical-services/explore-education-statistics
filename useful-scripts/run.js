@@ -18,6 +18,11 @@ const { StringStream } = require('scramjet');
 
 const args = process.argv.slice(2);
 
+// Set environment variables
+if (!process.env.ASPNETCORE_ENVIRONMENT) {
+  process.env.ASPNETCORE_ENVIRONMENT = 'Development';
+}
+
 const projectRoot = path.resolve(__dirname, '..');
 
 const projects = {
@@ -90,16 +95,18 @@ if (!matchingProjects.length) {
   process.exit(0);
 }
 
-matchingProjects.forEach(project => {
-  const subProcess = spawn(projects[project].command, {
-    cwd: projects[project].path,
-    shell: true,
-  });
+matchingProjects.forEach((project, index) => {
+  setTimeout(() => {
+    const subProcess = spawn(projects[project].command, {
+      cwd: projects[project].path,
+      shell: true,
+    });
 
-  labelStream(subProcess.stdout, project).pipe(process.stdout);
-  labelStream(
-    subProcess.stderr,
-    project,
-    line => `${chalk.red('[ERROR]')} ${line}`,
-  ).pipe(process.stderr);
+    labelStream(subProcess.stdout, project).pipe(process.stdout);
+    labelStream(
+      subProcess.stderr,
+      project,
+      line => `${chalk.red('[ERROR]')} ${line}`,
+    ).pipe(process.stderr);
+  }, 1000 * index);
 });
