@@ -8,7 +8,6 @@ import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import appRouteList from './routes/dashboard/routes';
-import prototypeRouteList from './routes/prototypeRoutes';
 
 function App() {
   const authRoutes = Object.entries(apiAuthorizationRouteList).map(
@@ -27,12 +26,6 @@ function App() {
     );
   });
 
-  const prototypeRoutes = Object.entries(prototypeRouteList).map(
-    ([key, prototypeRoute]) => {
-      return <Route key={`authRoute-${key}`} {...prototypeRoute} />;
-    },
-  );
-
   return (
     <AriaLiveAnnouncer>
       <ThemeAndTopic>
@@ -40,7 +33,6 @@ function App() {
           <Switch>
             {authRoutes}
             {appRoutes}
-            {prototypeRoutes}
             <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
           </Switch>
         </BrowserRouter>
