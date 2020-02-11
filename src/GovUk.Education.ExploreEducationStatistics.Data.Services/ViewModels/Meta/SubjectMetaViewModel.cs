@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
         
-        public bool IsGeoJsonAvailable { get; set; }
+        public bool GeoJsonAvailable { get; set; }
 
     }
 }

@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
-        public bool IncludeGeoJson { get; set; }
+        public bool IncludeGeoJson { get; set; } = true;
 
         public override string ToString()
         {

@@ -191,6 +191,7 @@ export type TableDataQuery = {
   indicators: string[];
   timePeriod?: TimePeriodQuery;
   geographicLevel?: string;
+  includeGeoJson?: boolean;
 } & PartialRecord<LocationLevelKeys, string[]>;
 
 export default {
