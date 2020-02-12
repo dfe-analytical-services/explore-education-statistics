@@ -93,6 +93,7 @@ os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
+             "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction"]
 if args.tags:
