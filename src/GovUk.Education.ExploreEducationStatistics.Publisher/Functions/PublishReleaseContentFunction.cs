@@ -50,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     catch (Exception e)
                     {
                         logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                        await UpdateStage(releaseStatus, Failed);
+                        await UpdateStage(releaseStatus, Failed, new ReleaseStatusLogMessage(
+                            $"Exception in publishing stage: {e.Message}"));
                     }
                 }
 
@@ -64,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateStage(published, Failed);
+                    await UpdateStage(published, Failed,
+                        new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                 }
             }
 
@@ -87,17 +89,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return await _releaseStatusService.ExecuteQueryAsync(query);
         }
 
-        private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, Stage stage)
+        private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             foreach (var releaseStatus in releaseStatuses)
             {
-                await UpdateStage(releaseStatus, stage);
+                await UpdateStage(releaseStatus, stage, logMessage);
             }
         }
 
-        private async Task UpdateStage(ReleaseStatus releaseStatus, Stage stage)
+        private async Task UpdateStage(ReleaseStatus releaseStatus, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
-            await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, stage);
+            await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, stage,
+                logMessage);
         }
     }
 }
