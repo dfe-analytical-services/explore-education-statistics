@@ -20,12 +20,13 @@ const PublicationAssignMethodologyPage = ({
   ErrorControlProps) => {
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
-  useEffect(() => {
+  const getPublication = () => {
     service
       .getBasicPublicationDetails(match.params.publicationId)
       .then(setPublication)
       .catch(handleApiErrors);
-  }, [match.params.publicationId]);
+  };
+  useEffect(getPublication, [match.params.publicationId]);
 
   return (
     <Page
@@ -46,7 +47,11 @@ const PublicationAssignMethodologyPage = ({
               </h1>
             </div>
           </div>
-          <AssignMethodologyForm methodology={publication.methodology} />
+          <AssignMethodologyForm
+            methodology={publication.methodology}
+            publicationId={match.params.publicationId}
+            refreshPublication={getPublication}
+          />
         </>
       ) : (
         <LoadingSpinner />
