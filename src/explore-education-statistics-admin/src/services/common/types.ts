@@ -1,3 +1,5 @@
+import { ExternalMethodology } from '../dashboard/types';
+
 export interface IdTitlePair {
   id: string;
   title: string;
@@ -44,12 +46,12 @@ export interface BasicMethodology {
   id: string;
   title: string;
   status: 'Live' | 'Draft' | 'Approved' | string;
-  externalLink?: string;
 }
 export interface BasicPublicationDetails {
   id: string;
   title: string;
   contact?: ContactDetails;
   methodology?: BasicMethodology;
+  externalMethodology?: ExternalMethodology;
   themeId: string;
 }

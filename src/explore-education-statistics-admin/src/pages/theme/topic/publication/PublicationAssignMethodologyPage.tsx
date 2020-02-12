@@ -49,6 +49,7 @@ const PublicationAssignMethodologyPage = ({
           </div>
           <AssignMethodologyForm
             methodology={publication.methodology}
+            externalMethodology={publication.externalMethodology}
             publicationId={match.params.publicationId}
             refreshPublication={getPublication}
           />
