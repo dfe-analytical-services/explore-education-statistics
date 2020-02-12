@@ -1,4 +1,3 @@
-import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import marked from 'marked';
 import React from 'react';
 import { EditableContentBlock } from '@admin/services/publicationService';
@@ -36,24 +35,6 @@ function EditableContentSubBlockRenderer({
             onContentChange={onContentChange}
           />
         </>
-      );
-    case 'InsetTextBlock':
-      return (
-        <div className="govuk-inset-text">
-          <PrototypeEditableContent
-            editable={editable}
-            onContentChange={onContentChange}
-            content={`
-            ${
-              block.heading
-                ? `<h3 className="govuk-heading-s">${block.heading}</h3>`
-                : ''
-            }
-
-            <div className="govuk-body">${marked(block.body)} </div>
-          `}
-          />
-        </div>
       );
     case 'DataBlock':
       return (
