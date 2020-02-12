@@ -33,12 +33,15 @@ const FormRadio = ({
   value,
   disabled = false,
 }: FormRadioProps) => {
+  /* eslint-disable jsx-a11y/role-supports-aria-props */
   return (
     <>
       <div className="govuk-radios__item">
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
-          data-aria-controls={conditional ? `${id}-conditional` : undefined}
+          data-aria-controls={!conditional ? `${id}-conditional` : undefined}
+          aria-controls={conditional ? `${id}-conditional` : undefined}
+          aria-expanded={conditional ? checked : undefined}
           className="govuk-radios__input"
           checked={checked}
           defaultChecked={defaultChecked}
