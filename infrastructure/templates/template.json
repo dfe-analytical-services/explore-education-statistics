@@ -343,10 +343,6 @@
       "type": "bool",
       "defaultValue": true
     },
-    "deployKeyVaultSecrets": {
-      "type": "bool",
-      "defaultValue": false
-    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -445,7 +441,6 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'sapublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'salogging')]",
-    "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
