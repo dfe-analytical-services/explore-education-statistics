@@ -10,13 +10,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         {
         }
 
-        protected CachedReleaseViewModel(Guid id, string title, string yearTitle, string coverageTitle, string releaseName, DateTime? published, string slug, ReleaseTypeViewModel type, List<ReleaseNoteViewModel> updates, List<ContentSectionViewModel> content, ContentSectionViewModel summarySection, ContentSectionViewModel headlinesSection, ContentSectionViewModel keyStatisticsSection, ContentSectionViewModel keyStatisticsSecondarySection, List<FileInfo> downloadFiles, List<LinkViewModel> relatedInformation)
+        protected CachedReleaseViewModel(Guid id,
+            string title,
+            string yearTitle,
+            string coverageTitle,
+            string releaseName,
+            PartialDate nextReleaseDate,
+            DateTime? published,
+            string slug,
+            ReleaseTypeViewModel type,
+            List<ReleaseNoteViewModel> updates,
+            List<ContentSectionViewModel> content,
+            ContentSectionViewModel summarySection,
+            ContentSectionViewModel headlinesSection,
+            ContentSectionViewModel keyStatisticsSection,
+            ContentSectionViewModel keyStatisticsSecondarySection,
+            List<FileInfo> downloadFiles,
+            List<LinkViewModel> relatedInformation)
         {
             Id = id;
             Title = title;
             YearTitle = yearTitle;
             CoverageTitle = coverageTitle;
             ReleaseName = releaseName;
+            NextReleaseDate = nextReleaseDate;
             Published = published;
             Slug = slug;
             Type = type;
@@ -39,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public string CoverageTitle { get; set; }
         
         public string ReleaseName { get; set; }
+        
+        public PartialDate NextReleaseDate { get; set; }
         
         public DateTime? Published { get; set; }
 

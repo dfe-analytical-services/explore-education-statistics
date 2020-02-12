@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using static System.Int32;
 using static System.String;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class PartialDate
     {
@@ -13,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         private string _year;
         private string _month;
         private string _day;
-
 
         public string Year
         {

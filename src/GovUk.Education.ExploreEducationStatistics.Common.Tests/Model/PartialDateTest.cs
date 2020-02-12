@@ -1,6 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 {
     public class PartialDateTest
     {
