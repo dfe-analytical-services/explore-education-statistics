@@ -1,3 +1,4 @@
+import useMounted from '@common/hooks/useMounted';
 import classNames from 'classnames';
 import React, { ChangeEvent, memo, ReactNode } from 'react';
 
@@ -32,16 +33,23 @@ const FormRadio = ({
   onChange,
   value,
   disabled = false,
+  jsRequired = false,
 }: FormRadioProps) => {
+  const { onMounted } = useMounted(undefined, jsRequired);
+
   /* eslint-disable jsx-a11y/role-supports-aria-props */
   return (
     <>
       <div className="govuk-radios__item">
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
-          data-aria-controls={!conditional ? `${id}-conditional` : undefined}
-          aria-controls={conditional ? `${id}-conditional` : undefined}
-          aria-expanded={conditional ? checked : undefined}
+          data-aria-controls={onMounted(
+            !conditional ? `${id}-conditional` : undefined,
+          )}
+          aria-controls={onMounted(
+            conditional ? `${id}-conditional` : undefined,
+          )}
+          aria-expanded={onMounted(conditional ? checked : undefined)}
           className="govuk-radios__input"
           checked={checked}
           defaultChecked={defaultChecked}
