@@ -38,8 +38,10 @@ const FormCheckboxSearchSubGroups = ({
     error,
   };
 
-  const [searchTerm, setSearchTerm] = useState('');
   const { isMounted } = useMounted();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   let filteredOptions = options;
 
@@ -49,7 +51,7 @@ const FormCheckboxSearchSubGroups = ({
         optionGroup.options.some(
           option =>
             value.indexOf(option.value) > -1 ||
-            new RegExp(searchTerm, 'i').test(option.label),
+            option.label.toLowerCase().includes(lowercaseSearchTerm),
         ),
       )
       .map(optionGroup => ({
@@ -57,7 +59,7 @@ const FormCheckboxSearchSubGroups = ({
         options: optionGroup.options.filter(
           option =>
             value.indexOf(option.value) > -1 ||
-            new RegExp(searchTerm, 'i').test(option.label),
+            option.label.toLowerCase().includes(lowercaseSearchTerm),
         ),
       }));
   }
