@@ -20,7 +20,6 @@ export interface FormRadioProps {
   onChange?: RadioChangeEventHandler;
   value: string;
   disabled?: boolean;
-  jsRequired?: boolean;
 }
 
 const FormRadio = ({
@@ -34,9 +33,8 @@ const FormRadio = ({
   onChange,
   value,
   disabled = false,
-  jsRequired = false,
 }: FormRadioProps) => {
-  const { onMounted } = useMounted(undefined, jsRequired);
+  const { onMounted } = useMounted(undefined, false);
 
   /* eslint-disable jsx-a11y/role-supports-aria-props */
   return (
