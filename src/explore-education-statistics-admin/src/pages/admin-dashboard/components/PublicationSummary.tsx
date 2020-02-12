@@ -28,13 +28,17 @@ const PublicationSummary = ({ publication }: Props) => {
             </Link>
           )}
           {publication.externalMethodology && (
-            <a
-              href={publication.externalMethodology.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {publication.externalMethodology.url}
-            </a>
+            <>
+              {publication.externalMethodology.title} (
+              <a
+                href={publication.externalMethodology.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {publication.externalMethodology.url}
+              </a>
+              )
+            </>
           )}
           {!publication.methodology && !publication.externalMethodology && (
             <>No methodology assigned</>

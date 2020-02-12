@@ -46,7 +46,7 @@ const AssignMethodologyForm = ({
       .getMethodologies()
       .then(setMethodologies)
       .catch(handleApiErrors);
-  }, [currentMethodology]);
+  }, [currentMethodology, currentExternalMethodology]);
 
   if (!formOpen)
     return (
@@ -74,7 +74,10 @@ const AssignMethodologyForm = ({
           onClick={() => setFormOpen(true)}
           disabled={!methodologies}
         >
-          {!currentMethodology ? 'Add' : 'Change'} methodology
+          {!currentMethodology && !currentExternalMethodology
+            ? 'Add'
+            : 'Change'}{' '}
+          methodology
         </Button>
       </>
     );
