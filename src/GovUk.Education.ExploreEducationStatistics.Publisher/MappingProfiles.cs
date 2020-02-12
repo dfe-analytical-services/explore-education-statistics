@@ -80,17 +80,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<TableRowGroupOption, DataBlockTableRowGroupOptionViewModel>();
         }
-
-        private static ContentSectionViewModel ContentSectionToViewModel(ContentSection section)
-        {
-            return new ContentSectionViewModel
-            {
-                Id = section.Id,
-                Caption = section.Caption,
-                //Content = section.Content?.OrderBy(contentBlock => contentBlock.Order).ToList(),
-                Heading = section.Heading,
-                Order = section.Order
-            };
-        }
     }
 }
