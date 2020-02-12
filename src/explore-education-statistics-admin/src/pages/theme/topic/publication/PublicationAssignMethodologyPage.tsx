@@ -39,14 +39,13 @@ const PublicationAssignMethodologyPage = ({
     >
       {publication ? (
         <>
-          <div className="govuk-grid-row">
-            <div>
-              <h1 className="govuk-heading-xl">
-                <span className="govuk-caption-xl">{publication.title}</span>
-                Assign methodology
-              </h1>
-            </div>
+          <div>
+            <h1 className="govuk-heading-xl">
+              <span className="govuk-caption-xl">{publication.title}</span>
+              Assign methodology
+            </h1>
           </div>
+
           <AssignMethodologyForm
             methodology={publication.methodology}
             externalMethodology={publication.externalMethodology}
