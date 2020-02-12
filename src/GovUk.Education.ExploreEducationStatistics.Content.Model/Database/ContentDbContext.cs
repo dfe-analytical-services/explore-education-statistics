@@ -1216,7 +1216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
                     Slug = "permanent-and-fixed-period-exclusions-in-england",
-                    NextUpdate = new DateTime(2019, 7, 19),
                     ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
@@ -1227,7 +1226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                     Slug = "pupil-absence-in-schools-in-england",
-                    NextUpdate = new DateTime(2019, 3, 22),
                     DataSource =
                         "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                     ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
@@ -1294,7 +1292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
-                    NextUpdate = new DateTime(2019, 6, 14),
                     ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")
                 },
                 new Publication
@@ -1644,6 +1641,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = absenceReleaseId,
                     ReleaseName = "2016",
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "22",
+                        Month = "3",
+                        Year = "2019"
+                    },
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
@@ -1656,6 +1659,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = exclusionsReleaseId,
                     ReleaseName = "2016",
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "19",
+                        Month = "7",
+                        Year = "2019"
+                    },
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
@@ -1684,6 +1693,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = applicationOffersReleaseId,
                     ReleaseName = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "14",
+                        Month = "6",
+                        Year = "2019"
+                    },
                     Published = new DateTime(2018, 6, 14),
                     Slug = "2018",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,

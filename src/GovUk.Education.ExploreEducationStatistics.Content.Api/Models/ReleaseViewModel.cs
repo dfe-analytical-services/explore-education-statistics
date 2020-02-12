@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.YearTitle,
             release.CoverageTitle,
             release.ReleaseName,
+            release.NextReleaseDate,
             release.Published,
             release.Slug,
             release.Type,
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.DownloadFiles,
             release.RelatedInformation)
         {
+            var otherReleases = publication.Releases.Where(model => Id != model.Id).ToList();
             Publication = new PublicationViewModel(
                 publication.Id,
                 publication.Title,
@@ -31,9 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
                 publication.Description,
                 publication.DataSource,
                 publication.Summary,
-                publication.NextUpdate,
                 publication.LatestReleaseId,
-                publication.Releases.Where(model => Id != model.Id).ToList(),
+                otherReleases,
                 publication.LegacyReleases,
                 publication.Topic,
                 publication.Contact,
