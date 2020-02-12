@@ -153,6 +153,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 // TODO: EES-1287 External methodology must be external link to the service
             }
+            else if (model.ExternalMethodology == null && model.MethodologyId == null)
+            {
+                return ValidationActionResult(MethodologyOrExternalMethodologyLinkMustBeDefined);
+            }
             else
             {
                 return ValidationActionResult(CannotSpecifyMethodologyAndExternalMethodology);
