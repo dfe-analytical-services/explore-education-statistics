@@ -97,21 +97,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => ValidateMethodologyCanBeAssigned(methodology))
                 .OnSuccess(async _ =>
                 {
-                    var publication = await _context.Publications.Include(p => p.Methodology)
+                    var publication = await _context.Publications.Include(p => p.ExternalMethodology).Include(p => p.Methodology)
                         .FirstOrDefaultAsync(p => p.Id == publicationId);
 
+                    _context.Publications.Update(publication);
+                    
                     if (methodology.MethodologyId != null)
                     {
                         publication.MethodologyId = methodology.MethodologyId;
-                        publication.ExternalMethodology = null;
+                        // Note: Cannot directly set ExternalMethodology to null as this causes a entity delete on the row
+                        if (publication.ExternalMethodology != null)
+                        {
+                            publication.ExternalMethodology.Title = null;
+                            publication.ExternalMethodology.Url = null;
+                        }
                     }
                     else
                     {
                         publication.ExternalMethodology = methodology.ExternalMethodology;
                         publication.MethodologyId = null;
                     }
-
                     _context.SaveChanges();
+
                     return true;
                 });
         }
