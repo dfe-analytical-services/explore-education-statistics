@@ -72,6 +72,7 @@
     "recharts": "^1.6.2",
     "stylelint": "^13.0.0",
     "typescript": "^3.7.5",
+    "uuid": "^3.3.3",
     "use-immer": "^0.3.2",
     "xlsx": "^0.15.5",
     "yup": "^0.27.0"
@@ -146,9 +147,5 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
-  },
-  "dependencies": {
-    "uuid": "^3.3.3",
-    "xlsx": "^0.15.5"
   }
 }
