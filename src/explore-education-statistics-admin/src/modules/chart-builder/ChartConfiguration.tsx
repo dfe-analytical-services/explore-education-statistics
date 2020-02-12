@@ -24,6 +24,7 @@ import {
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React from 'react';
+import value from '*.json';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -339,6 +340,19 @@ const ChartConfiguration = ({
                 }}
               />
             </FormGroup>
+            {chartOptions && (
+              <Button
+                onClick={async () => {
+                  // eslint-disable-next-line no-unused-expressions
+                  chartOptions.fileId &&
+                    service
+                      .deleteChartFile(data.releaseId, chartOptions.fileId)
+                      .catch(handleApiErrors);
+                }}
+              >
+                Delete infographic file
+              </Button>
+            )}
           </div>
         )}
 
