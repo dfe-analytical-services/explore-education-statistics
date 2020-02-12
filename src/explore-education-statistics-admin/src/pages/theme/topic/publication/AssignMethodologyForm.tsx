@@ -49,7 +49,10 @@ const AssignMethodologyForm = ({
     return (
       <>
         {currentMethodology ? (
-          <div>Current methodology: {currentMethodology.title}</div>
+          <div>
+            <strong>Current methodology:</strong>
+            <br /> {currentMethodology.title}
+          </div>
         ) : (
           <div>This publication doesn't have a methodology.</div>
         )}
@@ -163,10 +166,6 @@ const AssignMethodologyForm = ({
                         />
                       </FormGroup>
                     ),
-                  },
-                  {
-                    value: 'later',
-                    label: 'Select a methodology later',
                   },
                 ]}
                 onChange={e => {
