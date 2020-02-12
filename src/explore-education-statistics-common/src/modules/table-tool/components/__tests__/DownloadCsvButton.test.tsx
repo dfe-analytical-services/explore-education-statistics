@@ -12,6 +12,7 @@ import DownloadCsvButton from '../DownloadCsvButton';
 describe('DownloadCsvButton', () => {
   const emptyTable: FullTable = {
     subjectMeta: {
+      geoJsonAvailable: false,
       publicationName: '',
       subjectName: '',
       footnotes: [],

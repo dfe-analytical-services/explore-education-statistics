@@ -190,6 +190,7 @@ interface UnmappedFullTableSubjectMeta {
     options: GroupedFilterOptions;
     totalValue?: string;
   }>;
+  geoJsonAvailable: boolean;
   indicators: IndicatorOption[];
   footnotes: {
     id: string;
