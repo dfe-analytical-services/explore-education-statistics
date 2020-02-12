@@ -97,8 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => ValidateMethodologyCanBeAssigned(methodology))
                 .OnSuccess(async _ =>
                 {
-                    var publication = await _context.Publications.Include(p => p.ExternalMethodology).Include(p => p.Methodology)
-                        .FirstOrDefaultAsync(p => p.Id == publicationId);
+                    var publication = await _context.Publications.Include(p => p.ExternalMethodology).FirstOrDefaultAsync(p => p.Id == publicationId);
 
                     _context.Publications.Update(publication);
                     
