@@ -18,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateContentBlockMap();
 
-            CreateMap<ContentSection, ContentSectionViewModel>();
+            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
+                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
 
@@ -38,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
-                    m => m.MapFrom(r => r.GenericContent));
+                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
             CreateMap<Release, ReleaseTitleViewModel>();
 
@@ -78,6 +79,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<TableOption, DataBlockTableOptionViewModel>();
 
             CreateMap<TableRowGroupOption, DataBlockTableRowGroupOptionViewModel>();
+        }
+
+        private static ContentSectionViewModel ContentSectionToViewModel(ContentSection section)
+        {
+            return new ContentSectionViewModel
+            {
+                Id = section.Id,
+                Caption = section.Caption,
+                //Content = section.Content?.OrderBy(contentBlock => contentBlock.Order).ToList(),
+                Heading = section.Heading,
+                Order = section.Order
+            };
         }
     }
 }
