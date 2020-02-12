@@ -29,11 +29,62 @@ Create release
     user creates a new release for publication "Manage content test %{RUN_IDENTIFIER}" for start year "2025"
     user checks summary list item "Publication title" should be "Manage content test %{RUN_IDENTIFIER}"
 
-Add content to release
-    [Tags]  HappyPath   Failing
+Add summary content to release
+    [Tags]  HappyPath
+    user waits until page contains element   xpath://a[text()="Manage content"]
     user clicks element  xpath://a[text()="Manage content"]
     user waits until page contains heading  Manage content test %{RUN_IDENTIFIER}
-    user clicks element  xpath://button[text()="Add content"]
+    user clicks element  xpath://button[text()="Add summary content"]
     user waits until page contains element  xpath://p[text()="This section is empty"]
     user clicks element   xpath://span[text()="Edit"]
     user presses keys  Test intro text for Manage content test %{RUN_IDENTIFIER}
+    user clicks element   xpath://button[text()="Save"]
+    user waits until page contains element  xpath://p[text()="Test intro text for Manage content test %{RUN_IDENTIFIER}"]
+
+Add release note to release
+    [Tags]  HappyPath
+    user clicks element   xpath://button[text()="Add note"]
+    user clicks element   css:textarea#reason
+    user presses keys  Test release note one
+    user clicks element   xpath://button[text()="Add note"]
+    # TODO: Check release note is there
+    user checks page contains element   xpath://span[text()="See all 1 updates"]
+    user clicks element   xpath://span[text()="See all 1 updates"]
+    ${date}=  get datetime   %d %B %Y
+    user checks page contains element   xpath://*[@data-testid="last-updated-element"]/time[text()="${date}"]
+    user checks page contains element   xpath://*[@data-testid="last-updated-element"]/p[text()="Test release note one"]
+
+Add related guidance link to release
+    [Tags]  HappyPath
+    user clicks element  xpath://button[text()="Add related information"]
+    user clicks element  css:input#title
+    user presses keys   Test link one
+    user clicks element  css:input#link-url
+    user presses keys   http://test1.example.com/test1
+    user clicks element  xpath://button[text()="Create link"]
+
+# TODO: Add Secondary Stats
+# TODO: Add key statistics
+
+Add key statistics summary content to release
+    [Tags]  HappyPath
+    user clicks element   xpath://button[text()="Add key statistics summary content"]
+    user waits until page contains element  xpath://p[text()="This section is empty"]
+    user clicks element   xpath://section[@id="headlines"]//span[text()="Edit"]
+    user presses keys   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
+    user clicks element  xpath://button[text()="Save"]
+
+Add accordion sections to release
+    [Tags]  HappyPath
+    user clicks element   xpath://button[text()="Add new section"]
+    user waits until page contains element  xpath://span[text()="New section"]
+    user clicks element   xpath://a[.="(Edit Section Title)"]
+    user clears element text  xpath://*[@id="contents-accordion"]/div[@class="govuk-accordion__section"][1]//input[@id="heading"]
+    user clicks element  xpath://*[@id="contents-accordion"]/div[@class="govuk-accordion__section"][1]//input[@id="heading"]
+    user presses keys   Test section one
+
+This?
+    [Tags]  HappyPath
+    sleep  1000000
+
+
