@@ -78,10 +78,7 @@ Add accordion sections to release
     [Tags]  HappyPath
     user clicks element   xpath://button[text()="Add new section"]
     user waits until page contains element  xpath://span[text()="New section"]
-    user clicks element   xpath://a[.="(Edit Section Title)"]
-    user clears element text  xpath://*[@id="contents-accordion"]/div[@class="govuk-accordion__section"][1]//input[@id="heading"]
-    user clicks element  xpath://*[@id="contents-accordion"]/div[@class="govuk-accordion__section"][1]//input[@id="heading"]
-    user presses keys   Test section one
+    user changes accordion section title  1   Test section one
 
 This?
     [Tags]  HappyPath
