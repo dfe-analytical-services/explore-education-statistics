@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public List<ReleaseViewModel> Releases { get; set; }
 
         public MethodologyViewModel Methodology { get; set; }
+        
+        public ExternalMethodology ExternalMethodology { get; set; }
 
         public Guid TopicId { get; set; }
 
