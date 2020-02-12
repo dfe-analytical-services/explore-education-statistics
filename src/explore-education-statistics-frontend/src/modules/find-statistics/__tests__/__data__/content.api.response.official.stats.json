@@ -6,7 +6,6 @@
     "slug": "pupil-absence-in-schools-in-england",
     "dataSource": "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
     "summary": "",
-    "nextUpdate": "2019-03-22T00:00:00",
     "latestReleaseId": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
     "otherReleases": [
       {
@@ -66,6 +65,7 @@
   "yearTitle": "2016/17",
   "coverageTitle": "Academic Year",
   "releaseName": "2016",
+  "nextReleaseDate": { "year": "2019", "month": "3", "day": "22" },
   "published": "2018-03-22T00:00:00",
   "slug": "2016-17",
   "type": {

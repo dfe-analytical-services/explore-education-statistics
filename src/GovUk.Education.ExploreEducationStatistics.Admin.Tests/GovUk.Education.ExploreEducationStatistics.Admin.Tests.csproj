@@ -30,4 +30,11 @@
     <Folder Include="Areas" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Resources\**" />
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
