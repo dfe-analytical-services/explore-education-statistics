@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.DownloadFiles,
             release.RelatedInformation)
         {
+            var otherReleases = publication.Releases.Where(model => Id != model.Id).ToList();
             Publication = new PublicationViewModel(
                 publication.Id,
                 publication.Title,
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
                 publication.DataSource,
                 publication.Summary,
                 publication.LatestReleaseId,
-                publication.Releases.Where(model => Id != model.Id).ToList(),
+                otherReleases,
                 publication.LegacyReleases,
                 publication.Topic,
                 publication.Contact,

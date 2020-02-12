@@ -16,11 +16,6 @@
     ],
     "legacyReleases": [
       {
-        "id": "ce15f487-87b0-4c07-98f1-6c6732196be7",
-        "description": "2012 to 2013",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
-      },
-      {
         "id": "89c02688-646d-45b5-8919-9a3fafcfe0e9",
         "description": "2009 to 2010",
         "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"
@@ -31,6 +26,16 @@
         "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"
       },
       {
+        "id": "e20141d0-d894-4b8d-a78f-e41c23500786",
+        "description": "2011 to 2012",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
+      },
+      {
+        "id": "ce15f487-87b0-4c07-98f1-6c6732196be7",
+        "description": "2012 to 2013",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
+      },
+      {
         "id": "75991639-ad77-4ba6-91fc-ac08c00a4ce8",
         "description": "2013 to 2014",
         "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"
@@ -39,11 +44,6 @@
         "id": "28e53936-5a52-44be-a7a6-d2f14a426d28",
         "description": "2014 to 2015",
         "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"
-      },
-      {
-        "id": "e20141d0-d894-4b8d-a78f-e41c23500786",
-        "description": "2011 to 2012",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
       }
     ],
     "topic": { "theme": { "title": "Pupils and schools" } },

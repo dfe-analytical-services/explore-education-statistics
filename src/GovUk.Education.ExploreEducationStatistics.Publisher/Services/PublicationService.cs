@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var publication = await _context.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.LegacyReleases)
+                .Include(p => p.Methodology)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .SingleOrDefaultAsync(p => p.Id == id);
@@ -110,7 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releases = _context.Releases
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => IsReleasePublished(release, includedReleaseIds));
+                .Where(release => IsReleasePublished(release, includedReleaseIds))
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
         }
 
