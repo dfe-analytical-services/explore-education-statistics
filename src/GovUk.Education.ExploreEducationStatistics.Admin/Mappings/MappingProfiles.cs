@@ -146,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Summary = r.Publication.Summary,
                         DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
-                        NextUpdate = r.Publication.NextUpdate,
                         Topic = new ManageContentTopicViewModel
                         {
                             Theme = new ThemeViewModel

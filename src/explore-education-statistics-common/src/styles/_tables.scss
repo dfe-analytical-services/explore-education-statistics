@@ -1,6 +1,19 @@
 @import '~govuk-frontend/govuk/components/table/table';
 
 /* stylelint-disable scss/at-extend-no-missing-placeholder */
+
+/*.table class is used as a wrapper by ckeditor, need to select
+this class to style manually created tables via the editor*/
+.table {
+  margin-left: 0;
+  overflow: auto;
+}
+
+.table table {
+  @extend .govuk-table;
+}
+
+.table table,
 .govuk-table {
   background: #fff;
 
