@@ -20,6 +20,7 @@ export interface FormRadioProps {
   onChange?: RadioChangeEventHandler;
   value: string;
   disabled?: boolean;
+  jsRequired?: boolean;
 }
 
 const FormRadio = ({
