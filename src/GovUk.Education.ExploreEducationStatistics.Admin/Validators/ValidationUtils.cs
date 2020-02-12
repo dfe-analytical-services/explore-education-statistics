@@ -84,6 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         InvalidEmailAddress,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublicationDoesNotExist,
-        PublicationHasMethodologyAssigned
+        PublicationHasMethodologyAssigned,
+        MethodologyDoesNotExist, 
+        MethodologyMustBeApprovedOrPublished,
+        CannotSpecifyMethodologyAndExternalMethodology
     }
 }
