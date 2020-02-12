@@ -50,8 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     catch (Exception e)
                     {
                         logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                        await UpdateStage(releaseStatus, Failed, new ReleaseStatusLogMessage(
-                            $"Exception in publishing stage: {e.Message}"));
+                        await UpdateStage(releaseStatus, Failed,
+                            new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                     }
                 }
 
