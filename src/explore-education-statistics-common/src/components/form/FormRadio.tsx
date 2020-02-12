@@ -44,9 +44,6 @@ const FormRadio = ({
       <div className="govuk-radios__item">
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
-          data-aria-controls={onMounted(
-            !conditional ? `${id}-conditional` : undefined,
-          )}
           aria-controls={onMounted(
             conditional ? `${id}-conditional` : undefined,
           )}
