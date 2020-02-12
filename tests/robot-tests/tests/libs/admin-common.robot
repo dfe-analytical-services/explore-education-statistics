@@ -17,7 +17,7 @@ user creates publication
     [Arguments]   ${title}   ${methodology}   ${contact}
     user waits until page contains heading    Create new publication
     user enters text into element  css:#createPublicationForm-publicationTitle   ${title}
-    user clicks element          xpath://label[text()="Choose an existing methodology"]
+    user selects radio     Choose an existing methodology
     user checks element is visible    xpath://label[text()="Select methodology"]
     user selects from list by label  css:#createPublicationForm-selectedMethodologyId   ${methodology}
     user selects from list by label  css:#createPublicationForm-selectedContactId   ${contact}
@@ -39,7 +39,7 @@ User creates a new release for publication "${publication}" for start year "${st
     user enters text into element  css:[id="nextReleaseDate.day"]  01
     user enters text into element  css:[id="nextReleaseDate.month"]  09
     user enters text into element  css:[id="nextReleaseDate.year"]  ${nextYear}
-    user clicks element  xpath://label[text()="National Statistics"]
+    user selects radio   National Statistics
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until page contains element  xpath://h2[text()="Release summary"]
