@@ -87,11 +87,38 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     return optGroups;
   };
 
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  const todaysDate = new Date();
+
   const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
-    scheduledPublishDate: validateMandatoryDayMonthYearField,
+    scheduledPublishDate: validateMandatoryDayMonthYearField.test(
+      'validDateIfAfterToday',
+      `Schedule publish date can't be before ${todaysDate.getDate()} ${
+        months[todaysDate.getMonth()]
+      } ${todaysDate.getFullYear()}`,
+      value => {
+        const date = new Date(value.year, value.month, value.day);
+        date.setMonth(date.getMonth() - 1);
+        date.setDate(date.getDate() + 1);
+        return date >= todaysDate;
+      },
+    ),
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 
