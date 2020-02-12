@@ -21,7 +21,7 @@ const PublicationSummary = ({ publication }: Props) => {
       <SummaryList>
         <SummaryListItem term="Methodology" smallKey>
           {publication.methodology && (
-            <Link to={`/methodology/${publication.methodology.id}`}>
+            <Link to={`/methodologies/${publication.methodology.id}`}>
               {publication.methodology.title}
             </Link>
           )}
@@ -84,7 +84,7 @@ const PublicationSummary = ({ publication }: Props) => {
 
           {publication.methodology && (
             <ButtonLink
-              to={`/methodology/${publication.methodology.id}`}
+              to={`/methodologies/${publication.methodology.id}`}
               className="govuk-button--secondary"
             >
               Edit methodology
@@ -93,7 +93,7 @@ const PublicationSummary = ({ publication }: Props) => {
 
           {!publication.methodology && (
             <ButtonLink
-              to={`/methodology/create?publicationId=${publication.id}`}
+              to={`/methodologies/create?publicationId=${publication.id}`}
               className="govuk-button--secondary"
             >
               Add methodology

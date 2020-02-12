@@ -3,12 +3,12 @@ import Page from '@admin/components/Page';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React from 'react';
 
-const EditMethodologyPage = () => {
+const MethodologyPage = () => {
   return (
     <Page
       wide
       breadcrumbs={[
-        { name: 'Manage methodology', link: '/methodology' },
+        { name: 'Manage methodologies', link: '/methodologies' },
         { name: 'Edit methodology' },
       ]}
     >
@@ -36,4 +36,4 @@ const EditMethodologyPage = () => {
   );
 };
 
-export default EditMethodologyPage;
+export default MethodologyPage;

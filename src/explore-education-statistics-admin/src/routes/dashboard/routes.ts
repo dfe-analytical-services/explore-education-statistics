@@ -15,8 +15,8 @@ import AdminDocumentationManageDataBlocks from '@admin/pages/documentation/Docum
 import AdminDocumentationStyle from '@admin/pages/documentation/DocumentationStyle';
 import AdminDocumentationUsingDashboard from '@admin/pages/documentation/DocumentationUsingDashboard';
 import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
-import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
-import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
+import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
+import MethodologyPage from '@admin/pages/methodology/MethodologyPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
@@ -93,21 +93,21 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
-  methodology: {
-    path: '/methodology',
-    component: ListMethodologyPages,
+  methodologies: {
+    path: '/methodologies',
+    component: MethodologiesPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   methodologyCreate: {
-    path: '/methodology/create',
+    path: '/methodologies/create',
     component: CreateMethodologyPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
-  editMethodology: {
-    path: '/methodology/:methodologyId',
-    component: EditMethodologyPage,
+  methodology: {
+    path: '/methodologies/:methodologyId',
+    component: MethodologyPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
