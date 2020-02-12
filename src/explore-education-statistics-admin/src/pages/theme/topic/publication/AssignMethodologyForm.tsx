@@ -15,15 +15,17 @@ import Yup from '@common/lib/validation/yup';
 import { Form, FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
+import { ExternalMethodology } from 'src/services/dashboard/types';
 
 export interface AssignMethodologyFormValues {
   methodologyChoice?: 'existing' | 'external' | 'later';
   selectedMethodologyId?: string;
-  externalMethodology: { title: string; url: string };
+  externalMethodology?: ExternalMethodology;
 }
 
 interface Props {
   methodology?: BasicMethodology;
+  externalMethodology?: ExternalMethodology;
   publicationId: string;
   refreshPublication: () => void;
 }
@@ -31,6 +33,7 @@ interface Props {
 const AssignMethodologyForm = ({
   publicationId,
   methodology: currentMethodology,
+  externalMethodology: currentExternalMethodology,
   handleApiErrors,
   refreshPublication,
 }: Props & ErrorControlProps) => {
@@ -48,10 +51,20 @@ const AssignMethodologyForm = ({
   if (!formOpen)
     return (
       <>
-        {currentMethodology ? (
+        {currentMethodology || currentExternalMethodology ? (
           <div>
             <strong>Current methodology:</strong>
-            <br /> {currentMethodology.title}
+            <br />{' '}
+            {(currentMethodology && currentMethodology.title) ||
+              (currentExternalMethodology && (
+                <>
+                  {currentExternalMethodology.title} (
+                  <a href={currentExternalMethodology.url}>
+                    {currentExternalMethodology.url}
+                  </a>
+                  )
+                </>
+              ))}
           </div>
         ) : (
           <div>This publication doesn't have a methodology.</div>
@@ -73,18 +86,19 @@ const AssignMethodologyForm = ({
           initialValues={{
             selectedMethodologyId:
               (currentMethodology && currentMethodology.id) || '',
-            methodologyChoice:
-              currentMethodology && currentMethodology.externalLink
-                ? 'external'
-                : 'existing',
+            methodologyChoice: currentExternalMethodology
+              ? 'external'
+              : 'existing',
             externalMethodology: {
               title:
-                (currentMethodology &&
-                  currentMethodology.externalLink &&
-                  currentMethodology.title) ||
+                (currentExternalMethodology &&
+                  currentExternalMethodology.url &&
+                  currentExternalMethodology.title) ||
                 '',
               url:
-                (currentMethodology && currentMethodology.externalLink) || '',
+                (currentExternalMethodology &&
+                  currentExternalMethodology.url) ||
+                'https://',
             },
           }}
           validationSchema={Yup.object<AssignMethodologyFormValues>({
