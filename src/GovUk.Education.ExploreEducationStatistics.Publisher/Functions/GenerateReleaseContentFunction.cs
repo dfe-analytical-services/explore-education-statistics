@@ -39,17 +39,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                await UpdateStage(message, Failed);
+                await UpdateStage(message, Failed,
+                    new ReleaseStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage)
+        private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
-                await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage);
+                await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage, logMessage);
             }
         }
     }
