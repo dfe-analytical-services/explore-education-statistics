@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 new BasicLink
                 {
-                    Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
+                    Id = new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"),
                     Description = "Related Information",
                     Url = "http://example.com"
                 }
@@ -121,56 +122,108 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
+        private static readonly ContentSection Release1SummarySection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 1 summary section",
+            Caption = "",
+            Type = ContentSectionType.ReleaseSummary
+        };
+
+        private static readonly ContentSection Release1Section1 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 1 section 1 order 2",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release1Section2 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Heading = "Release 1 section 2 order 0",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+        
+        private static readonly ContentSection Release1Section3 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 1 section 3 order 1",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release1KeyStatsSection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 1 key stats section",
+            Caption = "",
+            Type = ContentSectionType.KeyStatistics
+        };
+
+        private static readonly ContentSection Release2SummarySection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 2 summary section",
+            Caption = "",
+            Type = ContentSectionType.ReleaseSummary
+        };
+
+        private static readonly ContentSection Release2Section1 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 2 section 1 order 2",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release2Section2 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Heading = "Release 2 section 2 order 0",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+        
+        private static readonly ContentSection Release2Section3 = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 2 section 3 order 1",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release2KeyStatsSection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 2 key stats section",
+            Caption = "",
+            Type = ContentSectionType.KeyStatistics
+        };
+
         private static readonly List<ContentSection> ContentSections = new List<ContentSection>
         {
-            new ContentSection
-            {
-                Id = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd"),
-                Order = 1,
-                Heading = "Content Section 1",
-                Caption = "",
-                Type = ContentSectionType.Generic
-            },
-            new ContentSection
-            {
-                Id = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240"),
-                Order = 2,
-                Heading = "Content Section 2",
-                Caption = "",
-                Type = ContentSectionType.Generic
-            },
-            new ContentSection
-            {
-                Id = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5"),
-                Order = 2,
-                Heading = "Content Section 3",
-                Caption = "",
-                Type = ContentSectionType.KeyStatistics
-            },
-            new ContentSection
-            {
-                Id = new Guid("99c28757-bf61-490e-a51f-98dd58afb578"),
-                Order = 1,
-                Heading = "Content Section 1",
-                Caption = "",
-                Type = ContentSectionType.Generic
-            },
-            new ContentSection
-            {
-                Id = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238"),
-                Order = 2,
-                Heading = "Content Section 2",
-                Caption = "",
-                Type = ContentSectionType.Generic
-            },
-            new ContentSection
-            {
-                Id = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766"),
-                Order = 2,
-                Heading = "Content Section 3",
-                Caption = "",
-                Type = ContentSectionType.KeyStatistics
-            }
+            Release1SummarySection,
+            Release1Section1,
+            Release1Section2,
+            Release1Section3,
+            Release1KeyStatsSection,
+            Release2SummarySection,
+            Release2Section1,
+            Release2Section2,
+            Release2Section3,
+            Release2KeyStatsSection
         };
 
         private static readonly List<ReleaseContentSection> ReleaseContentSections = new List<ReleaseContentSection>
@@ -178,47 +231,179 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease1.Id,
-                ContentSectionId = new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd")
+                ContentSectionId = Release1SummarySection.Id
             },
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease1.Id,
-                ContentSectionId = new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240")
+                ContentSectionId = Release1Section1.Id
             },
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease1.Id,
-                ContentSectionId = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5")
+                ContentSectionId = Release1Section2.Id
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = PublicationARelease1.Id,
+                ContentSectionId = Release1Section3.Id
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = PublicationARelease1.Id,
+                ContentSectionId = Release1KeyStatsSection.Id
             },
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = new Guid("99c28757-bf61-490e-a51f-98dd58afb578")
+                ContentSectionId = Release2SummarySection.Id
             },
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = new Guid("0b4b7ec8-98d7-4c75-ac97-bdab9bb51238")
+                ContentSectionId = Release2Section1.Id
             },
             new ReleaseContentSection
             {
                 ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766")
+                ContentSectionId = Release2Section2.Id
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = PublicationARelease2.Id,
+                ContentSectionId = Release2Section3.Id
+            },
+            new ReleaseContentSection
+            {
+                ReleaseId = PublicationARelease2.Id,
+                ContentSectionId = Release2KeyStatsSection.Id
             }
         };
 
-        private static readonly List<DataBlock> DataBlocks = new List<DataBlock>
+        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
         {
-            new DataBlock
-            {
-                Id = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
-                ContentSectionId = new Guid("cd30ff69-2eb1-4898-bc1b-46c50586c2e5")
-            },
-            new DataBlock
-            {
-                Id = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
-                ContentSectionId = new Guid("16c3fcfe-000e-4a36-a3ce-c058d7e5c766")
-            }
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 1 order 2</p>",
+            Order = 2,
+            ContentSectionId = Release1SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 2 order 0</p>",
+            Order = 0,
+            ContentSectionId = Release1SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 3 order 1</p>",
+            Order = 1,
+            ContentSectionId = Release1SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 1 order 2</p>",
+            Order = 2,
+            ContentSectionId = Release2SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 2 order 0</p>",
+            Order = 0,
+            ContentSectionId = Release2SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 3 order 1</p>",
+            Order = 1,
+            ContentSectionId = Release2SummarySection.Id
+        };
+
+        private static readonly IContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 2</p>",
+            Order = 2,
+            ContentSectionId = Release1Section1.Id
+        };
+
+        private static readonly IContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 0</p>",
+            Order = 0,
+            ContentSectionId = Release1Section1.Id
+        };
+
+        private static readonly IContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 1</p>",
+            Order = 1,
+            ContentSectionId = Release1Section1.Id
+        };
+        
+        private static readonly IContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 2</p>",
+            Order = 2,
+            ContentSectionId = Release2Section1.Id
+        };
+
+        private static readonly IContentBlock Release2Section1HtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 0</p>",
+            Order = 0,
+            ContentSectionId = Release2Section1.Id
+        };
+
+        private static readonly IContentBlock Release2Section1HtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 1</p>",
+            Order = 1,
+            ContentSectionId = Release2Section1.Id
+        };
+        
+        private static readonly IContentBlock Release1KeyStatsDataBlock = new DataBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = Release1KeyStatsSection.Id
+        };
+
+        private static readonly IContentBlock Release2KeyStatsDataBlock = new DataBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = Release2KeyStatsSection.Id
+        };
+
+        private static readonly List<IContentBlock> ContentBlocks = new List<IContentBlock>
+        {
+            Release1SummarySectionHtmlContentBlock1,
+            Release1SummarySectionHtmlContentBlock2,
+            Release1SummarySectionHtmlContentBlock3,
+            Release1Section1HtmlContentBlock1,
+            Release1Section1HtmlContentBlock2,
+            Release1Section1HtmlContentBlock3,
+            Release1KeyStatsDataBlock,
+            Release2SummarySectionHtmlContentBlock1,
+            Release2SummarySectionHtmlContentBlock2,
+            Release2SummarySectionHtmlContentBlock3,
+            Release2Section1HtmlContentBlock1,
+            Release2Section1HtmlContentBlock2,
+            Release2Section1HtmlContentBlock3,
+            Release2KeyStatsDataBlock
         };
 
         [Fact]
@@ -250,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetLatestReleaseViewModel_ReturnsA_WithARelease()
+        public void GetLatestReleaseViewModel()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "LatestReleaseViewModel");
@@ -262,6 +447,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 context.AddRange(Publications);
                 context.AddRange(Releases);
+                context.AddRange(ContentSections);
+                context.AddRange(ReleaseContentSections);
+                context.AddRange(ContentBlocks);
                 context.SaveChanges();
             }
 
@@ -274,14 +462,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
+                var keyStatisticsSection = result.KeyStatisticsSection;
+                Assert.NotNull(keyStatisticsSection);
+                Assert.Equal(Release2KeyStatsSection.Id, keyStatisticsSection.Id);
+                var keyStatisticsSectionContent = keyStatisticsSection.Content;
+                Assert.Single(keyStatisticsSectionContent);
+                Assert.Equal(Release2KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
+
+                var summarySection = result.SummarySection;
+                Assert.NotNull(summarySection);
+                Assert.Equal(Release2SummarySection.Id, summarySection.Id);
+                var summarySectionContent = summarySection.Content;
+                Assert.NotNull(summarySectionContent);
+                Assert.Equal(3, summarySectionContent.Count);
+                Assert.Equal(Release2SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
+                Assert.Equal("<p>Release 2 summary 2 order 0</p>", (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release2SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
+                Assert.Equal("<p>Release 2 summary 3 order 1</p>", (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release2SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
+                Assert.Equal("<p>Release 2 summary 1 order 2</p>", (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
+
+                var content = result.Content;
+                Assert.NotNull(content);
+                Assert.Equal(3, content.Count);
+                
+                Assert.Equal(Release2Section2.Id, content[0].Id);
+                Assert.Equal("Release 2 section 2 order 0", content[0].Heading);
+                Assert.Empty(content[0].Content);
+                
+                Assert.Equal(Release2Section3.Id, content[1].Id);
+                Assert.Equal("Release 2 section 3 order 1", content[1].Heading);
+                Assert.Empty(content[1].Content);
+                
+                Assert.Equal(Release2Section1.Id, content[2].Id);
+                Assert.Equal("Release 2 section 1 order 2", content[2].Heading);
+                Assert.Equal(3, content[2].Content.Count);
+                Assert.Equal(Release2Section1HtmlContentBlock2.Id, content[2].Content[0].Id);
+                Assert.Equal("<p>Release 2 section 1 order 0</p>", (content[2].Content[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release2Section1HtmlContentBlock3.Id, content[2].Content[1].Id);
+                Assert.Equal("<p>Release 2 section 1 order 1</p>", (content[2].Content[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release2Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
+                Assert.Equal("<p>Release 2 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
+
+                Assert.Single(result.RelatedInformation);
+                Assert.Equal(new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"), result.RelatedInformation[0].Id);
             }
         }
 
         [Fact]
-        public void GetReleaseViewModel_ReturnsA_WithATheme()
+        public void GetReleaseViewModel()
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ReleaseTheme");
+            builder.UseInMemoryDatabase("ReleaseViewModel");
             var options = builder.Options;
 
             var fileStorageService = new Mock<IFileStorageService>();
@@ -292,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.AddRange(Releases);
                 context.AddRange(ContentSections);
                 context.AddRange(ReleaseContentSections);
-                context.AddRange(DataBlocks);
+                context.AddRange(ContentBlocks);
                 context.SaveChanges();
             }
 
@@ -304,13 +536,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var result = service.GetReleaseViewModel(PublicationARelease1.Id);
 
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
-                Assert.Equal(new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
-                    result.KeyStatisticsSection.Content[0].Id);
+                var keyStatisticsSection = result.KeyStatisticsSection;
+                Assert.NotNull(keyStatisticsSection);
+                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
+                var keyStatisticsSectionContent = keyStatisticsSection.Content;
+                Assert.Single(keyStatisticsSectionContent);
+                Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
+
+                var summarySection = result.SummarySection;
+                Assert.NotNull(summarySection);
+                Assert.Equal(Release1SummarySection.Id, summarySection.Id);
+                var summarySectionContent = summarySection.Content;
+                Assert.NotNull(summarySectionContent);
+                Assert.Equal(3, summarySectionContent.Count);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
+                Assert.Equal("<p>Release 1 summary 2 order 0</p>", (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
+                Assert.Equal("<p>Release 1 summary 3 order 1</p>", (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
+                Assert.Equal("<p>Release 1 summary 1 order 2</p>", (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
-                Assert.Equal(2, content.Count);
-                Assert.Equal(new Guid("f29b4729-2061-4908-ba35-4a7d2c2291cd"), content[0].Id);
-                Assert.Equal(new Guid("a5638c29-9c54-4250-aa1a-d0fa4bce7240"), content[1].Id);
+                Assert.NotNull(content);
+                Assert.Equal(3, content.Count);
+                
+                Assert.Equal(Release1Section2.Id, content[0].Id);
+                Assert.Equal("Release 1 section 2 order 0", content[0].Heading);
+                Assert.Empty(content[0].Content);
+                
+                Assert.Equal(Release1Section3.Id, content[1].Id);
+                Assert.Equal("Release 1 section 3 order 1", content[1].Heading);
+                Assert.Empty(content[1].Content);
+                
+                Assert.Equal(Release1Section1.Id, content[2].Id);
+                Assert.Equal("Release 1 section 1 order 2", content[2].Heading);
+                Assert.Equal(3, content[2].Content.Count);
+                Assert.Equal(Release1Section1HtmlContentBlock2.Id, content[2].Content[0].Id);
+                Assert.Equal("<p>Release 1 section 1 order 0</p>", (content[2].Content[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1Section1HtmlContentBlock3.Id, content[2].Content[1].Id);
+                Assert.Equal("<p>Release 1 section 1 order 1</p>", (content[2].Content[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
+                Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"), result.RelatedInformation[0].Id);
