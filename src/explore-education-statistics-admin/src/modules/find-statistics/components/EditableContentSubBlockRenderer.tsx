@@ -1,4 +1,3 @@
-import marked from 'marked';
 import React from 'react';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
