@@ -15,10 +15,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "envNumber": {
-      "type": "string",
-      "defaultValue": ""
-    },
 
     "skuPublic": {
       "type": "string",
@@ -347,10 +343,6 @@
       "type": "bool",
       "defaultValue": true
     },
-    "deployKeyVaultSecrets": {
-      "type": "bool",
-      "defaultValue": false
-    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -429,8 +421,7 @@
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
-    "storageEnv": "[concat('ees', parameters('envNumber'))]",
-    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), 'storagecore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
@@ -440,17 +431,16 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
+    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storagenotify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
-    "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
+    "publicStorageAccountName": "[concat(parameters('subscription'), 'sapublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
-    "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
+    "publisherStorageAccountName": "[concat(parameters('subscription'), 'sapublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
-    "loggingStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'logging')]",
-    "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
+    "loggingStorageAccountName": "[concat(parameters('subscription'), 'salogging')]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
