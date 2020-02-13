@@ -64,16 +64,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateStage(message, Failed);
+                    await UpdateStage(message, Failed,
+                        new ReleaseStatusLogMessage($"Exception in data stage: {e.Message}"));
                 }
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseDataMessage message, Stage stage)
+        private async Task UpdateStage(PublishReleaseDataMessage message, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
-            await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage);
+            await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
+                logMessage);
         }
 
         private IEnumerable<Subject> GetSubjects(Guid releaseId)
