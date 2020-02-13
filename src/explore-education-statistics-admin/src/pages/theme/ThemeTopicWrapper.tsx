@@ -50,7 +50,12 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
         })
         .catch(handleApiErrors);
     }
-  }, [match.params, selectedThemeAndTopic]);
+  }, [
+    match.params,
+    selectedThemeAndTopic,
+    setSelectedThemeAndTopic,
+    handleApiErrors,
+  ]);
 
   const page404 = (
     <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
