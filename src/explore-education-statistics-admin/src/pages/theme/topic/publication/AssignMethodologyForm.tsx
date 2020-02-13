@@ -1,5 +1,7 @@
 import { BasicMethodology, IdTitlePair } from '@admin/services/common/types';
+import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
+import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -11,11 +13,11 @@ import {
   FormGroup,
   Formik,
 } from '@common/components/form';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
 import { Form, FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
-import { ExternalMethodology } from 'src/services/dashboard/types';
 
 export interface AssignMethodologyFormValues {
   methodologyChoice?: 'existing' | 'external' | 'later';
@@ -48,10 +50,57 @@ const AssignMethodologyForm = ({
       .catch(handleApiErrors);
   }, [currentMethodology, currentExternalMethodology, handleApiErrors]);
 
+  const errorCodeMappings = [
+    errorCodeToFieldError(
+      'METHODOLOGY_DOES_NOT_EXIST',
+      'methodologyChoice',
+      'There was a problem adding the selected methodology',
+    ),
+    errorCodeToFieldError(
+      'METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED',
+      'methodologyChoice',
+      'Choose a methodology that is Live or ready to be published',
+    ),
+    errorCodeToFieldError(
+      'METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED',
+      'methodologyChoice',
+      'Either an existing methodology or an external methodology link must be provided',
+    ),
+    errorCodeToFieldError(
+      'CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY',
+      'methodologyChoice',
+      'Either an existing methodology or an external methodology link must be provided',
+    ),
+  ];
+
+  const submitFormHandler = submitWithFormikValidation<
+    AssignMethodologyFormValues
+  >(
+    async values => {
+      const newMethodology = {
+        externalMethodology:
+          values.methodologyChoice === 'external'
+            ? values.externalMethodology
+            : undefined,
+        selectedMethodologyId:
+          values.methodologyChoice === 'existing'
+            ? values.selectedMethodologyId
+            : undefined,
+      };
+      await service.updatePublicationMethodology({
+        publicationId,
+        ...newMethodology,
+      });
+    },
+    handleApiErrors,
+    ...errorCodeMappings,
+  );
+
   if (!formOpen)
     return (
       <>
-        {currentMethodology || currentExternalMethodology ? (
+        {currentMethodology ||
+        (currentExternalMethodology && currentExternalMethodology.url) ? (
           <div>
             <strong>Current methodology:</strong>
             <br />{' '}
@@ -122,25 +171,7 @@ const AssignMethodologyForm = ({
               }),
             }),
           })}
-          onSubmit={values => {
-            const newMethodology = {
-              externalMethodology:
-                values.methodologyChoice === 'external'
-                  ? values.externalMethodology
-                  : undefined,
-              selectedMethodologyId:
-                values.methodologyChoice === 'existing'
-                  ? values.selectedMethodologyId
-                  : undefined,
-            };
-            service
-              .updatePublicationMethodology({
-                publicationId,
-                ...newMethodology,
-              })
-              .then(refreshPublication)
-              .catch(handleApiErrors);
-          }}
+          onSubmit={submitFormHandler}
           render={(form: FormikProps<AssignMethodologyFormValues>) => (
             <Form id={formId}>
               <FormFieldRadioGroup
