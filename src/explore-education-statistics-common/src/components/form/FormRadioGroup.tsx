@@ -40,22 +40,6 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   private ref = createRef<HTMLInputElement>();
 
-  public componentDidMount(): void {
-    if (this.ref.current) {
-      try {
-        import('govuk-frontend/govuk/components/radios/radios').then(
-          ({ default: GovUkRadios }) => {
-            new GovUkRadios(this.ref.current).init();
-          },
-        );
-      } catch (e) {
-        // if an error occurs during the import it breaks the entire page
-        // eslint-disable-next-line no-console
-        console.error('An error occured importing radios', e);
-      }
-    }
-  }
-
   private handleChange: RadioChangeEventHandler = (event, option) => {
     const { onChange } = this.props;
 
