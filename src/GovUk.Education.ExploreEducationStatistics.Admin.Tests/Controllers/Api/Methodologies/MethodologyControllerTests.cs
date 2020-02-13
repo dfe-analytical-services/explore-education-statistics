@@ -8,7 +8,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Methodologies
 {
-    public class MethodologiesControllerTests
+    public class MethodologyControllerTests
     {
         [Fact]
         public async void Topic_Methodology_Returns_Ok()
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             releaseService.Setup(s => s.GetTopicMethodologiesAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(new List<MethodologyViewModel>());
-            var controller = new MethodologiesController(releaseService.Object);
+            var controller = new MethodologyController(releaseService.Object);
 
             // Method under test
             var result = await controller.GetTopicMethodologiesAsync(Guid.NewGuid());
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             releaseService.Setup(s => s.ListAsync())
                 .ReturnsAsync(new List<MethodologyViewModel>());
-            var controller = new MethodologiesController(releaseService.Object);
+            var controller = new MethodologyController(releaseService.Object);
 
             // Method under test
             var result = await controller.GetMethodologiesAsync();

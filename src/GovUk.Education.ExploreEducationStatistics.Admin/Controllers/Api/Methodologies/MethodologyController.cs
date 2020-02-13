@@ -12,11 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 {
     [Authorize]
     [ApiController]
-    public class MethodologiesController : ControllerBase
+    public class MethodologyController : ControllerBase
     {
         private readonly IMethodologyService _methodologyService;
 
-        public MethodologiesController(IMethodologyService methodologyService)
+        public MethodologyController(IMethodologyService methodologyService)
         {
             _methodologyService = methodologyService;
         }
