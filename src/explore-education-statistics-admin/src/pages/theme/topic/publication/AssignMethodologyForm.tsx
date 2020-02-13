@@ -46,7 +46,7 @@ const AssignMethodologyForm = ({
       .getMethodologies()
       .then(setMethodologies)
       .catch(handleApiErrors);
-  }, [currentMethodology, currentExternalMethodology]);
+  }, [currentMethodology, currentExternalMethodology, handleApiErrors]);
 
   if (!formOpen)
     return (
