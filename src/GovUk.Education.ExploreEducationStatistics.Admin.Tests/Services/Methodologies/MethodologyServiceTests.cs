@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Microsoft.AspNetCore.Http;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
     public class MethodologyServiceTests
     {

@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Methodologies
 {
     public class MethodologiesControllerTests
     {

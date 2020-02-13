@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
-
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
     public class MethodologyService : IMethodologyService
     {

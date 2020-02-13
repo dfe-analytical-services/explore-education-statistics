@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
 {
     [Authorize]
     [ApiController]
