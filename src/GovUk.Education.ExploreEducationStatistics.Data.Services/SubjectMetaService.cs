@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -83,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel);
+            var locations = GetGeoJsonObservationalUnitsIfAvailable(observationalUnits, query.IncludeGeoJson, query.BoundaryLevel);
+            var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
 
             _logger.LogTrace("Got GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
@@ -112,8 +112,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 PublicationName = subject.Release.Publication.Title,
                 SubjectName = subject.Name,
                 TimePeriod = timePeriod,
-                Footnotes = footnotes
+                Footnotes = footnotes,
+                GeoJsonAvailable = geoJsonAvailable
             };
+        }
+        
+        private bool HasBoundaryLevelDataForAnyObservationalUnits(Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+        {
+            return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
+        }
+        
+        private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
+        {
+            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel) != null;
         }
 
         private Dictionary<string, IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
@@ -130,25 +141,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _locationService.GetObservationalUnits(observations);
         }
 
-        private Dictionary<string, ObservationalUnitGeoJsonMeta> GetGeoJsonObservationalUnits(
+        private Dictionary<string, ObservationalUnitGeoJsonMeta> GetGeoJsonObservationalUnitsIfAvailable(
             Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits,
+            bool geoJsonRequested,
             long? boundaryLevelId = null)
         {
             var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
-                GetGeoJsonForObservationalUnits(boundaryLevelId ?? GetBoundaryLevel(pair.Key).Id,
+                GetGeoJsonForObservationalUnitsIfAvailable(
                     pair.Key,
-                    pair.Value.ToList()));
+                    pair.Value.ToList(),
+                    geoJsonRequested,
+                    boundaryLevelId));
 
             return observationalUnitMetaViewModels.ToDictionary(
                 model => model.Value,
                 model => model);
         }
-
+        
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
-
+        
         private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
             IEnumerable<GeographicLevel> geographicLevels)
         {
@@ -165,19 +179,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 tuple => new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier));
         }
 
-        private IEnumerable<ObservationalUnitGeoJsonMeta> GetGeoJsonForObservationalUnits(long boundaryLevelId,
+        private IEnumerable<ObservationalUnitGeoJsonMeta> GetGeoJsonForObservationalUnitsIfAvailable(
             GeographicLevel geographicLevel,
-            ICollection<IObservationalUnit> observationalUnits)
+            ICollection<IObservationalUnit> observationalUnits,
+            bool geoJsonRequested,
+            long? boundaryLevelId = null)
         {
-            var codes = observationalUnits.Select(unit => unit is LocalAuthority localAuthority ?
-                localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
-            var geoJsonByCode = _geoJsonService.Find(boundaryLevelId, codes).ToDictionary(g => g.Code);
+            var geoJsonByCode = new Dictionary<string, GeoJson>();
+
+            if (geoJsonRequested)
+            {
+                var codes = observationalUnits.Select(unit => unit is LocalAuthority localAuthority ?
+                    localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
+
+                var boundaryLevel = boundaryLevelId ?? GetBoundaryLevel(geographicLevel)?.Id;
+
+                geoJsonByCode = boundaryLevel.HasValue 
+                    ? _geoJsonService.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code)
+                    : new Dictionary<string, GeoJson>();
+            }
+            
             return observationalUnits.Select(observationalUnit =>
             {
                 var value = observationalUnit is LocalAuthority localAuthority ?
                     localAuthority.GetCodeOrOldCodeIfEmpty() : observationalUnit.Code;
+
+                var serializedGeoJson = geoJsonByCode.GetValueOrDefault(value);
                 
-                var geoJson = DeserializeGeoJson(geoJsonByCode.GetValueOrDefault(value));
+                var geoJson = serializedGeoJson != null 
+                    ? DeserializeGeoJson(serializedGeoJson) 
+                    : null;
+                
                 return new ObservationalUnitGeoJsonMeta
                 {
                     GeoJson = geoJson,
