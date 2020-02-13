@@ -23,7 +23,7 @@ def data_file_number_contains_xpath(num, xpath):
 
 def user_changes_accordion_section_title(num, new_title):
     try:
-        elem = sl.driver.find_element_by_xpath(f'//*[@id="contents-accordion"]/div[@class="govuk-accordion__section"][{num}]')
+        elem = sl.driver.find_element_by_xpath(f'//*[@id="contents-accordion"]/div[contains(@class, "govuk-accordion__section")][{num}]')
     except:
         raise AssertionError(f'Cannot find accordion section number "{num}"')
 

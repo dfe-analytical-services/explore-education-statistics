@@ -43,3 +43,7 @@ User creates a new release for publication "${publication}" for start year "${st
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until page contains element  xpath://h2[text()="Release summary"]
+
+user opens editable accordion
+    [Arguments]   ${accordion_section_title}
+    user clicks element  //span[text()="${accordion_section_title}"]

@@ -41,6 +41,8 @@ Add summary content to release
     user clicks element   xpath://button[text()="Save"]
     user waits until page contains element  xpath://p[text()="Test intro text for Manage content test %{RUN_IDENTIFIER}"]
 
+# TODO: Add comment to summary content
+
 Add release note to release
     [Tags]  HappyPath
     user clicks element   xpath://button[text()="Add note"]
@@ -79,6 +81,18 @@ Add accordion sections to release
     user clicks element   xpath://button[text()="Add new section"]
     user waits until page contains element  xpath://span[text()="New section"]
     user changes accordion section title  1   Test section one
+
+    user clicks element   xpath://button[text()="Add new section"]
+    user waits until page contains element  xpath://span[text()="New section"]
+    user changes accordion section title  2   Test section two
+
+    user clicks element   xpath://button[text()="Add new section"]
+    user waits until page contains element  xpath://span[text()="New section"]
+    user changes accordion section title  3   Test section three
+
+Add content block to Test section one
+    [Tags]  HappyPath
+    user opens editable accordion   Test section one
 
 This?
     [Tags]  HappyPath
