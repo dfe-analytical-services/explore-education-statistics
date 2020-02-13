@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Management.DataFactory;
 using Microsoft.Azure.WebJobs;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,14 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseDataFunction
     {
         private readonly IReleaseStatusService _releaseStatusService;
-        private readonly StatisticsDbContext _context;
 
         public const string QueueName = "publish-release-data";
 
-        public PublishReleaseDataFunction(StatisticsDbContext context, IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(IReleaseStatusService releaseStatusService)
         {
             _releaseStatusService = releaseStatusService;
-            _context = context;
         }
 
         [FunctionName("PublishReleaseData")]
@@ -48,18 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 try
                 {
-                    var subjects = GetSubjects(message.ReleaseId).ToList();
-                    if (subjects.Any())
-                    {
-                        var configuration = LoadClientConfiguration(executionContext);
-                        var success = TriggerDataFactoryReleasePipeline(configuration, logger, subjects,
-                            message.ReleaseStatusId);
-                        await UpdateStage(message, success ? Started : Failed);
-                    }
-                    else
-                    {
-                        await UpdateStage(message, Complete);
-                    }
+                    var configuration = LoadClientConfiguration(executionContext);
+                    var success = TriggerDataFactoryReleasePipeline(configuration, logger, message);
+                    await UpdateStage(message, success ? Started : Failed);
                 }
                 catch (Exception e)
                 {
@@ -79,19 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logMessage);
         }
 
-        private IEnumerable<Subject> GetSubjects(Guid releaseId)
-        {
-            return _context.Subject
-                .Where(s => s.ReleaseId.Equals(releaseId))
-                .Include(s => s.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic);
-        }
-
         private static bool TriggerDataFactoryReleasePipeline(DataFactoryClientConfiguration configuration,
-            ILogger logger, List<Subject> subjects, Guid releaseStatusId)
+            ILogger logger, PublishReleaseDataMessage message)
         {
-            var parameters = BuildPipelineParameters(subjects, releaseStatusId);
+            var parameters = BuildPipelineParameters(message);
             var client = GetDataFactoryClient(configuration);
 
             var runResponse = client.Pipelines.CreateRunWithHttpMessagesAsync(configuration.ResourceGroupName,
@@ -103,18 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return runResponse.Response.IsSuccessStatusCode;
         }
 
-        private static IDictionary<string, object> BuildPipelineParameters(List<Subject> subjects, Guid releaseStatusId)
+        private static IDictionary<string, object> BuildPipelineParameters(PublishReleaseDataMessage message)
         {
-            var publication = subjects.First().Release.Publication;
-            var topic = publication.Topic;
             return new Dictionary<string, object>
             {
-                {"subjectIds", subjects.Select(s => s.Id).ToArray()},
-                {"releaseId", subjects.First().ReleaseId},
-                {"releaseStatusId", releaseStatusId},
-                {"publicationId", publication.Id},
-                {"topicId", topic.Id},
-                {"themeId", topic.ThemeId}
+                {"releaseId", message.ReleaseId},
+                {"releaseStatusId", message.ReleaseStatusId}
             };
         }
 
