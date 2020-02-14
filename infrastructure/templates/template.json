@@ -15,10 +15,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "envNumber": {
-      "type": "string",
-      "defaultValue": ""
-    },
 
     "skuPublic": {
       "type": "string",
@@ -347,10 +343,6 @@
       "type": "bool",
       "defaultValue": true
     },
-    "deployKeyVaultSecrets": {
-      "type": "bool",
-      "defaultValue": false
-    },
 
     "publishReleasesCronSchedule": {
       "type": "string",
@@ -429,8 +421,7 @@
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
-    "storageEnv": "[concat('ees', parameters('envNumber'))]",
-    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), 'storageeescore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
@@ -440,17 +431,16 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
+    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
-    "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
+    "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
-    "publisherStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'publisher')]",
+    "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
-    "loggingStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'logging')]",
-    "loggingStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('loggingStorageAccountName'))]",
+    "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
@@ -2700,7 +2690,84 @@
           }
         }
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
+    },
+
+
+
+    {
+      "name": "[concat(variables('dataAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "properties": {
+        "name": "[concat(variables('dataAppName'), '-autoscale')]",
+        "enabled": false,
+        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [
+                  ],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [
+                  ],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [
+        ],
+        "targetResourceLocation": ""
+      }
     }
+
   ]
 }

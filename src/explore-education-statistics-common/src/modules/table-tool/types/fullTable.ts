@@ -22,6 +22,7 @@ export interface FullTableMeta {
     id: string;
     label: string;
   }[];
+  geoJsonAvailable: boolean;
 }
 
 export interface FullTable {

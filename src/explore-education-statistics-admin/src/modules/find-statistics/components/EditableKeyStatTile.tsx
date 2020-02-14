@@ -52,7 +52,10 @@ const EditableKeyStatTile = ({
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(dataBlockRequest)
+      DataBlockService.getDataBlockForSubject({
+        ...dataBlockRequest,
+        includeGeoJson: false,
+      })
         .then(newResponse => {
           if (newResponse) {
             setDataBlockResponse(newResponse);

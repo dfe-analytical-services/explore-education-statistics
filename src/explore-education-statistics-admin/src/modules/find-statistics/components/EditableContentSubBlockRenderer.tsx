@@ -1,9 +1,8 @@
-import marked from 'marked';
-import React from 'react';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
 import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import React from 'react';
 
 interface Props {
   block: EditableContentBlock;

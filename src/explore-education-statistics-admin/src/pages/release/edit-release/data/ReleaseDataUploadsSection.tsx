@@ -52,7 +52,7 @@ const ReleaseDataUploadsSection = ({
 }: Props & ErrorControlProps) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
-  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
+  const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
 
   useEffect(() => {
     Promise.all([
@@ -188,7 +188,7 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease ? (
+            {canUpdateRelease && (
               <>
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
@@ -254,9 +254,11 @@ const ReleaseDataUploadsSection = ({
                   Cancel
                 </ButtonText>
               </>
-            ) : (
-              'Release has been approved, and can no longer be updated.'
             )}
+
+            {typeof canUpdateRelease !== 'undefined' &&
+              !canUpdateRelease &&
+              'Release has been approved, and can no longer be updated.'}
 
             {dataFiles.length > 0 && (
               <>
