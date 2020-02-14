@@ -8,22 +8,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class SubmitSpecificReleaseToHigherReviewRequirement : IAuthorizationRequirement
     {}
     
-    public class SubmitSpecificReleaseToHigherReviewAuthorizationHandler : CompoundAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
+    public class SubmitSpecificReleaseToHigherReviewAuthorizationHandler 
+        : CompoundAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
     {
         public SubmitSpecificReleaseToHigherReviewAuthorizationHandler(ContentDbContext context) : base(
-            new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(),
+            new SubmitSpecificEntityToHigherReviewCanSubmitAllEntitiesAuthorizationHandler(),
             new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        SubmitSpecificReleaseToHigherReviewRequirement>
+    public class SubmitSpecificEntityToHigherReviewCanSubmitAllEntitiesAuthorizationHandler 
+        : EntityAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
     {
-        public SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler() 
+        public SubmitSpecificEntityToHigherReviewCanSubmitAllEntitiesAuthorizationHandler() 
             : base(ctx => 
-                ctx.Release.Status != ReleaseStatus.Approved 
+                ctx.Entity.Status != ReleaseStatus.Approved 
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview)) {}
     }
 

@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
@@ -38,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(EnsureMethodologyContentListNotNull)
                 .OnSuccess(methodology =>
                 {
                     if (methodology.Content == null)
@@ -60,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                // .OnSuccess(CheckCanUpdateMethodology)
-                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(CheckCanUpdateMethodology)
+                .OnSuccess(EnsureMethodologyContentListNotNull)
                 .OnSuccess(async methodology =>
                 {
                     newSectionOrder.ToList().ForEach(kvp =>
@@ -83,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                // .OnSuccess(CheckCanUpdateMethodology)
-                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(CheckCanUpdateMethodology)
+                .OnSuccess(EnsureMethodologyContentListNotNull)
                 .OnSuccess(async methodology =>
                 {
                     var orderForNewSection = request?.Order ?? 
@@ -114,8 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, sectionToUpdate) = tuple;
@@ -134,8 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, sectionToRemove) = tuple;
@@ -165,8 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, section) = tuple;
@@ -188,8 +187,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, section) = tuple;
@@ -203,8 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, section) = tuple;
@@ -229,8 +228,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
-                    // .OnSuccess(CheckCanUpdateMethodology)
-                    .OnSuccess(EnsureMethodologyContentNotNull)
+                    .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentListNotNull)
                     .OnSuccess(async tuple =>
                     {
                         var (methodology, section) = tuple;
@@ -250,8 +249,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                                 return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body, methodology);
                             case ContentBlockType.InsetTextBlock:
                                 return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body, methodology);
-                            case ContentBlockType.DataBlock:
-                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
@@ -367,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(EnsureMethodologyContentListNotNull)
                 .OnSuccess(methodology =>
                 {
                     var section = methodology
@@ -397,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => tuple);
         }
 
-        private Either<ActionResult, Methodology> EnsureMethodologyContentNotNull(Methodology methodology)
+        private Either<ActionResult, Methodology> EnsureMethodologyContentListNotNull(Methodology methodology)
         {
             if (methodology.Content == null)
             {
@@ -407,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return methodology;
         }
 
-        private Either<ActionResult, Tuple<Methodology, ContentSection>> EnsureMethodologyContentNotNull(
+        private Either<ActionResult, Tuple<Methodology, ContentSection>> EnsureMethodologyContentListNotNull(
             Tuple<Methodology, ContentSection> tuple)
         {
             if (tuple.Item1.Content == null)

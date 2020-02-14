@@ -13,7 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
         CanViewAllTopics,
         CanViewSpecificTheme,
+        
+        CanViewAllMethodologies,
+        CanViewSpecificMethodology,
 
+        CanCreateMethodologies,
         CanCreatePublicationForSpecificTopic,
         CanCreateReleaseForSpecificPublication,
         

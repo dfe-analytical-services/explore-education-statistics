@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -201,6 +200,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanManageMethodologiesOnSystem.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyMethodology.ToString()));
                 
+                // does this user have permissions to update all methodologies on the system?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificMethodology.ToString(), policy => 
+                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+
+                // does this user have permissions to view all methodologies on the system?
+                options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllMethodologies.ToString()));
+
                 // does this user have permission to view all Topics across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
@@ -209,9 +216,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificThemeRequirement()));
                 
+                // does this user have permission to view a specific Methodology?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificMethodology.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificMethodologyRequirement()));
+                
                 // does this user have permission to view all Releases across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
+                
+                // does this user have permission to create a methodology?
+                options.AddPolicy(SecurityPolicies.CanCreateMethodologies.ToString(), policy => 
+                    policy.RequireClaim(SecurityClaimTypes.CreateAnyMethodology.ToString()));
                 
                 // does this user have permission to create a publication under a specific topic?
                 options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy => 
@@ -361,6 +376,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserService, UserService>();
             
             // These handlers enforce Resource-based access control
+            services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
@@ -378,9 +395,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 c.SwaggerDoc("v1",
                     new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
-                // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
                 c.CustomSchemaIds((type) => type.FullName);
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
                     Name = "Authorization",

@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(), SubmitAllReleasesToHigherReview);
+                new SubmitSpecificEntityToHigherReviewCanSubmitAllEntitiesAuthorizationHandler(), SubmitAllReleasesToHigherReview);
         }
         
         [Fact]
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             
             // Assert that no users can submit an approved Release to higher review
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(),
+                new SubmitSpecificEntityToHigherReviewCanSubmitAllEntitiesAuthorizationHandler(),
                 release);
         }
         

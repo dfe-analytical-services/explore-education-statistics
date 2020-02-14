@@ -33,6 +33,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanManageMethodologiesOnSystem);
         }
         
+        public static Task<Either<ActionResult, bool>> CheckCanCreateMethodology(
+            this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanCreateMethodologies);
+        }
+        
+        public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
+            this IUserService userService, Methodology methodology)
+        {
+            return userService.DoCheck(methodology, SecurityPolicies.CanViewSpecificMethodology);
+        }
+        
         public static Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(
             this IUserService userService, Methodology methodology)
         {

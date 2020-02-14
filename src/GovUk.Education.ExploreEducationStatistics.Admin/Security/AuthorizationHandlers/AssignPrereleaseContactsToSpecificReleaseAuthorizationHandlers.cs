@@ -10,22 +10,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
     {}
 
-    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
+    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler : 
+        CompoundAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
         public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(),
+            new AssignPrereleaseContactsToSpecificEntityCanUpdateAllEntitiesAuthorizationHandler(),
             new AssignPrereleaseContactsToSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        AssignPrereleaseContactsToSpecificReleaseRequirement>
+    public class AssignPrereleaseContactsToSpecificEntityCanUpdateAllEntitiesAuthorizationHandler : 
+        EntityAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
-        public AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
+        public AssignPrereleaseContactsToSpecificEntityCanUpdateAllEntitiesAuthorizationHandler()
             : base(ctx =>
-                ctx.Release.Status == ReleaseStatus.Approved && 
+                ctx.Entity.Status == ReleaseStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
             )
         {

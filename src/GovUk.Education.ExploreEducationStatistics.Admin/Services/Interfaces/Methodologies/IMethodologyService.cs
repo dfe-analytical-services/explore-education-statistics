@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies
 {
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         
         Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId);
         
-        Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(
+        Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAsync(
             CreateMethodologyViewModel methodology);
     }
 }

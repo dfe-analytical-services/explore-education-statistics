@@ -11,19 +11,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ApproveSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
     {
         public ApproveSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(),
+            new ApproveSpecificEntityCanApproveAllEntitiesAuthorizationHandler(),
             new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        ApproveSpecificReleaseRequirement>
+    public class ApproveSpecificEntityCanApproveAllEntitiesAuthorizationHandler : 
+        EntityAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
     {
-        public ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler() 
+        public ApproveSpecificEntityCanApproveAllEntitiesAuthorizationHandler() 
             : base(ctx => 
-                ctx.Release.Status != ReleaseStatus.Approved 
+                ctx.Entity.Status != ReleaseStatus.Approved 
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllReleases)) {}
     }
 

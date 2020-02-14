@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that any users with the "MarkAllReleasesAsDraft" claim can mark an arbitrary Release as draft
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
-                new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
+                new MarkSpecificEntityAsDraftCanMarkAllEntitiesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
         }
         
         [Fact]
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             
             // Assert that no users can mark an approved Release as Draft
             AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
-                new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(),
+                new MarkSpecificEntityAsDraftCanMarkAllEntitiesAsDraftAuthorizationHandler(),
                 release);
         }
         

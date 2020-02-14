@@ -6,30 +6,36 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
     public class MethodologyService : IMethodologyService
     {
+        private readonly IUserService _userService;
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public MethodologyService(ContentDbContext context, IMapper mapper)
+        public MethodologyService(ContentDbContext context, IMapper mapper, IUserService userService)
         {
             _context = context;
             _mapper = mapper;
+            _userService = userService;
         }
 
-        public async Task<Either<ValidationResult, MethodologyViewModel>> CreateMethodologyAsync(
+        public async Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAsync(
             CreateMethodologyViewModel methodology)
         {
-            return await ValidateMethodologySlugUnique(methodology.Slug)
-                .OnSuccess(async () => ValidateAssignedPublication(methodology.PublicationId))
+            return await _userService
+                .CheckCanCreateMethodology()
+                .OnSuccess(() => ValidateMethodologySlugUnique(methodology.Slug))
+                .OnSuccess(() => ValidateAssignedPublication(methodology.PublicationId))
                 .OnSuccess(async () =>
                 {
                     var model = new Methodology
