@@ -406,6 +406,10 @@
     "deployDatafactory": {
       "type": "bool",
       "defaultValue": false
+    },
+    "autoscalePublicApplication": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -2705,7 +2709,7 @@
       },
       "properties": {
         "name": "[concat(variables('dataAppName'), '-autoscale')]",
-        "enabled": false,
+        "enabled": "[parameters('autoscalePublicApplication')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
         "profiles": [
           {
@@ -2777,7 +2781,7 @@
       },
       "properties": {
         "name": "[concat(variables('contentAppName'), '-autoscale')]",
-        "enabled": false,
+        "enabled": "[parameters('autoscalePublicApplication')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('contentPlanName'))]",
         "profiles": [
           {
@@ -2849,7 +2853,7 @@
       },
       "properties": {
         "name": "[concat(variables('publicAppName'), '-autoscale')]",
-        "enabled": false,
+        "enabled": "[parameters('autoscalePublicApplication')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
         "profiles": [
           {
