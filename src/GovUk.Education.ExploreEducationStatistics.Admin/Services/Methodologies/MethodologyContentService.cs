@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(CheckCanViewMethodology)
                 .OnSuccess(EnsureMethodologyContentListNotNull)
                 .OnSuccess(methodology =>
                 {
@@ -157,6 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    .OnSuccess(CheckCanViewMethodology)
                     .OnSuccess(tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
         }
 
@@ -381,6 +383,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
+        private Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(Methodology methodology)
+        {
+            return _userService.CheckCanViewMethodology(methodology);
+        }
+
+        private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckCanViewMethodology(
+            Tuple<Methodology, ContentSection> tuple)
+        {
+            return _userService
+                .CheckCanViewMethodology(tuple.Item1)
+                .OnSuccess(_ => tuple);
+        }
+        
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(Methodology methodology)
         {
             return _userService.CheckCanUpdateMethodology(methodology);
