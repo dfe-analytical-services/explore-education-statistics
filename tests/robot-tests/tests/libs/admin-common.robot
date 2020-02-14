@@ -47,3 +47,4 @@ User creates a new release for publication "${publication}" for start year "${st
 user opens editable accordion
     [Arguments]   ${accordion_section_title}
     user clicks element  //span[text()="${accordion_section_title}"]
+

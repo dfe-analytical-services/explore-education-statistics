@@ -92,7 +92,17 @@ Add accordion sections to release
 
 Add content block to Test section one
     [Tags]  HappyPath
-    user opens editable accordion   Test section one
+    ${section_one}=  user gets editable accordion section element  Test section one
+    user clicks add content for editable accordion section   ${section_one}
+
+    #user opens editable accordion   Test section one
+    #user clicks add content for editable accordion section   Test section one
+    #user adds content to accordion section's empty content block
+
+    #user clicks element   xpath://span[text()="Edit"]
+    #user presses keys  Test intro text for Manage content test %{RUN_IDENTIFIER}
+    #user clicks element   xpath://button[text()="Save"]
+    #user waits until page contains element  xpath://p[text()="Test intro text for Manage content test %{RUN_IDENTIFIER}"]
 
 This?
     [Tags]  HappyPath

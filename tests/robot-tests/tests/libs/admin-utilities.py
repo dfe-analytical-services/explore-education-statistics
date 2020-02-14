@@ -46,3 +46,24 @@ def user_changes_accordion_section_title(num, new_title):
         elem.find_element_by_xpath('.//a[.="(Save Section Title)"]').click()
     except:
         raise AssertionError('Cannot click "(Save Section Title)" link!')
+
+def user_gets_editable_accordion_section_element(section_title):
+    try:
+        elem = sl.driver.find_element_by_xpath(f'//*[@id="contents-accordion"]//span[text()="{section_title}"]/../../..')
+    except:
+        raise AssertionError(f'Cannot find accordion section titled "{section_title}"')
+
+    return elem
+
+
+def user_clicks_add_content_for_editable_accordion_section(section_elem):
+    try:
+        section_elem.find_element_by_xpath('.//button[text()="Add content"]').click()
+    except:
+        raise AssertionError(f'Failed to click "Add content" button for accordion section "{section_title}"')
+
+    try:
+        section_elem.find_element_by_xpath('.//p[text()="This section is empty"]')
+    except:
+        raise AssertionError(f'Cannot find empty content block in accordion section titled "{section_title}"')
+
