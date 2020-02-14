@@ -2690,7 +2690,84 @@
           }
         }
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
+    },
+
+
+
+    {
+      "name": "[concat(variables('dataAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "properties": {
+        "name": "s101d01-asp-ees-data-Autoscale-694",
+        "enabled": false,
+        "targetResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [
+                  ],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [
+                  ],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [
+        ],
+        "targetResourceLocation": ""
+      }
     }
+
   ]
 }
