@@ -107,6 +107,8 @@ export interface ChartDefinition {
     defaultDataType?: AxisGroupBy;
     forcedDataType?: AxisGroupBy;
   }[];
+
+  requiresGeoJson: boolean;
 }
 
 function existAndCodesDoNotMatch(a?: Location, b?: Location) {

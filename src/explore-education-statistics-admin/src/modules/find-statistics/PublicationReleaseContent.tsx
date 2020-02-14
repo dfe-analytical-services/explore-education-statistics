@@ -18,7 +18,7 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import ContentBlocks from './components/EditableContentBlocks';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
@@ -53,17 +53,17 @@ const PublicationReleaseContent = ({
   handleApiErrors,
   availableDataBlocks: initialAvailableDataBlocks,
 }: Props & ErrorControlProps) => {
-  const [release, _setRelease] = React.useState(content.release);
+  const [release, setRelease] = useState(content.release);
 
-  const setRelease = React.useCallback(
+  const setReleaseAndTriggerOnReleaseChange = useCallback(
     (newRelease: ManageContentPageViewModel['release']) => {
       if (onReleaseChange) onReleaseChange(newRelease);
-      _setRelease(newRelease);
+      setRelease(newRelease);
     },
-    [onReleaseChange],
+    [setRelease, onReleaseChange],
   );
 
-  const [availableDataBlocks, setAvailableDataBlocks] = React.useState(
+  const [availableDataBlocks, setAvailableDataBlocks] = useState(
     initialAvailableDataBlocks,
   );
 
@@ -87,19 +87,19 @@ const PublicationReleaseContent = ({
 
   const publication = React.useMemo(() => release.publication, [release]);
 
-  const onAccordionContentChange = React.useCallback(
+  const onAccordionContentChange = useCallback(
     newContent => {
-      setRelease({
+      setReleaseAndTriggerOnReleaseChange({
         ...release,
         content: newContent,
       });
     },
-    [release, setRelease],
+    [release, setReleaseAndTriggerOnReleaseChange],
   );
 
-  const onSummaryContentChange = React.useCallback(
+  const onSummaryContentChange = useCallback(
     newContent => {
-      setRelease({
+      setReleaseAndTriggerOnReleaseChange({
         ...release,
         summarySection: {
           ...release.summarySection,
@@ -107,7 +107,7 @@ const PublicationReleaseContent = ({
         },
       });
     },
-    [release, setRelease],
+    [release, setReleaseAndTriggerOnReleaseChange],
   );
 
   return (
@@ -254,7 +254,10 @@ const PublicationReleaseContent = ({
 
       <hr />
 
-      <ReleaseHeadlines release={release} setRelease={setRelease} />
+      <ReleaseHeadlines
+        release={release}
+        setRelease={setReleaseAndTriggerOnReleaseChange}
+      />
 
       <ReleaseContentAccordion
         releaseId={release.id}

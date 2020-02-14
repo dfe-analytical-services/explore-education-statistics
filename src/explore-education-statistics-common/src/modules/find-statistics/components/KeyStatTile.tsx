@@ -35,7 +35,10 @@ const KeyStatTile = ({
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(dataBlockRequest)
+      DataBlockService.getDataBlockForSubject({
+        ...dataBlockRequest,
+        includeGeoJson: false,
+      })
         .then(setDataBlockResponse)
         .catch(handleApiErrors);
     } else {
