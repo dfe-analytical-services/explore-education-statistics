@@ -121,6 +121,7 @@ export interface DataBlockMetadata {
   publicationName: string;
   subjectName: string;
   footnotes: FootnoteMetadata[];
+  geoJsonAvailable: boolean;
 }
 
 export interface DataBlockRerequest {

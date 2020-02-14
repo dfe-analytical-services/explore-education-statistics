@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -24,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddMemoryCache()
                 .AddDbContext<ContentDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
-                .AddDbContext<StatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentService, ContentService>()

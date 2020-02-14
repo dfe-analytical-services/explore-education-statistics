@@ -737,6 +737,8 @@ const definition: ChartDefinition = {
       forcedDataType: 'locations',
     },
   ],
+
+  requiresGeoJson: true,
 };
 
 MapBlock.definition = definition;

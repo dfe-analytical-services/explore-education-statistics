@@ -67,6 +67,8 @@ export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
         type: 'minor',
       },
     ],
+
+    requiresGeoJson: false,
   };
 
   public render() {
