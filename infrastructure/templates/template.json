@@ -2706,7 +2706,7 @@
       "properties": {
         "name": "[concat(variables('dataAppName'), '-autoscale')]",
         "enabled": false,
-        "targetResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+        "targetResourceUri": "[variables('dataPlanName')]",
         "profiles": [
           {
             "name": "Auto created scale condition",
@@ -2726,7 +2726,7 @@
                 "metricTrigger": {
                   "metricName": "CpuPercentage",
                   "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+                  "metricResourceUri": "[variables('dataPlanName')]",
                   "operator": "GreaterThan",
                   "statistic": "Average",
                   "threshold": 70,
@@ -2748,7 +2748,7 @@
                 "metricTrigger": {
                   "metricName": "CpuPercentage",
                   "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
+                  "metricResourceUri": "[variables('dataPlanName')]",
                   "operator": "LessThan",
                   "statistic": "Average",
                   "threshold": 30,
