@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     // TODO EES-919 - return ActionResults rather than ValidationResults
     public interface IMethodologyService
     {
-        Task<List<MethodologyViewModel>> ListAsync();
+        Task<Either<ActionResult, List<MethodologyViewModel>>> ListAsync();
         
-        Task<List<MethodologyStatusViewModel>> ListStatusAsync();
+        Task<Either<ActionResult, List<MethodologyStatusViewModel>>> ListStatusAsync();
         
-        Task<MethodologyViewModel> GetAsync(Guid id);
+        Task<Either<ActionResult, MethodologyViewModel>> GetAsync(Guid id);
         
-        Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(Guid topicId);
+        Task<Either<ActionResult, List<MethodologyViewModel>>> GetTopicMethodologiesAsync(Guid topicId);
         
         Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAsync(
             CreateMethodologyViewModel methodology);
