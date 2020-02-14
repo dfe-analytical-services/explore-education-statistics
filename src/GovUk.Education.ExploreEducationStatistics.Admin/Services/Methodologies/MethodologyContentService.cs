@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
@@ -24,153 +20,156 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 {
     public class MethodologyContentService : IMethodologyContentService
     {
-        private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
 
-        public MethodologyContentService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, 
-            IMapper mapper, IUserService userService)
+        public MethodologyContentService(ContentDbContext context, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IUserService userService)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
-            _mapper = mapper;
             _userService = userService;
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
-            Guid releaseId)
+            Guid methodologyId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release => 
-                    release
-                        .GenericContent
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(methodology =>
+                {
+                    if (methodology.Content == null)
+                    {
+                        return new List<ContentSectionViewModel>();
+                    }
+
+                    return methodology
+                        .Content
                         .Select(ContentSectionViewModel.ToViewModel)
                         .OrderBy(c => c.Order)
-                        .ToList());
+                        .ToList();
+                });
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
-            Guid releaseId, 
+            Guid methodologyId, 
             Dictionary<Guid, int> newSectionOrder)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<Methodology>(methodologyId)
+                // .OnSuccess(CheckCanUpdateMethodology)
+                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(async methodology =>
                 {
                     newSectionOrder.ToList().ForEach(kvp =>
                     {
                         var (sectionId, newOrder) = kvp;
-                        release
-                            .GenericContent
-                            .ToList()
+                        methodology
+                            .Content
                             .Find(section => section.Id == sectionId).Order = newOrder;
                     });
                     
-                    _context.Releases.Update(release);
+                    _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
-                    return OrderedContentSections(release);
+                    return OrderedContentSections(methodology);
                 });
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, AddContentSectionRequest? request)
+            Guid methodologyId, AddContentSectionRequest? request)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<Methodology>(methodologyId)
+                // .OnSuccess(CheckCanUpdateMethodology)
+                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(async methodology =>
                 {
                     var orderForNewSection = request?.Order ?? 
-                                             release.GenericContent.Max(contentSection => contentSection.Order) + 1;
+                                             methodology.Content.Max(contentSection => contentSection.Order) + 1;
                     
-                    release.GenericContent
-                        .ToList()
+                    methodology.Content
                         .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                         .ForEach(contentSection => contentSection.Order++);
 
                     var newContentSection = new ContentSection
                     {
+                        Id = Guid.NewGuid(),
                         Heading = "New section",
                         Order = orderForNewSection
                     };
                     
-                    release.AddGenericContentSection(newContentSection);
+                    methodology.Content.Add(newContentSection);
                     
-                    _context.Releases.Update(release);
+                    _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
                     return ContentSectionViewModel.ToViewModel(newContentSection);
                 });
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
-            Guid releaseId, Guid contentSectionId, string newHeading)
+            Guid methodologyId, Guid contentSectionId, string newHeading)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (_, sectionToUpdate) = tuple;
+                        var (methodology, sectionToUpdate) = tuple;
                         
                         sectionToUpdate.Heading = newHeading;
 
-                        _context.ContentSections.Update(sectionToUpdate);
+                        _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
                         return ContentSectionViewModel.ToViewModel(sectionToUpdate);
                     });
         }
         
         public  Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
-            Guid releaseId,
+            Guid methodologyId,
             Guid contentSectionId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (release, sectionToRemove) = tuple;
+                        var (methodology, sectionToRemove) = tuple;
                         
-                        // detach DataBlocks before removing the ContentSection and its ContentBlocks
-                        sectionToRemove
-                            .Content
-                            .FindAll(contentBlock => contentBlock.Type == ContentBlockType.DataBlock.ToString())
-                            .ForEach(dataBlock =>  
-                                RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
-                        
-                        release.RemoveGenericContentSection(sectionToRemove);
+                        methodology.Content.Remove(sectionToRemove);
 
                         var removedSectionOrder = sectionToRemove.Order;
                         
-                        release.GenericContent
-                            .ToList()
+                        methodology.Content
                             .FindAll(contentSection => contentSection.Order > removedSectionOrder)
                             .ForEach(contentSection => contentSection.Order--);
                         
-                        _context.Releases.Update(release);
+                        _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
-                        return OrderedContentSections(release);
+                        return OrderedContentSections(methodology);
                     });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(Guid releaseId, Guid contentSectionId)
+        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(Guid methodologyId, Guid contentSectionId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
                     .OnSuccess(tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
         }
 
-        public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid methodologyId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (_, section) = tuple;
+                        var (methodology, section) = tuple;
 
                         newBlocksOrder.ToList().ForEach(kvp =>
                         {
@@ -178,35 +177,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             section.Content.Find(block => block.Id == blockId).Order = newOrder;
                         });
                         
-                        _context.ContentSections.Update(section);
+                        _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
                         return OrderedContentBlocks(section);
                     });
         }
 
-        public Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
+        public Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(Guid methodologyId, Guid contentSectionId,
             AddContentBlockRequest request) 
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (_, section) = tuple;
+                        var (methodology, section) = tuple;
                         var newContentBlock = CreateContentBlockForType(request.Type);
-                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, newContentBlock);
+                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, newContentBlock, methodology);
                     });
         }
 
         public Task<Either<ActionResult, List<IContentBlock>>> RemoveContentBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+            Guid methodologyId, Guid contentSectionId, Guid contentBlockId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (_, section) = tuple;
+                        var (methodology, section) = tuple;
 
                         var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
 
@@ -215,62 +216,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             return NotFound<List<IContentBlock>>(); 
                         }
                         
-                        if (!blockToRemove.ContentSectionId.HasValue)
-                        {
-                            return ValidationActionResult(ContentBlockAlreadyDetached);
-                        }
+                        RemoveContentBlockFromContentSection(section, blockToRemove);
                         
-                        if (blockToRemove.ContentSectionId != contentSectionId)
-                        {
-                            return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
-                        }
-
-                        var deleteContentBlock = blockToRemove.Type != ContentBlockType.DataBlock.ToString(); 
-                        RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
-                        
-                        _context.ContentSections.Update(section);
+                        _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
                         return OrderedContentBlocks(section);
                     });
         }
 
-        public Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
-        {
-            return
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (_, section) = tuple;
-
-                        var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                        if (blockToUpdate == null)
-                        {
-                            return NotFound<IContentBlock>();
-                        }
-
-                        switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
-                        {
-                            case ContentBlockType.DataBlock:
-                                return await UpdateDataBlock((DataBlock) blockToUpdate, request);
-                            default:
-                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                        }
-                    });
-        }
-
-
         public Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+            Guid methodologyId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExistsActionResult(methodologyId, contentSectionId)
+                    // .OnSuccess(CheckCanUpdateMethodology)
+                    .OnSuccess(EnsureMethodologyContentNotNull)
                     .OnSuccess(async tuple =>
                     {
-                        var (_, section) = tuple;
+                        var (methodology, section) = tuple;
 
                         var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
 
@@ -282,11 +245,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
                         {
                             case ContentBlockType.MarkDownBlock:
-                                return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body);
+                                return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body, methodology);
                             case ContentBlockType.HtmlBlock:
-                                return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body);
+                                return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body, methodology);
                             case ContentBlockType.InsetTextBlock:
-                                return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body);
+                                return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body, methodology);
                             case ContentBlockType.DataBlock:
                                 return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
                             default:
@@ -294,193 +257,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         }
                     });
         }
-
-        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId) 
-            where T : IContentBlock
-        {
-            var contentBlockTypeEnum = GetContentBlockTypeEnumValueFromType<T>();
-            
-            var unattachedContentBlocks = await _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .Where(join => join.ReleaseId == releaseId)
-                .Select(join => join.ContentBlock)
-                .Where(contentBlock => contentBlock.ContentSectionId == null 
-                                       && contentBlock.Type == contentBlockTypeEnum.ToString())
-                .OfType<T>()
-                .ToListAsync();
-
-            if (typeof(T) == typeof(DataBlock))
-            {
-                return unattachedContentBlocks
-                    .OfType<DataBlock>()
-                    .OrderBy(contentBlock => contentBlock.Name)
-                    .OfType<T>()
-                    .ToList();
-            }
-            
-            return unattachedContentBlocks;
-        }
-
-        public Task<Either<ActionResult, IContentBlock>> AttachContentBlockAsync(Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
-        {
-            return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (_, section) = tuple;
-
-                        var blockToAttach = _context
-                            .ContentBlocks
-                            .FirstOrDefault(block => block.Id == request.ContentBlockId);
-
-                        if (blockToAttach == null)
-                        {
-                            return NotFound<IContentBlock>();
-                        }
-                        
-                        if (blockToAttach.Type != ContentBlockType.DataBlock.ToString())
-                        {
-                            return ValidationActionResult(IncorrectContentBlockTypeForAttach);
-                        }
-
-                        if (blockToAttach.ContentSectionId.HasValue)
-                        {
-                            return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
-                        }
-                        
-                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, blockToAttach);
-                    });
-        }
-
-        public Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId
-        )
-        {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                .OnSuccess(tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
-                    {
-                        return NotFound<List<CommentViewModel>>();
-                    }
-
-                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
-                }
-            );
-        }
-
-        public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId, Guid contentSectionId,
-            Guid contentBlockId, AddCommentRequest comment)
-        {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
-                    {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                    }
-
-                    var newComment = _context.Comment.Add(new Comment
-                    {
-                        Id = new Guid(),
-                        IContentBlockId = contentBlockId,
-                        Name = comment.Name,
-                        State = EnumUtil.GetFromString<CommentState>(comment.State),
-                        Time = comment.Time,
-                        CommentText = comment.CommentText,
-                        ResolvedBy = comment.ResolvedBy,
-                        ResolvedOn = comment.ResolvedOn,
-                    });
-
-                    await _context.SaveChangesAsync();
-                    return _mapper.Map<CommentViewModel>(newComment.Entity);
-                }
-            );
-        }
-
-        public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid releaseId,
-            Guid contentSectionId, Guid contentBlockId, Guid commentId,
-            UpdateCommentRequest commentRequest)
-        {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
-                    {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                    }
-
-                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
-
-                    if (comment == null)
-                    {
-                        return ValidationActionResult(CommentNotFound);
-                    }
-
-                    comment.Name = commentRequest.Name;
-                    comment.State = EnumUtil.GetFromString<CommentState>(commentRequest.State);
-                    comment.Time = commentRequest.Time;
-                    comment.CommentText = commentRequest.CommentText;
-                    comment.ResolvedBy = commentRequest.ResolvedBy;
-                    comment.ResolvedOn = commentRequest.ResolvedOn;
-
-                    _context.Comment.Update(comment);
-                    await _context.SaveChangesAsync();
-
-                    return _mapper.Map<CommentViewModel>(comment);
-                }
-            );
-        }
-
-        public Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
-        {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
-                    {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                    }
-
-                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
-
-                    if (comment == null)
-                    {
-                        return ValidationActionResult(CommentNotFound);
-                    }
-
-                    _context.Comment.Remove(comment);
-                    await _context.SaveChangesAsync();
-
-                    return _mapper.Map<CommentViewModel>(comment);
-
-                }
-            );
-        }
         
         private async Task<Either<ActionResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
-            IContentBlock newContentBlock)
+            IContentBlock newContentBlock, Methodology methodology)
         {
             if (section.Content == null)
             {
@@ -496,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             newContentBlock.Order = orderForNewBlock;
             section.Content.Add(newContentBlock);
 
-            _context.ContentSections.Update(section);
+            _context.Methodologies.Update(methodology);
             await _context.SaveChangesAsync();
             return newContentBlock;
         }
@@ -518,8 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private void RemoveContentBlockFromContentSection(
             ContentSection section,
-            IContentBlock blockToRemove,
-            bool deleteContentBlock)
+            IContentBlock blockToRemove)
         {
             section.Content.Remove(blockToRemove);
 
@@ -528,78 +306,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             section.Content
                 .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
                 .ForEach(contentBlock => contentBlock.Order--);
-
-            if (deleteContentBlock)
-            {
-                _context.ContentBlocks.Remove(blockToRemove);
-            }
-            else
-            {
-                blockToRemove.Order = 0;
-                blockToRemove.ContentSectionId = null;
-                _context.ContentBlocks.Update(blockToRemove);
-            }
         }
 
         private async Task<Either<ActionResult, IContentBlock>> UpdateMarkDownBlock(MarkDownBlock blockToUpdate,
-            string body)
+            string body, Methodology methodology)
         {
             blockToUpdate.Body = body;
-            return await SaveContentBlock(blockToUpdate);
+            return await SaveMethodology(blockToUpdate, methodology);
         }
 
         private async Task<Either<ActionResult, IContentBlock>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
-            string body)
+            string body, Methodology methodology)
         {
             blockToUpdate.Body = body;
-            return await SaveContentBlock(blockToUpdate);
+            return await SaveMethodology(blockToUpdate, methodology);
         }
 
         private async Task<Either<ActionResult, IContentBlock>> UpdateInsetTextBlock(InsetTextBlock blockToUpdate,
-            string heading, string body)
+            string heading, string body, Methodology methodology)
         {
             blockToUpdate.Heading = heading;
             blockToUpdate.Body = body;
-            return await SaveContentBlock(blockToUpdate);
+            return await SaveMethodology(blockToUpdate, methodology);
         }
 
-        private async Task<Either<ActionResult, IContentBlock>> UpdateDataBlock(DataBlock blockToUpdate,
-            UpdateDataBlockRequest request)
+        private async Task<IContentBlock> SaveMethodology(IContentBlock block, Methodology methodology)
         {
-            if (blockToUpdate.Summary == null)
-            {
-                blockToUpdate.Summary = new Summary();
-            }
-            
-            blockToUpdate.Summary.dataDefinitionTitle = new List<string>
-            {
-                request.DataDefinitionTitle
-            };
-            
-            blockToUpdate.Summary.dataDefinition = new List<string>
-            {
-                request.DataDefinition
-            };
-
-            blockToUpdate.Summary.dataSummary = new List<string>
-            {
-                request.DataSummary
-            };
-
-            return await SaveContentBlock(blockToUpdate);
-        }
-
-        private async Task<IContentBlock> SaveContentBlock(IContentBlock blockToUpdate)
-        {
-            _context.ContentBlocks.Update(blockToUpdate);
+            _context.Update(methodology);
             await _context.SaveChangesAsync();
-            return blockToUpdate;
+            return block;
         }
 
         private static IContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            return (IContentBlock) Activator.CreateInstance(classType);
+            var newContentBlock = (IContentBlock) Activator.CreateInstance(classType);
+            newContentBlock.Id = Guid.NewGuid();
+            return newContentBlock;
         }
 
         private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
@@ -610,36 +353,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList();
         }
 
-        private static List<ContentSectionViewModel> OrderedContentSections(Release release)
+        private static List<ContentSectionViewModel> OrderedContentSections(Methodology methodology)
         {
-            return release
-                .GenericContent
+            return methodology
+                .Content
                 .Select(ContentSectionViewModel.ToViewModel)
                 .OrderBy(c => c.Order)
                 .ToList();
         }
 
-        private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> releases)
-        {
-            return releases
-                    .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                ;
-        }
-        
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExistsActionResult(
-            Guid releaseId, Guid contentSectionId)
+        private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckContentSectionExistsActionResult(
+            Guid methodologyId, Guid contentSectionId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release =>
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(EnsureMethodologyContentNotNull)
+                .OnSuccess(methodology =>
                 {
-                    var section = release
+                    var section = methodology
                         .Content
-                        .Select(join => join.ContentSection)
-                        .ToList()
                         .Find(contentSection => contentSection.Id == contentSectionId);
 
                     if (section == null)
@@ -647,22 +379,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         return new NotFoundResult();
                     }
 
-                    return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        new Tuple<Release, ContentSection>(release, section));
+                    return new Either<ActionResult, Tuple<Methodology, ContentSection>>(
+                        new Tuple<Methodology, ContentSection>(methodology, section));
                 });
         }
 
-        private Task<Either<ActionResult, Release>> CheckCanUpdateRelease(Release release)
+        private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(Methodology methodology)
         {
-            return _userService.CheckCanUpdateRelease(release);
+            return _userService.CheckCanUpdateMethodology(methodology);
         }
 
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckCanUpdateRelease(
-            Tuple<Release, ContentSection> tuple)
+        private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckCanUpdateMethodology(
+            Tuple<Methodology, ContentSection> tuple)
         {
             return _userService
-                .CheckCanUpdateRelease(tuple.Item1)
+                .CheckCanUpdateMethodology(tuple.Item1)
                 .OnSuccess(_ => tuple);
+        }
+
+        private Either<ActionResult, Methodology> EnsureMethodologyContentNotNull(Methodology methodology)
+        {
+            if (methodology.Content == null)
+            {
+                methodology.Content = new List<ContentSection>();
+            }
+
+            return methodology;
+        }
+
+        private Either<ActionResult, Tuple<Methodology, ContentSection>> EnsureMethodologyContentNotNull(
+            Tuple<Methodology, ContentSection> tuple)
+        {
+            if (tuple.Item1.Content == null)
+            {
+                tuple.Item1.Content = new List<ContentSection>();
+            }
+
+            return tuple;
         }
     }
 }
