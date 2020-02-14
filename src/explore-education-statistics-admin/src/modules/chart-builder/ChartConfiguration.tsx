@@ -24,7 +24,8 @@ import {
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React from 'react';
-import value from '*.json';
+import ButtonText from '@common/components/ButtonText';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -87,6 +88,8 @@ const InfographicChartOptions = ({
   >([]);
 
   const [uploading, setUploading] = React.useState(false);
+  const [fileName, setFileName] = React.useState<string>();
+  const [deleteFile, setDeleteFile] = React.useState<boolean>(false);
 
   const formId = 'fileUploadForm';
 
@@ -127,6 +130,17 @@ const InfographicChartOptions = ({
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
+  React.useEffect(() => {
+    const selectedFile = chartFileOptions.find(
+      fileOption => fileOption.value === fileId,
+    );
+    if (selectedFile) {
+      setFileName(selectedFile.label);
+    } else {
+      setFileName('');
+    }
+  }, [fileId, chartFileOptions]);
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -144,20 +158,46 @@ const InfographicChartOptions = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            <FormFieldSelect
-              id={`${formId}-fileId`}
-              name="fileId"
-              label="Select the file to show"
-              order={[]}
-              options={chartFileOptions}
-              value={fileId}
-              onChange={e => {
-                form.setFieldValue('fileId', e.target.value);
-                return onChange(e.target.value);
-              }}
-            />
+            {fileId && (
+              <>
+                <div className={styles.deleteInfographicContainer}>
+                  <p className="govuk-!-margin-right-2">{`${fileName}, ${fileId}`}</p>
+                  <ButtonText
+                    variant="warning"
+                    onClick={() => {
+                      setDeleteFile(true);
+                    }}
+                  >
+                    Delete infographic
+                  </ButtonText>
+                </div>
+                <ModalConfirm
+                  mounted={deleteFile}
+                  title="Confirm deletion of infographic"
+                  onExit={() => setDeleteFile(false)}
+                  onCancel={() => setDeleteFile(false)}
+                  onConfirm={async () => {
+                    // eslint-disable-next-line no-unused-expressions
+                    form.values.fileId &&
+                      service
+                        .deleteChartFile(releaseId, form.values.fileId)
+                        .then(() =>
+                          loadChartFilesAndMapToSelectOptionAsync(releaseId),
+                        )
+                        .then(setChartFileOptions)
+                        .catch(handleApiErrors);
+                    onChange('');
+                    setDeleteFile(false);
+                  }}
+                >
+                  <p>
+                    This data will no longer be available for use in this chart
+                  </p>
+                </ModalConfirm>
+              </>
+            )}
 
-            {!form.values.fileId && (
+            {!fileId && (
               <>
                 <FormFieldTextInput
                   id={`${formId}-name`}
@@ -340,19 +380,6 @@ const ChartConfiguration = ({
                 }}
               />
             </FormGroup>
-            {chartOptions && (
-              <Button
-                onClick={async () => {
-                  // eslint-disable-next-line no-unused-expressions
-                  chartOptions.fileId &&
-                    service
-                      .deleteChartFile(data.releaseId, chartOptions.fileId)
-                      .catch(handleApiErrors);
-                }}
-              >
-                Delete infographic file
-              </Button>
-            )}
           </div>
         )}
 
