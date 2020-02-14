@@ -2704,7 +2704,7 @@
       "tags": {
       },
       "properties": {
-        "name": "s101d01-asp-ees-data-Autoscale-694",
+        "name": "[concat(variables('dataAppName'), '-autoscale')]",
         "enabled": false,
         "targetResourceUri": "[resourceId('Microsoft.Web/serverfarms', variables('dataAppName'))]",
         "profiles": [
