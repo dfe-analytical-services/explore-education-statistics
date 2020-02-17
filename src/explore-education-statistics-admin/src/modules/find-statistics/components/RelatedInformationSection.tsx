@@ -114,13 +114,16 @@ const RelatedInformationSection = ({
         <ul className="govuk-list">
           <li>
             {release.publication.methodology && (
-              <Link to="#">{release.publication.methodology.title}</Link>
+              <Link to={`/publications/${release.publication.methodology.id}`}>
+                {release.publication.methodology.title}
+              </Link>
             )}
             {release.publication.externalMethodology && (
               <Link
                 to=""
                 href={release.publication.externalMethodology.url}
                 target="_blank"
+                rel="external"
               >
                 {release.publication.externalMethodology.title}
               </Link>

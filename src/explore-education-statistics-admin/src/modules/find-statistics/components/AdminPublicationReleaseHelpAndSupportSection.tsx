@@ -44,6 +44,11 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
                     : ''
                 }
                 target="_blank"
+                rel={
+                  !publication.methodology && publication.externalMethodology
+                    ? 'external'
+                    : undefined
+                }
               >
                 {`${publication.title}: methodology`}
               </Link>{' '}

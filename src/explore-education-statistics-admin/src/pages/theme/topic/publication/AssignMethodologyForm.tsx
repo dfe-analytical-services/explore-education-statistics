@@ -188,12 +188,12 @@ const AssignMethodologyForm = ({
                         id={`${formId}-selectedMethodologyId`}
                         name="selectedMethodologyId"
                         label="Select methodology"
-                        options={(methodologies as (IdTitlePair & {
-                          status: string;
-                        })[]).map(methodology => ({
-                          label: `${methodology.title} [${methodology.status}]`,
-                          value: methodology.id,
-                        }))}
+                        options={(methodologies as BasicMethodology[]).map(
+                          methodology => ({
+                            label: `${methodology.title} [${methodology.status}]`,
+                            value: methodology.id,
+                          }),
+                        )}
                       />
                     ),
                   },
