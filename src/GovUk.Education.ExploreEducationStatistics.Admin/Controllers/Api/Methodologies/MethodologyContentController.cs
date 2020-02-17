@@ -24,13 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             _contentService = contentService;
         }
 
-        [HttpGet("methodology/{methodologyId}/{contentType}/sections")]
+        [HttpGet("methodology/{methodologyId}/content/sections")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(
             Guid methodologyId,
-            MethodologyContentService.ContentListType contentType)
+            [FromQuery] MethodologyContentService.ContentListType type)
         {
             return await _contentService
-                .GetContentSectionsAsync(methodologyId, contentType)
+                .GetContentSectionsAsync(methodologyId, type)
                 .HandleFailuresOr(Ok);
         }
         
@@ -43,14 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpPost("methodology/{methodologyId}/{contentType}/sections/add")]
+        [HttpPost("methodology/{methodologyId}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
             Guid methodologyId, 
-            MethodologyContentService.ContentListType contentType, 
+            [FromQuery] MethodologyContentService.ContentListType type, 
             AddContentSectionRequest? request = null)
         {
             return await _contentService
-                .AddContentSectionAsync(methodologyId, request, contentType)
+                .AddContentSectionAsync(methodologyId, request, type)
                 .HandleFailuresOr(Ok);
         }
 

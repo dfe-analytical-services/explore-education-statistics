@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
-                    return OrderedContentSections(methodology);
+                    return OrderedContentSections(content);
                 });
         }
 
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         
                         _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
-                        return OrderedContentSections(methodology);
+                        return OrderedContentSections(content);
                     });
         }
 
@@ -364,10 +364,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList();
         }
 
-        private static List<ContentSectionViewModel> OrderedContentSections(Methodology methodology)
+        private static List<ContentSectionViewModel> OrderedContentSections(List<ContentSection> sectionsList)
         {
-            return methodology
-                .Content
+            return sectionsList
                 .Select(ContentSectionViewModel.ToViewModel)
                 .OrderBy(c => c.Order)
                 .ToList();
