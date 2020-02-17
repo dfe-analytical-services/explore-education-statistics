@@ -23,5 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
             
             return result.IsRight ? successFn.Invoke(result.Right) : result.Left;
         }
+        
+        public static async Task<ActionResult<T>> HandleFailuresOrOk<T>(
+            this Task<Either<ActionResult, T>> validationErrorsRaisingAction)
+        {
+            var result = await validationErrorsRaisingAction;
+            
+            return result.IsRight ? new ActionResult<T>(result.Right) : result.Left;
+        }
     }
 }
