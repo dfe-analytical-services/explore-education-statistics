@@ -2975,6 +2975,60 @@
 									"response": []
 								},
 								{
+									"name": "Add Content Section to Content list to make sure Annexes are separate",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"exec": [
+													"pm.test(\"New Content Section should be present\", function () { ",
+													"",
+													"    const respJson = pm.response.json();",
+													"",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.heading).to.equal('New section');",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Store environment variables\", function() {",
+													"    pm.globals.set(\"added_content_section_to_non_annexes_id\", pm.response.json().id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\torder: 1\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/sections/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"methodology",
+												"{{added_methodology_id}}",
+												"content",
+												"sections",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Add HTML Block",
 									"event": [
 										{
@@ -3864,6 +3918,7 @@
 													"pm.test(\"Remove temporary environment variables\", function() {",
 													"   pm.globals.unset(\"added_methodology_id\"); ",
 													"   pm.globals.unset(\"added_content_section_id\"); ",
+													"   pm.globals.unset(\"added_content_section_to_non_annexes_id\"); ",
 													"   pm.globals.unset(\"added_html_block_id\");",
 													"   pm.globals.unset(\"added_markdown_block_id\");",
 													"   pm.globals.unset(\"added_inset_text_block_id\");",
