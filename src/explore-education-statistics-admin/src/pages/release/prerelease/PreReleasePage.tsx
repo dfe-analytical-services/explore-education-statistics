@@ -134,6 +134,11 @@ const PreReleasePage = ({
               <p className="govuk-body">
                 Pre Release access is no longer available for this release.
               </p>
+              <p className="govuk-body">
+                This release has now been published on the Explore Education
+                Statistics service. If you are having problems finding the
+                release please contact the relevant production team.
+              </p>
             </>
           )}
         </Page>
