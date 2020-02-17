@@ -1,5 +1,6 @@
 from robot.libraries.BuiltIn import BuiltIn
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
+import time
 
 def data_csv_number_contains_xpath(num, xpath):
     try:
@@ -55,15 +56,43 @@ def user_gets_editable_accordion_section_element(section_title):
 
     return elem
 
+def user_opens_editable_accordion_section(section_elem):
+    try:
+        section_elem.click()
+    except:
+        raise AssertionError('Cannot click accordion section element')
 
-def user_clicks_add_content_for_editable_accordion_section(section_elem):
+def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=10):
     try:
         section_elem.find_element_by_xpath('.//button[text()="Add content"]').click()
     except:
-        raise AssertionError(f'Failed to click "Add content" button for accordion section "{section_title}"')
+        raise AssertionError(f'Failed to click "Add content" button for accordion section element')
+
+    max_time = time.time() + timeout
+    while time.time() < max_time:
+        try:
+            section_elem.find_element_by_xpath('.//p[text()="This section is empty"]')
+            return
+        except:
+            time.sleep(0.5)
+    raise AssertionError('Failed to find new empty content section')
+
+def user_adds_content_to_accordion_section_content_block(section_elem, block_num, content):
+    try:
+        section_elem.find_element_by_xpath(f'(.//span[text()="Edit"])[{block_num}]').click()
+    except:
+        raise AssertionError(f'Failed to find Delete button for content block number {block_num}')
+
+    sl.log_to_console('Content: ', content)
+    sl.press_keys(content)
+
+def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
+    try:
+        section_elem.find_element_by_xpath(f'(.//button[text()="Delete"])[{block_num}]').click()
+    except:
+        raise AssertionError(f'Failed to find/click Delete button for content block number {block_num}')
 
     try:
-        section_elem.find_element_by_xpath('.//p[text()="This section is empty"]')
+        sl.driver.find_element_by_xpath(f'//button[text()="Confirm"]').click()
     except:
-        raise AssertionError(f'Cannot find empty content block in accordion section titled "{section_title}"')
-
+        raise AssertionError('Failed to find/click Confirm button')
