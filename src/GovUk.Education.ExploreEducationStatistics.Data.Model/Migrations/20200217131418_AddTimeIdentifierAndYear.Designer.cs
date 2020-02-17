@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20200214173736_AddTimeIdentifierAndYear")]
+    [Migration("20200217131418_AddTimeIdentifierAndYear")]
     partial class AddTimeIdentifierAndYear
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -367,8 +367,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TimeIdentifier")
-                        .HasColumnType("int");
+                    b.Property<string>("TimeIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
 
                     b.Property<int>("Year")
                         .HasColumnType("int");

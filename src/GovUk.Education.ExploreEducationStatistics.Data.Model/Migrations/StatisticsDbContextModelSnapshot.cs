@@ -365,8 +365,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TimeIdentifier")
-                        .HasColumnType("int");
+                    b.Property<string>("TimeIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
