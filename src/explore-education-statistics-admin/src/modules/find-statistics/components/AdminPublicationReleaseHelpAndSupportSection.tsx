@@ -32,26 +32,22 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           {publication.methodology || publication.externalMethodology ? (
             <p>
               Read our{' '}
-              <Link
-                to={
-                  publication.methodology
-                    ? `/methodologies/${publication.methodology.id}`
-                    : ''
-                }
-                href={
-                  !publication.methodology && publication.externalMethodology
-                    ? publication.externalMethodology.url
-                    : ''
-                }
-                target="_blank"
-                rel={
-                  !publication.methodology && publication.externalMethodology
-                    ? 'external'
-                    : undefined
-                }
-              >
-                {`${publication.title}: methodology`}
-              </Link>{' '}
+              {publication.methodology && (
+                <Link to={`/methodologies/${publication.methodology.id}`}>
+                  {`${publication.title}: methodology`}
+                </Link>
+              )}
+              {!publication.methodology &&
+                publication.externalMethodology && (
+                  <Link
+                    to=""
+                    rel="external"
+                    target="_blank"
+                    href={publication.externalMethodology.url}
+                  >
+                    {`${publication.title}: methodology`}
+                  </Link>
+                )}{' '}
               guidance.
             </p>
           ) : (
