@@ -227,6 +227,8 @@ const definition: ChartDefinition = {
       type: 'minor',
     },
   ],
+
+  requiresGeoJson: false,
 };
 
 LineChartBlock.definition = definition;

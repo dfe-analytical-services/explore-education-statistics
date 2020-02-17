@@ -67,6 +67,8 @@ export default class VerticalBarBlock extends Component<VerticalBarProps> {
         type: 'minor',
       },
     ],
+
+    requiresGeoJson: false,
   };
 
   public render() {

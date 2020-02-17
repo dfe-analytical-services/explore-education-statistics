@@ -1,0 +1,487 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TimePeriodDataTable renders table with two of every option 1`] = `
+<thead>
+  <tr>
+    <td colspan="3"
+        rowspan="2"
+        class="borderBottom"
+    >
+    </td>
+    <th class="cellHorizontalMiddle"
+        colspan="2"
+        scope="colgroup"
+    >
+      Ethnicity Major Asian Total
+    </th>
+    <th class="cellHorizontalMiddle"
+        colspan="2"
+        scope="colgroup"
+    >
+      Ethnicity Major Black Total
+    </th>
+  </tr>
+  <tr>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="4"
+        scope="rowgroup"
+    >
+      State-funded primary
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      Barnet
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      32,125
+    </td>
+    <td class="govuk-table__cell--numeric">
+      33,725
+    </td>
+    <td class="govuk-table__cell--numeric">
+      31,241
+    </td>
+    <td class="govuk-table__cell--numeric">
+      31,322
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      39,697
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      41,239
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      41,945
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      41,228
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      Barnsley
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      1,135
+    </td>
+    <td class="govuk-table__cell--numeric">
+      1,582
+    </td>
+    <td class="govuk-table__cell--numeric">
+      904
+    </td>
+    <td class="govuk-table__cell--numeric">
+      939
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,512
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2,122
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,215
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,268
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="4"
+        scope="rowgroup"
+    >
+      State-funded secondary
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      Barnet
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      30,389
+    </td>
+    <td class="govuk-table__cell--numeric">
+      31,244
+    </td>
+    <td class="govuk-table__cell--numeric">
+      25,741
+    </td>
+    <td class="govuk-table__cell--numeric">
+      26,594
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      34,689
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      36,083
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      33,422
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      37,084
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      Barnsley
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      481
+    </td>
+    <td class="govuk-table__cell--numeric">
+      274
+    </td>
+    <td class="govuk-table__cell--numeric">
+      442
+    </td>
+    <td class="govuk-table__cell--numeric">
+      745
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      752
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      571
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      788
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,105
+    </td>
+  </tr>
+</tbody>
+`;
+
+exports[`TimePeriodDataTable renders table without indicators when there is only one 1`] = `
+<thead>
+  <tr>
+    <td colspan="2"
+        rowspan="2"
+        class="borderBottom"
+    >
+    </td>
+    <th class="cellHorizontalMiddle"
+        colspan="2"
+        scope="colgroup"
+    >
+      Ethnicity Major Asian Total
+    </th>
+    <th class="cellHorizontalMiddle"
+        colspan="2"
+        scope="colgroup"
+    >
+      Ethnicity Major Black Total
+    </th>
+  </tr>
+  <tr>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      State-funded primary
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnet
+    </th>
+    <td class="govuk-table__cell--numeric">
+      3.4%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      3.4%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      2.9%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      2.8%
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnsley
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      3.7%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      4.3%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.5%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.4%
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      State-funded secondary
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnet
+    </th>
+    <td class="govuk-table__cell--numeric">
+      3.3%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      3.3%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      2.9%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      3%
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnsley
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      3.3%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.1%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1.8%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.6%
+    </td>
+  </tr>
+</tbody>
+`;
+
+exports[`TimePeriodDataTable renders table without time period when there is only one 1`] = `
+<thead>
+  <tr>
+    <td colspan="2"
+        rowspan="1"
+        class="borderBottom"
+    >
+    </td>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      Ethnicity Major Asian Total
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+    >
+      Ethnicity Major Black Total
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      State-funded primary
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnet
+    </th>
+    <td class="govuk-table__cell--numeric">
+      3.4%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      2.8%
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnsley
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      4.3%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.4%
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        scope="rowgroup"
+    >
+      State-funded secondary
+    </th>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnet
+    </th>
+    <td class="govuk-table__cell--numeric">
+      3.3%
+    </td>
+    <td class="govuk-table__cell--numeric">
+      3%
+    </td>
+  </tr>
+  <tr>
+    <th class="govuk-table__cell--numeric"
+        rowspan="1"
+        scope="row"
+    >
+      Barnsley
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.1%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2.6%
+    </td>
+  </tr>
+</tbody>
+`;

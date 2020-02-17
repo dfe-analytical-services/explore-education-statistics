@@ -7,6 +7,8 @@ import ContentBlock from '@common/modules/find-statistics/components/ContentBloc
 import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
@@ -103,11 +105,13 @@ class PublicationReleasePage extends Component<Props> {
                   <div>
                     <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
-                      <strong>
-                        <FormattedDate format="MMMM yyyy">
-                          {data.publication.nextUpdate}
-                        </FormattedDate>
-                      </strong>
+                      {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                        <strong>
+                          <FormattedDate>
+                            {dayMonthYearToDate(data.nextReleaseDate)}
+                          </FormattedDate>
+                        </strong>
+                      )}
                     </dd>
                   </div>
                 </dl>
@@ -214,30 +218,24 @@ class PublicationReleasePage extends Component<Props> {
                       <ul className="govuk-list">
                         {[
                           ...data.publication.otherReleases.map(
-                            ({ id, slug, title }) => [
-                              title,
+                            ({ id, slug, title }) => (
                               <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${data.publication.slug}/${slug}`}
                                 >
                                   {title}
                                 </Link>
-                              </li>,
-                            ],
+                              </li>
+                            ),
                           ),
                           ...data.publication.legacyReleases.map(
-                            ({ id, description, url }) => [
-                              description,
+                            ({ id, description, url }) => (
                               <li key={id} data-testid="other-release-item">
                                 <a href={url}>{description}</a>
-                              </li>,
-                            ],
+                              </li>
+                            ),
                           ),
-                        ]
-                          .sort((a, b) =>
-                            b[0].toString().localeCompare(a[0].toString()),
-                          )
-                          .map(items => items[1])}
+                        ]}
                       </ul>
                     </Details>
                   </dd>

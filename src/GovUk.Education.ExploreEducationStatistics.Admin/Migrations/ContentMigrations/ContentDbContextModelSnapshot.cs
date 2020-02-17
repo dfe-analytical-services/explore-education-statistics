@@ -751,9 +751,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("MethodologyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("NextUpdate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
@@ -1089,7 +1086,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                             MethodologyId = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
-                            NextUpdate = new DateTime(2019, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "permanent-and-fixed-period-exclusions-in-england",
                             Summary = "",
                             Title = "Permanent and fixed-period exclusions in England",
@@ -1101,7 +1097,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                             DataSource = "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                             MethodologyId = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
-                            NextUpdate = new DateTime(2019, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "pupil-absence-in-schools-in-england",
                             Summary = "",
                             Title = "Pupil absence in schools in England",
@@ -1157,7 +1152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191"),
                             MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                            NextUpdate = new DateTime(2019, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "secondary-and-primary-schools-applications-and-offers",
                             Summary = "",
                             Title = "Secondary and primary schools applications and offers",
@@ -1456,6 +1450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
                             Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1468,6 +1463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"7\",\"Day\":\"19\"}",
                             Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1481,6 +1477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"6\",\"Day\":\"14\"}",
                             Order = 0,
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -3724,7 +3721,7 @@ Find out how and why these statistics are collected and published - [Secondary a
 
                             b1.HasKey("PublicationId");
 
-                            b1.ToTable("Publications");
+                            b1.ToTable("ExternalMethodology");
 
                             b1.WithOwner()
                                 .HasForeignKey("PublicationId");

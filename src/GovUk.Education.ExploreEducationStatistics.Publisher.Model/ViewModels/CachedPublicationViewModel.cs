@@ -17,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Summary { get; set; }
 
-        public DateTime? NextUpdate { get; set; }
-
         public Guid LatestReleaseId { get; set; }
 
         public List<ReleaseTitleViewModel> Releases { get; set; }
@@ -30,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public ContactViewModel Contact { get; set; }
 
         public MethodologySummaryViewModel Methodology { get; set; }
-        
+
         public ExternalMethodologyViewModel ExternalMethodology { get; set; }
     }
 }

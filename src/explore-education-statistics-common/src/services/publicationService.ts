@@ -1,5 +1,5 @@
 import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlockLocation,
   DataBlockRequest,
@@ -39,6 +39,10 @@ export interface Publication {
     slug: string;
     summary: string;
     title: string;
+  };
+  externalMethodology?: {
+    title: string;
+    url: string;
   };
 }
 
@@ -169,7 +173,7 @@ export interface Chart {
 
 export interface Table {
   indicators: string[];
-  tableHeaders: TableHeadersFormValues;
+  tableHeaders: TableHeadersConfig;
 }
 
 export interface Summary {
