@@ -120,6 +120,11 @@ const PreReleasePage = ({
                 .
               </p>
               <p className="govuk-body">Please try again later.</p>
+              <p className="govuk-body">
+                If you believe that this release should be available and you are
+                having problems accessing please contact the relevant production
+                team.
+              </p>
             </>
           )}
 
