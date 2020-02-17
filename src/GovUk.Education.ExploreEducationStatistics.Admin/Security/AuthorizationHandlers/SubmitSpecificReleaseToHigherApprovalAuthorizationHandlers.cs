@@ -12,17 +12,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : CompoundAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
     {
         public SubmitSpecificReleaseToHigherReviewAuthorizationHandler(ContentDbContext context) : base(
-            new SubmitSpecificReleaseToHigherReviewCanSubmitAllEntitiesAuthorizationHandler(),
+            new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(),
             new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class SubmitSpecificReleaseToHigherReviewCanSubmitAllEntitiesAuthorizationHandler 
+    public class SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler 
         : EntityAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
     {
-        public SubmitSpecificReleaseToHigherReviewCanSubmitAllEntitiesAuthorizationHandler() 
+        public SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler() 
             : base(ctx => 
                 ctx.Entity.Status != ReleaseStatus.Approved 
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview)) {}

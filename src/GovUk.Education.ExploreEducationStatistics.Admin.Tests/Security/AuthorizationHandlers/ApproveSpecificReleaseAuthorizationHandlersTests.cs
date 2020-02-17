@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that any users with the "ApproveAllReleases" claim can approve an arbitrary Release
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
-                new ApproveSpecificReleaseCanApproveAllEntitiesAuthorizationHandler(), ApproveAllReleases);
+                new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(), ApproveAllReleases);
         }
         
         [Fact]
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             
             // Assert that no users can approve an approved Release
             AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
-                new ApproveSpecificReleaseCanApproveAllEntitiesAuthorizationHandler(),
+                new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(),
                 release);
         }
         

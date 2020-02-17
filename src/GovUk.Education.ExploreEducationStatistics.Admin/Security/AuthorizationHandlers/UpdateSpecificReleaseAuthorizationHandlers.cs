@@ -13,16 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
         public UpdateSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new UpdateSpecificEntityCanUpdateAllEntitiesAuthorizationHandler(),
+            new UpdateSpecificEntityCanUpdateAllReleasesAuthorizationHandler(),
             new UpdateSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class UpdateSpecificEntityCanUpdateAllEntitiesAuthorizationHandler : EntityAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
+    public class UpdateSpecificEntityCanUpdateAllReleasesAuthorizationHandler : EntityAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
-        public UpdateSpecificEntityCanUpdateAllEntitiesAuthorizationHandler()
+        public UpdateSpecificEntityCanUpdateAllReleasesAuthorizationHandler()
             : base(ctx =>
                 ctx.Entity.Status != ReleaseStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
