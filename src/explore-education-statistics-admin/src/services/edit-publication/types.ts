@@ -1,11 +1,15 @@
 import { ExternalMethodology } from '../dashboard/types';
 
-export interface CreatePublicationRequest {
+export interface PublicationMethodologyDetails {
+  selectedMethodologyId?: string;
+  externalMethodology?: ExternalMethodology;
+}
+
+export interface CreatePublicationRequest
+  extends PublicationMethodologyDetails {
   topicId: string;
   publicationTitle: string;
-  selectedMethodologyId?: string;
   selectedContactId: string;
-  externalMethodology?: ExternalMethodology;
 }
 
 export default {};
