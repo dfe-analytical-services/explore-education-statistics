@@ -29,10 +29,30 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <p>
-            Read our <Link to="#">{`${publication.title}: methodology`}</Link>{' '}
-            guidance.
-          </p>
+          {publication.methodology || publication.externalMethodology ? (
+            <p>
+              Read our{' '}
+              {publication.methodology && (
+                <Link to={`/methodologies/${publication.methodology.id}`}>
+                  {`${publication.title}: methodology`}
+                </Link>
+              )}
+              {!publication.methodology &&
+                publication.externalMethodology && (
+                  <Link
+                    to=""
+                    rel="external"
+                    target="_blank"
+                    href={publication.externalMethodology.url}
+                  >
+                    {`${publication.title}: methodology`}
+                  </Link>
+                )}{' '}
+              guidance.
+            </p>
+          ) : (
+            <p>No methodology added.</p>
+          )}
         </AccordionSection>
         {release.type && release.type.title === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">

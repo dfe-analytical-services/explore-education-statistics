@@ -24,13 +24,11 @@ import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
 
-interface FormValues {
+interface FormValues extends AssignMethodologyFormValues {
   publicationTitle: string;
-  methodologyChoice?: 'existing' | 'external' | 'later';
-  selectedMethodologyId?: string;
   selectedContactId: string;
-  externalMethodology: { title: string; url: string };
 }
 
 interface CreatePublicationModel {
