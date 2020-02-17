@@ -14,17 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         CompoundAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
         public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new AssignPrereleaseContactsToSpecificEntityCanUpdateAllReleasesAuthorizationHandler(),
+            new AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(),
             new AssignPrereleaseContactsToSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     }
     
-    public class AssignPrereleaseContactsToSpecificEntityCanUpdateAllReleasesAuthorizationHandler : 
+    public class AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : 
         EntityAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
-        public AssignPrereleaseContactsToSpecificEntityCanUpdateAllReleasesAuthorizationHandler()
+        public AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
             : base(ctx =>
                 ctx.Entity.Status == ReleaseStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
