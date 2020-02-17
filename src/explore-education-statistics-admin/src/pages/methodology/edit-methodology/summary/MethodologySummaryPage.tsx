@@ -7,7 +7,9 @@ const MethodologySummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   return (
     <>
       <h2 className="govuk-heading-l">Methodology summary</h2>
-      <p>These details will be shown to users to help identify this release.</p>
+      <p>
+        These details will be shown to users to help identify this methodology.
+      </p>
     </>
   );
 };
