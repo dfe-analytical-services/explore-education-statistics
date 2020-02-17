@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 
                 // does this user have permissions to update all methodologies on the system?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificMethodology.ToString(), policy => 
-                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+                    policy.Requirements.Add(new UpdateSpecificMethodologyRequirement()));
 
                 // does this user have permissions to view all methodologies on the system?
                 options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy => 

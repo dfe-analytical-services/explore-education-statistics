@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageCon
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,10 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("methodology/{methodologyId}/content/sections")]
-        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid methodologyId)
+        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(
+            Guid methodologyId,
+            [FromQuery] MethodologyContentService.ContentListType type)
         {
             return await _contentService
-                .GetContentSectionsAsync(methodologyId)
+                .GetContentSectionsAsync(methodologyId, type)
                 .HandleFailuresOr(Ok);
         }
         
@@ -42,10 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         [HttpPost("methodology/{methodologyId}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
-            Guid methodologyId, AddContentSectionRequest? request = null)
+            Guid methodologyId, 
+            [FromQuery] MethodologyContentService.ContentListType type, 
+            AddContentSectionRequest? request = null)
         {
             return await _contentService
-                .AddContentSectionAsync(methodologyId, request)
+                .AddContentSectionAsync(methodologyId, request, type)
                 .HandleFailuresOr(Ok);
         }
 
