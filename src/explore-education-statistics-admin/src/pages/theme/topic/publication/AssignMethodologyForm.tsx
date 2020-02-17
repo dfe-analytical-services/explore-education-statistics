@@ -171,7 +171,9 @@ const AssignMethodologyForm = ({
               }),
             }),
           })}
-          onSubmit={submitFormHandler}
+          onSubmit={(values, actions) => {
+            submitFormHandler(values, actions).then(refreshPublication);
+          }}
           render={(form: FormikProps<AssignMethodologyFormValues>) => (
             <Form id={formId}>
               <FormFieldRadioGroup
