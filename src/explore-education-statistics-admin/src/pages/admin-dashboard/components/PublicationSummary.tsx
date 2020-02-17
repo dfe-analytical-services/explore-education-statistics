@@ -1,5 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
+import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -7,7 +8,7 @@ import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
-import React from 'react';
+import React, { useContext } from 'react';
 import LazyLoad from 'react-lazyload';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
@@ -16,6 +17,7 @@ export interface Props {
 }
 
 const PublicationSummary = ({ publication }: Props) => {
+  const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   return (
     <>
       <SummaryList>
@@ -25,18 +27,25 @@ const PublicationSummary = ({ publication }: Props) => {
               {publication.methodology.title}
             </Link>
           )}
-          {publication.externalMethodology && (
-            <a
-              href={publication.externalMethodology.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {publication.externalMethodology.url}
-            </a>
-          )}
-          {!publication.methodology && !publication.externalMethodology && (
-            <>No methodology assigned</>
-          )}
+          {publication.externalMethodology &&
+            publication.externalMethodology.url && (
+              <>
+                {publication.externalMethodology.title} (
+                <a
+                  href={publication.externalMethodology.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {publication.externalMethodology.url}
+                </a>
+                )
+              </>
+            )}
+          {!publication.methodology &&
+            (!publication.externalMethodology ||
+              !publication.externalMethodology.url) && (
+              <>No methodology assigned</>
+            )}
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <LazyLoad placeholder={<LoadingSpinner />} once>
@@ -81,24 +90,15 @@ const PublicationSummary = ({ publication }: Props) => {
               Create new release
             </ButtonLink>
           )}
-
-          {publication.methodology && (
-            <ButtonLink
-              to={`/methodology/${publication.methodology.id}`}
-              className="govuk-button--secondary"
-            >
-              Edit methodology
-            </ButtonLink>
-          )}
-
-          {!publication.methodology && (
-            <ButtonLink
-              to={`/methodology/create?publicationId=${publication.id}`}
-              className="govuk-button--secondary"
-            >
-              Add methodology
-            </ButtonLink>
-          )}
+          <ButtonLink
+            to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
+            className="govuk-button--secondary"
+          >
+            {!publication.methodology && !publication.externalMethodology
+              ? 'Add'
+              : 'Edit'}{' '}
+            methodology
+          </ButtonLink>
         </SummaryListItem>
       </SummaryList>
     </>

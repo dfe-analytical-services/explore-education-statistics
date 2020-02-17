@@ -17,6 +17,9 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import remove from 'lodash/remove';
 
 interface FormValues {
   name: string;
@@ -38,6 +41,7 @@ const ReleaseFileUploadsSection = ({
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
+  const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -152,43 +156,71 @@ const ReleaseFileUploadsSection = ({
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded files</h2>
+                <Accordion id="uploaded-files">
+                  {files.map((file, index) => {
+                    const accId = `${file.title}-${index}`;
+                    return (
+                      <AccordionSection
+                        /* eslint-disable-next-line react/no-array-index-key */
+                        key={accId}
+                        headingId={accId}
+                        heading={file.title}
+                        onToggle={() => {
+                          if (openedAccordions.includes(accId)) {
+                            setOpenedAccordions(
+                              remove(openedAccordions, (item: string) => {
+                                return item !== accId;
+                              }),
+                            );
+                          } else {
+                            setOpenedAccordions([...openedAccordions, accId]);
+                          }
+                        }}
+                        open={openedAccordions.includes(accId)}
+                      >
+                        <SummaryList key={file.filename}>
+                          <SummaryListItem term="Name">
+                            <h4 className="govuk-heading-m">{file.title}</h4>
+                          </SummaryListItem>
+                          <SummaryListItem term="File">
+                            <ButtonText
+                              onClick={() =>
+                                service
+                                  .downloadAncillaryFile(
+                                    releaseId,
+                                    file.filename,
+                                  )
+                                  .catch(handleApiErrors)
+                              }
+                            >
+                              {file.filename}
+                            </ButtonText>
+                          </SummaryListItem>
+                          <SummaryListItem term="Filesize">
+                            {file.fileSize.size.toLocaleString()}{' '}
+                            {file.fileSize.unit}
+                          </SummaryListItem>
+                          {canUpdateRelease && (
+                            <SummaryListItem
+                              term="Actions"
+                              actions={
+                                <ButtonText
+                                  onClick={() =>
+                                    setDeleteFileName(file.filename)
+                                  }
+                                >
+                                  Delete file
+                                </ButtonText>
+                              }
+                            />
+                          )}
+                        </SummaryList>
+                      </AccordionSection>
+                    );
+                  })}
+                </Accordion>
               </>
             )}
-
-            {files &&
-              files.map(file => (
-                <SummaryList key={file.filename}>
-                  <SummaryListItem term="Name">
-                    <h4 className="govuk-heading-m">{file.title}</h4>
-                  </SummaryListItem>
-                  <SummaryListItem term="File">
-                    <ButtonText
-                      onClick={() =>
-                        service
-                          .downloadAncillaryFile(releaseId, file.filename)
-                          .catch(handleApiErrors)
-                      }
-                    >
-                      {file.filename}
-                    </ButtonText>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                  </SummaryListItem>
-                  {canUpdateRelease && (
-                    <SummaryListItem
-                      term="Actions"
-                      actions={
-                        <ButtonText
-                          onClick={() => setDeleteFileName(file.filename)}
-                        >
-                          Delete file
-                        </ButtonText>
-                      }
-                    />
-                  )}
-                </SummaryList>
-              ))}
 
             <ModalConfirm
               mounted={deleteFileName !== null && deleteFileName.length > 0}
