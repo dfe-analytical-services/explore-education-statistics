@@ -16,7 +16,7 @@ import AdminDocumentationStyle from '@admin/pages/documentation/DocumentationSty
 import AdminDocumentationUsingDashboard from '@admin/pages/documentation/DocumentationUsingDashboard';
 import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
-import MethodologyPage from '@admin/pages/methodology/MethodologyPage';
+import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
@@ -109,7 +109,6 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     path: '/methodologies/:methodologyId',
     component: MethodologyPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
-    exact: true,
   },
   createRelease: {
     path: '/publication/:publicationId/create-release',
