@@ -6,6 +6,12 @@ using Microsoft.Azure.Documents.SystemFunctions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
+    public enum MethodologyStatus
+    {
+        Draft,
+        Approved
+    }
+    
     public class Methodology
     {
         [Key] 
@@ -19,9 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
-        // TODO EES-1315 - represent Methodology status with enum
-        [NotMapped]
-        public string Status => Published == null ?  "Draft" : "Live" ;
+        public MethodologyStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
         
