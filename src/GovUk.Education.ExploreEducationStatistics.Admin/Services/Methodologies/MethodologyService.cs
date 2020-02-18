@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -117,14 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId, MethodologyStatus status)
+        public async Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
+            UpdateMethodologyStatusRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, status))
+                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.MethodologyStatus))
                 .OnSuccess(async methodology =>
                 {
-                    methodology.Status = status;
+                    methodology.Status = request.MethodologyStatus;
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
 
