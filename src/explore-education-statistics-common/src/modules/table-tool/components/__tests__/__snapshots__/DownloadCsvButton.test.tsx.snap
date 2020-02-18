@@ -1,6 +1,110 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DownloadCsvButton clicking generates complete csv 1`] = `
+exports[`DownloadCsvButton calls \`writeFile\` when button is pressed 1`] = `
+Object {
+  "SheetNames": Array [
+    "Sheet1",
+  ],
+  "Sheets": Object {
+    "Sheet1": Object {
+      "!ref": "A1:F3",
+      "A1": Object {
+        "t": "s",
+        "v": "Location",
+      },
+      "A2": Object {
+        "t": "s",
+        "v": "England",
+      },
+      "A3": Object {
+        "t": "s",
+        "v": "England",
+      },
+      "B1": Object {
+        "t": "s",
+        "v": "Time period",
+      },
+      "B2": Object {
+        "t": "s",
+        "v": "2015/16",
+      },
+      "B3": Object {
+        "t": "s",
+        "v": "2015/16",
+      },
+      "C1": Object {
+        "t": "s",
+        "v": "Characteristics",
+      },
+      "C2": Object {
+        "t": "s",
+        "v": "Female",
+      },
+      "C3": Object {
+        "t": "s",
+        "v": "Female",
+      },
+      "D1": Object {
+        "t": "s",
+        "v": "School type",
+      },
+      "D2": Object {
+        "t": "s",
+        "v": "State-funded-primary",
+      },
+      "D3": Object {
+        "t": "s",
+        "v": "State-funded secondary",
+      },
+      "E1": Object {
+        "t": "s",
+        "v": "Authorised absence rate (%)",
+      },
+      "E2": Object {
+        "t": "s",
+        "v": "123",
+      },
+      "E3": Object {
+        "t": "s",
+        "v": "234",
+      },
+      "F1": Object {
+        "t": "s",
+        "v": "Number of authorised absence sessions",
+      },
+      "F2": Object {
+        "t": "s",
+        "v": "456",
+      },
+      "F3": Object {
+        "t": "s",
+        "v": "567",
+      },
+    },
+  },
+}
+`;
+
+exports[`DownloadCsvButton getCsvData can contain suppressed cells 1`] = `
+Array [
+  Array [
+    "Location",
+    "Time period",
+    "Characteristics",
+    "Authorised absence rate (%)",
+    "Number of authorised absence sessions",
+  ],
+  Array [
+    "England",
+    "2015/16",
+    "Female",
+    "13.4",
+    "x",
+  ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData contains full set of data 1`] = `
 Array [
   Array [
     "Location",
@@ -12,126 +116,81 @@ Array [
   ],
   Array [
     "England",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
     "2015/16",
     "Female",
     "State-funded-primary",
-    undefined,
-    undefined,
+    "123",
+    "456",
   ],
   Array [
     "England",
     "2015/16",
     "Female",
     "State-funded secondary",
-    undefined,
-    undefined,
+    "234",
+    "567",
+  ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData contains n/a's if matching result but no matching indicator 1`] = `
+Array [
+  Array [
+    "Location",
+    "Time period",
+    "Characteristics",
+    "Authorised absence rate (%)",
+    "Number of authorised absence sessions",
   ],
   Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
+    "England",
     "2015/16",
     "Female",
-    "State-funded-primary",
+    "n/a",
+    "123",
+  ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData contains n/a's if there are no results 1`] = `
+Array [
+  Array [
+    "Location",
+    "Time period",
+    "Characteristics",
+    "Authorised absence rate (%)",
+    "Number of authorised absence sessions",
+  ],
+  Array [
+    "England",
+    "2015/16",
+    "Female",
     "n/a",
     "n/a",
   ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData contains n/a's if there are some matching results 1`] = `
+Array [
   Array [
-    "South Yorkshire",
+    "Location",
+    "Time period",
+    "Characteristics",
+    "School type",
+    "Authorised absence rate (%)",
+    "Number of authorised absence sessions",
+  ],
+  Array [
+    "England",
+    "2015/16",
+    "Female",
+    "State-funded-primary",
+    "123",
+    "456",
+  ],
+  Array [
+    "England",
     "2015/16",
     "Female",
     "State-funded secondary",
@@ -141,284 +200,21 @@ Array [
 ]
 `;
 
-exports[`DownloadCsvButton generated csv can contain suppressed or cells with no result  1`] = `
+exports[`DownloadCsvButton getCsvData does not format values in any way 1`] = `
 Array [
   Array [
     "Location",
     "Time period",
     "Characteristics",
-    "School type",
     "Authorised absence rate (%)",
     "Number of authorised absence sessions",
   ],
   Array [
     "England",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
     "2015/16",
     "Female",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-]
-`;
-
-exports[`DownloadCsvButton generated csv does not format values 1`] = `
-Array [
-  Array [
-    "Location",
-    "Time period",
-    "Characteristics",
-    "School type",
-    "Authorised absence rate (%)",
-    "Number of authorised absence sessions",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Female",
-    "State-funded-primary",
-    undefined,
-    undefined,
-  ],
-  Array [
-    "England",
-    "2015/16",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Female",
-    "State-funded-primary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "South Yorkshire",
-    "2015/16",
-    "Female",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
+    "12300000",
+    "44255667.2356",
   ],
 ]
 `;
