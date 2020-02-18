@@ -1,4 +1,5 @@
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   CategoryFilter,
@@ -9,13 +10,6 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import compact from 'lodash/compact';
-
-export interface UnmappedTableHeadersConfig {
-  columnGroups: FilterOption[][];
-  columns: FilterOption[];
-  rowGroups: FilterOption[][];
-  rows: FilterOption[];
-}
 
 /**
  * This function remaps the config filters into
@@ -77,15 +71,23 @@ export default function mapTableHeadersConfig(
       return compact(
         optionGroup.map(
           option =>
-            locationAndFilterGroups[currentIndex].find(
-              element =>
-                element.value === option.value &&
-                // check for matching location level
-                ((element as LocationFilter).level
-                  ? (element as LocationFilter).level ===
-                    (option as LocationFilter).level
-                  : true),
-            ) as LocationFilter | CategoryFilter,
+            locationAndFilterGroups[currentIndex].find(filter => {
+              const hasMatchingValue = filter.value === option.value;
+
+              // The filter might be a location so just cast
+              // these as variables for convenience.
+              const locationOption = option as LocationFilter;
+              const locationFilter = filter as LocationFilter;
+
+              if (locationOption.level && locationFilter.level) {
+                return (
+                  hasMatchingValue &&
+                  locationFilter.level === locationOption.level
+                );
+              }
+
+              return hasMatchingValue;
+            }) as LocationFilter | CategoryFilter,
         ),
       );
     });
