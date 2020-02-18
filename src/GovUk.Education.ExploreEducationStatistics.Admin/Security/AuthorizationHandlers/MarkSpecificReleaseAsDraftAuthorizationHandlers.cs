@@ -8,7 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class MarkSpecificReleaseAsDraftRequirement : IAuthorizationRequirement
     {}
     
-    public class MarkSpecificReleaseAsDraftAuthorizationHandler : CompoundAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
+    public class MarkSpecificReleaseAsDraftAuthorizationHandler 
+        : CompoundAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
     {
         public MarkSpecificReleaseAsDraftAuthorizationHandler(ContentDbContext context) : base(
             new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(),
@@ -18,12 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
     }
     
-    public class MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler : ReleaseAuthorizationHandler<
-        MarkSpecificReleaseAsDraftRequirement>
+    public class MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler 
+        : EntityAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
     {
         public MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler() 
             : base(ctx => 
-                ctx.Release.Status != ReleaseStatus.Approved 
+                ctx.Entity.Status != ReleaseStatus.Approved 
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.MarkAllReleasesAsDraft)) {}
     }
     
