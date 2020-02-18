@@ -12,7 +12,6 @@ import {
 } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
@@ -23,9 +22,10 @@ import {
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -83,13 +83,11 @@ const InfographicChartOptions = ({
   onChange,
   handleApiErrors,
 }: InfographicChartOptionsProps & ErrorControlProps) => {
-  const [chartFileOptions, setChartFileOptions] = React.useState<
-    SelectOption[]
-  >([]);
+  const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
-  const [uploading, setUploading] = React.useState(false);
-  const [fileName, setFileName] = React.useState<string>();
-  const [deleteFile, setDeleteFile] = React.useState<boolean>(false);
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string>();
+  const [deleteFile, setDeleteFile] = useToggle(false);
 
   const formId = 'fileUploadForm';
 
