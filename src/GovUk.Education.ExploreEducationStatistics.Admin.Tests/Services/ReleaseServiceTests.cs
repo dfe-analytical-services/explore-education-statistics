@@ -29,11 +29,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "Publication"
+            };
+            
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
                 context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc",});
-                context.Add(new Publication
-                    {Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Title = "Publication"});
+                context.Add(publication);
                 context.SaveChanges();
             }
 
@@ -46,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
-                        PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
+                        PublicationId = publication.Id,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
@@ -179,61 +184,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void LatestReleaseCorrectlyReported()
         {
-            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
 
-            var latestReleaseId = new Guid("274d4621-7d21-431b-80de-77b62a4374d2");
-            var notLatestReleaseId = new Guid("49b73c2f-141a-4dc7-a2d4-69316aef8bbc");
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var notLatestRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2019",
+                TimePeriodCoverage = TimeIdentifier.December,
+                PublicationId = publication.Id,
+                Published = DateTime.UtcNow
+            };
+
+            var latestRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.June,
+                PublicationId = publication.Id,
+                Published = DateTime.UtcNow
+            };
+
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
-                context.Add(new Publication
+                context.Add(publication);
+                context.AddRange(new List<Release>
                 {
-                    Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-                    Title = "Publication",
-                    Releases = new List<Release>
-                    {
-                        new Release
-                        {
-                            Id = notLatestReleaseId,
-                            Order = 0,
-                            Published = DateTime.Now.AddDays(-2) // Is published but not the latest by order
-                        },
-                        new Release
-                        {
-                            Id = latestReleaseId,
-                            Order = 1,
-                            Published = DateTime.Now.AddDays(-1) // Is published and the the latest by order
-                        }
-                    }
+                    notLatestRelease, latestRelease
                 });
-
                 context.SaveChanges();
             }
+
             // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
             // loading of the entity graph as we go.
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
-                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test
-                var notLatest =
-                    await releaseService.GetReleaseForIdAsync(
-                        notLatestReleaseId);
-                Assert.False(notLatest.Right.LatestRelease);
+                var notLatest = (await releaseService.GetReleaseForIdAsync(notLatestRelease.Id)).Right;
+                Assert.Equal(notLatestRelease.Id, notLatest.Id);
+                Assert.False(notLatest.LatestRelease);
             }
             
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
-                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object);
                 
                 // Method under test
-                var notLatest =
-                    await releaseService.GetReleaseForIdAsync(
-                        notLatestReleaseId);
-                Assert.False(notLatest.Right.LatestRelease);
+                var latest = (await releaseService.GetReleaseForIdAsync(latestRelease.Id)).Right;
+                Assert.Equal(latestRelease.Id, latest.Id);
+                Assert.True(latest.LatestRelease);
             }
         }
 
@@ -401,38 +410,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetLatestReleaseAsync()
         {
-            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService) = Mocks();
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
             
-            var publicationId = new Guid("94af186f-5dbe-4f46-8a8e-f5480ed9f4fc");
-            var firstReleaseId = new Guid("8781ebf8-790c-484b-8a34-19ea501c9c74");
-            var secondReleaseId = new Guid("cace48cf-9f08-4471-815c-b3703aade096");
+            var notLatestRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow,
+                PublicationId = publication.Id,
+                ReleaseName = "2035",
+                TimePeriodCoverage = TimeIdentifier.December
+            };
+            
+            var latestRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow,
+                PublicationId = publication.Id,
+                ReleaseName = "2036",
+                TimePeriodCoverage = TimeIdentifier.June
+            };
 
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
                 context.Add(new UserReleaseRole
                 {
                     UserId = _userId,
-                    ReleaseId = firstReleaseId
+                    ReleaseId = notLatestRelease.Id
                 });
-                
-                context.Add(new Publication
+
+                context.Add(publication);
+                context.AddRange(new List<Release>
                 {
-                    Id = publicationId,
-                    Releases = new List<Release>
-                    {
-                        new Release
-                        {
-                            Id = firstReleaseId,
-                            Published = DateTime.Now.AddDays(1),
-                            ReleaseName = "2035",
-                        },
-                        new Release
-                        {
-                            Id = secondReleaseId,
-                            Published = DateTime.Now.AddDays(2),
-                            ReleaseName = "2036"
-                        }
-                    }
+                    notLatestRelease, latestRelease
                 });
                 context.SaveChanges();
             }
@@ -440,13 +454,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
-                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object);
 
                 // Method under test 
-                var latest = releaseService.GetLatestReleaseAsync(publicationId).Result.Right;
-                Assert.Equal(secondReleaseId, latest.Id);
-                Assert.Equal("Academic Year 2036/37", latest.Title);
+                var latest = releaseService.GetLatestReleaseAsync(publication.Id).Result.Right;
+                Assert.NotNull(latest);
+                Assert.Equal(latestRelease.Id, latest.Id);
+                Assert.Equal("June 2036", latest.Title);
             }
         }
 
