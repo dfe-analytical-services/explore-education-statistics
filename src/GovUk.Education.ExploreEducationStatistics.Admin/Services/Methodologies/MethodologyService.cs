@@ -117,6 +117,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
+        public async Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId, MethodologyStatus status)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, status))
+                .OnSuccess(async methodology =>
+                {
+                    methodology.Status = status;
+                    _context.Methodologies.Update(methodology);
+                    await _context.SaveChangesAsync();
+
+                    return await GetAsync(methodologyId);
+                });
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUnique(string slug)
         {
             if (await _context.Methodologies.AnyAsync(r => r.Slug == slug))
