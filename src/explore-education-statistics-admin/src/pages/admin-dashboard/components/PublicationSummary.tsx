@@ -94,7 +94,9 @@ const PublicationSummary = ({ publication }: Props) => {
             to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
             className="govuk-button--secondary"
           >
-            {!publication.methodology && !publication.externalMethodology
+            {!publication.methodology &&
+            (!publication.externalMethodology ||
+              !publication.externalMethodology.url)
               ? 'Add'
               : 'Edit'}{' '}
             methodology
