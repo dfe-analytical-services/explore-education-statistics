@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
     public class UpdateMethodologyStatusRequest
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyStatus MethodologyStatus { get; set; }
+        public MethodologyStatus Status { get; set; }
         
         public string InternalReleaseNote { get; set; }
     }

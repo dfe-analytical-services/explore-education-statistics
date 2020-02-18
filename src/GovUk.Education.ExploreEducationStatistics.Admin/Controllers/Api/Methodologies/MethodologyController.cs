@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
         
         [Produces("application/json")]
-        [HttpGet("api/methodologies/summary")]
+        [HttpGet("api/methodology/{methodologyId}/summary")]
         public async Task<ActionResult<MethodologyViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
         {
             return await _methodologyService
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         
         [Produces("application/json")]
         [HttpPut("api/methodology/{methodologyId}/status")]
-        public async Task<ActionResult<MethodologyViewModel>> GetMethodologySummaryAsync(Guid methodologyId, 
+        public async Task<ActionResult<MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId, 
             UpdateMethodologyStatusRequest request)
         {
             return await _methodologyService

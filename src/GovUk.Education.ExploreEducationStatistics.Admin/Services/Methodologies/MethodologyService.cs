@@ -123,10 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.MethodologyStatus))
+                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(async methodology =>
                 {
-                    methodology.Status = request.MethodologyStatus;
+                    methodology.Status = request.Status;
                     methodology.InternalReleaseNote = request.InternalReleaseNote;
                     
                     _context.Methodologies.Update(methodology);
