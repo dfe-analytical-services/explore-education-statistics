@@ -23,6 +23,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             _contentService = contentService;
         }
+        
+        [HttpGet("methodology/{methodologyId}/content")]
+        public async Task<ActionResult<List<ManageMethodologyContentViewModel>>> GetContent(
+            Guid methodologyId)
+        {
+            return await _contentService
+                .GetContentAsync(methodologyId)
+                .HandleFailuresOr(Ok);
+        }
 
         [HttpGet("methodology/{methodologyId}/content/sections")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(

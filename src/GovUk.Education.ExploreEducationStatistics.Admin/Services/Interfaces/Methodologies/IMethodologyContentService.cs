@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyContentService
     {
+        Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContentAsync(Guid methodologyId);
+        
         Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
             Guid releaseId, 
             MethodologyContentService.ContentListType contentType);

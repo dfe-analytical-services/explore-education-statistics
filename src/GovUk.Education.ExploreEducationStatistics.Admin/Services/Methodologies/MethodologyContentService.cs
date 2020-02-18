@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -34,14 +35,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
+        private readonly IMapper _mapper; 
 
         public MethodologyContentService(ContentDbContext context, 
             IPersistenceHelper<ContentDbContext> persistenceHelper, 
-            IUserService userService)
+            IUserService userService, IMapper mapper)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
+            _mapper = mapper;
+        }
+
+        public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContentAsync(Guid methodologyId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(CheckCanViewMethodology)
+                .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
