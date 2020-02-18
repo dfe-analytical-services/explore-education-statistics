@@ -8,5 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus MethodologyStatus { get; set; }
+        
+        public string InternalReleaseNote { get; set; }
     }
 }

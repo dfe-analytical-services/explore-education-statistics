@@ -127,6 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(async methodology =>
                 {
                     methodology.Status = request.MethodologyStatus;
+                    methodology.InternalReleaseNote = request.InternalReleaseNote;
+                    
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
 
