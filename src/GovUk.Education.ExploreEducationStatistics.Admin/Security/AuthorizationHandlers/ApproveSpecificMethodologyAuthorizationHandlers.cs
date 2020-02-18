@@ -10,9 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public ApproveSpecificMethodologyAuthorizationHandler() : base(
             new CanApproveAllMethodologiesAuthorizationHandler())
-        {
-            
-        }
+        {}
     }
     
     public class CanApproveAllMethodologiesAuthorizationHandler : 

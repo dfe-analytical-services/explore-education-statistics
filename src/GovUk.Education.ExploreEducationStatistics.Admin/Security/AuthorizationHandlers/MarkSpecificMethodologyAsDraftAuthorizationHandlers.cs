@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     
     public class MarkSpecificMethodologyAsDraftAuthorizationHandler : CompoundAuthorizationHandler<MarkSpecificMethodologyAsDraftRequirement, Methodology>
     {
-        public MarkSpecificMethodologyAsDraftAuthorizationHandler(ContentDbContext context) : base(
+        public MarkSpecificMethodologyAsDraftAuthorizationHandler() : base(
             new CanMarkAllMethodologiesAsDraftAuthorizationHandler())
         {}
     }
