@@ -3,24 +3,37 @@ import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
+import methodologyService from '@admin/services/methodology/service';
+import { MethodologyContent } from '@admin/services/methodology/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
-import { Methodology } from '@common/services/methodologyService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+
+export interface MethodologyTabProps {
+  refreshMethodology: () => void;
+  methodology: MethodologyContent;
+}
 
 const MethodologyPage = ({
   match,
   location,
+  handleApiErrors,
 }: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
   const { methodologyId } = match.params;
 
-  const [methodology, setMethodology] = useState<Methodology>();
+  const [methodology, setMethodology] = useState<MethodologyContent>();
 
-  const refreshMethodology = () => {};
+  const refreshMethodology = () => {
+    setMethodology(undefined);
+    methodologyService
+      .getMethodologyContent(methodologyId)
+      .then(setMethodology)
+      .catch(handleApiErrors);
+  };
 
   useEffect(refreshMethodology, [methodologyId]);
 
@@ -65,7 +78,7 @@ const MethodologyPage = ({
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
             <span className="govuk-caption-xl">Edit methodology</span>
-            [[methodology title]]
+            {methodology ? methodology.title : ''}
           </h1>
         </div>
 
