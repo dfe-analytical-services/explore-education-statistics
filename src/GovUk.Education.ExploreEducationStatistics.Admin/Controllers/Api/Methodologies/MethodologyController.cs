@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
         
         [Produces("application/json")]
-        [HttpGet("api/methodology/{methodologyId}")]
+        [HttpPut("api/methodology/{methodologyId}/status")]
         public async Task<ActionResult<MethodologyViewModel>> GetMethodologySummaryAsync(Guid methodologyId, 
             UpdateMethodologyStatusRequest request)
         {
