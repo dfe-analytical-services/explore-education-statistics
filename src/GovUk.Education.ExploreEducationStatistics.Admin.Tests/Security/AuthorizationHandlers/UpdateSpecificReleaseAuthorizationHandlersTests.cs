@@ -44,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 if (succeedingStatuses.Contains(status))
                 {
                     AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
-                        new UpdateSpecificEntityCanUpdateAllEntitiesAuthorizationHandler(), release, UpdateAllReleases);
+                        new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release, UpdateAllReleases);
                 }
                 else
                 {
-                    AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(new UpdateSpecificEntityCanUpdateAllEntitiesAuthorizationHandler(), release);
+                    AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(new UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(), release);
                 }
             });
         }

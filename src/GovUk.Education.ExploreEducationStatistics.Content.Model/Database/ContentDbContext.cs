@@ -241,11 +241,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+
+            modelBuilder.Entity<Methodology>()
+                .Property(b => b.Status)
+                .HasConversion(new EnumToStringConverter<MethodologyStatus>())
+                .HasDefaultValue(MethodologyStatus.Draft);
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
