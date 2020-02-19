@@ -164,4 +164,4 @@ const MethodologyStatusPage = ({
   );
 };
 
-export default withErrorControl(withRouter(MethodologyStatusPage));
+export default withErrorControl(MethodologyStatusPage);
