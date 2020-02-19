@@ -19,18 +19,17 @@ import { FootnotesData } from '@admin/pages/release/edit-release/data/ReleaseDat
 interface Props {
   publicationId: string;
   releaseId: string;
-  footnotesPropData?: FootnotesData;
+  footnotesData?: FootnotesData;
   onSubmit: (footnotesData: FootnotesData) => void;
   getFootnoteData: () => void;
 }
 
 const ReleaseFootnotesSection = ({
-  footnotesPropData: footnotesData,
+  footnotesData,
   onSubmit,
   getFootnoteData,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
-  const [loading, setLoading] = useState<boolean>(true);
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
   });
@@ -38,12 +37,6 @@ const ReleaseFootnotesSection = ({
   const [footnoteToBeDeleted, setFootnoteToBeDeleted] = useState<
     Footnote | undefined
   >();
-
-  useEffect(() => {
-    if (footnotesData) {
-      setLoading(footnotesData.loading);
-    }
-  }, [footnotesData]);
 
   const footnoteFormControls = {
     footnoteForm,
@@ -55,7 +48,6 @@ const ReleaseFootnotesSection = ({
     save: (footnote: FootnoteProps, footnoteId?: string) => {
       if (!footnotesData) return;
       if (footnoteId) {
-        setLoading(true);
         footnotesService
           .updateFootnote(footnoteId, footnote)
           .then(updatedFootnote => {
@@ -74,12 +66,10 @@ const ReleaseFootnotesSection = ({
                 ...footnotesData,
                 footnotes: updatedFootnotes,
               });
-              setLoading(false);
             }
           })
           .catch(handleApiErrors);
       } else {
-        setLoading(true);
         footnotesService
           .createFootnote(footnote)
           .then((newFootnote: Footnote) => {
@@ -87,7 +77,6 @@ const ReleaseFootnotesSection = ({
               ...footnotesData,
               footnotes: [...footnotesData.footnotes, newFootnote],
             });
-            setLoading(false);
           })
           .catch(handleApiErrors);
       }
@@ -96,72 +85,62 @@ const ReleaseFootnotesSection = ({
     delete: setFootnoteToBeDeleted,
   };
 
-  return (
+  return footnotesData && !!Object.keys(footnotesData.footnoteMeta).length ? (
     <>
       <h2>Footnotes</h2>
-      {footnotesData === undefined ||
-        (!footnotesData.hasSufficientData && (
-          <p>
-            Before footnotes can be created, relevant data files need to be
-            uploaded. That can be done in the{' '}
-            <Link to="#data-upload">Data uploads section</Link>.
-          </p>
-        ))}
-      {footnotesData && loading && <LoadingSpinner />}
-      {footnotesData &&
-        !loading &&
-        footnotesData &&
-        footnotesData.hasSufficientData &&
-        footnotesData.footnoteMeta &&
-        footnotesData.footnoteMetaGetters && (
+
+      {footnotesData.footnoteMeta && (
+        <>
+          {footnotesData.canUpdateRelease && (
+            <FootnoteForm
+              {...footnoteForm}
+              footnote={undefined}
+              onOpen={footnoteFormControls.create}
+              onCancel={footnoteFormControls.cancel}
+              onSubmit={footnoteFormControls.save}
+              isFirst={
+                footnotesData.footnotes && footnotesData.footnotes.length === 0
+              }
+              footnoteMeta={footnotesData.footnoteMeta}
+              footnoteMetaGetters={footnotesData.footnoteMetaGetters}
+            />
+          )}
           <>
-            {footnotesData.canUpdateRelease && (
-              <FootnoteForm
-                {...footnoteForm}
-                footnote={undefined}
-                onOpen={footnoteFormControls.create}
-                onCancel={footnoteFormControls.cancel}
-                onSubmit={footnoteFormControls.save}
-                isFirst={
-                  footnotesData.footnotes &&
-                  footnotesData.footnotes.length === 0
-                }
-                footnoteMeta={footnotesData.footnoteMeta}
-                footnoteMetaGetters={footnotesData.footnoteMetaGetters}
-              />
-            )}
-            {footnotesData.footnoteMeta && (
-              <>
-                <FootnotesList
-                  footnotes={footnotesData.footnotes}
-                  footnoteMeta={footnotesData.footnoteMeta}
-                  footnoteMetaGetters={footnotesData.footnoteMetaGetters}
-                  footnoteFormControls={footnoteFormControls}
-                  canUpdateRelease={footnotesData.canUpdateRelease}
-                />
-                {typeof footnoteToBeDeleted !== 'undefined' && (
-                  <ModalConfirm
-                    title="Confirm deletion of footnote"
-                    onExit={() => setFootnoteToBeDeleted(undefined)}
-                    onCancel={() => setFootnoteToBeDeleted(undefined)}
-                    onConfirm={() => {
-                      footnotesService
-                        .deleteFootnote((footnoteToBeDeleted as Footnote).id)
-                        .then(() => setFootnoteToBeDeleted(undefined))
-                        .then(getFootnoteData)
-                        .catch(handleApiErrors);
-                    }}
-                  >
-                    The footnote:
-                    <p className="govuk-inset-text">
-                      {(footnoteToBeDeleted as Footnote).content}
-                    </p>
-                  </ModalConfirm>
-                )}
-              </>
+            <FootnotesList
+              {...footnotesData}
+              footnoteFormControls={footnoteFormControls}
+            />
+            {typeof footnoteToBeDeleted !== 'undefined' && (
+              <ModalConfirm
+                title="Confirm deletion of footnote"
+                onExit={() => setFootnoteToBeDeleted(undefined)}
+                onCancel={() => setFootnoteToBeDeleted(undefined)}
+                onConfirm={() => {
+                  footnotesService
+                    .deleteFootnote((footnoteToBeDeleted as Footnote).id)
+                    .then(() => setFootnoteToBeDeleted(undefined))
+                    .then(getFootnoteData)
+                    .catch(handleApiErrors);
+                }}
+              >
+                The footnote:
+                <p className="govuk-inset-text">
+                  {(footnoteToBeDeleted as Footnote).content}
+                </p>
+              </ModalConfirm>
             )}
           </>
-        )}
+        </>
+      )}
+    </>
+  ) : (
+    <>
+      <h2>Footnotes</h2>
+      <p>
+        Before footnotes can be created, relevant data files need to be
+        uploaded. That can be done in the{' '}
+        <Link to="#data-upload">Data uploads section</Link>.
+      </p>
     </>
   );
 };

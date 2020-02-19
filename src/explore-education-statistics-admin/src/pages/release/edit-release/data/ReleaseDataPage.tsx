@@ -18,11 +18,9 @@ import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
 export interface FootnotesData {
-  loading: boolean;
   footnoteMeta: FootnoteMeta;
   footnotes: Footnote[];
   footnoteMetaGetters: FootnoteMetaGetters;
-  hasSufficientData: boolean;
   canUpdateRelease: boolean;
 }
 
@@ -41,11 +39,9 @@ const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
     ])
       .then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
         setFootnotesData({
-          loading: false,
           footnoteMeta: meta,
           footnotes: footnotesList,
           footnoteMetaGetters: generateFootnoteMetaMap(meta),
-          hasSufficientData: !!Object.keys(meta).length,
           canUpdateRelease: canUpdateReleaseResult,
         });
       })
@@ -77,7 +73,7 @@ const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
             getFootnoteData={getFootnoteData}
             publicationId={publication.id}
             releaseId={releaseId}
-            footnotesPropData={footnotesData}
+            footnotesData={footnotesData}
             onSubmit={(footnotesDataCallback: FootnotesData) => {
               setFootnotesData(footnotesDataCallback);
             }}
