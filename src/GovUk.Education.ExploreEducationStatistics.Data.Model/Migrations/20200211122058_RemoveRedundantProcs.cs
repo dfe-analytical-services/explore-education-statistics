@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
@@ -13,20 +12,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             // Types
-            ExecuteFile(migrationBuilder, $"{MigrationId}_RemoveRedundantProcs_down.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_RemoveRedundantProcs_down.sql");
             // Routines
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilter.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilterFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilterGroup.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilterGroupFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilterItem.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertFilterItemFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertIndicator.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertIndicatorFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertIndicatorGroup.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertRelease.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertSubject.sql");
-            ExecuteFile(migrationBuilder, $"{OrigMigrationId}_Routine_UpsertSubjectFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilter.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilterFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilterGroup.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilterGroupFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilterItem.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertFilterItemFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertIndicator.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertIndicatorFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertIndicatorGroup.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertRelease.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertSubject.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{OrigMigrationId}_Routine_UpsertSubjectFootnote.sql");
         }
 
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,15 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TYPE dbo.SubjectType");
             migrationBuilder.Sql("DROP TYPE dbo.SubjectFootnoteType");
             
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
-        }
-
-        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
-        {
-            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
-
-            migrationBuilder.Sql(File.ReadAllText(file));
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
         }
     }
 }

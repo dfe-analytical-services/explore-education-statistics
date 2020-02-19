@@ -25,7 +25,7 @@ const AddContentButton = ({
         {!datablockOnly && (
           <Button
             variant="secondary"
-            onClick={() => onClick('HtmlBlock', 'Click to edit')}
+            onClick={() => onClick('MarkdownBlock', 'Click to edit')}
           >
             {buttonText}
           </Button>

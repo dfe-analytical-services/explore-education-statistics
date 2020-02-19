@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.BoundaryLevel", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.Data.BoundaryLevel", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -365,8 +365,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("TimeIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

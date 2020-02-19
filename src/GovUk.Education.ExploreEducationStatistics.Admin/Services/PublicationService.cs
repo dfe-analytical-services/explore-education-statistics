@@ -104,12 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (methodology.MethodologyId != null)
                     {
                         publication.MethodologyId = methodology.MethodologyId;
-                        // Note: Cannot directly set ExternalMethodology to null as this causes a entity delete on the row
-                        if (publication.ExternalMethodology != null)
-                        {
-                            publication.ExternalMethodology.Title = null;
-                            publication.ExternalMethodology.Url = null;
-                        }
+                        publication.ExternalMethodology = null;
                     }
                     else
                     {
@@ -152,6 +147,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             else if (model.ExternalMethodology != null && model.MethodologyId == null)
             {
                 // TODO: EES-1287 External methodology must be external link to the service
+            }
+            else if (model.ExternalMethodology == null && model.MethodologyId == null)
+            {
+                return ValidationActionResult(MethodologyOrExternalMethodologyLinkMustBeDefined);
             }
             else
             {

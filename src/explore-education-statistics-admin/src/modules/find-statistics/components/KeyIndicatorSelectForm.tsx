@@ -32,14 +32,14 @@ const KeyIndicatorSelectForm = ({
       availableDataBlocks.filter(db => {
         return (
           Object.entries(db.dataBlockRequest).filter(([key, val]) => {
-            // only want datablocks with 1 of each filter type (filter, time period, location and indicator)
+            // only want datablocks with (<2) of each filter type (filter, time period, location and indicator)
             if (key === 'timePeriod') {
               return !(
                 (val as TimePeriodQuery).startYear ===
                 (val as TimePeriodQuery).endYear
               );
             }
-            return Array.isArray(val) ? val.length !== 1 : false;
+            return Array.isArray(val) ? val.length > 1 : false;
           }).length === 0
         );
       }),

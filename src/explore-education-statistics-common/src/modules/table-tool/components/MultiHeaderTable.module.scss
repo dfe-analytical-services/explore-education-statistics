@@ -39,14 +39,14 @@ $border-width: 1px;
 }
 
 :global(.govuk-table) {
-  .cellHorizontalMiddle {
+  .columnHeaderGroup {
     background: govuk-colour('light-grey');
     border-bottom: 1px solid $govuk-border-colour;
     border-right: 1px solid $govuk-border-colour;
     text-align: center;
   }
 
-  .cellHorizontalMiddle:last-child {
+  .borderRightNone {
     border-right: 0;
   }
 }
