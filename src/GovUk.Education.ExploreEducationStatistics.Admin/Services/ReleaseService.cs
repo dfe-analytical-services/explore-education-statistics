@@ -8,8 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -34,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IImportStatusService _importStatusService;
 
         public ReleaseService(
             ContentDbContext context, 
@@ -44,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository, 
             ISubjectService subjectService,
             ITableStorageService tableStorageService, 
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService, IImportStatusService importStatusService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -55,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _fileStorageService = fileStorageService;
+            _importStatusService = importStatusService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -286,6 +290,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(() => CheckCanDeleteDataFiles(releaseId, fileName))
+                .OnSuccess(async _ =>
+                {
+                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
+
+                    await _tableStorageService.DeleteEntityAsync("imports",
+                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
+                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    await DeleteDependentDataBlocks(releaseId, subject.Id);
+                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
+                });
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
+        {
+            var fileImportStatus = await _importStatusService.GetImportStatus(releaseId.ToString(), fileName);
+
+            if (fileImportStatus.Status != IStatus.COMPLETE.ToString())
+            {
+                return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            }
+
+            return true;
+        }
+
         private string GetContentSectionHeading(DataBlock block)
         {
             var section = block.ContentSection;
@@ -304,24 +338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
                 default: return block.ContentSection.Type.ToString();
             }
-        }
-
-
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async _ =>
-                {
-                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-
-                    await _tableStorageService.DeleteEntityAsync("imports",
-                        new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
-                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
-                    await DeleteDependentDataBlocks(releaseId, subject.Id);
-                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
-                });
         }
 
         private async Task DeleteDependentDataBlocks(Guid releaseId, Guid subjectId)
