@@ -86,7 +86,6 @@ const InfographicChartOptions = ({
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
-  const [fileName, setFileName] = useState<string>();
   const [deleteFile, setDeleteFile] = useToggle(false);
 
   const formId = 'fileUploadForm';
@@ -128,16 +127,9 @@ const InfographicChartOptions = ({
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
-  React.useEffect(() => {
-    const selectedFile = chartFileOptions.find(
-      fileOption => fileOption.value === fileId,
-    );
-    if (selectedFile) {
-      setFileName(selectedFile.label);
-    } else {
-      setFileName('');
-    }
-  }, [fileId, chartFileOptions]);
+  const selectedFile = chartFileOptions.find(
+    fileOption => fileOption.value === fileId,
+  );
 
   return (
     <Formik<FormValues>
@@ -156,10 +148,10 @@ const InfographicChartOptions = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {fileId && (
+            {fileId && selectedFile && (
               <>
                 <div className={styles.deleteInfographicContainer}>
-                  <p className="govuk-!-margin-right-2">{`${fileName}, ${fileId}`}</p>
+                  <p className="govuk-!-margin-right-2">{`${selectedFile.label}, ${fileId}`}</p>
                   <ButtonText
                     variant="warning"
                     onClick={() => {
