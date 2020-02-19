@@ -23,9 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
-                opts => opts.MapFrom(release => release.ReleaseName));
-            
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,

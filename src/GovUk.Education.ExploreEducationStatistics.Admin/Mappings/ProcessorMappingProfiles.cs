@@ -1,4 +1,5 @@
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -6,11 +7,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public ProcessorMappingProfiles()
         {
-            CreateMap<Content.Model.Release, Data.Processor.Model.Release>()
-                .ForMember(dest => dest.ReleaseDate, opts => { opts.MapFrom(release => release.PublishScheduled); });
-            CreateMap<Content.Model.Publication, Data.Processor.Model.Publication>();
-            CreateMap<Content.Model.Topic, Data.Processor.Model.Topic>();
-            CreateMap<Content.Model.Theme, Data.Processor.Model.Theme>();
+            CreateMap<Release, Data.Processor.Model.Release>()
+                .ForMember(dest => dest.ReleaseDate, opts => { opts.MapFrom(release => release.PublishScheduled); })
+                .ForMember(dest => dest.TimeIdentifier, opts => opts.MapFrom(release => release.TimePeriodCoverage));
+            CreateMap<Publication, Data.Processor.Model.Publication>();
+            CreateMap<Topic, Data.Processor.Model.Topic>();
+            CreateMap<Theme, Data.Processor.Model.Theme>();
         }
     }
 }
