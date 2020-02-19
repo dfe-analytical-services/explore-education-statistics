@@ -2,10 +2,11 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import React from 'react';
+import { MethodologyTabProps } from '../MethodologyPage';
 
 const MethodologyReleaseStatusPage = ({
   handleApiErrors,
-}: ErrorControlProps) => {
+}: ErrorControlProps & MethodologyTabProps) => {
   return (
     <>
       <h2 className="govuk-heading-l">Methodology release status</h2>
