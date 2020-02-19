@@ -1008,8 +1008,7 @@
             },
             {
               "name": "OpenIdConnect:Authority",
-              "value": "[concat('https://login.microsoftonline.com/','@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-tenant'), '2018-02-14').secretUriWithVersion, ')','/')]"
-            },
+               "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"             },
             {
               "name": "OpenIdConnect:ClientId",
               "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]"
