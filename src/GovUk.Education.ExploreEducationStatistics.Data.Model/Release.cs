@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -14,5 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public IEnumerable<Subject> Subjects { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
+
+        public bool Live => Compare(UtcNow, ReleaseDate) > 0;
     }
 }

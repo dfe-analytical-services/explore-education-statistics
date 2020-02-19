@@ -4,17 +4,16 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
 {
-    public class DataMappingProfiles : Profile
+    public class DataServiceMappingProfiles : Profile
     {
-        public DataMappingProfiles()
+        public DataServiceMappingProfiles()
         {
             CreateMap<BoundaryLevel, BoundaryLevelIdLabel>();
 
