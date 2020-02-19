@@ -59,7 +59,7 @@ const CreateMethodologyPage = ({
       .catch(handleApiErrors);
   }, [handleApiErrors]);
 
-  const cancelHandler = () => history.push('/methodology');
+  const cancelHandler = () => history.push('/methodologies');
 
   const getSelectedContact = (
     contactId: string,
@@ -88,7 +88,7 @@ const CreateMethodologyPage = ({
         submission,
       );
 
-      history.push(`/methodology/${createdMethodology.id}`);
+      history.push(`/methodologies/${createdMethodology.id}`);
     },
     handleApiErrors,
     ...errorCodeMappings,
@@ -101,8 +101,8 @@ const CreateMethodologyPage = ({
       wide
       breadcrumbs={[
         {
-          name: 'Manage methodology',
-          link: '/methodology',
+          name: 'Manage methodologies',
+          link: '/methodologies',
         },
         {
           name: 'Create new methodology',
