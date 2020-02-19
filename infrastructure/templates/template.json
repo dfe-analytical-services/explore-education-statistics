@@ -984,7 +984,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKeyAdmin')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",

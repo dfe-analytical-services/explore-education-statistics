@@ -12,7 +12,7 @@ interface Model {
   otherMethodologies: MethodologyStatus[];
 }
 
-const ListMethodologyPages = () => {
+const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const ListMethodologyPages = () => {
                 {model.liveMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodology/${methodology.id}`}>
+                      <Link to={`/methodologies/${methodology.id}`}>
                         {methodology.title}
                       </Link>
                     </td>
@@ -96,7 +96,7 @@ const ListMethodologyPages = () => {
               There is currently no draft methodology
             </div>
           )}
-          <Link to="/methodology/create" className="govuk-button">
+          <Link to="/methodologies/create" className="govuk-button">
             Create new methodology
           </Link>
         </TabsSection>
@@ -105,7 +105,7 @@ const ListMethodologyPages = () => {
           title={`Draft methodologies ${
             model && model.otherMethodologies.length
               ? `(${model.otherMethodologies.length})`
-              : null
+              : '(0)'
           }`}
         >
           {model && model.otherMethodologies.length ? (
@@ -127,7 +127,7 @@ const ListMethodologyPages = () => {
                 {model.otherMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodology/${methodology.id}`}>
+                      <Link to={`/methodologies/${methodology.id}`}>
                         {methodology.title}
                       </Link>
                     </td>
@@ -158,4 +158,4 @@ const ListMethodologyPages = () => {
   );
 };
 
-export default ListMethodologyPages;
+export default MethodologiesPage;
