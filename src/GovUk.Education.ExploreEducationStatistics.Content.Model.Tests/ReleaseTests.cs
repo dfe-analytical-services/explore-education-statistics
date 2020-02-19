@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 

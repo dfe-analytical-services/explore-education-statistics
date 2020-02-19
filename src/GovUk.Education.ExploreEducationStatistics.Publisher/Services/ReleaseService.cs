@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using NCrontab;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -46,14 +47,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Content)
                 .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
                 .ThenInclude(section => section.Content)
-                .Include( r => r.Publication)
+                .Include(r => r.Publication)
                 .Include(r => r.Updates)
                 .Single(r => r.Id == id);
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
-            releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
             releaseViewModel.DownloadFiles =
                 _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
+
+            if (!releaseViewModel.Published.HasValue)
+            {
+                // Release isn't live yet. Set the published date based on what we expect it to be
+                releaseViewModel.Published = GetNextScheduledPublishingTime();
+            }
+
             return releaseViewModel;
         }
 
@@ -68,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .LastOrDefault();
         }
 
-        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId,
+            IEnumerable<Guid> includedReleaseIds)
         {
             var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
             return GetReleaseViewModel(latestRelease.Id);
@@ -87,6 +95,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             release.Published = DateTime.UtcNow;
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
+        }
+
+        private static DateTime GetNextScheduledPublishingTime()
+        {
+            var publishReleasesCronSchedule = Environment.GetEnvironmentVariable("PublishReleasesCronSchedule");
+            return TryParseCronSchedule(publishReleasesCronSchedule, out var cronSchedule)
+                ? cronSchedule.GetNextOccurrence(DateTime.UtcNow) : DateTime.UtcNow;
+        }
+
+        private static bool TryParseCronSchedule(string cronExpression, out CrontabSchedule cronSchedule)
+        {
+            // ReSharper disable once IdentifierTypo
+            cronSchedule = CrontabSchedule.TryParse(cronExpression, new CrontabSchedule.ParseOptions
+            {
+                IncludingSeconds = CronExpressionHasSeconds(cronExpression)
+            });
+            return cronSchedule != null;
+        }
+
+        private static bool CronExpressionHasSeconds(string cronExpression)
+        {
+            return cronExpression.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Length != 5;
         }
 
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)

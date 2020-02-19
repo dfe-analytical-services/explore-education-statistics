@@ -72,9 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     Id = message.Release.Id,
                     ReleaseDate = message.Release.ReleaseDate,
-                    Title = message.Release.Title,
                     Slug = message.Release.Slug,
-                    Publication = CreateOrUpdatePublication(message, context)
+                    Publication = CreateOrUpdatePublication(message, context),
+                    TimeIdentifier = message.Release.TimeIdentifier,
+                    Year = message.Release.Year
                 };
                 return context.Release.Add(release).Entity;
             }

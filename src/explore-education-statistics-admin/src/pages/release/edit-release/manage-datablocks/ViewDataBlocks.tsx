@@ -15,6 +15,7 @@ import getDefaultTableHeaderConfig, {
 } from '@common/modules/table-tool/utils/tableHeaders';
 import dataBlockService, {
   DataBlock,
+  DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -108,9 +109,10 @@ const ViewDataBlocks = ({
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
-    const newRequest = {
+    const newRequest: DataBlockRequest = {
       ...dataBlock.dataBlockRequest,
       ...reRequest,
+      includeGeoJson: false,
     };
 
     dataBlockService

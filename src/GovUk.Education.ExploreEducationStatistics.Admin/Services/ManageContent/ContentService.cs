@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId, string newHeading)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid contentSectionId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -159,14 +159,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(Guid releaseId, Guid contentSectionId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
         }
 
         public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             AddContentBlockRequest request) 
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
         {
             return
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, IContentBlock>> AttachContentBlockAsync(Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
         {
             return 
-                CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+                CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId, Guid contentSectionId, Guid contentBlockId
         )
         {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+            return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(tuple =>
                 {
                     var (_, section) = tuple;
@@ -378,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId, Guid contentSectionId,
             Guid contentBlockId, AddCommentRequest comment)
         {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+            return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async tuple =>
                 {
@@ -413,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid contentSectionId, Guid contentBlockId, Guid commentId,
             UpdateCommentRequest commentRequest)
         {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+            return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async tuple =>
                 {
@@ -450,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
         {
-            return CheckContentSectionExistsActionResult(releaseId, contentSectionId)
+            return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async tuple =>
                 {
@@ -629,7 +629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 ;
         }
         
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExistsActionResult(
+        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
             Guid releaseId, Guid contentSectionId)
         {
             return _persistenceHelper

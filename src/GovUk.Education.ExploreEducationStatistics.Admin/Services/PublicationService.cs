@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-        public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService, 
+        public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService,
             IPublicationRepository publicationRepository, IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
@@ -35,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId)
+        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(
+            Guid topicId)
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -51,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
+        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(
+            CreatePublicationViewModel publication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(publication.TopicId)
@@ -62,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
                     }
-            
+
                     var saved = _context.Publications.Add(new Publication
                     {
                         Id = Guid.NewGuid(),
@@ -73,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Slug = publication.Slug,
                         ExternalMethodology = publication.ExternalMethodology
                     });
-                    
+
                     _context.SaveChanges();
                     return await GetViewModelAsync(saved.Entity.Id);
                 });
@@ -86,7 +88,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
-        
+
+        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodologyAsync(Guid publicationId,
+            UpdatePublicationMethodologyViewModel methodology)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_ => ValidateMethodologyCanBeAssigned(methodology))
+                .OnSuccess(async _ =>
+                {
+                    var publication = await _context.Publications.Include(p => p.ExternalMethodology).FirstOrDefaultAsync(p => p.Id == publicationId);
+
+                    _context.Publications.Update(publication);
+                    
+                    if (methodology.MethodologyId != null)
+                    {
+                        publication.MethodologyId = methodology.MethodologyId;
+                        publication.ExternalMethodology = null;
+                    }
+                    else
+                    {
+                        publication.ExternalMethodology = methodology.ExternalMethodology;
+                        publication.MethodologyId = null;
+                    }
+                    _context.SaveChanges();
+
+                    return true;
+                });
+        }
+
         public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
         {
             return values.Include(p => p.Contact)
@@ -94,6 +124,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(r => r.Type)
                 .Include(p => p.Methodology)
                 .Include(p => p.Topic);
+        }
+
+        private async Task<Either<ActionResult, bool>> ValidateMethodologyCanBeAssigned(
+            UpdatePublicationMethodologyViewModel model)
+        {
+            if (model.MethodologyId != null && model.ExternalMethodology == null)
+            {
+                var methodology = await _context.Methodologies.FirstOrDefaultAsync(p => p.Id == model.MethodologyId);
+
+                if (methodology == null)
+                {
+                    return ValidationActionResult(MethodologyDoesNotExist);
+                }
+
+                // TODO: this will want updating when methodology status is fully implemented
+                if (methodology.Status == "Draft")
+                {
+                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
+                }
+            }
+            else if (model.ExternalMethodology != null && model.MethodologyId == null)
+            {
+                // TODO: EES-1287 External methodology must be external link to the service
+            }
+            else if (model.ExternalMethodology == null && model.MethodologyId == null)
+            {
+                return ValidationActionResult(MethodologyOrExternalMethodologyLinkMustBeDefined);
+            }
+            else
+            {
+                return ValidationActionResult(CannotSpecifyMethodologyAndExternalMethodology);
+            }
+
+            return true;
         }
     }
 }

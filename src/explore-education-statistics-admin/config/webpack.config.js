@@ -270,6 +270,7 @@ module.exports = webpackEnv => {
         .map(ext => `.${ext}`)
         .filter(ext => useTypeScript || !ext.includes('ts')),
       alias: {
+        './dist/cpexcel.js': '',
         '@admin': paths.appSrc,
         '@common': path.resolve(
           paths.appPath,
@@ -627,6 +628,7 @@ module.exports = webpackEnv => {
       tls: 'empty',
       // eslint-disable-next-line @typescript-eslint/camelcase
       child_process: 'empty',
+      Buffer: false,
     },
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter

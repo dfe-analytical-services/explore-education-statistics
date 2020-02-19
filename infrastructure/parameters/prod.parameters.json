@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "skuPublic": {
-      "value": "B1 Basic"
+      "value": "S1 Standard"
     },
     "skuData": {
       "value": "S2 Standard"
@@ -18,6 +18,9 @@
       "value": true
     },
     "deploySubnets": {
+      "value": true
+    },
+    "autoscalePublicApplication": {
       "value": true
     }
   }

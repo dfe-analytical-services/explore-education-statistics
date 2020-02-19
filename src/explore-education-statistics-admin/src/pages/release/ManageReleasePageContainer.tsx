@@ -82,7 +82,7 @@ const ManageReleasePageContainer = ({
                       to="/documentation/create-new-release"
                       target="_blank"
                     >
-                      Creating a new release{' '}
+                      Creating a new release
                     </Link>
                   </li>
                 </ul>

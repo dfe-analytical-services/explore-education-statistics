@@ -7,12 +7,12 @@ import StepNavItem from './components/StepByStepItem';
 import imagePublicationCreate from './images/guidance/guidance-publication-create.png';
 import imagePublicationSelect from './images/guidance/guidance-publication-select.png';
 import imagePublicationSelectTheme from './images/guidance/guidance-publication-select-theme.png';
-import imagePublicationCreateRelease from './images/guidance/guidance-publication-create-release.jpg';
-import imageReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
-import imageReleaseList from './images/guidance/guidance-release-list.jpg';
-import imageReleaseDraftEdit from './images/guidance/guidance-release-draft-edit.jpg';
-import imageReleaseScheduled from './images/guidance/guidance-release-scheduled.jpg';
-import imageReleaseMethodology from './images/guidance/guidance-release-methodology.jpg';
+import imagePublicationCreateRelease from './images/guidance/guidance-publication-create-release.png';
+import imageReleaseNavigation from './images/guidance/guidance-create-release-navigation.png';
+import imageReleaseList from './images/guidance/guidance-release-list.png';
+import imageReleaseDraftEdit from './images/guidance/guidance-release-draft-edit.png';
+import imageReleaseScheduled from './images/guidance/guidance-release-scheduled.png';
+import imageReleaseMethodology from './images/guidance/guidance-release-methodology.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);

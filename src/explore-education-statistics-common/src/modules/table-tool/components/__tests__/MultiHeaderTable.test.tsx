@@ -920,4 +920,302 @@ describe('MultiHeaderTable', () => {
 
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('renders table with column header group identical to its subgroup at start', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          {
+            groups: [{ text: 'A' }, { text: 'B', span: 2 }],
+            headers: [{ text: 'A' }, { text: 'C' }, { text: 'D' }],
+          },
+        ]}
+        rowHeaders={[
+          { headers: [{ text: '1' }, { text: '2' }] },
+          { headers: [{ text: '3' }, { text: '4' }] },
+        ]}
+        rows={[
+          ['A13', 'C13', 'D13'],
+          ['A14', 'C14', 'D14'],
+          ['A23', 'C23', 'D23'],
+          ['A24', 'C24', 'D24'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('thead th')).toHaveLength(4);
+
+    // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="col"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('rowspan', '2');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(3)',
+      ),
+    ).toHaveAttribute('colspan', '2');
+
+    // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="col"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="col"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+
+    // Body
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with column header group identical to its subgroup in middle', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          {
+            groups: [{ text: 'A' }, { text: 'B' }, { text: 'C', span: 2 }],
+            headers: [
+              { text: 'D' },
+              { text: 'B' },
+              { text: 'C' },
+              { text: 'F' },
+            ],
+          },
+        ]}
+        rowHeaders={[
+          { headers: [{ text: '1' }, { text: '2' }] },
+          { headers: [{ text: '3' }, { text: '4' }] },
+        ]}
+        rows={[
+          ['D13', 'B13', 'C13', 'F13'],
+          ['D14', 'B14', 'C14', 'F14'],
+          ['D23', 'B23', 'C23', 'F23'],
+          ['D24', 'B24', 'C24', 'F24'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('thead th')).toHaveLength(6);
+
+    // Row 1
+    expect(container.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(
+      3,
+    );
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="col"]:nth-child(3)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="col"]:nth-child(3)',
+      ),
+    ).toHaveAttribute('rowspan', '2');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(1) th[scope="colgroup"]:nth-child(4)',
+      ),
+    ).toHaveAttribute('colspan', '2');
+
+    // Row 2
+    expect(container.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(
+      3,
+    );
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="col"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="col"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+    expect(
+      container.querySelector(
+        'thead tr:nth-child(2) th[scope="col"]:nth-child(3)',
+      ),
+    ).toHaveAttribute('colspan', '1');
+
+    // Body
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(16);
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with row header group identical to its subgroup at start', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          { headers: [{ text: 'A' }, { text: 'B' }] },
+          { headers: [{ text: 'C' }, { text: 'D' }] },
+        ]}
+        rowHeaders={[
+          {
+            groups: [{ text: '2' }, { text: '3', span: 2 }],
+            headers: [{ text: '2' }, { text: '4' }, { text: '5' }],
+          },
+        ]}
+        rows={[
+          ['AC2', 'AD2', 'BC2', 'BD2'],
+          ['AC4', 'AD4', 'BC4', 'BD4'],
+          ['AC5', 'AD5', 'BC5', 'BD5'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+
+    // Row 1
+    expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
+      1,
+    );
+    expect(
+      container.querySelector('tbody tr:nth-child(1) th:nth-child(1)'),
+    ).toHaveAttribute('colspan', '2');
+
+    // Row 2
+    expect(container.querySelectorAll('tbody tr:nth-child(2) th')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="rowgroup"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '2');
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Row 3
+    expect(container.querySelectorAll('tbody tr:nth-child(3) th')).toHaveLength(
+      1,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="row"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Body
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(12);
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with row header group identical to its subgroup in middle', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          { headers: [{ text: 'A' }, { text: 'B' }] },
+          { headers: [{ text: 'C' }, { text: 'D' }] },
+        ]}
+        rowHeaders={[
+          {
+            groups: [{ text: '1' }, { text: '2' }, { text: '3', span: 2 }],
+            headers: [
+              { text: '4' },
+              { text: '2' },
+              { text: '5' },
+              { text: '6' },
+            ],
+          },
+        ]}
+        rows={[
+          ['AC4', 'AD4', 'BC4', 'BD4'],
+          ['AC2', 'AD2', 'BC2', 'BD2'],
+          ['AC5', 'AD5', 'BC5', 'BD5'],
+          ['AC6', 'AD6', 'BC6', 'BD6'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+
+    // Row 1
+    expect(container.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="rowgroup"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(1) th[scope="row"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Row 2
+    expect(container.querySelectorAll('tbody tr:nth-child(2) th')).toHaveLength(
+      1,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('colspan', '2');
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(2) th[scope="row"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Row 3
+    expect(container.querySelectorAll('tbody tr:nth-child(3) th')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="rowgroup"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '2');
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(3) th[scope="row"]:nth-child(2)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Row 4
+    expect(container.querySelectorAll('tbody tr:nth-child(4) th')).toHaveLength(
+      1,
+    );
+    expect(
+      container.querySelector(
+        'tbody tr:nth-child(4) th[scope="row"]:nth-child(1)',
+      ),
+    ).toHaveAttribute('rowspan', '1');
+
+    // Body
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(16);
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureMeasures(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
+            ConfigureRelease(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
@@ -126,6 +127,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Release>()
                 .HasIndex(data => data.PublicationId);
+        }
+
+        private static void ConfigureRelease(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Release>()
+                .Property(r => r.TimeIdentifier)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
+                .HasMaxLength(6);
         }
 
         private static void ConfigureMeasures(ModelBuilder modelBuilder)

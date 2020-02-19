@@ -45,6 +45,7 @@ export const testData1 = {
         },
       },
       footnotes: [],
+      geoJsonAvailable: false,
       indicators: [
         {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
@@ -445,6 +446,7 @@ export const testData2 = {
         },
       },
       footnotes: [],
+      geoJsonAvailable: false,
       indicators: [
         {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
@@ -828,6 +830,7 @@ export const testData3 = {
             'See "Guide to absence statistics" for more information on how absence and pupil characteristic data have been linked.',
         },
       ],
+      geoJsonAvailable: false,
       indicators: [
         {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',

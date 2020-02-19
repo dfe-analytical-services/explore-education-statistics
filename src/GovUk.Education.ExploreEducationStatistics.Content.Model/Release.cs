@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
 using static System.DateTime;
 using static System.String;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -183,8 +183,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
-        public int Order { get; set; }
-        
         public ReleaseStatus Status { get; set; }
         
         public string InternalReleaseNote { get; set; }
