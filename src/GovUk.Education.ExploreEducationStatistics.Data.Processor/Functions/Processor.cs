@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     );
                     
                     logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                    $"{message.DataFileName} : {e.Message}");
+                                    $"{message.DataFileName} : {(e.InnerException == null ? e.Message : e.InnerException.Message)}");
                 }
             }
             else
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 );
                     
                 logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                $"{message.DataFileName} : {e.Message}");
+                                $"{message.DataFileName} : {(e.InnerException == null ? e.Message : e.InnerException.Message)}");
             }
         }
         
