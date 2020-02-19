@@ -241,6 +241,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         RoleId = analystRoleId,
                         ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
                         ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -22,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.CreateAnyMethodology.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -23,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -24,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -25,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.CreateAnyMethodology.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -26,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -27,
+                        RoleId = analystRoleId,
+                        ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
+                        ClaimValue = "",
                     }
                 );
             

@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -17,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateContentBlockMap();
 
-            CreateMap<ContentSection, ContentSectionViewModel>();
+            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
+                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
 
@@ -30,12 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<Publication, PublicationTitleViewModel>();
 
             CreateMap<Publication, CachedPublicationViewModel>()
+                .ForMember(dest => dest.LegacyReleases,
+                    m => m.MapFrom(p => p.LegacyReleases.OrderBy(l => l.Description)))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(
                     dest => dest.Content,
-                    m => m.MapFrom(r => r.GenericContent));
+                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
             CreateMap<Release, ReleaseTitleViewModel>();
 

@@ -285,7 +285,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"newUser", newUser ? "yes" : "no"},
                 {"release name", release.ReleaseName},
                 {"publication name", release.Publication.Title},
-                {"prerelease link", prereleaseUrl}
+                {"prerelease link", prereleaseUrl},
+                { "daybeforereleaseday", release.PublishScheduled.Value.AddDays(-1).ToString("dddd dd MMMM yyyy")},
+                { "releaseday", release.PublishScheduled.Value.ToString("dddd dd MMMM yyyy")},
             };
 
             _emailService.SendEmail(email, template, emailValues);

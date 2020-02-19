@@ -18,12 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
     }
     
-    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        ApproveSpecificReleaseRequirement>
+    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : 
+        EntityAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
     {
         public ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler() 
             : base(ctx => 
-                ctx.Release.Status != ReleaseStatus.Approved 
+                ctx.Entity.Status != ReleaseStatus.Approved 
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllReleases)) {}
     }
 

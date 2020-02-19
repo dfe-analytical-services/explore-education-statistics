@@ -7,11 +7,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanAccessPrereleasePages,
 
         CanManageUsersOnSystem,
+        
         CanManageMethodologiesOnSystem,
+        CanUpdateSpecificMethodology,
 
         CanViewAllTopics,
         CanViewSpecificTheme,
+        
+        CanViewAllMethodologies,
+        CanViewSpecificMethodology,
 
+        CanCreateMethodologies,
         CanCreatePublicationForSpecificTopic,
         CanCreateReleaseForSpecificPublication,
         
@@ -19,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         
         CanViewAllReleases,
         CanViewSpecificRelease,
-        
         CanUpdateSpecificRelease,
         
         CanMarkSpecificReleaseAsDraft,

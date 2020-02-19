@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
@@ -12,25 +11,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Types
-            ExecuteFile(migrationBuilder, $"{MigrationId}_TableTypes.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_TableTypes.sql");
             // Routines
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilter.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilterFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilterGroup.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilterGroupFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilterItem.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFilterItemFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertIndicator.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertIndicatorFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertIndicatorGroup.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertLocation.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertPublication.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertRelease.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertSubject.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertSubjectFootnote.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertTheme.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_UpsertTopic.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilter.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilterFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilterGroup.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilterGroupFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilterItem.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFilterItemFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertIndicator.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertIndicatorFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertIndicatorGroup.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertLocation.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertPublication.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertRelease.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertSubject.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertSubjectFootnote.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertTheme.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath,$"{MigrationId}_Routine_UpsertTopic.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -71,14 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TYPE dbo.SubjectFootnoteType");
             migrationBuilder.Sql("DROP TYPE dbo.ThemeType");
             migrationBuilder.Sql("DROP TYPE dbo.TopicType");
-        }
-
-        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
-        {
-            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
-
-            migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
 }

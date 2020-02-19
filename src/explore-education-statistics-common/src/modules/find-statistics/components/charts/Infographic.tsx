@@ -68,6 +68,8 @@ const definition: ChartDefinition = {
   data: [],
 
   axes: [],
+
+  requiresGeoJson: false,
 };
 
 Infographic.definition = definition;

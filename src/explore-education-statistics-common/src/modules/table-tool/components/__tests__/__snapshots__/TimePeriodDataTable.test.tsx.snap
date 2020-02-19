@@ -8,14 +8,16 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         class="borderBottom"
     >
     </td>
-    <th class="cellHorizontalMiddle"
+    <th class="columnHeaderGroup"
         colspan="2"
+        rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Asian Total
     </th>
-    <th class="cellHorizontalMiddle"
+    <th class="columnHeaderGroup borderRightNone"
         colspan="2"
+        rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Black Total
@@ -24,24 +26,28 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <tr>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2013/14
     </th>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2014/15
     </th>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom"
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2014/15
@@ -52,18 +58,21 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <tr>
     <th class="borderBottom"
         rowspan="4"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded primary
     </th>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       Barnet
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of authorised absence sessions
@@ -82,8 +91,9 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of overall absence sessions
@@ -104,12 +114,14 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       Barnsley
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of authorised absence sessions
@@ -128,8 +140,9 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of overall absence sessions
@@ -150,18 +163,21 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <tr>
     <th class="borderBottom"
         rowspan="4"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded secondary
     </th>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       Barnet
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of authorised absence sessions
@@ -180,8 +196,9 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of overall absence sessions
@@ -202,12 +219,14 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       Barnsley
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of authorised absence sessions
@@ -226,8 +245,9 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Number of overall absence sessions
@@ -256,14 +276,16 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         class="borderBottom"
     >
     </td>
-    <th class="cellHorizontalMiddle"
+    <th class="columnHeaderGroup"
         colspan="2"
+        rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Asian Total
     </th>
-    <th class="cellHorizontalMiddle"
+    <th class="columnHeaderGroup borderRightNone"
         colspan="2"
+        rowspan="1"
         scope="colgroup"
     >
       Ethnicity Major Black Total
@@ -272,24 +294,28 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
   <tr>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2013/14
     </th>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2014/15
     </th>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2013/14
     </th>
-    <th class="govuk-table__header--numeric borderBottom"
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       2014/15
@@ -300,12 +326,14 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded primary
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnet
@@ -324,8 +352,9 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnsley
@@ -346,12 +375,14 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded secondary
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnet
@@ -370,8 +401,9 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnsley
@@ -402,12 +434,14 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
     </td>
     <th class="govuk-table__header--numeric borderBottom"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       Ethnicity Major Asian Total
     </th>
-    <th class="govuk-table__header--numeric borderBottom"
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
         colspan="1"
+        rowspan="1"
         scope="col"
     >
       Ethnicity Major Black Total
@@ -418,12 +452,14 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded primary
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnet
@@ -436,8 +472,9 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnsley
@@ -452,12 +489,14 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
   <tr>
     <th class="borderBottom"
         rowspan="2"
+        colspan="1"
         scope="rowgroup"
     >
       State-funded secondary
     </th>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnet
@@ -470,8 +509,9 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
     </td>
   </tr>
   <tr>
-    <th class="govuk-table__cell--numeric"
+    <th class
         rowspan="1"
+        colspan="1"
         scope="row"
     >
       Barnsley

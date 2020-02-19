@@ -86,7 +86,7 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
                   <Link to="/dashboard">manage publications and releases</Link>
                 </li>
                 <li>
-                  <Link to="/methodology">manage methodology</Link>
+                  <Link to="/methodologies">manage methodologies</Link>
                 </li>
               </ul>
             </div>
@@ -125,6 +125,7 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
               <ManagePublicationsAndReleasesTab />
             </TabsSection>
             <TabsSection
+              lazy
               id="draft-releases"
               title={`View draft releases (${model.draftReleases.length})`}
             >
@@ -144,6 +145,7 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
               />
             </TabsSection>
             <TabsSection
+              lazy
               id="scheduled-releases"
               title={`View scheduled releases (${model.scheduledReleases.length})`}
             >

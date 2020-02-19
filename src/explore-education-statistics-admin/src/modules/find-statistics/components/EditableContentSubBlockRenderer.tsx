@@ -1,10 +1,8 @@
-import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
-import marked from 'marked';
-import React from 'react';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
 import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import React from 'react';
 
 interface Props {
   block: EditableContentBlock;
@@ -36,24 +34,6 @@ function EditableContentSubBlockRenderer({
             onContentChange={onContentChange}
           />
         </>
-      );
-    case 'InsetTextBlock':
-      return (
-        <div className="govuk-inset-text">
-          <PrototypeEditableContent
-            editable={editable}
-            onContentChange={onContentChange}
-            content={`
-            ${
-              block.heading
-                ? `<h3 className="govuk-heading-s">${block.heading}</h3>`
-                : ''
-            }
-
-            <div className="govuk-body">${marked(block.body)} </div>
-          `}
-          />
-        </div>
       );
     case 'DataBlock':
       return (
