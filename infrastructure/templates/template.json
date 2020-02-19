@@ -2022,7 +2022,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "TokenSecretKey",
