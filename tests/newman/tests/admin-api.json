@@ -3958,6 +3958,469 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Manage Content page",
+					"item": [
+						{
+							"name": "Create Methodology for following tests",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"New Methodology should be present\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    // assert new block details",
+											"    pm.expect(respJson.id).to.not.be.null;",
+											"    pm.expect(respJson.title.startsWith(\"Manage Content Page Test Methodology\")).to.be.true;",
+											"    pm.expect(respJson.status).to.equal(\"Draft\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () {",
+											"    ",
+											"    pm.globals.set(\"added_methodology_id\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n\ttitle: \"Manage Content Page Test Methodology {{$guid}}\",\n\tpublishScheduled: \"2021-01-01T00:00:00\",\n\tcontactId: \"32d61132-e4c0-442c-88f4-f879971eb699\"\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodologies",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodologies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Content Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"New Content Section should be present\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    pm.expect(respJson.id).to.not.be.null;",
+											"    pm.expect(respJson.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(respJson.heading).to.equal('New section');",
+											"    pm.expect(respJson.order).to.equal(1);",
+											"});",
+											"",
+											"pm.test(\"Store environment variables\", function() {",
+											"    pm.globals.set(\"added_content_section_id\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\torder: 1\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/sections/add",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"sections",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add HTML Block to Content Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"New HTMLBlock should be present\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    // assert new block details",
+											"    pm.expect(respJson.id).to.not.be.null;",
+											"    pm.expect(respJson.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(respJson.order).to.equal(1);",
+											"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+											"    pm.expect(respJson.content).to.be.undefined;",
+											"    ",
+											"    // assert that deliberately excluded fields are not present",
+											"    pm.expect(respJson.contentSection).to.be.undefined;",
+											"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () {",
+											"    ",
+											"    pm.globals.set(\"added_content_html_block_id\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n\torder: 1,\n\ttype: 'HtmlBlock'\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/section/{{added_content_section_id}}/blocks/add",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"section",
+										"{{added_content_section_id}}",
+										"blocks",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Annex Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"New Content Section should be present\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    pm.expect(respJson.id).to.not.be.null;",
+											"    pm.expect(respJson.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(respJson.heading).to.equal('New section');",
+											"    pm.expect(respJson.order).to.equal(1);",
+											"});",
+											"",
+											"pm.test(\"Store environment variables\", function() {",
+											"    pm.globals.set(\"added_annex_section_id\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\torder: 1\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/sections/add?type=annexes",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"sections",
+										"add"
+									],
+									"query": [
+										{
+											"key": "type",
+											"value": "annexes"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add HTML Block to Annex Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"New HTMLBlock should be present\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    // assert new block details",
+											"    pm.expect(respJson.id).to.not.be.null;",
+											"    pm.expect(respJson.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"    pm.expect(respJson.order).to.equal(1);",
+											"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+											"    pm.expect(respJson.content).to.be.undefined;",
+											"    ",
+											"    // assert that deliberately excluded fields are not present",
+											"    pm.expect(respJson.contentSection).to.be.undefined;",
+											"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () {",
+											"    ",
+											"    pm.globals.set(\"added_annex_html_block_id\", pm.response.json().id);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n\torder: 1,\n\ttype: 'HtmlBlock'\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/section/{{added_annex_section_id}}/blocks/add",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"section",
+										"{{added_annex_section_id}}",
+										"blocks",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Manage Content Page data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"",
+											"pm.test(\"Manage Content Page data should contain the correct information\", function () { ",
+											"",
+											"    const respJson = pm.response.json();",
+											"",
+											"    if(pm.environment.get('env') === 'local') { ",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('added_methodology_id'));",
+											"    pm.expect(respJson.title.startsWith('Manage Content Page Test Methodology')).to.be.true;",
+											"    pm.expect(respJson.status).to.equal('Draft');",
+											"    ",
+											"    pm.expect(respJson.content.length).to.equal(1);",
+											"    pm.expect(respJson.content[0].id).to.equal(pm.globals.get('added_content_section_id'));",
+											"    pm.expect(respJson.content[0].order).to.equal(1);",
+											"    pm.expect(respJson.content[0].heading).to.equal('New section');",
+											"    pm.expect(respJson.content[0].content.length).to.equal(1);",
+											"    pm.expect(respJson.content[0].content[0].id).to.equal(pm.globals.get('added_content_html_block_id'));",
+											"    ",
+											"    pm.expect(respJson.annexes.length).to.equal(1);",
+											"    pm.expect(respJson.annexes[0].id).to.equal(pm.globals.get('added_annex_section_id'));",
+											"    pm.expect(respJson.annexes[0].order).to.equal(1);",
+											"    pm.expect(respJson.annexes[0].heading).to.equal('New section');",
+											"    pm.expect(respJson.annexes[0].content.length).to.equal(1);",
+											"    pm.expect(respJson.annexes[0].content[0].id).to.equal(pm.globals.get('added_annex_html_block_id'));",
+											"    ",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Content Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"if(pm.environment.get('env') === 'local') { ",
+											"pm.test(\"New Content Section should be removed\", function () { ",
+											"    const respJson = pm.response.json();",
+											"    pm.expect(respJson.length).to.equal(0);",
+											"});",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/section/{{added_content_section_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"section",
+										"{{added_content_section_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Annex Section",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"if(pm.environment.get('env') === 'local') { ",
+											"pm.test(\"New Annex Section should be removed\", function () { ",
+											"    const respJson = pm.response.json();",
+											"    pm.expect(respJson.length).to.equal(0);",
+											"",
+											"});",
+											"}",
+											"",
+											"pm.test(\"Remove temporary environment variables\", function() {",
+											"   pm.globals.unset(\"added_methodology_id\"); ",
+											"   pm.globals.unset(\"added_content_section_id\"); ",
+											"   pm.globals.unset(\"added_annex_section_id\"); ",
+											"   pm.globals.unset(\"added_content_html_block_id\");",
+											"   pm.globals.unset(\"added_annex_html_block_id\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/methodology/{{added_methodology_id}}/content/section/{{added_annex_section_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"methodology",
+										"{{added_methodology_id}}",
+										"content",
+										"section",
+										"{{added_annex_section_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
