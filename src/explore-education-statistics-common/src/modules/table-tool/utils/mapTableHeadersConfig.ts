@@ -72,7 +72,8 @@ export default function mapTableHeadersConfig(
         optionGroup.map(
           option =>
             locationAndFilterGroups[currentIndex].find(filter => {
-              const hasMatchingValue = filter.value === option.value;
+              const hasMatch =
+                filter.value === option.value && filter.label === option.label;
 
               // The filter might be a location so just cast
               // these as variables for convenience.
@@ -81,12 +82,11 @@ export default function mapTableHeadersConfig(
 
               if (locationOption.level && locationFilter.level) {
                 return (
-                  hasMatchingValue &&
-                  locationFilter.level === locationOption.level
+                  hasMatch && locationFilter.level === locationOption.level
                 );
               }
 
-              return hasMatchingValue;
+              return hasMatch;
             }) as LocationFilter | CategoryFilter,
         ),
       );
