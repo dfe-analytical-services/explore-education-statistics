@@ -137,16 +137,14 @@ If you need to change the chromedriver version used by the CI pipeline, it can b
 ### Parallelism / Pabot
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. AND this might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.
 
-For this reason, you **MUST** ensure that if you test suite requires test data that will change, that you create test new data to be used specifically with that test. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
+For this reason, you **MUST** ensure that if a test suite changes test data, that you create test new data to be used specifically with that suite. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
 
 ### Test data
 After a group discussion, it was decided that tests will, as far as is possible, create their own test data. This means that any tests you write that alter data, you will need to create that data from scratch.
 
-After an environment's data has been reset and reseeded, you will need to create some test data for the UI tests to work:
-* "Test theme" with the GUID 449d720f-9a87-4895-91fe-70972d1bdc04
-* "Test methodology" with the GUID b4886b45-53c2-4d6f-e6bc-08d77d76f342
-
-You will need to alter the content database directly to create these.
+After an environment's data has been reset and reseeded, you will need to create some test data in the content database for the UI tests to work:
+* Themes - "Test theme" with the GUID 449d720f-9a87-4895-91fe-70972d1bdc04
+* Methodologies - "Test methodology" with the GUID b4886b45-53c2-4d6f-e6bc-08d77d76f342
 
 ### IDE
 If searching for an IDE to add/edit these tests, consider using IntelliJ with "IntelliBot @ SeleniumLibrary Patched" and "Robot Framework Support" plugins. This should give you autocompletion and allow you to click through to keywords defined in both .robot and .py files. For this to work, you'll need to change the Project Structure to use "No SDK".
