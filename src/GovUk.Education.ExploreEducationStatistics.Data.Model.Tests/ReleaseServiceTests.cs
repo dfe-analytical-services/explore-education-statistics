@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         public void GetLatestRelease()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase("GetLatestRelease");
+            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
             var options = builder.Options;
 
             using (var context = new StatisticsDbContext(options, null))
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         public void GetLatestRelease_PublicationIdNotFound()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase("GetLatestRelease");
+            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
             var options = builder.Options;
 
             using (var context = new StatisticsDbContext(options, null))
