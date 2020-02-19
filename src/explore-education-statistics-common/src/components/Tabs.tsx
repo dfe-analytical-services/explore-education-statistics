@@ -29,7 +29,7 @@ const Tabs = ({ children, id, onToggle, openId }: Props) => {
   const sectionElements: HTMLElement[] = [];
 
   const setSelectedTab = (index: number) => {
-    if (sectionElements.length > 0) {
+    if (sectionElements[index]) {
       if (window.history.pushState) {
         window.history.pushState(null, '', `#${sectionElements[index].id}`);
       } else {
@@ -54,6 +54,7 @@ const Tabs = ({ children, id, onToggle, openId }: Props) => {
       sections.map(function getTabIndex(e, index) {
         if (e.props.id === window.location.hash.substr(1)) {
           tabIndex = index;
+          setSelectedTab(index);
         }
         return null;
       });
@@ -69,9 +70,6 @@ const Tabs = ({ children, id, onToggle, openId }: Props) => {
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;
-          if (openId && openId === sectionId && selectedTabIndex !== index) {
-            setSelectedTab(index);
-          }
           return (
             <li
               className={classNames('govuk-tabs__list-item', {
