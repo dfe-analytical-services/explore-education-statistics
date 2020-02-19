@@ -984,7 +984,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKeyAdmin')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",
@@ -1008,15 +1008,15 @@
             },
             {
               "name": "OpenIdConnect:Authority",
-              "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"
+              "value": "[concat('https://login.microsoftonline.com/','@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-tenant'), '2018-02-14').secretUriWithVersion, ')','/')]"
             },
             {
               "name": "OpenIdConnect:ClientId",
-              "value": "[parameters('openIdConnectClientId')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "OpenIdConnect:ClientSecret",
-              "value": "[parameters('openIdConnectClientSecret')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]"
             }
           ],
           "connectionStrings": [

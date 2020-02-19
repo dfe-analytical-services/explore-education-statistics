@@ -20,12 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
     }
     
-    public class UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        UpdateSpecificReleaseRequirement>
+    public class UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : EntityAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
         public UpdateSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
             : base(ctx =>
-                ctx.Release.Status != ReleaseStatus.Approved && 
+                ctx.Entity.Status != ReleaseStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
             )
         {

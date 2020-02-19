@@ -86,7 +86,7 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
                   <Link to="/dashboard">manage publications and releases</Link>
                 </li>
                 <li>
-                  <Link to="/methodology">manage methodology</Link>
+                  <Link to="/methodologies">manage methodologies</Link>
                 </li>
               </ul>
             </div>
