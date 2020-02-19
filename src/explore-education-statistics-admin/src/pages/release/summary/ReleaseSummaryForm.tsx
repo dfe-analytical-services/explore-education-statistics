@@ -23,6 +23,7 @@ import { Dictionary } from '@common/types';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
+import { compareAsc, endOfDay, format, isValid, parse } from 'date-fns';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;
@@ -87,36 +88,23 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     return optGroups;
   };
 
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  const todaysDate = new Date();
-
   const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
     scheduledPublishDate: validateMandatoryDayMonthYearField.test(
       'validDateIfAfterToday',
-      `Schedule publish date can't be before ${todaysDate.getDate()} ${
-        months[todaysDate.getMonth()]
-      } ${todaysDate.getFullYear()}`,
+      `Schedule publish date can't be before ${format(
+        new Date(),
+        'do MMMM yyyy',
+      )}`,
       value => {
-        const date = new Date(value.year, value.month, value.day);
-        date.setMonth(date.getMonth() - 1);
-        date.setDate(date.getDate() + 1);
-        return date >= todaysDate;
+        const date = parse(
+          `${value.year}-${value.month}-${value.day}`,
+          'yyyy-M-d',
+          new Date(value.year, value.month, value.day),
+        );
+        return isValid(date) && endOfDay(date) >= endOfDay(new Date());
       },
     ),
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
