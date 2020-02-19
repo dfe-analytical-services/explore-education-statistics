@@ -40,6 +40,10 @@ export interface Publication {
     summary: string;
     title: string;
   };
+  externalMethodology?: {
+    title: string;
+    url: string;
+  };
 }
 
 export interface PublicationContact {

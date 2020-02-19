@@ -52,7 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Single(r => r.Id == id);
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
-            releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
             releaseViewModel.DownloadFiles =
                 _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
 

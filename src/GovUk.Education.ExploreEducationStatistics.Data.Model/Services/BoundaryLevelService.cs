@@ -39,12 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .OrderByDescending(level => level.Published)
                 .FirstOrDefault();
 
-            if (boundaryLevel == null)
-            {
-                throw new ArgumentException($"Boundary Level does not exist for geographic level {geographicLevel}",
-                    nameof(geographicLevel));
-            }
-
             return boundaryLevel;
         }
 

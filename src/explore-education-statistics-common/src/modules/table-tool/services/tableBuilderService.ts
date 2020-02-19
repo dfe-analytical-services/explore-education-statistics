@@ -176,6 +176,7 @@ export type TableDataQuery = {
   indicators: string[];
   timePeriod?: TimePeriodQuery;
   geographicLevel?: string;
+  includeGeoJson?: boolean;
 } & PartialRecord<LocationLevelKeys, string[]>;
 
 interface UnmappedFullTableSubjectMeta {
@@ -189,6 +190,7 @@ interface UnmappedFullTableSubjectMeta {
     options: GroupedFilterOptions;
     totalValue?: string;
   }>;
+  geoJsonAvailable: boolean;
   indicators: IndicatorOption[];
   footnotes: {
     id: string;

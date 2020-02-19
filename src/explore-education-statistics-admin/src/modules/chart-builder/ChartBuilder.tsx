@@ -435,6 +435,7 @@ const ChartBuilder = ({
           setSelectedChartType(chart);
         }}
         selectedChartType={selectedChartType}
+        geoJsonAvailable={data.metaData.geoJsonAvailable}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
         <a

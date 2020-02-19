@@ -75,6 +75,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             ? new List<ReleaseStatusLogMessage>()
             : JsonConvert.DeserializeObject<IEnumerable<ReleaseStatusLogMessage>>(Messages);
 
+        public void AppendLogMessage(ReleaseStatusLogMessage logMessage)
+        {
+            if (logMessage != null)
+            {
+                Messages = JsonConvert.SerializeObject(LogMessages.Append(logMessage));
+            }
+        }
+
         public void AppendLogMessages(IEnumerable<ReleaseStatusLogMessage> logMessages)
         {
             if (logMessages != null)
@@ -100,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                     PublishingStage = _state.Publishing.ToString();
                     break;
             }
-            
+
             OverallStage = _state.Overall.ToString();
         }
     }

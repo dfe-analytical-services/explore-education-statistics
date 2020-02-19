@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     p => new Uri(p));
 
             modelBuilder.Entity<Publication>()
-                .OwnsOne(p => p.ExternalMethodology);
+                .OwnsOne(p => p.ExternalMethodology).ToTable("ExternalMethodology");
 
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)

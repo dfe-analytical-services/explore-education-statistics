@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
+        // TODO EES-1315 - represent Methodology status with enum
         [NotMapped]
         public string Status => Published == null ?  "Draft" : "Live" ;
 

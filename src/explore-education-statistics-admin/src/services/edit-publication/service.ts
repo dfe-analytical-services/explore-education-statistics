@@ -1,5 +1,8 @@
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
-import { CreatePublicationRequest } from '@admin/services/edit-publication/types';
+import {
+  CreatePublicationRequest,
+  PublicationMethodologyDetails,
+} from '@admin/services/edit-publication/types';
 import client from '@admin/services/util/service';
 
 const service = {
@@ -19,6 +22,16 @@ const service = {
     return client.post(`/topic/${topicId}/publications`, {
       title,
       contactId,
+      methodologyId,
+      externalMethodology,
+    });
+  },
+  updatePublicationMethodology({
+    publicationId,
+    selectedMethodologyId: methodologyId,
+    externalMethodology,
+  }: PublicationMethodologyDetails & { publicationId: string }) {
+    return client.put(`/publications/${publicationId}/methodology`, {
       methodologyId,
       externalMethodology,
     });

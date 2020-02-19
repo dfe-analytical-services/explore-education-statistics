@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -92,7 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.HeadlinesSection = new ContentSection{
                         Type = ContentSectionType.Headlines
                     };
-                    release.Order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
                     release.ReleaseSummary = new ReleaseSummary
                     {
                         Versions = new List<ReleaseSummaryVersion>()
@@ -164,29 +162,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestReleaseAsync(Guid publicationId)
+        public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
+                .CheckEntityExists<Publication>(publicationId, queryable => 
+                    queryable.Include(r => r.Releases))
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(_ =>
+                .OnSuccess(publication =>
                 {
-                    var releases = _context
-                        .Releases
-                        .Where(r => r.PublicationId == publicationId && r.Published != null)
-                        .OrderBy(r => r.Published);
-
-                    if (!releases.Any())
-                    {
-                        return null;
-                    }
-                        
-                    var latestRelease = releases.Last();
-                    return new TitleAndIdViewModel
+                    var latestRelease = publication.LatestRelease();
+                    return latestRelease != null ? new TitleAndIdViewModel
                     {
                         Id = latestRelease.Id,
                         Title = latestRelease.Title
-                    };
+                    } : null;
                 });
         }
         
@@ -217,13 +206,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private int OrderForNextReleaseOnPublication(Guid publicationId)
-        {
-            var publication = _context.Publications.Include(p => p.Releases)
-                .Single(p => p.Id == publicationId);
-            return publication.Releases.Select(r => r.Order).DefaultIfEmpty().Max() + 1;
-        }
-        
         private async Task<List<ContentSection>> GetContentAsync(Guid id)
         {
             return await _context
@@ -293,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
         }
-        
+
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             // Require publication / release / contact / type graph to be able to work out:

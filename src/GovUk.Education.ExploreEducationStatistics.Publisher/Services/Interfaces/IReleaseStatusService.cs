@@ -15,12 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state);
 
-        Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage);
+        Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null);
 
-        Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage);
+        Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null);
 
-        Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage);
+        Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null);
 
-        Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage);
+        Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null);
     }
 }
