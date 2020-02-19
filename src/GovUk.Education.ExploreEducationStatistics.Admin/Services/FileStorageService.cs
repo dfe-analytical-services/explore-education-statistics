@@ -94,21 +94,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
-                {
-                    var blobContainer = await GetCloudBlobContainer();
-                    // Get the paths of the files to delete
-                    return await DataPathsForDeletion(blobContainer, releaseId, fileName)
-                        .OnSuccess((path) =>
-                        {
-                            // Delete the data file
-                            return DeleteFileAsync(blobContainer, path.dataFilePath)
-                                // and the metadata file
-                                .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
-                                // and return the remaining files
-                                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
-                        });
-                });
+                .OnSuccess(GetCloudBlobContainer)
+                .OnSuccess(blobContainer => 
+                    DataPathsForDeletion(blobContainer , releaseId, fileName)
+                    .OnSuccess(path => DeleteFileAsync(blobContainer, path.dataFilePath)))
+                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,

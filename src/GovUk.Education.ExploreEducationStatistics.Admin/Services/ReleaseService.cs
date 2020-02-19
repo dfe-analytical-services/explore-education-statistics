@@ -262,6 +262,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
+            string subjectTitle)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async _ =>
+                {
+                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
+                    var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject.Id);
+                    
+                    return new DeleteDataFilePlan
+                    {
+                       DependentDataBlocks = dependentDataBlocks.
+                           Select(block => new DependentDataBlock
+                           {
+                               Name = block.Name,
+                               ContentSectionHeading = GetContentSectionHeading(block)
+                           })
+                           .ToList()
+                     };
+                });
+        }
+
+        private string GetContentSectionHeading(DataBlock block)
+        {
+            var section = block.ContentSection;
+
+            if (section == null)
+            {
+                return null;
+            }
+
+            switch (block.ContentSection.Type)
+            {
+                case ContentSectionType.Generic: return section.Heading;
+                case ContentSectionType.ReleaseSummary: return "Release Summary";
+                case ContentSectionType.Headlines: return "Headlines";
+                case ContentSectionType.KeyStatistics: return "Key Statistics";
+                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
+                default: return block.ContentSection.Type.ToString();
+            }
+        }
+
+
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
@@ -269,11 +314,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async _ =>
                 {
+                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
+
                     await _tableStorageService.DeleteEntityAsync("imports",
                         new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    await DeleteDependentDataBlocks(releaseId, subject.Id);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
+        }
+
+        private async Task DeleteDependentDataBlocks(Guid releaseId, Guid subjectId)
+        {
+            var dependentDataBlocks = GetDependentDataBlocks(releaseId, subjectId);
+            _context.ContentBlocks.RemoveRange(dependentDataBlocks);
+            await _context.SaveChangesAsync();
+        }
+
+        private List<DataBlock> GetDependentDataBlocks(Guid releaseId, Guid subjectId)
+        {
+            return _context
+                .ReleaseContentBlocks
+                .Include(join => join.ContentBlock)
+                .ThenInclude(block => block.ContentSection)
+                .Where(join => join.ReleaseId == releaseId)
+                .ToList()
+                .Select(join => join.ContentBlock)
+                .Where(block => block.GetType() == typeof(DataBlock))
+                .Cast<DataBlock>()
+                .Where(block => block.DataBlockRequest.SubjectId == subjectId)
+                .ToList();
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
@@ -288,5 +358,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.Type);
         }
+    }
+
+    public class DeleteDataFilePlan
+    {
+        public List<DependentDataBlock> DependentDataBlocks { get; set; }
+    }
+
+    public class DependentDataBlock
+    {
+        public string Name { get; set; }
+        
+        public string? ContentSectionHeading { get; set; }
     }
 }
