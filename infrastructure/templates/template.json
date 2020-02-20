@@ -2688,7 +2688,6 @@
       "dependsOn": [
         "[variables('sqlserverName')]",
         "[variables('publicSqlServerName')]",
-        "[variables('templateBaseUrl')]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
