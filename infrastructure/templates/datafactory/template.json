@@ -15,11 +15,20 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "publicAppName": {
+    "publisherAppName": {
       "type": "string"
     },
-    "keyVaultName": {
-      "type": "string"
+    "ls_sql_statistics_connectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"
+      }
+    },
+    "ls_sql_public_statistics_connectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
+      }
     }
   },
   "variables":{
@@ -51,11 +60,14 @@
           "dataFactoryName": {
             "value": "[variables('dataFactoryName')]"
           },
-          "publicAppName": {
-            "value": "[parameters('publicAppName')]"
+          "publisherAppName": {
+            "value": "[parameters('publisherAppName')]"
           },
-          "keyVaultName": {
-            "value": "[parameters('keyVaultName')]"
+          "ls_sql_statistics_connectionString": {
+            "value": "[parameters('ls_sql_statistics_connectionString')]"
+          },
+          "ls_sql_public_statistics_connectionString": {
+            "value": "[parameters('ls_sql_public_statistics_connectionString')]"
           }
         }
       },

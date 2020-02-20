@@ -9,30 +9,26 @@
             }
         },
         "ls_sql_statistics_connectionString": {
-            "type": "secureString",
+            "type": "string",
             "metadata": {
-               "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"    
+               "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"
             }
         },
         "ls_sql_public_statistics_connectionString": {
-            "type": "secureString",
+            "type": "string",
             "metadata": {
               "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
             }
         },
-        "keyVaultName": {
-            "type": "string"
-        },
-        "publicAppName": {
+        "publisherAppName": {
             "type": "string",
             "metadata": {
-              "description": "The name of the public app"
+              "description": "The name of the publisher app"
             }
         }
     },
     "variables": {
-        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
-        "ls_kv_properties_typeProperties_baseUrl": "[concat(parameters('keyVaultName'), '.vault.azure.net/')]"
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
     },
     "resources": [
         {
@@ -164,7 +160,7 @@
                         },
                         "userProperties": [],
                         "typeProperties": {
-                            "url": "[concat('https://', parameters('publicAppName'),'.azurewebsites.net/api/datafactory/pipeline/status/')]",
+                            "url": "[concat('https://', parameters('publisherAppName'),'.azurewebsites.net/api/datafactory/pipeline/status/')]",
                             "method": "POST",
                             "headers": {},
                             "body": {
@@ -3371,19 +3367,10 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_statistics_connectionString')]",
-                    "password": {
-                        "type": "AzureKeyVaultSecret",
-                        "store": {
-                            "referenceName": "ls_kv",
-                            "type": "LinkedServiceReference"
-                        },
-                        "secretName": "ees-sql-admin-password"
-                    }
+                    "connectionString": "[parameters('ls_sql_statistics_connectionString')]"
                 }
             },
             "dependsOn": [
-                "[concat(variables('factoryId'), '/linkedServices/ls_kv')]"
             ]
         },
         {
@@ -3394,34 +3381,11 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_public_statistics_connectionString')]",
-                    "password": {
-                        "type": "AzureKeyVaultSecret",
-                        "store": {
-                            "referenceName": "ls_kv",
-                            "type": "LinkedServiceReference"
-                        },
-                        "secretName": "ees-sql-public-password"
-                    }
+                    "connectionString": "[parameters('ls_sql_public_statistics_connectionString')]"
                 }
             },
             "dependsOn": [
-                "[concat(variables('factoryId'), '/linkedServices/ls_kv')]"
             ]
-        },
-        {
-            "name": "[concat(parameters('factoryName'), '/ls_kv')]",
-            "type": "Microsoft.DataFactory/factories/linkedServices",
-            "apiVersion": "2018-06-01",
-            "properties": {
-                "description": "Key vault linked service",
-                "annotations": [],
-                "type": "AzureKeyVault",
-                "typeProperties": {
-                    "baseUrl": "[variables('ls_kv_properties_typeProperties_baseUrl')]"
-                }
-            },
-            "dependsOn": []
         }
     ]
 }
