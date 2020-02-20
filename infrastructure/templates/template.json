@@ -209,14 +209,6 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
-    "notifyApiKey": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyApiKeyAdmin": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
     "notifyInviteTemplateId": {
       "type": "securestring",
       "defaultValue": ""
