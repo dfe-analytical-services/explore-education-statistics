@@ -225,12 +225,6 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
-    "notifyTokenSecretKey": {
-      "type": "securestring",
-      "defaultValue": ""
-    },
-
-
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -2026,7 +2020,7 @@
             },
             {
               "name": "TokenSecretKey",
-              "value": "[parameters('notifyTokenSecretKey')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "VerificationEmailTemplateId",
