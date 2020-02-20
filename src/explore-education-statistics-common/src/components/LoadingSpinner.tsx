@@ -1,24 +1,25 @@
 import classNames from 'classnames';
 import React from 'react';
-import AriaLiveMessage from './AriaLiveMessage';
 import styles from './LoadingSpinner.module.scss';
 
 interface Props {
+  alert?: boolean;
   className?: string;
+  hideText?: boolean;
   text?: string;
   size?: number;
   inline?: boolean;
   overlay?: boolean;
-  screenReaderMessage?: string;
 }
 
 const LoadingSpinner = ({
+  alert = false,
   className,
-  text,
-  size = 80,
+  hideText = false,
   inline = false,
   overlay = false,
-  screenReaderMessage = 'The page is loading. Please wait.',
+  size = 80,
+  text,
 }: Props) => {
   return (
     <>
@@ -37,7 +38,13 @@ const LoadingSpinner = ({
             borderWidth: `${size * 0.15}px`,
           }}
         />
-        {text || <AriaLiveMessage message={screenReaderMessage} />}
+
+        <span
+          role={alert ? 'alert' : undefined}
+          className={classNames({ 'govuk-visually-hidden': hideText })}
+        >
+          {text}
+        </span>
       </div>
     </>
   );

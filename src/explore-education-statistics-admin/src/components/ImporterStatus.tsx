@@ -157,13 +157,13 @@ class ImporterStatus extends Component<Props> {
               {currentStatus && getImportStatusLabel(currentStatus.status)}
             </strong>
             {running && (
-              <>
-                <LoadingSpinner
-                  inline
-                  size={22}
-                  screenReaderMessage="Currently processing data"
-                />{' '}
-              </>
+              <LoadingSpinner
+                alert
+                hideText
+                inline
+                size={22}
+                text="Currently processing data"
+              />
             )}
           </div>
           {currentStatus &&
