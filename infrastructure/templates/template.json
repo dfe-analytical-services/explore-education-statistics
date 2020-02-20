@@ -312,15 +312,6 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-    "openIdConnectTenant": {
-      "type": "string"
-    },
-    "openIdConnectClientId": {
-      "type": "string"
-    },
-    "openIdConnectClientSecret": {
-      "type": "string"
-    },
 
     "adminUri": {
       "type": "string"
