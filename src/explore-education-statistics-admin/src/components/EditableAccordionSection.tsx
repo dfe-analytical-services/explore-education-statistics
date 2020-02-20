@@ -143,6 +143,7 @@ const EditableAccordionSection = ({
                 title="Are you sure?"
                 onConfirm={onRemoveSection}
                 onExit={() => setShowRemoveModal(false)}
+                onCancel={() => setShowRemoveModal(false)}
               >
                 <p>
                   Are you sure you want to remove the following section?
