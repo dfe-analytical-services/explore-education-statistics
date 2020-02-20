@@ -14,11 +14,17 @@
       "metadata": {
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
+    },
+    "publicAppName": {
+      "type": "string"
+    },
+    "keyVaultName": {
+      "type": "string"
     }
   },
   "variables":{
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
-    "factoryId":"[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'))]"
+    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources":[
     {
@@ -30,6 +36,32 @@
         "type":"SystemAssigned"
       },
       "properties": {}
+    },
+    {
+      "name": "datafactory-components",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/components/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
+          },
+          "publicAppName": {
+            "value": "[parameters('publicAppName')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('dataFactoryName')]"
+      ]
     }
   ]
 }
