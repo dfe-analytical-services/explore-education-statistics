@@ -8,7 +8,7 @@ interface Props {
   children?: ReactNode;
   hideText?: boolean;
   text?: string;
-  size?: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   inline?: boolean;
   loading?: boolean;
   overlay?: boolean;
@@ -22,26 +22,24 @@ const LoadingSpinner = ({
   inline = false,
   loading = true,
   overlay = false,
-  size = 80,
+  size = 'xl',
   text,
 }: Props) => {
   return (
     <>
       {loading ? (
         <div
-          className={classNames({
-            [styles.noInlineFlex]: size >= 80 || !inline,
-            [styles.container]: true,
-            [styles.overlay]: overlay,
-          })}
+          className={classNames(
+            styles.container,
+            {
+              [styles.noInlineFlex]: !inline,
+              [styles.overlay]: overlay,
+            },
+            className,
+          )}
         >
           <div
-            className={classNames(styles.spinner, className)}
-            style={{
-              height: `${size}px`,
-              width: `${size}px`,
-              borderWidth: `${size * 0.15}px`,
-            }}
+            className={classNames(styles.spinner, styles[`spinner--${size}`])}
           />
 
           <span

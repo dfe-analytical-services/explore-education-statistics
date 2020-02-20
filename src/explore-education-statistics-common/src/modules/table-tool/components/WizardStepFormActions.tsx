@@ -60,6 +60,7 @@ const WizardStepFormActions = ({
         inline
         hideText
         loading={form.isSubmitting}
+        size="md"
         text="Page is loading"
       />
     </FormGroup>

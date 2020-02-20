@@ -161,7 +161,7 @@ class ImporterStatus extends Component<Props> {
                 alert
                 hideText
                 inline
-                size={22}
+                size="sm"
                 text="Currently processing data"
               />
             )}
