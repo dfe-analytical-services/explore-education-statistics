@@ -151,6 +151,17 @@ const MethodologyContentPage = ({
                     );
                     refreshMethodology();
                   }}
+                  onRemoveSection={() => {
+                    return new Promise(resolve => {
+                      return methodologyService
+                        .removeContentSection(
+                          methodology.id,
+                          section.id as string,
+                        )
+                        .then(() => resolve(refreshMethodology()))
+                        .catch(handleApiErrors);
+                    });
+                  }}
                 />
               ))}
             </Accordion>
