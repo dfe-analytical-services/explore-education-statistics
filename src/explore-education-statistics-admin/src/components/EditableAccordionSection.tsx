@@ -1,11 +1,12 @@
 import AccordionSection, {
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
+import { FormTextInput } from '@common/components/form';
 import GoToTopLink from '@common/components/GoToTopLink';
+import ModalConfirm from '@common/components/ModalConfirm';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { FormTextInput } from '@common/components/form';
 import styles from './EditableAccordionSection.module.scss';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
@@ -14,6 +15,8 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
   canEditHeading: boolean;
+  canRemoveSection: boolean;
+  onRemoveSection: () => Promise<unknown>;
 }
 
 const EditableAccordionSection = ({
@@ -31,9 +34,12 @@ const EditableAccordionSection = ({
   onToggle,
   onHeadingChange,
   canEditHeading,
+  onRemoveSection,
+  canRemoveSection = !!onRemoveSection,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [previousOpen, setPreviousOpen] = useState(open);
 
   const [currentHeading, setCurrentHeading] = useState(heading);
@@ -112,7 +118,7 @@ const EditableAccordionSection = ({
               }}
               className={styles.edit}
             >
-              ({isEditingHeading ? 'Save' : 'Edit'} Section Title)
+              ({isEditingHeading ? 'Save' : 'Edit'} section title)
             </a>
           ),
           headingButtons,
@@ -120,6 +126,32 @@ const EditableAccordionSection = ({
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>
+        )}
+        {canRemoveSection && (
+          <a
+            role="button"
+            tabIndex={0}
+            onClick={() => setShowRemoveModal(true)}
+            onKeyPress={e => {
+              if (e.charCode === 13) setShowRemoveModal(true);
+            }}
+            className={styles.edit}
+          >
+            (Remove section)
+            {showRemoveModal && (
+              <ModalConfirm
+                title="Are you sure?"
+                onConfirm={onRemoveSection}
+                onExit={() => setShowRemoveModal(false)}
+              >
+                <p>
+                  Are you sure you want to remove the following section?
+                  <br />
+                  <strong>"{heading}"</strong>
+                </p>
+              </ModalConfirm>
+            )}
+          </a>
         )}
       </div>
       {children && (

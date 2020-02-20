@@ -130,13 +130,11 @@ const MethodologyContentPage = ({
               }}
               onAddSection={() => {
                 return new Promise(resolve => {
-                  methodologyService
+                  return methodologyService
                     .addContentSection(methodology.id, {
                       order: methodology.content.length,
                     })
-                    .then(() => {
-                      refreshMethodology();
-                    })
+                    .then(() => resolve(refreshMethodology()))
                     .catch(handleApiErrors);
                 });
               }}
@@ -155,6 +153,17 @@ const MethodologyContentPage = ({
                       heading,
                     )
                   }
+                  onRemoveSection={() => {
+                    return new Promise(resolve => {
+                      return methodologyService
+                        .removeContentSection(
+                          methodology.id,
+                          section.id as string,
+                        )
+                        .then(() => resolve(refreshMethodology()))
+                        .catch(handleApiErrors);
+                    });
+                  }}
                 />
               ))}
             </Accordion>
