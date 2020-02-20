@@ -1,0 +1,3427 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": {
+                "description": "Data Factory name"
+            }
+        },
+        "ls_sql_statistics_connectionString": {
+            "type": "secureString",
+            "metadata": {
+               "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"    
+            }
+        },
+        "ls_sql_public_statistics_connectionString": {
+            "type": "secureString",
+            "metadata": {
+              "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
+            }
+        },
+        "keyVaultName": {
+            "type": "string"
+        },
+        "publicAppName": {
+            "type": "string",
+            "metadata": {
+              "description": "The name of the public app"
+            }
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
+        "ls_kv_properties_typeProperties_baseUrl": "[concat(parameters('keyVaultName'), '.vault.azure.net/')]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_release_statistics')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Execute update observations",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_observations",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "releaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "releaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Execute update footnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Execute update observations",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_footnotes",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "releaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "releaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Execute update success",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Execute update footnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": "No errors",
+                                "Status": "Complete",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "releaseId": {
+                        "type": "string",
+                        "defaultValue": "CFEB8DC9-9B70-4AD1-ED98-08D7ABD4CCD5"
+                    },
+                    "releaseStatusId": {
+                        "type": "string",
+                        "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/pl_update_observations')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_update_footnotes')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_update_status')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_update_status')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Update status",
+                        "type": "WebActivity",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": "[concat('https://', parameters('publicAppName'),'.azurewebsites.net/api/datafactory/pipeline/status/')]",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "value": "{\n  \"DataFactoryName\":\"@{pipeline().DataFactory}\",\n  \"ErrorMessage\":\"@{replace(pipeline().parameters.ErrorMessage,'\"','\\\"')}\",\n  \"PipelineName\":\"@{pipeline().Pipeline}\",\n  \"PipelineTriggerTime\":\"@{pipeline().TriggerTime}\",\n  \"ReleaseId\":\"@{pipeline().parameters.ReleaseId}\",\n  \"ReleaseStatusId\":\"@{pipeline().parameters.ReleaseStatusId}\",\n  \"Status\": \"@{pipeline().parameters.Status}\"\n}",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "ErrorMessage": {
+                        "type": "string",
+                        "defaultValue": "No error message set"
+                    },
+                    "ReleaseId": {
+                        "type": "string"
+                    },
+                    "ReleaseStatusId": {
+                        "type": "string"
+                    },
+                    "Status": {
+                        "type": "string"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_update_footnotes')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Copy_Footnotes_For_FilterFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN (SELECT FootnoteId FROM dbo.FilterFootnote WHERE FilterId IN (SELECT Id FROM Filter WHERE SubjectId in (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertFootnote]",
+                                "sqlWriterTableType": "FootnoteType",
+                                "storedProcedureTableTypeParameterName": "Footnote"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Footnotes_For_SubjectFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterGroupFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN (SELECT FootnoteId FROM dbo.SubjectFootnote WHERE SubjectId in (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertFootnote]",
+                                "sqlWriterTableType": "FootnoteType",
+                                "storedProcedureTableTypeParameterName": "Footnote"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Footnotes_For_IndicatorFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_SubjectFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN (SELECT FootnoteId FROM dbo.IndicatorFootnote WHERE IndicatorId IN (SELECT Id FROM dbo.Indicator WHERE IndicatorGroupId IN (SELECT Id FROM dbo.IndicatorGroup WHERE SubjectId IN (SELECT Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))))\n",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertFootnote]",
+                                "sqlWriterTableType": "FootnoteType",
+                                "storedProcedureTableTypeParameterName": "Footnote"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_FilterFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterFootnote WITH (NOLOCK) WHERE FilterId IN (SELECT Id FROM Filter WHERE SubjectId IN (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterFootnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterFootnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_SubjectFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_SubjectFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.SubjectFootnote WITH (NOLOCK) WHERE SubjectId IN (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "SubjectFootnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "SubjectFootnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_IndicatorFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_IndicatorFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.IndicatorFootnote WITH (NOLOCK) WHERE IndicatorId IN (SELECT Id FROM dbo.Indicator WHERE IndicatorGroupId in (SELECT Id FROM dbo.IndicatorGroup WHERE SubjectId in (select Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))\n",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "IndicatorId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "IndicatorId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "IndicatorFootnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "IndicatorFootnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_Footnotes_For_FilterFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Footnotes_For_FilterFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_FilterFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_FilterFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Footnotes_For_SubjectFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_SubjectFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Footnotes_For_SubjectFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_SubjectFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_SubjectFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_SubjectFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Footnotes_For_IndicatorFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_IndicatorFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Footnotes_For_IndicatorFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_IndicatorFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_IndicatorFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_IndicatorFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy_FilterGroupFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterGroupFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterGroupFootNote WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN (SELECT Id FROM Filter WHERE SubjectId in (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "FilterGroupId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterGroupId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterGroupFootnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterGroupFootnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Footnotes_For_FilterGroupFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN \n(SELECT FootnoteId FROM dbo.FilterGroupFootNote WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN (SELECT Id FROM Filter WHERE SubjectId in (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertFootnote]",
+                                "sqlWriterTableType": "FootnoteType",
+                                "storedProcedureTableTypeParameterName": "Footnote"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_FilterGroupFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterGroupFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_FilterGroupFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Footnotes_For_FilterGroupFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterGroupFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Footnotes_For_FilterGroupFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "releaseId": {
+                        "type": "string"
+                    },
+                    "releaseStatusId": {
+                        "type": "string"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/ds_sql_statistics')]",
+                "[concat(variables('factoryId'), '/datasets/ds_sql_public_statistics')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_update_status')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_update_observations')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Copy_Theme",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Theme WITH (NOLOCK) WHERE Id IN (SELECT ThemeId FROM dbo.Topic WHERE Id IN (SELECT TopicId FROM dbo.Publication WHERE Id IN (SELECT PublicationId FROM Release WHERE Id = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertTheme]",
+                                "sqlWriterTableType": "ThemeType",
+                                "storedProcedureTableTypeParameterName": "Theme"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Theme"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Theme"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Topic",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Theme",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Topic WHERE Id IN (SELECT TopicId FROM dbo.Publication WHERE Id IN (SELECT PublicationId FROM Release WHERE Id = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertTopic]",
+                                "sqlWriterTableType": "TopicType",
+                                "storedProcedureTableTypeParameterName": "Topic"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ThemeId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "ThemeId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Topic"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Topic"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Publication",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Topic",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Publication WHERE Id IN (SELECT PublicationId FROM Release WHERE Id = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertPublication]",
+                                "sqlWriterTableType": "PublicationType",
+                                "storedProcedureTableTypeParameterName": "Publication"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Title",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "TopicId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "TopicId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Publication"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Publication"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Release",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Publication",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Release WITH (NOLOCK) WHERE Id = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[DropAndCreateRelease]",
+                                "sqlWriterTableType": "ReleaseType",
+                                "storedProcedureTableTypeParameterName": "Release"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "TimeIdentifier",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "TimeIdentifier",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ReleaseDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "ReleaseDate",
+                                            "type": "DateTime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Slug",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Year",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "Year",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PublicationId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "PublicationId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Release"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Release"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Filters",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Subjects",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Filter WITH (NOLOCK) WHERE SubjectId IN (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Hint",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Hint",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Filter"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Filter"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_FilterGroups",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Filters",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterGroup WITH (NOLOCK) WHERE FilterId IN (SELECT id FROM dbo.Filter WHERE SubjectId in (SELECT Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterGroup"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterGroup"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_FilterItems",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterGroups",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterItem WITH (NOLOCK) WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN (\nSELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT Id FROM Subject WHERE  ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FilterGroupId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterGroupId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterItem"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterItem"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_IndicatorGroups",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterItems",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.IndicatorGroup WITH (NOLOCK) WHERE SubjectId IN (select Id FROM  Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "IndicatorGroup"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "IndicatorGroup"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Indicators",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_IndicatorGroups",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Indicator WITH (NOLOCK) WHERE IndicatorGroupId IN (SELECT Id FROM dbo.IndicatorGroup WHERE SubjectId in (SELECT Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Label",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Unit",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Unit",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "IndicatorGroupId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "IndicatorGroupId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Indicator"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Indicator"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_Theme",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Theme",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Theme').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatus": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Topic",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Topic",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Topic').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Publication",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Publication",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Publication').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Release",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Release",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Release').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Subjects",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Subjects",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Subjects').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Filters",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Filters",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Filters').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_FilterGroups",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterGroups",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_FilterGroups').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_FilterItems",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterItems",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_FilterItems').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_IndicatorGroups",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_IndicatorGroups",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_IndicatorGroups').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Indicators",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Indicators",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Indicators').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_Observations",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Observations",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Observations').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Fail_Copy_ObservationFilterItems",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_ObservationFilterItems",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_ObservationFilterItems').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy_Locations",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Indicators",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Location WITH (NOLOCK) WHERE Id IN (SELECT LocationId FROM dbo.Observation WHERE SubjectId in (select Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertLocation]",
+                                "sqlWriterTableType": "LocationType",
+                                "storedProcedureTableTypeParameterName": "Location"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Country_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Country_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Country_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Country_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Institution_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Institution_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Institution_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Institution_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalAuthority_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalAuthority_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalAuthority_OldCode",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalAuthority_OldCode",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalAuthority_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalAuthority_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalAuthorityDistrict_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalAuthorityDistrict_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalAuthorityDistrict_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalAuthorityDistrict_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalEnterprisePartnership_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalEnterprisePartnership_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocalEnterprisePartnership_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "LocalEnterprisePartnership_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "MayoralCombinedAuthority_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "MayoralCombinedAuthority_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "MayoralCombinedAuthority_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "MayoralCombinedAuthority_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "MultiAcademyTrust_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "MultiAcademyTrust_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "MultiAcademyTrust_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "MultiAcademyTrust_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "OpportunityArea_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "OpportunityArea_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "OpportunityArea_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "OpportunityArea_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ParliamentaryConstituency_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "ParliamentaryConstituency_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ParliamentaryConstituency_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "ParliamentaryConstituency_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Region_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Region_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Region_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Region_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "RscRegion_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "RscRegion_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Sponsor_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Sponsor_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Sponsor_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Sponsor_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Ward_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Ward_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Ward_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Ward_Name",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Location"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Location"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_Locations",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Locations",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Locations').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy_Subjects",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Release",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Subject WITH (NOLOCK) WHERE ReleaseId IN (SELECT Id FROM dbo.Release WHERE Id = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ReleaseId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "ReleaseId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Subject"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Subject"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_Observations",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Locations",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Observation WITH (NOLOCK) WHERE SubjectId IN (select Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "writeBatchSize": 100,
+                                "disableMetricsCollection": false
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "GeographicLevel",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "GeographicLevel",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LocationId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "LocationId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ProviderUrn",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "ProviderUrn",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SchoolLaEstab",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "SchoolLaEstab",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Year",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "Year",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "TimeIdentifier",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "TimeIdentifier",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Measures",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Measures",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "CsvRow",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "CsvRow",
+                                            "type": "Int64"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Observation"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Observation"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Copy_ObservationFilterItems",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Observations",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.ObservationFilterItem WITH (NOLOCK) WHERE ObservationId IN (SELECT Id FROM Observation WHERE SubjectId IN (SELECT Id FROM Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "writeBatchSize": 100,
+                                "disableMetricsCollection": false
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "ObservationId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "ObservationId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FilterItemId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterItemId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "ObservationFilterItem"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "ObservationFilterItem"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "parameters": {
+                    "releaseId": {
+                        "type": "string",
+                        "defaultValue": "CFEB8DC9-9B70-4AD1-ED98-08D7ABD4CCD5"
+                    },
+                    "releaseStatusId": {
+                        "type": "string",
+                        "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/ds_sql_statistics')]",
+                "[concat(variables('factoryId'), '/datasets/ds_sql_public_statistics')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_update_status')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_sql_public_statistics')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_public_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "cw_table": {
+                        "type": "String"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": {
+                        "value": "@dataset().cw_table",
+                        "type": "Expression"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_sql_observation')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "Id",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "SubjectId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "GeographicLevel",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "LocationId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "ProviderUrn",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "SchoolLaEstab",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "Year",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "TimeIdentifier",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "Measures",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "CsvRow",
+                        "type": "bigint",
+                        "precision": 19
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "Observation"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_public_statistics_observations')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_public_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "Id",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "SubjectId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "GeographicLevel",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "LocationId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "ProviderUrn",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "SchoolLaEstab",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "Year",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "TimeIdentifier",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "Measures",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "CsvRow",
+                        "type": "bigint",
+                        "precision": 19
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "Observation"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_sql_observationfilteritem')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "ObservationId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "FilterItemId",
+                        "type": "uniqueidentifier"
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "ObservationFilterItem"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_public_statistics_observationfilteritems')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_public_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "ObservationId",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "FilterItemId",
+                        "type": "uniqueidentifier"
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "ObservationFilterItem"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_sql_statistics')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_sql_statistics",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "cw_table": {
+                        "type": "String"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": {
+                        "value": "@dataset().cw_table",
+                        "type": "Expression"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ls_sql_statistics')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('ls_sql_statistics_connectionString')]",
+                    "password": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "ls_kv",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-admin-password"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_kv')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ls_sql_public_statistics')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('ls_sql_public_statistics_connectionString')]",
+                    "password": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "ls_kv",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-public-password"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_kv')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ls_kv')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "description": "Key vault linked service",
+                "annotations": [],
+                "type": "AzureKeyVault",
+                "typeProperties": {
+                    "baseUrl": "[variables('ls_kv_properties_typeProperties_baseUrl')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
