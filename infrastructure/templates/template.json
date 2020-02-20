@@ -618,7 +618,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
@@ -801,7 +822,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
@@ -1046,7 +1088,27 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
