@@ -2695,15 +2695,24 @@
           },
           "environment": {
             "value": "[parameters('environment')]"
+          },
+          "publisherAppName": {
+            "value": "[variables('publisherAppName')]"
+          },
+          "ls_sql_public_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+          },
+          "ls_sql_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
           }
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('sqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publicSqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
-
-
-
     {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",
       "apiVersion": "2014-04-01",
