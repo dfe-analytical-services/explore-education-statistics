@@ -44,12 +44,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
             CreateMap<Subject, IdLabel>()
                 .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
 
-            CreateMap<Theme, ThemeMetaViewModel>();
+            CreateMap<Theme, ThemeMetaViewModel>()
+                .ForMember(dest => dest.Topics, opts => opts.Ignore());
 
-            CreateMap<Topic, TopicMetaViewModel>();
+            CreateMap<Topic, TopicMetaViewModel>()
+                .ForMember(dest => dest.Publications, opts => opts.Ignore());
         }
 
-        private IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
         {
             try
             {
