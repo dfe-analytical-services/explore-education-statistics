@@ -1,5 +1,6 @@
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
+import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import methodologyService from '@admin/services/methodology/service';
 import withErrorControl, {
@@ -164,11 +165,18 @@ const MethodologyContentPage = ({
                         .catch(handleApiErrors);
                     });
                   }}
-                />
+                >
+                  <ContentBlocks
+                    id={`${section.heading}-content`}
+                    sectionId={section.id as string}
+                    content={section.content}
+                    onContentChange={refreshMethodology}
+                    canAddBlocks
+                    textOnly
+                  />
+                </AccordionSection>
               ))}
             </Accordion>
-
-            <p>{JSON.stringify(methodology)}</p>
           </section>
         </div>
       </EditingContext.Provider>
