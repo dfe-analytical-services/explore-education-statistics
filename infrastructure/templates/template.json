@@ -467,7 +467,7 @@
 
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
-    "ees-openidconnect-tenant": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-tenant')]",
+    "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
 
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
@@ -1008,7 +1008,8 @@
             },
             {
               "name": "OpenIdConnect:Authority",
-               "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"             },
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]"
+            },
             {
               "name": "OpenIdConnect:ClientId",
               "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]"
