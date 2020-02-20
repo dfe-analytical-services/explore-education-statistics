@@ -57,7 +57,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "dataFactoryName": {
+          "factoryName": {
             "value": "[variables('dataFactoryName')]"
           },
           "publisherAppName": {
