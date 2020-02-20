@@ -11,7 +11,7 @@ import withErrorControl, {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
-import { Route, RouteComponentProps, Switch } from 'react-router';
+import { Route, RouteComponentProps, Switch, Redirect } from 'react-router';
 
 export interface MethodologyTabProps {
   refreshMethodology: () => void;
