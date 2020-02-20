@@ -72,8 +72,7 @@
         }
       },
       "dependsOn": [
-        "[variables('dataFactoryName')]",
-        "[variables('templateBaseUrl')]"
+        "[variables('dataFactoryName')]"
       ]
     }
   ]
