@@ -2,7 +2,7 @@
 //   PublicationMeta,
 // } from '@common/services/tableBuilderService';
 // import React from 'react';
-// import { fireEvent, render, wait, within } from 'react-testing-library';
+// import { fireEvent, render, wait, within } from '@testing-library/react';
 // import TableToolPage from '../TableToolPage';
 
 // jest.mock('@common/services/tableBuilderService');

@@ -4,7 +4,7 @@ import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
-import { fireEvent, render, wait } from 'react-testing-library';
+import { fireEvent, render, wait } from '@testing-library/react';
 import PageSearchForm from '../PageSearchForm';
 
 const labelText = 'Find on this page';
