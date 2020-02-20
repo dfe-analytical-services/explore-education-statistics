@@ -176,6 +176,7 @@ const nextConfig = {
 
     config.resolve.alias = {
       ...config.resolve.alias,
+      './dist/cpexcel.js': '',
       '@frontend': path.resolve(__dirname, 'src'),
       '@common': path.resolve(
         __dirname,
@@ -183,6 +184,11 @@ const nextConfig = {
       ),
       react: path.resolve(__dirname, 'node_modules/react'),
       formik: path.resolve(__dirname, 'node_modules/formik'),
+    };
+
+    config.node = {
+      ...config.node,
+      Buffer: false,
     };
 
     options.defaultLoaders.babel.options.configFile = path.resolve(

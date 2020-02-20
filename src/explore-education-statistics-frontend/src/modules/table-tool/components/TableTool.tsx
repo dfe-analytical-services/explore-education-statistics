@@ -1,10 +1,8 @@
 import ButtonText from '@common/components/ButtonText';
 import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import permalinkService from '@common/modules/table-tool/services/permalinkService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   FinalStepProps,
@@ -13,9 +11,12 @@ import TableToolWizard, {
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const TableToolFinalStep = ({
   table,
@@ -23,7 +24,7 @@ const TableToolFinalStep = ({
   publication,
   query,
 }: FinalStepProps) => {
-  const dataTableRef = createRef<HTMLTableElement>();
+  const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
   const [currentTable, setCurrentTable] = useState<FullTable>();
@@ -139,6 +140,13 @@ const TableToolFinalStep = ({
                   <DownloadCsvButton
                     publicationSlug={publication.slug}
                     fullTable={table}
+                  />
+                </li>
+                <li>
+                  <DownloadExcelButton
+                    publicationSlug={publication.slug}
+                    tableRef={dataTableRef}
+                    footnotes={table?.subjectMeta.footnotes}
                   />
                 </li>
 

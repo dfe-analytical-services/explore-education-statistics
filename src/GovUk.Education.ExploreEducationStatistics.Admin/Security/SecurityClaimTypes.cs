@@ -8,10 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
         ManageAnyUser,
         ManageAnyMethodology,
+        UpdateAllMethodologies,
         
+        CreateAnyMethodology,
         CreateAnyPublication,
         CreateAnyRelease,
 
+        AccessAllMethodologies,
         AccessAllReleases,
         AccessAllTopics,
         
