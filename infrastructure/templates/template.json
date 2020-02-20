@@ -2708,8 +2708,9 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('sqlServerName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('publicSqlServerName'))]",
+        "[variables('sqlserverName')]",
+        "[variables('publicSqlServerName')]",
+        "[variables('templateBaseUrl')]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
