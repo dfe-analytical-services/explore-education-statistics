@@ -4,9 +4,11 @@ import { PublicationContact } from '@common/services/publicationService';
 const ContactUsSection = ({
   publicationContact,
   themeTitle,
+  editing,
 }: {
   publicationContact: PublicationContact;
   themeTitle: string;
+  editing?: boolean;
 }) => (
   <>
     <p>
@@ -17,9 +19,13 @@ const ContactUsSection = ({
     </h4>
     <p className="govuk-!-margin-top-0">
       Email <br />
-      <a href={`mailto:${publicationContact.teamEmail}`}>
-        {publicationContact.teamEmail}
-      </a>
+      {editing ? (
+        <a>{publicationContact.teamEmail}</a>
+      ) : (
+        <a href={`mailto:${publicationContact.teamEmail}`}>
+          {publicationContact.teamEmail}
+        </a>
+      )}
     </p>
     <p>
       Telephone: {publicationContact.contactName} <br />{' '}

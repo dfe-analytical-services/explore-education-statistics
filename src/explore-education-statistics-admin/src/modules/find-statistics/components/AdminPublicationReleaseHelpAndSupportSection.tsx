@@ -10,9 +10,11 @@ import ContactUsSection from '@common/modules/find-statistics/components/Contact
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
   publication,
+  editing,
 }: {
   publication: ManageContentPageViewModel['release']['publication'];
   release: ManageContentPageViewModel['release'];
+  editing?: boolean;
 }) => {
   return (
     <>
@@ -32,13 +34,19 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           {publication.methodology || publication.externalMethodology ? (
             <p>
               Read our{' '}
-              {publication.methodology && (
-                <Link to={`/methodologies/${publication.methodology.id}`}>
-                  {`${publication.title}: methodology`}
-                </Link>
-              )}
+              {publication.methodology &&
+                (editing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
+                  <Link to={`/methodologies/${publication.methodology.id}`}>
+                    {`${publication.title}: methodology`}
+                  </Link>
+                ))}
               {!publication.methodology &&
-                publication.externalMethodology && (
+                publication.externalMethodology &&
+                (editing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
                   <Link
                     to=""
                     rel="external"
@@ -47,7 +55,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
                   >
                     {`${publication.title}: methodology`}
                   </Link>
-                )}{' '}
+                ))}{' '}
               guidance.
             </p>
           ) : (
@@ -61,6 +69,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         )}
         <AccordionSection heading="Contact us" headingTag="h3">
           <ContactUsSection
+            editing={editing}
             publicationContact={publication.contact}
             themeTitle={publication.topic.theme.title}
           />

@@ -231,7 +231,11 @@ const PublicationReleaseContent = ({
                           ({ id, description, url }) => [
                             description,
                             <li key={id} data-testid="other-release-item">
-                              <a href={url}>{description}</a>
+                              {!editing ? (
+                                <a href={url}>{description}</a>
+                              ) : (
+                                <a>{description}</a>
+                              )}
                             </li>,
                           ],
                         ),
@@ -246,7 +250,7 @@ const PublicationReleaseContent = ({
               )}
             </dl>
             <ReleaseNotesSection release={release} />
-            <RelatedInformationSection release={release} />
+            <RelatedInformationSection editing={editing} release={release} />
           </RelatedAside>
         </div>
       </div>
@@ -267,6 +271,7 @@ const PublicationReleaseContent = ({
       />
 
       <AdminPublicationReleaseHelpAndSupportSection
+        editing={editing}
         publication={publication}
         release={release}
       />
