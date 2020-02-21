@@ -26,6 +26,7 @@
   flex-direction: column;
   margin: 0.5%;
   max-width: 32.3%;
+  position: relative;
 
   @include govuk-media-query($until: tablet) {
     flex: 0 0 100%;
@@ -39,7 +40,7 @@
     background: $govuk-brand-colour;
     color: govuk-colour('white');
     flex: 1 0 auto;
-    padding: 0.7rem 1rem;
+    padding: 0.7rem 1rem 3rem;
 
     @include govuk-media-query($until: tablet) {
       flex-basis: auto;
@@ -72,20 +73,29 @@
   }
 
   details {
+    background: govuk-colour('white');
+    bottom: 0;
     font-size: 1rem;
     margin: 0 0.5rem 0 0;
-    min-height: 3.5rem;
-    padding-top: 0.5rem;
-
-    @include govuk-media-query($until: tablet) {
-      min-height: auto;
-    }
+    padding: 0.5rem;
+    position: absolute;
+    width: 100%;
   }
+
+  /* stylelint-disable */
+  details[open] {
+    height: 100%;
+  }
+  /* stylelint-enable */
 }
 
-.keyStatTile :global(.govuk-details__text) {
-  padding: 0 20px;
+:global(.page-editing) .keyStatTile details {
+  position: static;
 }
+
+/*.keyStatTile :global(.govuk-details__text) {
+  padding: 0 20px;
+}*/
 
 .trendText {
   color: govuk-colour('white');
