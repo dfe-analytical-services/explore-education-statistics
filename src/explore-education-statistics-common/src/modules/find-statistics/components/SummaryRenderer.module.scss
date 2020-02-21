@@ -47,7 +47,10 @@
 
     background: $govuk-brand-colour;
     color: govuk-colour('white');
+    display: flex;
     flex: 1 0 auto;
+    flex-direction: column;
+    justify-content: space-evenly;
     padding: 0.7rem 1rem 3rem;
 
     @include govuk-media-query($until: tablet) {
