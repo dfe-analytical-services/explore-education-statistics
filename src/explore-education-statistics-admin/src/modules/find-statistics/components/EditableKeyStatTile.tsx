@@ -112,7 +112,7 @@ const EditableKeyStatTile = ({
                 (summary &&
                   summary.dataDefinitionTitle &&
                   summary.dataDefinitionTitle[0]) ||
-                `Define '${config.indicatorLabel}'`,
+                `Help`,
               dataDefinition:
                 (summary &&
                   summary.dataDefinition &&
@@ -149,7 +149,7 @@ const EditableKeyStatTile = ({
                       />
                     </div>
                   </div>
-                  <Details summary="Guidance text" open>
+                  <div className="govuk-inset-text">
                     <FormFieldTextInput<KeyStatsFormValues>
                       id={`key-stat-dataDefinitionTitle-${id}`}
                       name="dataDefinitionTitle"
@@ -160,7 +160,7 @@ const EditableKeyStatTile = ({
                       name="dataDefinition"
                       label="Guidance text"
                     />
-                  </Details>
+                  </div>
                   <Button
                     disabled={!form.isValid}
                     type="submit"
@@ -192,7 +192,7 @@ const EditableKeyStatTile = ({
           summary={summary}
           handleApiErrors={handleApiErrors}
         >
-          <div className="govuk-!-margin-top-2">
+          <div className={styles.keyStatEdit}>
             <Button
               onClick={() => {
                 setShowForm(true);

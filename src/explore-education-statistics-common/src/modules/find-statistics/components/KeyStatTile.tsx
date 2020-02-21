@@ -71,10 +71,7 @@ const KeyStatTile = ({
           </div>
           {summary && summary.dataDefinition && (
             <Details
-              summary={
-                (summary && summary.dataDefinitionTitle) ||
-                `Define '${config.indicatorLabel}'`
-              }
+              summary={(summary && summary.dataDefinitionTitle) || `Help`}
             >
               <div>{summary.dataDefinition}</div>
             </Details>
