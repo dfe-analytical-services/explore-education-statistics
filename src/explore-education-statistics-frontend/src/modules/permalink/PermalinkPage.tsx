@@ -8,7 +8,7 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 
 interface Props {
@@ -17,14 +17,10 @@ interface Props {
 }
 
 class PermalinkPage extends Component<Props> {
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    permalink: string;
-  }>) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const { permalink } = query;
 
-    const request = permalinkService.getPermalink(permalink);
+    const request = permalinkService.getPermalink(permalink as string);
 
     const data = await request;
 
@@ -89,7 +85,7 @@ class PermalinkPage extends Component<Props> {
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-        <ButtonLink prefetch as="/data-tables/" href="/data-tables">
+        <ButtonLink as="/data-tables/" href="/data-tables">
           Create tables
         </ButtonLink>
       </Page>

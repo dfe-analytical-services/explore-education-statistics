@@ -21,7 +21,7 @@ const ButtonLink = ({
   ...props
 }: Props) => {
   return (
-    <Link {...props} prefetch={prefetch} href={href || to}>
+    <Link {...props} prefetch={prefetch} href={href ?? to ?? ''}>
       <a
         {...props}
         className={classNames(
