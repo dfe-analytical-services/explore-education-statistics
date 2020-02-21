@@ -40,6 +40,8 @@ Upload subject
     user clicks element   xpath://button[text()="Upload data files"]
 
     user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user waits until page contains accordion section   UI test subject
+    user opens accordion section   UI test subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
     user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
 
@@ -246,7 +248,6 @@ Save data block
     user clears element text   css:#data-block-title
     user enters text into element  css:#data-block-title       UI Test table title
     user enters text into element  css:#data-block-source      UI Test source
-    user enters text into element  css:#data-block-footnotes   UI Test footnotes
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
