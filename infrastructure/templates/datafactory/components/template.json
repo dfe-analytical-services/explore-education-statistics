@@ -273,7 +273,7 @@
                         "type": "Copy",
                         "dependsOn": [
                             {
-                                "activity": "Copy_FilterGroupFootnotes",
+                                "activity": "Copy_FilterItemFootnotes",
                                 "dependencyConditions": [
                                     "Succeeded"
                                 ]
@@ -1082,6 +1082,233 @@
                             "parameters": {
                                 "ErrorMessage": {
                                     "value": "@{activity('Copy_Footnotes_For_FilterGroupFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy_Footnotes_For_FilterItemFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterGroupFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN\n(SELECT FootnoteId FROM dbo.FilterItemFootNote WHERE FilterItemId IN (\n(SELECT Id FROM dbo.FilterItem WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN \n(SELECT Id FROM Filter WHERE SubjectId IN \n(SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')))))))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "sqlWriterStoredProcedureName": "[[dbo].[UpsertFootnote]",
+                                "sqlWriterTableType": "FootnoteType",
+                                "storedProcedureTableTypeParameterName": "Footnote"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Content",
+                                            "type": "String"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "Footnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_Footnotes_For_FilterItemFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterItemFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_Footnotes_For_FilterItemFootnotes').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Copy_FilterItemFootnotes",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Footnotes_For_FilterItemFootnotes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterItemFootNote WITH (NOLOCK) WHERE FilterItemId IN (\n(SELECT Id FROM dbo.FilterItem WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN \n(SELECT Id FROM Filter WHERE SubjectId IN \n(SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))))))",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "FilterItemId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterItemId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FootnoteId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterItemFootnote"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "FilterItemFootnote"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_FilterItemFootnotes",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_FilterItemFootnotes",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_FilterItemFootnotes').Error.Message}",
                                     "type": "Expression"
                                 },
                                 "Status": "Failed",
