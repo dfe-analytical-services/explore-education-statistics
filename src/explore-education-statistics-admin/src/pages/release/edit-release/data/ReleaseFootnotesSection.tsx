@@ -7,9 +7,8 @@ import Link from '@admin/components/Link';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import FootnotesList from '@admin/components/footnotes/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
@@ -21,13 +20,13 @@ interface Props {
   releaseId: string;
   footnotesData?: FootnotesData;
   onSubmit: (footnotesData: FootnotesData) => void;
-  getFootnoteData: () => void;
+  onDelete: () => void;
 }
 
 const ReleaseFootnotesSection = ({
   footnotesData,
   onSubmit,
-  getFootnoteData,
+  onDelete,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
@@ -119,7 +118,7 @@ const ReleaseFootnotesSection = ({
                   footnotesService
                     .deleteFootnote((footnoteToBeDeleted as Footnote).id)
                     .then(() => setFootnoteToBeDeleted(undefined))
-                    .then(getFootnoteData)
+                    .then(onDelete)
                     .catch(handleApiErrors);
                 }}
               >
