@@ -36,61 +36,61 @@ restore_cmds = [
 for cmd in restore_cmds:
     print(container.exec_run(cmd))
 
-## Delete all files in cache blob container
-#block_blob_service = BlockBlobService(is_emulated=True)
-#generator = block_blob_service.list_blobs('cache')
-#for blob in generator:
-#    block_blob_service.delete_blob('cache', blob.name)
-#
-## Restore all files to cache blob container
-#for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'content-cache')):
-#    for filename in filenames:
-#        file_path = os.path.join(dirpath, filename)
-#        blob_name = os.path.join(dirpath, filename).split(f'content-cache{os.sep}', 1)[1]
-#        block_blob_service.create_blob_from_path('cache', blob_name, file_path)
-#
-## Delete all files in releases blob container
-#block_blob_service = BlockBlobService(is_emulated=True)
-#generator = block_blob_service.list_blobs('releases')
-#for blob in generator:
-#    block_blob_service.delete_blob('releases', blob.name)
-#
-## Restore all files to releases blob container
-#for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'releases')):
-#    for filename in filenames:
-#        if filename.endswith('.metadata'):
-#            continue
-#        file_path = os.path.join(dirpath, filename)
-#        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
-#        with open(metadata_file_path, 'r') as file:
-#            metadata = json.loads(file.read())
-#        print('metadata', metadata)
-#        blob_name = os.path.join(dirpath, filename).split(f'releases{os.sep}', 1)[1]
-#        block_blob_service.create_blob_from_path('releases', blob_name, file_path, metadata=metadata)
-#
-## Delete all files in downloads blob container
-#block_blob_service = BlockBlobService(is_emulated=True)
-#generator = block_blob_service.list_blobs('downloads')
-#for blob in generator:
-#    block_blob_service.delete_blob('downloads', blob.name)
-#
-## Restore all files to downloads blob container
-#for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'downloads')):
-#    for filename in filenames:
-#        if filename.endswith('.metadata'):
-#            continue
-#        file_path = os.path.join(dirpath, filename)
-#        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
-#        with open(metadata_file_path, 'r') as file:
-#            metadata = json.loads(file.read())
-#        print('metadata', metadata)
-#        blob_name = os.path.join(dirpath, filename).split(f'downloads{os.sep}', 1)[1]
-#        block_blob_service.create_blob_from_path('downloads', blob_name, file_path, metadata=metadata)
-#
-## Restore imports table
-#restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}', '/destType:table', f'/Dest:{storage_table_url}/imports', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
-#print(subprocess.run(restore_table_cmd))
-#
-## Restore ReleaseStatus table
-#restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "ReleaseStatus")}', '/destType:table', f'/Dest:{storage_table_url}/ReleaseStatus', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
-#print(subprocess.run(restore_table_cmd))
+# Delete all files in cache blob container
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('cache')
+for blob in generator:
+    block_blob_service.delete_blob('cache', blob.name)
+
+# Restore all files to cache blob container
+for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'content-cache')):
+    for filename in filenames:
+        file_path = os.path.join(dirpath, filename)
+        blob_name = os.path.join(dirpath, filename).split(f'content-cache{os.sep}', 1)[1]
+        block_blob_service.create_blob_from_path('cache', blob_name, file_path)
+
+# Delete all files in releases blob container
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('releases')
+for blob in generator:
+    block_blob_service.delete_blob('releases', blob.name)
+
+# Restore all files to releases blob container
+for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'releases')):
+    for filename in filenames:
+        if filename.endswith('.metadata'):
+            continue
+        file_path = os.path.join(dirpath, filename)
+        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
+        with open(metadata_file_path, 'r') as file:
+            metadata = json.loads(file.read())
+        print('metadata', metadata)
+        blob_name = os.path.join(dirpath, filename).split(f'releases{os.sep}', 1)[1]
+        block_blob_service.create_blob_from_path('releases', blob_name, file_path, metadata=metadata)
+
+# Delete all files in downloads blob container
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('downloads')
+for blob in generator:
+    block_blob_service.delete_blob('downloads', blob.name)
+
+# Restore all files to downloads blob container
+for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'downloads')):
+    for filename in filenames:
+        if filename.endswith('.metadata'):
+            continue
+        file_path = os.path.join(dirpath, filename)
+        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
+        with open(metadata_file_path, 'r') as file:
+            metadata = json.loads(file.read())
+        print('metadata', metadata)
+        blob_name = os.path.join(dirpath, filename).split(f'downloads{os.sep}', 1)[1]
+        block_blob_service.create_blob_from_path('downloads', blob_name, file_path, metadata=metadata)
+
+# Restore imports table
+restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}', '/destType:table', f'/Dest:{storage_table_url}/imports', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
+print(subprocess.run(restore_table_cmd))
+
+# Restore ReleaseStatus table
+restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "ReleaseStatus")}', '/destType:table', f'/Dest:{storage_table_url}/ReleaseStatus', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
+print(subprocess.run(restore_table_cmd))
