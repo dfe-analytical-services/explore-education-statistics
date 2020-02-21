@@ -34,15 +34,17 @@ const FormCheckboxSearchGroup = ({
     error,
   };
 
-  const [searchTerm, setSearchTerm] = useState('');
   const { isMounted } = useMounted();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   let filteredOptions = options;
 
   if (searchTerm) {
     filteredOptions = options.filter(
       option =>
-        new RegExp(searchTerm, 'i').test(option.label) ||
+        option.label.toLowerCase().includes(lowercaseSearchTerm) ||
         value.indexOf(option.value) > -1,
     );
   }
