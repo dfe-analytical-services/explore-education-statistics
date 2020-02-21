@@ -435,7 +435,7 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
@@ -2744,12 +2744,16 @@
           },
           "ls_sql_statistics_connectionString": {
             "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+          },
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
           }
         }
       },
       "dependsOn": [
         "[variables('sqlserverName')]",
         "[variables('publicSqlServerName')]",
+        "[variables('dataFactoryName')]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
