@@ -1,0 +1,6 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,filter_hint,filter_grouping_column
+admission_numbers,Indicator,Admission Numbers,,,,
+some_filter_one,Filter,Some Filter One,,,,Some Filter One
+some_filter_two,Filter,Some Filter Two,,,,Some Filter One
+some_filter_three,Filter,Some Filter Three,,,,Some Filter Three
+some_filter_four,Filter,Some Filter Four,,,,Some Filter Four Unmatched
