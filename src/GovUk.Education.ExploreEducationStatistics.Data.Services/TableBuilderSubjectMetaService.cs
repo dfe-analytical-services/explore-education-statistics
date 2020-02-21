@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -52,8 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public TableBuilderSubjectMetaViewModel GetSubjectMeta(Guid subjectId)
         {
-            var subject = _subjectService.Find(subjectId);
-            if (subject == null)
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
+            {
+                s => s.Release
+            });
+            
+            if (subject == null || !subject.Release.Live)
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));
             }

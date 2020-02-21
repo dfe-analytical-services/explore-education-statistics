@@ -86,14 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                // subjectService.Setup(s =>
-                //         s.FindMany(It.IsAny<Expression<Func<Subject, bool>>>(),
-                //             It.IsAny<List<Expression<Func<Subject, object>>>>()))
-                //     .Returns(new List<Subject>
-                //     {
-                //         subject1, subject2
-                //     }.AsQueryable);
-
                 context.Add(publication);
 
                 context.AddRange(new List<Release>
