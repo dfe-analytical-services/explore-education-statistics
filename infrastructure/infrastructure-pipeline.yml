@@ -5,7 +5,7 @@ trigger:
     - master
   paths:
     include:
-    - infrastructure/*
+    - infrastructure/**
     exclude:
     - README.md
     - infrastructure/templates/datafactory/template.json
