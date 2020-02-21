@@ -162,6 +162,39 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
 </tbody>
 `;
 
+exports[`TimePeriodDataTable renders table with only one of each option and no filters or locations 1`] = `
+<thead>
+  <tr>
+    <td colspan="1"
+        rowspan="1"
+        class="borderBottom"
+    >
+    </td>
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      England
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      18.3%
+    </td>
+  </tr>
+</tbody>
+`;
+
 exports[`TimePeriodDataTable renders table with two of every option 1`] = `
 <thead>
   <tr>
