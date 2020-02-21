@@ -49,7 +49,9 @@
       "identity":{
         "type":"SystemAssigned"
       },
-      "properties": {}
+      "properties": {},
+      "dependsOn": [
+      ]
     },
     {
       "name": "datafactory-components",

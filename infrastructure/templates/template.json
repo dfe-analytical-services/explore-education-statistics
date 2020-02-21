@@ -2751,9 +2751,8 @@
         }
       },
       "dependsOn": [
-        "[variables('sqlserverName')]",
-        "[variables('publicSqlServerName')]",
-        "[variables('dataFactoryName')]",
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
