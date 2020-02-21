@@ -1,12 +1,12 @@
 trigger:
   paths:
     include:
-    - infrastructure/**/*
+    - infrastructure/
 
 pr:
   paths:
     include:
-    - infrastructure/**/*
+    - infrastructure/
 
 pool:
   vmImage: 'windows-latest'

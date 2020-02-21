@@ -8,7 +8,7 @@ trigger:
     - master
   paths:
     exclude:
-    - infrastructure/**/*
+    - infrastructure/
 pr: none
 
 jobs:
