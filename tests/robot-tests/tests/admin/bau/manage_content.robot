@@ -90,7 +90,9 @@ Add accordion sections to release
     user waits until page contains element  xpath://span[text()="New section"]
     user changes accordion section title  3   Test section three
 
-Add content block to Test section one
+    # TODO: Validate that three accordion sections exist
+
+Add three content blocks to Test section one
     [Tags]  HappyPath
     ${section_one}=  user gets editable accordion section element  Test section one
     user opens editable accordion section   ${section_one}
@@ -99,24 +101,21 @@ Add content block to Test section one
     user clicks add content for editable accordion section   ${section_one}
     set global variable   ${section_one}   ${section_one}
 
-Delete newly added content block
+Add text to newly created content blocks
     [Tags]  HappyPath
-    user goes to url    https://localhost:5021/publication/15035cb5-81a9-4cdc-a425-8bb916a5ac04/release/ad771bac-fcf6-470f-5d93-08d7b14fc938/content
-    user waits until page contains element   xpath://h1[text()="Manage content test 1581692935"]
-    ${section_one}=  user gets editable accordion section element  Test section one
-    user opens editable accordion section   ${section_one}
-    user adds content to accordion section content block  ${section_one}   2    test test test
-    #user deletes editable accordion section content block  ${section_one}   5
-    #user clicks add content for editable accordion section   Test section one
-    #user adds content to accordion section's empty content block
+    user adds content to accordion section content block  ${section_one}   1    block one test text
+    user adds content to accordion section content block  ${section_one}   2    block two test text
+    user adds content to accordion section content block  ${section_one}   3    block three test text
 
-    #user clicks element   xpath://span[text()="Edit"]
-    #user presses keys  Test intro text for Manage content test %{RUN_IDENTIFIER}
-    #user clicks element   xpath://button[text()="Save"]
-    #user waits until page contains element  xpath://p[text()="Test intro text for Manage content test %{RUN_IDENTIFIER}"]
+    user checks accordion section contains X blocks   ${section_one}    3
 
-This?
+Delete second content block
     [Tags]  HappyPath
-    sleep  1000000
+    user deletes editable accordion section content block  ${section_one}   2
 
+Validate two remaining content blocks
+    [Tags]  HappyPath
+    user checks accordion section content block contains text   ${section_one}   1   block one test text
+    user checks accordion section content block contains text   ${section_one}   2   block three test text
 
+    user checks accordion section contains X blocks   ${section_one}    2

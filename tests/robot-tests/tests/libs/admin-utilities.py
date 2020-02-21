@@ -77,14 +77,36 @@ def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout
             time.sleep(0.5)
     raise AssertionError('Failed to find new empty content section')
 
+def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):
+    try:
+        elems = section_elem.find_elements_by_xpath(
+            f'.//*[@class="govuk-accordion__section-content"]/*[contains(@id, "content-section-")]'
+        )
+    except:
+        raise AssertionError(f'Failed to find any content blocks in accordion section')
+
+    assert len(elems) == int(num_blocks), f'Found {len(elems)} content blocks. Should have found {num_blocks}'
+
 def user_adds_content_to_accordion_section_content_block(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(f'(.//span[text()="Edit"])[{block_num}]').click()
     except:
         raise AssertionError(f'Failed to find Delete button for content block number {block_num}')
 
-    sl.log_to_console('Content: ', content)
-    sl.press_keys(content)
+    sl.press_keys(None, content)
+
+    try:
+        section_elem.find_element_by_xpath(f'.//button[text()="Save"]').click()
+    except:
+        raise AssertionError(f'Failed to find Save button for content block')
+
+def user_checks_accordion_section_content_block_contains_text(section_elem, block_num, content):
+    try:
+        section_elem.find_element_by_xpath(
+            f'.//*[@class="govuk-accordion__section-content"]/div[{block_num}]//*[text()="{content}"]'
+        )
+    except:
+        raise AssertionError(f'Failed to text "{content}" in content block number {block_num}')
 
 def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
     try:
