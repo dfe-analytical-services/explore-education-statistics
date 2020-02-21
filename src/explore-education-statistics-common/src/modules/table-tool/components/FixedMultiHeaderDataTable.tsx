@@ -1,5 +1,5 @@
+import CollapsibleList from '@common/components/CollapsibleList';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import Footnote from '@common/modules/table-tool/components/Footnote';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { HeaderGroup } from './MultiHeaderTable';
@@ -101,10 +101,16 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
+
         {footnotes.length > 0 && (
           <>
             <h2 className="govuk-heading-m">Footnotes</h2>
-            <Footnote content={footnotes} />
+
+            <CollapsibleList listStyle="number">
+              {footnotes.map(footnote => (
+                <li key={footnote.id}>{footnote.label}</li>
+              ))}
+            </CollapsibleList>
           </>
         )}
       </figure>
