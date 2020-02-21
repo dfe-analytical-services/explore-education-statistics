@@ -1,4 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
+import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
+import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
+
 export const testData1 = {
   fullTable: {
     subjectMeta: {
@@ -1009,4 +1012,97 @@ export const testData3 = {
       },
     ],
   },
+};
+
+export const testDataNoFilters = {
+  fullTable: {
+    subjectMeta: {
+      geoJsonAvailable: false,
+      filters: {},
+      footnotes: [],
+      indicators: [
+        {
+          value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
+          unit: '',
+        },
+        {
+          value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
+          unit: '',
+        },
+        {
+          value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+          label: 'Authorised absence rate',
+          unit: '%',
+        },
+      ],
+      locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+      publicationName: 'Pupil absence in schools in England',
+      subjectName: 'Absence in prus',
+      timePeriodRange: [
+        { label: '2014/15', code: 'AY', year: 2014 },
+        { label: '2015/16', code: 'AY', year: 2015 },
+        { label: '2016/17', code: 'AY', year: 2016 },
+      ],
+    },
+    results: [
+      {
+        filters: [],
+        geographicLevel: 'Country',
+        location: { country: { code: 'E92000001', name: 'England' } },
+        measures: {
+          '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2453340',
+          'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1397521',
+          '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.6',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'Country',
+        location: { country: { code: 'E92000001', name: 'England' } },
+        measures: {
+          '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2212399',
+          'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1280964',
+          '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'Country',
+        location: { country: { code: 'E92000001', name: 'England' } },
+        measures: {
+          '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2637752',
+          'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1488865',
+          '6160c4f8-4c9f-40f0-a623-2a4f742860af': '19.2',
+        },
+        timePeriod: '2016_AY',
+      },
+    ],
+  } as UnmappedFullTable,
+  tableHeadersConfig: {
+    columns: [
+      { label: '2014/15', value: '2014_AY' },
+      { label: '2015/16', value: '2015_AY' },
+      { label: '2016/17', value: '2016_AY' },
+    ],
+    columnGroups: [],
+    rows: [
+      {
+        value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+        label: 'Authorised absence rate',
+      },
+      {
+        value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
+        label: 'Number of authorised absence sessions',
+      },
+      {
+        value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
+        label: 'Number of overall absence sessions',
+      },
+    ],
+    rowGroups: [[{ value: 'E92000001', label: 'England' }]],
+  } as UnmappedTableHeadersConfig,
 };

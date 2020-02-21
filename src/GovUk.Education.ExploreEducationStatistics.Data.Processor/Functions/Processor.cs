@@ -68,14 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 }
                 catch (Exception e)
                 {
+                    var ex = GetInnerException(e);
+
                     await _batchService.FailImport(
                         message.Release.Id.ToString(),
                         message.DataFileName,
-                        new List<string> {e.Message}
+                        new List<string> {ex.Message}
                     );
                     
-                    logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                    $"{message.DataFileName} : {e.Message}");
+                    logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
+                                    $"{message.DataFileName} : {ex.Message}");
                 }
             }
             else
@@ -136,14 +138,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
             catch (Exception e)
             {
+                var ex = GetInnerException(e);
+                
                 await _batchService.FailImport(
                     message.Release.Id.ToString(),
                     message.DataFileName,
-                    new List<string> {e.Message}
+                    new List<string> {ex.Message}
                 );
                     
-                logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                $"{message.DataFileName} : {e.Message}");
+                logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
+                                $"{message.DataFileName} : {ex.Message}");
             }
         }
         
@@ -241,6 +245,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 RowsPerBatch =
                     Convert.ToInt32(config.GetValue<string>("RowsPerBatch"))
             };
+        }
+
+        private static Exception GetInnerException(Exception ex)
+        {
+            return ex.InnerException ?? ex;
         }
     }
 }
