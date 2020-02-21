@@ -19,7 +19,9 @@ import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ErrorSummary from '@common/components/ErrorSummary';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -67,7 +69,7 @@ const ManagePublicationsAndReleasesTab = ({
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
-  const [apiError, setApiError] = useState<{ id: ''; message: '' }[]>([]);
+  const [apiErrors, setApiErrors] = useState<ErrorSummaryMessage[]>([]);
 
   const [canCreatePublication, setCanCreatePublication] = useState(false);
 
@@ -154,7 +156,7 @@ const ManagePublicationsAndReleasesTab = ({
           .then(setCanCreatePublication),
       ])
         .then(_ => {
-          setApiError([]);
+          setApiErrors([]);
           // eslint-disable-next-line
           history.replaceState(
             {},
@@ -166,8 +168,8 @@ const ManagePublicationsAndReleasesTab = ({
           );
         })
         .catch(error => {
-          setApiError([
-            ...apiError,
+          setApiErrors([
+            ...apiErrors,
             { id: error.data.traceId, message: error.data.title },
           ]);
         });
@@ -271,8 +273,8 @@ const ManagePublicationsAndReleasesTab = ({
           </>
         ) : (
           <>
-            {apiError.length > 0 ? (
-              <ErrorSummary id="publications-error" errors={apiError} />
+            {apiErrors.length > 0 ? (
+              <ErrorSummary id="publications-error" errors={apiErrors} />
             ) : (
               <LoadingSpinner />
             )}
