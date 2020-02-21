@@ -7,6 +7,7 @@ import {
 import TimePeriodDataTable, {
   createGroupHeaders,
 } from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import React from 'react';
@@ -216,6 +217,273 @@ describe('TimePeriodDataTable', () => {
     ).toHaveLength(3);
 
     expect(container.querySelectorAll('table tbody td')).toHaveLength(9);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with only one of each option', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {
+          Characteristic: {
+            totalValue: '',
+            hint: 'Filter by pupil characteristic',
+            legend: 'Characteristic',
+            options: {
+              EthnicGroupMajor: {
+                label: 'Ethnic group major',
+                options: [
+                  {
+                    label: 'Ethnicity Major Asian Total',
+                    value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
+                  },
+                ],
+              },
+            },
+          },
+        },
+        footnotes: [],
+        indicators: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+            unit: '%',
+          },
+        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: ['598ed9fd-b37e-4e08-baec-08d78f6f2c4d'],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as UnmappedFullTable);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [
+          [
+            {
+              value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
+              label: 'Ethnicity Major Asian Total',
+            },
+          ],
+        ],
+        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
+        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rows: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+          },
+        ],
+      },
+      fullTable.subjectMeta,
+    );
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table thead th[scope="col"]'),
+    ).toHaveTextContent('Ethnicity Major Asian Total');
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table tbody th[scope="row"]'),
+    ).toHaveTextContent('England');
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(1);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with only one of each option and no filters', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+            unit: '%',
+          },
+        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as UnmappedFullTable);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [],
+        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
+        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rows: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+          },
+        ],
+      },
+      fullTable.subjectMeta,
+    );
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table thead th[scope="col"]'),
+    ).toHaveTextContent('2014/15');
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table tbody th[scope="row"]'),
+    ).toHaveTextContent('England');
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(1);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with only one of each option and no filters or locations', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+            unit: '%',
+          },
+        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as UnmappedFullTable);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [],
+        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
+        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rows: [
+          {
+            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            label: 'Authorised absence rate',
+          },
+        ],
+      },
+      fullTable.subjectMeta,
+    );
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table thead th[scope="col"]'),
+    ).toHaveTextContent('2014/15');
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector('table tbody th[scope="row"]'),
+    ).toHaveTextContent('England');
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(1);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
