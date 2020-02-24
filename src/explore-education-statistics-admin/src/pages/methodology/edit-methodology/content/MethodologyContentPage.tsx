@@ -61,8 +61,8 @@ const MethodologyContentPage = ({
       >
         <div
           className={classNames('govuk-width-container', {
-            'dfe-align--comments': isEditing,
-            'dfe-hide-comments': !isEditing,
+            'dfe-align--left-hand-controls': isEditing,
+            'dfe-hide-controls': !isEditing,
           })}
         >
           <section
