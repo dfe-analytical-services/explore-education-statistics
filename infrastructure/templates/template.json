@@ -2777,7 +2777,8 @@
         "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
+            "objectId": "ed8eb206-5af2-4943-b649-bdd842383d69",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataFactoryName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
@@ -2791,7 +2792,8 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2017-03-30', 'Full').identity.principalId]",
+            "objectId": "e9bf6777-2f02-4299-b484-91c58debed25",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
@@ -2805,7 +2807,23 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2017-03-30', 'Full').identity.principalId]",
+            "objectId": "215cae9a-701a-417a-97f4-20e1d8e0b690",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2017-03-30', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "10ddc034-bdb0-4655-92ba-4ad6c490d68a",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
