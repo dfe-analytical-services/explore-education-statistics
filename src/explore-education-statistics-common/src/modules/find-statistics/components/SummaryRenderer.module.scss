@@ -86,15 +86,12 @@
   }
 
   details {
-    background: govuk-colour('light-grey');
-    bottom: 0;
+    background: govuk-colour('white');
     font-size: 1rem;
     margin: 0;
     order: 2;
-    padding: 0.2rem 0.5rem;
-    //position: absolute;
+    padding: 0.2rem 0 0.2rem 0.5rem;
     text-align: right;
-    width: 100%;
 
     @include govuk-media-query($until: tablet) {
       order: 2;
@@ -104,11 +101,7 @@
 
   /* stylelint-disable */
   details[open] {
-    //max-height: 100%;
-    //overflow-x: auto;
-    //position: absolute;
     order: 1;
-
     @include govuk-media-query($until: tablet) {
       order: 2;
     }
