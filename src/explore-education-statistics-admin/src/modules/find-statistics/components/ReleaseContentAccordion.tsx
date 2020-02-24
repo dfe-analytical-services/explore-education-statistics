@@ -108,9 +108,8 @@ const ReleaseContentAccordion = ({
 
   const onRemoveContentSection = useCallback(
     async (block: ContentType, index: number) => {
-      let result;
       if (block.id) {
-        result = await releaseContentService
+        await releaseContentService
           .removeContentSection(releaseId, block.id)
           .catch(handleApiErrors);
 
@@ -118,7 +117,6 @@ const ReleaseContentAccordion = ({
 
         setContentAndTriggerOnContentChange(newContent);
       }
-      return result;
     },
     [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
   );

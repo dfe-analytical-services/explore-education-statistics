@@ -35,7 +35,6 @@ const EditableAccordionSection = ({
   onHeadingChange,
   canEditHeading,
   onRemoveSection,
-  canRemoveSection = !!onRemoveSection,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
@@ -127,13 +126,13 @@ const EditableAccordionSection = ({
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>
         )}
-        {canRemoveSection && (
+        {!!onRemoveSection && (
           <a
             role="button"
             tabIndex={0}
             onClick={() => setShowRemoveModal(true)}
             onKeyPress={e => {
-              if (e.charCode === 13) setShowRemoveModal(true);
+              if (e.key === 'Enter') setShowRemoveModal(true);
             }}
             className={styles.edit}
           >
@@ -143,6 +142,7 @@ const EditableAccordionSection = ({
                 title="Are you sure?"
                 onConfirm={onRemoveSection}
                 onExit={() => setShowRemoveModal(false)}
+                onCancel={() => setShowRemoveModal(false)}
               >
                 <p>
                   Are you sure you want to remove the following section?
