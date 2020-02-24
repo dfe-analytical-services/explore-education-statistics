@@ -2780,7 +2780,7 @@
           {
             "tenantId": "[subscription().tenantId]",
             // "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataFactoryName')), '2017-03-30', 'Full').identity.principalId]",
+            "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
