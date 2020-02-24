@@ -2772,6 +2772,7 @@
       "apiVersion": "2016-10-01",
       "location": "[resourceGroup().location]",
       "properties": {
+        "tenantId": "[subscription().tenantId]",
         "sku": {
           "family": "A",
           "name": "standard"
