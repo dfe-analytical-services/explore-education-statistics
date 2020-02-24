@@ -11,6 +11,7 @@ export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
     canDelete: boolean;
     onDelete: () => void;
+    toolbarStyle?: 'full' | 'reduced';
     editable?: boolean;
     onContentChange?: (content: string) => void;
   };
@@ -19,6 +20,7 @@ const EditableMarkdownRenderer = ({
   contentId,
   source,
   canDelete,
+  toolbarStyle,
   onDelete,
   editable = true,
   onContentChange,
@@ -36,13 +38,14 @@ const EditableMarkdownRenderer = ({
         canDelete={canDelete}
         editable={editable}
         useMarkdown
+        toolbarStyle={toolbarStyle}
         onContentChange={async ss => {
           if (
             editingContext.releaseId &&
             editingContext.sectionId &&
             contentId
           ) {
-            const { body } = await releaseContentService
+            await releaseContentService
               .updateContentSectionBlock(
                 editingContext.releaseId,
                 editingContext.sectionId,
@@ -52,10 +55,9 @@ const EditableMarkdownRenderer = ({
                 },
               )
               .catch(handleApiErrors);
-
-            if (onContentChange) onContentChange(body);
-            setMarkdown(body);
           }
+          if (onContentChange) onContentChange(ss);
+          setMarkdown(ss);
         }}
         onDelete={onDelete}
       />
