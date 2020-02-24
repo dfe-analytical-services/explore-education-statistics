@@ -4,10 +4,10 @@ import withErrorControl, {
 import React, { useEffect, useState } from 'react';
 import methodologyService from '@admin/services/methodology/service';
 import Page from '@admin/components/Page';
-import { MethodologyStatus } from '@admin/services/methodology/types';
+import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 
 interface Model {
-  methodologies: MethodologyStatus[];
+  methodologies: MethodologyStatusListItem[];
 }
 
 const BauMethodologyPage = ({ handleApiErrors }: ErrorControlProps) => {
