@@ -2776,7 +2776,9 @@
         "sku": {
           "family": "A",
           "name": "standard"
-        }
+        },
+        "accessPolicies": [
+        ]
       },
       "resources": [
         {
