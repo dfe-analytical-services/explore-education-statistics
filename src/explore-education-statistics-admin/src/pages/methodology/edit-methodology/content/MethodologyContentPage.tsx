@@ -66,7 +66,9 @@ const MethodologyContentPage = ({
             'dfe-hide-comments': !isEditing,
           })}
         >
-          <section className={isEditing ? 'page-editing' : 'page-preview'}>
+          <section
+            className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+          >
             <h1
               className="govuk-heading-xl"
               data-testid={`page-title ${methodology.title}`}
@@ -121,23 +123,18 @@ const MethodologyContentPage = ({
               id="contents-accordion"
               canReorder
               sectionName="Contents"
-              onSaveOrder={order => {
-                return new Promise(resolve => {
-                  methodologyService
-                    .updateContentSectionsOrder(methodology.id, order)
-                    .then(resolve)
-                    .catch(handleApiErrors);
-                });
+              onSaveOrder={async order => {
+                await methodologyService.updateContentSectionsOrder(
+                  methodology.id,
+                  order,
+                );
+                refreshMethodology();
               }}
-              onAddSection={() => {
-                return new Promise(resolve => {
-                  return methodologyService
-                    .addContentSection(methodology.id, {
-                      order: methodology.content.length,
-                    })
-                    .then(() => resolve(refreshMethodology()))
-                    .catch(handleApiErrors);
+              onAddSection={async () => {
+                await methodologyService.addContentSection(methodology.id, {
+                  order: methodology.content.length,
                 });
+                refreshMethodology();
               }}
             >
               {sortBy(methodology.content, 'order').map((section, index) => (
@@ -147,34 +144,15 @@ const MethodologyContentPage = ({
                   heading={section.heading}
                   index={index}
                   canEditHeading
-                  onHeadingChange={heading =>
-                    methodologyService.updateContentSectionHeading(
+                  onHeadingChange={async heading => {
+                    await methodologyService.updateContentSectionHeading(
                       methodology.id,
                       section.id as string,
                       heading,
-                    )
-                  }
-                  onRemoveSection={() => {
-                    return new Promise(resolve => {
-                      return methodologyService
-                        .removeContentSection(
-                          methodology.id,
-                          section.id as string,
-                        )
-                        .then(() => resolve(refreshMethodology()))
-                        .catch(handleApiErrors);
-                    });
+                    );
+                    refreshMethodology();
                   }}
-                >
-                  <ContentBlocks
-                    id={`${section.heading}-content`}
-                    sectionId={section.id as string}
-                    content={section.content}
-                    onContentChange={refreshMethodology}
-                    canAddBlocks
-                    textOnly
-                  />
-                </AccordionSection>
+                />
               ))}
             </Accordion>
           </section>

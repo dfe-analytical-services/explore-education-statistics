@@ -156,7 +156,9 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
           >
             <div
               className={
-                model.pageMode === 'edit' ? 'page-editing' : 'page-preview'
+                model.pageMode === 'edit'
+                  ? 'dfe-page-editing'
+                  : 'dfe-page-preview'
               }
             >
               <PublicationReleaseContent
