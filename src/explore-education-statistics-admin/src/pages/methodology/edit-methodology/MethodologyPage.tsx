@@ -28,7 +28,6 @@ const MethodologyPage = ({
   const [methodology, setMethodology] = useState<MethodologyContent>();
 
   const refreshMethodology = () => {
-    setMethodology(undefined);
     methodologyService
       .getMethodologyContent(methodologyId)
       .then(setMethodology)

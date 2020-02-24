@@ -1,5 +1,8 @@
-import { MethodologyStatus } from '@admin/services/common/types';
-import { ContentBlock } from '@common/services/publicationService';
+import {
+  ContentBlock,
+  ContentSection,
+} from '@common/services/publicationService';
+import { EditableContentBlock } from '../publicationService';
 
 export interface MethodologyStatusListItem {
   id: string;
@@ -23,12 +26,9 @@ export interface MethodologyContent {
   id: string;
   title: string;
   status: string;
-  content: {
-    order: number;
-    heading: string;
-    caption: string;
-    content: ContentBlock[];
-  }[];
+  published?: string;
+  lastUpdated?: string;
+  content: ContentSection<EditableContentBlock>[];
   annexes: {
     order: number;
     heading: string;
@@ -38,6 +38,6 @@ export interface MethodologyContent {
 }
 
 export interface UpdateMethodologyStatusRequest {
-  status: MethodologyStatus;
+  status: MethodologyStatusListItem;
   internalReleaseNote: string;
 }

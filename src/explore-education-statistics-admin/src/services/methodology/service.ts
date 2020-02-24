@@ -4,7 +4,9 @@ import {
   MethodologyStatusListItem,
   UpdateMethodologyStatusRequest,
 } from '@admin/services/methodology/types';
+import { ContentSectionViewModel } from '@admin/services/release/edit-release/content/types';
 import client from '@admin/services/util/service';
+import { Dictionary } from '@common/types';
 import {
   BasicMethodology,
   IdTitlePair,
@@ -24,6 +26,46 @@ const service = {
 
   getMethodologyContent(methodologyId: string): Promise<MethodologyContent> {
     return client.get(`methodology/${methodologyId}/content`);
+  },
+
+  addContentSection(
+    methodologyId: string,
+    body: { order: number },
+    isAnnexes = false,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.post(
+      `methodology/${methodologyId}/content/sections/add${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      body,
+    );
+  },
+
+  updateContentSectionHeading(
+    methodologyId: string,
+    sectionId: string,
+    heading: string,
+    isAnnexes = false,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.put(
+      `methodology/${methodologyId}/content/section/${sectionId}/heading${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      { heading },
+    );
+  },
+
+  updateContentSectionsOrder(
+    methodologyId: string,
+    ids: Dictionary<number>,
+    isAnnexes = false,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.put(
+      `methodology/${methodologyId}/content/sections/order${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      ids,
+    );
   },
 
   getMethodologyStatus: (methodologyId: string): Promise<MethodologyStatus> =>
