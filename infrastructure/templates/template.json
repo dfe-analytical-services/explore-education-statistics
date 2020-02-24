@@ -2794,8 +2794,8 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
-            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
+            // "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
