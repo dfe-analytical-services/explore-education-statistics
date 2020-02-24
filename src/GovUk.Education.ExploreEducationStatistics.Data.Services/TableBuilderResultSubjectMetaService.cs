@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -13,7 +15,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -23,77 +27,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
-        private readonly ILogger _logger;
-        private readonly IMapper _mapper;
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
+        private readonly IUserService _userService;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
         public TableBuilderResultSubjectMetaService(IFilterItemService filterItemService,
             IFootnoteService footnoteService,
             IIndicatorService indicatorService,
             ILocationService locationService,
-            ILogger<TableBuilderResultSubjectMetaService> logger,
-            IMapper mapper,
             ISubjectService subjectService,
-            ITimePeriodService timePeriodService) : base(filterItemService)
+            ITimePeriodService timePeriodService,
+            IUserService userService,
+            ILogger<TableBuilderResultSubjectMetaService> logger,
+            IMapper mapper) : base(filterItemService)
         {
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
-            _logger = logger;
-            _mapper = mapper;
             _subjectService = subjectService;
             _timePeriodService = timePeriodService;
+            _userService = userService;
+            _logger = logger;
+            _mapper = mapper;
         }
 
-        public TableBuilderResultSubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query,
-            IQueryable<Observation> observations)
+        public Task<Either<ActionResult, TableBuilderResultSubjectMetaViewModel>> GetSubjectMeta(
+            SubjectMetaQueryContext query, IQueryable<Observation> observations)
         {
-            var subject = _subjectService.Find(query.SubjectId,
-                new List<Expression<Func<Subject, object>>> {s => s.Release.Publication});
-            if (subject == null)
+            return CheckSubjectExists(query.SubjectId)
+                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(subject =>
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    stopwatch.Start();
+
+                    var filters = GetFilters(observations);
+
+                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var footnotes = GetFootnotes(observations, query);
+
+                    _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var indicators = GetIndicators(query);
+
+                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var locations = GetObservationalUnits(observations);
+
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var timePeriodRange = GetTimePeriodRange(observations);
+
+                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Stop();
+
+                    return new TableBuilderResultSubjectMetaViewModel
+                    {
+                        Filters = filters,
+                        Footnotes = footnotes,
+                        Indicators = indicators,
+                        Locations = locations,
+                        PublicationName = subject.Release.Publication.Title,
+                        SubjectName = subject.Name,
+                        TimePeriodRange = timePeriodRange
+                    };
+                });
+        }
+
+        private async Task<Either<ActionResult, Subject>> CheckSubjectExists(Guid subjectId)
+        {
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
             {
-                throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
-            }
+                s => s.Release.Publication
+            });
 
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+            return subject == null
+                ? new NotFoundResult()
+                : new Either<ActionResult, Subject>(subject);
+        }
 
-            var filters = GetFilters(observations);
-
-            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            var footnotes = GetFootnotes(observations, query);
-
-            _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            var indicators = GetIndicators(query);
-
-            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            var locations = GetObservationalUnits(observations);
-
-            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            var timePeriodRange = GetTimePeriodRange(observations);
-
-            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Stop();
-
-            return new TableBuilderResultSubjectMetaViewModel
-            {
-                Filters = filters,
-                Footnotes = footnotes,
-                Indicators = indicators,
-                Locations = locations,
-                PublicationName = subject.Release.Publication.Title,
-                SubjectName = subject.Name,
-                TimePeriodRange = timePeriodRange
-            };
+        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        {
+            var result = subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData);
+            return result ? new Either<ActionResult, Subject>(subject) : new ForbidResult();
         }
 
         private IEnumerable<ObservationalUnitMetaViewModel> GetObservationalUnits(IQueryable<Observation> observations)

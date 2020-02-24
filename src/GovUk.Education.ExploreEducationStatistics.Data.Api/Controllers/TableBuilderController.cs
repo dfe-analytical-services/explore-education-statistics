@@ -1,10 +1,9 @@
-using System.Diagnostics;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -13,27 +12,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class TableBuilderController : ControllerBase
     {
         private readonly IDataService<TableBuilderResultViewModel> _dataService;
-        private readonly ILogger _logger;
 
-        public TableBuilderController(IDataService<TableBuilderResultViewModel> dataService,
-            ILogger<TableBuilderController> logger)
+        public TableBuilderController(IDataService<TableBuilderResultViewModel> dataService)
         {
             _dataService = dataService;
-            _logger = logger;
         }
 
         [HttpPost]
-        public ActionResult<TableBuilderResultViewModel> Query([FromBody] ObservationQueryContext query)
+        public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
         {
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
-
-            var tableBuilderResultViewModel = _dataService.Query(query);
-
-            stopwatch.Stop();
-            _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
-
-            return tableBuilderResultViewModel;
+            return _dataService.Query(query).HandleFailuresOrOk();
         }
     }
 }

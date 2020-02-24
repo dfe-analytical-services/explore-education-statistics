@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -12,8 +15,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -27,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly ISubjectService _subjectService;
         private readonly IFootnoteService _footnoteService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
@@ -39,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ITimePeriodService timePeriodService,
             ISubjectService subjectService,
             IFootnoteService footnoteService,
+            IUserService userService,
             ILogger<SubjectMetaService> logger
         ) : base(filterItemService)
         {
@@ -50,78 +57,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
             _subjectService = subjectService;
             _footnoteService = footnoteService;
+            _userService = userService;
             _logger = logger;
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(
+        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
-            var subject = _subjectService.Find(query.SubjectId,
-                new List<Expression<Func<Subject, object>>> {s => s.Release.Publication});
-            if (subject == null)
-            {
-                throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
-            }
+            return CheckSubjectExists(query.SubjectId)
+                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(subject =>
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    stopwatch.Start();
 
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+                    var observationalUnits = GetObservationalUnits(observations);
 
-            var observationalUnits = GetObservationalUnits(observations);
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var filters = GetFilters(observations);
 
-            var filters = GetFilters(observations);
+                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var indicators = GetIndicators(query);
 
-            var indicators = GetIndicators(query);
+                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var locations = GetGeoJsonObservationalUnitsIfAvailable(observationalUnits, query.IncludeGeoJson,
+                        query.BoundaryLevel);
+                    var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
 
-            var locations = GetGeoJsonObservationalUnitsIfAvailable(observationalUnits, query.IncludeGeoJson, query.BoundaryLevel);
-            var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
+                    _logger.LogTrace("Got GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got GeoJson in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var boundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys);
 
-            var boundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys);
+                    _logger.LogTrace("Got Boundary Level Options in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Boundary Level Options in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var timePeriod = GetTimePeriod(observations);
 
-            var timePeriod = GetTimePeriod(observations);
+                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var footnotes = GetFootnotes(observations, query);
 
-            var footnotes = GetFootnotes(observations, query);
+                    _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Stop();
 
-            _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Stop();
-
-            return new SubjectMetaViewModel
-            {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = locations,
-                BoundaryLevels = boundaryLevels,
-                PublicationName = subject.Release.Publication.Title,
-                SubjectName = subject.Name,
-                TimePeriod = timePeriod,
-                Footnotes = footnotes,
-                GeoJsonAvailable = geoJsonAvailable
-            };
+                    return new SubjectMetaViewModel
+                    {
+                        Filters = filters,
+                        Indicators = indicators,
+                        Locations = locations,
+                        BoundaryLevels = boundaryLevels,
+                        PublicationName = subject.Release.Publication.Title,
+                        SubjectName = subject.Name,
+                        TimePeriod = timePeriod,
+                        Footnotes = footnotes,
+                        GeoJsonAvailable = geoJsonAvailable
+                    };
+                });
         }
-        
-        private bool HasBoundaryLevelDataForAnyObservationalUnits(Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+
+        private bool HasBoundaryLevelDataForAnyObservationalUnits(
+            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
         {
             return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
         }
-        
+
         private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
         {
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel) != null;
@@ -157,12 +165,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 model => model.Value,
                 model => model);
         }
-        
+
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
-        
+
         private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
             IEnumerable<GeographicLevel> geographicLevels)
         {
@@ -189,35 +197,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (geoJsonRequested)
             {
-                var codes = observationalUnits.Select(unit => unit is LocalAuthority localAuthority ?
-                    localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
+                var codes = observationalUnits.Select(unit =>
+                    unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
 
                 var boundaryLevel = boundaryLevelId ?? GetBoundaryLevel(geographicLevel)?.Id;
 
-                geoJsonByCode = boundaryLevel.HasValue 
+                geoJsonByCode = boundaryLevel.HasValue
                     ? _geoJsonService.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code)
                     : new Dictionary<string, GeoJson>();
             }
-            
+
             return observationalUnits.Select(observationalUnit =>
             {
-                var value = observationalUnit is LocalAuthority localAuthority ?
-                    localAuthority.GetCodeOrOldCodeIfEmpty() : observationalUnit.Code;
+                var value = observationalUnit is LocalAuthority localAuthority
+                    ? localAuthority.GetCodeOrOldCodeIfEmpty()
+                    : observationalUnit.Code;
 
                 var serializedGeoJson = geoJsonByCode.GetValueOrDefault(value);
-                
-                var geoJson = serializedGeoJson != null 
-                    ? DeserializeGeoJson(serializedGeoJson) 
+
+                var geoJson = serializedGeoJson != null
+                    ? DeserializeGeoJson(serializedGeoJson)
                     : null;
-                
+
                 return new ObservationalUnitGeoJsonMeta
                 {
                     GeoJson = geoJson,
                     Label = observationalUnit.Name,
                     Level = geographicLevel,
-                    Value = value 
+                    Value = value
                 };
             });
+        }
+
+        private async Task<Either<ActionResult, Subject>> CheckSubjectExists(Guid subjectId)
+        {
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
+            {
+                s => s.Release.Publication
+            });
+
+            return subject == null
+                ? new NotFoundResult()
+                : new Either<ActionResult, Subject>(subject);
+        }
+
+        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        {
+            var result = subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData);
+            return result ? new Either<ActionResult, Subject>(subject) : new ForbidResult();
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,

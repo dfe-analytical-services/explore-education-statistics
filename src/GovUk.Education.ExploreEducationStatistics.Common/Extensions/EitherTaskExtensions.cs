@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class EitherTaskExtensions
     {

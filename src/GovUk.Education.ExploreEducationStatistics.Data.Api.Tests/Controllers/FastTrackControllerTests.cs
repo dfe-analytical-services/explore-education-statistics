@@ -29,10 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             );
 
-            fastTrackService.Setup(s => s.GetAsync(_notFoundId)).Throws(new StorageException(new RequestResult
-            {
-                HttpStatusCode = 404
-            }, null, null));
+            fastTrackService.Setup(s => s.GetAsync(_notFoundId)).ReturnsAsync(new NotFoundResult());
 
             _controller = new FastTrackController(fastTrackService.Object);
         }
@@ -40,23 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack()
         {
-            var result = await _controller.Get(_validId) as OkObjectResult;
+            var result = await _controller.GetAsync(_validId);
 
-            Assert.IsAssignableFrom<FastTrackViewModel>(result.Value);
-
-            var link = result.Value as FastTrackViewModel;
-
-            Assert.Equal(_validId, link.Id);
+            Assert.IsType<FastTrackViewModel>(result.Value);
+            Assert.Equal(_validId, result.Value.Id);
         }
 
         [Fact]
         public async void Get_FastTrack_NotFound()
         {
-            var result = await _controller.Get(_notFoundId);
-
-            Assert.NotNull(result);
-
-            Assert.IsAssignableFrom<NotFoundResult>(result);
+            var result = await _controller.GetAsync(_notFoundId);
+            Assert.IsType<NotFoundResult>(result.Result);
         }
     }
 }

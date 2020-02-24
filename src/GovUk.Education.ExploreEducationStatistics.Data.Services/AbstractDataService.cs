@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -21,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectService = subjectService;
         }
 
-        public abstract TResult Query(ObservationQueryContext queryContext, ReleaseId? releaseId = null);
+        public abstract Task<Either<ActionResult, TResult>> Query(
+            ObservationQueryContext queryContext, Guid? releaseId = null);
 
         protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
         {

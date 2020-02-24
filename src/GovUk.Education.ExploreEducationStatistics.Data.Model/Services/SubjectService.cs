@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public bool IsSubjectForLatestRelease(Guid subjectId)
         {
             var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
+            // TODO return permissions error if not live?
             if (subject == null || !subject.Release.Live)
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));

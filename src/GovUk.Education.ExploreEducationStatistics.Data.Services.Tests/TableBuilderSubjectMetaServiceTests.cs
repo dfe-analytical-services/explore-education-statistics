@@ -1,11 +1,13 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -25,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             using (var context = new StatisticsDbContext(options, null))
             {
                 var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, releaseService, timePeriodService) = Mocks();
+                    observationService, releaseService, timePeriodService, userService) = Mocks();
 
                 var subjectService = new SubjectService(context, new Mock<ILogger<SubjectService>>().Object,
                     releaseService.Object);
@@ -38,9 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
                     subjectService,
-                    timePeriodService.Object);
+                    timePeriodService.Object,
+                    userService.Object);
 
-                Assert.Throws<ArgumentException>(() => service.GetSubjectMeta(Guid.NewGuid()));
+                var result = service.GetSubjectMeta(Guid.NewGuid());
+                Assert.True(result.Result.IsLeft);
+                Assert.IsAssignableFrom<NotFoundResult>(result.Result.Left);
             }
         }
 
@@ -58,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Id = Guid.NewGuid(),
                     ReleaseDate = DateTime.UtcNow.AddDays(1)
                 };
-                
+
                 var subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    ReleaseId =  release.Id
+                    ReleaseId = release.Id
                 };
 
                 context.Add(release);
@@ -71,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, releaseService, timePeriodService) = Mocks();
+                    observationService, releaseService, timePeriodService, userService) = Mocks();
 
                 var subjectService = new SubjectService(context, new Mock<ILogger<SubjectService>>().Object,
                     releaseService.Object);
@@ -84,9 +89,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
                     subjectService,
-                    timePeriodService.Object);
+                    timePeriodService.Object,
+                    userService.Object);
 
-                Assert.Throws<ArgumentException>(() => service.GetSubjectMeta(subject.Id));
+                var result = service.GetSubjectMeta(subject.Id);
+                Assert.True(result.Result.IsLeft);
+                Assert.IsAssignableFrom<ForbidResult>(result.Result.Left);
             }
         }
 
@@ -96,7 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Mock<ILocationService>,
             Mock<IObservationService>,
             Mock<IReleaseService>,
-            Mock<ITimePeriodService>) Mocks()
+            Mock<ITimePeriodService>,
+            Mock<IUserService>) Mocks()
         {
             return (new Mock<IFilterService>(),
                 new Mock<IFilterItemService>(),
@@ -104,7 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new Mock<ILocationService>(),
                 new Mock<IObservationService>(),
                 new Mock<IReleaseService>(),
-                new Mock<ITimePeriodService>());
+                new Mock<ITimePeriodService>(),
+                new Mock<IUserService>());
         }
     }
 }
