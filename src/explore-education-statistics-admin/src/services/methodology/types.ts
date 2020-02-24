@@ -1,3 +1,4 @@
+import { MethodologyStatus } from '@admin/services/common/types';
 import {
   ContentBlock,
   ContentSection,
@@ -38,6 +39,6 @@ export interface MethodologyContent {
 }
 
 export interface UpdateMethodologyStatusRequest {
-  status: MethodologyStatusListItem;
+  status: MethodologyStatus;
   internalReleaseNote: string;
 }

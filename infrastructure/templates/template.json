@@ -412,8 +412,8 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
-    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+    "notificationsStorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
+    "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
@@ -462,6 +462,8 @@
     "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
     "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
+
+    "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
 
     "ipWhiteList": {
       "copy": [
@@ -1973,7 +1975,8 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2001,7 +2004,9 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
           ]
         }
       ],
@@ -2030,11 +2035,13 @@
           "appSettings": [
             {
               "name": "AzureWebJobsDashboard",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
+
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
+
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -2084,7 +2091,7 @@
           "connectionStrings": [
             {
               "name": "TableStorageConnString",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
               "type": "Custom"
             }
           ]
@@ -2321,7 +2328,8 @@
         "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2349,7 +2357,9 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
           ]
         }
       ],
@@ -2446,7 +2456,7 @@
             },
             {
               "name": "NotificationStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
               "type": "Custom"
             },
             {
@@ -2754,6 +2764,35 @@
         "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
         "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
+      ]
+    },
+    {
+      "name": "[variables('keyVaultName')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2016-10-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "accessPolicies": [
+        ]
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "name": "ees-storage-notifications",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        }
       ]
     },
     {
