@@ -19,6 +19,9 @@
     },
     "deploySubnets": {
       "value": true
+    },
+    "deployDatafactory": {
+      "value": true
     }
   }
 }

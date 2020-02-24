@@ -17,9 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return DbSet()
                 .Where(release => release.PublicationId.Equals(publicationId))
-                .OrderByDescending(release => release.ReleaseDate)
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimeIdentifier)
                 .Select(release => release.Id)
-                .FirstOrDefault();
+                .Last();
         }
     }
 }

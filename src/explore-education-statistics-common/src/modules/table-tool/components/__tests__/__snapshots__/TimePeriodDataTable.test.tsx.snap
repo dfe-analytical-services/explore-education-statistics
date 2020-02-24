@@ -1,5 +1,101 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`TimePeriodDataTable renders table with no filters 1`] = `
+<thead>
+  <tr>
+    <td colspan="2"
+        rowspan="1"
+        class="borderBottom"
+    >
+    </td>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2015/16
+    </th>
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2016/17
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="3"
+        colspan="1"
+        scope="rowgroup"
+    >
+      England
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Authorised absence rate
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      18.3%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      18.6%
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      19.2%
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,280,964
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,397,521
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      1,488,865
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2,212,399
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2,453,340
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      2,637,752
+    </td>
+  </tr>
+</tbody>
+`;
+
 exports[`TimePeriodDataTable renders table with two of every option 1`] = `
 <thead>
   <tr>

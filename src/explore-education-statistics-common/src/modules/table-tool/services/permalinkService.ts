@@ -2,7 +2,6 @@ import {
   TableDataQuery,
   UnmappedFullTable,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { dataApi } from '@common/services/api';
 
 export interface UnmappedPermalink {
@@ -11,6 +10,20 @@ export interface UnmappedPermalink {
   created: string;
   fullTable: UnmappedFullTable;
   query: PermalinkCreateQuery;
+}
+
+interface HeaderOption {
+  value: string;
+  label: string;
+}
+
+// TODO: We should re-work this to store type information
+//  in the backend so that its easier to work with
+export interface UnmappedTableHeadersConfig {
+  columnGroups: HeaderOption[][];
+  columns: HeaderOption[];
+  rowGroups: HeaderOption[][];
+  rows: HeaderOption[];
 }
 
 interface PermalinkCreateQuery extends TableDataQuery {
