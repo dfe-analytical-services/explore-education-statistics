@@ -2005,7 +2005,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
             "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
           ]
         }
@@ -2358,7 +2358,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
             "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
           ]
         }
