@@ -160,8 +160,6 @@ const MethodologyContentPage = ({
                 />
               ))}
             </Accordion>
-
-            <p>{JSON.stringify(methodology)}</p>
           </section>
         </div>
       </EditingContext.Provider>
