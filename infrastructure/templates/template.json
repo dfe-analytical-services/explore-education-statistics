@@ -1974,9 +1974,7 @@
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2004,9 +2002,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
           ]
         }
       ],
@@ -2328,8 +2324,7 @@
         "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2357,9 +2352,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
           ]
         }
       ],
