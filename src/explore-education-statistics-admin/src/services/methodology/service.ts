@@ -62,6 +62,18 @@ const service = {
       ids,
     );
   },
+
+  removeContentSection(
+    methodologyId: string,
+    sectionId: string,
+    isAnnexes = false,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.delete(
+      `methodology/${methodologyId}/content/section/${sectionId}${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+    );
+  },
 };
 
 export default service;

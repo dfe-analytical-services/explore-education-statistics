@@ -106,6 +106,21 @@ const ReleaseContentAccordion = ({
     [content, setContentAndTriggerOnContentChange],
   );
 
+  const onRemoveContentSection = useCallback(
+    async (block: ContentType, index: number) => {
+      if (block.id) {
+        await releaseContentService
+          .removeContentSection(releaseId, block.id)
+          .catch(handleApiErrors);
+
+        const newContent = content.filter(item => item.id !== block.id);
+
+        setContentAndTriggerOnContentChange(newContent);
+      }
+    },
+    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+  );
+
   return (
     <>
       <Accordion
@@ -128,6 +143,7 @@ const ReleaseContentAccordion = ({
             onContentChange={newContent =>
               updateContentSection(index, newContent)
             }
+            onRemoveSection={() => onRemoveContentSection(contentItem, index)}
           />
         ))}
       </Accordion>

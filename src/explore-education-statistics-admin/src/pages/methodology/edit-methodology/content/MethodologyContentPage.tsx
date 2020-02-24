@@ -151,6 +151,13 @@ const MethodologyContentPage = ({
                     );
                     refreshMethodology();
                   }}
+                  onRemoveSection={async () => {
+                    await methodologyService.removeContentSection(
+                      methodology.id,
+                      section.id as string,
+                    );
+                    refreshMethodology();
+                  }}
                 />
               ))}
             </Accordion>
