@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 
 export interface MethodologyTabProps {
-  refreshMethodology: () => void;
+  refreshMethodology: () => MethodologyContent | undefined;
   methodology: MethodologyContent;
 }
 
@@ -27,14 +27,22 @@ const MethodologyPage = ({
 
   const [methodology, setMethodology] = useState<MethodologyContent>();
 
-  const refreshMethodology = () => {
-    methodologyService
-      .getMethodologyContent(methodologyId)
-      .then(setMethodology)
-      .catch(handleApiErrors);
+  const refreshMethodology = async () => {
+    try {
+      const methodologyResponse = await methodologyService.getMethodologyContent(
+        methodologyId,
+      );
+      setMethodology(methodologyResponse);
+      return methodology;
+    } catch (err) {
+      handleApiErrors(err);
+      return undefined;
+    }
   };
 
-  useEffect(refreshMethodology, [methodologyId]);
+  useEffect(() => {
+    refreshMethodology();
+  }, [methodologyId]);
 
   const currentRouteIndex =
     methodologyRoutes.findIndex(
