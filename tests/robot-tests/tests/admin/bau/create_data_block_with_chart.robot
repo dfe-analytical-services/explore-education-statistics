@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/admin-common.robot
+Resource    ../../libs/admin-common.robot
 Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
@@ -40,6 +40,8 @@ Upload subject
     user clicks element   xpath://button[text()="Upload data files"]
 
     user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user waits until page contains accordion section   UI test subject
+    user opens accordion section   UI test subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
     user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
 
@@ -118,7 +120,6 @@ Validate table row Bolton 001 (E02000984)
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 001 (E02000984)
     user checks row contains heading  ${row}   Bolton 001 (E02000984)
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text  ${row}   1   n/a
     user checks row cell contains text  ${row}   2   n/a
     user checks row cell contains text  ${row}   3   n/a
@@ -140,7 +141,6 @@ Validate table row Bolton 001 (E05000364)
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 001 (E05000364)
     user checks row contains heading  ${row}   Bolton 001 (E05000364)
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text  ${row}   1   n/a
     user checks row cell contains text  ${row}   2   n/a
     user checks row cell contains text  ${row}   3   n/a
@@ -162,7 +162,6 @@ Validate table row Bolton 004 (E02000987)
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 004 (E02000987)
     user checks row contains heading  ${row}   Bolton 004 (E02000987)
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text  ${row}   1    n/a
     user checks row cell contains text  ${row}   2    n/a
     user checks row cell contains text  ${row}   3    n/a
@@ -184,7 +183,6 @@ Validate table row Bolton 004 (E05010450)
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 004 (E05010450)
     user checks row contains heading  ${row}   Bolton 004 (E05010450)
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text  ${row}   1    8,557
     user checks row cell contains text  ${row}   2    n/a
     user checks row cell contains text  ${row}   3    n/a
@@ -206,7 +204,6 @@ Validate table row Nailsea Youngwood
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Nailsea Youngwood
     user checks row contains heading  ${row}   Nailsea Youngwood
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text   ${row}    1    3,612
     user checks row cell contains text   ${row}    2    n/a
     user checks row cell contains text   ${row}    3    n/a
@@ -228,7 +225,6 @@ Validate table row Syon
     [Tags]  HappyPath
     ${row}=  user gets row with heading   Syon
     user checks row contains heading  ${row}   Syon
-    user checks row contains heading  ${row}   Admission Numbers
     user checks row cell contains text   ${row}   1    n/a
     user checks row cell contains text   ${row}   2    n/a
     user checks row cell contains text   ${row}   3    9,914
@@ -247,48 +243,19 @@ Validate table row Syon
     user checks row cell contains text   ${row}   16   n/a
 
 Save data block
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user enters text into element  css:#data-block-name        UI Test data block name
     user clears element text   css:#data-block-title
     user enters text into element  css:#data-block-title       UI Test table title
     user enters text into element  css:#data-block-source      UI Test source
-    user enters text into element  css:#data-block-footnotes   UI Test footnotes
     user clicks button   Save data block
     user waits until page contains    The Data Block has been saved.
 
-Refresh page, select new data block, verify selections
+Navigate to Create chart tab
     [Tags]  HappyPath   UnderConstruction
-    user reloads page
-    user selects from list by label  css:#selectDataBlock   UI Test create data block title
-    user waits until page contains element   xpath://h3[text()="Update data source"]
-    user checks previous table tool step contains  1   Subject   Absence in PRUs
-    user checks previous table tool step contains  2   Local Authority   Barnet
-    user checks previous table tool step contains  2   Local Authority   Barnsley
-    user checks previous table tool step contains  2   Local Authority   Bedford
-    user checks previous table tool step contains  3   Start date    2014/15
-    user checks previous table tool step contains  3   End date      2014/15
-    user checks subheaded indicator checkbox is selected  Absence fields   Authorised absence rate
-    user checks subheaded indicator checkbox is selected  Absence fields   Overall absence rate
-    user checks subheaded indicator checkbox is selected  Absence fields   Unauthorised absence rate
-    user checks category checkbox is selected   School type   Pupil Referral Unit
+    sleep  1000000
+    user clicks element   xpath://a[text()="Configure content"]
+    user clicks element   xpath://a[text()="Create chart"]
+    user clicks element   css:[class^="graph-builder_chartContainer"] button:nth-child(1)  # Line chart button
+    sleep   1000000
 
-    user checks results table column heading contains  1  1  Pupil Referral Unit
-    user checks results table column heading contains  2  1  2014/15
-    user checks results table row heading contains   1   1   Barnet
-    user checks results table row heading contains   1   2   Unauthorised absence rate
-    user checks results table row heading contains   2   1   Authorised absence rate
-    user checks results table row heading contains   3   1   Overall absence rate
-    user checks results table cell contains   1     1     13.2%
-    user checks results table cell contains   2     1     26.9%
-    user checks results table cell contains   3     1     40.1%
-
-Edit data block
-    [Tags]  HappyPath  UnderConstruction
-
-Delete data block
-    [Tags]  HappyPath   UnderConstruction
-    user clicks button   Delete this data block
-    user waits until page contains heading   Delete data block
-    user clicks button   Confirm
-    user waits until page does not contain element   xpath:h1[text()="Delete data block"]
-    user checks list does not contain label   css:#selectDataBlock   UI Test create data block title

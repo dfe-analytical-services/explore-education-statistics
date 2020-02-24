@@ -1,4 +1,7 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -8,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Title { get; set; }
         
-        public string Status { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyStatus Status { get; set; }
     }
 }

@@ -209,14 +209,6 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
-    "notifyApiKey": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyApiKeyAdmin": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
     "notifyInviteTemplateId": {
       "type": "securestring",
       "defaultValue": ""
@@ -225,12 +217,6 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
-    "notifyTokenSecretKey": {
-      "type": "securestring",
-      "defaultValue": ""
-    },
-
-
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -311,15 +297,6 @@
       "metadata": {
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
-    },
-    "openIdConnectTenant": {
-      "type": "string"
-    },
-    "openIdConnectClientId": {
-      "type": "string"
-    },
-    "openIdConnectClientSecret": {
-      "type": "string"
     },
 
     "adminUri": {
@@ -458,7 +435,7 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
@@ -467,7 +444,7 @@
 
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
-    "ees-openidconnect-tenant": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-tenant')]",
+    "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
 
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
@@ -641,7 +618,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
@@ -824,7 +822,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
@@ -1008,7 +1027,7 @@
             },
             {
               "name": "OpenIdConnect:Authority",
-              "value": "[concat('https://login.microsoftonline.com/','@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-tenant'), '2018-02-14').secretUriWithVersion, ')','/')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "OpenIdConnect:ClientId",
@@ -1069,7 +1088,27 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
@@ -2023,11 +2062,11 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "TokenSecretKey",
-              "value": "[parameters('notifyTokenSecretKey')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "VerificationEmailTemplateId",
@@ -2696,15 +2735,27 @@
           },
           "environment": {
             "value": "[parameters('environment')]"
+          },
+          "publisherAppName": {
+            "value": "[variables('publisherAppName')]"
+          },
+          "ls_sql_public_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+          },
+          "ls_sql_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+          },
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
           }
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
-
-
-
     {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",
       "apiVersion": "2014-04-01",
