@@ -2796,8 +2796,7 @@
               ]
             },
             "dependsOn": [
-              // "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-              "[resourceId('Microsoft.Web/sites/', variables('adminAppName'))]"
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
             ]
           },
           {
@@ -2814,8 +2813,7 @@
               ]
             },
             "dependsOn": [
-              // "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-              "[resourceId('Microsoft.Web/sites/', variables('publisherAppName'))]"
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
             ]
           },
           {
@@ -2832,8 +2830,7 @@
               ]
             },
             "dependsOn": [
-              // "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-              "[resourceId('Microsoft.Web/sites/', variables('notificationsAppName'))]"
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
             ]
           },
           {
