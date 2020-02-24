@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200218111707_AddMethodologyStatusColumn")]
+    partial class AddMethodologyStatusColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -672,9 +674,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastUpdated")
@@ -1417,6 +1416,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1460,6 +1462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
+                            Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
@@ -1472,6 +1475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"7\",\"Day\":\"19\"}",
+                            Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RelatedInformation = "[{\"Id\":\"f3c67bc9-6132-496e-a848-c39dfcd16f49\",\"Description\":\"Additional guidance\",\"Url\":\"http://example.com\"},{\"Id\":\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\",\"Description\":\"Statistics guide\",\"Url\":\"http://example.com\"}]",
@@ -1485,6 +1489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"6\",\"Day\":\"14\"}",
+                            Order = 0,
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",

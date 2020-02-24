@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -9,11 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
     public class UpdateSpecificMethodologyAuthorizationHandler : CompoundAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
-        public UpdateSpecificMethodologyAuthorizationHandler(ContentDbContext context) : base(
+        public UpdateSpecificMethodologyAuthorizationHandler() : base(
             new UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler())
-        {
-            
-        }
+        {}
     }
     
     public class UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler 
@@ -21,12 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler()
             : base(ctx =>
-                // TODO EES-1315 - represent Methodology status with enum
-                ctx.Entity.Status != "Live" && 
+                ctx.Entity.Status != MethodologyStatus.Approved && 
                 SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllMethodologies)
             )
-        {
-            
-        }
+        {}
     }
 }

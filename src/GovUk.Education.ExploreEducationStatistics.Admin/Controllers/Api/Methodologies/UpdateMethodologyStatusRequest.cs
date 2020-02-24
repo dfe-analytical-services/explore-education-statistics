@@ -1,17 +1,14 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
 {
-    public class MethodologyViewModel
+    public class UpdateMethodologyStatusRequest
     {
-        public Guid Id { get; set; }
-
-        public string Title { get; set; }
-        
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+        
+        public string InternalReleaseNote { get; set; }
     }
 }
