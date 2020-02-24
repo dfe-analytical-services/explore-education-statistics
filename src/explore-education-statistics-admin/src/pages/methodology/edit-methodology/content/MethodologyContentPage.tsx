@@ -123,16 +123,17 @@ const MethodologyContentPage = ({
               canReorder
               sectionName="Contents"
               onSaveOrder={async order => {
-                await methodologyService.updateContentSectionsOrder(
-                  methodology.id,
-                  order,
-                );
+                await methodologyService
+                  .updateContentSectionsOrder(methodology.id, order)
+                  .catch(handleApiErrors);
                 refreshMethodology();
               }}
               onAddSection={async () => {
-                await methodologyService.addContentSection(methodology.id, {
-                  order: methodology.content.length,
-                });
+                await methodologyService
+                  .addContentSection(methodology.id, {
+                    order: methodology.content.length,
+                  })
+                  .catch(handleApiErrors);
                 refreshMethodology();
               }}
             >
@@ -144,10 +145,19 @@ const MethodologyContentPage = ({
                   index={index}
                   canEditHeading
                   onHeadingChange={async heading => {
-                    await methodologyService.updateContentSectionHeading(
+                    await methodologyService
+                      .updateContentSectionHeading(
+                        methodology.id,
+                        section.id as string,
+                        heading,
+                      )
+                      .catch(handleApiErrors);
+                    refreshMethodology();
+                  }}
+                  onRemoveSection={async () => {
+                    await methodologyService.removeContentSection(
                       methodology.id,
                       section.id as string,
-                      heading,
                     );
                     refreshMethodology();
                   }}
