@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Reflection;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
@@ -14,20 +13,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Geometry
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Geometry.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Geometry.sql");
             // Types
-            ExecuteFile(migrationBuilder, $"{MigrationId}_TableTypes.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_TableTypes.sql");
             // Routines
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredObservations.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_FilteredFootnotes.sql");
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Routine_geometry2json.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservations.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredFootnotes.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_geometry2json.sql");
             // Views
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Views.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Views.sql");
             // Indexes
-            ExecuteFile(migrationBuilder, $"{MigrationId}_Indexes.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Indexes.sql");
             // Data
-            ExecuteFile(migrationBuilder, $"{MigrationId}_BoundaryLevelData.sql");
-            ExecuteLines(migrationBuilder, $"{MigrationId}_GeometryData.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_BoundaryLevelData.sql");
+            migrationBuilder.SqlFromFileByLine(MigrationsPath, $"{MigrationId}_GeometryData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -51,26 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TABLE dbo.geometry_columns;");
             migrationBuilder.Sql("DROP TABLE dbo.spatial_ref_sys;");
             migrationBuilder.Sql("DROP TABLE dbo.geometry;");
-        }
-
-        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
-        {
-            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
-            
-            migrationBuilder.Sql(File.ReadAllText(file));
-        }
-
-        private static void ExecuteLines(MigrationBuilder migrationBuilder, string filename)
-        {
-            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
-            
-            var lines = File.ReadAllLines(file);
-            foreach (var line in lines)
-            {
-                migrationBuilder.Sql(line);
-            }
         }
     }
 }

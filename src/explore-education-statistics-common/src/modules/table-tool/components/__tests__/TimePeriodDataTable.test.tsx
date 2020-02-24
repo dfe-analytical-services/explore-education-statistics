@@ -2,6 +2,7 @@ import {
   testData1,
   testData2,
   testData3,
+  testDataNoFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable, {
   createGroupHeaders,
@@ -181,6 +182,43 @@ describe('TimePeriodDataTable', () => {
         "Table showing 'Absence by characteristic' from 'Pupil absence' for 2014/15 for Barnet and Barnsley",
       ),
     ).not.toBeNull();
+  });
+
+  test('renders table with no filters', () => {
+    const fullTable = mapFullTable(testDataNoFilters.fullTable);
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testDataNoFilters.tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(1);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(3);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(0);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(3);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(4);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(3);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(9);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
   });
 
   describe('createGroupHeaders', () => {

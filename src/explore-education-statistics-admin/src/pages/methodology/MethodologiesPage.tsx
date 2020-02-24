@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { summaryRoute } from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/service';
 import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -71,7 +72,7 @@ const MethodologiesPage = () => {
                 {model.liveMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodologies/${methodology.id}`}>
+                      <Link to={summaryRoute.generateLink(methodology.id)}>
                         {methodology.title}
                       </Link>
                     </td>
@@ -127,7 +128,7 @@ const MethodologiesPage = () => {
                 {model.otherMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodologies/${methodology.id}`}>
+                      <Link to={summaryRoute.generateLink(methodology.id)}>
                         {methodology.title}
                       </Link>
                     </td>

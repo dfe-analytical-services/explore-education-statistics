@@ -116,6 +116,50 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(checkboxes[0]).toHaveAttribute('value', '2');
   });
 
+  test('does not throw error if search term that is invalid regex is used', () => {
+    jest.useFakeTimers();
+
+    const { getByLabelText, queryAllByLabelText } = render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+          {
+            legend: 'Group B',
+            options: [
+              { label: 'Checkbox 3', value: '3' },
+              { label: 'Checkbox 4', value: '4' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    const searchInput = getByLabelText('Search options');
+
+    fireEvent.change(searchInput, {
+      target: {
+        value: '[',
+      },
+    });
+
+    jest.runAllTimers();
+
+    const checkboxes = queryAllByLabelText(/Checkbox/) as HTMLInputElement[];
+
+    expect(checkboxes).toHaveLength(0);
+  });
+
   test('providing a search term does not remove checkboxes that have already been checked', () => {
     jest.useFakeTimers();
 
