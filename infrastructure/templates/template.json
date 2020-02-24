@@ -2794,7 +2794,11 @@
               ],
               "certificates": [
               ]
-            }
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+              "[resourceId('Microsoft.Web/sites/', variables('adminAppName'))]"
+            ]
           },
           {
             "tenantId": "[subscription().tenantId]",
@@ -2808,7 +2812,11 @@
               ],
               "certificates": [
               ]
-            }
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+              "[resourceId('Microsoft.Web/sites/', variables('publisherAppName'))]"
+            ]
           },
           {
             "tenantId": "[subscription().tenantId]",
@@ -2822,7 +2830,11 @@
               ],
               "certificates": [
               ]
-            }
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+              "[resourceId('Microsoft.Web/sites/', variables('notificationsAppName'))]"
+            ]
           },
           {
             "tenantId": "[subscription().tenantId]",
