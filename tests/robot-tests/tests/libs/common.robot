@@ -30,14 +30,14 @@ user signs in
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading     Sign-in
 
-  environment variable should be set   IDENTITY_LOCAL_STORAGE
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE}
-  environment variable should be set   IDENTITY_COOKIE
-  set cookie from json   %{IDENTITY_COOKIE}
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
+  environment variable should be set   IDENTITY_COOKIE_BAU
+  set cookie from json   %{IDENTITY_COOKIE_BAU}
 
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading   Bau1
-  user waits until page contains element   css:#selectTheme
+  user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
@@ -140,6 +140,10 @@ user waits until page contains link
 user waits until page contains heading
   [Arguments]   ${text}
   wait until page contains element   xpath://h1[contains(.,"${text}")]
+
+user waits until page contains accordion section
+  [Arguments]   ${section_title}
+  user waits until page contains element  xpath://*[@class="govuk-accordion__section-button" and text()="${section_title}"]
 
 user checks element contains
   [Arguments]   ${element}    ${text}
@@ -249,7 +253,6 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 user checks summary list item "${dtText}" should be "${ddText}"
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
-user checks summary list item "${}" should contain link "${link}"
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
