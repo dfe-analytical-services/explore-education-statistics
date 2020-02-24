@@ -2777,7 +2777,7 @@
         "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "ed8eb206-5af2-4943-b649-bdd842383d69",
+            "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e",
             // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataFactoryName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
@@ -2792,7 +2792,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "e9bf6777-2f02-4299-b484-91c58debed25",
+            "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
             // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
@@ -2807,7 +2807,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "215cae9a-701a-417a-97f4-20e1d8e0b690",
+            "objectId": "484e1067-2be8-4b18-a636-62b0254aa7f8",
             // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
@@ -2822,7 +2822,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "10ddc034-bdb0-4655-92ba-4ad6c490d68a",
+            "objectId": "66506892-8b1e-4815-9597-515cd2828628",
             // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
