@@ -172,16 +172,7 @@ const MethodologyContentPage = ({
                       setMethodology,
                       section.id as string,
                     )}
-                  >
-                    <ContentBlocks
-                      id={`${section.heading}-content`}
-                      sectionId={section.id as string}
-                      content={section.content}
-                      onContentChange={refreshMethodology}
-                      canAddBlocks
-                      textOnly
-                    />
-                  </AccordionSection>
+                  />
                 ))}
               </Accordion>
             </section>
