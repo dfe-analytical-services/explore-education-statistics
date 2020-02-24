@@ -183,8 +183,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
-        public int Order { get; set; }
-        
         public ReleaseStatus Status { get; set; }
         
         public string InternalReleaseNote { get; set; }

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import last from 'lodash/last';
 import sumBy from 'lodash/sumBy';
 import times from 'lodash/times';
-import React, { forwardRef, ReactElement } from 'react';
+import React, { forwardRef, ReactNode } from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
 /**
@@ -35,8 +35,10 @@ export interface HeaderGroup {
 interface ExpandedHeader {
   text: string;
   span: number;
+  crossSpan: number;
   start: number;
   isGroup: boolean;
+  isHidden?: boolean;
 }
 
 /**
@@ -58,6 +60,8 @@ const createExpandedHeaders = (
       const previousGroupLength = last(acc)?.length ?? 1;
       const span = maxSpan / (headerGroup.headers.length * previousGroupLength);
 
+      let expandedHeaderGroups: ExpandedHeader[] = [];
+
       if (headerGroup.groups && headerGroup.groups.length) {
         const hasMultipleGroups = headerGroup.groups.length > 1;
 
@@ -71,7 +75,7 @@ const createExpandedHeaders = (
           ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
           : maxSpan;
 
-        const expandedHeaderGroups = times(
+        expandedHeaderGroups = times(
           maxSpan / groupSpan,
           repeat =>
             headerGroup.groups?.reduce((headerSubGroups, header) => {
@@ -80,6 +84,7 @@ const createExpandedHeaders = (
               headerSubGroups.push({
                 text: header.text,
                 span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
+                crossSpan: 1,
                 start: previous
                   ? previous.start + previous.span
                   : repeat * groupSpan,
@@ -93,19 +98,52 @@ const createExpandedHeaders = (
         acc.push(expandedHeaderGroups);
       }
 
-      const expandedHeaders = times(previousGroupLength, repeat =>
-        headerGroup.headers.map((header, headerIndex) => {
-          return {
-            text: header.text,
-            // Headers are expected to have equal sizes
-            // within their group (unlike header subgroups)
-            span,
-            start:
-              repeat * headerGroup.headers.length * span + headerIndex * span,
-            isGroup: headerGroupIndex !== headerGroups.length - 1,
-          };
-        }),
-      ).flat();
+      const expandedHeaders: ExpandedHeader[] = times(
+        previousGroupLength,
+        repeat =>
+          headerGroup.headers.map((header, headerIndex) => {
+            return {
+              text: header.text,
+              // Headers are expected to have equal sizes
+              // within their group (unlike header subgroups)
+              span,
+              crossSpan: 1,
+              start:
+                repeat * headerGroup.headers.length * span + headerIndex * span,
+              isGroup: headerGroupIndex !== headerGroups.length - 1,
+            };
+          }),
+      )
+        .flat()
+        .map(expandedHeader => {
+          // We want to find any headers that duplicate their
+          // corresponding header group to clean up the headers.
+          const matchingHeaderGroup = expandedHeaderGroups.find(
+            expandedHeaderGroup =>
+              expandedHeaderGroup.start === expandedHeader.start &&
+              expandedHeaderGroup.text === expandedHeader.text &&
+              expandedHeaderGroup.span === expandedHeader.span,
+          );
+
+          // We simply make the header group take up the space
+          // that the header would normally have taken in the table.
+          // We then prevent the header itself from being rendered.
+          if (matchingHeaderGroup) {
+            // A bit naughty, but we mutate the header group
+            // to re-use the current context and avoid
+            // having to perform any further complex loops.
+            matchingHeaderGroup.isGroup = false;
+            matchingHeaderGroup.crossSpan = 2;
+
+            // eslint-disable-next-line no-param-reassign
+            return {
+              ...expandedHeader,
+              isHidden: true,
+            };
+          }
+
+          return expandedHeader;
+        });
 
       acc.push(expandedHeaders);
 
@@ -127,8 +165,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
     const expandedColumnHeaders = createExpandedHeaders(columnHeaders);
     const expandedRowHeaders = createExpandedHeaders(rowHeaders);
-
-    const firstRowLength = expandedRowHeaders[0].length;
+    const firstRowHeaderLength = expandedRowHeaders[0].length;
 
     // Expanded headers need to be transposed so that
     // they are compatible with HTML table rows.
@@ -173,24 +210,30 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                   />
                 )}
 
-                {columns.map((column, columnIndex) => {
-                  const key = `${column.text}_${columnIndex}`;
+                {columns
+                  .filter(column => !column.isHidden)
+                  .map((column, columnIndex) => {
+                    const key = `${column.text}_${columnIndex}`;
 
-                  return (
-                    <th
-                      className={classNames({
-                        'govuk-table__header--numeric': !column.isGroup,
-                        [styles.cellHorizontalMiddle]: column.isGroup,
-                        [styles.borderBottom]: !column.isGroup,
-                      })}
-                      colSpan={column.span}
-                      scope={column.isGroup ? 'colgroup' : 'col'}
-                      key={key}
-                    >
-                      {column.text}
-                    </th>
-                  );
-                })}
+                    return (
+                      <th
+                        className={classNames({
+                          'govuk-table__header--numeric': !column.isGroup,
+                          [styles.columnHeaderGroup]:
+                            column.isGroup || column.crossSpan > 1,
+                          [styles.borderBottom]: !column.isGroup,
+                          [styles.borderRightNone]:
+                            column.start + column.span === rows[0].length,
+                        })}
+                        colSpan={column.span}
+                        rowSpan={column.crossSpan}
+                        scope={column.isGroup ? 'colgroup' : 'col'}
+                        key={key}
+                      >
+                        {column.text}
+                      </th>
+                    );
+                  })}
               </tr>
             );
           })}
@@ -200,24 +243,28 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
           {transposedRowHeaders
             .reduce((acc, rowGroup, headerGroupIndex) => {
               acc.push(
-                rowGroup.map((row, rowIndex) => (
-                  <th
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={`${rowIndex}_${headerGroupIndex}`}
-                    className={classNames({
-                      'govuk-table__cell--numeric': !row.isGroup,
-                      [styles.borderBottom]: row.isGroup,
-                    })}
-                    rowSpan={row.span}
-                    scope={row.isGroup ? 'rowgroup' : 'row'}
-                  >
-                    {row.text}
-                  </th>
-                )),
+                rowGroup
+                  .filter(row => !row.isHidden)
+                  .map((row, rowIndex) => {
+                    return (
+                      <th
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${rowIndex}_${headerGroupIndex}`}
+                        className={classNames({
+                          [styles.borderBottom]: row.isGroup,
+                        })}
+                        rowSpan={row.span}
+                        colSpan={row.crossSpan}
+                        scope={row.isGroup ? 'rowgroup' : 'row'}
+                      >
+                        {row.text}
+                      </th>
+                    );
+                  }),
               );
 
               return acc;
-            }, [] as ReactElement[][])
+            }, [] as ReactNode[][])
             .map((headerCells, rowIndex) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
@@ -230,7 +277,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         key={cellIndex}
                         className={classNames('govuk-table__cell--numeric', {
                           [styles.borderBottom]:
-                            (rowIndex + 1) % firstRowLength === 0,
+                            (rowIndex + 1) % firstRowHeaderLength === 0,
                         })}
                       >
                         {cell}

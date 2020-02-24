@@ -150,8 +150,8 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
 
           <div
             className={classNames('govuk-width-container', {
-              'dfe-align--comments': model.pageMode === 'edit',
-              'dfe-hide-comments': model.pageMode === 'preview',
+              'dfe-align--left-hand-controls': model.pageMode === 'edit',
+              'dfe-hide-controls': model.pageMode === 'preview',
             })}
           >
             <div
