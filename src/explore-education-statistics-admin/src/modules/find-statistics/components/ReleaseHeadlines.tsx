@@ -105,6 +105,7 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
                 publication={release.publication}
                 id={release.headlinesSection.id as string}
                 content={release.headlinesSection.content}
+                addContentButtonText="Add key statistics summary content"
                 canAddSingleBlock
                 textOnly
                 onContentChange={newContent =>
