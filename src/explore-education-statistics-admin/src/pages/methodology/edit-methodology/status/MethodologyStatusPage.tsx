@@ -1,33 +1,28 @@
-import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { MethodologyStatus } from '@admin/services/common/types';
+import service from '@admin/services/methodology/service';
 import permissionService from '@admin/services/permissions/service';
-import service from '@admin/services/release/edit-release/status/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
-import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import ButtonText from '@common/components/ButtonText';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 interface FormValues {
-  releaseStatus: ReleaseStatus;
+  status: MethodologyStatus;
   internalReleaseNote: string;
 }
 
 interface Model {
-  releaseStatus: ReleaseStatus;
+  methodologyStatus: MethodologyStatus;
   statusOptions: RadioOption[];
   editable: boolean;
 }
@@ -36,36 +31,30 @@ const statusMap: {
   [keyof: string]: string;
 } = {
   Draft: 'In Draft',
-  HigherLevelReview: 'Awaiting higher review',
   Approved: 'Approved',
 };
 
-const ReleaseStatusPage = ({
+const MethodologyStatusPage = ({
+  match,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
+  const { methodologyId } = match.params;
+
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
-
   useEffect(() => {
     Promise.all([
-      service.getReleaseStatus(releaseId),
-      permissionService.canMarkReleaseAsDraft(releaseId),
-      permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
-      permissionService.canApproveRelease(releaseId),
+      service.getMethodologyStatus(methodologyId),
+      permissionService.canMarkMethodologyAsDraft(methodologyId),
+      permissionService.canApproveMethodology(methodologyId),
     ])
-      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
+      .then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
         const statusOptions: RadioOption[] = [
           {
             label: 'In draft',
             value: 'Draft',
             disabled: !canMarkAsDraft,
-          },
-          {
-            label: 'Ready for higher review',
-            value: 'HigherLevelReview',
-            disabled: !canSubmit,
           },
           {
             label: 'Approved for publication',
@@ -75,56 +64,40 @@ const ReleaseStatusPage = ({
         ];
 
         setModel({
-          releaseStatus,
+          methodologyStatus,
           statusOptions,
           editable: statusOptions.some(option => !option.disabled),
         });
       })
       .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, showForm]);
+  }, [methodologyId, handleApiErrors, showForm]);
 
   if (!model) return null;
 
-  const formId = 'releaseStatusForm';
-
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
-      'releaseStatus',
-      'Enter a publish scheduled date before approving',
-    ),
-  ];
+  const formId = 'methodologyStatusForm';
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async values => {
-      await service.updateReleaseStatus(releaseId, values).then(() => {
+      await service.updateMethodologyStatus(methodologyId, values).then(() => {
         setModel({
           ...model,
-          releaseStatus: values.releaseStatus,
-          statusOptions: model.statusOptions,
+          methodologyStatus: values.status,
         });
 
         setShowForm(false);
       });
     },
     handleApiErrors,
-    ...errorCodeMappings,
   );
 
   return (
     <>
-      <h2 className="govuk-heading-m">Release Status</h2>
+      <h2 className="govuk-heading-m">Methodology Status</h2>
       {!showForm ? (
         <>
           <div className="govuk-!-margin-bottom-6">
-            The current release status is:{' '}
-            <StatusBlock text={statusMap[model.releaseStatus]} />
-            {model.releaseStatus === 'Approved' && (
-              <div className="govuk-!-margin-top-1">
-                Release process status:{' '}
-                <ReleaseServiceStatus releaseId={releaseId} />
-              </div>
-            )}
+            The current methodology status is:{' '}
+            <StatusBlock text={statusMap[model.methodologyStatus]} />
           </div>
 
           {model.editable && (
@@ -132,7 +105,7 @@ const ReleaseStatusPage = ({
               className="govuk-!-margin-top-2"
               onClick={() => setShowForm(true)}
             >
-              Update release status
+              Update methodology status
             </Button>
           )}
         </>
@@ -140,12 +113,12 @@ const ReleaseStatusPage = ({
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            releaseStatus: model.releaseStatus,
+            status: model.methodologyStatus,
             internalReleaseNote: '',
           }}
           onSubmit={submitFormHandler}
           validationSchema={Yup.object<FormValues>({
-            releaseStatus: Yup.mixed().required('Choose a status'),
+            status: Yup.mixed().required('Choose a status'),
             internalReleaseNote: Yup.string().required(
               'Provide an internal release note',
             ),
@@ -153,11 +126,11 @@ const ReleaseStatusPage = ({
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>
-                <p>Select and update the release status.</p>
+                <p>Select and update the methodology status.</p>
                 <FormFieldRadioGroup<FormValues>
                   legend="Status"
-                  name="releaseStatus"
-                  id={`${formId}-releaseStatus`}
+                  name="status"
+                  id={`${formId}-status`}
                   options={model.statusOptions}
                   orderDirection={[]}
                 />
@@ -191,4 +164,4 @@ const ReleaseStatusPage = ({
   );
 };
 
-export default withErrorControl(ReleaseStatusPage);
+export default withErrorControl(withRouter(MethodologyStatusPage));

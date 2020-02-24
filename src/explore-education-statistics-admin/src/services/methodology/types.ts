@@ -1,10 +1,11 @@
+import { MethodologyStatus } from '@admin/services/common/types';
 import {
   ContentBlock,
   ContentSection,
 } from '@common/services/publicationService';
 import { EditableContentBlock } from '../publicationService';
 
-export interface MethodologyStatus {
+export interface MethodologyStatusListItem {
   id: string;
   title: string;
   status: string;
@@ -35,4 +36,9 @@ export interface MethodologyContent {
     caption: string;
     content: ContentBlock[];
   }[];
+}
+
+export interface UpdateMethodologyStatusRequest {
+  status: MethodologyStatus;
+  internalReleaseNote: string;
 }
