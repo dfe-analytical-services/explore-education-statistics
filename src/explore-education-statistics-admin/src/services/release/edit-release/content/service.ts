@@ -50,6 +50,14 @@ export const releaseContentService = {
       order,
     );
   },
+  removeContentSection(
+    releaseId: string,
+    sectionId: string,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.delete<ContentSectionViewModel[]>(
+      `/release/${releaseId}/content/section/${sectionId}`,
+    );
+  },
 
   getContentSection(
     releaseId: string,
