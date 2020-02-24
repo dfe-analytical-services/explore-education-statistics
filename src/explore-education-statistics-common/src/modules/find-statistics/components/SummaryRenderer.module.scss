@@ -124,8 +124,8 @@
 
 .keyStatTile :global(.govuk-details__text) {
   background: govuk-colour('white');
+  height: 100%;
   margin-left: -8px;
-  max-height: 100%;
   overflow: auto;
   position: absolute;
   text-align: left;

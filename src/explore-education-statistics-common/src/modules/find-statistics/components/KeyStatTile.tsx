@@ -71,7 +71,7 @@ const KeyStatTile = ({
           </div>
           {summary && summary.dataDefinition && (
             <Details
-              summary={(summary && summary.dataDefinitionTitle) || `Help`}
+              summary={(summary && summary.dataDefinitionTitle) || 'Help'}
             >
               <div>{summary.dataDefinition}</div>
             </Details>

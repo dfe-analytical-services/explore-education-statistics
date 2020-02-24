@@ -112,7 +112,7 @@ const EditableKeyStatTile = ({
                 (summary &&
                   summary.dataDefinitionTitle &&
                   summary.dataDefinitionTitle[0]) ||
-                `Help`,
+                'Help',
               dataDefinition:
                 (summary &&
                   summary.dataDefinition &&
