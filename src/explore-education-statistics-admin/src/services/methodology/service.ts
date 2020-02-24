@@ -27,7 +27,7 @@ const service = {
     methodologyId: string,
     body: { order: number },
     isAnnexes = false,
-  ): Promise<ContentSectionViewModel[]> {
+  ): Promise<ContentSectionViewModel> {
     return client.post(
       `methodology/${methodologyId}/content/sections/add${
         isAnnexes ? '?type=annexes' : ''
@@ -41,7 +41,7 @@ const service = {
     sectionId: string,
     heading: string,
     isAnnexes = false,
-  ): Promise<ContentSectionViewModel[]> {
+  ): Promise<ContentSectionViewModel> {
     return client.put(
       `methodology/${methodologyId}/content/section/${sectionId}/heading${
         isAnnexes ? '?type=annexes' : ''

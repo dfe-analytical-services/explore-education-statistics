@@ -2,7 +2,6 @@ import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
-import methodologyService from '@admin/services/methodology/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -16,6 +15,7 @@ import sortBy from 'lodash/sortBy';
 import React, { useEffect, useState } from 'react';
 import { MethodologyContent } from 'src/services/methodology/types';
 import { MethodologyTabProps } from '../MethodologyPage';
+import util from './methodologyContentUtil';
 
 const MethodologyContentPage = ({
   refreshMethodology,
@@ -146,19 +146,14 @@ const MethodologyContentPage = ({
                 id="contents-accordion"
                 canReorder
                 sectionName="Contents"
-                onSaveOrder={async order => {
-                  await methodologyService.updateContentSectionsOrder(
-                    methodology.id,
-                    order,
-                  );
-                  refreshMethodology();
-                }}
-                onAddSection={async () => {
-                  await methodologyService.addContentSection(methodology.id, {
-                    order: methodology.content.length,
-                  });
-                  refreshMethodology();
-                }}
+                onSaveOrder={util.accordionUpdateSectionsOrder(
+                  methodology,
+                  setMethodology,
+                )}
+                onAddSection={util.accordionAddNewSection(
+                  methodology,
+                  setMethodology,
+                )}
               >
                 {sortBy(methodology.content, 'order').map((section, index) => (
                   <AccordionSection
@@ -167,21 +162,16 @@ const MethodologyContentPage = ({
                     heading={section.heading}
                     index={index}
                     canEditHeading
-                    onHeadingChange={async heading => {
-                      await methodologyService.updateContentSectionHeading(
-                        methodology.id,
-                        section.id as string,
-                        heading,
-                      );
-                      refreshMethodology();
-                    }}
-                    onRemoveSection={async () => {
-                      await methodologyService.removeContentSection(
-                        methodology.id,
-                        section.id as string,
-                      );
-                      refreshMethodology();
-                    }}
+                    onHeadingChange={util.accordionSectionUpdateHeading(
+                      methodology,
+                      setMethodology,
+                      section.id as string,
+                    )}
+                    onRemoveSection={util.accordionSectionRemoveSection(
+                      methodology,
+                      setMethodology,
+                      section.id as string,
+                    )}
                   >
                     <ContentBlocks
                       id={`${section.heading}-content`}
