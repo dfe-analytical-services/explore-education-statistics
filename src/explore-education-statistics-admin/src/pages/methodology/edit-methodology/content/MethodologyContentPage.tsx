@@ -65,7 +65,9 @@ const MethodologyContentPage = ({
             'dfe-hide-comments': !isEditing,
           })}
         >
-          <section className={isEditing ? 'page-editing' : 'page-preview'}>
+          <section
+            className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+          >
             <h1
               className="govuk-heading-xl"
               data-testid={`page-title ${methodology.title}`}
