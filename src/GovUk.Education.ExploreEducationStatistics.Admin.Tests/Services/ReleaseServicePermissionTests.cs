@@ -18,6 +18,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -117,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
             var list = new List<ReleaseViewModel>
             {
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             Assert.Equal(list, result.Right);
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewRelatedReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
             var list = new List<ReleaseViewModel>
             {
@@ -186,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -205,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_NoAccessToSystem()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
             userService
                 .Setup(s => s.MatchesPolicy(CanAccessSystem))
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -239,11 +240,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             where TEntity : class
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }
@@ -257,7 +258,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ISubjectService>,
             Mock<ITableStorageService>,
             Mock<IFileStorageService>,
-            Mock<IImportStatusService>) Mocks()
+            Mock<IImportStatusService>,
+            Mock<IFootnoteService>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
             MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
@@ -272,7 +274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ISubjectService>(),
                 new Mock<ITableStorageService>(),
                 new Mock<IFileStorageService>(),
-                new Mock<IImportStatusService>());
+                new Mock<IImportStatusService>(),
+                new Mock<IFootnoteService>());
         }
     }
 }
