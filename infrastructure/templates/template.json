@@ -2019,8 +2019,9 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2019-08-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', variables('notificationsAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('ees-storage-notifications'))]",
       ],
       "properties": {
         "http20Enabled": true,
