@@ -89,6 +89,7 @@
     background: govuk-colour('white');
     font-size: 1rem;
     margin: 0;
+    min-height: 2rem;
     order: 2;
     padding: 0.2rem 0 0.2rem 0.5rem;
     text-align: right;
@@ -124,11 +125,13 @@
 
 .keyStatTile :global(.govuk-details__text) {
   background: govuk-colour('white');
-  height: 100%;
+  box-sizing: border-box;
+  height: calc(100% - 1rem);
   margin-left: -8px;
   overflow: auto;
   position: absolute;
   text-align: left;
+  width: 100%;
   z-index: 1;
 
   @include govuk-media-query($until: tablet) {
