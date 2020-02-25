@@ -1991,8 +1991,6 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "properties": {
-      },
       "resources": [
         {
           "condition": "[parameters('useSubnets')]",
@@ -2023,7 +2021,6 @@
         "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
