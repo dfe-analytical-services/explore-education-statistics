@@ -2009,7 +2009,8 @@
         }
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "httpsOnly": true
       }
     },
     {
@@ -2021,9 +2022,9 @@
         "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]"
       ],
       "properties": {
-        "httpsOnly": true,
         "http20Enabled": true,
         "minTlsVersion": "[parameters('minTlsVersion')]",
+        "ftpsState": "FtpsOnly",
         "phpVersion": "off",
         "netFrameworkVersion": "v4.7",
         "webSocketsEnabled": false,
