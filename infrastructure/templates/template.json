@@ -540,6 +540,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
@@ -626,6 +627,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "AlwaysOn": false,
           "webSocketsEnabled": false,
@@ -759,6 +761,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
@@ -830,6 +833,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "AlwaysOn": false,
           "webSocketsEnabled": false,
@@ -963,6 +967,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
@@ -1061,6 +1066,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "AlwaysOn": false,
           "webSocketsEnabled": false,
@@ -1166,6 +1172,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
@@ -2126,6 +2133,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
@@ -2280,6 +2288,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
           "phpVersion": "off",
           "netFrameworkVersion": "v4.7",
           "AlwaysOn": true,
