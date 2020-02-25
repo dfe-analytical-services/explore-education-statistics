@@ -37,7 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IFootnoteService _footnoteService;
+        private readonly IImportStatusService _importStatusService;
+	private readonly IFootnoteService _footnoteService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -50,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository, 
             ISubjectService subjectService,
             ITableStorageService tableStorageService, 
-            IFileStorageService fileStorageService, IFootnoteService footnoteService)
+            IFileStorageService fileStorageService, 
+            IImportStatusService importStatusService,
+	    IFootnoteService footnoteService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -61,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _fileStorageService = fileStorageService;
+            _importStatusService = importStatusService;
             _footnoteService = footnoteService;
         }
 
@@ -338,6 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(() => CheckCanDeleteDataFiles(releaseId, fileName))
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileName, subjectTitle))
                 .OnSuccess(async deletePlan =>
                 {
@@ -360,6 +365,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             _context.ContentBlocks.RemoveRange(dependentDataBlocks);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
+        {
+            var importFinished = await _importStatusService.IsImportFinished(releaseId.ToString(), fileName);
+            
+            if (!importFinished)
+            {
+                return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            }
+
+            return true;
         }
 
         private List<DataBlock> GetDependentDataBlocks(Guid releaseId, Guid subjectId)

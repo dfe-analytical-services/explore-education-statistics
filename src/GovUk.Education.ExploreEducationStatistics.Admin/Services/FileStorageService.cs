@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(GetCloudBlobContainer)
                 .OnSuccess(blobContainer => 
                     DataPathsForDeletion(blobContainer , releaseId, fileName)
-                    .OnSuccess(path => DeleteFileAsync(blobContainer, path.dataFilePath)))
+                    .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
@@ -326,6 +326,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(CloudBlobContainer blobContainer,
+            (string, string) paths)
+        {
+            await DeleteFileAsync(blobContainer, paths.Item1);
+            await DeleteFileAsync(blobContainer, paths.Item2);
+            return true;
+        }
+        
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
