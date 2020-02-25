@@ -88,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MethodologyDoesNotExist, 
         MethodologyMustBeApprovedOrPublished,
         CannotSpecifyMethodologyAndExternalMethodology,
-        MethodologyOrExternalMethodologyLinkMustBeDefined
+        MethodologyOrExternalMethodologyLinkMustBeDefined,
+        CannotRemoveDataFilesUntilImportComplete
     }
 }
