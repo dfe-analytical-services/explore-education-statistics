@@ -344,3 +344,4 @@ user checks publication bullet contains link
 user checks publication bullet does not contain link
   [Arguments]   ${publication}   ${link}
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+

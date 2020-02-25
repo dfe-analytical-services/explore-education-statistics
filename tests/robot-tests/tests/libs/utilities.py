@@ -275,4 +275,4 @@ def user_checks_list_does_not_contain_label(list_locator, label):
 def user_checks_selected_list_label(list_locator, label):
   selected_label = sl.get_selected_list_label(list_locator)
   if selected_label != label:
-    raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label} for list "{list_Locator}"')
+    raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
