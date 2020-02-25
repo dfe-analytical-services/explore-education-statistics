@@ -161,7 +161,6 @@ const MethodologyContentPage = ({
                     key={section.id}
                     heading={section.heading}
                     index={index}
-                    canEditHeading
                     onHeadingChange={util.accordionSectionUpdateHeading(
                       methodology,
                       setMethodology,

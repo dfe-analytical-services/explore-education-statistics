@@ -14,7 +14,6 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
   headingButtons?: ReactNode[];
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
-  canEditHeading: boolean;
   canRemoveSection: boolean;
   onRemoveSection: () => Promise<unknown>;
 }
@@ -33,7 +32,6 @@ const EditableAccordionSection = ({
   open = false,
   onToggle,
   onHeadingChange,
-  canEditHeading,
   onRemoveSection,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
@@ -107,7 +105,7 @@ const EditableAccordionSection = ({
               currentHeading
             )}
           </span>,
-          canEditHeading && (
+          onHeadingChange && (
             <a
               role="button"
               tabIndex={0}

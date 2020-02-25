@@ -88,7 +88,6 @@ const ReleaseContentAccordionSection = ({
         ),
         ...(headingButtons || []),
       ]}
-      canEditHeading
       onHeadingChange={onHeadingChange}
       onRemoveSection={onRemoveSection}
       {...restOfProps}
