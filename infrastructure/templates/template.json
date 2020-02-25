@@ -2026,13 +2026,11 @@
         // "http20Enabled": true,
         // "minTlsVersion": "[parameters('minTlsVersion')]",
         // "ftpsState": "FtpsOnly",
-        // "phpVersion": "off",
-        // "netFrameworkVersion": "v4.7",
         // "webSocketsEnabled": false,
-        // "remoteDebuggingEnabled": false,
-        // "httpLoggingEnabled": true,
-        // "detailedErrorLoggingEnabled": true,
-        // "requestTracingEnabled": true,
+        "requestTracingEnabled": true,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": true,
+        "detailedErrorLoggingEnabled": true
         // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         // "cors": {
         //   "allowedOrigins": [
