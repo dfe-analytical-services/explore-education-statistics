@@ -1022,10 +1022,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[variables('ees-notify-apikey-admin')]",
-        "[variables('ees-openidconnect-authority')]",
-        "[variables('ees-openidconnect-clientid')]",
-        "[variables('ees-openidconnect-clientsecret')]",
         "[variables('ees-storage-core')]",
         "[variables('ees-storage-publisher')]"
       ],
