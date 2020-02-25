@@ -2779,7 +2779,6 @@
         "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]",
-            // "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
@@ -2794,8 +2793,8 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            // "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
+            "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
@@ -2837,6 +2836,21 @@
               ]
             }
           },
+          {
+            "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
+            "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e", // Devops SPN
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe", // EES Admin Group ID
