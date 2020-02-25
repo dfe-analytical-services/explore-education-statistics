@@ -2010,20 +2010,7 @@
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "httpsOnly": true
-      }
-    },
-    {
-      "name": "[concat(variables('notificationsAppName'), '/web')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[variables('ees-storage-notifications')]"
-      ],
-      "properties": {
+        "httpsOnly": true,
         "http20Enabled": true,
         "minTlsVersion": "[parameters('minTlsVersion')]",
         "ftpsState": "FtpsOnly",
@@ -2040,70 +2027,41 @@
             "http://localhost:3000",
             "http://127.0.0.1"
           ]
-        },
-        "appSettings": [
-          {
-            "name": "AzureWebJobsDashboard",
-            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
-
-          },
-          {
-            "name": "AzureWebJobsStorage",
-            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
-
-          },
-          {
-            "name": "WEBSITE_RUN_FROM_PACKAGE",
-            "value": "1"
-          },
-          {
-            "name": "FUNCTIONS_EXTENSION_VERSION",
-            "value": "~3"
-          },
-          {
-            "name": "FUNCTIONS_WORKER_RUNTIME",
-            "value": "dotnet"
-          },
-          {
-            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-            "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
-          },
-          {
-            "name": "BaseUrl",
-            "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
-          },
-          {
-            "name": "WebApplicationBaseUrl",
-            "value": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]"
-          },
-          {
-            "name": "NotifyApiKey",
-            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
-          },
-          {
-            "name": "TokenSecretKey",
-            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]"
-          },
-          {
-            "name": "VerificationEmailTemplateId",
-            "value": "[parameters('verificationEmailTemplateId')]"
-          },
-          {
-            "name": "PublicationNotificationEmailTemplateId",
-            "value": "[parameters('publicationNotificationEmailTemplateId')]"
-          },
-          {
-            "name": "SubscriptionConfirmationEmailTemplateId",
-            "value": "[parameters('subscriptionConfirmationEmailTemplateId')]"
-          }
-        ],
-        "connectionStrings": [
-          {
-            "name": "TableStorageConnString",
-            "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-            "type": "Custom"
-          }
-        ]
+        }
+        //,
+        //   "connectionStrings": [
+        //   {
+        //     "name": "TableStorageConnString",
+        //     "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        //     "type": "Custom"
+        //   }
+        // ]
+      }
+    },
+    {
+      "name": "[concat(variables('notificationsAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-notifications')]"
+      ],
+      "properties": {
+        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "FUNCTIONS_EXTENSION_VERSION": "~3",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]",
+        "BaseUrl": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]",
+        "WebApplicationBaseUrl": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]",
+        "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]",
+        "TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]",
+        "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
+        "PublicationNotificationEmailTemplateId": "[parameters('publicationNotificationEmailTemplateId')]",
+        "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]"
       }
     },
     {
@@ -2483,7 +2441,6 @@
         }
       }
     },
-
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('publisherStorageAccountName')]",
@@ -2542,7 +2499,6 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
     },
-
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('loggingStorageAccountName')]",
@@ -3223,6 +3179,5 @@
         "targetResourceLocation": ""
       }
     }
-
   ]
 }
