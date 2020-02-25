@@ -2010,6 +2010,18 @@
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+      }
+    },
+    {
+      "name": "appsettings",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
@@ -2823,8 +2835,8 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "66506892-8b1e-4815-9597-515cd2828628",
-            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2017-03-30', 'Full').identity.principalId]",
+            //"objectId": "66506892-8b1e-4815-9597-515cd2828628",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2017-03-30', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
