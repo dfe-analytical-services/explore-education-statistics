@@ -92,12 +92,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         Id = new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"),
                         Title = "Methodology 1",
-                        Published = DateTime.UtcNow
+                        Published = DateTime.UtcNow,
+                        Status = MethodologyStatus.Approved
                     },
                     new Methodology
                     {
                         Id = new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba"),
                         Title = "Methodology 2",
+                        Status = MethodologyStatus.Draft
                     },
                 };
                 
@@ -115,8 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         new PersistenceHelper<ContentDbContext>(context))
                     .ListAsync().Result.Right;
                 
-                Assert.Contains(methodologies, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1" && m.Status == "Live");
-                Assert.Contains(methodologies, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2" && m.Status == "Draft");
+                Assert.Contains(methodologies, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1" && m.Status == MethodologyStatus.Approved);
+                Assert.Contains(methodologies, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2" && m.Status == MethodologyStatus.Draft);
             }
         }
     }

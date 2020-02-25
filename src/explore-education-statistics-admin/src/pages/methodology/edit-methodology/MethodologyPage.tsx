@@ -28,7 +28,6 @@ const MethodologyPage = ({
   const [methodology, setMethodology] = useState<MethodologyContent>();
 
   const refreshMethodology = () => {
-    setMethodology(undefined);
     methodologyService
       .getMethodologyContent(methodologyId)
       .then(setMethodology)
@@ -118,8 +117,8 @@ const MethodologyPage = ({
                 exact
                 key={route.path}
                 path={route.path}
-                render={() =>
-                  route.component({ methodology, refreshMethodology })
+                render={props =>
+                  route.component({ methodology, refreshMethodology, ...props })
                 }
               />
             ))}

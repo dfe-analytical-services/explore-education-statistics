@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
 
                 // TODO: this will want updating when methodology status is fully implemented
-                if (methodology.Status == "Draft")
+                if (methodology.Status == MethodologyStatus.Draft)
                 {
                     return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
                 }

@@ -44,7 +44,7 @@ const ReleaseStatusPage = ({
   handleApiErrors,
 }: RouteComponentProps & ErrorControlProps) => {
   const [model, setModel] = useState<Model>();
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState(false);
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 

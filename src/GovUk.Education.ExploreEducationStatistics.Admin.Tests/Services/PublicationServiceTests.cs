@@ -149,7 +149,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
             {
                 context.Add(new Publication { Id = testPublicationId});
-                context.Add(new Methodology { Id = testMethodologyId, Published = DateTime.UtcNow.AddDays(-1)});
+                context.Add(new Methodology 
+                { 
+                    Id = testMethodologyId, 
+                    Published = DateTime.UtcNow.AddDays(-1), 
+                    Status = MethodologyStatus.Approved
+                    
+                });
 
                 context.SaveChanges();
             }
@@ -159,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = null,
                     MethodologyId = testMethodologyId

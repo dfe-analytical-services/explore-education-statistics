@@ -34,6 +34,7 @@ export interface Props extends ContentBlockProps {
   textOnly?: boolean;
   isReordering?: boolean;
   resolveComments?: boolean;
+  addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
   onReorderHook?: (callback: ReorderHook) => void;
 }
@@ -64,6 +65,7 @@ const EditableContentBlock = ({
   textOnly = false,
   isReordering = false,
   onReorderHook = undefined,
+  addContentButtonText = 'Add content',
 }: Props) => {
   const editingContext = useContext(EditingContext);
 
@@ -212,6 +214,7 @@ const EditableContentBlock = ({
         {(canAddBlocks || canAddSingleBlock) && (
           <AddContentButton
             textOnly={textOnly}
+            buttonText={addContentButtonText}
             onClick={(type, data) => onAddContentCallback(type, data, 0)}
             availableDataBlocks={editingContext.availableDataBlocks}
           />
