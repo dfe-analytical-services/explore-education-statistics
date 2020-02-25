@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Web.Http;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -28,13 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public Task<ActionResult<ResultWithMetaViewModel>> Query([FromUri] Guid releaseId,
-            [FromBody] ObservationQueryContext query)
+        public Task<ActionResult<ResultWithMetaViewModel>> Query([FromBody] ObservationQueryContext query)
         {
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var resultWithMetaViewModel = _dataService.Query(query, releaseId);
+            var resultWithMetaViewModel = _dataService.Query(query);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);

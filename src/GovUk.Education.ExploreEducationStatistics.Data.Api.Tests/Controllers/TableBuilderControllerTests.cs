@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var tableBuilderService = new Mock<IDataService<TableBuilderResultViewModel>>();
 
-            tableBuilderService.Setup(s => s.Query(_query, null)).ReturnsAsync(new TableBuilderResultViewModel
+            tableBuilderService.Setup(s => s.Query(_query)).ReturnsAsync(new TableBuilderResultViewModel
             {
                 Results = new List<ObservationViewModel>
                 {

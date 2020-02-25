@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IReleaseService : IRepository<Release, Guid>
     {
-        Guid? GetLatestRelease(Guid publicationId);
+        Guid? GetLatestPublishedRelease(Guid publicationId);
     }
 }

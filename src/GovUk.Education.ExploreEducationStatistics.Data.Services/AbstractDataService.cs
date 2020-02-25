@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -15,26 +16,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     {
         private readonly IObservationService _observationService;
         private readonly ISubjectService _subjectService;
+        protected readonly IUserService _userService;
 
         protected AbstractDataService(IObservationService observationService,
-            ISubjectService subjectService)
+            ISubjectService subjectService,
+            IUserService userService)
         {
             _observationService = observationService;
             _subjectService = subjectService;
+            _userService = userService;
         }
 
-        public abstract Task<Either<ActionResult, TResult>> Query(
-            ObservationQueryContext queryContext, Guid? releaseId = null);
+        public abstract Task<Either<ActionResult, TResult>> Query(ObservationQueryContext queryContext);
 
-        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
+        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {
-            // If release Id is not specified then verify that the subject id passed exists for the latest release.
-            if ((releaseId == null || releaseId == Guid.Empty) && !_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
-            {
-                throw new InvalidOperationException("Subject is not for the latest release of this publication");
-            }
-
             return _observationService.FindObservations(queryContext);
+        }
+
+        protected async Task<Either<ActionResult, Subject>> CheckSubjectExists(Guid subjectId)
+        {
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
+            {
+                s => s.Release
+            });
+            return subject == null ? new NotFoundResult() : new Either<ActionResult, Subject>(subject);
         }
     }
 }

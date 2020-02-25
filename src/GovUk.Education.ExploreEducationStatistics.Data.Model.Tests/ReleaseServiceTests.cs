@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
     public class ReleaseServiceTests
     {
         [Fact]
-        public void GetLatestRelease()
+        public void GetLatestPublishedRelease()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -89,13 +89,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
 
-                var result = service.GetLatestRelease(publicationA.Id);
+                var result = service.GetLatestPublishedRelease(publicationA.Id);
                 Assert.Equal(publicationARelease1.Id, result);
             }
         }
 
         [Fact]
-        public void GetLatestRelease_PublicationIdNotFound()
+        public void GetLatestPublishedRelease_PublicationIdNotFound()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
 
-                var result = service.GetLatestRelease(Guid.NewGuid());
+                var result = service.GetLatestPublishedRelease(Guid.NewGuid());
                 Assert.False(result.HasValue);
             }
         }

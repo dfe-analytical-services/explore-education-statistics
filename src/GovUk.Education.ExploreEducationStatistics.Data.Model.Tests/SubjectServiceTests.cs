@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
     public class SubjectServiceTests
     {
         [Fact]
-        public void IsSubjectForLatestRelease()
+        public void IsSubjectForLatestPublishedRelease()
         {
             var (logger, releaseService) = Mocks();
 
@@ -46,15 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 context.SaveChanges();
 
-                releaseService.Setup(s => s.GetLatestRelease(publication.Id)).Returns(release.Id);
+                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(release.Id);
 
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.True(service.IsSubjectForLatestRelease(subject.Id));
+                Assert.True(service.IsSubjectForLatestPublishedRelease(subject.Id));
             }
         }
 
         [Fact]
-        public void IsSubjectForLatestRelease_SubjectNotFound()
+        public void IsSubjectForLatestPublishedRelease_SubjectNotFound()
         {
             var (logger, releaseService) = Mocks();
 
@@ -65,12 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             using (var context = new StatisticsDbContext(options, null))
             {
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestRelease(Guid.NewGuid()));
+                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestPublishedRelease(Guid.NewGuid()));
             }
         }
 
         [Fact]
-        public void IsSubjectForLatestRelease_SubjectBelongsToOldRelease()
+        public void IsSubjectForLatestPublishedRelease_SubjectBelongsToOldRelease()
         {
             var (logger, releaseService) = Mocks();
 
@@ -104,15 +104,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 context.SaveChanges();
 
-                releaseService.Setup(s => s.GetLatestRelease(publication.Id)).Returns(Guid.NewGuid());
+                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(Guid.NewGuid());
 
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.False(service.IsSubjectForLatestRelease(subject.Id));
+                Assert.False(service.IsSubjectForLatestPublishedRelease(subject.Id));
             }
         }
 
         [Fact]
-        public void IsSubjectForLatestRelease_SubjectBelongsToNonLiveRelease()
+        public void IsSubjectForLatestPublishedRelease_SubjectBelongsToNonLiveRelease()
         {
             var (logger, releaseService) = Mocks();
 
@@ -146,10 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 context.SaveChanges();
 
-                releaseService.Setup(s => s.GetLatestRelease(publication.Id)).Returns(Guid.NewGuid());
+                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(Guid.NewGuid());
 
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestRelease(Guid.NewGuid()));
+                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestPublishedRelease(Guid.NewGuid()));
             }
         }
 
