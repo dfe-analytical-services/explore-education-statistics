@@ -2301,7 +2301,7 @@
             },
             {
               "name": "NotificationStorage",
-              "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]",
               "type": "Custom"
             },
             {
