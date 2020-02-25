@@ -70,7 +70,7 @@ const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
         </TabsSection>
         <TabsSection id="footnotes" title="Footnotes">
           <ReleaseFootnotesSection
-            getFootnoteData={getFootnoteData}
+            onDelete={getFootnoteData}
             publicationId={publication.id}
             releaseId={releaseId}
             footnotesData={footnotesData}
