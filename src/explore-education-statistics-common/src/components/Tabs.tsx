@@ -16,9 +16,10 @@ interface Props {
   children: ReactNode;
   id: string;
   onToggle?: (section: { id: string; title: string }) => void;
+  openId?: string;
 }
 
-const Tabs = ({ children, id, onToggle }: Props) => {
+const Tabs = ({ children, id, onToggle, openId }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -28,10 +29,12 @@ const Tabs = ({ children, id, onToggle }: Props) => {
   const sectionElements: HTMLElement[] = [];
 
   const setSelectedTab = (index: number) => {
-    if (window.history.pushState) {
-      window.history.pushState(null, '', `#${sectionElements[index].id}`);
-    } else {
-      window.location.hash = sectionElements[index].id;
+    if (sectionElements[index]) {
+      if (window.history.pushState) {
+        window.history.pushState(null, '', `#${sectionElements[index].id}`);
+      } else {
+        window.location.hash = sectionElements[index].id;
+      }
     }
 
     setLoadedSections(loadedSections.add(index));
@@ -51,10 +54,10 @@ const Tabs = ({ children, id, onToggle }: Props) => {
       sections.map(function getTabIndex(e, index) {
         if (e.props.id === window.location.hash.substr(1)) {
           tabIndex = index;
+          setSelectedTab(index);
         }
         return null;
       });
-
       if (tabIndex !== null) {
         setSelectedTabIndex(tabIndex);
       }
@@ -67,7 +70,6 @@ const Tabs = ({ children, id, onToggle }: Props) => {
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;
-
           return (
             <li
               className={classNames('govuk-tabs__list-item', {
