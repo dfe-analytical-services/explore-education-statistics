@@ -980,68 +980,6 @@
               "http://localhost:3000"
             ]
           },
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "AppInsights__InstrumentationKey",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
-            },
-            {
-              "name": "WEBSITE_LOAD_CERTIFICATES",
-              "value": "*"
-            },
-            {
-              "name": "ASPNETCORE_DETAILEDERRORS",
-              "value": "true"
-            },
-            {
-              "name": "NotifyApiKey",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]"
-            },
-            {
-              "name": "NotifyInviteTemplateId",
-              "value": "[parameters('notifyInviteTemplateId')]"
-            },
-            {
-              "name": "NotifyPreReleaseTemplateId",
-              "value": "[parameters('notifyPreReleaseTemplateId')]"
-            },
-            {
-              "name": "AdminUri",
-              "value": "[parameters('adminUri')]"
-            },
-            {
-              "name": "IdentityServer:IssuerUri",
-              "value": "[concat('urn=', parameters('adminUri'))]"
-            },
-            {
-              "name": "IdentityServer:Key:Name",
-              "value": "[concat('CN=', parameters('adminUri'))]"
-            },
-            {
-              "name": "OpenIdConnect:Authority",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]"
-            },
-            {
-              "name": "OpenIdConnect:ClientId",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]"
-            },
-            {
-              "name": "OpenIdConnect:ClientSecret",
-              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]"
-            }
-          ],
           "connectionStrings": [
             {
               "name": "CoreStorage",
@@ -1070,6 +1008,37 @@
         "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
       ]
+    },
+    {
+      "name": "[concat(variables('adminAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-notify-apikey-admin')]",
+        "[variables('ees-openidconnect-authority')]",
+        "[variables('ees-openidconnect-clientid')]",
+        "[variables('ees-openidconnect-clientsecret')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]",
+        "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "WEBSITE_LOAD_CERTIFICATES": "*",
+        "ASPNETCORE_DETAILEDERRORS": "true",
+        "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
+        "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
+        "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
+        "AdminUri": "[parameters('adminUri')]",
+        "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
+        "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
+        "OpenIdConnect:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnect:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]"
+      }
     },
     {
       "apiVersion": "2016-08-01",
@@ -2742,8 +2711,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "66506892-8b1e-4815-9597-515cd2828628",
-            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
               ],
@@ -2783,7 +2751,7 @@
               ]
             }
           },
-                    {
+          {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
