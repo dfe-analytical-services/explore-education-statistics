@@ -1,5 +1,5 @@
 import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
-import MethodologyReleaseStatusPage from '@admin/pages/methodology/edit-methodology/release-status/MethodologyReleaseStatusPage';
+import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 
 export interface MethodologyRoute {
@@ -39,7 +39,7 @@ export const contentRoute = createReadonlyRoute(
 export const publishStatusRoute = createReadonlyRoute(
   'status',
   'Release status',
-  MethodologyReleaseStatusPage,
+  MethodologyStatusPage,
 );
 
 export default [summaryRoute, contentRoute, publishStatusRoute];
