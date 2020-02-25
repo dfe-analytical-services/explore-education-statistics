@@ -2013,7 +2013,7 @@
       }
     },
     {
-      "name": "appsettings",
+      "name": "[concat(variables('notificationsAppName'), '/appsettings')]",
       "type": "Microsoft.Web/sites/config",
       "location": "[resourceGroup().location]",
       "apiVersion": "2019-08-01",
