@@ -5,6 +5,7 @@ import {
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import {
+  parseDate,
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
@@ -99,12 +100,10 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
         'do MMMM yyyy',
       )}`,
       value => {
-        const date = parse(
-          `${value.year}-${value.month}-${value.day}`,
-          'yyyy-M-d',
-          new Date(value.year, value.month, value.day),
+        return (
+          isValid(parseDate(value)) &&
+          endOfDay(parseDate(value)) >= endOfDay(new Date())
         );
-        return isValid(date) && endOfDay(date) >= endOfDay(new Date());
       },
     ),
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
