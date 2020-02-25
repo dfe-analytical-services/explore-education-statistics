@@ -130,8 +130,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IFileTypeService>) Mocks()
         {
+            var mockConf= new Mock<IConfiguration>();
+            mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);  
+            
             return (
-                new Mock<IConfiguration>(), 
+                mockConf,
                 new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
