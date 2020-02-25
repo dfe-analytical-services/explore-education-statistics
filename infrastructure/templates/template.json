@@ -2802,7 +2802,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
+            "objectId": "66506892-8b1e-4815-9597-515cd2828628",
             // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
@@ -2833,6 +2833,7 @@
           {
             "tenantId": "[subscription().tenantId]",
             //"objectId": "66506892-8b1e-4815-9597-515cd2828628",
+            // "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [
