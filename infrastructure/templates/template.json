@@ -1991,6 +1991,8 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "properties": {
+      },
       "resources": [
         {
           "condition": "[parameters('useSubnets')]",
