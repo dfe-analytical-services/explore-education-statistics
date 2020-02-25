@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public async Task<ActionResult<TableBuilderResultViewModel>> Query([FromUri, Required] ReleaseId releaseId,
+        public async Task<ActionResult<TableBuilderResultViewModel>> Query([FromUri, Required] Guid releaseId,
             [FromBody] ObservationQueryContext query)
         {
             return await _persistenceHelper
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     return tableBuilderResultViewModel;
                     
                 })
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 }

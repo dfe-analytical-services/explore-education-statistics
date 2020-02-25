@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -8,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -20,7 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     {
         private readonly TableBuilderController _controller;
 
-        private readonly ObservationQueryContext _query = new ObservationQueryContext();
+        private readonly ObservationQueryContext _query = new ObservationQueryContext
+        {
+            SubjectId = ReleaseId.NewGuid()
+        };
 
         private readonly ReleaseId _releaseId = ReleaseId.NewGuid();
 
@@ -34,11 +37,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void Query_Post()
+        public async Task Query_Post()
         {
-            var result = _controller.Query(_releaseId, _query);
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result.Result);
-            Assert.IsAssignableFrom<TableBuilderResultViewModel>(((OkObjectResult) result.Result.Result).Value);
+            var result = await _controller.Query(_releaseId, _query);
+            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
+        }
+        
+        [Fact]
+        public async Task Query_Post_NoResult()
+        {
+            var result = await _controller.Query(_releaseId, new ObservationQueryContext());
+            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
+            Assert.Empty(result.Value.Results);
         }
         
         private (
@@ -49,13 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var tableBuilderService = new Mock<IDataService<TableBuilderResultViewModel>>();
 
-            tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query), null)).Returns(
+            tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query), _releaseId)).ReturnsAsync(
                 new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>()
                 });
 
-            tableBuilderService.Setup(s => s.Query(_query, _releaseId)).Returns(
+            tableBuilderService.Setup(s => s.Query(_query, _releaseId)).ReturnsAsync(
                 new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>
