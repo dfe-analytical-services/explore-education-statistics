@@ -2023,10 +2023,10 @@
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
       ],
       "properties": {
-        // "http20Enabled": true,
-        // "minTlsVersion": "[parameters('minTlsVersion')]",
-        // "ftpsState": "FtpsOnly",
-        // "webSocketsEnabled": false,
+        "http20Enabled": true,
+        "minTlsVersion": "[parameters('minTlsVersion')]",
+        "ftpsState": "FtpsOnly",
+        "webSocketsEnabled": false,
         "requestTracingEnabled": true,
         "remoteDebuggingEnabled": false,
         "httpLoggingEnabled": true,
