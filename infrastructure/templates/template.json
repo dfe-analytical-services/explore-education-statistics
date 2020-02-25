@@ -387,6 +387,9 @@
     "autoscalePublicApplication": {
       "type": "bool",
       "defaultValue": false
+    },
+    "devopsSPN": {
+      "type": "string"
     }
   },
   "variables": {
@@ -2765,7 +2768,7 @@
           },
           {
             "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
-            "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e", // Devops SPN
+            "objectId": "[parameters('devopsSPN')]", // Devops SPN
             "permissions": {
               "keys": [
               ],
