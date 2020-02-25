@@ -1,23 +1,24 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { summaryRoute } from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/service';
-import { MethodologyStatus } from '@admin/services/methodology/types';
+import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
-  liveMethodologies: MethodologyStatus[];
-  otherMethodologies: MethodologyStatus[];
+  liveMethodologies: MethodologyStatusListItem[];
+  otherMethodologies: MethodologyStatusListItem[];
 }
 
-const ListMethodologyPages = () => {
+const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
     methodologyService.getMethodologies().then(methodologies => {
-      const liveMethodologies: MethodologyStatus[] = [];
+      const liveMethodologies: MethodologyStatusListItem[] = [];
       setModel({
         otherMethodologies: methodologies.filter(method => {
           if (method.status.toLocaleLowerCase() === 'live') {
@@ -71,7 +72,7 @@ const ListMethodologyPages = () => {
                 {model.liveMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodology/${methodology.id}`}>
+                      <Link to={summaryRoute.generateLink(methodology.id)}>
                         {methodology.title}
                       </Link>
                     </td>
@@ -96,7 +97,7 @@ const ListMethodologyPages = () => {
               There is currently no draft methodology
             </div>
           )}
-          <Link to="/methodology/create" className="govuk-button">
+          <Link to="/methodologies/create" className="govuk-button">
             Create new methodology
           </Link>
         </TabsSection>
@@ -105,7 +106,7 @@ const ListMethodologyPages = () => {
           title={`Draft methodologies ${
             model && model.otherMethodologies.length
               ? `(${model.otherMethodologies.length})`
-              : null
+              : '(0)'
           }`}
         >
           {model && model.otherMethodologies.length ? (
@@ -127,7 +128,7 @@ const ListMethodologyPages = () => {
                 {model.otherMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
-                      <Link to={`/methodology/${methodology.id}`}>
+                      <Link to={summaryRoute.generateLink(methodology.id)}>
                         {methodology.title}
                       </Link>
                     </td>
@@ -158,4 +159,4 @@ const ListMethodologyPages = () => {
   );
 };
 
-export default ListMethodologyPages;
+export default MethodologiesPage;

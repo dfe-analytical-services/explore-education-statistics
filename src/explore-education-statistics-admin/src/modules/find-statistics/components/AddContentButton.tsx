@@ -7,12 +7,14 @@ interface AddContentButtonProps {
   onClick: (type: string, data: string) => void;
   availableDataBlocks: DataBlock[];
   textOnly?: boolean;
+  buttonText?: string;
   datablockOnly?: boolean;
 }
 
 const AddContentButton = ({
   onClick,
   textOnly = false,
+  buttonText = 'Add content',
   datablockOnly = false,
 }: AddContentButtonProps) => {
   const [showDataBlocks, setShowDataBlocks] = React.useState(false);
@@ -25,7 +27,7 @@ const AddContentButton = ({
             variant="secondary"
             onClick={() => onClick('MarkdownBlock', 'Click to edit')}
           >
-            Add content
+            {buttonText}
           </Button>
         )}
         {!textOnly && (

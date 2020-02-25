@@ -1,6 +1,5 @@
 from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
-from selenium.webdriver.common.action_chains  import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')

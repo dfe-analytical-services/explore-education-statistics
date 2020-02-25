@@ -42,10 +42,12 @@ export interface TimePeriodCoverageGroup {
   }[];
 }
 
+export type MethodologyStatus = 'Draft' | 'Approved';
+
 export interface BasicMethodology {
   id: string;
   title: string;
-  status: 'Live' | 'Draft' | 'Approved' | string;
+  status: MethodologyStatus;
 }
 export interface BasicPublicationDetails {
   id: string;

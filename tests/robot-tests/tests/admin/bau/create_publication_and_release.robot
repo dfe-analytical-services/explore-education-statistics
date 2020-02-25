@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/admin-common.robot
+Resource    ../../libs/admin-common.robot
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -18,8 +18,8 @@ Go to Create publication page for "UI tests topic" topic
 
 Select an existing methodology
     [Tags]  HappyPath
-    user waits until page contains element   xpath://label[text()="Add existing methodology"]
-    user clicks element          xpath://label[text()="Add existing methodology"]
+    user waits until page contains element   xpath://label[text()="Choose an existing methodology"]
+    user clicks element          xpath://label[text()="Choose an existing methodology"]
     user checks element is visible    xpath://label[text()="Select methodology"]
     user selects from list by label  css:#createPublicationForm-selectedMethodologyId   Test methodology
 

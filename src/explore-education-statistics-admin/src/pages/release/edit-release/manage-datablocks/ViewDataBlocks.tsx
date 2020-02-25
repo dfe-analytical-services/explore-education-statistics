@@ -34,6 +34,7 @@ const ViewDataBlocks = ({
   onDataBlockSave,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
+  const [activeTab, setActiveTab] = useState<string>('');
   // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = useState<DataBlockResponse>(
     () => {
@@ -126,13 +127,19 @@ const ViewDataBlocks = ({
 
   return (
     <>
-      <Tabs id="editDataBlockSections">
+      <Tabs
+        openId={activeTab}
+        onToggle={tab => {
+          setActiveTab(tab.id);
+        }}
+        id="editDataBlockSections"
+      >
         <TabsSection title="Table">
           <div className="govuk-width-container">
             {tableData && <TimePeriodDataTable {...tableData} />}
           </div>
         </TabsSection>
-        <TabsSection title="Create Chart">
+        <TabsSection title="Create chart">
           {chartBuilderData ? (
             <div style={{ position: 'relative' }}>
               <ChartBuilder
