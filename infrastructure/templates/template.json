@@ -2030,16 +2030,16 @@
         "requestTracingEnabled": true,
         "remoteDebuggingEnabled": false,
         "httpLoggingEnabled": true,
-        "detailedErrorLoggingEnabled": true
+        "detailedErrorLoggingEnabled": true,
         // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-        // "cors": {
-        //   "allowedOrigins": [
-        //     "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-        //     "https://localhost:3000",
-        //     "http://localhost:3000",
-        //     "http://127.0.0.1"
-        //   ]
-        // },
+        "cors": {
+          "allowedOrigins": [
+            "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+            "https://localhost:3000",
+            "http://localhost:3000",
+            "http://127.0.0.1"
+          ]
+        }
         // "appSettings": [
         //   {
         //     "name": "AzureWebJobsDashboard",
