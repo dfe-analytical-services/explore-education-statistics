@@ -2054,7 +2054,7 @@
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
         "PublicationNotificationEmailTemplateId": "[parameters('publicationNotificationEmailTemplateId')]",
         "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]",
-        "TableStorageConnString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "TableStorageConnString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
       }
     },
     {
