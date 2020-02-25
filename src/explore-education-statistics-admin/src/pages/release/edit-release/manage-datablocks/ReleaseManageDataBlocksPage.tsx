@@ -32,6 +32,7 @@ const ReleaseManageDataBlocksPage = ({
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
+  const [activeTab, setActiveTab] = React.useState<string>('');
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<
     DataBlock['id']
   >('');
@@ -242,7 +243,13 @@ const ReleaseManageDataBlocksPage = ({
               : 'Create new data block'}
           </h2>
 
-          <Tabs id="manageDataBlocks">
+          <Tabs
+            openId={activeTab}
+            onToggle={tab => {
+              setActiveTab(tab.id);
+            }}
+            id="manageDataBlocks"
+          >
             <TabsSection
               title={
                 dataBlockData && dataBlockData.dataBlock

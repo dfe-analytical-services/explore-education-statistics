@@ -209,14 +209,6 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
-    "notifyApiKey": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyApiKeyAdmin": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
     "notifyInviteTemplateId": {
       "type": "securestring",
       "defaultValue": ""
@@ -225,12 +217,6 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
-    "notifyTokenSecretKey": {
-      "type": "securestring",
-      "defaultValue": ""
-    },
-
-
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -311,15 +297,6 @@
       "metadata": {
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
-    },
-    "openIdConnectTenant": {
-      "type": "string"
-    },
-    "openIdConnectClientId": {
-      "type": "string"
-    },
-    "openIdConnectClientSecret": {
-      "type": "string"
     },
 
     "adminUri": {
@@ -435,8 +412,8 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
-    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+    "notificationsStorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
+    "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
@@ -458,7 +435,7 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-    "dataFactoryName": "[concat(parameters('subscription'), 'datafactory')]",
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
@@ -467,14 +444,13 @@
 
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
-    "ees-openidconnect-tenant": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-tenant')]",
+    "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
 
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
 
     "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
     "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
-
 
     "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
     "ees-sql-password-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-data')]",
@@ -485,6 +461,11 @@
     "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
     "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
+
+    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
+    "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
+    "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
+    "ees-storage-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-publisher')]",
 
     "ipWhiteList": {
       "copy": [
@@ -641,7 +622,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
@@ -824,7 +826,28 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
@@ -984,7 +1007,7 @@
             },
             {
               "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKeyAdmin')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "NotifyInviteTemplateId",
@@ -1008,15 +1031,15 @@
             },
             {
               "name": "OpenIdConnect:Authority",
-              "value": "[concat('https://login.microsoftonline.com/',parameters('openIdConnectTenant'),'/')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "OpenIdConnect:ClientId",
-              "value": "[parameters('openIdConnectClientId')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]"
             },
             {
               "name": "OpenIdConnect:ClientSecret",
-              "value": "[parameters('openIdConnectClientSecret')]"
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]"
             }
           ],
           "connectionStrings": [
@@ -1069,7 +1092,27 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+          // "scmIpSecurityRestrictionsUseMain": true,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          }
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
@@ -1933,8 +1976,7 @@
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]"
       ],
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1968,88 +2010,99 @@
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "http20Enabled": true,
-          "minTlsVersion": "[parameters('minTlsVersion')]",
-          "phpVersion": "off",
-          "netFrameworkVersion": "v4.7",
-          "webSocketsEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": true,
-          "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-          "cors": {
-            "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
-          },
-          "appSettings": [
-            {
-              "name": "AzureWebJobsDashboard",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
-            },
-            {
-              "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~3"
-            },
-            {
-              "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "dotnet"
-            },
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "BaseUrl",
-              "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
-            },
-            {
-              "name": "WebApplicationBaseUrl",
-              "value": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]"
-            },
-            {
-              "name": "NotifyApiKey",
-              "value": "[parameters('notifyApiKey')]"
-            },
-            {
-              "name": "TokenSecretKey",
-              "value": "[parameters('notifyTokenSecretKey')]"
-            },
-            {
-              "name": "VerificationEmailTemplateId",
-              "value": "[parameters('verificationEmailTemplateId')]"
-            },
-            {
-              "name": "PublicationNotificationEmailTemplateId",
-              "value": "[parameters('publicationNotificationEmailTemplateId')]"
-            },
-            {
-              "name": "SubscriptionConfirmationEmailTemplateId",
-              "value": "[parameters('subscriptionConfirmationEmailTemplateId')]"
-            }
-          ],
-          "connectionStrings": [
-            {
-              "name": "TableStorageConnString",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
-              "type": "Custom"
-            }
+        "httpsOnly": true
+      }
+    },
+    {
+      "name": "[concat(variables('notificationsAppName'), '/web')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites/', variables('notificationsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ],
+      "properties": {
+        "http20Enabled": true,
+        "minTlsVersion": "[parameters('minTlsVersion')]",
+        "ftpsState": "FtpsOnly",
+        "webSocketsEnabled": false,
+        "requestTracingEnabled": true,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": true,
+        "detailedErrorLoggingEnabled": true,
+        // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
+        "cors": {
+          "allowedOrigins": [
+            "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+            "https://localhost:3000",
+            "http://localhost:3000",
+            "http://127.0.0.1"
           ]
-        }
+        },
+        "appSettings": [
+          {
+            "name": "AzureWebJobsDashboard",
+            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
+
+          },
+          {
+            "name": "AzureWebJobsStorage",
+            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
+
+          },
+          {
+            "name": "WEBSITE_RUN_FROM_PACKAGE",
+            "value": "1"
+          },
+          {
+            "name": "FUNCTIONS_EXTENSION_VERSION",
+            "value": "~3"
+          },
+          {
+            "name": "FUNCTIONS_WORKER_RUNTIME",
+            "value": "dotnet"
+          },
+          {
+            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+            "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
+          },
+          {
+            "name": "BaseUrl",
+            "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
+          },
+          {
+            "name": "WebApplicationBaseUrl",
+            "value": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]"
+          },
+          {
+            "name": "NotifyApiKey",
+            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]"
+          },
+          {
+            "name": "TokenSecretKey",
+            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]"
+          },
+          {
+            "name": "VerificationEmailTemplateId",
+            "value": "[parameters('verificationEmailTemplateId')]"
+          },
+          {
+            "name": "PublicationNotificationEmailTemplateId",
+            "value": "[parameters('publicationNotificationEmailTemplateId')]"
+          },
+          {
+            "name": "SubscriptionConfirmationEmailTemplateId",
+            "value": "[parameters('subscriptionConfirmationEmailTemplateId')]"
+          }
+        ],
+        "connectionStrings": [
+          {
+            "name": "TableStorageConnString",
+            "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+            "type": "Custom"
+          }
+        ]
       }
     },
     {
@@ -2407,7 +2460,7 @@
             },
             {
               "name": "NotificationStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
               "type": "Custom"
             },
             {
@@ -2696,15 +2749,263 @@
           },
           "environment": {
             "value": "[parameters('environment')]"
+          },
+          "publisherAppName": {
+            "value": "[variables('publisherAppName')]"
+          },
+          "ls_sql_public_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+          },
+          "ls_sql_statistics_connectionString": {
+            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+          },
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
           }
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ]
     },
+    {
+      "name": "[variables('keyVaultName')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2016-10-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "Standard"
+        },
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": true,
+        "enabledForTemplateDeployment": true,
+        "enableSoftDelete": true,
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "66506892-8b1e-4815-9597-515cd2828628",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "484e1067-2be8-4b18-a636-62b0254aa7f8",
+            // "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            //"objectId": "66506892-8b1e-4815-9597-515cd2828628",
+            // "objectId": "0785898a-68f6-4b01-95b5-e22863f07d26",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
+            "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e", // Devops SPN
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
 
-
-
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe", // EES Admin Group ID
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "976855ee-57b9-438c-bace-b4dfe141bb7e", // EDAP Team
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "Decrypt",
+                "Encrypt",
+                "UnwrapKey",
+                "WrapKey",
+                "Verify",
+                "Sign"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          }
+        ]
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "name": "ees-storage-core",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-notifications",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-public",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-publisher",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        }
+      ]
+    },
     {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",
       "apiVersion": "2014-04-01",

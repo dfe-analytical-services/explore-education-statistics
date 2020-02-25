@@ -3,7 +3,6 @@ import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
 import Button from '@common/components/Button';
-import classnames from 'classnames';
 import ModalConfirm from '@common/components/ModalConfirm';
 import styles from './EditableDataBlock.module.scss';
 
@@ -19,7 +18,7 @@ const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
     <div className={styles.wrapper}>
       <DataBlock id={id} {...restOfProps} />
       <Button
-        className={classnames(styles.delete, 'govuk-button--warning')}
+        className="govuk-button--warning"
         onClick={() => setShowConfirmation(true)}
       >
         Remove this data block

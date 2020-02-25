@@ -31,11 +31,11 @@
   text-align: right;
 }
 
-.dfe-align--comments {
+.dfe-align--left-hand-controls {
   margin-right: 0;
 }
 
-.dfe-hide-comments {
+.dfe-hide-controls {
   .dfe-comment-block {
     display: none;
   }
@@ -144,8 +144,8 @@ h1.govuk-panel__title {
 }
 
 // Hide page status tag from admin pages
-.page-editing,
-.page-preview {
+.dfe-page-editing,
+.dfe-page-preview {
   .govuk-tag {
     display: none;
   }

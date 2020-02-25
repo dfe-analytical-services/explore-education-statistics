@@ -1,3 +1,4 @@
+import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
@@ -193,14 +194,22 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     });
 
     return (
-      <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
-        columnHeaders={columnHeaders}
-        rowHeaders={rowHeaders}
-        rows={rows}
-        ref={dataTableRef}
-        footnotes={subjectMeta.footnotes}
-      />
+      <ErrorBoundary
+        fallback={
+          <WarningMessage>
+            There was a problem rendering your table.
+          </WarningMessage>
+        }
+      >
+        <FixedMultiHeaderDataTable
+          caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
+          columnHeaders={columnHeaders}
+          rowHeaders={rowHeaders}
+          rows={rows}
+          ref={dataTableRef}
+          footnotes={subjectMeta.footnotes}
+        />
+      </ErrorBoundary>
     );
   },
 );
