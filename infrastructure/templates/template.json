@@ -2324,12 +2324,12 @@
       }
     },
     {
-      "name": "[concat(variables('importerAppName'), '/appsettings')]",
+      "name": "[concat(variables('publisherAppName'), '/appsettings')]",
       "type": "Microsoft.Web/sites/config",
       "location": "[resourceGroup().location]",
       "apiVersion": "2019-08-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-publisher')]"
       ],
