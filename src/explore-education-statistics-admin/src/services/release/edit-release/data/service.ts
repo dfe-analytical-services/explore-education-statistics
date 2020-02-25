@@ -20,6 +20,13 @@ interface GetFileResponse {
   created: string;
 }
 
+export interface DeleteDataFilePlan {
+  dependentDataBlocks: {
+    name: string;
+    contentSectionHeading?: string;
+  }[];
+}
+
 const getFileNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1);
 
@@ -75,6 +82,14 @@ const service = {
     return client.post<null>(
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
+    );
+  },
+  getDeleteDataFilePlan(
+    releaseId: string,
+    subjectTitle: string,
+  ): Promise<DeleteDataFilePlan> {
+    return client.get<DeleteDataFilePlan>(
+      `/release/${releaseId}/data/${subjectTitle}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
