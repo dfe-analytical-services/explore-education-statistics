@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IImportStatusService _importStatusService;
 
         public ReleaseService(
             ContentDbContext context, 
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository, 
             ISubjectService subjectService,
             ITableStorageService tableStorageService, 
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService, IImportStatusService importStatusService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -56,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _fileStorageService = fileStorageService;
+            _importStatusService = importStatusService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -263,18 +265,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
+            string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async _ =>
                 {
+                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
+                    var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject.Id);
+                    
+                    return new DeleteDataFilePlan
+                    {
+                       DependentDataBlocks = dependentDataBlocks.
+                           Select(block => new DependentDataBlock
+                           {
+                               Name = block.Name,
+                               ContentSectionHeading = GetContentSectionHeading(block)
+                           })
+                           .ToList()
+                     };
+                });
+        }
+
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(() => CheckCanDeleteDataFiles(releaseId, fileName))
+                .OnSuccess(async _ =>
+                {
+                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
+
                     await _tableStorageService.DeleteEntityAsync("imports",
                         new DatafileImport(releaseId.ToString(), fileName, 0,0, null));
                     await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    await DeleteDependentDataBlocks(releaseId, subject.Id);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
+        {
+            var importFinished = await _importStatusService.IsImportFinished(releaseId.ToString(), fileName);
+            
+            if (!importFinished)
+            {
+                return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            }
+
+            return true;
+        }
+
+        private string GetContentSectionHeading(DataBlock block)
+        {
+            var section = block.ContentSection;
+
+            if (section == null)
+            {
+                return null;
+            }
+
+            switch (block.ContentSection.Type)
+            {
+                case ContentSectionType.Generic: return section.Heading;
+                case ContentSectionType.ReleaseSummary: return "Release Summary";
+                case ContentSectionType.Headlines: return "Headlines";
+                case ContentSectionType.KeyStatistics: return "Key Statistics";
+                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
+                default: return block.ContentSection.Type.ToString();
+            }
+        }
+
+        private async Task DeleteDependentDataBlocks(Guid releaseId, Guid subjectId)
+        {
+            var dependentDataBlocks = GetDependentDataBlocks(releaseId, subjectId);
+            _context.ContentBlocks.RemoveRange(dependentDataBlocks);
+            await _context.SaveChangesAsync();
+        }
+
+        private List<DataBlock> GetDependentDataBlocks(Guid releaseId, Guid subjectId)
+        {
+            return _context
+                .ReleaseContentBlocks
+                .Include(join => join.ContentBlock)
+                .ThenInclude(block => block.ContentSection)
+                .Where(join => join.ReleaseId == releaseId)
+                .ToList()
+                .Select(join => join.ContentBlock)
+                .Where(block => block.GetType() == typeof(DataBlock))
+                .Cast<DataBlock>()
+                .Where(block => block.DataBlockRequest.SubjectId == subjectId)
+                .ToList();
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
@@ -289,5 +373,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.Type);
         }
+    }
+
+    public class DeleteDataFilePlan
+    {
+        public List<DependentDataBlock> DependentDataBlocks { get; set; }
+    }
+
+    public class DependentDataBlock
+    {
+        public string Name { get; set; }
+        
+        public string? ContentSectionHeading { get; set; }
     }
 }

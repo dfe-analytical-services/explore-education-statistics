@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
 
             var list = new List<ReleaseViewModel>
             {
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             Assert.Equal(list, result.Right);
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewRelatedReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
 
             var list = new List<ReleaseViewModel>
             {
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetMyReleasesForReleaseStatusesAsync_NoAccessToSystem()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
 
             userService
                 .Setup(s => s.MatchesPolicy(CanAccessSystem))
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -240,11 +240,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             where TEntity : class
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
-                subjectService, tableStorageService, fileStorageService) = Mocks();
+                subjectService, tableStorageService, fileStorageService, importStatusService) = Mocks();
 
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }
@@ -257,7 +257,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository>,
             Mock<ISubjectService>,
             Mock<ITableStorageService>,
-            Mock<IFileStorageService>) Mocks()
+            Mock<IFileStorageService>,
+            Mock<IImportStatusService>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
             MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
@@ -271,7 +272,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IReleaseRepository>(),
                 new Mock<ISubjectService>(),
                 new Mock<ITableStorageService>(),
-                new Mock<IFileStorageService>());
+                new Mock<IFileStorageService>(),
+                new Mock<IImportStatusService>());
         }
     }
 }
