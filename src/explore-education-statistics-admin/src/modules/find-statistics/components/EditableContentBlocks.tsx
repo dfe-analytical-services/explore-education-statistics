@@ -259,26 +259,24 @@ const EditableContentBlock = ({
                   block={block}
                   id={id}
                   index={index}
+                  // @ts-ignore this component won't be used later
                   onContentChange={(newContent: string) =>
                     onContentBlockChange(index, newContent)
                   }
                   onDelete={() => onDeleteContent(block.id)}
                 />
-
-                {!isReordering &&
-                  canAddBlocks &&
-                  index === contentBlocks.length - 1 && (
-                    <AddContentButton
-                      textOnly={textOnly}
-                      onClick={(type, data) =>
-                        onAddContentCallback(type, data, contentBlocks.length)
-                      }
-                      availableDataBlocks={editingContext.availableDataBlocks}
-                    />
-                  )}
               </ContentBlockDraggable>
             </div>
           ))}
+          {!isReordering && canAddBlocks && (
+            <AddContentButton
+              textOnly={textOnly}
+              onClick={(type, data) =>
+                onAddContentCallback(type, data, contentBlocks.length)
+              }
+              availableDataBlocks={editingContext.availableDataBlocks}
+            />
+          )}
         </ContentBlockDroppable>
       </DragDropContext>
     </EditingContext.Provider>

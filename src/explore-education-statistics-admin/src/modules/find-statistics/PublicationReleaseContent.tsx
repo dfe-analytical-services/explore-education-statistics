@@ -261,7 +261,6 @@ const PublicationReleaseContent = ({
 
       <ReleaseContentAccordion
         releaseId={release.id}
-        publication={publication}
         accordionId="contents-accordion"
         sectionName="Contents"
         onContentChange={onAccordionContentChange}

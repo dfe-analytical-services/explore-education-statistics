@@ -13,55 +13,31 @@ export type MarkdownRendererProps = RendererProps &
     canDelete: boolean;
     onDelete: () => void;
     editable?: boolean;
-    onContentChange?: (content: string) => void;
+    onContentChange: (content: string) => Promise<unknown>;
   };
 
-const EditableMarkdownRenderer = ({
-  contentId,
-  source,
+const EditingMarkdownRenderer = ({
+  source = '',
   canDelete,
   onDelete,
   editable = true,
   onContentChange,
 }: MarkdownRendererProps) => {
-  const [markdown, setMarkdown] = React.useState(source);
-
-  const editingContext = React.useContext(EditingContext);
-
-  const { handleApiErrors } = useContext(ErrorControlContext);
-
   return (
     <>
       <WysiwygEditor
-        content={markdown || ''}
+        content={source}
         canDelete={canDelete}
         editable={editable}
         useMarkdown
-        onContentChange={async ss => {
-          if (
-            editingContext.releaseId &&
-            editingContext.sectionId &&
-            contentId
-          ) {
-            const { body } = await releaseContentService
-              .updateContentSectionBlock(
-                editingContext.releaseId,
-                editingContext.sectionId,
-                contentId,
-                {
-                  body: ss,
-                },
-              )
-              .catch(handleApiErrors);
-
-            if (onContentChange) onContentChange(body);
-            setMarkdown(body);
-          }
-        }}
+        onContentChange={onContentChange}
         onDelete={onDelete}
       />
     </>
   );
 };
-
-export default wrapEditableComponent(EditableMarkdownRenderer, ReactMarkdown);
+const EditableMarkdownRenderer = wrapEditableComponent(
+  EditingMarkdownRenderer,
+  ReactMarkdown,
+);
+export default EditableMarkdownRenderer;

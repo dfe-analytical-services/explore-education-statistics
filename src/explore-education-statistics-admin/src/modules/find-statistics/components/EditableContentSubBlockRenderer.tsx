@@ -1,17 +1,13 @@
 import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
-import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import EditableMarkdownRenderer, {
+  MarkdownRendererProps,
+} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import React from 'react';
 
-interface Props {
+interface Props extends MarkdownRendererProps {
   block: EditableContentBlock;
-  id: string;
-  index: number;
-  editable?: boolean;
-  canDelete?: boolean;
-  onContentChange?: (content: string) => void;
-  onDelete?: () => void;
 }
 
 function EditableContentSubBlockRenderer({
@@ -24,16 +20,14 @@ function EditableContentSubBlockRenderer({
   switch (block.type) {
     case 'MarkDownBlock':
       return (
-        <>
-          <EditableMarkdownRenderer
-            editable={editable}
-            contentId={block.id}
-            source={block.body}
-            canDelete={canDelete}
-            onDelete={onDelete}
-            onContentChange={onContentChange}
-          />
-        </>
+        <EditableMarkdownRenderer
+          editable={editable}
+          contentId={block.id}
+          source={block.body}
+          canDelete={canDelete}
+          onDelete={onDelete}
+          onContentChange={onContentChange}
+        />
       );
     case 'DataBlock':
       return (

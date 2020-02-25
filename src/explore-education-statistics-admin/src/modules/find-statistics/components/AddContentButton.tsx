@@ -21,7 +21,7 @@ const AddContentButton = ({
 
   return (
     <>
-      <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9 dfe-align--centre">
+      <div className="govuk-!-margin-top-4 govuk-!-margin-bottom-4 dfe-align--centre">
         {!datablockOnly && (
           <Button
             variant="secondary"

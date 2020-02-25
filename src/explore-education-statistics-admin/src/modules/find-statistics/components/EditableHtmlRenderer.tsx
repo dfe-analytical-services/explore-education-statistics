@@ -12,50 +12,23 @@ export type Props = RendererProps & {
   canDelete: boolean;
   onDelete: () => void;
   editable?: boolean;
-  onContentChange?: (content: string) => void;
+  onContentChange: (content: string) => Promise<unknown>;
 };
 
 const EditableHtmlRenderer = ({
-  contentId,
-  source,
+  source = '',
   canDelete,
   onDelete,
   editable = true,
   onContentChange,
 }: Props) => {
-  const [html, setHtml] = React.useState(source);
-
-  const editingContext = React.useContext(EditingContext);
-
-  const { handleApiErrors } = useContext(ErrorControlContext);
-
   return (
     <>
       <WysiwygEditor
-        content={html || ''}
+        content={source}
         editable={editable}
         canDelete={canDelete}
-        onContentChange={async ss => {
-          if (
-            editingContext.releaseId &&
-            editingContext.sectionId &&
-            contentId
-          ) {
-            const { body } = await releaseContentService
-              .updateContentSectionBlock(
-                editingContext.releaseId,
-                editingContext.sectionId,
-                contentId,
-                {
-                  body: ss,
-                },
-              )
-              .catch(handleApiErrors);
-
-            if (onContentChange) onContentChange(body);
-            setHtml(body);
-          }
-        }}
+        onContentChange={onContentChange}
         onDelete={onDelete}
       />
     </>
