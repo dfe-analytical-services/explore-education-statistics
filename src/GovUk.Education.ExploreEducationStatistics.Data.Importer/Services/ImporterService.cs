@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
-        private readonly ImporterSchoolService _importerSchoolService;
         private readonly ILogger<ImporterService> _logger;
 
         private enum Columns
@@ -86,19 +85,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Columns.WARD_COLS, new[]{"ward_code", "ward_name"}
                 }
             };
+                
+        private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
+        {
+            GeographicLevel.Institution,
+            GeographicLevel.Provider,
+            GeographicLevel.School
+        };
         
         public ImporterService(
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
-            ImporterSchoolService importerSchoolService,
             ILogger<ImporterService> logger)
         {
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _logger = logger;
-            _importerSchoolService = importerSchoolService;
         }
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
@@ -116,13 +120,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
-            _importerSchoolService.ClearCache();
             
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
             {
-                CreateFiltersLocationsAndSchoolsFromCsv(context, line, headers, subjectMeta.Filters);
+                CreateFiltersAndLocationsFromCsv(context, line, headers, subjectMeta.Filters);
             });
         }
 
@@ -131,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
-            _importerSchoolService.ClearCache();
             
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
@@ -215,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
                 return ObservationFromCsv(context, line, headers, subject, subjectMeta, csvRowNum);
-            });
+            }).Where(o => !IgnoredGeographicLevels.Contains(o.GeographicLevel));
         }
         
         private Observation ObservationFromCsv(
@@ -234,8 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                ProviderUrn = GetProvider(line, headers)?.Urn,
-                SchoolLaEstab = GetSchool(line, headers, context)?.LaEstab,
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
         }
         
-        private void CreateFiltersLocationsAndSchoolsFromCsv(
+        private void CreateFiltersAndLocationsFromCsv(
             StatisticsDbContext context,
             string raw,
             List<string> headers,
@@ -253,7 +253,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var line = raw.Split(',');
             CreateFilterItems(context, line, headers, filtersMeta);
             GetLocationId(line, headers, context);
-            GetSchool(line, headers, context);
         }
 
         private void CreateFilterItems(
@@ -307,22 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetSponsor(line, headers),
                 GetWard(line, headers)
             ).Id;
-        }
-
-        private School GetSchool(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
-        {
-            var school = CsvUtil.BuildType(line, headers, ColumnValues[Columns.SCHOOL_COLS], values => new School
-            {
-                AcademyOpenDate = values[0],
-                AcademyType = values[1],
-                Estab = values[2],
-                LaEstab = values[3],
-                Name = values[4],
-                Postcode = values[5],
-                Urn = values[6]
-            });
-            
-            return _importerSchoolService.Find(school, context);
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> line,
@@ -393,12 +376,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PARLIAMENTARY_CONSTITUENCY_COLS], values =>
                 new ParliamentaryConstituency(values[0], values[1]));
-        }
-
-        private static Provider GetProvider(IReadOnlyList<string> line, List<string> headers)
-        {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PROVIDER_COLS], values =>
-                new Provider(values[0], values[1], values[2], values[3]));
         }
 
         private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)

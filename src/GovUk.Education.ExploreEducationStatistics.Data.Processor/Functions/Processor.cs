@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 
                 await _batchService.FailImport(
                     message.Release.Id.ToString(),
-                    message.DataFileName,
+                    message.OrigDataFileName,
                     new List<string> {ex.Message}
                 );
                     
