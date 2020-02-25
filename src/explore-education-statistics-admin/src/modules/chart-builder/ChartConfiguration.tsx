@@ -86,7 +86,7 @@ const InfographicChartOptions = ({
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
-  const [deleteFile, setDeleteFile] = useToggle(false);
+  const [deleteFile, toggleDeleteFile] = useToggle(false);
 
   const formId = 'fileUploadForm';
 
@@ -154,9 +154,7 @@ const InfographicChartOptions = ({
                   <p className="govuk-!-margin-right-2">{`${selectedFile.label}, ${fileId}`}</p>
                   <ButtonText
                     variant="warning"
-                    onClick={() => {
-                      setDeleteFile(true);
-                    }}
+                    onClick={() => toggleDeleteFile(true)}
                   >
                     Delete infographic
                   </ButtonText>
@@ -164,8 +162,8 @@ const InfographicChartOptions = ({
                 <ModalConfirm
                   mounted={deleteFile}
                   title="Confirm deletion of infographic"
-                  onExit={() => setDeleteFile(false)}
-                  onCancel={() => setDeleteFile(false)}
+                  onExit={() => toggleDeleteFile(false)}
+                  onCancel={() => toggleDeleteFile(false)}
                   onConfirm={async () => {
                     // eslint-disable-next-line no-unused-expressions
                     form.values.fileId &&
@@ -177,7 +175,7 @@ const InfographicChartOptions = ({
                         .then(setChartFileOptions)
                         .catch(handleApiErrors);
                     onChange('');
-                    setDeleteFile(false);
+                    toggleDeleteFile(false);
                   }}
                 >
                   <p>
