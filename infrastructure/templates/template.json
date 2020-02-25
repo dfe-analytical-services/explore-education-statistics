@@ -2028,14 +2028,6 @@
             "http://127.0.0.1"
           ]
         }
-        //,
-        //   "connectionStrings": [
-        //   {
-        //     "name": "TableStorageConnString",
-        //     "connectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        //     "type": "Custom"
-        //   }
-        // ]
       }
     },
     {
@@ -2061,7 +2053,8 @@
         "TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]",
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
         "PublicationNotificationEmailTemplateId": "[parameters('publicationNotificationEmailTemplateId')]",
-        "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]"
+        "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]",
+        "TableStorageConnString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
       }
     },
     {
