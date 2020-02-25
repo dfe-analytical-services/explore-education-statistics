@@ -1,11 +1,12 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import wrapEditableComponent, {
+  EditingContext,
+} from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext } from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
@@ -25,7 +26,7 @@ const EditableMarkdownRenderer = ({
 }: MarkdownRendererProps) => {
   const [markdown, setMarkdown] = React.useState(source);
 
-  const editingContext = React.useContext(EditingContentBlockContext);
+  const editingContext = React.useContext(EditingContext);
 
   const { handleApiErrors } = useContext(ErrorControlContext);
 

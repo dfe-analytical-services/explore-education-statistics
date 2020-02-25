@@ -8,7 +8,6 @@ import PreviewContentBlocks, {
 } from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent, {
   EditingContext,
-  ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
 import React, { useContext, useState } from 'react';
@@ -38,21 +37,6 @@ export interface Props extends ContentBlockProps {
   onContentChange?: (content: ContentType) => void;
   onReorderHook?: (callback: ReorderHook) => void;
 }
-
-interface EditingContentBlockContext extends ReleaseContentContext {
-  sectionId?: string;
-}
-
-export const EditingContentBlockContext = React.createContext<
-  EditingContentBlockContext
->({
-  releaseId: undefined,
-  isCommenting: false,
-  isReviewing: false,
-  isEditing: false,
-  sectionId: undefined,
-  availableDataBlocks: [],
-});
 
 const EditableContentBlock = ({
   content = [],
@@ -224,7 +208,7 @@ const EditableContentBlock = ({
   }
 
   return (
-    <EditingContentBlockContext.Provider
+    <EditingContext.Provider
       value={{
         ...editingContext,
         sectionId,
@@ -297,7 +281,7 @@ const EditableContentBlock = ({
           ))}
         </ContentBlockDroppable>
       </DragDropContext>
-    </EditingContentBlockContext.Provider>
+    </EditingContext.Provider>
   );
 };
 

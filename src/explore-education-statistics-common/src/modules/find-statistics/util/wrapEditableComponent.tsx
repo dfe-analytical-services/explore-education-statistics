@@ -1,5 +1,5 @@
-import React, { ComponentType, useContext } from 'react';
 import { DataBlock } from '@common/services/dataBlockService';
+import React, { ComponentType, useContext } from 'react';
 
 export interface ReleaseContentContext {
   isEditing: boolean;
@@ -8,6 +8,7 @@ export interface ReleaseContentContext {
   releaseId: string | undefined;
   availableDataBlocks: DataBlock[];
   updateAvailableDataBlocks?: () => void;
+  sectionId?: string;
 }
 
 export const EditingContext = React.createContext<ReleaseContentContext>({

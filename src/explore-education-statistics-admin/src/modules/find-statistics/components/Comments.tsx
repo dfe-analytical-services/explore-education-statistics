@@ -1,12 +1,12 @@
 import LoginContext from '@admin/components/Login';
-import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
+import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
+import { User } from '@admin/services/sign-in/types';
 import Details from '@common/components/Details';
+import FormattedDate from '@common/components/FormattedDate';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React from 'react';
-import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import FormattedDate from '@common/components/FormattedDate';
 import styles from './Comments.module.scss';
 
 interface Props {
@@ -30,7 +30,7 @@ const Comments = ({
   );
 
   const context = React.useContext(LoginContext);
-  const editingContext = React.useContext(EditingContentBlockContext);
+  const editingContext = React.useContext(EditingContext);
 
   const addComment = (comment: string) => {
     const user = context.user as User;
