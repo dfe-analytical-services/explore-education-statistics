@@ -8,7 +8,7 @@ import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import sortBy from 'lodash/sortBy';
-import React, { MouseEventHandler, ReactNode, useContext } from 'react';
+import React, { MouseEventHandler, useContext } from 'react';
 import { Dictionary } from 'src/types';
 import AddContentButton from './AddContentButton';
 import Comments from './Comments';

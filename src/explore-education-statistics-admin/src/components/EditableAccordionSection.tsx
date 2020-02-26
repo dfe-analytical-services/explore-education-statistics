@@ -154,7 +154,7 @@ const EditableAccordionSection = ({
                 if (e.charCode === 13) editHeading(e);
               }}
               className={`govuk-button ${!isEditingHeading &&
-                'govuk-button--secondary'} govuk-!-margin-right-2`}
+                'govuk-button--secondary'} govuk-!-margin-right-2 govuk-!-margin-bottom-0`}
             >
               {isEditingHeading ? 'Save' : 'Edit'} title
             </a>
@@ -168,7 +168,7 @@ const EditableAccordionSection = ({
                 if (e.key === 'Enter') setIsReordering(!isReordering);
               }}
               className={`govuk-button ${!isReordering &&
-                'govuk-button--secondary'} govuk-!-margin-right-2`}
+                'govuk-button--secondary'} govuk-!-margin-right-2 govuk-!-margin-bottom-0`}
             >
               {isReordering ? 'Save order' : 'Reorder'}
             </a>
@@ -181,7 +181,7 @@ const EditableAccordionSection = ({
               onKeyPress={e => {
                 if (e.key === 'Enter') setShowRemoveModal(true);
               }}
-              className="govuk-button govuk-button--warning"
+              className="govuk-button govuk-button--warning govuk-!-margin-bottom-0"
             >
               Remove section
               {showRemoveModal && (
