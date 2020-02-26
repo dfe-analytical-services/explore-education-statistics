@@ -15,8 +15,8 @@
   },
   "extensions": {
     "queues": {
-      "batchSize": 4,
-      "maxDequeueCount": 1
+      "batchSize": 6,
+      "maxDequeueCount": 3
     }
   }
 }

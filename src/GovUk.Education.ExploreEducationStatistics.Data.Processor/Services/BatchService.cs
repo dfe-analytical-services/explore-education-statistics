@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
             }
             
-            if (message.NumBatches == 1 || _fileStorageService.GetNumBatchesRemaining(releaseId) == 0)
+            if (message.NumBatches == 1 || _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName) == 0)
             {
                 await UpdateStatus(releaseId, message.OrigDataFileName,
                     import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED

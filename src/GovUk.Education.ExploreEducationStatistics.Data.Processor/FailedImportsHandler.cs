@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             aQueue.CreateIfNotExists();
             table.CreateIfNotExists();
             aQueue.Clear();
-            pQueue.Clear();
+            //pQueue.Clear();
 
             TableContinuationToken token = null;
             do
@@ -47,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     // Else create a message for all remaining batches
                     else
                     {
-                        foreach (var fileName in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container))
-                        {
+                        ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
 
-                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(
-                                JsonConvert.DeserializeObject<ImportMessage>(entity.Message), fileName)));
+                        foreach (var folderAndFilename in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName))
+                        {
+                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
                         }
                     }
                 }
@@ -71,15 +71,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .Where(TableQuery.CombineFilters(combineFilters, TableOperators.Or, f3));
         }
         
-        private static string BuildMessage(ImportMessage message, string filename)
+        private static string BuildMessage(ImportMessage message, string folderAndFilename)
         {
-            var batchNo = filename.Split('_')[1];
+            var fileName = folderAndFilename.Split(FileStoragePathUtils.BatchesDir + "/")[1];
+            var batchNo = Int16.Parse(fileName.Substring(fileName.Length-6));
+            
             var iMessage = new ImportMessage
             {
-                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{filename}",
+                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{fileName}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,
-                BatchNo = 1,
+                BatchNo = batchNo,
                 NumBatches = message.NumBatches,
                 RowsPerBatch = message.RowsPerBatch
             };

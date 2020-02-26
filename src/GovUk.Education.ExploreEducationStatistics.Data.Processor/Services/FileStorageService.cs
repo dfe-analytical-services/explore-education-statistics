@@ -63,23 +63,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             GetBlobReference(FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName).DeleteIfExists();
         }
 
-        public int GetNumBatchesRemaining(string releaseId)
+        public int GetNumBatchesRemaining(string releaseId, string origDataFileName)
         {
             return _blobContainer.ListBlobs(
                     FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
                     true, BlobListingDetails.Metadata)
                 .Where(cbb => IsBatchedFile(cbb, releaseId))
-                .OfType<CloudBlockBlob>()
+                .OfType<CloudBlockBlob>().Where(blob => blob.Name.Contains(origDataFileName))
                 .ToList().Count;
         }
 
-        public static IEnumerable<string> GetBatchesRemaining(string releaseId, CloudBlobContainer blobContainer)
+        public static IEnumerable<string> GetBatchesRemaining(string releaseId, CloudBlobContainer blobContainer, string origDataFileName)
         {
             return blobContainer.ListBlobs(
                     FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
                     true, BlobListingDetails.Metadata)
                 .Where(cbb => IsBatchedFile(cbb, releaseId))
-                .OfType<CloudBlockBlob>().Select(blob => blob.Name);
+                .OfType<CloudBlockBlob>().Where(blob => blob.Name.Contains(origDataFileName)).Select(blob => blob.Name);
         }
         
         private CloudBlockBlob GetBlobReference(string fullPath)

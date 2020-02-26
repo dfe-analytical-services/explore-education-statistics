@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batchCount = 1;
             var numRows = enumerable.Count();
             var numBatches = GetNumBatches(numRows, message.RowsPerBatch);
+            var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
             {
@@ -111,8 +112,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     RowsPerBatch = message.RowsPerBatch
                 };
 
-                collector.Add(iMessage);
+                messages.Add(iMessage);
+                
                 batchCount++;
+            }
+
+            // Ensure generated messages are added after batch creation.
+            foreach (var m in messages)
+            {
+                collector.Add(m);
             }
         }
 

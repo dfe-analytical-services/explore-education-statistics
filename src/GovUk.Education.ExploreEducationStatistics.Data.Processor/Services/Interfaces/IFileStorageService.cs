@@ -21,6 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         void DeleteBatchFile(string releaseId, string dataFileName);
 
-        int GetNumBatchesRemaining(string releaseId);
+        int GetNumBatchesRemaining(string releaseId, string origDataFileName);
     }
 }
