@@ -2669,6 +2669,7 @@
         "enableSoftDelete": true,
         "accessPolicies": [
           {
+            "condition": "[parameters('deployDatafactory')]",
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {
