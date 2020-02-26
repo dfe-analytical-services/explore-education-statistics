@@ -28,7 +28,7 @@ interface Props {
   onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
 
-const ViewDataBlocks = ({
+const DataBlockContentTabs = ({
   dataBlock,
   dataBlockResponse,
   onDataBlockSave,
@@ -158,4 +158,4 @@ const ViewDataBlocks = ({
   );
 };
 
-export default withErrorControl(ViewDataBlocks);
+export default withErrorControl(DataBlockContentTabs);

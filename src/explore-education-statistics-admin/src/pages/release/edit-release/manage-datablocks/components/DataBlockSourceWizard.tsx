@@ -33,7 +33,7 @@ interface CreateDataBlockProps {
   onTableToolLoaded?: () => void;
 }
 
-const CreateDataBlocks = ({
+const DataBlockSourceWizard = ({
   releaseId,
   dataBlock,
   dataBlockResponse,
@@ -157,4 +157,4 @@ const CreateDataBlocks = ({
   ) : null;
 };
 
-export default CreateDataBlocks;
+export default DataBlockSourceWizard;
