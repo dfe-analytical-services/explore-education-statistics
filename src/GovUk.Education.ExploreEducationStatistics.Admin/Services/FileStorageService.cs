@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
             IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService)
         {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
@@ -94,21 +94,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
-                {
-                    var blobContainer = await GetCloudBlobContainer();
-                    // Get the paths of the files to delete
-                    return await DataPathsForDeletion(blobContainer, releaseId, fileName)
-                        .OnSuccess((path) =>
-                        {
-                            // Delete the data file
-                            return DeleteFileAsync(blobContainer, path.dataFilePath)
-                                // and the metadata file
-                                .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
-                                // and return the remaining files
-                                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
-                        });
-                });
+                .OnSuccess(GetCloudBlobContainer)
+                .OnSuccess(blobContainer => 
+                    DataPathsForDeletion(blobContainer , releaseId, fileName)
+                    .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
+                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
@@ -336,6 +326,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(CloudBlobContainer blobContainer,
+            (string, string) paths)
+        {
+            await DeleteFileAsync(blobContainer, paths.Item1);
+            await DeleteFileAsync(blobContainer, paths.Item2);
+            return true;
+        }
+        
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
