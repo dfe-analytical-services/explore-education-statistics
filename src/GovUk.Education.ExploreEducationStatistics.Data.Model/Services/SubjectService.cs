@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 return false;
             }
 
-            // if this Footnote is directly linked to a Filter Group for any other Subject, then it's not just for
+            // if this Footnote is directly linked to a Filter Item for any other Subject, then it's not just for
             // this Subject
             if (f.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId))
             {
