@@ -1,9 +1,11 @@
 /* eslint-disable no-shadow */
+import CreateDataBlocks from '@admin/pages/release/edit-release/manage-datablocks/components/CreateDataBlocks';
+import ViewDataBlocks from '@admin/pages/release/edit-release/manage-datablocks/components/ViewDataBlocks';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import permissionService from '@admin/services/permissions/service';
+import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -18,8 +20,6 @@ import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { useCallback, useContext } from 'react';
-import CreateDataBlocks from './CreateDataBlocks';
-import ViewDataBlocks from './ViewDataBlocks';
 
 interface DataBlockData {
   dataBlock: DataBlock;
