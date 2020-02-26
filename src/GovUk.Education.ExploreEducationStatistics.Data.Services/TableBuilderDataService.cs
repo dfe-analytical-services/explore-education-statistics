@@ -61,8 +61,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, bool>> CheckCanViewSubjectData(Subject subject)
         {
-            var result = _subjectService.IsSubjectForLatestPublishedRelease(subject.Id) || await _userService.MatchesPolicy(subject, CanViewSubjectData);
-            return result ? new Either<ActionResult, bool>(true) : new ForbidResult();
+            if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) || await _userService.MatchesPolicy(subject, CanViewSubjectData))
+            {
+                return true;
+            }
+            return new ForbidResult();
         }
     }
 }

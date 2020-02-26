@@ -57,8 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         
         private async Task<Either<ActionResult, bool>> CheckCanViewSubjectData(Subject subject)
         {
-            var result = subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData);
-            return result ? new Either<ActionResult, bool>(true) : new ForbidResult();
+            if (subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData))
+            {
+                return true;
+            }
+            return new ForbidResult();
         }
     }
 }
