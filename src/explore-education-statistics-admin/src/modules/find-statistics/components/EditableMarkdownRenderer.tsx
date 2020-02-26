@@ -1,11 +1,11 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import React, { useContext } from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
@@ -39,7 +39,7 @@ const EditableMarkdownRenderer = ({
         editable={editable}
         useMarkdown
         toolbarStyle={toolbarStyle}
-        onContentChange={async ss => {
+        onContentChange={async (ss: string) => {
           if (
             editingContext.releaseId &&
             editingContext.sectionId &&
