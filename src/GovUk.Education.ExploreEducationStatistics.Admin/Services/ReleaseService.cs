@@ -349,8 +349,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                     await _subjectService.DeleteAsync(deletePlan.SubjectId);
                     await DeleteDependentDataBlocks(deletePlan);
+                    await DeleteChartFiles(deletePlan);
                     return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
                 });
+        }
+
+        private async Task DeleteChartFiles(DeleteDataFilePlan deletePlan)
+        {
+            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
+                block.InfographicFilenames.Select(chartFilename =>
+                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
+                )
+            );
+            
+            await Task.WhenAll(deletes);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataFilePlan deletePlan)
