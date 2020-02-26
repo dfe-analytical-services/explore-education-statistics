@@ -24,9 +24,7 @@ export type ReorderHook = (sectionId?: string) => Promise<void>;
 
 export interface Props extends ContentBlockProps {
   content: ContentType;
-
   sectionId: string;
-
   editable?: boolean;
   canAddBlocks: boolean;
   canAddSingleBlock?: boolean;
@@ -35,12 +33,13 @@ export interface Props extends ContentBlockProps {
   resolveComments?: boolean;
   addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
-  onReorderHook?: (callback: ReorderHook) => void;
+  onBlockSaveOrder?: (order: Dictionary<number>) => Promise<void>;
+  onBlockContentChange: (blockId: string) => (content: string) => Promise<void>;
+  onBlockDelete: (blockId: string) => () => Promise<void>;
 }
 
 const EditableContentBlock = ({
   content = [],
-  id = '',
   sectionId,
   editable = true,
   onContentChange,
@@ -48,8 +47,10 @@ const EditableContentBlock = ({
   canAddSingleBlock = false,
   textOnly = false,
   isReordering = false,
-  onReorderHook = undefined,
   addContentButtonText = 'Add content',
+  onBlockSaveOrder,
+  onBlockContentChange,
+  onBlockDelete,
 }: Props) => {
   const editingContext = useContext(EditingContext);
 
@@ -58,42 +59,23 @@ const EditableContentBlock = ({
   React.useEffect(() => {
     setContentBlocks(content);
   }, [content]);
+  React.useEffect(() => {
+    if (!isReordering) {
+      //save
+      if (onBlockSaveOrder && contentBlocks !== undefined)
+        onBlockSaveOrder(
+          contentBlocks.reduce<Dictionary<number>>(
+            (map, { id: blockId }, index) => ({
+              ...map,
+              [blockId]: index,
+            }),
+            {},
+          ),
+        );
+    }
+  }, [isReordering]);
 
   const { handleApiErrors } = useContext(ErrorControlContext);
-
-  React.useEffect(() => {
-    if (onReorderHook) {
-      const saveOrder: ReorderHook = async contentSectionId => {
-        if (editingContext.releaseId && contentSectionId) {
-          if (contentBlocks) {
-            const newOrder = contentBlocks.reduce<Dictionary<number>>(
-              (order, next, index) => ({ ...order, [next.id]: index }),
-              {},
-            );
-
-            await releaseContentService
-              .updateContentSectionBlocksOrder(
-                editingContext.releaseId,
-                contentSectionId,
-                newOrder,
-              )
-              .catch(handleApiErrors);
-
-            if (onContentChange) {
-              onContentChange(contentBlocks);
-            }
-          }
-        }
-      };
-      onReorderHook(saveOrder);
-    }
-  }, [
-    contentBlocks,
-    editingContext.releaseId,
-    onContentChange,
-    onReorderHook,
-    handleApiErrors,
-  ]);
 
   const onAddContentCallback = (
     type: string,
@@ -141,39 +123,6 @@ const EditableContentBlock = ({
     }
   };
 
-  const onContentBlockChange = React.useCallback(
-    (index: number, newContent: string) => {
-      const newBlocks = [...(contentBlocks || [])];
-      newBlocks[index].body = newContent;
-      setContentBlocks(newBlocks);
-      if (onContentChange) {
-        onContentChange(newBlocks);
-      }
-    },
-    [contentBlocks, onContentChange],
-  );
-
-  const onDeleteContent = async (contentId: string) => {
-    const { releaseId } = editingContext;
-    if (releaseId && sectionId && contentId) {
-      await releaseContentService
-        .deleteContentSectionBlock(releaseId, sectionId, contentId)
-        .catch(handleApiErrors);
-
-      if (editingContext.updateAvailableDataBlocks) {
-        editingContext.updateAvailableDataBlocks();
-      }
-
-      const {
-        content: newContentBlocks,
-      } = await releaseContentService.getContentSection(releaseId, sectionId);
-
-      setContentBlocks(newContentBlocks);
-
-      if (onContentChange) onContentChange(newContentBlocks);
-    }
-  };
-
   const onDragEnd = React.useCallback(
     (result: DropResult) => {
       const { source, destination, type } = result;
@@ -183,7 +132,6 @@ const EditableContentBlock = ({
         const [removed] = newContentBlocks.splice(source.index, 1);
         newContentBlocks.splice(destination.index, 0, removed);
         setContentBlocks(newContentBlocks);
-        if (onContentChange) onContentChange(newContentBlocks);
       }
     },
     [contentBlocks, onContentChange],
@@ -257,13 +205,10 @@ const EditableContentBlock = ({
                   editable={editable && !isReordering}
                   canDelete={!!canAddBlocks && !isReordering}
                   block={block}
-                  id={id}
-                  index={index}
-                  // @ts-ignore this component won't be used later
-                  onContentChange={(newContent: string) =>
-                    onContentBlockChange(index, newContent)
+                  onContentChange={newContent =>
+                    onBlockContentChange(block.id)(newContent)
                   }
-                  onDelete={() => onDeleteContent(block.id)}
+                  onDelete={() => onBlockDelete(block.id)()}
                 />
               </ContentBlockDraggable>
             </div>

@@ -95,8 +95,8 @@ export const releaseContentService = {
     sectionId: string,
     blockId: string,
     block: ContentBlockPutModel,
-  ): Promise<ContentBlockViewModel> {
-    return client.put<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.put<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
     );
@@ -118,8 +118,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     order: Dictionary<number>,
-  ): Promise<ContentBlockViewModel[]> {
-    return client.put<ContentBlockViewModel[]>(
+  ): Promise<EditableContentBlock[]> {
+    return client.put<EditableContentBlock[]>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
       order,
     );

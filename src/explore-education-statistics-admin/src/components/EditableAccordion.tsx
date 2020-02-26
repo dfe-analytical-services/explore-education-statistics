@@ -1,12 +1,12 @@
 /* eslint-disable no-shadow, react/jsx-indent */
+import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
+import DroppableAccordion from '@admin/components/DroppableAccordion';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { Dictionary } from '@common/types/util';
 import classnames from 'classnames';
 import React, { createRef, ReactElement, ReactNode } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { Dictionary } from '@common/types/util';
-import DroppableAccordion from '@admin/components/DroppableAccordion';
-import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
 import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
 

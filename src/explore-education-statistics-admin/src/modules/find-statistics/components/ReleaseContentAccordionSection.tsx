@@ -2,17 +2,16 @@ import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import { ReorderHook } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks, {
+  ReorderHook,
+} from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import sortBy from 'lodash/sortBy';
 import React, { MouseEventHandler, useContext } from 'react';
 import { Dictionary } from 'src/types';
 import AddContentButton from './AddContentButton';
-import Comments from './Comments';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 export interface ReleaseContentAccordionSectionProps {
   id?: string;
@@ -20,7 +19,6 @@ export interface ReleaseContentAccordionSectionProps {
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   onContentChange?: (content?: EditableContentBlock[]) => void;
-  canToggle?: boolean;
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
   canAddBlocks?: boolean;
 }
@@ -29,7 +27,6 @@ const ReleaseContentAccordionSection = ({
   id: sectionId,
   index,
   contentItem,
-  canToggle = true,
   onHeadingChange,
   onContentChange,
   onRemoveSection,
@@ -40,9 +37,6 @@ const ReleaseContentAccordionSection = ({
   const [content, setContent] = React.useState(contentItem.content);
   const saveOrder = React.useRef<ReorderHook>();
   const {
-    isEditing,
-    isCommenting,
-    isReviewing,
     availableDataBlocks,
     updateAvailableDataBlocks,
     releaseId,
@@ -64,43 +58,53 @@ const ReleaseContentAccordionSection = ({
     }
   };
 
-  // const contentChange = React.useCallback(
-  //   (newContent?: EditableContentBlock[]) => {
-  //     setContent(newContent);
-  //     if (onContentChange) {
-  //       onContentChange(newContent);
-  //     }
-  //   },
-  //   [onContentChange],
-  // );
-
-  const onSaveBlockOrder = async (order: Dictionary<number>) => {
-    return null;
+  const onBlockSaveOrder = async (order: Dictionary<number>) => {
+    if (releaseId && sectionId) {
+      const newBlocks = await releaseContentService.updateContentSectionBlocksOrder(
+        releaseId,
+        sectionId,
+        order,
+      );
+      if (onContentChange) onContentChange(newBlocks);
+    }
   };
 
   const onBlockContentChange = (blockId: string) => {
     return async (newContent: string) => {
       if (releaseId && sectionId && blockId) {
-        const { body } = await releaseContentService
-          .updateContentSectionBlock(releaseId, sectionId, blockId, {
+        const updatedBlock = await releaseContentService.updateContentSectionBlock(
+          releaseId,
+          sectionId,
+          blockId,
+          {
             body: newContent,
-          })
-          .catch(handleApiErrors);
-
-        if (onContentChange) onContentChange(body);
+          },
+        );
+        if (onContentChange) {
+          const newBlocks = [
+            ...((contentItem && contentItem.content) || []).map(block => {
+              if (block.id === updatedBlock.id) {
+                return updatedBlock;
+              }
+              return block;
+            }),
+          ];
+          onContentChange(newBlocks);
+        }
       }
     };
   };
+
   const onBlockDelete = (blockId: string) => {
     return async () => {
       if (releaseId && sectionId && blockId) {
-        await releaseContentService
-          .deleteContentSectionBlock(releaseId, sectionId, blockId)
-          .catch(handleApiErrors);
+        await releaseContentService.deleteContentSectionBlock(
+          releaseId,
+          sectionId,
+          blockId,
+        );
 
-        if (updateAvailableDataBlocks) {
-          updateAvailableDataBlocks();
-        }
+        if (updateAvailableDataBlocks) updateAvailableDataBlocks();
 
         const {
           content: newContentBlocks,
@@ -163,11 +167,23 @@ const ReleaseContentAccordionSection = ({
       index={index}
       heading={heading || ''}
       caption={caption}
-      canToggle={canToggle}
       onHeadingChange={onHeadingChange}
       onRemoveSection={onRemoveSection}
-      onSaveOrder={onSaveBlockOrder}
       sectionId={sectionId}
+      headerButtons={
+        <a
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsReordering(!isReordering)}
+          onKeyPress={e => {
+            if (e.key === 'Enter') setIsReordering(!isReordering);
+          }}
+          className={`govuk-button ${!isReordering &&
+            'govuk-button--secondary'} govuk-!-margin-right-2`}
+        >
+          {isReordering ? 'Save order' : 'Reorder'}
+        </a>
+      }
       footerButtons={
         !isReordering &&
         canAddBlocks && (
@@ -180,57 +196,17 @@ const ReleaseContentAccordionSection = ({
         )
       }
     >
-      {/*
-      <ContentBlock
+      <ContentBlocks
         id={`${heading}-content`}
         isReordering={isReordering}
         canAddBlocks
-        sectionId={id}
-        content={content}
-        publication={publication}
-        onContentChange={newContent => contentChange(newContent)}
-        onReorderHook={s => {
-          saveOrder.current = s;
-        }}
+        sectionId={sectionId}
+        onContentChange={onContentChange}
+        onBlockSaveOrder={onBlockSaveOrder}
+        onBlockContentChange={onBlockContentChange}
+        onBlockDelete={onBlockDelete}
+        content={contentItem.content}
       />
-      */}
-      {content &&
-        sortBy(content, 'order').map((contentBlock, blockIndex) => (
-          <div
-            key={`content-section-${contentBlock.id}`}
-            id={`content-section-${contentBlock.id}`}
-            className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
-          >
-            {!isReordering && (
-              <>
-                {(isCommenting || isReviewing) && (
-                  <Comments
-                    contentBlockId={contentBlock.id}
-                    initialComments={contentBlock.comments}
-                    canResolve={isReviewing}
-                    canComment={isCommenting}
-                    onCommentsChange={async comments => {
-                      const newBlocks = [...content];
-                      newBlocks[blockIndex].comments = comments;
-                      setContent(newBlocks);
-                      if (onContentChange) {
-                        onContentChange(newBlocks);
-                      }
-                    }}
-                  />
-                )}
-              </>
-            )}
-
-            <EditableContentSubBlockRenderer
-              editable={!isReordering}
-              canDelete={!isReordering}
-              block={contentBlock}
-              onContentChange={onBlockContentChange(contentBlock.id)}
-              onDelete={onBlockDelete(contentBlock.id)}
-            />
-          </div>
-        ))}
     </AccordionSection>
   );
 };

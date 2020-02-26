@@ -1,4 +1,3 @@
-import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import AccordionSection, {
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
@@ -6,21 +5,21 @@ import { FormTextInput } from '@common/components/form';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ModalConfirm from '@common/components/ModalConfirm';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { Dictionary } from '@common/types/util';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DropResult } from 'react-beautiful-dnd';
 import styles from './EditableAccordionSection.module.scss';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   sectionId: string;
   index?: number;
+  headerButtons?: ReactNode;
   footerButtons?: ReactNode;
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
   canRemoveSection: boolean;
   onRemoveSection: () => Promise<unknown>;
-  onSaveOrder: (order: Dictionary<number>) => Promise<unknown>;
+  isReordering: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -37,18 +36,16 @@ const EditableAccordionSection = ({
   onToggle,
   onHeadingChange,
   onRemoveSection,
-  onSaveOrder,
-  sectionId,
+  isReordering = false,
+  headerButtons,
   footerButtons,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
-  const [isReordering, setIsReordering] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [previousOpen, setPreviousOpen] = useState(open);
   const [currentHeading, setCurrentHeading] = useState(heading);
   const [isEditingHeading, setIsEditingHeading] = useState(false);
-
   if (open !== previousOpen) {
     setPreviousOpen(open);
     setIsOpen(open);
@@ -65,23 +62,6 @@ const EditableAccordionSection = ({
       setIsEditingHeading(!isEditingHeading);
     }
   };
-
-  const onDragEnd = React.useCallback(
-    (result: DropResult) => {
-      /* const { source, destination, type } = result;
-
-      if (type === 'content' && destination) {
-        const newContentBlocks = [...(contentBlocks || [])];
-        const [removed] = newContentBlocks.splice(source.index, 1);
-        newContentBlocks.splice(destination.index, 0, removed);
-        setContentBlocks(newContentBlocks);
-        if (onContentChange) onContentChange(newContentBlocks);
-      } */
-    },
-    [
-      /* contentBlocks, onContentChange */
-    ],
-  );
 
   return (
     <div
@@ -154,25 +134,12 @@ const EditableAccordionSection = ({
                 if (e.charCode === 13) editHeading(e);
               }}
               className={`govuk-button ${!isEditingHeading &&
-                'govuk-button--secondary'} govuk-!-margin-right-2 govuk-!-margin-bottom-0`}
+                'govuk-button--secondary'} govuk-!-margin-right-2`}
             >
               {isEditingHeading ? 'Save' : 'Edit'} title
             </a>
           )}
-          {!!onSaveOrder && (
-            <a
-              role="button"
-              tabIndex={0}
-              onClick={() => setIsReordering(!isReordering)}
-              onKeyPress={e => {
-                if (e.key === 'Enter') setIsReordering(!isReordering);
-              }}
-              className={`govuk-button ${!isReordering &&
-                'govuk-button--secondary'} govuk-!-margin-right-2 govuk-!-margin-bottom-0`}
-            >
-              {isReordering ? 'Save order' : 'Reorder'}
-            </a>
-          )}
+          {headerButtons}
           {!!onRemoveSection && (
             <a
               role="button"
@@ -181,7 +148,7 @@ const EditableAccordionSection = ({
               onKeyPress={e => {
                 if (e.key === 'Enter') setShowRemoveModal(true);
               }}
-              className="govuk-button govuk-button--warning govuk-!-margin-bottom-0"
+              className="govuk-button govuk-button--warning"
             >
               Remove section
               {showRemoveModal && (
@@ -204,19 +171,8 @@ const EditableAccordionSection = ({
 
         {children && (
           <>
-            {onSaveOrder ? (
-              <DragDropContext onDragEnd={onDragEnd}>
-                <ContentBlockDroppable
-                  draggable={isReordering}
-                  droppableId={sectionId}
-                >
-                  {children}
-                </ContentBlockDroppable>
-              </DragDropContext>
-            ) : (
-              children
-            )}
-            {footerButtons}
+            {children}
+            {!isReordering && footerButtons}
             {goToTop && <GoToTopLink />}
           </>
         )}
