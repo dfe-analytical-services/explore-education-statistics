@@ -6,6 +6,16 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum ChartType
+    {
+        line,
+        horizontalbar,
+        verticalbar,
+        map,
+        infographic
+    }
+    
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IContentBlockChart
     {
@@ -15,9 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         int Width { get; set; }
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum Legend
+    {
+        none,
+        bottom,
+        top
+    }
+
     public class LineChart : IContentBlockChart
     {
-        public string Type => "line";
+        public string Type => ChartType.line.ToString();
         public string Title { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -31,17 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
     }
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum Legend
-    {
-        none,
-        bottom,
-        top
-    }
-
     public class HorizontalBarChart : IContentBlockChart
     {
-        public string Type => "horizontalbar";
+        public string Type =>  ChartType.horizontalbar.ToString();
         public string Title { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -58,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class VerticalBarChart : IContentBlockChart
     {
-        public string Type => "verticalbar";
+        public string Type =>  ChartType.verticalbar.ToString();
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
         public bool Stacked;
@@ -74,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class MapChart : IContentBlockChart
     {
-        public string Type => "map";
+        public string Type =>  ChartType.map.ToString();
         public string Title { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -84,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class InfographicChart : IContentBlockChart
     {
-        public string Type => "infographic";
+        public string Type =>  ChartType.infographic.ToString();
         public string Title { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
