@@ -68,7 +68,6 @@ const validateAndPopulateFiltersAndIndicators = (
 
 const initialiseFromQuery = async (
   initialQuery?: TableDataQuery,
-  releaseId?: string,
 ): Promise<TableToolState> => {
   const state: TableToolState = {
     initialStep: 1,
@@ -108,7 +107,7 @@ const initialiseFromQuery = async (
     state.query = newQuery;
 
     if (state.initialStep === 5) {
-      state.response = await executeTableQuery(newQuery, releaseId);
+      state.response = await executeTableQuery(newQuery);
     }
 
     state.subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({

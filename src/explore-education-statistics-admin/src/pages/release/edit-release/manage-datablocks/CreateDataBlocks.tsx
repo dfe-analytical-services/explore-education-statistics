@@ -59,15 +59,13 @@ const CreateDataBlocks = ({
   useEffect(() => {
     if (dataBlock && dataBlockResponse) {
       if (dataBlock.dataBlockRequest) {
-        initialiseFromQuery(dataBlock.dataBlockRequest, releaseId).then(
-          state => {
-            setTableToolState(state);
+        initialiseFromQuery(dataBlock.dataBlockRequest).then(state => {
+          setTableToolState(state);
 
-            if (onTableToolLoaded) {
-              onTableToolLoaded();
-            }
-          },
-        );
+          if (onTableToolLoaded) {
+            onTableToolLoaded();
+          }
+        });
       }
 
       setQuery(dataBlock.dataBlockRequest);
@@ -83,7 +81,7 @@ const CreateDataBlocks = ({
         setTableHeaders(getDefaultTableHeaderConfig(dataTable.subjectMeta));
       }
     }
-  }, [dataBlock, dataBlockResponse, onTableToolLoaded, releaseId]);
+  }, [dataBlock, dataBlockResponse, onTableToolLoaded]);
 
   useEffect(() => {
     if (!dataBlock) {
