@@ -65,6 +65,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     .ToList();
         }
 
+        public async Task<bool> DeleteAsync(ReleaseId subjectId)
+        {
+            var subject = await _context
+                .Subject
+                .FirstOrDefaultAsync(s => s.Id == subjectId);
+                
+            if (subject != null)
+            {
+                var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
+
+                _context.Subject.Remove(subject);
+                _context.Footnote.RemoveRange(orphanFootnotes);
+                
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteAsync(ReleaseId releaseId, string name)
+        {
+            var subject = await GetAsync(releaseId, name);
+            return await DeleteAsync(subject.Id);
+        }
+        
+        public async Task<Subject> GetAsync(ReleaseId releaseId, string name)
+        {
+            return await _context
+                .Subject
+                .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+        }
+
         private static bool FootnoteLinkedToNoOtherSubject(ReleaseId subjectId, Footnote f)
         {
             // if this Footnote is directly linked to any other Subjects than this one, then it's not just for
@@ -103,38 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
 
             return true;
-        }
-
-        public async Task<bool> DeleteAsync(ReleaseId subjectId)
-        {
-            var subject = await _context
-                .Subject
-                .FirstOrDefaultAsync(s => s.Id == subjectId);
-                
-            if (subject != null)
-            {
-                var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
-
-                _context.Subject.Remove(subject);
-                _context.Footnote.RemoveRange(orphanFootnotes);
-                
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            return false;
-        }
-
-        public async Task<bool> DeleteAsync(ReleaseId releaseId, string name)
-        {
-            var subject = await GetAsync(releaseId, name);
-            return await DeleteAsync(subject.Id);
-        }
-        
-        public async Task<Subject> GetAsync(ReleaseId releaseId, string name)
-        {
-            return await _context
-                .Subject
-                .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
         }
     }
 }
