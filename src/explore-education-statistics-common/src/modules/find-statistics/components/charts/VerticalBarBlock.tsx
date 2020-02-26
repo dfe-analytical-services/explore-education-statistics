@@ -1,13 +1,15 @@
 import {
-  ChartDataB,
   ChartDefinition,
+  StackedBarProps,
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import {
+  ChartDataB,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 
 import classnames from 'classnames';

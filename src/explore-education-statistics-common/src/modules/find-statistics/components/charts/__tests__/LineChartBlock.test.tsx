@@ -1,11 +1,11 @@
 import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
 import {
-  AxesConfiguration,
   ChartMetaData,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/find-statistics/components/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
+import { AxesConfiguration } from '@common/services/publicationService';
 import React from 'react';
 
 import { render } from 'react-testing-library';

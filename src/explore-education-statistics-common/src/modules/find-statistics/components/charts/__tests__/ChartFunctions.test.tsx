@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/types/chart';
 import {
-  ChartMetaData,
   createDataForAxis,
   createSortedDataForAxis,
   parseMetaData,

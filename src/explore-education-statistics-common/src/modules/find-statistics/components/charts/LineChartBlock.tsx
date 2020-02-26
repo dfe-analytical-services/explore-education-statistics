@@ -1,8 +1,10 @@
 import CustomTooltip from '@common/modules/find-statistics/components/charts/CustomTooltip';
 import {
-  ChartDataB,
   ChartDefinition,
   ChartProps,
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import {
+  ChartDataB,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,

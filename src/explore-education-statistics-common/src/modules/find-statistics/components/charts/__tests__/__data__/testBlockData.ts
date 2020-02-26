@@ -2,8 +2,8 @@
 import {
   ChartMetaData,
   ChartProps,
-  parseMetaData,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import {
   DataBlockData,
   DataBlockMetadata,

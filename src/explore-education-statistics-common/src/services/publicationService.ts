@@ -1,4 +1,3 @@
-import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlockLocation,
@@ -151,6 +150,11 @@ export interface AxisConfiguration {
 
   tickConfig?: 'default' | 'startEnd' | 'custom';
   tickSpacing?: string;
+}
+
+export interface AxesConfiguration {
+  major: AxisConfiguration;
+  minor?: AxisConfiguration;
 }
 
 export interface Chart {

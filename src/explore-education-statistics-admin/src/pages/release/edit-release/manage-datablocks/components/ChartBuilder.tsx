@@ -22,6 +22,8 @@ import ChartRenderer, {
 import {
   ChartDefinition,
   ChartMetaData,
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import {
   generateKeyFromDataSet,
   parseMetaData,
 } from '@common/modules/find-statistics/components/charts/util/chartUtils';

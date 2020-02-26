@@ -6,8 +6,8 @@ import {
 } from '@common/components/form';
 
 import { SelectOption } from '@common/components/form/FormSelect';
+import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/types/chart';
 import {
-  ChartCapabilities,
   colours,
   symbols,
 } from '@common/modules/find-statistics/components/charts/util/chartUtils';

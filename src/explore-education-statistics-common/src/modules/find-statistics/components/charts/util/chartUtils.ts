@@ -1,26 +1,21 @@
+import formatPretty from '@common/lib/utils/number/formatPretty';
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/types/chart';
 import {
-  BoundaryLevel,
-  DataBlockData,
-  DataBlockLocationMetadata,
   DataBlockMetadata,
   LabelValueMetadata,
-  LabelValueUnitMetadata,
   Location,
   Result,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
-  AxisType,
   ChartDataSet,
   ChartSymbol,
-  ChartType,
   DataSetConfiguration,
   LabelConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
-import { ReactNode } from 'react';
 import { AxisDomain } from 'recharts';
 
 export const colours: string[] = [
@@ -38,77 +33,6 @@ export const symbols: ChartSymbol[] = [
   'cross',
   'star',
 ];
-
-export interface ChartMetaData {
-  filters: Dictionary<LabelValueMetadata>;
-  indicators: Dictionary<LabelValueUnitMetadata>;
-  locations: Dictionary<DataBlockLocationMetadata>;
-  boundaryLevels?: BoundaryLevel[];
-  timePeriod: Dictionary<LabelValueMetadata>;
-}
-
-export interface AxesConfiguration {
-  major: AxisConfiguration;
-  minor?: AxisConfiguration;
-}
-
-export interface AbstractChartProps {
-  data: DataBlockData;
-  meta: ChartMetaData;
-  title?: string;
-  height?: number;
-  width?: number;
-  children?: ReactNode[];
-}
-
-export interface ChartProps extends AbstractChartProps {
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
-  legend?: 'none' | 'top' | 'bottom';
-  legendHeight?: string;
-}
-
-export interface StackedBarProps extends ChartProps {
-  stacked?: boolean;
-}
-
-export interface ChartCapabilities {
-  hasAxes: boolean;
-  dataSymbols: boolean;
-  stackable: boolean;
-  lineStyle: boolean;
-  gridLines: boolean;
-  canSize: boolean;
-  fixedAxisGroupBy: boolean;
-  hasReferenceLines: boolean;
-  hasLegend: boolean;
-}
-
-export interface ChartDefinition {
-  type: ChartType;
-  name: string;
-
-  height?: number;
-
-  capabilities: ChartCapabilities;
-
-  data: {
-    type: string;
-    title: string;
-    entryCount: number | 'multiple';
-    targetAxis: string;
-  }[];
-
-  axes: {
-    id: string;
-    title: string;
-    type: AxisType;
-    defaultDataType?: AxisGroupBy;
-    forcedDataType?: AxisGroupBy;
-  }[];
-
-  requiresGeoJson: boolean;
-}
 
 function existAndCodesDoNotMatch(a?: Location, b?: Location) {
   return a !== undefined && b !== undefined && a.code !== b.code;

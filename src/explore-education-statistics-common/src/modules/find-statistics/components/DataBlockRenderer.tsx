@@ -1,8 +1,6 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import {
-  ChartMetaData,
-  parseMetaData,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/types/chart';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,

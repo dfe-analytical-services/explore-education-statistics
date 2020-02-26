@@ -8,6 +8,8 @@ import {
   ChartCapabilities,
   ChartDefinition,
   ChartMetaData,
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import {
   colours,
   generateKeyFromDataSet,
   symbols,

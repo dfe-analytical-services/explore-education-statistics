@@ -2,10 +2,12 @@ import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
-  ChartDataB,
   ChartDefinition,
   ChartMetaData,
   ChartProps,
+} from '@common/modules/find-statistics/components/charts/types/chart';
+import {
+  ChartDataB,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
 } from '@common/modules/find-statistics/components/charts/util/chartUtils';
