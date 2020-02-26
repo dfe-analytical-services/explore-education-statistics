@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
             IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService)
         {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;

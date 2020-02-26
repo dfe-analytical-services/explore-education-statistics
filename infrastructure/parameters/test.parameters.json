@@ -22,6 +22,9 @@
     },
     "deployDatafactory": {
       "value": true
+    },
+    "devopsSPN": {
+      "value": "10ddc034-bdb0-4655-92ba-4ad6c490d68a"
     }
   }
 }

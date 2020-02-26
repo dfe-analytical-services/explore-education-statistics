@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new TableStorageService(Configuration.GetConnectionString("PublisherStorage"))));
+                    new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+                new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 
