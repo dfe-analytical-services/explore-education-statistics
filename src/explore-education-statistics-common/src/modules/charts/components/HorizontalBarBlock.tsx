@@ -3,7 +3,7 @@ import {
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import {
-  ChartDataB,
+  ChartData,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
@@ -96,7 +96,7 @@ export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
     )
       return <div>Unable to render chart, chart incorrectly configured</div>;
 
-    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+    const chartData: ChartData[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,

@@ -7,7 +7,7 @@ import {
   ChartProps,
 } from '@common/modules/charts/types/chart';
 import {
-  ChartDataB,
+  ChartData,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
 } from '@common/modules/charts/util/chartUtils';
@@ -73,14 +73,14 @@ interface MapClickEvent extends LeafletMouseEvent {
 function getLocationsForDataSet(
   data: DataBlockData,
   meta: ChartMetaData,
-  chartData: ChartDataB[],
+  chartData: ChartData[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
 
   return [
     { label: 'Select...', value: '' },
     ...allLocationIds.reduce(
-      (locations: { label: string; value: string }[], next: string) => {
+      (locations: { label: string; value: string }[], next) => {
         const { label, value } = (meta.locations || {})[next];
 
         return [...locations, { label, value }];
@@ -100,7 +100,7 @@ function getLocationsForDataSet(
 function getGeometryForOptions(
   meta: ChartMetaData,
   selectedDataSet: DataSetConfiguration,
-  sourceData: ChartDataB[],
+  sourceData: ChartData[],
   min: number,
   scale: number,
 ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
@@ -114,19 +114,19 @@ function getGeometryForOptions(
           ...meta.locations[id].geoJson[0].properties,
           measures,
           color: selectedDataSet.colour,
-          data: Number.parseFloat(data),
-          scaledData: (Number.parseFloat(data) - min) * scale,
+          data: Number(data),
+          scaledData: (Number(data) - min) * scale,
         },
       };
     }),
   };
 }
 
-function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
+function calculateMinAndScaleForSourceData(sourceData: ChartData[]) {
   const { min, max } = sourceData.reduce(
     // eslint-disable-next-line no-shadow
     ({ min, max }, { data }) => {
-      const dataVal = Number.parseFloat(data);
+      const dataVal = Number(data);
       return {
         min: dataVal < min ? dataVal : min,
         max: dataVal > max ? dataVal : max,
@@ -148,11 +148,11 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
 function generateGeometryAndLegendForSelectedOptions(
   meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
-  chartData: ChartDataB[],
+  chartData: ChartData[],
   selectedDataSet: string,
 ) {
   const sourceData = chartData
-    .map<ChartDataB>(entry => ({ ...entry, data: entry[selectedDataSet] }))
+    .map<ChartData>(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(
       ({ data, __name: id }) =>
         data !== undefined && meta.locations[id] && meta.locations[id].geoJson,
@@ -323,7 +323,7 @@ const MapBlock = ({
 
   const [results, setResults] = React.useState<IdValue[]>([]);
 
-  const [chartData, setChartData] = React.useState<ChartDataB[]>();
+  const [chartData, setChartData] = React.useState<ChartData[]>();
 
   // enforce that the Map only responds to being grouped by locations
   const [axisMajor, setAxisMajor] = React.useState<AxisConfiguration>({

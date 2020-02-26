@@ -13,7 +13,7 @@ import {
   ChartMetaData,
 } from '@common/modules/charts/types/chart';
 import {
-  ChartDataB,
+  ChartData,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
@@ -67,7 +67,7 @@ const getAxisLabels = (
     dataSets,
   };
 
-  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
     configurationWithDataSet,
     data.result,
     meta,

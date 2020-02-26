@@ -4,7 +4,7 @@ import {
   ChartProps,
 } from '@common/modules/charts/types/chart';
 import {
-  ChartDataB,
+  ChartData,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
@@ -82,7 +82,7 @@ const LineChartBlock = (props: LineChartProps) => {
   )
     return <div>Unable to render chart, chart incorrectly configured</div>;
 
-  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
     axes.major,
     data.result,
     meta,

@@ -1,4 +1,3 @@
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import { ChartMetaData } from '@common/modules/charts/types/chart';
 import {
   DataBlockMetadata,
@@ -16,6 +15,7 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
+import omit from 'lodash/omit';
 import { AxisDomain } from 'recharts';
 
 export const colours: string[] = [
@@ -33,6 +33,11 @@ export const symbols: ChartSymbol[] = [
   'cross',
   'star',
 ];
+
+export interface ChartData {
+  name: string;
+  [key: string]: number | string;
+}
 
 function existAndCodesDoNotMatch(a?: Location, b?: Location) {
   return a !== undefined && b !== undefined && a.code !== b.code;
@@ -80,12 +85,6 @@ function filterResultsForDataSet(ds: ChartDataSet) {
 
     return true;
   };
-}
-
-export interface ChartDataB {
-  name: string;
-
-  [key: string]: string;
 }
 
 export function generateKeyFromDataSet(
@@ -192,29 +191,29 @@ function getChartDataForAxis(
     );
   }
 
-  const nameDictionary: Dictionary<ChartDataB> = initialNames.reduce(
+  const nameDictionary: Dictionary<ChartData> = initialNames.reduce(
     (chartdata, n) => ({ ...chartdata, [n]: { name: n } }),
     {},
   );
 
   return Object.values(
-    dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
+    dataForAxis.reduce<Dictionary<ChartData>>((acc, result) => {
       const name = generateNameForAxisConfiguration(result, dataSet, groupBy);
 
-      return {
-        ...r,
-        [name]: {
-          name,
-          [generateKeyFromDataSet(dataSet, groupBy)]:
-            formatPretty(result.measures[dataSet.indicator]) || 'NaN',
-        },
-      };
+      acc[name] = {
+        [generateKeyFromDataSet(dataSet, groupBy)]: Number(
+          result.measures[dataSet.indicator],
+        ),
+        name,
+      } as ChartData;
+
+      return acc;
     }, nameDictionary),
   );
 }
 
 function reduceCombineChartData(
-  newCombinedData: ChartDataB[],
+  newCombinedData: ChartData[],
   { name, ...valueData }: { name: string },
 ) {
   // find and remove the existing matching (by name) entry from the list of data, or create a new one empty one
@@ -237,15 +236,14 @@ function reduceCombineChartData(
 }
 
 export function sortChartData(
-  chartData: ChartDataB[],
+  chartData: ChartData[],
   sortBy: string | undefined,
   sortAsc: boolean,
 ) {
   if (sortBy === undefined) return chartData;
 
   const mappedValueAndData = chartData.map(data => ({
-    value:
-      data[sortBy] === undefined ? undefined : Number.parseFloat(data[sortBy]),
+    value: data[sortBy] === undefined ? undefined : Number(data[sortBy]),
     data,
   }));
 
@@ -266,7 +264,7 @@ export function createDataForAxis(
 ) {
   if (axisConfiguration === undefined || results === undefined) return [];
 
-  return axisConfiguration.dataSets.reduce<ChartDataB[]>(
+  return axisConfiguration.dataSets.reduce<ChartData[]>(
     (combinedChartData, dataSetForAxisConfiguration) => {
       return getChartDataForAxis(
         results.filter(filterResultsForDataSet(dataSetForAxisConfiguration)),
@@ -304,9 +302,9 @@ export function createSortedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: ChartMetaData,
-  mapFunction: (data: ChartDataB) => ChartDataB = data => data,
-): ChartDataB[] {
-  const chartData: ChartDataB[] = createDataForAxis(
+  mapFunction: (data: ChartData) => ChartData = data => data,
+): ChartData[] {
+  const chartData: ChartData[] = createDataForAxis(
     axisConfiguration,
     results,
     meta,
@@ -331,7 +329,7 @@ export function createSortedAndMappedDataForAxis(
   meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   keepOriginalValue = false,
-): ChartDataB[] {
+): ChartData[] {
   return createSortedDataForAxis(
     axisConfiguration,
     results,
@@ -347,7 +345,7 @@ export function createSortedAndMappedDataForAxis(
   );
 }
 
-export function getKeysForChart(chartData: ChartDataB[]) {
+export function getKeysForChart(chartData: ChartData[]) {
   return Array.from(
     chartData.reduce((setOfKeys, { name: _, ...values }) => {
       return new Set([...Array.from(setOfKeys), ...Object.keys(values)]);
@@ -390,13 +388,13 @@ const calculateMinMaxReduce = (
   };
 };
 
-export function calculateDataRange(chartData: ChartDataB[]) {
-  // removing the 'name' variable from the object and just keeping the rest of the values
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const allValuesInData = chartData.reduce<string[]>(
-    (all, { name, ...values }) => [...all, ...Object.values(values)], // eslint-disable-line
-    [],
-  );
+export function calculateDataRange(chartData: ChartData[]) {
+  const allValuesInData = chartData.reduce<string[]>((acc, data) => {
+    // removing the 'name' variable from the object and just keeping the rest of the values
+    acc.push(...(Object.values(omit(data, ['name'])) as string[]));
+
+    return acc;
+  }, []);
 
   return allValuesInData.reduce(calculateMinMaxReduce, {
     min: +Infinity,
@@ -523,7 +521,7 @@ function calculateMajorTicks(
 }
 
 export function generateMinorAxis(
-  chartData: ChartDataB[],
+  chartData: ChartData[],
   axis: AxisConfiguration,
 ) {
   const { min, max } = calculateDataRange(chartData);
@@ -543,7 +541,7 @@ export function generateMinorAxis(
 }
 
 export function generateMajorAxis(
-  chartData: ChartDataB[],
+  chartData: ChartData[],
   axis: AxisConfiguration,
 ) {
   const majorAxisCateories = chartData.map(({ name }) => name);
