@@ -1,8 +1,8 @@
-import CustomTooltip from '@common/modules/find-statistics/components/charts/CustomTooltip';
+import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
   ChartDefinition,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   ChartDataB,
   conditionallyAdd,
@@ -11,7 +11,7 @@ import {
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
@@ -33,7 +33,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import './charts.scss';
+import 'src/modules/charts/components/charts.scss';
 
 const LineStyles: Dictionary<string> = {
   solid: '',

@@ -5,12 +5,12 @@ import {
   ChartDefinition,
   ChartMetaData,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   ChartDataB,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 
 import {
   DataBlockData,
@@ -30,8 +30,8 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import stylesIndicators from '../SummaryRenderer.module.scss';
-import styles from './MapBlock.module.scss';
+import stylesIndicators from 'src/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from 'src/modules/charts/components/MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;

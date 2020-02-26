@@ -6,11 +6,8 @@ import {
 } from '@common/components/form';
 
 import { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/types/chart';
-import {
-  colours,
-  symbols,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+import { ChartCapabilities } from '@common/modules/charts/types/chart';
+import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import {
   ChartSymbol,
   DataSetConfiguration,

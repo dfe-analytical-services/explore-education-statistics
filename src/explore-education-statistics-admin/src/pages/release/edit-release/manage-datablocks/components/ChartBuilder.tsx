@@ -18,20 +18,20 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
+} from '@common/modules/charts/components/ChartRenderer';
 import {
   ChartDefinition,
   ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   generateKeyFromDataSet,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
-import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
-import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+} from '@common/modules/charts/util/chartUtils';
+import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import Infographic from '@common/modules/charts/components/Infographic';
+import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import {
   DataBlockRerequest,
   DataBlockResponse,

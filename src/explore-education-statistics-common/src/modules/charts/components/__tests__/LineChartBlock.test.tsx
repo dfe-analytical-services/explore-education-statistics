@@ -1,15 +1,15 @@
-import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
+import PrototypeData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import {
   ChartMetaData,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
 import { AxesConfiguration } from '@common/services/publicationService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
-import Chart from '../LineChartBlock';
+import Chart from 'src/modules/charts/components/LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
 

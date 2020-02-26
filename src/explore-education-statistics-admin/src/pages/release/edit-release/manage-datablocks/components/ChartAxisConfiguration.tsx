@@ -11,11 +11,11 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   ChartDataB,
   createSortedAndMappedDataForAxis,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,

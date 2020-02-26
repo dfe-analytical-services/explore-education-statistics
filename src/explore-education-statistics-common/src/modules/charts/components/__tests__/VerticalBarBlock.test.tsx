@@ -1,28 +1,26 @@
-import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
 import {
   ChartMetaData,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
-
+} from '@common/modules/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
 import { AxesConfiguration } from '@common/services/publicationService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
-import Chart from '../HorizontalBarBlock';
+import Chart from 'src/modules/charts/components/VerticalBarBlock';
 
-import testData from './__data__/testBlockData';
+import testData from 'src/modules/charts/components/__tests__/__data__/testBlockData';
+import { expectTicks } from 'src/modules/charts/components/__tests__/testUtils';
 
 jest.mock('recharts/lib/util/LogUtils');
 
 const props = {
   ...testData.AbstractChartProps,
-  width: 900,
+  height: 900,
 };
-
 const { axes } = props;
 
-describe('HorzontalBarBlock', () => {
+describe('VerticalBarBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
 
@@ -72,7 +70,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -92,7 +90,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -284,7 +282,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '-3', '3', '9', '20');
+    expectTicks(container, 'y', '-3', '3', '9', '20');
   });
 
   test('Can limit range of minor ticks to start and end', () => {
@@ -302,7 +300,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '-3', '20');
+    expectTicks(container, 'y', '-3', '20');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -323,7 +321,7 @@ describe('HorzontalBarBlock', () => {
 
     expectTicks(
       container,
-      'x',
+      'y',
       '-3',
       '-2',
       '-1',
@@ -355,7 +353,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 
   test('Can limit range of major ticks to start and end', () => {
@@ -372,7 +370,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -390,7 +388,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 
   test('Can sort by name', () => {
@@ -408,7 +406,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 
   test('Can sort by name descending', () => {
@@ -426,7 +424,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2015/16', '2014/15');
+    expectTicks(container, 'x', '2015/16', '2014/15');
   });
 
   test('Can filter a data range', () => {
@@ -445,6 +443,6 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '2014/15');
+    expectTicks(container, 'x', '2014/15');
   });
 });

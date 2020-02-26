@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ChartMetaData } from '@common/modules/find-statistics/components/charts/types/chart';
+import { ChartMetaData } from '@common/modules/charts/types/chart';
 import {
   createDataForAxis,
   createSortedDataForAxis,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 import {
   AxisConfiguration,
   ChartDataSet,
 } from '@common/services/publicationService';
 
-import Data from './__data__/chartFunctionsData';
+import Data from 'src/modules/charts/components/__tests__/__data__/chartFunctionsData';
 
 describe('ChartFunctions', () => {
   const dataSet23_1_72: ChartDataSet = {

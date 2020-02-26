@@ -1,26 +1,28 @@
+import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import {
   ChartMetaData,
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
+
 import { DataBlockData } from '@common/services/dataBlockService';
 import { AxesConfiguration } from '@common/services/publicationService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
-import Chart from '../VerticalBarBlock';
+import Chart from 'src/modules/charts/components/HorizontalBarBlock';
 
-import testData from './__data__/testBlockData';
-import { expectTicks } from './testUtils';
+import testData from 'src/modules/charts/components/__tests__/__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
 const props = {
   ...testData.AbstractChartProps,
-  height: 900,
+  width: 900,
 };
+
 const { axes } = props;
 
-describe('VerticalBarBlock', () => {
+describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
 
@@ -70,7 +72,7 @@ describe('VerticalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -90,7 +92,7 @@ describe('VerticalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -282,7 +284,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '3', '9', '20');
+    expectTicks(container, 'x', '-3', '3', '9', '20');
   });
 
   test('Can limit range of minor ticks to start and end', () => {
@@ -300,7 +302,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '20');
+    expectTicks(container, 'x', '-3', '20');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -321,7 +323,7 @@ describe('VerticalBarBlock', () => {
 
     expectTicks(
       container,
-      'y',
+      'x',
       '-3',
       '-2',
       '-1',
@@ -353,7 +355,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can limit range of major ticks to start and end', () => {
@@ -370,7 +372,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -388,7 +390,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can sort by name', () => {
@@ -406,7 +408,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can sort by name descending', () => {
@@ -424,7 +426,7 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2015/16', '2014/15');
+    expectTicks(container, 'y', '2015/16', '2014/15');
   });
 
   test('Can filter a data range', () => {
@@ -443,6 +445,6 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15');
+    expectTicks(container, 'y', '2014/15');
   });
 });

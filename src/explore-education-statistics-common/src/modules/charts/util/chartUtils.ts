@@ -1,5 +1,5 @@
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import { ChartMetaData } from '@common/modules/find-statistics/components/charts/types/chart';
+import { ChartMetaData } from '@common/modules/charts/types/chart';
 import {
   DataBlockMetadata,
   LabelValueMetadata,

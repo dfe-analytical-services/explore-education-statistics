@@ -1,7 +1,7 @@
 import {
   AbstractChartProps,
   ChartDefinition,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import * as React from 'react';
 
 export interface InfographicChartProps extends AbstractChartProps {

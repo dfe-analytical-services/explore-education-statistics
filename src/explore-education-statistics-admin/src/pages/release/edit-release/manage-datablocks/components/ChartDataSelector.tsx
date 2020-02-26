@@ -8,12 +8,12 @@ import {
   ChartCapabilities,
   ChartDefinition,
   ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   colours,
   generateKeyFromDataSet,
   symbols,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 import {
   ChartDataSet,
   DataSetConfiguration,

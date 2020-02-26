@@ -3,8 +3,8 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
-import { parseMetaData } from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/components/ChartRenderer';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';

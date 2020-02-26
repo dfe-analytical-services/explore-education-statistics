@@ -6,7 +6,7 @@ import withErrorControl, {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';

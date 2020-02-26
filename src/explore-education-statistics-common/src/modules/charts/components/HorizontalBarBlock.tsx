@@ -1,7 +1,7 @@
 import {
   ChartDefinition,
   StackedBarProps,
-} from '@common/modules/find-statistics/components/charts/types/chart';
+} from '@common/modules/charts/types/chart';
 import {
   ChartDataB,
   conditionallyAdd,
@@ -10,7 +10,7 @@ import {
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+} from '@common/modules/charts/util/chartUtils';
 
 import classnames from 'classnames';
 import React, { Component } from 'react';
@@ -26,7 +26,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import './charts.scss';
+import 'src/modules/charts/components/charts.scss';
 
 export type HorizontalBarProps = StackedBarProps;
 
