@@ -387,6 +387,9 @@
     "autoscalePublicApplication": {
       "type": "bool",
       "defaultValue": false
+    },
+    "devopsSPN": {
+      "type": "string"
     }
   },
   "variables": {
@@ -462,7 +465,7 @@
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
     "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
 
-    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
+    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
     "ees-storage-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-publisher')]",
@@ -2680,8 +2683,8 @@
             }
           },
           {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",
             "permissions": {
               "keys": [
               ],
@@ -2736,8 +2739,36 @@
             }
           },
           {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2019-08-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
+          {
             "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
-            "objectId": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e", // Devops SPN
+            "objectId": "[parameters('devopsSPN')]", // Devops SPN
             "permissions": {
               "keys": [
               ],
