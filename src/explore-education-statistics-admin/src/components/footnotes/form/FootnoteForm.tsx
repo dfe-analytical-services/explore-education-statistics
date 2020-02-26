@@ -123,7 +123,11 @@ const FootnoteForm = ({
                   legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
                   error={getError('subjects')}
                 >
-                  <p>Select either one or multiple subject areas from below</p>
+                  <p>
+                    Select filters and indicators from either one or multiple
+                    subject areas and then add your footnote (shown at the
+                    bottom of the page)
+                  </p>
                   {Object.entries(footnoteMeta)
                     .sort((a, b) => {
                       const textA = a[1].subjectName.toUpperCase();
@@ -141,26 +145,29 @@ const FootnoteForm = ({
                             `subjects.${subjectMetaId}.selected`,
                           ) || false;
                         return (
-                          <div key={subjectMetaId}>
-                            <div key={subjectMetaId} className="govuk-grid-row">
-                              <h4 className="govuk-visually-hidden">
-                                {subjectMeta.subjectName} footnote matching
-                                criteria
-                              </h4>
-                              <div className="govuk-grid-column-one-third govuk-!-margin-bottom-2">
-                                <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                                  Subject
-                                </h5>
-                                <FieldSubjectCheckbox
-                                  id={`subject-${subjectMetaId}`}
-                                  label={subjectMeta.subjectName}
-                                  name={`subjects.${subjectMetaId}.selected`}
-                                />
-                              </div>
-                              <div className="govuk-grid-column-one-third">
-                                <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                          <fieldset
+                            key={subjectMetaId}
+                            className="govuk-fieldset"
+                          >
+                            <legend className="govuk-heading-m">
+                              Subject: {subjectMeta.subjectName}
+                            </legend>
+                            <div>
+                              <FieldSubjectCheckbox
+                                id={`subject-${subjectMetaId}`}
+                                label="Select all indicators and filters for this subject"
+                                name={`subjects.${subjectMetaId}.selected`}
+                                className="govuk-checkboxes--small"
+                              />
+                            </div>
+                            <div
+                              key={subjectMetaId}
+                              className="govuk-grid-row govuk-!-margin-top-3 "
+                            >
+                              <div className="govuk-grid-column-one-half">
+                                <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
                                   Indicators
-                                </h5>
+                                </h3>
                                 <IndicatorDetails
                                   summary="Indicators"
                                   parentSelected={subjectSelected}
@@ -169,10 +176,10 @@ const FootnoteForm = ({
                                   form={form}
                                 />
                               </div>
-                              <div className="govuk-grid-column-one-third">
-                                <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                              <div className="govuk-grid-column-one-half">
+                                <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
                                   Filters
-                                </h5>
+                                </h3>
                                 {Object.entries(subjectMeta.filters).map(
                                   ([filterId, filter]: [
                                     string,
@@ -197,28 +204,29 @@ const FootnoteForm = ({
                               </div>
                             </div>
                             <hr className="govuk-!-margin-bottom-2" />
-                          </div>
+                          </fieldset>
                         );
                       },
                     )}
+
+                  <FormFieldTextArea<FootnoteProps>
+                    id={`${formId}-content`}
+                    name="content"
+                    label="Footnote"
+                  />
+                  <Button
+                    type="submit"
+                    className="govuk-button govuk-!-margin-right-6"
+                  >
+                    {!footnote ? 'Create' : 'Update'} footnote
+                  </Button>
+                  <ButtonText
+                    className="govuk-button govuk-button--secondary"
+                    onClick={onCancel}
+                  >
+                    Cancel
+                  </ButtonText>
                 </FormFieldset>
-                <FormFieldTextArea<FootnoteProps>
-                  id={`${formId}-content`}
-                  name="content"
-                  label="Footnote"
-                />
-                <Button
-                  type="submit"
-                  className="govuk-button govuk-!-margin-right-6"
-                >
-                  {!footnote ? 'Create' : 'Update'} footnote
-                </Button>
-                <ButtonText
-                  className="govuk-button govuk-button--secondary"
-                  onClick={onCancel}
-                >
-                  Cancel
-                </ButtonText>
               </Form>
             </div>
           );
