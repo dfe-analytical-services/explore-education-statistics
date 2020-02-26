@@ -8,7 +8,7 @@ import {
   getKeysForChart,
   populateDefaultChartProps,
   StackedBarProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 
 import classnames from 'classnames';
 import React, { Component } from 'react';

@@ -3,7 +3,7 @@ import {
   ChartMetaData,
   ChartProps,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import {
   DataBlockData,
   DataBlockMetadata,

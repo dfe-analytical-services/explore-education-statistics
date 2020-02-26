@@ -6,7 +6,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';

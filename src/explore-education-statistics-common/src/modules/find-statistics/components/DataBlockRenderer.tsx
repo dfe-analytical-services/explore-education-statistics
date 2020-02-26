@@ -2,7 +2,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import {
   ChartMetaData,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,

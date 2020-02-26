@@ -24,7 +24,7 @@ import {
   ChartMetaData,
   generateKeyFromDataSet,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';

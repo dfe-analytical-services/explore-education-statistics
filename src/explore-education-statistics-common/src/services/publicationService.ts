@@ -1,4 +1,4 @@
-import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlockLocation,

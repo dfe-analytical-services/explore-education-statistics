@@ -22,7 +22,7 @@ import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';

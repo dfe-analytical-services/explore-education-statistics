@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  AxisConfiguration,
-  ChartDataSet,
-} from '@common/services/publicationService';
-import {
   ChartMetaData,
   createDataForAxis,
   createSortedDataForAxis,
   parseMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
+import {
+  AxisConfiguration,
+  ChartDataSet,
+} from '@common/services/publicationService';
 
 import Data from './__data__/chartFunctionsData';
 

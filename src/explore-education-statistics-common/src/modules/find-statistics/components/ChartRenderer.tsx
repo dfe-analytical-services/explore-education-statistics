@@ -1,7 +1,7 @@
 import {
   ChartProps,
   StackedBarProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import Infographic, {
   InfographicChartProps,

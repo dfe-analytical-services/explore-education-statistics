@@ -13,7 +13,7 @@ import {
   ChartDataB,
   ChartMetaData,
   createSortedAndMappedDataForAxis,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,

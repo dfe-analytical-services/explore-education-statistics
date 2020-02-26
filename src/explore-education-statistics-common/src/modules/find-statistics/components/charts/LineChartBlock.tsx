@@ -1,3 +1,4 @@
+import CustomTooltip from '@common/modules/find-statistics/components/charts/CustomTooltip';
 import {
   ChartDataB,
   ChartDefinition,
@@ -8,8 +9,7 @@ import {
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import CustomTooltip from '@common/modules/find-statistics/components/charts/CustomTooltip';
+} from '@common/modules/find-statistics/components/charts/util/chartUtils';
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
