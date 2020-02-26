@@ -21,10 +21,14 @@ interface GetFileResponse {
 }
 
 export interface DeleteDataFilePlan {
-  dependentDataBlocks: {
-    name: string;
-    contentSectionHeading?: string;
-  }[];
+  dependentDataBlocks: DependentDataBlock[];
+  footnoteIds: string[];
+}
+
+export interface DependentDataBlock {
+  name: string;
+  contentSectionHeading?: string;
+  infographicFilenames: string[];
 }
 
 const getFileNameFromPath = (path: string) =>
@@ -86,10 +90,10 @@ const service = {
   },
   getDeleteDataFilePlan(
     releaseId: string,
-    subjectTitle: string,
+    dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${subjectTitle}/delete-plan`,
+      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {

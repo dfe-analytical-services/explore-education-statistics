@@ -245,11 +245,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
-        [HttpGet("release/{releaseId}/data/{subjectTitle}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string subjectTitle)
+        [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseId,  subjectTitle)
+                .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
                 .HandleFailuresOr(Ok);
         }
         

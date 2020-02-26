@@ -55,7 +55,14 @@ const WizardStepFormActions = ({
         {form.isSubmitting ? submittingText : submitText}
       </Button>
 
-      {form.isSubmitting && <LoadingSpinner inline size={39} />}
+      <LoadingSpinner
+        alert
+        inline
+        hideText
+        loading={form.isSubmitting}
+        size="md"
+        text="Page is loading"
+      />
     </FormGroup>
   );
 };
