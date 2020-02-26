@@ -29,9 +29,9 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError(f'Cannot find accordion section number "{num}"')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Edit Section Title)"]').click()
+        elem.find_element_by_xpath('.//a[.="(Edit section title)"]').click()
     except:
-        raise AssertionError('Cannot click "(Edit Section Title)" link!')
+        raise AssertionError('Cannot click "(Edit section title)" link!')
 
     try:
         elem.find_element_by_xpath('.//input[@id="heading"]').clear()
@@ -44,9 +44,9 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError('Failed to press keys!?!')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Save Section Title)"]').click()
+        elem.find_element_by_xpath('.//a[.="(Save section title)"]').click()
     except:
-        raise AssertionError('Cannot click "(Save Section Title)" link!')
+        raise AssertionError('Cannot click "(Save section title)" link!')
 
 def user_gets_editable_accordion_section_element(section_title):
     try:
@@ -110,9 +110,9 @@ def user_checks_accordion_section_content_block_contains_text(section_elem, bloc
 
 def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
     try:
-        section_elem.find_element_by_xpath(f'(.//button[text()="Delete"])[{block_num}]').click()
+        elem = section_elem.find_element_by_xpath(f'(.//button[text()="Delete"])[{block_num}]').click()
     except:
-        raise AssertionError(f'Failed to find/click Delete button for content block number {block_num}')
+        raise AssertionError(f'Failed to find Delete button for content block number {block_num}')
 
     try:
         sl.driver.find_element_by_xpath(f'//button[text()="Confirm"]').click()

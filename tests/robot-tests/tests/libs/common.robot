@@ -23,6 +23,8 @@ set to local storage
   [Arguments]    ${key}   ${value}
   execute javascript  localStorage.setItem('${key}', '${value}');
 
+user signs in
+
 user signs in as bau1
   user opens the browser
 

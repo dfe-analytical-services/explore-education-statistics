@@ -4,7 +4,7 @@ Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       user signs in
+Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
@@ -112,10 +112,11 @@ Add text to newly created content blocks
 Delete second content block
     [Tags]  HappyPath
     user deletes editable accordion section content block  ${section_one}   2
+    user waits until page does not contain    block two test text
+    user checks accordion section contains X blocks   ${section_one}    2
 
 Validate two remaining content blocks
     [Tags]  HappyPath
     user checks accordion section content block contains text   ${section_one}   1   block one test text
     user checks accordion section content block contains text   ${section_one}   2   block three test text
 
-    user checks accordion section contains X blocks   ${section_one}    2

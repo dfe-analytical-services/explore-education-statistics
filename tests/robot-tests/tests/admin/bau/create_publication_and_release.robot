@@ -3,7 +3,7 @@ Resource    ../../libs/admin-common.robot
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       user signs in
+Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***

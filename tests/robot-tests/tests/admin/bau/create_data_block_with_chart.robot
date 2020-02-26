@@ -4,7 +4,7 @@ Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       user signs in
+Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
@@ -59,6 +59,7 @@ Select subject "UI test subject"
 
 Select locations
     [Tags]   HappyPath
+    sleep  10000
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)
