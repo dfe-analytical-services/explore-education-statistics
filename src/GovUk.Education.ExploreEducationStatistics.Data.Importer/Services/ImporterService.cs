@@ -143,8 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             using (var transaction = context.Database.BeginTransaction())
             {
-                context.BulkInsert(observations,
-                    new BulkConfig {WithHoldlock= true, BatchSize = observations.Count(), PreserveInsertOrder = true, SetOutputIdentity = true});
+                context.BulkInsert(observations);
 
                 foreach (var o in observations)
                 {
@@ -156,8 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     
                     subEntities.AddRange(o.FilterItems);
                 }
-                context.BulkInsert(subEntities,
-                        new BulkConfig {WithHoldlock= true, BatchSize = subEntities.Count()});
+                context.BulkInsert(subEntities);
                     
                 transaction.Commit();
             }

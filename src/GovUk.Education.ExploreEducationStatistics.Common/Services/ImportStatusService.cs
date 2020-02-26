@@ -44,17 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new ImportStatus
             {
                 Errors = import.Errors,
-                PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
+                //PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };
-        }
-        
-        public static int GetNumBatchesComplete(DatafileImport import)
-        {
-            return (from bool b in new BitArray(import.BatchesProcessed)
-                where b
-                select b).Count();
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
@@ -63,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 
                 dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string>(){ "NumBatches", "Status", "NumberOfRows", "Errors"}));
             
             return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
         }

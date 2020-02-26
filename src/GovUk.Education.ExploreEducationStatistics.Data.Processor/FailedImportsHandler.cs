@@ -3,9 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Newtonsoft.Json;
+using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
@@ -15,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
+            CloudBlobContainer container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
             var tClient = tblStorageAccount.CreateCloudTableClient();
             var qClient = storageAccount.CreateCloudQueueClient();
             var aQueue = qClient.GetQueueReference("imports-available");
@@ -23,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             aQueue.CreateIfNotExists();
             table.CreateIfNotExists();
+            //aQueue.Clear();
+            //pQueue.Clear();
 
             TableContinuationToken token = null;
             do
@@ -33,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                 foreach (var entity in resultSegment.Results)
                 {
-                    var lastBatch = ImportStatusService.GetNumBatchesComplete(entity);
+                    var lastBatch = FileStorageService.GetNumBatchesComplete(entity.PartitionKey, container, entity.NumBatches);
                     if (entity.NumBatches != 1 && entity.NumBatches == lastBatch)
                     {
                         continue;
