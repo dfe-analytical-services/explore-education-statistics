@@ -340,8 +340,8 @@ const MapBlock = ({
 
   // initialise
   React.useEffect(() => {
-    import('@common/services/UKGeoJson').then(imported => {
-      setUkGeometry(imported.default);
+    import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
+      setUkGeometry(imported.default as FeatureCollection);
     });
   }, []);
 
