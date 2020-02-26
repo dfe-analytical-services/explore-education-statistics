@@ -11,7 +11,7 @@ using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class SubjectService : AbstractRepository<Subject, Guid>, ISubjectService
+    public class SubjectService : AbstractRepository<Subject, ReleaseId>, ISubjectService
     {
         private readonly IReleaseService _releaseService;
 
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _releaseService = releaseService;
         }
 
-        public bool IsSubjectForLatestRelease(Guid subjectId)
+        public bool IsSubjectForLatestRelease(ReleaseId subjectId)
         {
             var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
             if (subject == null)
@@ -36,16 +36,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
         }
 
-        public List<Footnote> GetFootnotesOnlyForSubject(Guid subjectId)
+        public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(ReleaseId subjectId)
         {
-            return _context
+            var releaseId = _context
+                .Subject
+                .First(s => s.Id == subjectId)
+                .ReleaseId;
+
+            var releaseFootnotes = await _context
                 .Footnote
+                .Include(f => f.Filters)
+                .Include(f => f.FilterGroups)
+                .ThenInclude(fg => fg.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Include(f => f.FilterItems)
+                .ThenInclude(fi => fi.FilterItem)
+                .ThenInclude(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Include(f => f.Indicators)
+                .ThenInclude(i => i.Indicator)
+                .ThenInclude(i => i.IndicatorGroup)
                 .Include(f => f.Subjects)
-                .Where(f => f.Subjects.Count == 1 && f.Subjects.First().SubjectId == subjectId)
-                .ToList();
+                .Where(f => f.ReleaseId == releaseId)
+                .ToListAsync();
+             
+                return releaseFootnotes
+                    .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
+                    .ToList();
         }
 
-        public async Task<bool> DeleteAsync(Guid subjectId)
+        private static bool FootnoteLinkedToNoOtherSubject(ReleaseId subjectId, Footnote f)
+        {
+            // if this Footnote is directly linked to any other Subjects than this one, then it's not just for
+            // this Subject
+            if (f.Subjects.Any(subject => subject.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter for any other Subject, then it's not just for
+            // this Subject
+            if (f.Filters.Any(filter => filter.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to an Indicator for any other Subject, then it's not just for
+            // this Subject
+            if (f.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter Group for any other Subject, then it's not just for
+            // this Subject
+            if (f.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter Group for any other Subject, then it's not just for
+            // this Subject
+            if (f.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(ReleaseId subjectId)
         {
             var subject = await _context
                 .Subject
@@ -53,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 
             if (subject != null)
             {
-                var orphanFootnotes = GetFootnotesOnlyForSubject(subjectId);
+                var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
 
                 _context.Subject.Remove(subject);
                 _context.Footnote.RemoveRange(orphanFootnotes);

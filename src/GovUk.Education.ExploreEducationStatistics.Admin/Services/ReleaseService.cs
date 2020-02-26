@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
                     var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject.Id);
 
-                    var orphanFootnotes = _subjectService.GetFootnotesOnlyForSubject(subject.Id);
+                    var orphanFootnotes = await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
                     {

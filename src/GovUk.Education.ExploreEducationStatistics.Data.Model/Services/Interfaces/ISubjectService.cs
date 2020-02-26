@@ -16,6 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         Task<Subject> GetAsync(Guid releaseId, string name);
 
-        List<Footnote> GetFootnotesOnlyForSubject(Guid subjectId);
+        Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId);
     }
 }
