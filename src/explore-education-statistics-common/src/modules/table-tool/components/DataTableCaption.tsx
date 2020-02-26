@@ -44,9 +44,14 @@ export function generateTableTitle({
 
 interface Props extends FullTableMeta {
   id: string;
+  heading?: string;
 }
 
-const DataTableCaption = ({ id = 'dataTableCaption', ...props }: Props) => {
+const DataTableCaption = ({
+  id = 'dataTableCaption',
+  heading,
+  ...props
+}: Props) => {
   const { locations } = props;
 
   const [expanded, toggleExpanded] = useToggle(false);
@@ -58,7 +63,7 @@ const DataTableCaption = ({ id = 'dataTableCaption', ...props }: Props) => {
 
   return (
     <>
-      <strong id={id}>{caption}</strong>
+      <strong id={id}>{heading || caption}</strong>
       {locations.length > 10 && (
         <ButtonText
           className={classNames('govuk-!-display-block govuk-!-margin-top-2')}

@@ -12,12 +12,16 @@ export interface Props {
   tableHeaders?: TableHeadersConfig;
 }
 
-const TimePeriodDataTableRenderer = ({ response, tableHeaders }: Props) => {
+const TimePeriodDataTableRenderer = ({
+  response,
+  tableHeaders,
+  heading,
+}: Props) => {
   const table = mapDataBlockResponseToFullTable(response);
-
   return (
     <TimePeriodDataTable
       fullTable={table}
+      heading={heading}
       tableHeadersConfig={
         tableHeaders ?? getDefaultTableHeaderConfig(table.subjectMeta)
       }

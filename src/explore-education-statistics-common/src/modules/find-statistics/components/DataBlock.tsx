@@ -158,8 +158,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const { charts, tables, isLoading, isError } = this.state;
     return (
       <>
-        {heading && <h3>{heading}</h3>}
-
         {isLoading ? (
           <LoadingSpinner text="Loading content..." />
         ) : (
@@ -175,7 +173,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 {tables.map((table, idx) => {
                   const key = `${id}0_table_${idx}`;
 
-                  return <TimePeriodDataTableRenderer key={key} {...table} />;
+                  return (
+                    <TimePeriodDataTableRenderer
+                      heading={heading}
+                      key={key}
+                      {...table}
+                    />
+                  );
                 })}
 
                 {additionalTabContent}
