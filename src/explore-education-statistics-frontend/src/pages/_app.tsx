@@ -1,13 +1,12 @@
-import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
+import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
-import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
+import { NextContext } from 'next';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
+import { Cookies, CookiesProvider } from 'react-cookie';
 import './_app.scss';
-import { CookiesProvider, Cookies } from 'react-cookie';
-import { NextContext } from 'next';
 
 process.env.APP_ROOT_ID = '__next';
 
@@ -59,11 +58,9 @@ class App extends BaseApp<Props> {
 
     return (
       <Container>
-        <AriaLiveAnnouncer>
-          <CookiesProvider cookies={new Cookies(cookies)}>
-            <Component {...pageProps} />
-          </CookiesProvider>
-        </AriaLiveAnnouncer>
+        <CookiesProvider cookies={new Cookies(cookies)}>
+          <Component {...pageProps} />
+        </CookiesProvider>
       </Container>
     );
   }
