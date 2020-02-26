@@ -19,6 +19,9 @@ import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -65,6 +68,8 @@ const ManagePublicationsAndReleasesTab = ({
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
+
+  const [apiErrors, setApiErrors] = useState<ErrorSummaryMessage[]>([]);
 
   const [canCreatePublication, setCanCreatePublication] = useState(false);
 
@@ -150,7 +155,8 @@ const ManagePublicationsAndReleasesTab = ({
           .canCreatePublicationForTopic(selectedThemeAndTopic.topic.id)
           .then(setCanCreatePublication),
       ])
-        .then(_ =>
+        .then(_ => {
+          setApiErrors([]);
           // eslint-disable-next-line
           history.replaceState(
             {},
@@ -159,9 +165,14 @@ const ManagePublicationsAndReleasesTab = ({
               selectedThemeAndTopic.theme.id,
               selectedThemeAndTopic.topic.id,
             ),
-          ),
-        )
-        .catch(handleApiErrors);
+          );
+        })
+        .catch(error => {
+          setApiErrors([
+            ...apiErrors,
+            { id: error.data.traceId, message: error.data.title },
+          ]);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThemeAndTopic]);
@@ -261,7 +272,13 @@ const ManagePublicationsAndReleasesTab = ({
             )}
           </>
         ) : (
-          <LoadingSpinner />
+          <>
+            {apiErrors.length > 0 ? (
+              <ErrorSummary id="publications-error" errors={apiErrors} />
+            ) : (
+              <LoadingSpinner />
+            )}
+          </>
         )}
       </section>
     </>

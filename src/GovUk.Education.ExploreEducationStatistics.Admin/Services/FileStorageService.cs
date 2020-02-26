@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
             IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService)
         {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(GetCloudBlobContainer)
                 .OnSuccess(blobContainer => 
                     DataPathsForDeletion(blobContainer , releaseId, fileName)
-                    .OnSuccess(path => DeleteFileAsync(blobContainer, path.dataFilePath)))
+                    .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
@@ -326,6 +326,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(CloudBlobContainer blobContainer,
+            (string, string) paths)
+        {
+            await DeleteFileAsync(blobContainer, paths.Item1);
+            await DeleteFileAsync(blobContainer, paths.Item2);
+            return true;
+        }
+        
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
