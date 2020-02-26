@@ -9,8 +9,6 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
 import React, { useContext } from 'react';
-import LazyLoad from 'react-lazyload';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export interface Props {
   publication: AdminDashboardPublication;
@@ -48,35 +46,30 @@ const PublicationSummary = ({ publication }: Props) => {
             )}
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
-          <LazyLoad placeholder={<LoadingSpinner />} once>
-            <ul className="govuk-list dfe-admin">
-              {publication.releases.map(release => (
-                <li key={release.id}>
-                  <ReleaseSummary
-                    release={release}
-                    actions={
-                      <ButtonLink
-                        to={summaryRoute.generateLink(
-                          publication.id,
-                          release.id,
-                        )}
-                        testId={formatTestId(
-                          `Edit release link for ${
-                            publication.title
-                          }, ${getReleaseSummaryLabel(release)}`,
-                        )}
-                      >
-                        {release.permissions.canUpdateRelease
-                          ? 'Edit this release'
-                          : 'View this release'}
-                      </ButtonLink>
-                    }
-                  />
-                </li>
-              ))}
-              {publication.releases.length < 1 && <>No releases created</>}
-            </ul>
-          </LazyLoad>
+          <ul className="govuk-list dfe-admin">
+            {publication.releases.map(release => (
+              <li key={release.id}>
+                <ReleaseSummary
+                  release={release}
+                  actions={
+                    <ButtonLink
+                      to={summaryRoute.generateLink(publication.id, release.id)}
+                      testId={formatTestId(
+                        `Edit release link for ${
+                          publication.title
+                        }, ${getReleaseSummaryLabel(release)}`,
+                      )}
+                    >
+                      {release.permissions.canUpdateRelease
+                        ? 'Edit this release'
+                        : 'View this release'}
+                    </ButtonLink>
+                  }
+                />
+              </li>
+            ))}
+            {publication.releases.length < 1 && <>No releases created</>}
+          </ul>
         </SummaryListItem>
       </SummaryList>
       <SummaryList>
