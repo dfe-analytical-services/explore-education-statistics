@@ -1,23 +1,22 @@
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import {
+  FormFieldset,
+  FormSelect,
+  FormTextInput,
+} from '@common/components/form';
+
+import { SelectOption } from '@common/components/form/FormSelect';
+import {
+  ChartCapabilities,
+  colours,
+  symbols,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   ChartSymbol,
   DataSetConfiguration,
   LineStyle,
 } from '@common/services/publicationService';
 import * as React from 'react';
-import {
-  FormFieldset,
-  FormSelect,
-  FormTextInput,
-} from '@common/components/form';
-import {
-  ChartCapabilities,
-  colours,
-  symbols,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-
-import { SelectOption } from '@common/components/form/FormSelect';
-
-import styles from './graph-builder.module.scss';
 
 interface Props {
   configuration: DataSetConfiguration;

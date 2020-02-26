@@ -1,3 +1,4 @@
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import {
   FormCheckbox,
   FormFieldset,
@@ -21,9 +22,8 @@ import {
   DataSetConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
-import * as React from 'react';
 import { Dictionary } from '@common/types';
-import styles from './graph-builder.module.scss';
+import * as React from 'react';
 
 interface Props {
   id: string;

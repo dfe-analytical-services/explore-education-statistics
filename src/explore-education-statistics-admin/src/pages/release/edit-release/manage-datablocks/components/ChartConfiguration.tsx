@@ -1,4 +1,4 @@
-import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import service from '@admin/services/release/edit-release/data/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { ErrorControlProps } from '@admin/validation/withErrorControl';

@@ -1,7 +1,14 @@
+import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
+import ChartConfiguration, {
+  ChartOptions,
+} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector, {
   ChartDataSetAndConfiguration,
   SelectedData,
-} from '@admin/modules/chart-builder/ChartDataSelector';
+} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
+import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import service from '@admin/services/release/edit-release/data/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -14,11 +21,12 @@ import ChartRenderer, {
 } from '@common/modules/find-statistics/components/ChartRenderer';
 import {
   ChartDefinition,
+  ChartMetaData,
   generateKeyFromDataSet,
   parseMetaData,
-  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
@@ -33,16 +41,8 @@ import {
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React from 'react';
-import ChartConfiguration, {
-  ChartOptions,
-} from '@admin/modules/chart-builder/ChartConfiguration';
 import classnames from 'classnames';
-import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
-import service from '@admin/services/release/edit-release/data/service';
-import ChartAxisConfiguration from './ChartAxisConfiguration';
-import ChartTypeSelector from './ChartTypeSelector';
-import styles from './graph-builder.module.scss';
+import React from 'react';
 
 interface Props {
   data: DataBlockResponse;

@@ -1,24 +1,24 @@
-import ChartDataConfiguration from '@admin/modules/chart-builder/ChartDataConfiguration';
+import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import Button from '@common/components/Button';
+import Details from '@common/components/Details';
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDefinition,
+  ChartMetaData,
   colours,
   generateKeyFromDataSet,
   symbols,
-  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   ChartDataSet,
   DataSetConfiguration,
 } from '@common/services/publicationService';
+import { difference } from 'lodash';
 
 import React from 'react';
-import Details from '@common/components/Details';
-import { difference } from 'lodash';
-import styles from './graph-builder.module.scss';
 
 export interface SelectedData {
   dataSet: {

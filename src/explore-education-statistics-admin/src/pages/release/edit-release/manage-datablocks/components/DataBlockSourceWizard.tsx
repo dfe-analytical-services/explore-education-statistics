@@ -2,11 +2,6 @@ import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import getDefaultTableHeaderConfig, {
-  TableHeadersConfig,
-} from '@common/modules/table-tool/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableToolWizard, {
   TableToolState,
@@ -15,6 +10,11 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlock,
   DataBlockResponse,

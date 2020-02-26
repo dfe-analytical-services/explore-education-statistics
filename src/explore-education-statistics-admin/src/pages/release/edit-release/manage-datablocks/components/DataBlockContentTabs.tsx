@@ -1,4 +1,4 @@
-import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import ChartBuilder from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
 import withErrorControl, {
   ErrorControlProps,
