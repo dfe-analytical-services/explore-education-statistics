@@ -1,7 +1,6 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
-import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
 import React from 'react';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
@@ -27,17 +26,15 @@ function App() {
   });
 
   return (
-    <AriaLiveAnnouncer>
-      <ThemeAndTopic>
-        <BrowserRouter>
-          <Switch>
-            {authRoutes}
-            {appRoutes}
-            <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
-          </Switch>
-        </BrowserRouter>
-      </ThemeAndTopic>
-    </AriaLiveAnnouncer>
+    <ThemeAndTopic>
+      <BrowserRouter>
+        <Switch>
+          {authRoutes}
+          {appRoutes}
+          <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
+        </Switch>
+      </BrowserRouter>
+    </ThemeAndTopic>
   );
 }
 

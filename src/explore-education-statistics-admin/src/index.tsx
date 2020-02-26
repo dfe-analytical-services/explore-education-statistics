@@ -1,4 +1,5 @@
 import '@common/polyfill';
+import '@admin/polyfill';
 import axiosConfigurer from '@admin/services/util/axios-configurer';
 import React from 'react';
 import ReactDOM from 'react-dom';

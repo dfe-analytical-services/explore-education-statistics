@@ -21,6 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     
     public class ImportStatusService : IImportStatusService
     {
+        public static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
+            IStatus.COMPLETE,
+            IStatus.FAILED
+        };
+        
         private readonly CloudTable _table;
 
         public ImportStatusService(
@@ -48,6 +53,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };
+        }
+
+        public async Task<bool> IsImportFinished(string releaseId, string dataFileName)
+        {
+            var importStatus = await GetImportStatus(releaseId, dataFileName);
+            
+            return FinishedImportStatuses
+                .Select(status => status.ToString())
+                .ToList()
+                .Contains(importStatus.Status);
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
