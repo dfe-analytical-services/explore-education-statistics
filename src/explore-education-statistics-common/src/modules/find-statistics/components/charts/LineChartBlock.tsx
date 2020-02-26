@@ -4,12 +4,12 @@ import {
   ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
-  CustomToolTip,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import CustomTooltip from '@common/modules/find-statistics/components/charts/CustomTooltip';
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
@@ -103,7 +103,7 @@ const LineChartBlock = (props: LineChartProps) => {
             top: legend === 'top' ? 10 : 0,
           }}
         >
-          <Tooltip content={CustomToolTip} />
+          <Tooltip content={CustomTooltip} />
 
           {(legend === 'top' || legend === 'bottom') && (
             <Legend verticalAlign={legend} height={+(legendHeight || '50')} />

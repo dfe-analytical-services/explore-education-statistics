@@ -20,9 +20,8 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
-import React, { ReactNode } from 'react';
-import { AxisDomain, TooltipProps } from 'recharts';
-import formatPretty from '@common/lib/utils/number/formatPretty';
+import { ReactNode } from 'react';
+import { AxisDomain } from 'recharts';
 
 export const colours: string[] = [
   '#4763a5',
@@ -675,33 +674,3 @@ export function parseMetaData(
     ),
   };
 }
-
-export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
-  if (active) {
-    return (
-      <div className="graph-tooltip">
-        <p className="govuk-!-font-weight-bold">{label}</p>
-        {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
-
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {payload[index].name} :{' '}
-                  <strong> {payload[index].value}</strong>
-                </p>
-              );
-            })}
-      </div>
-    );
-  }
-
-  return null;
-};

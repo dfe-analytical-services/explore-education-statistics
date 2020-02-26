@@ -1,14 +1,14 @@
 import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
+import {
+  AxesConfiguration,
+  ChartMetaData,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import { DataBlockData } from '@common/services/dataBlockService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
-import {
-  AxesConfiguration,
-  ChartMetaData,
-  ChartProps,
-} from '../ChartFunctions';
 import Chart from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';

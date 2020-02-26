@@ -1,13 +1,16 @@
+import {
+  ChartProps,
+  StackedBarProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { ChartType } from '@common/services/publicationService';
-import React from 'react';
-import dynamic from 'next-server/dynamic';
 import Infographic, {
   InfographicChartProps,
 } from '@common/modules/find-statistics/components/charts/Infographic';
-import { ChartProps, StackedBarProps } from './charts/ChartFunctions';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import { ChartType } from '@common/services/publicationService';
+import dynamic from 'next-server/dynamic';
+import React from 'react';
 import { MapProps } from './charts/MapBlock';
 
 const DynamicMapBlock = dynamic(

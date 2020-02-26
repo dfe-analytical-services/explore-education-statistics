@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import {
+  ChartMetaData,
+  parseMetaData,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
+import React, { useEffect, useState } from 'react';
 import ChartRenderer, { ChartRendererProps } from './ChartRenderer';
-import { parseMetaData, ChartMetaData } from './charts/ChartFunctions';
+import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
 
 interface DataBlockWithOptionalResponse extends DataBlock {
   dataBlockResponse?: DataBlockResponse;
