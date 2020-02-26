@@ -31,6 +31,7 @@ const ReleaseContentAccordionSection = ({
   onContentChange,
   onRemoveSection,
   canAddBlocks = true,
+  ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
@@ -195,6 +196,7 @@ const ReleaseContentAccordionSection = ({
           />
         )
       }
+      {...restOfProps}
     >
       <ContentBlocks
         id={`${heading}-content`}
