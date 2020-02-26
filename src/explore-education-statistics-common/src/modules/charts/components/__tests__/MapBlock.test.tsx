@@ -3,7 +3,7 @@ import testData from '@common/modules/charts/components/__tests__/__data__/testB
 import React from 'react';
 
 import { render, wait } from 'react-testing-library';
-import MapBlock from 'src/modules/charts/components/MapBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
 
 describe('MapBlock', () => {
   test('renders', async () => {

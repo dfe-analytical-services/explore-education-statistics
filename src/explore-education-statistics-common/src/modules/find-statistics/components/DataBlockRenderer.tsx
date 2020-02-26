@@ -8,7 +8,7 @@ import DataBlockService, {
 import React, { useEffect, useState } from 'react';
 import ChartRenderer, {
   ChartRendererProps,
-} from 'src/modules/charts/components/ChartRenderer';
+} from '@common/modules/charts/components/ChartRenderer';
 import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
 
 interface DataBlockWithOptionalResponse extends DataBlock {

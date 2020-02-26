@@ -26,7 +26,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import 'src/modules/charts/components/charts.scss';
+import '@common/modules/charts/components/charts.scss';
 
 export type VerticalBarProps = StackedBarProps;
 

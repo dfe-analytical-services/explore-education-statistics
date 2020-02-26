@@ -1,17 +1,14 @@
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
-import {
-  ChartMetaData,
-  ChartProps,
-} from '@common/modules/charts/types/chart';
+import { ChartMetaData, ChartProps } from '@common/modules/charts/types/chart';
 
 import { DataBlockData } from '@common/services/dataBlockService';
 import { AxesConfiguration } from '@common/services/publicationService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
-import Chart from 'src/modules/charts/components/HorizontalBarBlock';
+import Chart from '@common/modules/charts/components/HorizontalBarBlock';
 
-import testData from 'src/modules/charts/components/__tests__/__data__/testBlockData';
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 

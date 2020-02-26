@@ -10,7 +10,7 @@ import {
   ChartDataSet,
 } from '@common/services/publicationService';
 
-import Data from 'src/modules/charts/components/__tests__/__data__/chartFunctionsData';
+import Data from '@common/modules/charts/components/__tests__/__data__/chartFunctionsData';
 
 describe('ChartFunctions', () => {
   const dataSet23_1_72: ChartDataSet = {

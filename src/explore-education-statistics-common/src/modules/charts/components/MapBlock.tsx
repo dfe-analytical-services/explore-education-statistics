@@ -30,8 +30,8 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import stylesIndicators from 'src/modules/find-statistics/components/SummaryRenderer.module.scss';
-import styles from 'src/modules/charts/components/MapBlock.module.scss';
+import stylesIndicators from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from '@common/modules/charts/components/MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;

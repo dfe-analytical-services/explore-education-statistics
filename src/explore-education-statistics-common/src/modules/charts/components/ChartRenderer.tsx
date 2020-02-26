@@ -11,7 +11,7 @@ import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock
 import { ChartType } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
 import React from 'react';
-import { MapProps } from 'src/modules/charts/components/MapBlock';
+import { MapProps } from '@common/modules/charts/components/MapBlock';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/charts/components/MapBlock'),

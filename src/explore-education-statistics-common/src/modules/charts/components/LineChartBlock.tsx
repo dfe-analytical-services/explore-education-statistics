@@ -33,7 +33,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import 'src/modules/charts/components/charts.scss';
+import '@common/modules/charts/components/charts.scss';
 
 const LineStyles: Dictionary<string> = {
   solid: '',
