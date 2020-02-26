@@ -42,7 +42,13 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classnames from 'classnames';
-import React from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface Props {
   data: DataBlockResponse;
@@ -121,17 +127,17 @@ const ChartBuilder = ({
   handleApiErrors,
   handleManualErrors,
 }: Props & ErrorControlProps) => {
-  const [selectedChartType, setSelectedChartType] = React.useState<
+  const [selectedChartType, setSelectedChartType] = useState<
     ChartDefinition | undefined
   >();
 
   const indicatorIds = Object.keys(data.metaData.indicators);
-  const metaData = React.useMemo(
+  const metaData = useMemo(
     () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
     [data.metaData],
   );
 
-  const filterIdCombinations = React.useMemo<string[][]>(
+  const filterIdCombinations = useMemo<string[][]>(
     () =>
       Object.values(
         data.result.reduce((filterSet, result) => {
@@ -146,7 +152,7 @@ const ChartBuilder = ({
     [data.result],
   );
 
-  const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
+  const [chartOptions, setChartOptions] = useState<ChartOptions>({
     stacked: false,
     legend: 'top',
     legendHeight: '42',
@@ -154,17 +160,15 @@ const ChartBuilder = ({
     title: '',
   });
 
-  const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
-    {},
-  );
+  const previousAxesConfiguration = useRef<Dictionary<AxisConfiguration>>({});
 
-  const [chartSaveState, setChartSaveState] = React.useState(SaveState.Unsaved);
+  const [chartSaveState, setChartSaveState] = useState(SaveState.Unsaved);
 
-  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
+  const [axesConfiguration, realSetAxesConfiguration] = useState<
     Dictionary<AxisConfiguration>
   >({});
 
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<
+  const [dataSetAndConfiguration, setDataSetAndConfiguration] = useState<
     ChartDataSetAndConfiguration[]
   >([]);
 
@@ -190,10 +194,10 @@ const ChartBuilder = ({
     setDataSetAndConfiguration(newDataSets);
   };
 
-  const [chartLabels, setChartLabels] = React.useState<
+  const [chartLabels, setChartLabels] = useState<
     Dictionary<DataSetConfiguration>
   >({});
-  React.useEffect(() => {
+  useEffect(() => {
     setChartLabels({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
         (mapped, { configuration }) => ({
@@ -206,18 +210,18 @@ const ChartBuilder = ({
     });
   }, [dataSetAndConfiguration, axesConfiguration, data, metaData]);
 
-  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
-    ChartDataSet[]
-  >([]);
-  React.useEffect(() => {
+  const [majorAxisDataSets, setMajorAxisDataSets] = useState<ChartDataSet[]>(
+    [],
+  );
+  useEffect(() => {
     setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
   }, [dataSetAndConfiguration]);
 
   // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = React.useState<
+  const [renderedChartProps, setRenderedChartProps] = useState<
     ChartRendererProps
   >();
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       selectedChartType &&
       (selectedChartType.axes.length === 0 ||
@@ -261,9 +265,9 @@ const ChartBuilder = ({
     majorAxisDataSets,
   ]);
 
-  const previousSelectionChartType = React.useRef<ChartDefinition>();
+  const previousSelectionChartType = useRef<ChartDefinition>();
   // set defaults for a selected chart type
-  React.useEffect(() => {
+  useEffect(() => {
     if (previousSelectionChartType.current !== selectedChartType) {
       previousSelectionChartType.current = selectedChartType;
 
@@ -378,7 +382,7 @@ const ChartBuilder = ({
     };
   };
 
-  const saveChart = React.useCallback(async () => {
+  const saveChart = useCallback(async () => {
     setChartSaveState(SaveState.Unsaved);
     if (renderedChartProps && onChartSave) {
       try {
@@ -391,7 +395,7 @@ const ChartBuilder = ({
   }, [onChartSave, renderedChartProps]);
 
   // initial chart options set up
-  React.useEffect(() => {
+  useEffect(() => {
     const initial = extractInitialChartOptions(initialConfiguration);
 
     setChartSaveState(SaveState.Unsaved);

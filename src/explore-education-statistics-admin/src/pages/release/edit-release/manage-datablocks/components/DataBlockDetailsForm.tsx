@@ -14,7 +14,13 @@ import {
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React, { ReactNode } from 'react';
+import React, {
+  ReactNode,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
@@ -43,13 +49,13 @@ const DataBlockDetailsForm = ({
   initialDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const formikRef = React.useRef<Formik<DataBlockDetailsFormValues>>(null);
+  const formikRef = useRef<Formik<DataBlockDetailsFormValues>>(null);
 
-  const [currentDataBlock, setCurrentDataBlock] = React.useState<
+  const [currentDataBlock, setCurrentDataBlock] = useState<
     DataBlock | undefined
   >(initialDataBlock);
 
-  const [blockState, setBlockState] = React.useReducer(
+  const [blockState, setBlockState] = useReducer(
     (
       state,
       { saved, error, updated } = {
@@ -69,7 +75,7 @@ const DataBlockDetailsForm = ({
     { saved: false, error: false },
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setBlockState({ saved: false, error: false });
   }, [query, tableHeaders, releaseId]);
 

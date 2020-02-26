@@ -18,7 +18,7 @@ import {
 } from '@common/services/publicationService';
 import { difference } from 'lodash';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface SelectedData {
   dataSet: {
@@ -92,16 +92,16 @@ const ChartDataSelector = ({
       ],
     );
 
-  const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
-  const [selectedFilters, setSelectedFilters] = React.useState<string>('');
+  const [selectedIndicator, setSelectedIndicator] = useState<string>('');
+  const [selectedFilters, setSelectedFilters] = useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<
+  const [selectedList, setSelectedList] = useState<
     ChartDataSetAndConfiguration[]
   >([...selectedData]);
 
-  const [alreadyAdded, setAlreadyAdded] = React.useState(false);
+  const [alreadyAdded, setAlreadyAdded] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const filters = selectedFilters.split(',');
 
     const added =

@@ -16,7 +16,7 @@ import {
   DataSetConfiguration,
   LineStyle,
 } from '@common/services/publicationService';
-import * as React from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   configuration: DataSetConfiguration;
@@ -55,9 +55,7 @@ const ChartDataConfiguration = ({
   capabilities,
   onConfigurationChange,
 }: Props) => {
-  const [config, setConfig] = React.useState<DataSetConfiguration>(
-    configuration,
-  );
+  const [config, setConfig] = useState<DataSetConfiguration>(configuration);
 
   const updateConfig = (newConfig: DataSetConfiguration) => {
     setConfig(newConfig);

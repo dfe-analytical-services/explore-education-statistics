@@ -3,6 +3,7 @@ import service from '@admin/services/release/edit-release/data/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import {
   FormCheckbox,
   FormGroup,
@@ -15,6 +16,8 @@ import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
@@ -22,10 +25,7 @@ import {
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React, { useState } from 'react';
-import ButtonText from '@common/components/ButtonText';
-import ModalConfirm from '@common/components/ModalConfirm';
-import useToggle from '@common/hooks/useToggle';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -121,7 +121,7 @@ const InfographicChartOptions = ({
     ...errorCodeMappings,
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadChartFilesAndMapToSelectOptionAsync(releaseId)
       .then(setChartFileOptions)
       .catch(handleApiErrors);
@@ -225,17 +225,17 @@ const ChartConfiguration = ({
   handleApiErrors,
   handleManualErrors,
 }: Props & ErrorControlProps) => {
-  const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
+  const [chartOptions, setChartOptions] = useState<ChartOptions>(
     initialChartOptions,
   );
   const updateChartOptions = (options: ChartOptions) => {
     setChartOptions(options);
     if (onChange) onChange(options);
   };
-  const [chartWidth, setChartWidth] = React.useState(
+  const [chartWidth, setChartWidth] = useState(
     `${initialChartOptions.width || ''}`,
   );
-  const [chartHeight, setChartHeight] = React.useState(
+  const [chartHeight, setChartHeight] = useState(
     `${initialChartOptions.height || ''}`,
   );
   return (
