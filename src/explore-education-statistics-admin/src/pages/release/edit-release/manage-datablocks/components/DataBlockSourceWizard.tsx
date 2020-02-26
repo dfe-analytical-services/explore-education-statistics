@@ -12,6 +12,7 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
@@ -73,10 +74,13 @@ const DataBlockSourceWizard = ({
       const dataTable = mapDataBlockResponseToFullTable(dataBlockResponse);
       setTable(dataTable);
 
-      if (dataBlock?.tables && dataBlock.tables.length > 0) {
-        setTableHeaders({
-          ...dataBlock?.tables?.[0]?.tableHeaders,
-        });
+      if (dataBlock?.tables?.length) {
+        setTableHeaders(
+          mapTableHeadersConfig(
+            dataBlock?.tables?.[0]?.tableHeaders,
+            dataTable.subjectMeta,
+          ),
+        );
       } else {
         setTableHeaders(getDefaultTableHeaderConfig(dataTable.subjectMeta));
       }
