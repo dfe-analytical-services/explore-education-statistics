@@ -9,7 +9,6 @@ interface DraggableAccordionSectionProps {
   index: number;
   openAll: boolean;
   section: ReactElement<EditableAccordionSectionProps>;
-  headingButtons?: ReactNode[];
 }
 
 const DraggableAccordionSection = ({
@@ -18,7 +17,6 @@ const DraggableAccordionSection = ({
   index,
   openAll,
   section,
-  headingButtons,
 }: DraggableAccordionSectionProps) => {
   if (isReordering) {
     return (
@@ -33,14 +31,6 @@ const DraggableAccordionSection = ({
               index,
               open: false,
               canToggle: false,
-              headingButtons: [
-                ...(headingButtons || []),
-                <span
-                  key="drag_handle"
-                  className={styles.dragHandle}
-                  {...draggableProvided.dragHandleProps}
-                />,
-              ],
             })}
           </div>
         )}
@@ -51,7 +41,6 @@ const DraggableAccordionSection = ({
   return cloneElement<EditableAccordionSectionProps>(section, {
     index,
     open: openAll,
-    headingButtons,
   });
 };
 

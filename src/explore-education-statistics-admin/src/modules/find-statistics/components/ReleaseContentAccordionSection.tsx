@@ -18,8 +18,6 @@ export interface ReleaseContentAccordionSectionProps {
   id?: string;
   contentItem: ContentType;
   index: number;
-
-  headingButtons?: ReactNode[];
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   onContentChange?: (content?: EditableContentBlock[]) => void;
   canToggle?: boolean;
@@ -31,7 +29,6 @@ const ReleaseContentAccordionSection = ({
   id: sectionId,
   index,
   contentItem,
-  headingButtons,
   canToggle = true,
   onHeadingChange,
   onContentChange,
@@ -167,7 +164,6 @@ const ReleaseContentAccordionSection = ({
       heading={heading || ''}
       caption={caption}
       canToggle={canToggle}
-      headingButtons={headingButtons || []}
       onHeadingChange={onHeadingChange}
       onRemoveSection={onRemoveSection}
       onSaveOrder={onSaveBlockOrder}

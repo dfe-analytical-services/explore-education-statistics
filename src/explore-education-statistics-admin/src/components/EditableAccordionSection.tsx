@@ -15,7 +15,6 @@ import styles from './EditableAccordionSection.module.scss';
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   sectionId: string;
   index?: number;
-  headingButtons?: ReactNode[];
   footerButtons?: ReactNode;
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
@@ -31,7 +30,6 @@ const EditableAccordionSection = ({
   contentId,
   goToTop = true,
   heading,
-  headingButtons,
   headingId,
   headingTag = 'h2',
   canToggle = true,
@@ -121,9 +119,14 @@ const EditableAccordionSection = ({
                 name="heading"
                 label="Edit Heading"
                 defaultValue={currentHeading}
-                onChange={e => setCurrentHeading(e.target.value)}
+                onChange={e => {
+                  setCurrentHeading(e.target.value);
+                }}
                 onClick={e => {
                   e.stopPropagation();
+                }}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') editHeading(e);
                 }}
               />
             ) : (
@@ -136,82 +139,88 @@ const EditableAccordionSection = ({
           <span className="govuk-accordion__section-summary">{caption}</span>
         )}
       </div>
-      {onHeadingChange && (
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={editHeading}
-          onKeyPress={e => {
-            if (e.charCode === 13) editHeading(e);
-          }}
-          className={styles.edit}
-        >
-          ({isEditingHeading ? 'Save' : 'Edit'} section title)
-        </a>
-      )}
-      {!!onRemoveSection && (
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={() => setShowRemoveModal(true)}
-          onKeyPress={e => {
-            if (e.key === 'Enter') setShowRemoveModal(true);
-          }}
-          className={styles.edit}
-        >
-          (Remove section)
-          {showRemoveModal && (
-            <ModalConfirm
-              title="Are you sure?"
-              onConfirm={onRemoveSection}
-              onExit={() => setShowRemoveModal(false)}
-              onCancel={() => setShowRemoveModal(false)}
+      <div
+        className="govuk-accordion__section-content"
+        aria-labelledby={headingId}
+        id={contentId}
+      >
+        <div>
+          {onHeadingChange && (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={editHeading}
+              onKeyPress={e => {
+                if (e.charCode === 13) editHeading(e);
+              }}
+              className={`govuk-button ${!isEditingHeading &&
+                'govuk-button--secondary'} govuk-!-margin-right-2`}
             >
-              <p>
-                Are you sure you want to remove the following section?
-                <br />
-                <strong>"{heading}"</strong>
-              </p>
-            </ModalConfirm>
+              {isEditingHeading ? 'Save' : 'Edit'} title
+            </a>
           )}
-        </a>
-      )}
-      {headingButtons}
-      {!!onSaveOrder && (
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsReordering(!isReordering)}
-          onKeyPress={e => {
-            if (e.key === 'Enter') setIsReordering(!isReordering);
-          }}
-          className={styles.edit}
-        >
-          ({isReordering ? 'Save order' : 'Reorder'})
-        </a>
-      )}
-      {children && (
-        <div
-          className="govuk-accordion__section-content"
-          aria-labelledby={headingId}
-          id={contentId}
-        >
-          {onSaveOrder ? (
-            <DragDropContext onDragEnd={onDragEnd}>
-              <ContentBlockDroppable
-                draggable={isReordering}
-                droppableId={sectionId}
-              >
-                {children}
-              </ContentBlockDroppable>
-            </DragDropContext>
-          ) : (
-            children
+          {!!onSaveOrder && (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={() => setIsReordering(!isReordering)}
+              onKeyPress={e => {
+                if (e.key === 'Enter') setIsReordering(!isReordering);
+              }}
+              className={`govuk-button ${!isReordering &&
+                'govuk-button--secondary'} govuk-!-margin-right-2`}
+            >
+              {isReordering ? 'Save order' : 'Reorder'}
+            </a>
           )}
-          {footerButtons}
-          {goToTop && <GoToTopLink />}
+          {!!onRemoveSection && (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={() => setShowRemoveModal(true)}
+              onKeyPress={e => {
+                if (e.key === 'Enter') setShowRemoveModal(true);
+              }}
+              className="govuk-button govuk-button--warning"
+            >
+              Remove section
+              {showRemoveModal && (
+                <ModalConfirm
+                  title="Are you sure?"
+                  onConfirm={onRemoveSection}
+                  onExit={() => setShowRemoveModal(false)}
+                  onCancel={() => setShowRemoveModal(false)}
+                >
+                  <p>
+                    Are you sure you want to remove the following section?
+                    <br />
+                    <strong>"{heading}"</strong>
+                  </p>
+                </ModalConfirm>
+              )}
+            </a>
+          )}
         </div>
-      )}
+
+        {children && (
+          <>
+            {onSaveOrder ? (
+              <DragDropContext onDragEnd={onDragEnd}>
+                <ContentBlockDroppable
+                  draggable={isReordering}
+                  droppableId={sectionId}
+                >
+                  {children}
+                </ContentBlockDroppable>
+              </DragDropContext>
+            ) : (
+              children
+            )}
+            {footerButtons}
+            {goToTop && <GoToTopLink />}
+          </>
+        )}
+      </div>
     </div>
   );
 };
