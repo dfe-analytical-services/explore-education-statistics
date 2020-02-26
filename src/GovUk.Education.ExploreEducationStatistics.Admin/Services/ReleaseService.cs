@@ -346,11 +346,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileName, subjectTitle))
                 .OnSuccess(async deletePlan =>
                 {
-                    await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                     await _subjectService.DeleteAsync(deletePlan.SubjectId);
                     await DeleteDependentDataBlocks(deletePlan);
                     await DeleteChartFiles(deletePlan);
-                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
+
+                    return await _fileStorageService
+                        .DeleteDataFileAsync(releaseId, fileName)
+                        .OnSuccessDo(async () =>
+                        {
+                            await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+                        });
                 });
         }
 
