@@ -87,46 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
 
-        [FunctionName("ProcessUploadsSequentially")]
-        public async void ProcessUploadsSequentially(
-            [QueueTrigger("imports-pending-sequential")]
-            ImportMessage[] messages,
-            ILogger logger,
-            ExecutionContext context,
-            [Queue("imports-available")] ICollector<ImportMessage> collector
-        )
-        {
-            var batchSettings = GetBatchSettings(LoadAppSettings(context));
-
-            // Log all initial validation messages
-            var allValid = true;
-            foreach (var message in messages)
-            {
-                message.RowsPerBatch = batchSettings.RowsPerBatch;
-                if (!await IsDataFileValid(message, logger))
-                {
-                    allValid = false;
-                }
-            }
-
-            if (allValid)
-            {
-                foreach (var message in messages)
-                {
-                    logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
-                    await ProcessSubject(message, DbUtils.CreateDbContext(), true);
-                    var subjectData = await _fileStorageService.GetSubjectData(message);
-                    await _splitFileService.SplitDataFile(collector, message, subjectData);
-                    logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
-                }
-            }
-            else
-            {
-                logger.LogError(
-                    "Seeding FAILED...check log");
-            }
-        }
-
         [FunctionName("ImportObservations")]
         public async Task ImportObservations(
             [QueueTrigger("imports-available")] ImportMessage message,

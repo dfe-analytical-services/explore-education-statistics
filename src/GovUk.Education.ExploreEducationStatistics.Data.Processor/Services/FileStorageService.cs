@@ -66,21 +66,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public int GetNumBatchesRemaining(string releaseId)
         {
             return _blobContainer.ListBlobs(
-                           FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
-                           true, BlobListingDetails.Metadata)
-                       .Where(cbb => IsBatchedFile(cbb, releaseId))
-                       .OfType<CloudBlockBlob>()
-                       .ToList().Count;
-        }
-        
-        public static int GetNumBatchesComplete(string releaseId, CloudBlobContainer blobContainer, int numBatches)
-        {
-            return numBatches - blobContainer.ListBlobs(
                     FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
                     true, BlobListingDetails.Metadata)
                 .Where(cbb => IsBatchedFile(cbb, releaseId))
                 .OfType<CloudBlockBlob>()
                 .ToList().Count;
+        }
+
+        public static IEnumerable<string> GetBatchesRemaining(string releaseId, CloudBlobContainer blobContainer)
+        {
+            return blobContainer.ListBlobs(
+                    FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
+                    true, BlobListingDetails.Metadata)
+                .Where(cbb => IsBatchedFile(cbb, releaseId))
+                .OfType<CloudBlockBlob>().Select(blob => blob.Name);
         }
         
         private CloudBlockBlob GetBlobReference(string fullPath)

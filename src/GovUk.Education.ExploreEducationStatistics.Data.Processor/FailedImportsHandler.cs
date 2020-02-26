@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Newtonsoft.Json;
-using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
@@ -17,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-            CloudBlobContainer container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
+            var container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
             var tClient = tblStorageAccount.CreateCloudTableClient();
             var qClient = storageAccount.CreateCloudQueueClient();
             var aQueue = qClient.GetQueueReference("imports-available");
@@ -26,8 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             aQueue.CreateIfNotExists();
             table.CreateIfNotExists();
-            //aQueue.Clear();
-            //pQueue.Clear();
+            aQueue.Clear();
+            pQueue.Clear();
 
             TableContinuationToken token = null;
             do
@@ -38,34 +37,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                 foreach (var entity in resultSegment.Results)
                 {
-                    var lastBatch = FileStorageService.GetNumBatchesComplete(entity.PartitionKey, container, entity.NumBatches);
-                    if (entity.NumBatches != 1 && entity.NumBatches == lastBatch)
-                    {
-                        continue;
-                    }
+                    Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
 
-                    // Older entries will not have this recover mechanism so have to ignore 
-                    if (entity.Message != null)
+                    // If batch was not split then just processing again by adding to pending queue
+                    if (entity.NumBatches == 1)
                     {
-                        Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
-
-                        // If batch was not split then just processing again by adding to pending queue
-                        if (entity.NumBatches == 1 || lastBatch == 0)
-                        {
-                            pQueue.AddMessage(new CloudQueueMessage(entity.Message));
-                        }
-                        else
-                            // Add the batch that failed on to the queue is missing
-                        {
-                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(
-                                JsonConvert.DeserializeObject<ImportMessage>(entity.Message), 
-                                lastBatch+1)));
-                        }
+                        pQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
+                    // Else create a message for all remaining batches
                     else
                     {
-                        Console.Out.WriteLine($"No message stored for import - unable to recover import " +
-                                              $"{entity.PartitionKey} : {entity.RowKey}");
+                        foreach (var fileName in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container))
+                        {
+
+                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(
+                                JsonConvert.DeserializeObject<ImportMessage>(entity.Message), fileName)));
+                        }
                     }
                 }
             } while (token != null);
@@ -84,14 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .Where(TableQuery.CombineFilters(combineFilters, TableOperators.Or, f3));
         }
         
-        private static string BuildMessage(ImportMessage message, int batchNo)
+        private static string BuildMessage(ImportMessage message, string filename)
         {
+            var batchNo = filename.Split('_')[1];
             var iMessage = new ImportMessage
             {
-                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchNo:000000}",
+                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{filename}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,
-                BatchNo = batchNo,
+                BatchNo = 1,
                 NumBatches = message.NumBatches,
                 RowsPerBatch = message.RowsPerBatch
             };
