@@ -18,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public ReleaseSummary ReleaseSummary { get; set; }
-        
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 
         public int Year => int.Parse(_releaseName);

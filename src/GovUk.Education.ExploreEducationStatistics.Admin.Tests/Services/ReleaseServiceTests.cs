@@ -280,18 +280,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Id = releaseId,
                             TypeId = addHocReleaseTypeId,
-                            ReleaseSummary = new ReleaseSummary()
-                            {
-                                Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
-                                Versions = new List<ReleaseSummaryVersion>() {
-                                    new ReleaseSummaryVersion()
-                                    {    
-                                        Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
-                                        Created = DateTime.Now,
-                                        TypeId = addHocReleaseTypeId,
-                                    }
-                                }
-                            }
                         }
                     }
                 });
@@ -334,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetReleaseSummaryAsync()
         {
-            var (userService, persistenceHelper, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
             
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
             var adhocReleaseType = new ReleaseType
@@ -367,23 +355,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = publishScheduled,
                             NextReleaseDate = nextReleaseDate,
                             ReleaseName = releaseName,
-                            ReleaseSummary = new ReleaseSummary()
-                            {
-                                Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
-                                Versions = new List<ReleaseSummaryVersion>() {
-                                    new ReleaseSummaryVersion()
-                                    {    
-                                        Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
-                                        Created = DateTime.Now,
-                                        TypeId = adhocReleaseType.Id,
-                                        Type = adhocReleaseType,
-                                        PublishScheduled = publishScheduled,
-                                        NextReleaseDate = nextReleaseDate,
-                                        ReleaseName = releaseName,
-                                        TimePeriodCoverage = timePeriodCoverage
-                                    }
-                                }
-                            }
                         }
                     }
                 });
@@ -393,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
-                    publishingService.Object, persistenceHelper.Object, userService.Object, repository.Object,
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
                 
                 // Method under test 
