@@ -18,7 +18,7 @@ export interface ReleaseContentAccordionSectionProps {
   contentItem: ContentType;
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
-  onContentChange?: (content?: EditableContentBlock[]) => void;
+  onContentChange: (content?: EditableContentBlock[]) => void;
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
   canAddBlocks?: boolean;
 }
@@ -35,29 +35,7 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
-  const [content, setContent] = React.useState(contentItem.content);
-  const saveOrder = React.useRef<ReorderHook>();
-  const {
-    availableDataBlocks,
-    updateAvailableDataBlocks,
-    releaseId,
-  } = useContext(EditingContext);
-  const { handleApiErrors } = useContext(ErrorControlContext);
-
-  const onReorderClick: MouseEventHandler = e => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    if (isReordering) {
-      if (saveOrder.current) {
-        saveOrder.current(contentItem.id).then(() => setIsReordering(false));
-      } else {
-        setIsReordering(false);
-      }
-    } else {
-      setIsReordering(true);
-    }
-  };
+  const { updateAvailableDataBlocks, releaseId } = useContext(EditingContext);
 
   const onBlockSaveOrder = async (order: Dictionary<number>) => {
     if (releaseId && sectionId) {
@@ -66,7 +44,7 @@ const ReleaseContentAccordionSection = ({
         sectionId,
         order,
       );
-      if (onContentChange) onContentChange(newBlocks);
+      onContentChange(newBlocks);
     }
   };
 
@@ -80,7 +58,7 @@ const ReleaseContentAccordionSection = ({
           body: newContent,
         },
       );
-      if (onContentChange) {
+      {
         const newBlocks = [
           ...((contentItem && contentItem.content) || []).map(block => {
             if (block.id === updatedBlock.id) {
@@ -109,9 +87,7 @@ const ReleaseContentAccordionSection = ({
           content: newContentBlocks,
         } = await releaseContentService.getContentSection(releaseId, sectionId);
 
-        setContent(newContentBlocks);
-
-        if (onContentChange) onContentChange(newContentBlocks);
+        onContentChange(newContentBlocks);
       }
     };
   };
@@ -126,18 +102,21 @@ const ReleaseContentAccordionSection = ({
       onRemoveSection={onRemoveSection}
       sectionId={sectionId}
       headerButtons={
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsReordering(!isReordering)}
-          onKeyPress={e => {
-            if (e.key === 'Enter') setIsReordering(!isReordering);
-          }}
-          className={`govuk-button ${!isReordering &&
-            'govuk-button--secondary'} govuk-!-margin-right-2`}
-        >
-          {isReordering ? 'Save order' : 'Reorder'}
-        </a>
+        contentItem.content &&
+        contentItem.content.length > 1 && (
+          <a
+            role="button"
+            tabIndex={0}
+            onClick={() => setIsReordering(!isReordering)}
+            onKeyPress={e => {
+              if (e.key === 'Enter') setIsReordering(!isReordering);
+            }}
+            className={`govuk-button ${!isReordering &&
+              'govuk-button--secondary'} govuk-!-margin-right-2`}
+          >
+            {isReordering ? 'Save order' : 'Reorder'}
+          </a>
+        )
       }
       {...restOfProps}
     >

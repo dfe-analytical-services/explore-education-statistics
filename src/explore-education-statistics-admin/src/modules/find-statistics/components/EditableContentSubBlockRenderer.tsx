@@ -33,6 +33,7 @@ function EditableContentSubBlockRenderer({
       return (
         <div className="dfe-content-overflow">
           <EditableDataBlock
+            editable={editable}
             canDelete={canDelete}
             onDelete={onDelete}
             {...block}

@@ -1,28 +1,40 @@
-import React from 'react';
+import Button from '@common/components/Button';
+import ModalConfirm from '@common/components/ModalConfirm';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
-import Button from '@common/components/Button';
-import ModalConfirm from '@common/components/ModalConfirm';
+import classNames from 'classnames';
+import React from 'react';
 import styles from './EditableDataBlock.module.scss';
 
 type Props = {
   canDelete?: boolean;
   onDelete?: () => void;
+  editable?: boolean;
 } & DataBlockProps;
 
-const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
+const EditableDataBlock = ({
+  id,
+  onDelete,
+  editable,
+  ...restOfProps
+}: Props) => {
   const [showConfirmation, setShowConfirmation] = React.useState(false);
 
   return (
     <div className={styles.wrapper}>
       <DataBlock id={id} {...restOfProps} />
-      <Button
-        className="govuk-button--warning"
-        onClick={() => setShowConfirmation(true)}
-      >
-        Remove this data block
-      </Button>
+      {editable && (
+        <Button
+          className={classNames(
+            styles.delete,
+            'govuk-button--warning govuk-!-margin-bottom-0',
+          )}
+          onClick={() => setShowConfirmation(true)}
+        >
+          Remove this data block
+        </Button>
+      )}
 
       <ModalConfirm
         onConfirm={() => {
