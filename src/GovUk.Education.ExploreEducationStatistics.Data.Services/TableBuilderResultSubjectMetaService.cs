@@ -1,14 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
-        private readonly ISubjectService _subjectService;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IFootnoteService footnoteService,
             IIndicatorService indicatorService,
             ILocationService locationService,
-            ISubjectService subjectService,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
             ILogger<TableBuilderResultSubjectMetaService> logger,
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
-            _subjectService = subjectService;
+            _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
             _logger = logger;
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public Task<Either<ActionResult, TableBuilderResultSubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query, IQueryable<Observation> observations)
         {
-            return CheckSubjectExists(query.SubjectId)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject =>
                 {
@@ -99,18 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         TimePeriodRange = timePeriodRange
                     };
                 });
-        }
-
-        private async Task<Either<ActionResult, Subject>> CheckSubjectExists(Guid subjectId)
-        {
-            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
-            {
-                s => s.Release.Publication
-            });
-
-            return subject == null
-                ? new NotFoundResult()
-                : new Either<ActionResult, Subject>(subject);
         }
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
@@ -163,6 +152,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Level = level,
                 Value = value
             };
+        }
+
+        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
+        {
+            return queryable.Include(subject => subject.Release)
+                .ThenInclude(release => release.Publication);
         }
     }
 }

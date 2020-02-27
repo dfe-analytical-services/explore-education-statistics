@@ -1,9 +1,9 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings;
@@ -27,10 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             using (var context = new StatisticsDbContext(options, null))
             {
                 var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, releaseService, timePeriodService, userService) = Mocks();
-
-                var subjectService = new SubjectService(context, new Mock<ILogger<SubjectService>>().Object,
-                    releaseService.Object);
+                    observationService, timePeriodService, userService) = Mocks();
 
                 var service = new TableBuilderSubjectMetaService(filterService.Object,
                     filterItemService.Object,
@@ -39,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
-                    subjectService,
+                    new PersistenceHelper<StatisticsDbContext>(context),
                     timePeriodService.Object,
                     userService.Object);
 
@@ -76,10 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, releaseService, timePeriodService, userService) = Mocks();
-
-                var subjectService = new SubjectService(context, new Mock<ILogger<SubjectService>>().Object,
-                    releaseService.Object);
+                    observationService, timePeriodService, userService) = Mocks();
 
                 var service = new TableBuilderSubjectMetaService(filterService.Object,
                     filterItemService.Object,
@@ -88,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
-                    subjectService,
+                    new PersistenceHelper<StatisticsDbContext>(context),
                     timePeriodService.Object,
                     userService.Object);
 
@@ -103,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Mock<IIndicatorGroupService>,
             Mock<ILocationService>,
             Mock<IObservationService>,
-            Mock<IReleaseService>,
             Mock<ITimePeriodService>,
             Mock<IUserService>) Mocks()
         {
@@ -112,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new Mock<IIndicatorGroupService>(),
                 new Mock<ILocationService>(),
                 new Mock<IObservationService>(),
-                new Mock<IReleaseService>(),
                 new Mock<ITimePeriodService>(),
                 new Mock<IUserService>());
         }

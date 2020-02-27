@@ -1,14 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
@@ -29,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IGeoJsonService _geoJsonService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
-        private readonly ISubjectService _subjectService;
         private readonly IFootnoteService _footnoteService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -41,9 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IGeoJsonService geoJsonService,
             IIndicatorService indicatorService,
             ILocationService locationService,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IMapper mapper,
             ITimePeriodService timePeriodService,
-            ISubjectService subjectService,
             IFootnoteService footnoteService,
             IUserService userService,
             ILogger<SubjectMetaService> logger
@@ -53,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _geoJsonService = geoJsonService;
             _indicatorService = indicatorService;
             _locationService = locationService;
+            _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _timePeriodService = timePeriodService;
-            _subjectService = subjectService;
             _footnoteService = footnoteService;
             _userService = userService;
             _logger = logger;
@@ -65,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
-            return CheckSubjectExists(query.SubjectId)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject =>
                 {
@@ -229,18 +230,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             });
         }
 
-        private async Task<Either<ActionResult, Subject>> CheckSubjectExists(Guid subjectId)
-        {
-            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
-            {
-                s => s.Release.Publication
-            });
-
-            return subject == null
-                ? new NotFoundResult()
-                : new Either<ActionResult, Subject>(subject);
-        }
-
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
             var result = subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData);
@@ -261,6 +250,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static dynamic DeserializeGeoJson(GeoJson geoJson)
         {
             return geoJson == null ? null : JsonConvert.DeserializeObject(geoJson.Value);
+        }
+
+        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
+        {
+            return queryable.Include(subject => subject.Release)
+                .ThenInclude(release => release.Publication);
         }
     }
 }

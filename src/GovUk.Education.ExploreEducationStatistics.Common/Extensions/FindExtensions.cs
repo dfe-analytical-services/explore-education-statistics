@@ -6,7 +6,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     /**
      * Provide extension to filter by primary key generically.

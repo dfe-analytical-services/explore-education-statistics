@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -20,11 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectService _subjectService;
 
         public TableBuilderDataService(IObservationService observationService,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITableBuilderResultSubjectMetaService resultSubjectMetaService,
             ISubjectService subjectService,
             IUserService userService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder) :
-            base(observationService, subjectService, userService)
+            base(observationService, persistenceHelper, userService)
         {
             _resultBuilder = resultBuilder;
             _resultSubjectMetaService = resultSubjectMetaService;
@@ -34,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public override Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             ObservationQueryContext queryContext)
         {
-            return CheckSubjectExists(queryContext.SubjectId)
+            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(_ =>
                 {
@@ -61,10 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, bool>> CheckCanViewSubjectData(Subject subject)
         {
-            if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) || await _userService.MatchesPolicy(subject, CanViewSubjectData))
+            if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
+                await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return true;
             }
+
             return new ForbidResult();
         }
     }

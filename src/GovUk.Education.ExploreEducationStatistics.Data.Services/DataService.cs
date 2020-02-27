@@ -3,12 +3,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -19,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectMetaService _subjectMetaService;
 
         public DataService(IObservationService observationService,
-            ISubjectService subjectService,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder,
             ISubjectMetaService subjectMetaService,
-            IUserService userService) : base(observationService, subjectService, userService)
+            IUserService userService) : base(observationService, persistenceHelper, userService)
         {
             _resultBuilder = resultBuilder;
             _subjectMetaService = subjectMetaService;
@@ -30,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public override Task<Either<ActionResult, ResultWithMetaViewModel>> Query(ObservationQueryContext queryContext)
         {
-            return CheckSubjectExists(queryContext.SubjectId)
+            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId, HydrateSubject)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(_ =>
                 {
@@ -46,22 +48,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Select(observation => _resultBuilder.BuildResult(observation, queryContext.Indicators))
                         .ToList();
 
-                    return _subjectMetaService.GetSubjectMeta(SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
+                    return _subjectMetaService
+                        .GetSubjectMeta(SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
+                            observations)
                         .OnSuccess(subjectMetaViewModel => new ResultWithMetaViewModel
-                    {
-                        MetaData = subjectMetaViewModel,
-                        Result = result
-                    });
+                        {
+                            MetaData = subjectMetaViewModel,
+                            Result = result
+                        });
                 });
         }
-        
+
         private async Task<Either<ActionResult, bool>> CheckCanViewSubjectData(Subject subject)
         {
             if (subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return true;
             }
+
             return new ForbidResult();
+        }
+        
+        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
+        {
+            return queryable.Include(subject => subject.Release);
         }
     }
 }
