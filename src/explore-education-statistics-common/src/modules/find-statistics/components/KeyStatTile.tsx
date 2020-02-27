@@ -58,7 +58,7 @@ const KeyStatTile = ({
     <div className={styles.keyStatTile}>
       {dataBlockResponse && config ? (
         <>
-          <div className={styles.keyStat}>
+          <div className={styles.keyStat} data-testid="key-stat-tile">
             <h3 className="govuk-heading-s" data-testid="key-stat-tile-title">
               {config.indicatorLabel}
             </h3>

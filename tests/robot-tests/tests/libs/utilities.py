@@ -134,7 +134,7 @@ def user_opens_details_dropdown(exact_details_text):
 
 def user_closes_details_dropdown(exact_details_text):
   try:
-    elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+    elem = sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
   except:
     raise AssertionError(f'Cannot find details component "{exact_details_text}"')
   elem.click()
@@ -277,3 +277,9 @@ def user_checks_selected_list_label(list_locator, label):
   selected_label = sl.get_selected_list_label(list_locator)
   if selected_label != label:
     raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
+
+def user_checks_page_contains_key_stat_tile(title, value):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@data-testid="key-stat-tile-title" and text()="{title}"]/../*[@data-testid="key-stat-tile-value" and text()="{value}"]')
+  except:
+    raise AssertionError(f"Couldn't find key stat tile titled '{title}' with value '{value}'")
