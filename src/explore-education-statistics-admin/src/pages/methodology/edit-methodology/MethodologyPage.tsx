@@ -16,9 +16,7 @@ import { Route, RouteComponentProps, Switch } from 'react-router';
 export interface MethodologyTabProps {
   refreshMethodology: () => MethodologyContent | undefined;
   methodology: MethodologyContent;
-  setMethodology: React.Dispatch<
-    React.SetStateAction<MethodologyContent | undefined>
-  >;
+  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>;
 }
 
 const MethodologyPage = ({
