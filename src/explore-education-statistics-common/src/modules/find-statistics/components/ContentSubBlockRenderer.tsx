@@ -12,7 +12,7 @@ export type SectionToggleHandler = (section: {
 interface Props {
   block?: ContentBlock;
   id: string;
-  publication: Publication;
+  publication?: Publication;
   onToggle?: SectionToggleHandler;
 }
 
@@ -54,13 +54,23 @@ const ContentSubBlockRenderer = ({
                 Explore and edit this data online
               </h2>
               <p>Use our table tool to explore this data.</p>
-              <ButtonLink
-                as={`/data-tables/${publication.slug}`}
-                to={`/data-tables?publicationSlug=${publication.slug}`}
-                href={`/data-tables?publicationSlug=${publication.slug}`}
-              >
-                Explore data
-              </ButtonLink>
+              {publication ? (
+                <ButtonLink
+                  as={`/data-tables/${publication.slug}`}
+                  to={`/data-tables?publicationSlug=${publication.slug}`}
+                  href={`/data-tables?publicationSlug=${publication.slug}`}
+                >
+                  Explore data
+                </ButtonLink>
+              ) : (
+                <ButtonLink
+                  as="/data-tables"
+                  to="/data-tables"
+                  href="/data-tables"
+                >
+                  Explore data
+                </ButtonLink>
+              )}
             </div>
           }
           onToggle={onToggle}
