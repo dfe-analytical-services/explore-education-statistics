@@ -380,10 +380,6 @@
         "description": "Number of days to retain blobs after delete"
       }
     },
-    "deployDatafactory": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "autoscalePublicApplication": {
       "type": "bool",
       "defaultValue": false
@@ -2612,7 +2608,6 @@
       }
     },
     {
-      "condition": "[parameters('deployDatafactory')]",
       "name": "datafactory",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -2666,7 +2661,6 @@
         "enableSoftDelete": true,
         "accessPolicies": [
           {
-            "condition": "[parameters('deployDatafactory')]",
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {
