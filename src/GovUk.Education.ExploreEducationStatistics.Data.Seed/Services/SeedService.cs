@@ -57,24 +57,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             pQueue.CreateIfNotExists();
 
-            var cloudMessage = BuildCloudMessage(dataFileName, release);
+            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release);
 
             _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
 
             pQueue.AddMessage(cloudMessage);
         }
 
-        private CloudQueueMessage BuildCloudMessage(string dataFileName, Release release)
+        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release)
         {
             var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
             var message = new ImportMessage
             {
+                SubjectId = subjectId,
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
                 NumBatches = 1,
-                RowsPerBatch = 10000   // Just for info - rows per batch is actually set in host.json of the processor function
+                // Just for info - rows per batch is actually set in host.json of the processor function
+                RowsPerBatch = 3000,
+                Seeding = true
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

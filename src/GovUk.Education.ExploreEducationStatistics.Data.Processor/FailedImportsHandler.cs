@@ -17,16 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
             var container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
-            var tClient = tblStorageAccount.CreateCloudTableClient();
-            var qClient = storageAccount.CreateCloudQueueClient();
-            var aQueue = qClient.GetQueueReference("imports-available");
-            var pQueue = qClient.GetQueueReference("imports-pending");
-            var table = tClient.GetTableReference("imports");
+            var tableClient = tblStorageAccount.CreateCloudTableClient();
+            var queueClient = storageAccount.CreateCloudQueueClient();
+            var availableQueue = queueClient.GetQueueReference("imports-available");
+            var pendingQueue = queueClient.GetQueueReference("imports-pending");
+            var table = tableClient.GetTableReference("imports");
 
-            aQueue.CreateIfNotExists();
+            availableQueue.CreateIfNotExists();
             table.CreateIfNotExists();
-            aQueue.Clear();
-            //pQueue.Clear();
+            availableQueue.Clear();
 
             TableContinuationToken token = null;
             do
@@ -42,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     // If batch was not split then just processing again by adding to pending queue
                     if (entity.NumBatches == 1)
                     {
-                        pQueue.AddMessage(new CloudQueueMessage(entity.Message));
+                        pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
                     // Else create a message for all remaining batches
                     else
@@ -51,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                         foreach (var folderAndFilename in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName))
                         {
-                            aQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
+                            availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
                         }
                     }
                 }

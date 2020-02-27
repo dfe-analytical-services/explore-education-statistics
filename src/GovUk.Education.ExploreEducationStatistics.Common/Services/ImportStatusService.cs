@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     
     public class ImportStatusService : IImportStatusService
     {
-        public static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
+        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
             IStatus.COMPLETE,
             IStatus.FAILED
         };
@@ -49,7 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new ImportStatus
             {
                 Errors = import.Errors,
-                //PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };

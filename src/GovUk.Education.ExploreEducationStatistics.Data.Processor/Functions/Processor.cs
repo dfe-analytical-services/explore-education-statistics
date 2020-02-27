@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 try
                 {
-                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext(), false);
+                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
                     logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
         
-        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext, bool isSeeding)
+        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
 
-            if (isSeeding)
+            if (message.Seeding)
             {
                 SampleGuids.GenerateIndicatorGuids(dbContext);
                 SampleGuids.GenerateFilterGuids(dbContext);
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
             
-            if (isSeeding)
+            if (message.Seeding)
             {
                 SampleGuids.GenerateFilterGuids(dbContext);
                 SampleGuids.GenerateFilterGroupGuids(dbContext);
