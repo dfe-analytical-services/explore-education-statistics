@@ -144,7 +144,7 @@ const TableToolFinalStep = ({
                   <DownloadExcelButton
                     publicationSlug={publication.slug}
                     tableRef={dataTableRef}
-                    footnotes={table?.subjectMeta.footnotes}
+                    subjectMeta={table.subjectMeta}
                   />
                 </li>
 

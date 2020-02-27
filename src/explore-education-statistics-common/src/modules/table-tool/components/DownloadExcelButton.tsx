@@ -1,14 +1,61 @@
 import ButtonText from '@common/components/ButtonText';
+import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
+import last from 'lodash/last';
 import sum from 'lodash/sum';
 import React, { RefObject } from 'react';
 import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
 
 interface Props {
   publicationSlug: string;
-  footnotes: FullTableMeta['footnotes'];
+  subjectMeta: FullTableMeta;
   tableRef: RefObject<HTMLElement>;
+}
+
+/**
+ * Append a {@param title} to the beginning of the {@param sheet}.
+ *
+ * Might not be the most efficient way of doing this, as it
+ * relies heavily on the `sheet_to_json` util.
+ */
+export function appendTitle(sheet: WorkSheet, title: string) {
+  const existingRows = utils.sheet_to_json<string[]>(sheet, {
+    header: 1,
+    defval: '',
+  });
+
+  // We use the last as it gives us the length more reliably than
+  // the first row due to the top-left corner of the table being empty.
+  const totalCols = last(existingRows)?.length ?? 0;
+  const emptyRow = Array(totalCols).fill('');
+
+  // Top-left corner might not exist in the array for some
+  // reason, so make this an empty string manually.
+  if (typeof existingRows[0][0] === 'undefined') {
+    existingRows[0][0] = '';
+  }
+
+  utils.sheet_add_aoa(sheet, [
+    [title, ...emptyRow.slice(1)],
+    [...emptyRow],
+    ...existingRows,
+  ]);
+
+  // Preserve merges by shifting them all down by 2 rows
+  // eslint-disable-next-line no-param-reassign
+  sheet['!merges'] = sheet['!merges']?.map(merge => ({
+    s: {
+      r: merge.s.r + 2,
+      c: merge.s.c,
+    },
+    e: {
+      r: merge.e.r + 2,
+      c: merge.e.c,
+    },
+  }));
+
+  return sheet;
 }
 
 /**
@@ -93,9 +140,11 @@ export function appendFootnotes(
 
 const DownloadExcelButton = ({
   publicationSlug,
-  footnotes,
+  subjectMeta,
   tableRef,
 }: Props) => {
+  const { footnotes } = subjectMeta;
+
   // Try to find table element within the ref
   let tableEl: HTMLTableElement | null = null;
 
@@ -121,6 +170,7 @@ const DownloadExcelButton = ({
         const sheet = workBook.Sheets[workBook.SheetNames[0]];
 
         appendColumnWidths(sheet);
+        appendTitle(sheet, generateTableTitle(subjectMeta));
         appendFootnotes(sheet, footnotes);
 
         writeFile(workBook, `data-${publicationSlug}.xlsx`, {
