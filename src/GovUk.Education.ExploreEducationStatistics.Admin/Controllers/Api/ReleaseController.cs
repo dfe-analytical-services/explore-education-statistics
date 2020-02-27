@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -244,6 +245,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
+        [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _releaseService
+                .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
+                .HandleFailuresOr(Ok);
+        }
+        
         [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {

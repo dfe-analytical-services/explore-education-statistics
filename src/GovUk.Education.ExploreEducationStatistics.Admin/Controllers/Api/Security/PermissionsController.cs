@@ -89,6 +89,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .HandleFailuresOr(Ok);
         }
 
+        [HttpGet("methodology/{methodologyId}/status/draft")]
+        public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
+        {
+            return CheckPolicyAgainstEntity<Methodology>(methodologyId, _userService.CheckCanMarkMethodologyAsDraft);
+        }
+
+        [HttpGet("methodology/{methodologyId}/status/approve")]
+        public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
+        {
+            return CheckPolicyAgainstEntity<Methodology>(methodologyId, _userService.CheckCanApproveMethodology);
+        }
+
         public class GlobalPermissions
         {
             public bool CanAccessSystem { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -114,6 +115,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToListAsync();
                     
                     return _mapper.Map<List<MethodologyViewModel>>(methodologies);
+                });
+        }
+
+        public async Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
+            UpdateMethodologyStatusRequest request)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.Status))
+                .OnSuccess(async methodology =>
+                {
+                    methodology.Status = request.Status;
+                    methodology.InternalReleaseNote = request.InternalReleaseNote;
+                    
+                    _context.Methodologies.Update(methodology);
+                    await _context.SaveChangesAsync();
+
+                    return await GetAsync(methodologyId);
                 });
         }
 

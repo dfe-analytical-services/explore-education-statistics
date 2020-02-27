@@ -33,16 +33,25 @@ const ReleaseServiceStatus = ({
     return dashboardService
       .getReleaseStatus(releaseId)
       .then(status => {
-        setCurrentStatus(status);
-        if (
-          status &&
-          (status.overallStage === 'Started' ||
-            status.overallStage === 'Queued')
-        ) {
+        if (!status) {
+          // 204 response waiting for status
+          setCurrentStatus({ overallStage: 'Validating' });
           timeoutRef.current = setTimeout(
             fetchReleaseServiceStatus,
             refreshPeriod,
           );
+        } else {
+          setCurrentStatus(status);
+          if (
+            status &&
+            (status.overallStage === 'Started' ||
+              status.overallStage === 'Queued')
+          ) {
+            timeoutRef.current = setTimeout(
+              fetchReleaseServiceStatus,
+              refreshPeriod,
+            );
+          }
         }
       })
       .catch(handleApiErrors);
@@ -72,16 +81,17 @@ const ReleaseServiceStatus = ({
           case 'Failed':
           case 'Cancelled':
             return { color: 'red', text: status };
+          case 'Validating':
           case 'Queued':
           case 'Started':
             return { color: 'orange', text: status };
           case 'Complete':
             return { color: 'green', text: status };
           default:
-            return { color: undefined, text: '' };
+            return { color: 'red', text: 'Error' };
         }
       }
-      return { color: undefined, text: '' };
+      return { color: 'orange', text: 'Requesting status' };
     },
     [currentStatus],
   );
@@ -100,7 +110,14 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock color={statusColor} text={currentStatus.overallStage} />
+        <StatusBlock
+          color={statusColor}
+          text={
+            currentStatus
+              ? currentStatus.overallStage
+              : 'Waiting to be scheduled...'
+          }
+        />
       )}
 
       {currentStatus &&

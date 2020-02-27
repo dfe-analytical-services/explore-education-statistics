@@ -73,14 +73,23 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   2012/13
-    user checks results table column heading contains  1   2   2013/14
-    user checks results table column heading contains  1   3   2014/15
-    user checks results table column heading contains  1   4   2015/16
+
+    user checks results table column heading contains  1   1   England
+    user checks results table column heading contains  2   1   2012/13
+    user checks results table column heading contains  2   2   2013/14
+    user checks results table column heading contains  2   3   2014/15
+    user checks results table column heading contains  2   4   2015/16
 
 Validate results table row heading Gender
     [Tags]  HappyPath
-    user checks results table row heading contains  1    1    Gender
+    user checks results table row heading contains  1    1    Gender male
+    user checks results table row heading contains  1    2    Authorised absence rate
+    user checks results table row heading contains  2    1    Overall absence rate
+    user checks results table row heading contains  3    1    Unauthorised absence rate
+    user checks results table row heading contains  4    1    Gender female
+    user checks results table row heading contains  4    2    Authorised absence rate
+    user checks results table row heading contains  5    1    Overall absence rate
+    user checks results table row heading contains  6    1    Unauthorised absence rate
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
@@ -193,21 +202,21 @@ Click Re-order table button
 
 Validate results table column headings after reordering
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   Gender
-    user checks results table column heading contains  2   1   Gender female
-    user checks results table column heading contains  2   2   Gender male
-    user checks results table column heading contains  3   1   2013/14
-    user checks results table column heading contains  3   2   2014/15
-    user checks results table column heading contains  3   3   2015/16
-    user checks results table column heading contains  3   4   2012/13
-    user checks results table column heading contains  3   5   2013/14
-    user checks results table column heading contains  3   6   2014/15
-    user checks results table column heading contains  3   7   2015/16
-    user checks results table column heading contains  3   8   2012/13
+    user checks results table column heading contains  1   1   Gender female
+    user checks results table column heading contains  1   2   Gender male
+    user checks results table column heading contains  2   1   2013/14
+    user checks results table column heading contains  2   2   2014/15
+    user checks results table column heading contains  2   3   2015/16
+    user checks results table column heading contains  2   4   2012/13
+    user checks results table column heading contains  2   5   2013/14
+    user checks results table column heading contains  2   6   2014/15
+    user checks results table column heading contains  2   7   2015/16
+    user checks results table column heading contains  2   8   2012/13
 
 Validate results table row headings after reordering
     [Tags]  HappyPath
-    user checks results table row heading contains  1    1      Overall absence rate
+    user checks results table row heading contains  1    1      England
+    user checks results table row heading contains  1    2      Overall absence rate
     user checks results table row heading contains  2    1      Unauthorised absence rate
     user checks results table row heading contains  3    1      Authorised absence rate
 

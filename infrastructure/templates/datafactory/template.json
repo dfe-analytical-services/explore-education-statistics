@@ -29,22 +29,29 @@
       "metadata": {
         "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
       }
+    },
+    "dataFactoryName": {
+      "type": "string",
+      "metadata": {
+        "description": "The data factory name"
+      }
     }
   },
   "variables":{
-    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
   },
   "resources":[
     {
-      "name":"[variables('dataFactoryName')]",
+      "name":"[parameters('dataFactoryName')]",
       "apiVersion":"2018-06-01",
       "type":"Microsoft.DataFactory/factories",
       "location":"[resourceGroup().location]",
       "identity":{
         "type":"SystemAssigned"
       },
-      "properties": {}
+      "properties": {},
+      "dependsOn": [
+      ]
     },
     {
       "name": "datafactory-components",
@@ -58,7 +65,7 @@
         },
         "parameters": {
           "factoryName": {
-            "value": "[variables('dataFactoryName')]"
+            "value": "[parameters('dataFactoryName')]"
           },
           "publisherAppName": {
             "value": "[parameters('publisherAppName')]"
@@ -72,7 +79,7 @@
         }
       },
       "dependsOn": [
-        "[variables('dataFactoryName')]"
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
       ]
     }
   ]

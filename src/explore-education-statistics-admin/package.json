@@ -190,6 +190,7 @@
     "lodash": "^4.17.13",
     "oidc-client": "^1.9.1",
     "react-lazyload": "^2.6.5",
+    "url-search-params-polyfill": "^8.0.0",
     "whatwg-fetch": "^3.0.0"
   }
 }

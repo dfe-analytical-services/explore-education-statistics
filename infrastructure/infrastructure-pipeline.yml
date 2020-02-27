@@ -8,7 +8,6 @@ trigger:
     - infrastructure/*
     exclude:
     - README.md
-    - infrastructure/templates/datafactory/template.json
 pr: none
 
 pool:

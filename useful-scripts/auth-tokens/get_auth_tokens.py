@@ -18,7 +18,7 @@ def wait_until_page_contains_xpath(context, selector):
             return
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
 
-def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70'):
+def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN", chromedriver_version='78.0.3904.70'):
     cdi.install(file_directory="./webdriver/",
                 verbose=False,
                 chmod=True,
@@ -72,11 +72,11 @@ def get_identity_info(url, email, password, chromedriver_version='78.0.3904.70')
     try:
         wait_until_page_contains_xpath(driver, '//span[contains(text(),"Register")]')
         driver.find_element_by_css_selector('#Input_FirstName').clear()
-        driver.find_element_by_css_selector('#Input_FirstName').send_keys('Bau1')
+        driver.find_element_by_css_selector('#Input_FirstName').send_keys(first_name)
         driver.find_element_by_css_selector('#Input_LastName').clear()
-        driver.find_element_by_css_selector('#Input_LastName').send_keys('EESADMIN')
+        driver.find_element_by_css_selector('#Input_LastName').send_keys(last_name)
         driver.find_element_by_css_selector('#Input_Email').clear()
-        driver.find_element_by_css_selector('#Input_Email').send_keys('bau1@example.com')
+        driver.find_element_by_css_selector('#Input_Email').send_keys(email)
         driver.find_element_by_xpath('//button[contains(text(), "Register")]').click()
     except Exception as e:
         pass

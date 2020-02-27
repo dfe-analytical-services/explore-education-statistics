@@ -35,22 +35,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
         }
-        
-        public async Task<bool> DeleteAsync(ReleaseId releaseId, string name)
+
+        public List<Footnote> GetFootnotesOnlyForSubject(Guid subjectId)
         {
-            var subject = await GetAsync(releaseId, name);
+            return _context
+                .Footnote
+                .Include(f => f.Subjects)
+                .Where(f => f.Subjects.Count == 1 && f.Subjects.First().SubjectId == subjectId)
+                .ToList();
+        }
+
+        public async Task<bool> DeleteAsync(Guid subjectId)
+        {
+            var subject = await _context
+                .Subject
+                .FirstOrDefaultAsync(s => s.Id == subjectId);
+                
             if (subject != null)
             {
+                var orphanFootnotes = GetFootnotesOnlyForSubject(subjectId);
+
                 _context.Subject.Remove(subject);
+                _context.Footnote.RemoveRange(orphanFootnotes);
+                
                 await _context.SaveChangesAsync();
                 return true;
             }
             return false;
         }
+
+        public async Task<bool> DeleteAsync(ReleaseId releaseId, string name)
+        {
+            var subject = await GetAsync(releaseId, name);
+            return await DeleteAsync(subject.Id);
+        }
         
         public async Task<Subject> GetAsync(ReleaseId releaseId, string name)
         {
-            return await _context.Subject.FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+            return await _context
+                .Subject
+                .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
         }
     }
 }
