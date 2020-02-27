@@ -10,12 +10,15 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 
 export interface MethodologyTabProps {
   refreshMethodology: () => MethodologyContent | undefined;
   methodology: MethodologyContent;
+  setMethodology: React.Dispatch<
+    React.SetStateAction<MethodologyContent | undefined>
+  >;
 }
 
 const MethodologyPage = ({
@@ -24,7 +27,6 @@ const MethodologyPage = ({
   handleApiErrors,
 }: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
   const { methodologyId } = match.params;
-
   const [methodology, setMethodology] = useState<MethodologyContent>();
 
   const refreshMethodology = useCallback(async () => {
@@ -34,10 +36,8 @@ const MethodologyPage = ({
         methodologyId,
       );
       setMethodology(methodologyResponse);
-      return methodology;
     } catch (err) {
       handleApiErrors(err);
-      return undefined;
     }
   }, [methodologyId]);
 
@@ -127,7 +127,12 @@ const MethodologyPage = ({
                 key={route.path}
                 path={route.path}
                 render={props =>
-                  route.component({ methodology, refreshMethodology, ...props })
+                  route.component({
+                    methodology,
+                    setMethodology,
+                    refreshMethodology,
+                    ...props,
+                  })
                 }
               />
             ))}
