@@ -10,9 +10,9 @@ import {
   ChartDataSet,
 } from '@common/services/publicationService';
 
-import Data from '@common/modules/charts/components/__tests__/__data__/chartFunctionsData';
+import Data from '@common/modules/charts/util/__tests__/__data__/chartUtils.data';
 
-describe('ChartFunctions', () => {
+describe('chartUtils', () => {
   const dataSet23_1_72: ChartDataSet = {
     indicator: '23',
     filters: ['1', '72'],
