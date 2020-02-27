@@ -108,19 +108,17 @@ const TableToolFinalStep = ({
                     </div>
                   </>
                 ) : (
-                  <>
-                    {permalinkLoading ? (
-                      <LoadingSpinner
-                        inline
-                        size={19}
-                        text="Generating permanent link"
-                      />
-                    ) : (
-                      <ButtonText onClick={() => handlePermalinkClick()}>
-                        Generate permanent link
-                      </ButtonText>
-                    )}
-                  </>
+                  <LoadingSpinner
+                    alert
+                    inline
+                    loading={permalinkLoading}
+                    size="sm"
+                    text="Generating permanent link"
+                  >
+                    <ButtonText onClick={() => handlePermalinkClick()}>
+                      Generate permanent link
+                    </ButtonText>
+                  </LoadingSpinner>
                 )}
               </li>
             </ul>
