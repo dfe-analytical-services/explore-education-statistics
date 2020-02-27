@@ -243,6 +243,7 @@ const ReleaseDataUploadsSection = ({
 
                 <Button
                   type="submit"
+                  id="upload-data-files-button"
                   className="govuk-button govuk-!-margin-right-6"
                 >
                   Upload data files

@@ -229,8 +229,13 @@ const FootnoteForm = ({
 
   const renderNewForm = () => {
     return state !== 'create' ? (
-      <Button type="button" className="govuk-button" onClick={onOpen}>
-        Add {!isFirst && ` another `}footnote
+      <Button
+        type="button"
+        id="add-footnote-button"
+        className="govuk-button"
+        onClick={onOpen}
+      >
+        Add {!isFirst && `another `}footnote
       </Button>
     ) : (
       renderForm()

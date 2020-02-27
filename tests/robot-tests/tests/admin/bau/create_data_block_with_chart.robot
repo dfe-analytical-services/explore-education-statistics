@@ -59,7 +59,6 @@ Select subject "UI test subject"
 
 Select locations
     [Tags]   HappyPath
-    sleep  10000
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)

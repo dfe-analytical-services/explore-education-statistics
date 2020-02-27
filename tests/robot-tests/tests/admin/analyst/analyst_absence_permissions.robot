@@ -42,14 +42,33 @@ Validate Analyst1 cannot create a release for Pupil absence topic
     user opens accordion section  Pupil absence in schools in England
     user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
 
-Validate Analyst1 cannot Approve a Pupil absence in schools in England release
+Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath
-    sleep  10
     user opens details dropdown  Academic Year, 2016 to 2017 (Live - Latest release)
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year, 2016 to 2017 (Live - Latest release)"]
-    user waits until page contains heading  Pupil absnece in schools in England
+    user waits until page contains heading  Pupil absence in schools in England
+    user checks summary list item "Publication title" should be "Pupil absence in schools in England"
+    user checks summary list item "Time period" should be "Academic Year"
+    user checks summary list item "Release period" should be "2016 to 2017"
+    user checks summary list item "Lead statistician" should be "Mark Pearson"
+    user checks summary list item "Scheduled release" should be ""
+    user checks summary list item "Next release expected" should be ""
+    user checks summary list item "Release type" should be "Official Statistics"
+
+Validate Analyst1 can see "Upload data files" button
+    [Tags]  HappyPath
+    user clicks element   xpath://a[text()="Manage data"]
+    user waits until page contains element  xpath://legend[text()="Add new data to release"]
+    user checks page contains element   css:#upload-data-files-button
+
+Validate Analyst1 can see "Add another footnote" button
+    [Tags]  HappyPath
+    
+
+Validate Analyst1 cannot Approve a Pupil absence in schools in England release
+    [Tags]  HappyPath
     user clicks element   xpath://a[text()="Release status"]
-    user waits until page contains element  xpath://h2[text()="Release status"]
+    user waits until page contains element  xpath://h2[text()="Release Status"]
     user clicks element   xpath://button[text()="Update release status"]
     user waits until page contains element   css:#releaseStatusForm
     user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-draft" and not(@disabled)]
