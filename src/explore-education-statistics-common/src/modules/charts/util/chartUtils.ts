@@ -36,7 +36,7 @@ export const symbols: ChartSymbol[] = [
 
 export interface ChartData {
   name: string;
-  [key: string]: number | string;
+  [key: string]: string;
 }
 
 function existAndCodesDoNotMatch(a?: Location, b?: Location) {
@@ -201,9 +201,9 @@ function getChartDataForAxis(
       const name = generateNameForAxisConfiguration(result, dataSet, groupBy);
 
       acc[name] = {
-        [generateKeyFromDataSet(dataSet, groupBy)]: Number(
-          result.measures[dataSet.indicator],
-        ),
+        [generateKeyFromDataSet(dataSet, groupBy)]: result.measures[
+          dataSet.indicator
+        ],
         name,
       } as ChartData;
 
@@ -243,7 +243,10 @@ export function sortChartData(
   if (sortBy === undefined) return chartData;
 
   const mappedValueAndData = chartData.map(data => ({
-    value: data[sortBy] === undefined ? undefined : Number(data[sortBy]),
+    value:
+      data[sortBy] === undefined
+        ? undefined
+        : Number.parseFloat(data[sortBy] as string),
     data,
   }));
 
