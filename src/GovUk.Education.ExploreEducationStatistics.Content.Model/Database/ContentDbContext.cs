@@ -271,6 +271,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<BasicLink>>(v));
 
+            modelBuilder.Entity<Release>()
+                .HasIndex(r => new {r.OriginalId, r.Version});
+
+            modelBuilder.Entity<Release>()
+                .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Release>()
+                .HasOne(r => r.Original)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
