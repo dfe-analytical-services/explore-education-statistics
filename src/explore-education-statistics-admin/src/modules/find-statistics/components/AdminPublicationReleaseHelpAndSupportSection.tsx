@@ -2,20 +2,20 @@ import { ManageContentPageViewModel } from '@admin/services/release/edit-release
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ReleaseType } from '@common/services/publicationService';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
   publication,
-  editing,
 }: {
   publication: ManageContentPageViewModel['release']['publication'];
   release: ManageContentPageViewModel['release'];
-  editing?: boolean;
 }) => {
+  const { isEditing } = useContext(EditingContext);
   return (
     <>
       <h2
@@ -35,7 +35,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
             <p>
               Read our{' '}
               {publication.methodology &&
-                (editing ? (
+                (isEditing ? (
                   <a>{`${publication.title}: methodology`}</a>
                 ) : (
                   <Link to={`/methodologies/${publication.methodology.id}`}>
@@ -44,7 +44,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
                 ))}
               {!publication.methodology &&
                 publication.externalMethodology &&
-                (editing ? (
+                (isEditing ? (
                   <a>{`${publication.title}: methodology`}</a>
                 ) : (
                   <Link
@@ -69,7 +69,6 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         )}
         <AccordionSection heading="Contact us" headingTag="h3">
           <ContactUsSection
-            editing={editing}
             publicationContact={publication.contact}
             themeTitle={publication.topic.theme.title}
           />

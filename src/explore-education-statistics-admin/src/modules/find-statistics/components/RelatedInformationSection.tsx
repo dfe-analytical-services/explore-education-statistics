@@ -21,13 +21,11 @@ import EditableLink from './EditableLink';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
-  editing?: boolean;
 }
 
 const RelatedInformationSection = ({
   release,
   handleApiErrors,
-  editing,
 }: Props & ErrorControlProps) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
@@ -116,7 +114,7 @@ const RelatedInformationSection = ({
         <ul className="govuk-list">
           <li>
             {release.publication.methodology &&
-              (editing ? (
+              (isEditing ? (
                 <a>{release.publication.methodology.title}</a>
               ) : (
                 <Link
@@ -126,7 +124,7 @@ const RelatedInformationSection = ({
                 </Link>
               ))}
             {release.publication.externalMethodology &&
-              (editing ? (
+              (isEditing ? (
                 <a>{release.publication.externalMethodology.title}</a>
               ) : (
                 <Link

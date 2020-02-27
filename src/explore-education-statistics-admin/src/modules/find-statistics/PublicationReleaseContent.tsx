@@ -251,7 +251,7 @@ const PublicationReleaseContent = ({
               )}
             </dl>
             <ReleaseNotesSection release={release} />
-            <RelatedInformationSection editing={editing} release={release} />
+            <RelatedInformationSection release={release} />
           </RelatedAside>
         </div>
       </div>
@@ -272,7 +272,6 @@ const PublicationReleaseContent = ({
       />
 
       <AdminPublicationReleaseHelpAndSupportSection
-        editing={editing}
         publication={publication}
         release={release}
       />
