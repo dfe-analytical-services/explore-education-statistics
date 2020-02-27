@@ -1,8 +1,5 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { EditableRelease } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import PreviewContentBlocks, {
   ContentBlockProps,
 } from '@common/modules/find-statistics/components/ContentBlocks';
@@ -77,54 +74,6 @@ const EditableContentBlock = ({
     }
   }, [isReordering]);
 
-  const { handleApiErrors } = useContext(ErrorControlContext);
-
-  const onAddContentCallback = (
-    type: string,
-    data: string,
-    order: number | undefined,
-  ) => {
-    if (editingContext.releaseId && sectionId) {
-      const { releaseId } = editingContext;
-
-      let addPromise: Promise<unknown>;
-
-      if (type === 'DataBlock') {
-        addPromise = releaseContentService
-          .attachContentSectionBlock(releaseId, sectionId, {
-            contentBlockId: data,
-            order: order || 0,
-          })
-          .then(v => {
-            if (editingContext.updateAvailableDataBlocks) {
-              editingContext.updateAvailableDataBlocks();
-            }
-            return v;
-          });
-      } else {
-        addPromise = releaseContentService.addContentSectionBlock(
-          releaseId,
-          sectionId,
-          {
-            body: data,
-            type,
-            order,
-          },
-        );
-      }
-
-      addPromise
-        .then(() =>
-          releaseContentService.getContentSection(releaseId, sectionId),
-        )
-        .then(section => {
-          if (onContentChange) onContentChange(section.content);
-          setContentBlocks(section.content);
-        })
-        .catch(handleApiErrors);
-    }
-  };
-
   const onDragEnd = React.useCallback(
     (result: DropResult) => {
       const { source, destination, type } = result;
@@ -141,19 +90,9 @@ const EditableContentBlock = ({
 
   if (contentBlocks === undefined || contentBlocks.length === 0) {
     return (
-      <>
-        <div className="govuk-inset-text">
-          There is no content for this section.
-        </div>
-        {(canAddBlocks || canAddSingleBlock) && (
-          <AddContentButton
-            textOnly={textOnly}
-            buttonText={addContentButtonText}
-            onClick={(type, data) => onAddContentCallback(type, data, 0)}
-            availableDataBlocks={editingContext.availableDataBlocks}
-          />
-        )}
-      </>
+      <div className="govuk-inset-text">
+        There is no content for this section.
+      </div>
     );
   }
 
@@ -216,15 +155,6 @@ const EditableContentBlock = ({
               </ContentBlockDraggable>
             </div>
           ))}
-          {!isReordering && canAddBlocks && (
-            <AddContentButton
-              textOnly={textOnly}
-              onClick={(type, data) =>
-                onAddContentCallback(type, data, contentBlocks.length)
-              }
-              availableDataBlocks={editingContext.availableDataBlocks}
-            />
-          )}
         </ContentBlockDroppable>
       </DragDropContext>
     </EditingContext.Provider>

@@ -8,9 +8,11 @@ import { releaseContentService } from '@admin/services/release/edit-release/cont
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext } from 'react';
 import { Dictionary } from 'src/types';
+import { ErrorControlContext } from 'src/components/ErrorBoundary';
+import AddContentButton from './AddContentButton';
 
 export interface ReleaseContentAccordionSectionProps {
-  id?: string;
+  sectionId: string;
   contentItem: ContentType;
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
@@ -20,7 +22,7 @@ export interface ReleaseContentAccordionSectionProps {
 }
 
 const ReleaseContentAccordionSection = ({
-  id: sectionId,
+  sectionId,
   index,
   contentItem,
   onHeadingChange,
@@ -31,7 +33,12 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
-  const { updateAvailableDataBlocks, releaseId } = useContext(EditingContext);
+  const {
+    availableDataBlocks,
+    updateAvailableDataBlocks,
+    releaseId,
+  } = useContext(EditingContext);
+  const { handleApiErrors } = useContext(ErrorControlContext);
 
   const onBlockSaveOrder = async (order: Dictionary<number>) => {
     if (releaseId && sectionId) {
@@ -87,6 +94,48 @@ const ReleaseContentAccordionSection = ({
       }
     };
   };
+  const onAddContentCallback = (
+    type: string,
+    data: string,
+    order: number | undefined,
+  ) => {
+    if (releaseId && sectionId) {
+      let addPromise: Promise<unknown>;
+
+      if (type === 'DataBlock') {
+        addPromise = releaseContentService
+          .attachContentSectionBlock(releaseId, sectionId, {
+            contentBlockId: data,
+            order: order || 0,
+          })
+          .then(v => {
+            if (updateAvailableDataBlocks) {
+              updateAvailableDataBlocks();
+            }
+            return v;
+          });
+      } else {
+        addPromise = releaseContentService.addContentSectionBlock(
+          releaseId,
+          sectionId,
+          {
+            body: data,
+            type,
+            order,
+          },
+        );
+      }
+
+      addPromise
+        .then(() =>
+          releaseContentService.getContentSection(releaseId, sectionId),
+        )
+        .then(section => {
+          onContentChange(section.content);
+        })
+        .catch(handleApiErrors);
+    }
+  };
 
   return (
     <AccordionSection
@@ -98,20 +147,32 @@ const ReleaseContentAccordionSection = ({
       onRemoveSection={onRemoveSection}
       sectionId={sectionId}
       headerButtons={
-        contentItem.content &&
-        contentItem.content.length > 1 && (
-          <a
-            role="button"
-            tabIndex={0}
-            onClick={() => setIsReordering(!isReordering)}
-            onKeyPress={e => {
-              if (e.key === 'Enter') setIsReordering(!isReordering);
-            }}
-            className={`govuk-button ${!isReordering &&
-              'govuk-button--secondary'} govuk-!-margin-right-2`}
-          >
-            {isReordering ? 'Save order' : 'Reorder'}
-          </a>
+        <a
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsReordering(!isReordering)}
+          onKeyPress={e => {
+            if (e.key === 'Enter') setIsReordering(!isReordering);
+          }}
+          className={`govuk-button ${!isReordering &&
+            'govuk-button--secondary'} govuk-!-margin-right-2`}
+        >
+          {isReordering ? 'Save order' : 'Reorder'}
+        </a>
+      }
+      footerButtons={
+        !isReordering &&
+        canAddBlocks && (
+          <AddContentButton
+            onClick={(type, data) =>
+              onAddContentCallback(
+                type,
+                data,
+                contentItem.content ? contentItem.content.length : 0,
+              )
+            }
+            availableDataBlocks={availableDataBlocks}
+          />
         )
       }
       {...restOfProps}
