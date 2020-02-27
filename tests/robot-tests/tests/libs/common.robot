@@ -347,3 +347,7 @@ user checks publication bullet does not contain link
   [Arguments]   ${publication}   ${link}
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
+user waits until page contains key stat tile
+  [Arguments]  ${title}  ${value}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]
+

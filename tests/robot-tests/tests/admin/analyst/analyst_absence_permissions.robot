@@ -88,11 +88,10 @@ Validate Analyst1 can see Manage content page contents
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
 
-    user waits until page contains element  css:[data-testid="key-stat-tile-title"]
+    user waits until page contains key stat tile   Overall absence rate        4.6%
+    user waits until page contains key stat tile   Authorised absence rate     3.5%
+    user waits until page contains key stat tile   Unauthorised absence rate   1.1%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3
-    user checks page contains key stat tile   Overall absence rate   4.6%
-    user checks page contains key stat tile   Authorised absence rate  3.5%
-    user checks page contains key stat tile   Unauthorised absence rate  1.1%
 
     user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
     user checks accordion is in position  About these statistics            1

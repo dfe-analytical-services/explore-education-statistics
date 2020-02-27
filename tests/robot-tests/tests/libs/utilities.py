@@ -277,9 +277,3 @@ def user_checks_selected_list_label(list_locator, label):
   selected_label = sl.get_selected_list_label(list_locator)
   if selected_label != label:
     raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
-
-def user_checks_page_contains_key_stat_tile(title, value):
-  try:
-    sl.driver.find_element_by_xpath(f'//*[@data-testid="key-stat-tile-title" and text()="{title}"]/../*[@data-testid="key-stat-tile-value" and text()="{value}"]')
-  except:
-    raise AssertionError(f"Couldn't find key stat tile titled '{title}' with value '{value}'")
