@@ -115,25 +115,27 @@ export function appendFootnotes(
   sheet: WorkSheet,
   footnotes: FullTableMeta['footnotes'],
 ): WorkSheet {
-  const [, lastCell] = sheet['!ref']?.split(':') ?? [];
-
-  if (!lastCell) {
-    return sheet;
-  }
-
-  const [lastColumn, lastRow] = lastCell.split(/([0-9]+)/);
-  const footnoteStartRow = parseInt(lastRow, 10) + 2;
-
-  footnotes.forEach((footnote, index) => {
-    // eslint-disable-next-line no-param-reassign
-    sheet[`A${footnoteStartRow + index}`] = {
-      t: 's',
-      v: `(${index + 1}) ${footnote.label}`,
-    } as CellObject;
-  });
-
-  // eslint-disable-next-line no-param-reassign
-  sheet['!ref'] = `A1:${lastColumn}${footnoteStartRow + footnotes.length - 1}`;
+  utils.sheet_add_json(
+    sheet,
+    [
+      [
+        {
+          t: 's',
+          v: '',
+        },
+      ],
+      ...footnotes.map((footnote, index) => [
+        {
+          t: 's',
+          v: `(${index + 1}) ${footnote.label}`,
+        },
+      ]),
+    ],
+    {
+      origin: -1,
+      skipHeader: true,
+    },
+  );
 
   return sheet;
 }
