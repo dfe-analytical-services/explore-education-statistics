@@ -30,7 +30,7 @@ export interface Props extends ContentBlockProps {
   canAddSingleBlock?: boolean;
   textOnly?: boolean;
   isReordering?: boolean;
-  resolveComments?: boolean;
+  allowComments: boolean;
   addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
   onBlockSaveOrder?: (order: Dictionary<number>) => Promise<void>;
@@ -47,6 +47,7 @@ const EditableContentBlock = ({
   canAddSingleBlock = false,
   textOnly = false,
   isReordering = false,
+  allowComments = false,
   addContentButtonText = 'Add content',
   onBlockSaveOrder,
   onBlockContentChange,
@@ -182,23 +183,24 @@ const EditableContentBlock = ({
               >
                 {!isReordering && (
                   <>
-                    {(editingContext.isCommenting ||
-                      editingContext.isReviewing) && (
-                      <Comments
-                        contentBlockId={block.id}
-                        initialComments={block.comments}
-                        canResolve={editingContext.isReviewing}
-                        canComment={editingContext.isCommenting}
-                        onCommentsChange={async comments => {
-                          const newBlocks = [...contentBlocks];
-                          newBlocks[index].comments = comments;
-                          setContentBlocks(newBlocks);
-                          if (onContentChange) {
-                            onContentChange(newBlocks);
-                          }
-                        }}
-                      />
-                    )}
+                    {allowComments &&
+                      (editingContext.isCommenting ||
+                        editingContext.isReviewing) && (
+                        <Comments
+                          contentBlockId={block.id}
+                          initialComments={block.comments}
+                          canResolve={editingContext.isReviewing}
+                          canComment={editingContext.isCommenting}
+                          onCommentsChange={async comments => {
+                            const newBlocks = [...contentBlocks];
+                            newBlocks[index].comments = comments;
+                            setContentBlocks(newBlocks);
+                            if (onContentChange) {
+                              onContentChange(newBlocks);
+                            }
+                          }}
+                        />
+                      )}
                   </>
                 )}
 

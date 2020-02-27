@@ -1,17 +1,13 @@
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import ContentBlocks, {
-  ReorderHook,
-} from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { MouseEventHandler, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Dictionary } from 'src/types';
-import AddContentButton from './AddContentButton';
 
 export interface ReleaseContentAccordionSectionProps {
   id?: string;
@@ -130,6 +126,7 @@ const ReleaseContentAccordionSection = ({
         onBlockContentChange={onBlockContentChange}
         onBlockDelete={onBlockDelete}
         content={contentItem.content}
+        allowComments
       />
     </AccordionSection>
   );
