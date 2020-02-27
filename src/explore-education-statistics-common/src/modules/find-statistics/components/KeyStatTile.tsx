@@ -74,10 +74,7 @@ const KeyStatTile = ({
             summary.dataDefinition &&
             summary.dataDefinition[0] !== '' && (
               <Details
-                summary={
-                  (summary && summary.dataDefinitionTitle) ||
-                  `Define '${config.indicatorLabel}'`
-                }
+                summary={(summary && summary.dataDefinitionTitle) || 'Help'}
               >
                 {summary.dataDefinition.map(data => (
                   <ReactMarkdown key={data}>{data}</ReactMarkdown>

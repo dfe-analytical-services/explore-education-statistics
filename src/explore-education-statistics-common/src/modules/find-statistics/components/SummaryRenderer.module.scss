@@ -25,12 +25,21 @@
   flex: 1 0 32.3%;
   flex-direction: column;
   margin: 0.5%;
-  max-width: 32.3%;
+  position: relative;
 
   @include govuk-media-query($until: tablet) {
-    flex: 0 0 100%;
+    flex: 1 0 auto;
     margin-bottom: 1rem;
-    max-width: 100%;
+    max-width: 99%;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    margin-bottom: 6%;
+    max-width: none;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    max-width: 32.2%;
   }
 
   .keyStat {
@@ -38,11 +47,16 @@
 
     background: $govuk-brand-colour;
     color: govuk-colour('white');
+    display: flex;
     flex: 1 0 auto;
+    flex-direction: column;
+    justify-content: space-evenly;
+    order: 2;
     padding: 0.7rem 1rem;
 
     @include govuk-media-query($until: tablet) {
       flex-basis: auto;
+      padding-bottom: 0.5rem;
     }
 
     @media print {
@@ -72,21 +86,64 @@
   }
 
   details {
+    background: govuk-colour('white');
     font-size: 1rem;
-    margin: 0 0.5rem 0 0;
-    min-height: 3.5rem;
-    padding-top: 0.5rem;
+    margin: 0;
+    min-height: 2rem;
+    order: 2;
+    padding: 0.2rem 0 0.2rem 0.5rem;
+    text-align: right;
 
     @include govuk-media-query($until: tablet) {
-      min-height: auto;
+      order: 2;
+      position: static;
     }
+  }
+
+  /* stylelint-disable */
+  details[open] {
+    order: 1;
+    @include govuk-media-query($until: tablet) {
+      order: 2;
+    }
+  }
+  /* stylelint-enable */
+
+  :global(.govuk-details__summary) {
+    margin-bottom: 0;
+    padding-left: 16px;
   }
 }
 
+:global(.page-editing) .keyStatTile {
+  margin-bottom: 10%;
+}
+
+:global(.page-editing) .keyStat {
+  flex: 0 0 auto;
+}
+
 .keyStatTile :global(.govuk-details__text) {
-  padding: 0 20px;
+  background: govuk-colour('white');
+  box-sizing: border-box;
+  height: calc(100% - 1rem);
+  margin-left: -8px;
+  overflow: auto;
+  position: absolute;
+  text-align: left;
+  width: 100%;
+  z-index: 1;
+
+  @include govuk-media-query($until: tablet) {
+    position: static;
+  }
 }
 
 .trendText {
   color: govuk-colour('white');
+}
+
+.keyStatEdit {
+  margin-top: 3rem;
+  order: 3;
 }
