@@ -5,9 +5,7 @@ import { EditableAccordionSectionProps } from 'src/components/EditableAccordionS
 
 function accordionAddNewSection(
   methodology: MethodologyContent,
-  setMethodology: React.Dispatch<
-    React.SetStateAction<MethodologyContent | undefined>
-  >,
+  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
 ): EditableAccordionProps['onAddSection'] {
   return async function onAddSection() {
     const newSection = await methodologyService.addContentSection(
@@ -25,9 +23,7 @@ function accordionAddNewSection(
 
 function accordionUpdateSectionsOrder(
   methodology: MethodologyContent,
-  setMethodology: React.Dispatch<
-    React.SetStateAction<MethodologyContent | undefined>
-  >,
+  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
 ): EditableAccordionProps['onSaveOrder'] {
   return async function onSaveOrder(order) {
     const sectionsOrdered = await methodologyService.updateContentSectionsOrder(
@@ -43,9 +39,7 @@ function accordionUpdateSectionsOrder(
 
 function accordionSectionUpdateHeading(
   methodology: MethodologyContent,
-  setMethodology: React.Dispatch<
-    React.SetStateAction<MethodologyContent | undefined>
-  >,
+  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
   sectionId: string,
 ): EditableAccordionSectionProps['onHeadingChange'] {
   return async function(heading) {
@@ -69,9 +63,7 @@ function accordionSectionUpdateHeading(
 
 function accordionSectionRemoveSection(
   methodology: MethodologyContent,
-  setMethodology: React.Dispatch<
-    React.SetStateAction<MethodologyContent | undefined>
-  >,
+  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
   sectionId: string,
 ): EditableAccordionSectionProps['onRemoveSection'] {
   return async function onRemoveSection() {

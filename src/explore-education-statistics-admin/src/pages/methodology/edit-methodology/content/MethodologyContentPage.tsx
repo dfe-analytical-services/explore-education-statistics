@@ -1,6 +1,5 @@
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
-import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import withErrorControl, {
   ErrorControlProps,
@@ -12,36 +11,16 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import sortBy from 'lodash/sortBy';
-import React, { useEffect, useState } from 'react';
-import { MethodologyContent } from 'src/services/methodology/types';
+import React, { useState } from 'react';
 import { MethodologyTabProps } from '../MethodologyPage';
 import util from './methodologyContentUtil';
 
 const MethodologyContentPage = ({
-  refreshMethodology,
+  methodology,
+  setMethodology,
 }: ErrorControlProps & MethodologyTabProps) => {
   const [isEditing, setIsEditing] = useState(true);
-  const [pageError, setPageError] = useState('');
-  const [methodology, setMethodology] = useState<MethodologyContent>();
 
-  async function getMethodology() {
-    setPageError('');
-    setMethodology(undefined);
-    try {
-      const freshMethodology = await refreshMethodology();
-      if (!freshMethodology) throw new Error();
-      setPageError('');
-      setMethodology(freshMethodology);
-    } catch (err) {
-      setPageError('There was a problem fetching the methodology.');
-    }
-  }
-
-  useEffect(() => {
-    getMethodology();
-  }, []);
-
-  if (pageError) return <p>{pageError}</p>;
   if (methodology)
     return (
       <>

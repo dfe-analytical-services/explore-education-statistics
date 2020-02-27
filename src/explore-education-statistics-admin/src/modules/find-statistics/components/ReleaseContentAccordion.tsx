@@ -105,7 +105,7 @@ const ReleaseContentAccordion = ({
   );
 
   const onRemoveContentSection = useCallback(
-    async (block: ContentType, index: number) => {
+    async (block: ContentType) => {
       if (block.id) {
         await releaseContentService
           .removeContentSection(releaseId, block.id)
@@ -140,7 +140,7 @@ const ReleaseContentAccordion = ({
             onContentChange={newContent =>
               updateContentSection(index, newContent)
             }
-            onRemoveSection={() => onRemoveContentSection(contentItem, index)}
+            onRemoveSection={() => onRemoveContentSection(contentItem)}
           />
         ))}
       </Accordion>

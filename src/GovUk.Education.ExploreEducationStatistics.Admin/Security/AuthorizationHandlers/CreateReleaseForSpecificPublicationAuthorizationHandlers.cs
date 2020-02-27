@@ -7,17 +7,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {}
     
     public class CreateReleaseForSpecificPublicationAuthorizationHandler 
-        : CompoundAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Release>
+        : CompoundAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
     {
         public CreateReleaseForSpecificPublicationAuthorizationHandler() : base(
-            new CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler())
+            new CanCreateReleaseForAnyPublicationAuthorizationHandler())
         {}
     }
     
-    public class CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler : 
+    public class CanCreateReleaseForAnyPublicationAuthorizationHandler : 
         HasClaimAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement>
     {
-        public CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler() 
+        public CanCreateReleaseForAnyPublicationAuthorizationHandler() 
             : base(SecurityClaimTypes.CreateAnyRelease) {}
     }
 }
