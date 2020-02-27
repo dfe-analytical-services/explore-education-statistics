@@ -63,7 +63,49 @@ Validate Analyst1 can see "Upload data files" button
 
 Validate Analyst1 can see "Add another footnote" button
     [Tags]  HappyPath
-    
+    user clicks element  css:#footnotes-tab
+    user waits until page contains element   xpath://h2[text()="Footnotes"]
+    user waits until page contains element   css:#add-footnote-button
+
+Validate Analyst1 can see "Upload file" button for ancillary files
+    [Tags]  HappyPath
+    user clicks element   css:#file-upload-tab
+    user waits until page contains element   xpath://legend[text()="Upload file"]
+    user checks page contains element   css:#upload-file-button
+
+Validate Analyst1 can see subjects for Absence 2016/17 release
+    [Tags]  HappyPath
+    user clicks element   xpath://a[text()="Manage data blocks"]
+    user waits until page contains element   xpath://h2[text()="Create new data block"]
+    user checks element count is x   xpath://*[@id="publicationSubjectForm-subjectId"]//*[@class="govuk-radios__item"]    7
+
+Validate Analyst1 can see Manage content page contents
+    [Tags]  HappyPath
+    user clicks element   xpath://a[text()="Manage content"]
+    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]
+
+    user waits until page contains element   css:#pageMode
+    user checks page contains element  css:#pageMode-edit[checked]
+    user checks page does not contain element   css:#pageMode-preview[checked]
+
+    user waits until page contains element  css:[data-testid="key-stat-tile-title"]
+    user checks element count is x    css:[data-testid="key-stat-tile"]   3
+    user checks page contains key stat tile   Overall absence rate   4.6%
+    user checks page contains key stat tile   Authorised absence rate  3.5%
+    user checks page contains key stat tile   Unauthorised absence rate  1.1%
+
+    user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
+    user checks accordion is in position  About these statistics            1
+    user checks accordion is in position  Pupil absence rates               2
+    user checks accordion is in position  Persistent absence                3
+    user checks accordion is in position  Reasons for absence               4
+    user checks accordion is in position  Distribution of absence           5
+    user checks accordion is in position  Absence by pupil characteristics  6
+    user checks accordion is in position  Absence for 4-year-olds           7
+    user checks accordion is in position  Pupil referral unit absence       8
+    user checks accordion is in position  Regional and local authority (LA) breakdown  9
+    user checks accordion is in position  Methodology                       10
+    user checks accordion is in position  Contact us                        11
 
 Validate Analyst1 cannot Approve a Pupil absence in schools in England release
     [Tags]  HappyPath
@@ -74,7 +116,3 @@ Validate Analyst1 cannot Approve a Pupil absence in schools in England release
     user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-draft" and not(@disabled)]
     user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-higher-level-review" and not(@disabled)]
     user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-approved" and @disabled]
-
-This?
-    [Tags]  HappyPath
-    sleep  100000
