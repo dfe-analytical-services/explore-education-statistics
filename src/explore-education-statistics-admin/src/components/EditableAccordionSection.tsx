@@ -36,9 +36,7 @@ const EditableAccordionSection = ({
   onToggle,
   onHeadingChange,
   onRemoveSection,
-  isReordering = false,
   headerButtons,
-  footerButtons,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
@@ -175,7 +173,6 @@ const EditableAccordionSection = ({
             {goToTop && <GoToTopLink />}
           </>
         )}
-        {footerButtons}
       </div>
     </div>
   );

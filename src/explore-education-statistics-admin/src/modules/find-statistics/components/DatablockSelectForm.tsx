@@ -42,7 +42,7 @@ const DatablockSelectForm = ({
   };
 
   return (
-    <>
+    <div className="dfe-align--left">
       <FormSelect
         className="govuk-!-margin-right-1"
         id="id"
@@ -62,16 +62,21 @@ const DatablockSelectForm = ({
           })),
         ]}
       />
+      <Button className="govuk-button--secondary" onClick={onCancel}>
+        Cancel
+      </Button>
       {getDBPreview(selectedDataBlockId)}
       {selectedDataBlockId !== '' && (
-        <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
+        <>
+          <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
+          {!hideCancel && (
+            <Button className="govuk-button--secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+        </>
       )}
-      {!hideCancel && (
-        <Button className="govuk-button--secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-      )}
-    </>
+    </div>
   );
 };
 

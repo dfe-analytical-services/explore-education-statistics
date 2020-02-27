@@ -130,7 +130,7 @@ const ReleaseContentAccordion = ({
       >
         {content.map((contentItem, index) => (
           <ReleaseContentAccordionSection
-            id={contentItem.id}
+            id={contentItem.id as string}
             key={contentItem.order}
             contentItem={contentItem}
             index={index}

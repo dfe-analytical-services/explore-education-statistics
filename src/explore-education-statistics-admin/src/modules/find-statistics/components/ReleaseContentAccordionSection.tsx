@@ -5,14 +5,14 @@ import ContentBlocks from '@admin/modules/find-statistics/components/EditableCon
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import { Dictionary } from '@admin/types';
+import Button from '@common/components/Button';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext } from 'react';
-import { Dictionary } from 'src/types';
-import { ErrorControlContext } from 'src/components/ErrorBoundary';
-import AddContentButton from './AddContentButton';
+import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
-  sectionId: string;
+  id: string;
   contentItem: ContentType;
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
@@ -22,7 +22,7 @@ export interface ReleaseContentAccordionSectionProps {
 }
 
 const ReleaseContentAccordionSection = ({
-  sectionId,
+  id: sectionId,
   index,
   contentItem,
   onHeadingChange,
@@ -33,12 +33,7 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
-  const {
-    availableDataBlocks,
-    updateAvailableDataBlocks,
-    releaseId,
-  } = useContext(EditingContext);
-  const { handleApiErrors } = useContext(ErrorControlContext);
+  const { updateAvailableDataBlocks, releaseId } = useContext(EditingContext);
 
   const onBlockSaveOrder = async (order: Dictionary<number>) => {
     if (releaseId && sectionId) {
@@ -75,65 +70,57 @@ const ReleaseContentAccordionSection = ({
     }
   };
 
-  const onBlockDelete = (blockId: string) => {
-    return async () => {
-      if (releaseId && sectionId && blockId) {
-        await releaseContentService.deleteContentSectionBlock(
-          releaseId,
-          sectionId,
-          blockId,
-        );
+  const onBlockDelete = async (blockId: string) => {
+    if (releaseId && sectionId && blockId) {
+      await releaseContentService.deleteContentSectionBlock(
+        releaseId,
+        sectionId,
+        blockId,
+      );
 
-        if (updateAvailableDataBlocks) updateAvailableDataBlocks();
+      if (updateAvailableDataBlocks) updateAvailableDataBlocks();
 
-        const {
-          content: newContentBlocks,
-        } = await releaseContentService.getContentSection(releaseId, sectionId);
+      const {
+        content: newContentBlocks,
+      } = await releaseContentService.getContentSection(releaseId, sectionId);
 
-        onContentChange(newContentBlocks);
-      }
-    };
+      onContentChange(newContentBlocks);
+    }
   };
-  const onAddContentCallback = (
-    type: string,
-    data: string,
-    order: number | undefined,
-  ) => {
+
+  const onSectionAddTextBlock = async (type: 'MarkdownBlock' | 'HTMLBlock') => {
     if (releaseId && sectionId) {
-      let addPromise: Promise<unknown>;
+      await releaseContentService.addContentSectionBlock(releaseId, sectionId, {
+        body: '',
+        type,
+        order: contentItem.content ? contentItem.content.length : undefined,
+      });
+      const {
+        content: newContentBlocks,
+      } = await releaseContentService.getContentSection(releaseId, sectionId);
 
-      if (type === 'DataBlock') {
-        addPromise = releaseContentService
-          .attachContentSectionBlock(releaseId, sectionId, {
-            contentBlockId: data,
-            order: order || 0,
-          })
-          .then(v => {
-            if (updateAvailableDataBlocks) {
-              updateAvailableDataBlocks();
-            }
-            return v;
-          });
-      } else {
-        addPromise = releaseContentService.addContentSectionBlock(
-          releaseId,
-          sectionId,
-          {
-            body: data,
-            type,
-            order,
-          },
-        );
-      }
+      onContentChange(newContentBlocks);
+    }
+  };
 
-      addPromise
-        .then(() =>
-          releaseContentService.getContentSection(releaseId, sectionId),
-        )
-        .then(section => {
-          onContentChange(section.content);
-        })
-        .catch(handleApiErrors);
+  const onSectionAddDataBlock = async (datablockId: string) => {
+    if (releaseId && sectionId) {
+      await releaseContentService.attachContentSectionBlock(
+        releaseId,
+        sectionId,
+        {
+          contentBlockId: datablockId,
+          order: contentItem.content ? contentItem.content.length : 0,
+        },
+      );
+
+      if (updateAvailableDataBlocks) updateAvailableDataBlocks();
+
+      const {
+        content: newContentBlocks,
+      } = await releaseContentService.getContentSection(releaseId, sectionId);
+
+      onContentChange(newContentBlocks);
     }
   };
 
@@ -160,21 +147,6 @@ const ReleaseContentAccordionSection = ({
           {isReordering ? 'Save order' : 'Reorder'}
         </a>
       }
-      footerButtons={
-        !isReordering &&
-        canAddBlocks && (
-          <AddContentButton
-            onClick={(type, data) =>
-              onAddContentCallback(
-                type,
-                data,
-                contentItem.content ? contentItem.content.length : 0,
-              )
-            }
-            availableDataBlocks={availableDataBlocks}
-          />
-        )
-      }
       {...restOfProps}
     >
       <ContentBlocks
@@ -189,6 +161,24 @@ const ReleaseContentAccordionSection = ({
         content={contentItem.content}
         allowComments
       />
+
+      {!isReordering && (
+        <div className="govuk-!-margin-bottom-8 dfe-align--center">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              onSectionAddTextBlock('MarkdownBlock');
+            }}
+          >
+            Add text block
+          </Button>
+          <AddDataBlockButton
+            onAddDataBlock={dataBlockId => {
+              onSectionAddDataBlock(dataBlockId);
+            }}
+          />
+        </div>
+      )}
     </AccordionSection>
   );
 };

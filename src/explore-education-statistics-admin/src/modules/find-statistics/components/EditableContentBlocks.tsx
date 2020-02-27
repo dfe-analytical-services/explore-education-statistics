@@ -32,7 +32,7 @@ export interface Props extends ContentBlockProps {
   onContentChange?: (content: ContentType) => void;
   onBlockSaveOrder?: (order: Dictionary<number>) => Promise<void>;
   onBlockContentChange: (blockId: string, content: string) => Promise<void>;
-  onBlockDelete: (blockId: string) => () => Promise<void>;
+  onBlockDelete: (blockId: string) => Promise<void>;
 }
 
 const EditableContentBlock = ({
@@ -41,11 +41,8 @@ const EditableContentBlock = ({
   editable = true,
   onContentChange,
   canAddBlocks = false,
-  canAddSingleBlock = false,
-  textOnly = false,
   isReordering = false,
   allowComments = false,
-  addContentButtonText = 'Add content',
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
@@ -150,7 +147,7 @@ const EditableContentBlock = ({
                   onContentChange={newContent =>
                     onBlockContentChange(block.id, newContent)
                   }
-                  onDelete={() => onBlockDelete(block.id)()}
+                  onDelete={() => onBlockDelete(block.id)}
                 />
               </ContentBlockDraggable>
             </div>
