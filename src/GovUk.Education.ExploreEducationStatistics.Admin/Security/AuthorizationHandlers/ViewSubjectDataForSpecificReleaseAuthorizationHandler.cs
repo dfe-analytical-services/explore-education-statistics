@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     public class ViewSubjectDataForSpecificReleaseAuthorizationHandler : AuthorizationHandler<
-        CanViewSubjectDataForReleaseRequirement, Release>
+        ViewSubjectDataForReleaseRequirement, Release>
     {
         private readonly ContentDbContext _context;
         private readonly IPreReleaseService _preReleaseService;
@@ -22,26 +22,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            CanViewSubjectDataForReleaseRequirement requirement,
+            ViewSubjectDataForReleaseRequirement requirement,
             Release release)
         {
-            await new CanViewSubjectDataForReleaseAuthorizationHandler().HandleAsync(context);
-
+            // Is the Release data published?
+            await new ViewSubjectDataForPublishedReleasesAuthorizationHandler().HandleAsync(context);
             if (!context.HasSucceeded)
             {
-                await ViewSpecificReleaseAuthorizationHandler(context, requirement, release);
+                // Can the user view the Release?
+                await HandleViewSpecificReleaseAuthorization(context, requirement, release);
             }
         }
 
-        private async Task ViewSpecificReleaseAuthorizationHandler(AuthorizationHandlerContext context,
+        private async Task HandleViewSpecificReleaseAuthorization(AuthorizationHandlerContext context,
             IAuthorizationRequirement requirement, Release release)
         {
             var contentRelease = _context.Releases.First(r => r.Id == release.Id);
-            
+
             var viewSpecificReleaseAuthorizationContext = new AuthorizationHandlerContext(
                 new[] {new ViewSpecificReleaseRequirement()}, context.User, contentRelease);
-            
-            await new ViewSpecificReleaseAuthorizationHandler(_context, _preReleaseService).HandleAsync(viewSpecificReleaseAuthorizationContext);
+
+            await new ViewSpecificReleaseAuthorizationHandler(_context, _preReleaseService).HandleAsync(
+                viewSpecificReleaseAuthorizationContext);
             if (viewSpecificReleaseAuthorizationContext.HasSucceeded)
             {
                 context.Succeed(requirement);

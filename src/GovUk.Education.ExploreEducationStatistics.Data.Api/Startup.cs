@@ -118,10 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy =>
-                    policy.Requirements.Add(new CanViewSubjectDataForReleaseRequirement()));
+                    policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
             });
 
-            services.AddTransient<IAuthorizationHandler, CanViewSubjectDataForReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
             services.AddCors();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
