@@ -99,10 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
             catch (Exception e)
             {
-                // If it's a deadlock issue then throw & try 3 up to 3 times
+                // If deadlock exception then throw & try up to 3 times
                 if (e is SqlException exception && exception.Number == 1205)
                 {
-                    throw exception;
+                    logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
+                                       $"{message.DataFileName} : {exception.Message} : transaction will be retried");
+                    throw e;
                 }
                 
                 var ex = GetInnerException(e);
@@ -130,9 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
-
-            await dbContext.SaveChangesAsync();
-
+            
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
 
             if (message.Seeding)
