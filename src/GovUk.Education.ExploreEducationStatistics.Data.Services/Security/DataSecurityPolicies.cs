@@ -2,6 +2,6 @@
 {
     public enum DataSecurityPolicies
     {
-        CanViewSubjectData
+        CanViewSubjectDataForRelease
     }
 }

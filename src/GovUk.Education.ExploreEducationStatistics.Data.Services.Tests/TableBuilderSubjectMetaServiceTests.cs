@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -58,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var release = new Release
                 {
                     Id = Guid.NewGuid(),
-                    ReleaseDate = DateTime.UtcNow.AddDays(1)
                 };
 
                 var subject = new Subject
@@ -74,6 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var (filterService, filterItemService, indicatorGroupService, locationService,
                     observationService, timePeriodService, userService) = Mocks();
+
+                userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectDataForRelease)).ReturnsAsync(false);
 
                 var service = new TableBuilderSubjectMetaService(filterService.Object,
                     filterItemService.Object,

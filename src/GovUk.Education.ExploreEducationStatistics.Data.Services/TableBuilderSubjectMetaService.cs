@@ -217,8 +217,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            var result = subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData);
-            return result ? new Either<ActionResult, Subject>(subject) : new ForbidResult();
+            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            {
+                return subject;
+            }
+
+            return new ForbidResult();
         }
 
         private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)

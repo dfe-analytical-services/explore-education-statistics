@@ -59,11 +59,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private async Task<Either<ActionResult, bool>> CheckCanViewSubjectData(Subject subject)
+        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (subject.Release.Live || await _userService.MatchesPolicy(subject, CanViewSubjectData))
+            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
             {
-                return true;
+                return subject;
             }
 
             return new ForbidResult();
