@@ -14,7 +14,6 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
   sectionId: string;
   index?: number;
   headerButtons?: ReactNode;
-  footerButtons?: ReactNode;
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
   canRemoveSection: boolean;
@@ -38,7 +37,6 @@ const EditableAccordionSection = ({
   onRemoveSection,
   isReordering = false,
   headerButtons,
-  footerButtons,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
@@ -172,7 +170,6 @@ const EditableAccordionSection = ({
         {children && (
           <>
             {children}
-            {!isReordering && footerButtons}
             {goToTop && <GoToTopLink />}
           </>
         )}

@@ -70,30 +70,28 @@ const ReleaseContentAccordionSection = ({
     }
   };
 
-  const onBlockContentChange = (blockId: string) => {
-    return async (newContent: string) => {
-      if (releaseId && sectionId && blockId) {
-        const updatedBlock = await releaseContentService.updateContentSectionBlock(
-          releaseId,
-          sectionId,
-          blockId,
-          {
-            body: newContent,
-          },
-        );
-        if (onContentChange) {
-          const newBlocks = [
-            ...((contentItem && contentItem.content) || []).map(block => {
-              if (block.id === updatedBlock.id) {
-                return updatedBlock;
-              }
-              return block;
-            }),
-          ];
-          onContentChange(newBlocks);
-        }
+  const onBlockContentChange = async (blockId: string, newContent: string) => {
+    if (releaseId && sectionId && blockId) {
+      const updatedBlock = await releaseContentService.updateContentSectionBlock(
+        releaseId,
+        sectionId,
+        blockId,
+        {
+          body: newContent,
+        },
+      );
+      if (onContentChange) {
+        const newBlocks = [
+          ...((contentItem && contentItem.content) || []).map(block => {
+            if (block.id === updatedBlock.id) {
+              return updatedBlock;
+            }
+            return block;
+          }),
+        ];
+        onContentChange(newBlocks);
       }
-    };
+    }
   };
 
   const onBlockDelete = (blockId: string) => {
@@ -118,50 +116,6 @@ const ReleaseContentAccordionSection = ({
     };
   };
 
-  const onAddContentCallback = (
-    type: string,
-    data: string,
-    order: number | undefined,
-  ) => {
-    if (releaseId && sectionId) {
-      let addPromise: Promise<unknown>;
-
-      if (type === 'DataBlock') {
-        addPromise = releaseContentService
-          .attachContentSectionBlock(releaseId, sectionId, {
-            contentBlockId: data,
-            order: order || 0,
-          })
-          .then(v => {
-            if (updateAvailableDataBlocks) {
-              updateAvailableDataBlocks();
-            }
-            return v;
-          });
-      } else {
-        addPromise = releaseContentService.addContentSectionBlock(
-          releaseId,
-          sectionId,
-          {
-            body: data,
-            type,
-            order,
-          },
-        );
-      }
-
-      addPromise
-        .then(() =>
-          releaseContentService.getContentSection(releaseId, sectionId),
-        )
-        .then(section => {
-          if (onContentChange) onContentChange(section.content);
-          setContent(section.content);
-        })
-        .catch(handleApiErrors);
-    }
-  };
-
   return (
     <AccordionSection
       id={sectionId}
@@ -184,17 +138,6 @@ const ReleaseContentAccordionSection = ({
         >
           {isReordering ? 'Save order' : 'Reorder'}
         </a>
-      }
-      footerButtons={
-        !isReordering &&
-        canAddBlocks && (
-          <AddContentButton
-            onClick={(type, data) =>
-              onAddContentCallback(type, data, content ? content.length : 0)
-            }
-            availableDataBlocks={availableDataBlocks}
-          />
-        )
       }
       {...restOfProps}
     >

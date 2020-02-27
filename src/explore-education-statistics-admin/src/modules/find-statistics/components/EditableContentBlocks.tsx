@@ -34,7 +34,7 @@ export interface Props extends ContentBlockProps {
   addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
   onBlockSaveOrder?: (order: Dictionary<number>) => Promise<void>;
-  onBlockContentChange: (blockId: string) => (content: string) => Promise<void>;
+  onBlockContentChange: (blockId: string, content: string) => Promise<void>;
   onBlockDelete: (blockId: string) => () => Promise<void>;
 }
 
@@ -59,6 +59,7 @@ const EditableContentBlock = ({
   React.useEffect(() => {
     setContentBlocks(content);
   }, [content]);
+
   React.useEffect(() => {
     if (!isReordering) {
       //save
@@ -206,7 +207,7 @@ const EditableContentBlock = ({
                   canDelete={!!canAddBlocks && !isReordering}
                   block={block}
                   onContentChange={newContent =>
-                    onBlockContentChange(block.id)(newContent)
+                    onBlockContentChange(block.id, newContent)
                   }
                   onDelete={() => onBlockDelete(block.id)()}
                 />

@@ -1,6 +1,6 @@
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import Accordion from '@admin/components/EditableAccordion';
-import AccordionSection from '@admin/components/EditableAccordionSection';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Link from '@admin/components/Link';
 import React from 'react';
 import { ReleaseType } from '@common/services/publicationService';
@@ -23,7 +23,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         Help and support
       </h2>
 
-      <Accordion id="static-content-section" canReorder={false}>
+      <Accordion id="static-content-section">
         <AccordionSection
           heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"
