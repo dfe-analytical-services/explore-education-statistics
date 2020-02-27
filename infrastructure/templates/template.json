@@ -562,35 +562,12 @@
               "http://127.0.0.1"
             ]
           },
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
-            },
-            {
-              "name": "SeedConfig:BatchSize",
-              "value": "50"
-            }
-          ],
           "connectionStrings": [
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
             },
-            // {
-            //   "name": "VaultTest",
-            //   "type": "SQLAzure",
-            //   "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', '@Microsoft.KeyVault(SecretUri=', reference(variables('ees-sql-user-data')).secretUriWithVersion, ')', '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', '@Microsoft.KeyVault(SecretUri=', reference(variables('ees-sql-password-data')).secretUriWithVersion, ')', ';')]"
-            // },
             {
               "name": "PublicStorage",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
@@ -604,6 +581,23 @@
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
       ]
+    },
+    {
+      "name": "[concat(variables('dataAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-public')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]"
+      }
     },
     {
       "apiVersion": "2016-08-01",
@@ -783,20 +777,6 @@
               "http://127.0.0.1"
             ]
           },
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
-            }
-          ],
           "connectionStrings": [
             {
               "name": "PublicStorage",
@@ -810,6 +790,23 @@
         "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('contentAppInsights'))]"
       ]
+    },
+    {
+      "name": "[concat(variables('contentAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-public')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]"
+      }
     },
     {
       "apiVersion": "2016-08-01",
