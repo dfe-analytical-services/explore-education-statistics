@@ -24,7 +24,7 @@ import { Dictionary } from '@common/types';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
-import { compareAsc, endOfDay, format, isValid, parse } from 'date-fns';
+import { endOfDay, format, isValid } from 'date-fns';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;
@@ -101,8 +101,8 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
       )}`,
       value => {
         return (
-          isValid(parseDate(value)) &&
-          endOfDay(parseDate(value)) >= endOfDay(new Date())
+          isValid(parseDate({ value })) &&
+          endOfDay(parseDate({ value })) >= endOfDay(new Date())
         );
       },
     ),

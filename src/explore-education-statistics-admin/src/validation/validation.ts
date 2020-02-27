@@ -9,14 +9,19 @@ const yupNumberOrUndefinedIfBlank = Yup.mixed().transform((val: string) =>
   val === '' ? undefined : parseInt(val, 10),
 );
 
-export const parseDate = (
-  value: { year: number; month: number; day: number },
-  backupDate?: Date,
-) => {
+interface ParseDateParams {
+  value: { year: number; month: number; day: number };
+  backupDate?: Date;
+}
+
+export const parseDate = ({
+  value,
+  backupDate = new Date(value.year, value.month, value.day),
+}: ParseDateParams) => {
   return parse(
     `${value.year}-${value.month}-${value.day}`,
     'yyyy-M-d',
-    backupDate || new Date(value.year, value.month, value.day),
+    backupDate,
   );
 };
 
@@ -28,7 +33,9 @@ export const validateMandatoryDayMonthYearField = Yup.object({
   day: yupNumberOrUndefinedIfBlank.required('Enter a day'),
   month: yupNumberOrUndefinedIfBlank.required('Enter a month'),
   year: yupNumberOrUndefinedIfBlank.required('Enter a year'),
-}).test('validDate', 'Enter a valid date', value => isValid(parseDate(value)));
+}).test('validDate', 'Enter a valid date', value =>
+  isValid(parseDate({ value })),
+);
 
 /**
  * A validator that allows for a user to only enter certain fields of a day-month-year field group, but if all
@@ -45,7 +52,7 @@ export const validateOptionalPartialDayMonthYearField = Yup.object({
   }
 
   // but if all fields have been filled in, they should represent a valid date
-  return isValid(parseDate(value));
+  return isValid(parseDate({ value }));
 });
 
 /**
@@ -62,7 +69,7 @@ export const validateOptionalFullDayMonthYearField = Yup.object({
   }
 
   // but if all fields have been filled in, they should represent a valid date
-  return isValid(parseDate(value));
+  return isValid(parseDate({ value }));
 });
 
 export const shapeOfDayMonthYearField = Yup.object({
