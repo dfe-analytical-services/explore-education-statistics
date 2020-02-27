@@ -155,7 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     
                     subEntities.AddRange(o.FilterItems);
                 }
-                context.BulkInsert(subEntities);
+                context.BulkInsert(subEntities, new BulkConfig
+                {
+                    BulkCopyTimeout = 0
+                });
                     
                 transaction.Commit();
             }
