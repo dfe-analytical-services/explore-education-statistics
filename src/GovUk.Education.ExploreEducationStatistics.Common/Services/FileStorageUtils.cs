@@ -185,6 +185,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blob.Metadata.ContainsKey(DataFileKey);
         }
         
+        public static int CalculateNumberOfRows(Stream fileStream)
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                var numberOfLines = 0;
+                while (reader.ReadLine() != null)
+                {
+                    ++numberOfLines;
+                }
+
+                return numberOfLines;
+            }
+        }
+        
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);

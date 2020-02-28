@@ -12,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             PartitionKey = releaseId;
             RowKey = dataFileName;
             NumBatches = numBatches;
-            BatchesProcessed = new byte[64];
             Errors = "";
             Status = IStatus.RUNNING_PHASE_1;
             NumberOfRows = numberOfRows;
@@ -23,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         {
         }
 
-        public byte[] BatchesProcessed { get; set; }
         public int NumBatches { get; set; }
 
         [EntityEnumPropertyConverter] public IStatus Status { get; set; }

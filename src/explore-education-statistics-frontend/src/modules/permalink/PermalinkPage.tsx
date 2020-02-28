@@ -4,6 +4,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import permalinkService from '@common/modules/table-tool/services/permalinkService';
 import { Permalink } from '@common/modules/table-tool/types/permalink';
 import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
@@ -69,7 +70,10 @@ class PermalinkPage extends Component<Props> {
           fullTable={fullTable}
           tableHeadersConfig={
             configuration.tableHeadersConfig
-              ? configuration.tableHeadersConfig
+              ? mapTableHeadersConfig(
+                  configuration.tableHeadersConfig,
+                  fullTable.subjectMeta,
+                )
               : getDefaultTableHeaderConfig(fullTable.subjectMeta)
           }
         />

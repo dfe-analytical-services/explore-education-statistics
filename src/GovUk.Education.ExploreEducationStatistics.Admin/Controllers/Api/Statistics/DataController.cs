@@ -1,13 +1,12 @@
 using System.Diagnostics;
-using System.Web.Http;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
@@ -27,18 +26,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public ActionResult<ResultWithMetaViewModel> Query([FromUri] ReleaseId releaseId,
-            [FromBody] ObservationQueryContext query)
+        public Task<ActionResult<ResultWithMetaViewModel>> Query([FromBody] ObservationQueryContext query)
         {
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var resultWithMetaViewModel = _dataService.Query(query, releaseId);
+            var resultWithMetaViewModel = _dataService.Query(query);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
 
-            return resultWithMetaViewModel;
+            return resultWithMetaViewModel.HandleFailuresOrOk();
         }
     }
 }
