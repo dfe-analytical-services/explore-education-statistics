@@ -221,8 +221,9 @@ def user_gets_row_with_heading(heading):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
   return elem
 
-def user_gets_row_with_group_and_indicator(group, indicator):
-  elems = sl.driver.find_elements_by_xpath(f'//table/tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
+  table_elem = sl.get_webelement(table_selector)
+  elems = table_elem.find_elements_by_xpath(f'.//tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
   for elem in elems:
     try:
       elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')

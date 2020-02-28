@@ -127,42 +127,42 @@ Validate new table column headings
 
 Validate Barnet Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnet   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     224
     user checks row cell contains text  ${row}    2     210
 
 Validate Barnet Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnet   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     38,345
     user checks row cell contains text  ${row}    2     36,820
 
 Validate Barnsley Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnsley   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Barnsley   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     149
     user checks row cell contains text  ${row}    2     146
 
 Validate Barnsley Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnsley   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Barnsley   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     31,938
     user checks row cell contains text  ${row}    2     36,250
 
 Validate Bedford Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Bedford   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Bedford   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     176
     user checks row cell contains text  ${row}    2     178
 
 Validate Bedford Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Bedford   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Bedford   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     17,687
     user checks row cell contains text  ${row}    2     21,847

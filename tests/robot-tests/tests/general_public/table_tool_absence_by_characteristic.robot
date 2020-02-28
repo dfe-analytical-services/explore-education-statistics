@@ -81,7 +81,7 @@ Validate results table column headings
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender male   Authorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Authorised absence rate
     user checks row contains heading  ${row}  Authorised absence rate
     user checks row cell contains text  ${row}    1     4.2%
     user checks row cell contains text  ${row}    2     3.4%
@@ -90,7 +90,7 @@ Validate Gender male Authorised absence rate row
 
 Validate Gender male Overall absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender male   Overall absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Overall absence rate
     user checks row contains heading  ${row}  Overall absence rate
     user checks row cell contains text  ${row}    1     5.2%
     user checks row cell contains text  ${row}    2     4.5%
@@ -99,7 +99,7 @@ Validate Gender male Overall absence rate row
 
 Validate Gender male Unauthorised absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender male   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Unauthorised absence rate
     user checks row contains heading  ${row}  Unauthorised absence rate
     user checks row cell contains text  ${row}    1     1.1%
     user checks row cell contains text  ${row}    2     1.1%
@@ -108,7 +108,7 @@ Validate Gender male Unauthorised absence rate row
 
 Validate Gender female Authorised absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender female   Authorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Authorised absence rate
     user checks row contains heading  ${row}  Authorised absence rate
     user checks row cell contains text  ${row}    1     4.2%
     user checks row cell contains text  ${row}    2     3.5%
@@ -117,7 +117,7 @@ Validate Gender female Authorised absence rate row
 
 Validate Gender female Overall absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender female   Overall absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Overall absence rate
     user checks row contains heading  ${row}  Overall absence rate
     user checks row cell contains text  ${row}    1     5.3%
     user checks row cell contains text  ${row}    2     4.5%
@@ -126,7 +126,7 @@ Validate Gender female Overall absence rate row
 
 Validate Gender female Unauthorised absence rate row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Gender female   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Unauthorised absence rate
     user checks row contains heading  ${row}  Unauthorised absence rate
     user checks row cell contains text  ${row}    1     1.1%
     user checks row cell contains text  ${row}    2     1.1%
@@ -260,42 +260,42 @@ User validates permalink table
     user checks results table column heading contains  2   3   2014/15
     user checks results table column heading contains  2   4   2015/16
 
-    ${row}=  user gets row with group and indicator   Gender male   Authorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Authorised absence rate
     user checks row contains heading  ${row}  Authorised absence rate
     user checks row cell contains text  ${row}    1     4.2%
     user checks row cell contains text  ${row}    2     3.4%
     user checks row cell contains text  ${row}    3     3.6%
     user checks row cell contains text  ${row}    4     3.5%
 
-    ${row}=  user gets row with group and indicator   Gender male   Overall absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Overall absence rate
     user checks row contains heading  ${row}  Overall absence rate
     user checks row cell contains text  ${row}    1     5.2%
     user checks row cell contains text  ${row}    2     4.5%
     user checks row cell contains text  ${row}    3     4.6%
     user checks row cell contains text  ${row}    4     4.6%
 
-    ${row}=  user gets row with group and indicator   Gender male   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Unauthorised absence rate
     user checks row contains heading  ${row}  Unauthorised absence rate
     user checks row cell contains text  ${row}    1     1.1%
     user checks row cell contains text  ${row}    2     1.1%
     user checks row cell contains text  ${row}    3     1.1%
     user checks row cell contains text  ${row}    4     1.1%
 
-    ${row}=  user gets row with group and indicator   Gender female   Authorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Authorised absence rate
     user checks row contains heading  ${row}  Authorised absence rate
     user checks row cell contains text  ${row}    1     4.2%
     user checks row cell contains text  ${row}    2     3.5%
     user checks row cell contains text  ${row}    3     3.5%
     user checks row cell contains text  ${row}    4     3.4%
 
-    ${row}=  user gets row with group and indicator   Gender female   Overall absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Overall absence rate
     user checks row contains heading  ${row}  Overall absence rate
     user checks row cell contains text  ${row}    1     5.3%
     user checks row cell contains text  ${row}    2     4.5%
     user checks row cell contains text  ${row}    3     4.6%
     user checks row cell contains text  ${row}    4     4.5%
 
-    ${row}=  user gets row with group and indicator   Gender female   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Unauthorised absence rate
     user checks row contains heading  ${row}  Unauthorised absence rate
     user checks row cell contains text  ${row}    1     1.1%
     user checks row cell contains text  ${row}    2     1.1%
