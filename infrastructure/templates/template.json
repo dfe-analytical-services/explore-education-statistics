@@ -339,9 +339,9 @@
 
     "publishReleaseDataFunctionDisabled": {
       "type": "string",
-      "defaultValue": "true",
+      "defaultValue": "false",
       "metadata": {
-        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+        "description": "Disable the Publish Release Data Function in the Publisher App which triggers the Datafactory pipeline"
       }
     },
 
@@ -379,10 +379,6 @@
       "metadata": {
         "description": "Number of days to retain blobs after delete"
       }
-    },
-    "deployDatafactory": {
-      "type": "bool",
-      "defaultValue": false
     },
     "autoscalePublicApplication": {
       "type": "bool",
@@ -778,11 +774,6 @@
             ]
           },
           "connectionStrings": [
-            {
-              "name": "PublicStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
-            }
           ]
         }
       },
@@ -2612,7 +2603,6 @@
       }
     },
     {
-      "condition": "[parameters('deployDatafactory')]",
       "name": "datafactory",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -2623,12 +2613,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "environment": {
-            "value": "[parameters('environment')]"
-          },
           "publisherAppName": {
             "value": "[variables('publisherAppName')]"
           },
@@ -2666,7 +2650,6 @@
         "enableSoftDelete": true,
         "accessPolicies": [
           {
-            "condition": "[parameters('deployDatafactory')]",
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {

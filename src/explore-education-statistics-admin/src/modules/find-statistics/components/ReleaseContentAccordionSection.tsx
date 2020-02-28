@@ -35,7 +35,7 @@ const ReleaseContentAccordionSection = ({
   onRemoveSection,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
-  const { caption, heading, order } = contentItem;
+  const { caption, heading } = contentItem;
 
   const [isReordering, setIsReordering] = React.useState(false);
 
@@ -94,11 +94,11 @@ const ReleaseContentAccordionSection = ({
       {...restOfProps}
     >
       <ContentBlock
+        id={`${heading}-content`}
         isReordering={isReordering}
         canAddBlocks
         sectionId={id}
         content={content}
-        id={`content_${order}`}
         publication={publication}
         onContentChange={newContent => contentChange(newContent)}
         onReorderHook={s => {
