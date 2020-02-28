@@ -1,5 +1,5 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
-import service from '@admin/services/release/edit-release/data/service';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
@@ -31,7 +31,7 @@ interface InfographicChartOptionsProps {
 const loadChartFilesAndMapToSelectOptionAsync = (
   releaseId: string,
 ): Promise<SelectOption[]> => {
-  return service.getChartFiles(releaseId).then(chartFiles => {
+  return editReleaseDataService.getChartFiles(releaseId).then(chartFiles => {
     return [
       {
         label: 'Upload a new file',
@@ -72,7 +72,7 @@ const InfographicChartForm = ({
       if (values.file) {
         setUploading(true);
 
-        await service
+        await editReleaseDataService
           .uploadChartFile(releaseId, {
             name: values.name,
             file: values.file as File,
@@ -135,7 +135,7 @@ const InfographicChartForm = ({
                   onConfirm={async () => {
                     // eslint-disable-next-line no-unused-expressions
                     form.values.fileId &&
-                      service
+                      editReleaseDataService
                         .deleteChartFile(releaseId, form.values.fileId)
                         .then(() =>
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),

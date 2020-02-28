@@ -1,6 +1,7 @@
 import permissionService from '@admin/services/permissions/service';
-import service from '@admin/services/release/edit-release/data/service';
-import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
+import editReleaseDataService, {
+  AncillaryFile,
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
   ErrorControlProps,
@@ -45,7 +46,7 @@ const ReleaseFileUploadsSection = ({
 
   useEffect(() => {
     Promise.all([
-      service.getAncillaryFiles(releaseId),
+      editReleaseDataService.getAncillaryFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ])
       .then(([filesResult, canUpdateReleaseResult]) => {
@@ -64,7 +65,9 @@ const ReleaseFileUploadsSection = ({
         fileInput.value = '';
       });
 
-    const latestFiles = await service.getAncillaryFiles(releaseId);
+    const latestFiles = await editReleaseDataService.getAncillaryFiles(
+      releaseId,
+    );
     setFiles(latestFiles);
   };
 
@@ -88,7 +91,7 @@ const ReleaseFileUploadsSection = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
-      await service.uploadAncillaryFile(releaseId, {
+      await editReleaseDataService.uploadAncillaryFile(releaseId, {
         name: values.name,
         file: values.file as File,
       });
@@ -185,7 +188,7 @@ const ReleaseFileUploadsSection = ({
                           <SummaryListItem term="File">
                             <ButtonText
                               onClick={() =>
-                                service
+                                editReleaseDataService
                                   .downloadAncillaryFile(
                                     releaseId,
                                     file.filename,
@@ -228,7 +231,7 @@ const ReleaseFileUploadsSection = ({
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
               onConfirm={async () => {
-                await service
+                await editReleaseDataService
                   .deleteAncillaryFile(releaseId, deleteFileName)
                   .catch(handleApiErrors);
                 setDeleteFileName('');
