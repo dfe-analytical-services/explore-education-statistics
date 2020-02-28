@@ -2613,12 +2613,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "environment": {
-            "value": "[parameters('environment')]"
-          },
           "publisherAppName": {
             "value": "[variables('publisherAppName')]"
           },
