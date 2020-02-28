@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -24,18 +24,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ILogger<FileStorageService> _logger;
 
-        private readonly string _privateStorageConnectionString =
-            ConnectionUtils.GetAzureStorageConnectionString("CoreStorage");
-
-        private readonly string _publicStorageConnectionString =
-            ConnectionUtils.GetAzureStorageConnectionString("PublicStorage");
+        private readonly string _privateStorageConnectionString;
+        private readonly string _publicStorageConnectionString;
 
         private const string PrivateFilesContainerName = "releases";
         private const string PublicFilesContainerName = "downloads";
         private const string PublicContentContainerName = "cache";
 
-        public FileStorageService(ILogger<FileStorageService> logger)
+        public FileStorageService(IConfiguration configuration, ILogger<FileStorageService> logger)
         {
+            _privateStorageConnectionString = configuration.GetValue<string>("CoreStorage");
+            _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
             _logger = logger;
         }
 

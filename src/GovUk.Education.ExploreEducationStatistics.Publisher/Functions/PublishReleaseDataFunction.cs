@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         public async Task PublishReleaseData(
             [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
+            IConfiguration configuration,
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
@@ -42,8 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 try
                 {
-                    var configuration = LoadClientConfiguration(executionContext);
-                    var success = TriggerDataFactoryReleasePipeline(configuration, logger, message);
+                    var clientConfiguration = new DataFactoryClientConfiguration(configuration);
+                    var success = TriggerDataFactoryReleasePipeline(clientConfiguration, logger, message);
                     await UpdateStage(message, success ? Started : Failed);
                 }
                 catch (Exception e)
@@ -99,16 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 SubscriptionId = configuration.SubscriptionId
             };
-        }
-
-        private static DataFactoryClientConfiguration LoadClientConfiguration(ExecutionContext context)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-            return new DataFactoryClientConfiguration(configuration);
         }
 
         private static bool IsDevelopment()
