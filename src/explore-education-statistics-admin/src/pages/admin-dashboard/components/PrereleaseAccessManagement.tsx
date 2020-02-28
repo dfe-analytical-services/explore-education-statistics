@@ -38,10 +38,7 @@ const PrereleaseAccessManagement = ({
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    Promise.all([
-      dashboardService.getAvailablePreReleaseContacts(),
-      dashboardService.getPreReleaseContactsForRelease(release.id),
-    ])
+    Promise.all([dashboardService.getPreReleaseContactsForRelease(release.id)])
       .then(([preReleaseContactsForRelease]) =>
         setModel({
           preReleaseContactsForRelease,
