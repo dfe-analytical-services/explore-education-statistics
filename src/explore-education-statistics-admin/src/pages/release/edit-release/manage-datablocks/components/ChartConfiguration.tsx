@@ -135,6 +135,7 @@ const ChartConfiguration = ({
             {chartOptions.legend !== 'none' && (
               <FormGroup>
                 <FormTextInput
+                  type="number"
                   id="legend-height"
                   name="legend-height"
                   label="Legend height (px)"
@@ -157,6 +158,7 @@ const ChartConfiguration = ({
           <div className={styles.formGroup}>
             <FormGroup>
               <FormTextInput
+                type="number"
                 id="chart-height"
                 name="chart-height"
                 label="Chart height (px)"
@@ -173,6 +175,7 @@ const ChartConfiguration = ({
             </FormGroup>
             <FormGroup>
               <FormTextInput
+                type="number"
                 id="chart-width"
                 name="chart-width"
                 label="Chart width (px)"
