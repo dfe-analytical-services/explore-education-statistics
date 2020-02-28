@@ -3,11 +3,27 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearIsEmpty,
 } from '@common/services/publicationService';
-import { isValid } from 'date-fns';
+import { isValid, parse } from 'date-fns';
 
 const yupNumberOrUndefinedIfBlank = Yup.mixed().transform((val: string) =>
   val === '' ? undefined : parseInt(val, 10),
 );
+
+interface ParseDateParams {
+  value: { year: number; month: number; day: number };
+  backupDate?: Date;
+}
+
+export const parseDate = ({
+  value,
+  backupDate = new Date(value.year, value.month, value.day),
+}: ParseDateParams) => {
+  return parse(
+    `${value.year}-${value.month}-${value.day}`,
+    'yyyy-M-d',
+    backupDate,
+  );
+};
 
 /**
  * Validator that validates that all fields of a day-month-year field are entered, and that the combination
@@ -18,7 +34,7 @@ export const validateMandatoryDayMonthYearField = Yup.object({
   month: yupNumberOrUndefinedIfBlank.required('Enter a month'),
   year: yupNumberOrUndefinedIfBlank.required('Enter a year'),
 }).test('validDate', 'Enter a valid date', value =>
-  isValid(new Date(value.year, value.month, value.day)),
+  isValid(parseDate({ value })),
 );
 
 /**
@@ -36,7 +52,7 @@ export const validateOptionalPartialDayMonthYearField = Yup.object({
   }
 
   // but if all fields have been filled in, they should represent a valid date
-  return isValid(new Date(value.year, value.month, value.day));
+  return isValid(parseDate({ value }));
 });
 
 /**
@@ -53,7 +69,7 @@ export const validateOptionalFullDayMonthYearField = Yup.object({
   }
 
   // but if all fields have been filled in, they should represent a valid date
-  return isValid(new Date(value.year, value.month, value.day));
+  return isValid(parseDate({ value }));
 });
 
 export const shapeOfDayMonthYearField = Yup.object({

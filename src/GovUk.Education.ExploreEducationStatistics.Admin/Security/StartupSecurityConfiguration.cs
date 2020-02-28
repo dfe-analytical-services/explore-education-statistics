@@ -1,6 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -79,6 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to approve a specific Release?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
+                
+                // does this user have permission to view the subject data of a specific Release?
+                options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
+                    policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
 
                 /**
                  * Pre Release management
@@ -157,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSubjectDataForSpecificReleaseAuthorizationHandler>();
 
             /**
              * Pre Release management

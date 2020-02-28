@@ -181,6 +181,11 @@ const service = {
       data,
     );
   },
+
+  async deleteChartFile(releaseId: string, fileName: string): Promise<null> {
+    return client.delete<null>(`/release/${releaseId}/chart/${fileName}`);
+  },
+
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
     return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
       responseType: 'blob',

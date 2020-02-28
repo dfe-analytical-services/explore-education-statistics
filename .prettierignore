@@ -5,4 +5,4 @@ node_modules/
 *.min.js
 
 # This file is massive and holds the formatter
-src/explore-education-statistics-common/src/services/UKGeoJson.ts
+src/explore-education-statistics-common/src/modules/charts/files/ukGeoJson.json
