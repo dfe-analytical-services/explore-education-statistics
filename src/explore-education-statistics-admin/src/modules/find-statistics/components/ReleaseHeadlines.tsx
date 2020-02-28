@@ -11,6 +11,7 @@ import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
@@ -133,13 +134,15 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
                 <TimePeriodDataTable
                   fullTable={secondaryStatsDatablock.data}
                   tableHeadersConfig={
-                    (secondaryStatsDatablock.datablock.tables &&
-                      secondaryStatsDatablock.datablock.tables[0] &&
-                      secondaryStatsDatablock.datablock.tables[0]
-                        .tableHeaders) ||
-                    getDefaultTableHeaderConfig(
-                      secondaryStatsDatablock.data.subjectMeta,
-                    )
+                    secondaryStatsDatablock.datablock.tables?.[0]?.tableHeaders
+                      ? mapTableHeadersConfig(
+                          secondaryStatsDatablock.datablock.tables?.[0]
+                            ?.tableHeaders,
+                          secondaryStatsDatablock.data.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(
+                          secondaryStatsDatablock.data.subjectMeta,
+                        )
                   }
                 />
               ) : (
