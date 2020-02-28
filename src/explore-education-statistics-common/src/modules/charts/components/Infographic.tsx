@@ -4,19 +4,21 @@ import {
 } from '@common/modules/charts/types/chart';
 import React, { useEffect, useState } from 'react';
 
-export interface InfographicChartProps extends AbstractChartProps {
-  fileId?: string;
+export type GetInfographic = (
+  releaseId: string,
+  fileName: string,
+) => Promise<Blob>;
 
-  chartFileDownloadService?: (
-    releaseId: string,
-    fileName: string,
-  ) => Promise<Blob>;
+export interface InfographicChartProps extends AbstractChartProps {
+  releaseId?: string;
+  fileId?: string;
+  getInfographic?: GetInfographic;
 }
 
 const Infographic = ({
-  data,
+  releaseId,
   fileId,
-  chartFileDownloadService,
+  getInfographic,
   width = 0,
   height = 0,
   children,
@@ -24,15 +26,15 @@ const Infographic = ({
   const [file, setFile] = useState<string>();
 
   useEffect(() => {
-    if (fileId && chartFileDownloadService) {
-      chartFileDownloadService(data.releaseId, fileId).then(blob => {
+    if (fileId && releaseId && getInfographic) {
+      getInfographic(releaseId, fileId).then(blob => {
         const a = new FileReader();
         // @ts-ignore
         a.onload = (e: ProgressEvent) => setFile(e.target.result);
         a.readAsDataURL(blob);
       });
     }
-  }, [chartFileDownloadService, data.releaseId, fileId]);
+  }, [getInfographic, fileId, releaseId]);
 
   if (fileId === undefined || fileId === '') {
     return <div>Infographic not configured</div>;

@@ -1,3 +1,4 @@
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import React from 'react';
 import DataBlock, {
   DataBlockProps,
@@ -16,7 +17,12 @@ const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      <DataBlock id={id} {...restOfProps} />
+      <DataBlock
+        {...restOfProps}
+        id={id}
+        getInfographic={editReleaseDataService.downloadChartFile}
+      />
+
       <Button
         className="govuk-button--warning"
         onClick={() => setShowConfirmation(true)}

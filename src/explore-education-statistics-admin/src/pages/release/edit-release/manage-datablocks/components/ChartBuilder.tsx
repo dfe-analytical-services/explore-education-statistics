@@ -249,7 +249,7 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
-        chartFileDownloadService: editReleaseDataService.downloadChartFile,
+        getInfographic: editReleaseDataService.downloadChartFile,
 
         ...chartOptions,
       });
