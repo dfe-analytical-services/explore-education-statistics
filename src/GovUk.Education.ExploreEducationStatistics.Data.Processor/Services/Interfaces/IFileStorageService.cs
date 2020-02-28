@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
@@ -20,12 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             string contentType,
             int numRows);
 
-        void DeleteDatafile(string releaseId, string dataFileName);
+        void DeleteBatchFile(string releaseId, string dataFileName);
 
-        void DeleteBatches(string releaseId, string dataFileName);
-
-        CloudBlockBlob GetBlobReference(string releaseId, string dataFileName);
-
-        Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob);
+        int GetNumBatchesRemaining(string releaseId, string origDataFileName);
     }
 }
