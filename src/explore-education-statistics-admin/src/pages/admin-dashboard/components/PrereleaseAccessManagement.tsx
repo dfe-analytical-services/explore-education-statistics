@@ -112,45 +112,17 @@ const PrereleaseAccessManagement = ({
               email: Yup.string().email('Enter a valid email address'),
             })}
             onSubmit={submitFormHandler}
-            render={(form: FormikProps<FormValues>) => {
+            render={() => {
               return (
-                <Form id={formId}>
+                <form id={formId}>
                   <FormFieldset
                     legend="Manage pre release access"
                     legendSize="s"
                     id={`pre-release-selection-${release.id}`}
                   >
-                    <FormFieldSelect
-                      id={`preReleaseAccessContact-${release.id}`}
-                      name="preReleaseAccessContact"
-                      label="Select user"
-                      options={[
-                        {
-                          label: 'Please select',
-                          value: '',
-                        },
-                        ...model.availablePreReleaseContacts
-                          .filter(
-                            contact =>
-                              !model.preReleaseContactsForRelease.find(
-                                c => c.email === contact.email,
-                              ),
-                          )
-                          .map(contact => ({
-                            label: contact.email,
-                            value: contact.email,
-                          })),
-                      ]}
-                      order={[]}
-                      className="govuk-!-width-one-third"
-                      onChange={event =>
-                        inviteUserByEmail(event.target.value, form.resetForm)
-                      }
-                      disabled={model.inviting || model.removing}
-                    />
                     <FormFieldTextInput
                       id={`${formId}-email`}
-                      label="or invite a new user"
+                      label="Invite a new user"
                       name="email"
                       disabled={model.inviting || model.removing}
                     />
@@ -164,7 +136,7 @@ const PrereleaseAccessManagement = ({
                       {!model.inviting && !model.removing && 'Invite new user'}
                     </Button>
                   </FormFieldset>
-                </Form>
+                </form>
               );
             }}
           />
