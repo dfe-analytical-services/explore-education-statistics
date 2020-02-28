@@ -127,6 +127,7 @@ Validate new table column headings
 
 Validate Barnet Number of pupil enrolments row
     [Tags]  HappyPath
+    sleep  100000
     ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     224
