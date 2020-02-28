@@ -9,18 +9,15 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
-  availablePreReleaseContacts: PrereleaseContactDetails[];
   preReleaseContactsForRelease: PrereleaseContactDetails[];
   inviting: boolean;
   removing: boolean;
@@ -45,9 +42,8 @@ const PrereleaseAccessManagement = ({
       dashboardService.getAvailablePreReleaseContacts(),
       dashboardService.getPreReleaseContactsForRelease(release.id),
     ])
-      .then(([availablePreReleaseContacts, preReleaseContactsForRelease]) =>
+      .then(([preReleaseContactsForRelease]) =>
         setModel({
-          availablePreReleaseContacts,
           preReleaseContactsForRelease,
           inviting: false,
           removing: false,
@@ -81,8 +77,6 @@ const PrereleaseAccessManagement = ({
         resetForm();
 
         setModel({
-          availablePreReleaseContacts:
-            (model && model.availablePreReleaseContacts) || [],
           preReleaseContactsForRelease: updatedContacts,
           inviting: false,
           removing: false,
@@ -114,7 +108,7 @@ const PrereleaseAccessManagement = ({
             onSubmit={submitFormHandler}
             render={() => {
               return (
-                <form id={formId}>
+                <Form id={formId}>
                   <FormFieldset
                     legend="Manage pre release access"
                     legendSize="s"
@@ -136,7 +130,7 @@ const PrereleaseAccessManagement = ({
                       {!model.inviting && !model.removing && 'Invite new user'}
                     </Button>
                   </FormFieldset>
-                </form>
+                </Form>
               );
             }}
           />
