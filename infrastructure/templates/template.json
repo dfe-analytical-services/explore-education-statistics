@@ -339,9 +339,9 @@
 
     "publishReleaseDataFunctionDisabled": {
       "type": "string",
-      "defaultValue": "true",
+      "defaultValue": "false",
       "metadata": {
-        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+        "description": "Disable the Publish Release Data Function in the Publisher App which triggers the Datafactory pipeline"
       }
     },
 
