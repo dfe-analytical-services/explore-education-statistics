@@ -62,6 +62,11 @@
   flex-direction: column;
 }
 
+.deleteInfographicContainer {
+  display: flex;
+  flex-direction: row;
+}
+
 .colorSelect {
   width: 50px;
 }

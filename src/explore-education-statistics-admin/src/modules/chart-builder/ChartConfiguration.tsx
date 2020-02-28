@@ -12,7 +12,6 @@ import {
 } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
@@ -23,7 +22,10 @@ import {
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
+import ButtonText from '@common/components/ButtonText';
+import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -81,11 +83,10 @@ const InfographicChartOptions = ({
   onChange,
   handleApiErrors,
 }: InfographicChartOptionsProps & ErrorControlProps) => {
-  const [chartFileOptions, setChartFileOptions] = React.useState<
-    SelectOption[]
-  >([]);
+  const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
-  const [uploading, setUploading] = React.useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [deleteFile, toggleDeleteFile] = useToggle(false);
 
   const formId = 'fileUploadForm';
 
@@ -126,6 +127,10 @@ const InfographicChartOptions = ({
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
+  const selectedFile = chartFileOptions.find(
+    fileOption => fileOption.value === fileId,
+  );
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -143,20 +148,44 @@ const InfographicChartOptions = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            <FormFieldSelect
-              id={`${formId}-fileId`}
-              name="fileId"
-              label="Select the file to show"
-              order={[]}
-              options={chartFileOptions}
-              value={fileId}
-              onChange={e => {
-                form.setFieldValue('fileId', e.target.value);
-                return onChange(e.target.value);
-              }}
-            />
+            {fileId && selectedFile && (
+              <>
+                <div className={styles.deleteInfographicContainer}>
+                  <p className="govuk-!-margin-right-2">{`${selectedFile.label}, ${fileId}`}</p>
+                  <ButtonText
+                    variant="warning"
+                    onClick={() => toggleDeleteFile(true)}
+                  >
+                    Delete infographic
+                  </ButtonText>
+                </div>
+                <ModalConfirm
+                  mounted={deleteFile}
+                  title="Confirm deletion of infographic"
+                  onExit={() => toggleDeleteFile(false)}
+                  onCancel={() => toggleDeleteFile(false)}
+                  onConfirm={async () => {
+                    // eslint-disable-next-line no-unused-expressions
+                    form.values.fileId &&
+                      service
+                        .deleteChartFile(releaseId, form.values.fileId)
+                        .then(() =>
+                          loadChartFilesAndMapToSelectOptionAsync(releaseId),
+                        )
+                        .then(setChartFileOptions)
+                        .catch(handleApiErrors);
+                    onChange('');
+                    toggleDeleteFile(false);
+                  }}
+                >
+                  <p>
+                    This data will no longer be available for use in this chart
+                  </p>
+                </ModalConfirm>
+              </>
+            )}
 
-            {!form.values.fileId && (
+            {!fileId && (
               <>
                 <FormFieldTextInput
                   id={`${formId}-name`}
