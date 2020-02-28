@@ -2,7 +2,7 @@ import {
   AbstractChartProps,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface InfographicChartProps extends AbstractChartProps {
   fileId?: string;
@@ -17,13 +17,13 @@ const Infographic = ({
   data,
   fileId,
   chartFileDownloadService,
-  width,
-  height,
+  width = 0,
+  height = 0,
   children,
 }: InfographicChartProps) => {
-  const [file, setFile] = React.useState<string>();
+  const [file, setFile] = useState<string>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (fileId && chartFileDownloadService) {
       chartFileDownloadService(data.releaseId, fileId).then(blob => {
         const a = new FileReader();
@@ -34,13 +34,19 @@ const Infographic = ({
     }
   }, [chartFileDownloadService, data.releaseId, fileId]);
 
-  if (fileId === undefined || fileId === '')
+  if (fileId === undefined || fileId === '') {
     return <div>Infographic not configured</div>;
+  }
 
   return (
     <>
       {file && (
-        <img alt="infographic" src={file} width={width} height={height} />
+        <img
+          alt="infographic"
+          src={file}
+          width={width > 0 ? width : undefined}
+          height={height > 0 ? height : undefined}
+        />
       )}
       {children}
     </>
