@@ -1,10 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -13,7 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -98,9 +105,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
+            services.AddTransient<IUserService, UserService>();
+
+            services
+                .AddAuthentication(options=>{
+                    options.DefaultAuthenticateScheme = "defaultScheme";
+                    options.DefaultForbidScheme = "defaultScheme";
+                    options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
+                });
+            
+            services.AddAuthorization(options =>
+            {
+                // does this user have permission to view the subject data of a specific Release?
+                options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
+            });
+
+            services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
             services.AddCors();
-            services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            
+            AddPersistenceHelper<StatisticsDbContext>(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -146,6 +172,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             app.UseRewriter(option);
         }
 
+        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
+            where TDbContext : DbContext
+        {
+            services.AddTransient<IPersistenceHelper<TDbContext>, PersistenceHelper<TDbContext>>(
+                s =>
+                {
+                    var dbContext = s.GetService<TDbContext>();
+                    return new PersistenceHelper<TDbContext>(dbContext);
+                });
+        }
+        
         private static void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()

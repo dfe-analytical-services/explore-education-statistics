@@ -1,12 +1,11 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 {
     public interface IPersistenceHelper<TDbContext> where TDbContext : DbContext
     {

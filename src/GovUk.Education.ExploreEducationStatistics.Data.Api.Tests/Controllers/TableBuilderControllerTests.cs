@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -17,36 +16,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         public TableBuilderControllerTests()
         {
-            var logger = new Mock<ILogger<TableBuilderController>>();
-            
             var tableBuilderService = new Mock<IDataService<TableBuilderResultViewModel>>();
 
-            tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query), null)).Returns(
-                new TableBuilderResultViewModel
+            tableBuilderService.Setup(s => s.Query(_query)).ReturnsAsync(new TableBuilderResultViewModel
+            {
+                Results = new List<ObservationViewModel>
                 {
-                    Results = new List<ObservationViewModel>()
-                });
+                    new ObservationViewModel()
+                }
+            });
 
-            tableBuilderService.Setup(s => s.Query(_query, null)).Returns(
-                new TableBuilderResultViewModel
-                {
-                    Results = new List<ObservationViewModel>
-                    {
-                        new ObservationViewModel()
-                    }
-                });
-            
-            _controller = new TableBuilderController(
-                tableBuilderService.Object,
-                logger.Object
-            );
+            _controller = new TableBuilderController(tableBuilderService.Object);
         }
 
         [Fact]
-        public void Query_Post()
+        public async Task Query_Post()
         {
-            var result = _controller.Query(_query);
-            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
+            var result = await _controller.Query(_query);
+            Assert.IsType<TableBuilderResultViewModel>(result.Value);
         }
     }
 }
