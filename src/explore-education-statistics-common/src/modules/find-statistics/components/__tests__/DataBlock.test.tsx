@@ -1,4 +1,4 @@
-import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import _dataBlockService, {
   DataBlockRequest,
   GeographicLevel,
