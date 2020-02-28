@@ -24,8 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var table = tableClient.GetTableReference("imports");
 
             availableQueue.CreateIfNotExists();
+            pendingQueue.CreateIfNotExists();
             table.CreateIfNotExists();
             availableQueue.Clear();
+            // TODO See EES-1425
+            pendingQueue.Clear();
 
             TableContinuationToken token = null;
             do
