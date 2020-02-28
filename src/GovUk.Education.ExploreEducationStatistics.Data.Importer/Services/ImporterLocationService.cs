@@ -195,9 +195,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .And(location => location.Region.Code == (region != null ? region.Code : null)
                                  && location.Region.Name == (region != null ? region.Name : null));
 
+            // Note that Name is not included in the predicate here as it is the same as the code
             predicateBuilder = predicateBuilder
-                .And(location => location.RscRegion.Code == (rscRegion != null ? rscRegion.Code : null)
-                                 && location.RscRegion.Name == (rscRegion != null ? rscRegion.Name : null));
+                .And(location => location.RscRegion.Code == (rscRegion != null ? rscRegion.Code : null));
 
             predicateBuilder = predicateBuilder
                 .And(location => location.Sponsor.Code == (sponsor != null ? sponsor.Code : null)
