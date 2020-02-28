@@ -112,12 +112,7 @@ const ManageReleasePageContainer = ({
             }}
           >
             {releaseRoutes.manageReleaseRoutes.map(route => (
-              <Route
-                exact
-                key={route.path}
-                path={route.path}
-                component={route.component}
-              />
+              <Route exact key={route.path} {...route} />
             ))}
           </ManageReleaseContext.Provider>
 

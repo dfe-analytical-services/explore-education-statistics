@@ -6,4 +6,4 @@ export interface ManageRelease {
   releaseId: string;
 }
 
-export default React.createContext<ManageRelease | null>(null);
+export default React.createContext<ManageRelease | undefined>(undefined);

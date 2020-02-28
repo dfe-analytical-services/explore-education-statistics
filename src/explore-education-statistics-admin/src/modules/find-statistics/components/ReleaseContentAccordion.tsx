@@ -38,17 +38,6 @@ const ReleaseContentAccordion = ({
     [onContentChange, setContent],
   );
 
-  const onReorder = useCallback(
-    async (ids: Dictionary<number>) => {
-      const newContent = await releaseContentService
-        .updateContentSectionsOrder(releaseId, ids)
-        .catch(handleApiErrors);
-
-      setContentAndTriggerOnContentChange(newContent);
-    },
-    [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
-  );
-
   useEffect(
     () => {
       releaseContentService
@@ -58,6 +47,17 @@ const ReleaseContentAccordion = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
+  );
+
+  const onReorder = useCallback(
+    async (ids: Dictionary<number>) => {
+      const newContent = await releaseContentService
+        .updateContentSectionsOrder(releaseId, ids)
+        .catch(handleApiErrors);
+
+      setContentAndTriggerOnContentChange(newContent);
+    },
+    [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
   );
 
   const onAddSection = useCallback(async () => {

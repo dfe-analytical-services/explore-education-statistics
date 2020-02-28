@@ -20,13 +20,14 @@ import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import { DataBlock } from '@common/services/dataBlockService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ReleaseProvider } from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';
 
 interface Model {
   unresolvedComments: ExtendedComment[];
   pageMode: PageMode;
-  content: ManageContentPageViewModel;
+  release: ManageContentPageViewModel['release'];
   availableDataBlocks: DataBlock[];
   canUpdateRelease: boolean;
 }
@@ -78,12 +79,12 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
       releaseContentService.getContent(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ])
-      .then(([newContent, canUpdateRelease]) => {
+      .then(([{ release, availableDataBlocks }, canUpdateRelease]) => {
         setModel({
-          unresolvedComments: getUnresolveComments(newContent.release),
+          unresolvedComments: getUnresolveComments(release),
           pageMode: canUpdateRelease ? 'edit' : 'preview',
-          content: newContent,
-          availableDataBlocks: newContent.availableDataBlocks,
+          release,
+          availableDataBlocks,
           canUpdateRelease,
         });
       })
@@ -163,7 +164,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
             >
               <PublicationReleaseContent
                 editing={model.pageMode === 'edit'}
-                content={model.content}
+                release={model.release}
                 styles={{}}
                 onReleaseChange={c => onReleaseChange(c)}
                 availableDataBlocks={model.availableDataBlocks}
@@ -178,4 +179,8 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(ReleaseContentPage);
+export default withErrorControl(props => (
+  <ReleaseProvider>
+    <ReleaseContentPage {...props} />
+  </ReleaseProvider>
+));

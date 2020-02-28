@@ -81,7 +81,7 @@ const PreReleasePage = ({
             model.content && (
               <PublicationReleaseContent
                 editing={false}
-                content={model.content}
+                release={model.content?.release}
                 styles={{}}
                 onReleaseChange={_ => {}}
                 availableDataBlocks={[]}

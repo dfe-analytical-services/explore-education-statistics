@@ -31,7 +31,7 @@ export interface RendererProps {
 
 interface Props {
   editing: boolean;
-  content: ManageContentPageViewModel;
+  release: ManageContentPageViewModel['release'];
 
   styles: Dictionary<string>;
 
@@ -46,14 +46,14 @@ const nullLogEvent = () => {};
 
 const PublicationReleaseContent = ({
   editing = true,
-  content,
+  release: theRelease,
   styles,
   logEvent = nullLogEvent,
   onReleaseChange,
   handleApiErrors,
   availableDataBlocks: initialAvailableDataBlocks,
 }: Props & ErrorControlProps) => {
-  const [release, setRelease] = useState(content.release);
+  const [release, setRelease] = useState(theRelease);
 
   const setReleaseAndTriggerOnReleaseChange = useCallback(
     (newRelease: ManageContentPageViewModel['release']) => {
