@@ -778,11 +778,6 @@
             ]
           },
           "connectionStrings": [
-            {
-              "name": "PublicStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
-            }
           ]
         }
       },
