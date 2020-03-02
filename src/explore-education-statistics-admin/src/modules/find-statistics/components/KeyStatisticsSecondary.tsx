@@ -1,3 +1,9 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import {
+  deleteContentSectionBlock,
+  attachContentSectionBlock,
+} from '@admin/pages/release/edit-release/content/helpers';
+import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import Button from '@common/components/Button';
@@ -30,35 +36,12 @@ export function hasSecondaryStats(
 }
 
 export const AddSecondaryStats = ({ release, updating = false }: Props) => {
-  const { isEditing } = useContext(EditingContext);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
-  async function removeSecondarySectionBlock() {
-    return new Promise(async resolve => {
-      if (
-        release.keyStatisticsSecondarySection &&
-        release.keyStatisticsSecondarySection.id &&
-        release.keyStatisticsSecondarySection.content
-      ) {
-        await Promise.all(
-          release.keyStatisticsSecondarySection.content.map(
-            (content: EditableContentBlock) => {
-              return releaseContentService.deleteContentSectionBlock(
-                release.id,
-                // @ts-ignore will be defined, due to above if statement
-                release.keyStatisticsSecondarySection.id,
-                content.id,
-              );
-            },
-          ),
-        ).then(() => {
-          resolve();
-        });
-      }
-      resolve();
-    });
-  }
+  const { isEditing } = useContext(EditingContext);
+  const { handleApiErrors } = useContext(ErrorControlContext);
+  const dispatch = useReleaseDispatch();
 
   if (!isEditing) return null;
   if (!isFormOpen)
@@ -84,8 +67,22 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
         )}
 
         <ModalConfirm
-          onConfirm={async () => {
-            await removeSecondarySectionBlock();
+          onConfirm={() => {
+            if (release.keyStatisticsSecondarySection?.content) {
+              release.keyStatisticsSecondarySection.content.forEach(
+                (content: EditableContentBlock) => {
+                  deleteContentSectionBlock(
+                    dispatch,
+                    release.id,
+                    // @ts-ignore will be defined, due to above if statement
+                    release.keyStatisticsSecondarySection.id,
+                    content.id,
+                    'keyStatisticsSecondarySection',
+                    handleApiErrors,
+                  );
+                },
+              );
+            }
             setShowConfirmation(false);
           }}
           onExit={() => {
@@ -113,27 +110,35 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
             release.keyStatisticsSecondarySection &&
             release.keyStatisticsSecondarySection.id
           ) {
-            await removeSecondarySectionBlock();
-            await releaseContentService
-              .attachContentSectionBlock(
-                release.id,
-                release.keyStatisticsSecondarySection &&
-                  release.keyStatisticsSecondarySection.id,
-                {
-                  contentBlockId: selectedDataBlockId,
-                  order: 0,
-                },
-              )
-              .then(v => {
-                return v;
-              });
-            const keyStatisticsSecondarySection = await releaseContentService.getContentSection(
+            if (release.keyStatisticsSecondarySection?.content) {
+              await Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async (content: EditableContentBlock) => {
+                    const response = await deleteContentSectionBlock(
+                      dispatch,
+                      release.id,
+                      // @ts-ignore will be defined, due to above if statement
+                      release.keyStatisticsSecondarySection.id,
+                      content.id,
+                      'keyStatisticsSecondarySection',
+                      handleApiErrors,
+                    );
+                    return response;
+                  },
+                ),
+              );
+            }
+            await attachContentSectionBlock(
+              dispatch,
               release.id,
               release.keyStatisticsSecondarySection.id,
+              'keyStatisticsSecondarySection',
+              {
+                contentBlockId: selectedDataBlockId,
+                order: 0,
+              },
             );
-            if (keyStatisticsSecondarySection) {
-              setIsFormOpen(false);
-            }
+            setIsFormOpen(false);
           }
         }}
         onCancel={() => {

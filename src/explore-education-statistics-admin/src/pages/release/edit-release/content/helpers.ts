@@ -224,6 +224,9 @@ export async function attachContentSectionBlock(
       type: 'ADD_BLOCK_TO_SECTION',
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
+    // becuase we don't know if a datablock was used,
+    // and so it is unavailable
+    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
   } catch (err) {
     if (errorHandler) {
       errorHandler(err);
