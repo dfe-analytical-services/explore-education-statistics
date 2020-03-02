@@ -31,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
                 {
                     var configuration = provider.GetService<IConfiguration>();
-                    var publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
-                    return new TableStorageService(publisherStorageConnectionString);
+                    var connectionString = configuration.GetValue<string>("PublisherStorage");
+                    return new TableStorageService(connectionString);
                 })
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
