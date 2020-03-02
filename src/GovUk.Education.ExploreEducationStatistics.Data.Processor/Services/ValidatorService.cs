@@ -42,11 +42,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         DataFileHasInvalidTimeIdentifier,
 
         [EnumLabelValue("Datafile has invalid time period")]
-        DataFileHasInvalidTimePeriod
+        DataFileHasInvalidTimePeriod,
+        
+        [EnumLabelValue("Datafile is missing expected column")]
+        DataFileMissingExpectedColumn
     }
 
     public class ValidatorService : IValidatorService
     {
+        private static readonly List<string> MandatoryObservationColumns = new List<string>
+        {
+            "time_identifier,TIME_IDENTIFIER",
+            "time_period",
+            "geographic_level"
+        };
+        
         public List<string> Validate(ImportMessage message, SubjectData subjectData)
         {
             var errors = new List<string>();
@@ -61,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
-            ValidateObservations(subjectData.GetCsvLines(), errors);
+            var headers = subjectData.GetCsvLines().First().Split(',').ToList();
+            ValidateObservationHeaders(headers, errors);
+            ValidateObservations(headers, subjectData.GetCsvLines(), errors);
 
             return errors;
         }
@@ -97,11 +109,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static void ValidateObservations(IEnumerable<string> lines, List<string> errors)
+        private static void ValidateObservations(List<string> headers, IEnumerable<string> lines, List<string> errors)
         {
             var idx = 2;
-            var headers = lines.First().Split(',').ToList();
-
             foreach (var line in lines.Skip(1))
             {
                 if (errors.Count == 100)
@@ -110,6 +120,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     break;
                 }
                 ValidateObservationRow(line, idx++, headers, errors);
+            }
+        }
+        
+        private static void ValidateObservationHeaders(List<string> headers, List<string> errors)
+        {
+            foreach (var mandatoryCol in MandatoryObservationColumns)
+            {
+                if (!headers.Contains(mandatoryCol))
+                {
+                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " + mandatoryCol.Split(",")[0]);
+                }
+                if (errors.Count == 100)
+                {
+                    errors.Add("Only first 100 errors are returned");
+                    break;
+                }
             }
         }
 

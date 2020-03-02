@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -51,7 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     {
                         ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
 
-                        foreach (var folderAndFilename in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName))
+                        var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
+
+                        // If no batches then assume it didn't get passed initial validation stage
+                        if (!batches.Any())
+                        {
+                            pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
+                            return;
+                        }
+                        
+                        foreach (var folderAndFilename in batches)
                         {
                             availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
                         }
