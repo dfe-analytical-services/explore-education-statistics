@@ -16,12 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class PublishReleaseDataFunction
     {
+        private readonly IConfiguration _configuration;
         private readonly IReleaseStatusService _releaseStatusService;
 
         public const string QueueName = "publish-release-data";
 
-        public PublishReleaseDataFunction(IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(IConfiguration configuration, IReleaseStatusService releaseStatusService)
         {
+            _configuration = configuration;
             _releaseStatusService = releaseStatusService;
         }
 
@@ -29,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         public async Task PublishReleaseData(
             [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
-            IConfiguration configuration,
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 try
                 {
-                    var clientConfiguration = new DataFactoryClientConfiguration(configuration);
+                    var clientConfiguration = new DataFactoryClientConfiguration(_configuration);
                     var success = TriggerDataFactoryReleasePipeline(clientConfiguration, logger, message);
                     await UpdateStage(message, success ? Started : Failed);
                 }
