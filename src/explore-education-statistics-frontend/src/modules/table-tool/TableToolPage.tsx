@@ -3,7 +3,7 @@ import tableBuilderService, {
 } from '@common/modules/table-tool/services/tableBuilderService';
 import Page from '@frontend/components/Page';
 import TableTool from '@frontend/modules/table-tool/components/TableTool';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 }
 
 class TableToolPage extends Component<Props> {
-  public static async getInitialProps({ query }: NextContext) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const themeMeta = await tableBuilderService.getThemes();
 
     const publication = themeMeta

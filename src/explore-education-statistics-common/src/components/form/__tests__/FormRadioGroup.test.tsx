@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render } from '@testing-library/react';
 import { RadioChangeEventHandler } from '../FormRadio';
 import FormRadioGroup from '../FormRadioGroup';
 

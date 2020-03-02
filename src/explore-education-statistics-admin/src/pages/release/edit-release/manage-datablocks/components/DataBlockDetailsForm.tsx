@@ -16,12 +16,38 @@ import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, {
   ReactNode,
+  Reducer,
   useEffect,
   useReducer,
   useRef,
   useState,
 } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
+
+type BlockState = {
+  saved?: boolean;
+  error?: boolean;
+  updated?: boolean;
+};
+
+type BlockStateReducer = Reducer<BlockState, BlockState>;
+
+const reducer: BlockStateReducer = (
+  state,
+  { saved, error, updated } = {
+    saved: false,
+    error: false,
+    updated: false,
+  },
+) => {
+  if (saved || updated) {
+    return { saved: true, updated };
+  }
+  if (error) {
+    return { error: true };
+  }
+  return { saved: false, error: false };
+};
 
 interface Props {
   children?: ReactNode;
@@ -55,25 +81,10 @@ const DataBlockDetailsForm = ({
     DataBlock | undefined
   >(initialDataBlock);
 
-  const [blockState, setBlockState] = useReducer(
-    (
-      state,
-      { saved, error, updated } = {
-        saved: false,
-        error: false,
-        updated: false,
-      },
-    ) => {
-      if (saved || updated) {
-        return { saved: true, updated };
-      }
-      if (error) {
-        return { error: true };
-      }
-      return { saved: false, error: false };
-    },
-    { saved: false, error: false },
-  );
+  const [blockState, setBlockState] = useReducer<BlockStateReducer>(reducer, {
+    saved: false,
+    error: false,
+  });
 
   useEffect(() => {
     setBlockState({ saved: false, error: false });

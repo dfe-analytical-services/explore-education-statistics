@@ -1,8 +1,8 @@
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
-import { NextContext } from 'next';
-import BaseApp, { Container, NextAppContext } from 'next/app';
+import { NextPageContext } from 'next';
+import BaseApp, { AppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import { Cookies, CookiesProvider } from 'react-cookie';
@@ -15,28 +15,23 @@ interface Props {
 }
 
 class App extends BaseApp<Props> {
-  public static getCookies = (ctx: NextContext) => {
-    if (
-      ctx.req &&
-      // @ts-ignore
-      ctx.req.universalCookies &&
-      // @ts-ignore
-      ctx.req.universalCookies.cookies
-    ) {
+  public static getCookies = (ctx: NextPageContext) => {
+    // @ts-ignore
+    if (ctx?.req?.universalCookies?.cookies) {
       // @ts-ignore
       return ctx.req.universalCookies.cookies;
     }
+
     return { cookies: undefined };
   };
 
-  public static async getInitialProps({ Component, ctx }: NextAppContext) {
+  public static async getInitialProps({ Component, ctx }: AppContext) {
     let pageProps = {};
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx);
     }
 
-    // @ts-ignore
     return { pageProps, cookies: this.getCookies(ctx) };
   }
 
@@ -53,15 +48,12 @@ class App extends BaseApp<Props> {
   }
 
   public render() {
-    // @ts-ignore
     const { Component, pageProps, cookies } = this.props;
 
     return (
-      <Container>
-        <CookiesProvider cookies={new Cookies(cookies)}>
-          <Component {...pageProps} />
-        </CookiesProvider>
-      </Container>
+      <CookiesProvider cookies={new Cookies(cookies)}>
+        <Component {...pageProps} />
+      </CookiesProvider>
     );
   }
 }

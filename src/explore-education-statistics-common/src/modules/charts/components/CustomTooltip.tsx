@@ -7,7 +7,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
       <div className="graph-tooltip">
         <p className="govuk-!-font-weight-bold">{label}</p>
         {payload &&
-          payload
+          [...payload]
             .sort((a, b) => {
               if (typeof b.value === 'number' && typeof a.value === 'number') {
                 return b.value - a.value;

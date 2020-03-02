@@ -3,7 +3,7 @@ import publicationService, {
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next-server/dist/lib/utils';
 import React, { Component } from 'react';
 import Link from '@frontend/components/Link';
 import classNames from 'classnames';
@@ -28,14 +28,12 @@ class SubscriptionPage extends Component<Props> {
     subscribed: false,
   };
 
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    slug: string;
-    unsubscribed?: string;
-    verified?: string;
-  }>) {
-    const { slug, unsubscribed, verified } = query;
+  public static async getInitialProps({ query }: NextPageContext) {
+    const { slug, unsubscribed, verified } = query as {
+      slug: string;
+      unsubscribed?: string;
+      verified?: string;
+    };
 
     const request = publicationService.getPublicationTitle(slug);
 
