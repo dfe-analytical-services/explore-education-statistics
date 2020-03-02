@@ -54,7 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Release = release
                 }
             ).Entity;
-
+            
+            context.SaveChanges();
             return subject;
         }
 
@@ -77,11 +78,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     TimeIdentifier = message.Release.TimeIdentifier,
                     Year = message.Release.Year
                 };
-                return context.Release.Add(release).Entity;
-            }
 
-            release = _mapper.Map(message.Release, release);
-            return context.Release.Update(release).Entity;
+                release = context.Release.Add(release).Entity;
+            }
+            else
+            {
+                release = _mapper.Map(message.Release, release);
+                release = context.Release.Update(release).Entity;
+            }
+            context.SaveChanges();
+            return release;
         }
 
         private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext context)
@@ -100,11 +106,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Slug = message.Release.Publication.Slug,
                     Topic = CreateOrUpdateTopic(message, context)
                 };
-                return context.Publication.Add(publication).Entity;
+                publication = context.Publication.Add(publication).Entity;
             }
-
-            publication = _mapper.Map(message.Release.Publication, publication);
-            return context.Publication.Update(publication).Entity;
+            else
+            {
+                publication = _mapper.Map(message.Release.Publication, publication);
+                publication = context.Publication.Update(publication).Entity;
+            }
+            context.SaveChanges();
+            return publication;
         }
 
         private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
@@ -112,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var topic = context.Topic
                 .Include(p => p.Theme)
                 .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Id));
-
+            
             if (topic == null)
             {
                 topic = new Topic
@@ -122,26 +132,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Slug = message.Release.Publication.Topic.Slug,
                     Theme = CreateOrUpdateTheme(message, context)
                 };
-                return context.Topic.Add(topic).Entity;
+                topic = context.Topic.Add(topic).Entity;
             }
-
-            topic = _mapper.Map(message.Release.Publication.Topic, topic);
-            return context.Topic.Update(topic).Entity;
+            else
+            {
+                topic = _mapper.Map(message.Release.Publication.Topic, topic);
+                topic = context.Topic.Update(topic).Entity;
+            }
+            context.SaveChanges();
+            return topic;
         }
 
         private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext context)
         {
             var theme = context.Theme
                 .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id));
-
+            
             if (theme == null)
             {
                 theme = _mapper.Map<Theme>(message.Release.Publication.Topic.Theme);
-                return context.Theme.Add(theme).Entity;
+                theme = context.Theme.Add(theme).Entity;
             }
-
-            theme = _mapper.Map(message.Release.Publication.Topic.Theme, theme);
-            return context.Theme.Update(theme).Entity;
+            else
+            {
+                theme = _mapper.Map(message.Release.Publication.Topic.Theme, theme);
+                theme = context.Theme.Update(theme).Entity;  
+            }
+            context.SaveChanges();
+            return theme;
         }
     }
 }

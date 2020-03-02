@@ -20,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _releaseService = releaseService;
         }
 
-        public bool IsSubjectForLatestRelease(Guid subjectId)
+        public bool IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
             var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
             if (subject == null)
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));
             }
-            return _releaseService.GetLatestRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
+            return _releaseService.GetLatestPublishedRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
         }
         
         public bool Exists(Guid releaseId, string name)

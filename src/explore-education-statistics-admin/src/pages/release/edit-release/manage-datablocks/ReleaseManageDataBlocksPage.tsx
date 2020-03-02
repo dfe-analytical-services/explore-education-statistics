@@ -1,9 +1,11 @@
 /* eslint-disable no-shadow */
+import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import ViewDataBlocks from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import permissionService from '@admin/services/permissions/service';
+import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -17,9 +19,14 @@ import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useCallback, useContext } from 'react';
-import CreateDataBlocks from './CreateDataBlocks';
-import ViewDataBlocks from './ViewDataBlocks';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface DataBlockData {
   dataBlock: DataBlock;
@@ -31,20 +38,20 @@ const ReleaseManageDataBlocksPage = ({
 }: ErrorControlProps) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
-  const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
-  const [activeTab, setActiveTab] = React.useState<string>('');
-  const [selectedDataBlock, setSelectedDataBlock] = React.useState<
-    DataBlock['id']
-  >('');
+  const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [selectedDataBlock, setSelectedDataBlock] = useState<DataBlock['id']>(
+    '',
+  );
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isSaving, setIsSaving] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const [canUpdateRelease, setCanUpdateRelease] = React.useState(false);
+  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
-  const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
+  const [dataBlockData, setDataBlockData] = useState<DataBlockData>();
 
-  const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
+  const [deleteDataBlock, setDeleteDataBlock] = useState<DataBlock>();
 
   const updateDataBlocks = useCallback(
     (rId: string) => {
@@ -56,17 +63,17 @@ const ReleaseManageDataBlocksPage = ({
     [handleApiErrors],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateDataBlocks(releaseId);
   }, [releaseId, updateDataBlocks]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     permissionService
       .canUpdateRelease(releaseId)
       .then(canUpdateRelease => setCanUpdateRelease(canUpdateRelease));
   }, [releaseId]);
 
-  const dataBlockOptions = React.useMemo(
+  const dataBlockOptions = useMemo(
     () =>
       dataBlocks.map(({ name, id }, index) => ({
         label: `${name || index}`,
@@ -123,14 +130,14 @@ const ReleaseManageDataBlocksPage = ({
     [handleApiErrors],
   );
 
-  const currentlyLoadingDataBlockId = React.useRef<string>();
+  const currentlyLoadingDataBlockId = useRef<string>();
 
-  const unsetIsLoading = React.useCallback(() => {
+  const unsetIsLoading = useCallback(() => {
     setIsLoading(false);
     currentlyLoadingDataBlockId.current = undefined;
   }, []);
 
-  const doLoad = React.useCallback(
+  const doLoad = useCallback(
     (
       releaseId: string,
       selectedDataBlockId: string | undefined,
@@ -167,7 +174,7 @@ const ReleaseManageDataBlocksPage = ({
     [load],
   );
 
-  const onDataBlockSave = React.useMemo(
+  const onDataBlockSave = useMemo(
     () => async (db: DataBlock) => {
       setIsSaving(true);
 
@@ -200,7 +207,7 @@ const ReleaseManageDataBlocksPage = ({
     [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     doLoad(releaseId, selectedDataBlock, dataBlocks);
   }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
 
@@ -287,7 +294,7 @@ const ReleaseManageDataBlocksPage = ({
               </ModalConfirm>
 
               <div style={{ overflow: 'hidden' }}>
-                <CreateDataBlocks
+                <DataBlockSourceWizard
                   {...dataBlockData}
                   releaseId={releaseId}
                   loading={isLoading}

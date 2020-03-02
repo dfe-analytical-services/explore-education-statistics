@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     
     public class ImportStatusService : IImportStatusService
     {
-        public static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
+        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
             IStatus.COMPLETE,
             IStatus.FAILED
         };
@@ -49,17 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new ImportStatus
             {
                 Errors = import.Errors,
-                PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };
-        }
-        
-        public static int GetNumBatchesComplete(DatafileImport import)
-        {
-            return (from bool b in new BitArray(import.BatchesProcessed)
-                where b
-                select b).Count();
         }
 
         public async Task<bool> IsImportFinished(string releaseId, string dataFileName)
@@ -78,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 
                 dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string>(){ "NumBatches", "Status", "NumberOfRows", "Errors"}));
             
             return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
         }

@@ -202,7 +202,7 @@ const TableToolWizard = ({
       filters: Object.values(filters).flat(),
     };
 
-    const response = await executeTableQuery(query, releaseId);
+    const response = await executeTableQuery(query);
 
     updateTableToolState(draft => {
       draft.query = query;
