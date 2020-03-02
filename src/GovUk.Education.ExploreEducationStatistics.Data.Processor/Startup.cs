@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
@@ -18,14 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services
+            var serviceProvider = builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddTransient<IFileStorageService, FileStorageService>(provider =>
-                {
-                    var configuration = provider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetValue<string>("CoreStorage");
-                    return new FileStorageService(connectionString);
-                })
+                    new FileStorageService(GetConfigurationValue(provider, "CoreStorage")))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()
@@ -35,18 +32,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
                 .AddTransient<ImporterMemoryCache>()
                 .AddTransient<ITableStorageService, TableStorageService>(provider =>
-                {
-                    var configuration = provider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetValue<string>("CoreStorage");
-                    return new TableStorageService(connectionString);
-                })
+                    new TableStorageService(GetConfigurationValue(provider, "CoreStorage")))
                 .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IImportStatusService, ImportStatusService>()
                 .AddSingleton<IValidatorService, ValidatorService>()
                 .AddApplicationInsightsTelemetry()
                 .BuildServiceProvider();
-            
-            FailedImportsHandler.CheckIncompleteImports();
+
+            FailedImportsHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
+        }
+
+        private static string GetConfigurationValue(IServiceProvider provider, string key)
+        {
+            var configuration = provider.GetService<IConfiguration>();
+            return configuration.GetValue<string>(key);
         }
     }
 }

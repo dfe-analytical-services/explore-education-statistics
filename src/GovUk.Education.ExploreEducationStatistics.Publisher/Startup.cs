@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -29,11 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
-                {
-                    var configuration = provider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetValue<string>("PublisherStorage");
-                    return new TableStorageService(connectionString);
-                })
+                    new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
@@ -41,6 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IQueueService, QueueService>()
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>();
+        }
+
+        private static string GetConfigurationValue(IServiceProvider provider, string key)
+        {
+            var configuration = provider.GetService<IConfiguration>();
+            return configuration.GetValue<string>(key);
         }
     }
 }
