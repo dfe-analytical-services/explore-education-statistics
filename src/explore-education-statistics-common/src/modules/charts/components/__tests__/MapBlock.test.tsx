@@ -1,6 +1,5 @@
-/* eslint-disable */
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import MapBlock from '@common/modules/charts/components/MapBlock';
-import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
 
