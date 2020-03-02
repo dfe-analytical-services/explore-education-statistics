@@ -118,7 +118,7 @@
     "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit -p src/tsconfig.json"
   },
   "browserslist": [
     ">0.2%",
