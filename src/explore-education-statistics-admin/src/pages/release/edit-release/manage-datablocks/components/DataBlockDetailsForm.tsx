@@ -175,11 +175,7 @@ const DataBlockDetailsForm = ({
                   additionalClass="govuk-!-width-two-thirds"
                 />
 
-                <Button
-                  disabled={!form.isValid}
-                  type="submit"
-                  className="govuk-!-margin-top-6"
-                >
+                <Button type="submit" className="govuk-!-margin-top-6">
                   {currentDataBlock ? 'Update data block' : 'Save data block'}
                 </Button>
               </FormGroup>
