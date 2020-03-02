@@ -58,8 +58,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="645.6521739130435"
-              y2="645.6521739130435"
+              y1="645.6521739130434"
+              y2="645.6521739130434"
             />
             <line
               fill="none"
@@ -71,8 +71,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="421.304347826087"
-              y2="421.304347826087"
+              y1="421.30434782608694"
+              y2="421.30434782608694"
             />
             <line
               fill="none"
@@ -211,8 +211,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="645.6521739130435"
-                y2="645.6521739130435"
+                y1="645.6521739130434"
+                y2="645.6521739130434"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -222,7 +222,7 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="645.6521739130435"
+                y="645.6521739130434"
               >
                 <tspan
                   dy="0.355em"
@@ -245,8 +245,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="421.304347826087"
-                y2="421.304347826087"
+                y1="421.30434782608694"
+                y2="421.30434782608694"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -256,7 +256,7 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="421.304347826087"
+                y="421.30434782608694"
               >
                 <tspan
                   dy="0.355em"
@@ -402,14 +402,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 148.5,645.6521739130435 h 100 v 112.17391304347825 h -100 Z"
+                d="M 148.5,645.6521739130434 h 100 v 112.17391304347836 h -100 Z"
                 fill="#ff0000"
-                height="112.17391304347825"
+                height="112.17391304347836"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="148.5"
-                y="645.6521739130435"
+                y="645.6521739130434"
               />
             </g>
             <g
@@ -478,14 +478,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 356.5,570.8695652173913 h 100 v 186.9565217391305 h -100 Z"
+                d="M 356.5,570.8695652173914 h 100 v 186.95652173913038 h -100 Z"
                 fill="#0000ff"
-                height="186.9565217391305"
+                height="186.95652173913038"
                 radius="0"
                 stroke="#0000ff"
                 width="100"
                 x="356.5"
-                y="570.8695652173913"
+                y="570.8695652173914"
               />
             </g>
             <g
@@ -593,7 +593,7 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
       </div>
       <div
         class="recharts-tooltip-wrapper"
-        style="pointer-events: none; visibility: hidden; position: absolute; top: 0px; transform: translate(undefinedpx, undefinedpx);"
+        style="transform: translate(undefinedpx, undefinedpx); pointer-events: none; visibility: hidden; position: absolute; top: 0px;"
       >
         <div
           class="recharts-default-tooltip"

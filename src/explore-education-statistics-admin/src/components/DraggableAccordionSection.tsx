@@ -22,7 +22,7 @@ const DraggableAccordionSection = ({
 }: DraggableAccordionSectionProps) => {
   if (isReordering) {
     return (
-      <Draggable draggableId={id} type="section" index={index}>
+      <Draggable draggableId={id} index={index}>
         {draggableProvided => (
           <div
             {...draggableProvided.draggableProps}

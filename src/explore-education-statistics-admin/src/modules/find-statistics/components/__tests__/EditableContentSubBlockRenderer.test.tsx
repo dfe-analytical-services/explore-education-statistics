@@ -1,6 +1,6 @@
-import React from 'react';
-import { render } from 'react-testing-library';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { render } from '@testing-library/react';
+import React from 'react';
 import EditableContentSubBlockRenderer from '../EditableContentSubBlockRenderer';
 
 describe('EditableContentSubBlockRenderer', () => {

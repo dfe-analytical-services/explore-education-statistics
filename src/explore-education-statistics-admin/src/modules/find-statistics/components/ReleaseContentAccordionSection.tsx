@@ -1,5 +1,5 @@
 import { EditableContentBlock } from '@admin/services/publicationService';
-import React, { MouseEventHandler, ReactNode } from 'react';
+import React, { MouseEventHandler, ReactNode, useCallback } from 'react';
 import ContentBlock, {
   ReorderHook,
 } from '@admin/modules/find-statistics/components/EditableContentBlocks';
@@ -58,7 +58,7 @@ const ReleaseContentAccordionSection = ({
     }
   };
 
-  const contentChange = React.useCallback(
+  const handleContentChange = React.useCallback(
     (newContent?: EditableContentBlock[]) => {
       setContent(newContent);
       if (onContentChange) {
@@ -67,6 +67,10 @@ const ReleaseContentAccordionSection = ({
     },
     [onContentChange],
   );
+
+  const handleReorder = useCallback(ord => {
+    saveOrder.current = ord;
+  }, []);
 
   return (
     <AccordionSection
@@ -100,10 +104,8 @@ const ReleaseContentAccordionSection = ({
         sectionId={id}
         content={content}
         publication={publication}
-        onContentChange={newContent => contentChange(newContent)}
-        onReorderHook={s => {
-          saveOrder.current = s;
-        }}
+        onContentChange={handleContentChange}
+        onReorder={handleReorder}
       />
     </AccordionSection>
   );

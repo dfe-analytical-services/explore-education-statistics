@@ -1,5 +1,4 @@
-import 'react-testing-library/cleanup-after-each';
-import 'jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import 'core-js/fn/array/virtual/flat-map';
 import '@common-test/setupGlobals';
 import '@common-test/extend-expect';
