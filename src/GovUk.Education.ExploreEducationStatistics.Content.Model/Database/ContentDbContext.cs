@@ -796,7 +796,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamName = "School preference statistics team",
                     TeamEmail = "school.preference@education.gov.uk",
                     ContactName = "Helen Bray",
-                    ContactTelNo = "02077838553"
+                    ContactTelNo = "020 7783 8553"
+
                 },
                 new Contact
                 {
@@ -821,7 +822,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamEmail = "Attainment.STATISTICS@education.gov.uk",
                     ContactName = "Raffaele Sasso",
                     ContactTelNo = "07469413581"
-                }
+                },
                 new Contact
                 {
                     Id = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf"),
@@ -895,6 +896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContactName = "Sally Marshall",
                     ContactTelNo = "0114 274 2317"
                 },
+                new Contact
                 {
                     Id = new Guid("f47cb404-6bf1-4f69-b223-c9a6a2c15082"),
                     TeamName = "Post-16 statistics team",
@@ -902,20 +904,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContactName = "Suzanne Wallace",
                     ContactTelNo = "020 7654 6191"
                 },
+                new Contact
                 {
                     Id = new Guid("6a95bda0-a823-4faa-9a13-7e65f5b6c121"),
                     TeamName = "Post-16 statistics team",
                     TeamEmail = "post16.statistics@education.gov.uk",
                     ContactName = "Ann Claytor",
                     ContactTelNo = "0114 274 2515"
-                },
-                new Contact
-                {
-                    Id = new Guid(""),
-                    TeamName = "School preference statistics team",
-                    TeamEmail = "school.preference@education.gov.uk",
-                    ContactName = "",
-                    ContactTelNo = "020 7783 8553"
                 },
                 new Contact
                 {
@@ -991,7 +986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("d718aebb-bda6-4c3a-802d-8e9945b80997"),
                     TeamName = "Further education statistical dissemination team",
                     TeamEmail = "FE.OFFICIALSTATISTICS@education.gov.uk",
                     ContactName = "Dave Bartholomew",
@@ -1015,7 +1010,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid("1c696dea-8db7-4347-a12c-c9d081c34748),
+                    Id = new Guid("1c696dea-8db7-4347-a12c-c9d081c34748"),
                     TeamName = "Teachers and teaching analysis unit",
                     TeamEmail = "TeachersAnalysisUnit.MAILBOX@education.gov.uk",
                     ContactName = "Emma Ibberson",
@@ -1023,10 +1018,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("b40b586f-818f-4ef0-90d3-7ca4e65b0b00"),
                     TeamName = "Academies financial benchmarking team",
                     TeamEmail = "AFB.BENCHMARKING@education.gov.uk",
-                    ContactName = "b40b586f-818f-4ef0-90d3-7ca4e65b0b00",
+                    ContactName = "",
                     ContactTelNo = "01325 340 593"
                 },
                 new Contact
