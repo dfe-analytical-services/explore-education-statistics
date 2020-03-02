@@ -37,6 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId)
         {
+            if (subjectId.Equals(Guid.Empty))
+            {
+                return new List<Footnote>();
+            }
+            
             var releaseId = _context
                 .Subject
                 .First(s => s.Id == subjectId)
@@ -59,9 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(f => f.ReleaseId == releaseId)
                 .ToListAsync();
              
-                return releaseFootnotes
-                    .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
-                    .ToList();
+            return releaseFootnotes
+                .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
+                .ToList();
         }
 
         public async Task<bool> DeleteAsync(Guid subjectId)
