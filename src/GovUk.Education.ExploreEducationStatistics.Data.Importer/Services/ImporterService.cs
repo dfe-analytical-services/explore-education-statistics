@@ -233,6 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
             return new Observation
             {
+                Id = Guid.NewGuid(),
                 FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
@@ -240,8 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
-                CsvRow = csvRowNum,
-                Id = Guid.NewGuid()
+                CsvRow = csvRowNum
             };
         }
         
