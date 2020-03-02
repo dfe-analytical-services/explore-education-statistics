@@ -19,6 +19,11 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
+import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import Infographic from '@common/modules/charts/components/Infographic';
+import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import {
   ChartDefinition,
   ChartMetaData,
@@ -27,11 +32,6 @@ import {
   generateKeyFromDataSet,
   parseMetaData,
 } from '@common/modules/charts/util/chartUtils';
-import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
-import Infographic from '@common/modules/charts/components/Infographic';
-import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
-import MapBlock from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import {
   DataBlockRerequest,
   DataBlockResponse,
@@ -43,7 +43,6 @@ import {
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import classnames from 'classnames';
 import React, {
   useCallback,
   useEffect,
@@ -457,19 +456,13 @@ const ChartBuilder = ({
         <Details summary="Chart preview" open>
           <div className="govuk-width-container">
             {renderedChartProps === undefined ? (
-              <div
-                className={classnames(styles.preview)}
-                style={{
-                  width: chartOptions.width && `${chartOptions.width}px`,
-                  height: chartOptions.height && `${chartOptions.height}px`,
-                }}
-              >
+              <div className={styles.previewPlaceholder}>
                 {selectedChartType.axes.length > 0 ? (
-                  <span>Add data to view a preview of the chart</span>
+                  <p>Add data to view a preview of the chart</p>
                 ) : (
-                  <span>
+                  <p>
                     Configure the {selectedChartType.name} to view a preview
-                  </span>
+                  </p>
                 )}
               </div>
             ) : (

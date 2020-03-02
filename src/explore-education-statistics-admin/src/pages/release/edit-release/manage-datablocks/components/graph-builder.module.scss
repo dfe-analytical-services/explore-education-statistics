@@ -1,3 +1,5 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
 .chartContainer {
   display: flex;
 }
@@ -167,16 +169,14 @@
   margin-top: 30px;
 }
 
-.preview {
+.previewPlaceholder {
   align-items: center;
-  background-color: #eee;
+  background-color: govuk-colour('light-grey');
   display: flex;
+  font-size: 1.5rem;
+  font-weight: $govuk-font-weight-bold;
+  height: 300px;
   justify-content: center;
-
-  span {
-    font-size: 1.5em;
-    font-weight: bold;
-  }
 }
 
 .chartTypeUnavailable {
