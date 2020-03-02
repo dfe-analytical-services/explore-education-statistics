@@ -1,5 +1,4 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -12,11 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class FailedImportsHandler
     {
-        public static void CheckIncompleteImports()
+        public static void CheckIncompleteImports(string storageConnectionString)
         {
-            var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-            var container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
+            var tblStorageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
+            var container = FileStorageService.GetOrCreateBlobContainer(storageConnectionString).Result;
             var tableClient = tblStorageAccount.CreateCloudTableClient();
             var queueClient = storageAccount.CreateCloudQueueClient();
             var availableQueue = queueClient.GetQueueReference("imports-available");
