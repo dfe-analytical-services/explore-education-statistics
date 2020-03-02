@@ -27,22 +27,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));
             }
-
             return _releaseService.GetLatestPublishedRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
         }
-
+        
         public bool Exists(Guid releaseId, string name)
         {
             return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
         }
 
-        public List<Footnote> GetFootnotesOnlyForSubject(Guid subjectId)
+        public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId)
         {
-            return _context
+            var releaseId = _context
+                .Subject
+                .First(s => s.Id == subjectId)
+                .ReleaseId;
+
+            var releaseFootnotes = await _context
                 .Footnote
+                .Include(f => f.Filters)
+                .Include(f => f.FilterGroups)
+                .ThenInclude(fg => fg.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Include(f => f.FilterItems)
+                .ThenInclude(fi => fi.FilterItem)
+                .ThenInclude(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Include(f => f.Indicators)
+                .ThenInclude(i => i.Indicator)
+                .ThenInclude(i => i.IndicatorGroup)
                 .Include(f => f.Subjects)
-                .Where(f => f.Subjects.Count == 1 && f.Subjects.First().SubjectId == subjectId)
-                .ToList();
+                .Where(f => f.ReleaseId == releaseId)
+                .ToListAsync();
+             
+                return releaseFootnotes
+                    .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
+                    .ToList();
         }
 
         public async Task<bool> DeleteAsync(Guid subjectId)
@@ -50,18 +69,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var subject = await _context
                 .Subject
                 .FirstOrDefaultAsync(s => s.Id == subjectId);
-
+                
             if (subject != null)
             {
-                var orphanFootnotes = GetFootnotesOnlyForSubject(subjectId);
+                var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
 
                 _context.Subject.Remove(subject);
                 _context.Footnote.RemoveRange(orphanFootnotes);
-
+                
                 await _context.SaveChangesAsync();
                 return true;
             }
-
             return false;
         }
 
@@ -70,12 +88,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var subject = await GetAsync(releaseId, name);
             return await DeleteAsync(subject.Id);
         }
-
+        
         public async Task<Subject> GetAsync(Guid releaseId, string name)
         {
             return await _context
                 .Subject
                 .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+        }
+
+        private static bool FootnoteLinkedToNoOtherSubject(Guid subjectId, Footnote f)
+        {
+            // if this Footnote is directly linked to any other Subjects than this one, then it's not just for
+            // this Subject
+            if (f.Subjects.Any(subject => subject.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter for any other Subject, then it's not just for
+            // this Subject
+            if (f.Filters.Any(filter => filter.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to an Indicator for any other Subject, then it's not just for
+            // this Subject
+            if (f.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter Group for any other Subject, then it's not just for
+            // this Subject
+            if (f.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            // if this Footnote is directly linked to a Filter Item for any other Subject, then it's not just for
+            // this Subject
+            if (f.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

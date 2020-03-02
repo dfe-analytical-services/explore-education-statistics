@@ -20,11 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly string _storageConnectionString;
         private const string QueueName = "publication-queue";
 
-        public NotificationsService(ContentDbContext context,
-            IConfiguration config)
+        public NotificationsService(ContentDbContext context, IConfiguration config)
         {
             _context = context;
-            _storageConnectionString = config.GetConnectionString("NotificationStorage");
+            _storageConnectionString = config.GetValue<string>("NotificationStorage");
         }
 
         public async Task NotifySubscribersAsync(IEnumerable<Guid> releaseIds)

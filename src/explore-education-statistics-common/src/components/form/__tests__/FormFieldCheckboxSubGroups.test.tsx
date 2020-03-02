@@ -1,7 +1,7 @@
 import Yup from '@common/lib/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
-import { fireEvent, render, wait } from 'react-testing-library';
+import { fireEvent, render, wait } from '@testing-library/react';
 import FormFieldCheckboxSubGroups from '../FormFieldCheckboxSubGroups';
 
 describe('FormFieldCheckboxSubGroups', () => {

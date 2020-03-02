@@ -71,8 +71,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="134.34782608695653"
-              y2="134.34782608695653"
+              y1="134.3478260869565"
+              y2="134.3478260869565"
             />
             <line
               fill="none"
@@ -245,8 +245,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="134.34782608695653"
-                y2="134.34782608695653"
+                y1="134.3478260869565"
+                y2="134.3478260869565"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -256,7 +256,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="134.34782608695653"
+                y="134.3478260869565"
               >
                 <tspan
                   dy="0.355em"
@@ -412,7 +412,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M110,123.04347826086956L880,190.8695652173913"
+            d="M110,123.04347826086958L880,190.86956521739128"
             fill="none"
             height="260"
             stroke="#00ff00"
@@ -428,7 +428,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M110,179.56521739130434L880,224.7826086956522"
+            d="M110,179.56521739130434L880,224.78260869565216"
             fill="none"
             height="260"
             stroke="#0000ff"
@@ -539,7 +539,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
       </div>
       <div
         class="recharts-tooltip-wrapper"
-        style="pointer-events: none; visibility: hidden; position: absolute; top: 0px; transform: translate(undefinedpx, undefinedpx);"
+        style="transform: translate(undefinedpx, undefinedpx); pointer-events: none; visibility: hidden; position: absolute; top: 0px;"
       />
     </div>
     <div

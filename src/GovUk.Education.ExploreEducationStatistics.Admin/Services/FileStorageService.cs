@@ -402,19 +402,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             return _fileTypeService.HasMatchingMimeType(file, CsvMimeTypes) && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
-
-        private static int CalculateNumberOfRows(Stream fileStream)
-        {
-            using (var reader = new StreamReader(fileStream))
-            {
-                var numberOfLines = 0;
-                while (reader.ReadLine() != null)
-                {
-                    ++numberOfLines;
-                }
-
-                return numberOfLines;
-            }
-        }
     }
 }

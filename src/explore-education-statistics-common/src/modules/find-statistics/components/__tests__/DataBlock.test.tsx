@@ -4,7 +4,7 @@ import _dataBlockService, {
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import React from 'react';
-import { render, wait } from 'react-testing-library';
+import { render, wait } from '@testing-library/react';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
