@@ -137,6 +137,7 @@ const DataBlockSourceWizard = ({
                   <div className="govuk-!-margin-bottom-4">
                     <TableHeadersForm
                       initialValues={tableHeaders}
+                      id="dataBlockSourceWizard-tableHeadersForm"
                       onSubmit={async nextTableHeaders => {
                         setTableHeaders(nextTableHeaders);
 

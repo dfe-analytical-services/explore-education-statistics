@@ -138,6 +138,7 @@ const DataBlockContentTabs = ({
         <TabsSection title="Table">
           <TableHeadersForm
             initialValues={tableData?.tableHeadersConfig}
+            id="dataBlockContentTabs-tableHeadersForm"
             onSubmit={async nextTableHeaders => {
               setTableData({
                 ...tableData,
