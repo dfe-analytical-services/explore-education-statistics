@@ -12,8 +12,8 @@ build/
 .next/
 
 #govuk-toolkit assets
-/public/assets
-/public/all.js
+/src/public/assets
+/src/public/all.js
 
 # misc
 .DS_Store
