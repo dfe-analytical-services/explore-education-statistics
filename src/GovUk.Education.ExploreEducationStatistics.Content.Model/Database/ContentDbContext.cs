@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 }
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf"),
                     TeamName = "Attainment statistics team",
                     TeamEmail = "Attainment.STATISTICS@education.gov.uk",
                     ContactName = "Allan Burrage",
@@ -832,7 +832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("102497b9-ebd6-442a-b422-942ac391aaae"),
                     TeamName = "Attainment statistics team",
                     TeamEmail = "Attainment.STATISTICS@education.gov.uk",
                     ContactName = "Tingting Shu",
@@ -840,7 +840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2"),
                     TeamName = "Attainment statistics team",
                     TeamEmail = "Attainment.STATISTICS@education.gov.uk",
                     ContactName = "Glenn Goodman",
@@ -873,7 +873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252"),
                     TeamName = "Primary attainment statistics team",
                     TeamEmail = "primary.attainment@education.gov.uk",
                     ContactName = "Gemma Coleman",
@@ -881,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("94b3f9c3-6169-4e85-bf26-08d69bcb1a4a"),
                     TeamName = "Infrastructure statistics team",
                     TeamEmail = "Schools.STATISTICS@education.gov.uk",
                     ContactName = "Anastasia Ioannou",
@@ -919,7 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("8d1469b6-f029-4dcc-92fa-bda8ab2c69cd"),
                     TeamName = "Further education outcomes statistics",
                     TeamEmail = "FE.OUTCOMESDATA@education.gov.uk",
                     ContactName = "Nick Treece",
@@ -927,7 +927,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("367a6e6f-48c5-4f1a-9580-f44852bc8e7a"),
                     TeamName = "Standards and Testing Agency",
                     TeamEmail = "Marking.STA@education.gov.uk",
                     ContactName = "Alana Afflick",
@@ -935,7 +935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("0e7d435f-2177-4063-bad2-4b3dcdb17ea8"),
                     TeamName = "Academies and school organisation team",
                     TeamEmail = "Academies.DATA@education.gov.uk",
                     ContactName = "Adam Hatton",
@@ -943,7 +943,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("2e38c23a-564b-4228-bffe-fa6f88b7bec4"),
                     TeamName = "International evidence and statistics team",
                     TeamEmail = "InternationalEvidence.STATISTICS@education.gov.uk",
                     ContactName = "",
@@ -951,7 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("308accc8-6b2e-4e26-b3e9-2437d5d1da23"),
                     TeamName = "Admission appeals statistics team",
                     TeamEmail = "admissions.appeals@education.gov.uk",
                     ContactName = "Helen Bray",
@@ -959,7 +959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("667f03a6-fd2f-41a2-a28d-3721662633c3"),
                     TeamName = "Widening participation statistics",
                     TeamEmail = "HE.statistics@education.gov.uk",
                     ContactName = "John Simes",
@@ -967,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("71f624fd-d8b8-4dc5-924c-4d768c9aa8fa"),
                     TeamName = "Pupils and School Finance team",
                     TeamEmail = "PupilPopulation.PROJECTIONS@education.gov.uk",
                     ContactName = "Helen Bray",
@@ -975,7 +975,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("922ceecb-d0bf-4c2a-a166-928afecd4892"),
                     TeamName = "Pupil Place Planning team",
                     TeamEmail = "SCAP.PPP@education.gov.uk",
                     ContactName = "Selena Jackson",
@@ -983,7 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e"),
                     TeamName = "Further education statistical dissemination team",
                     TeamEmail = "FE.OFFICIALSTATISTICS@education.gov.uk",
                     ContactName = "Matthew Rolfe",
@@ -1088,7 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("f4dd2a45-3538-47da-b40c-0cd270c185c6"),
                     TeamName = "Further education statistical production team",
                     TeamEmail = "andy.cooke@education.gov.uk",
                     ContactName = "Andy Cooke",
@@ -1096,7 +1096,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid(""),
+                    Id = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
                     TeamName = "Higher education statistics team (LEO)",
                     TeamEmail = "he.leo@education.gov.uk",
                     ContactName = "Matthew Bridge",
@@ -1359,7 +1359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e")
                 },
                 new Publication
                 {
@@ -1371,7 +1371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e")
                 },
                 new Publication
                 {
@@ -1382,8 +1382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "further-education-and-skills",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data")
                 },
                 new Publication
                 {
@@ -1394,8 +1393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "further-education-and-benefits-claimants",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents")
                 },
                 new Publication
                 {
@@ -1407,7 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("f4dd2a45-3538-47da-b40c-0cd270c185c6")
                 },
                 new Publication
                 {
@@ -1419,7 +1417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e")
                 },
                 new Publication
                 {
@@ -1430,8 +1428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "higher-education-destinations-of-leavers",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers")
                 },
                 new Publication
                 {
@@ -1442,8 +1439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "higher-education-enrolments-and-qualifications",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications")
                 },
                 new Publication
                 {
@@ -1454,8 +1450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "performance-indicators-in-higher-education",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators")
                 },
                 new Publication
                 {
@@ -1466,8 +1461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "staff-at-higher-education-providers-in-the-uk",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education")
                 },
                 new Publication
                 {
@@ -1478,8 +1472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "participation-rates-in-higher-education",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-on-higher-education-initial-participation-rates#participation-rates-in-higher-education-for-england"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/statistics-on-higher-education-initial-participation-rates#participation-rates-in-higher-education-for-england")
                 },
                 new Publication
                 {
@@ -1491,7 +1484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("667f03a6-fd2f-41a2-a28d-3721662633c3")
                 },
                 new Publication
                 {
@@ -1502,7 +1495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "admission-appeals-in-england",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-admission-appeals#documents"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("308accc8-6b2e-4e26-b3e9-2437d5d1da23")
                 },
                 new Publication
                 {
@@ -1536,7 +1529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-pupil-absence#autumn-term-release"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1548,7 +1541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-pupil-absence#combined-autumn--and-spring-term-release"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1560,7 +1553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1571,7 +1564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "national-pupil-projections",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-pupil-projections#documents"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("71f624fd-d8b8-4dc5-924c-4d768c9aa8fa")
                 },
                 new Publication
                 {
@@ -1582,7 +1575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "school-pupils-and-their-characteristics",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("94b3f9c3-6169-4e85-bf26-08d69bcb1a4a")
                 },
                 new Publication
                 {
@@ -1605,7 +1598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("922ceecb-d0bf-4c2a-a166-928afecd4892")
                 },
                 new Publication
                 {
@@ -1617,7 +1610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0")
                 },
                 new Publication
                 {
@@ -1628,8 +1621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "special-educational-needs-analysis-and-summary-of-data-sources",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs")
                 },
                 new Publication
                 {
@@ -1641,7 +1633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0")
                 },
                 new Publication
                 {
@@ -1653,7 +1645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1665,7 +1657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1689,7 +1681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2")
                 },
                 new Publication
                 {
@@ -1701,7 +1693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf")
                 },
                 new Publication
                 {
@@ -1713,7 +1705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("18c9a473-465d-4b8a-b2cf-b24fd3b9c094")
                 },
                 new Publication
                 {
@@ -1725,7 +1717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf")
                 },
                 new Publication
                 {
@@ -1737,7 +1729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1749,7 +1741,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("367a6e6f-48c5-4f1a-9580-f44852bc8e7a")
                 },
                 new Publication
                 {
@@ -1761,7 +1753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("0e7d435f-2177-4063-bad2-4b3dcdb17ea8")
                 },
                 new Publication
                 {
@@ -1772,8 +1764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "national-curriculum-assessments-at-ks2",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2"),
-                    ContactId = new Guid("")
+                            "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2")
                 },
                 new Publication
                 {
@@ -1785,7 +1776,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1797,7 +1788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("8d1469b6-f029-4dcc-92fa-bda8ab2c69cd")
                 },
                 new Publication
                 {
@@ -1809,7 +1800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1821,7 +1812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1833,7 +1824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2")
                 },
                 new Publication
                 {
@@ -1901,7 +1892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "education-and-training-statistics-for-the-uk",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-education-and-training#documents"),
-                    ContactId = new Guid("")
+                    ContactId = new Guid("2e38c23a-564b-4228-bffe-fa6f88b7bec4")
                 }
             );
 
