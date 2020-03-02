@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -109,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var entityEntry = context.Location.Add(new Location
                 {
+                    Id = Guid.NewGuid(),
                     Country = country ?? Country.Empty(),
                     Institution = institution ?? Institution.Empty(),
                     LocalAuthority = localAuthority ?? LocalAuthority.Empty(),
