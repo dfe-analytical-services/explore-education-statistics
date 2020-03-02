@@ -187,6 +187,7 @@
     "@types/react-lazyload": "^2.6.0",
     "history": "^4.10.1",
     "i": "^0.3.6",
+    "immer": "^5.3.6",
     "lodash": "^4.17.13",
     "oidc-client": "^1.9.1",
     "react-lazyload": "^2.6.5",
