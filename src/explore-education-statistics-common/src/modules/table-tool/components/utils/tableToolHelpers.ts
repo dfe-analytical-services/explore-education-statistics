@@ -40,11 +40,8 @@ export const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
   filters: {},
 });
 
-export const executeTableQuery = async (
-  query: TableDataQuery,
-  releaseId?: string,
-) => {
-  const rawTableData = await tableBuilderService.getTableData(query, releaseId);
+export const executeTableQuery = async (query: TableDataQuery) => {
+  const rawTableData = await tableBuilderService.getTableData(query);
 
   const table = mapFullTable(rawTableData);
   const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);

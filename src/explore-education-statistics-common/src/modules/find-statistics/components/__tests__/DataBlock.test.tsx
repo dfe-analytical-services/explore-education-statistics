@@ -1,10 +1,10 @@
-import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import _dataBlockService, {
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import React from 'react';
-import { render, wait } from 'react-testing-library';
+import { render, wait } from '@testing-library/react';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');

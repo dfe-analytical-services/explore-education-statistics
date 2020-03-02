@@ -184,6 +184,10 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Services\Security" />
+  </ItemGroup>
 
   <PropertyGroup>
     <NoWarn>NU1605</NoWarn>

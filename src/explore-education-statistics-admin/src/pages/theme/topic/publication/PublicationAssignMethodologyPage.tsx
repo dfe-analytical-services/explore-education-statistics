@@ -1,12 +1,12 @@
 import Page from '@admin/components/Page';
 import service from '@admin/services/common/service.ts';
+import { BasicPublicationDetails } from '@admin/services/common/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { BasicPublicationDetails } from 'src/services/common/types';
 import AssignMethodologyForm from './AssignMethodologyForm';
 
 const PublicationAssignMethodologyPage = ({

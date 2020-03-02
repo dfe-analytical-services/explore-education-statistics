@@ -1,12 +1,12 @@
 /* eslint-disable no-shadow, react/jsx-indent */
+import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
+import DroppableAccordion from '@admin/components/DroppableAccordion';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { Dictionary } from '@common/types/util';
 import classnames from 'classnames';
 import React, { createRef, ReactElement, ReactNode } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { Dictionary } from '@common/types/util';
-import DroppableAccordion from '@admin/components/DroppableAccordion';
-import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
 import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
 
@@ -25,22 +25,20 @@ interface ChildSection {
 }
 
 const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
-  React.Children.map(children, (child, thisIndex) => {
-    if (child) {
+  React.Children.toArray(children)
+    .filter(child => !!child)
+    .map((child, index) => {
       const section = child as ReactElement<EditableAccordionSectionProps>;
 
-      const key = section.props.id || `unknown_section_id_${thisIndex}`;
+      const key = section.props.id || `unknown_section_id_${index}`;
 
       return {
         id: key,
         key,
-        index: thisIndex,
+        index,
         section,
       };
-    }
-
-    return undefined;
-  }).filter(item => !!item) as ChildSection[];
+    });
 
 const EditableAccordion = ({
   children,

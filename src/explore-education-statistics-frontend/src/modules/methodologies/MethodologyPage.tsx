@@ -12,7 +12,7 @@ import Page from '@frontend/components/Page';
 import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
 import MethodologyContent from '@frontend/modules/methodologies/components/MethodologyContent';
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 
 interface Props {
@@ -23,14 +23,10 @@ interface Props {
 class MethodologyPage extends Component<Props> {
   private accId: string[] = generateIdList(2);
 
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    publication: string;
-  }>) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const { publication } = query;
 
-    const request = methodologyService.getMethodology(publication);
+    const request = methodologyService.getMethodology(publication as string);
 
     const data = await request;
 

@@ -221,8 +221,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<InsetTextBlock> InsetTextBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
-        public DbSet<ReleaseSummary> ReleaseSummaries { get; set; }
-        public DbSet<ReleaseSummaryVersion> ReleaseSummaryVersions { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
@@ -290,26 +288,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Release>()
                 .Property(b => b.Status)
                 .HasConversion(new EnumToStringConverter<ReleaseStatus>());
-
-            modelBuilder.Entity<ReleaseSummary>()
-                .HasOne(rs => rs.Release).WithOne(r => r.ReleaseSummary)
-                .HasForeignKey<ReleaseSummary>(rs => rs.ReleaseId);
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .HasOne(rsv => rsv.ReleaseSummary)
-                .WithMany(rs => rs.Versions)
-                .HasForeignKey(rsv => rsv.ReleaseSummaryId);
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .Property(b => b.NextReleaseDate)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<PartialDate>(v));
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .Property(r => r.TimePeriodCoverage)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(6);
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
@@ -1588,58 +1566,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             var absenceReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5");
             var exclusionsReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278");
             var applicationOffersReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717");
-
-            modelBuilder.Entity<ReleaseSummary>().HasData(
-                new ReleaseSummary
-                {
-                    ReleaseId = absenceReleaseId,
-                    Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                },
-                new ReleaseSummary
-                {
-                    ReleaseId = exclusionsReleaseId,
-                    Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                },
-                new ReleaseSummary
-                {
-                    ReleaseId = applicationOffersReleaseId,
-                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                }
-            );
-
-
-            modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
-                new ReleaseSummaryVersion
-                {
-                    Created = new DateTime(2018, 1, 1),
-                    Id = new Guid("420ca58e-278b-456b-9031-fe74a6966159"),
-                    Slug = "2016-17",
-                    ReleaseName = "2016",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                },
-                new ReleaseSummaryVersion
-                {
-                    Id = new Guid("04adfe47-9057-4abd-a0e8-5a6ac56e1560"),
-                    Created = new DateTime(2018, 1, 1),
-                    ReleaseName = "2016",
-                    Slug = "2016-17",
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseSummaryId = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                },
-                new ReleaseSummaryVersion
-                {
-                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                    Created = new DateTime(2018, 1, 1),
-                    ReleaseName = "2018",
-                    Slug = "2018",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    ReleaseSummaryId = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                });
-
 
             modelBuilder.Entity<Release>().HasData(
                 //absence

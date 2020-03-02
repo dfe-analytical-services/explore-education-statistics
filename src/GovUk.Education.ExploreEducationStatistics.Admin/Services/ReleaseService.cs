@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -12,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -84,10 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
                 .OnSuccess(async () =>
                 {
-                    var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);
-                    releaseSummary.Created = DateTime.Now;
-                    
                     var release = _mapper.Map<Release>(createRelease);
+                    
                     release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
                     release.SummarySection = new ContentSection
                     {
@@ -102,13 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.HeadlinesSection = new ContentSection{
                         Type = ContentSectionType.Headlines
                     };
-                    release.ReleaseSummary = new ReleaseSummary
-                    {
-                        Versions = new List<ReleaseSummaryVersion>()
-                        {
-                            releaseSummary
-                        }
-                    };
+                    
                     var saved =_context.Releases.Add(release);
                     await _context.SaveChangesAsync();
                     return await GetReleaseForIdAsync(saved.Entity.Id);
@@ -118,19 +111,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<Release>(releaseId, 
+                    releases => releases.Include(r => r.Type)
+                )
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
-                    {
-                        var releaseForSummary = await _context.Releases
-                            .Where(r => r.Id == releaseId)
-                            .Include(r => r.ReleaseSummary)
-                            .ThenInclude(summary => summary.Versions)
-                            .Include(summary => summary.Type)
-                            .FirstOrDefaultAsync();
-                        
-                        return _mapper.Map<ReleaseSummaryViewModel>(releaseForSummary.ReleaseSummary);
-                    });
+                .OnSuccess(_mapper.Map<ReleaseSummaryViewModel>);
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
@@ -144,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var release = await _context.Releases
                         .Where(r => r.Id == releaseId)
-                        .Include(r => r.ReleaseSummary)
-                        .ThenInclude(summary => summary.Versions)
                         .FirstOrDefaultAsync();
 
                     release.Slug = request.Slug;
@@ -155,18 +138,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     
-                    var newSummaryVersion = new ReleaseSummaryVersion
-                    {
-                        Slug = request.Slug,
-                        TypeId = request.TypeId,
-                        PublishScheduled = request.PublishScheduled,
-                        ReleaseName = request.ReleaseName,
-                        NextReleaseDate = request.NextReleaseDate,
-                        TimePeriodCoverage = request.TimePeriodCoverage,
-                        Created = DateTime.Now
-                    };
-                    
-                    release.ReleaseSummary.Versions.Add(newSummaryVersion);
                     _context.Update(release);
                     await _context.SaveChangesAsync();
                     return await GetReleaseForIdAsync(releaseId);
@@ -285,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
                     var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject.Id);
 
-                    var orphanFootnotes = _subjectService.GetFootnotesOnlyForSubject(subject.Id);
+                    var orphanFootnotes = await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
                     {

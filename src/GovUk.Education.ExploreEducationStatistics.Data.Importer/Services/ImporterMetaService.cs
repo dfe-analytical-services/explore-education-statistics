@@ -144,6 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                             i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
                             i.Unit == row.IndicatorUnit) ?? new Indicator
                         {
+                            Id = Guid.NewGuid(),
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
                             Name = row.ColumnName,

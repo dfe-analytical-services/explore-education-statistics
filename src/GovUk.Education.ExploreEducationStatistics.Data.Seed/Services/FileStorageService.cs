@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         {
             var blobContainer =
                 await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
+            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {NumberOfRows, CalculateNumberOfRows(dataFile.OpenReadStream()).ToString()}};
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
                 .OnSuccess(() =>
