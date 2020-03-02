@@ -1,4 +1,4 @@
-import { KeyStatsFormValues } from '@admin/modules/find-statistics/components/EditableKeyStatTile';
+import { KeyStatsFormValues } from '@admin/modules/editable-components/EditableKeyStatTile';
 import {
   EditableContentBlock,
   ExtendedComment,

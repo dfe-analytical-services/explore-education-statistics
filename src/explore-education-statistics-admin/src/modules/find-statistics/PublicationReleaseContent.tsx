@@ -13,7 +13,7 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext } from 'react';
-import ContentBlocks from './components/EditableContentBlocks';
+import ContentBlocks from '../editable-components/EditableContentBlocks';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';

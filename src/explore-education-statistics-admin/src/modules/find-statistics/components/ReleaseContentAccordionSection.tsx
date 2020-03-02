@@ -1,7 +1,7 @@
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
-import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import {
   updateSectionBlockOrder,

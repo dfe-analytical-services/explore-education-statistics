@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-testing-library';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import EditableContentSubBlockRenderer from '../EditableContentSubBlockRenderer';
+import EditableContentSubBlockRenderer from '../../../editable-components/EditableContentSubBlockRenderer';
 
 describe('EditableContentSubBlockRenderer', () => {
   test('Renders non-editable Markdown block correctly', () => {

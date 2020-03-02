@@ -1,8 +1,8 @@
-import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
+import EditableDataBlock from 'src/modules/editable-components/EditableDataBlock';
+import EditableHtmlRenderer from 'src/modules/editable-components/EditableHtmlRenderer';
 import EditableMarkdownRenderer, {
   MarkdownRendererProps,
-} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+} from 'src/modules/editable-components/EditableMarkdownRenderer';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import React from 'react';
 

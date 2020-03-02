@@ -1,4 +1,4 @@
-import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import {
   deleteContentSectionBlock,
   updateContentSectionBlock,

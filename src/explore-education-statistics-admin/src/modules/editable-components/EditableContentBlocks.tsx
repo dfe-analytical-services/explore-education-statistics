@@ -7,8 +7,8 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 import { Dictionary } from '@common/types/util';
 import React, { useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import Comments from './Comments';
-import ContentBlockDraggable from './ContentBlockDraggable';
+import Comments from '../find-statistics/components/Comments';
+import ContentBlockDraggable from '../find-statistics/components/ContentBlockDraggable';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 type ContentType = EditableRelease['content'][0]['content'];

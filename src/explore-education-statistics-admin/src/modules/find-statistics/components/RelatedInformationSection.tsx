@@ -17,7 +17,7 @@ import {
   FormFieldTextInput,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
-import EditableLink from './EditableLink';
+import EditableLink from '../../editable-components/EditableLink';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
