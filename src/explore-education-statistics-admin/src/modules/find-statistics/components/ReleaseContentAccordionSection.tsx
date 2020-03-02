@@ -3,11 +3,22 @@ import AccordionSection, {
 } from '@admin/components/EditableAccordionSection';
 import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import {
+  updateSectionBlockOrder,
+  deleteContentSectionBlock,
+  updateContentSectionBlock,
+} from '@admin/pages/release/edit-release/content/helpers';
+import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import {
+  EditableContentBlock,
+  EditableRelease,
+} from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { Dictionary } from '@admin/types';
 import Button from '@common/components/Button';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
@@ -19,9 +30,11 @@ export interface ReleaseContentAccordionSectionProps {
   onContentChange: (content?: EditableContentBlock[]) => void;
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
   canAddBlocks?: boolean;
+  release: EditableRelease;
 }
 
 const ReleaseContentAccordionSection = ({
+  release,
   id: sectionId,
   index,
   contentItem,
@@ -31,9 +44,10 @@ const ReleaseContentAccordionSection = ({
   canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
+  const dispatch = useReleaseDispatch();
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
-  const { updateAvailableDataBlocks, releaseId } = useContext(EditingContext);
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const onBlockSaveOrder = async (order: Dictionary<number>) => {
     if (releaseId && sectionId) {
@@ -43,48 +57,6 @@ const ReleaseContentAccordionSection = ({
         order,
       );
       onContentChange(newBlocks);
-    }
-  };
-
-  const onBlockContentChange = async (blockId: string, newContent: string) => {
-    if (releaseId && sectionId && blockId) {
-      const updatedBlock = await releaseContentService.updateContentSectionBlock(
-        releaseId,
-        sectionId,
-        blockId,
-        {
-          body: newContent,
-        },
-      );
-      {
-        const newBlocks = [
-          ...((contentItem && contentItem.content) || []).map(block => {
-            if (block.id === updatedBlock.id) {
-              return updatedBlock;
-            }
-            return block;
-          }),
-        ];
-        onContentChange(newBlocks);
-      }
-    }
-  };
-
-  const onBlockDelete = async (blockId: string) => {
-    if (releaseId && sectionId && blockId) {
-      await releaseContentService.deleteContentSectionBlock(
-        releaseId,
-        sectionId,
-        blockId,
-      );
-
-      if (updateAvailableDataBlocks) updateAvailableDataBlocks();
-
-      const {
-        content: newContentBlocks,
-      } = await releaseContentService.getContentSection(releaseId, sectionId);
-
-      onContentChange(newContentBlocks);
     }
   };
 
@@ -113,8 +85,6 @@ const ReleaseContentAccordionSection = ({
           order: contentItem.content ? contentItem.content.length : 0,
         },
       );
-
-      if (updateAvailableDataBlocks) updateAvailableDataBlocks();
 
       const {
         content: newContentBlocks,
@@ -152,12 +122,36 @@ const ReleaseContentAccordionSection = ({
       <ContentBlocks
         id={`${heading}-content`}
         isReordering={isReordering}
-        canAddBlocks
         sectionId={sectionId}
         onContentChange={onContentChange}
-        onBlockSaveOrder={onBlockSaveOrder}
-        onBlockContentChange={onBlockContentChange}
-        onBlockDelete={onBlockDelete}
+        onBlockSaveOrder={order => {
+          updateSectionBlockOrder(
+            dispatch,
+            release.id,
+            release.headlinesSection.id,
+            'headlinesSection',
+            order,
+          );
+        }}
+        onBlockContentChange={(blockId, bodyContent) =>
+          updateContentSectionBlock(
+            dispatch,
+            release.id,
+            release.headlinesSection.id,
+            blockId,
+            'headlinesSection',
+            bodyContent,
+          )
+        }
+        onBlockDelete={(blockId: string) =>
+          deleteContentSectionBlock(
+            dispatch,
+            release.id,
+            release.headlinesSection.id,
+            blockId,
+            'headlinesSection',
+          )
+        }
         content={contentItem.content}
         allowComments
       />

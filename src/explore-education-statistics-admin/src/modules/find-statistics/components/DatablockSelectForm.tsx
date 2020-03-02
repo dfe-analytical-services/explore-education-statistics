@@ -6,6 +6,7 @@ import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
 import Details from '@common/components/Details';
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -20,7 +21,7 @@ const DatablockSelectForm = ({
   hideCancel = false,
   label = 'Select a data block',
 }: Props) => {
-  const { availableDataBlocks } = useContext(EditingContext);
+  const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const getDBPreview = (datablockId: string) => {

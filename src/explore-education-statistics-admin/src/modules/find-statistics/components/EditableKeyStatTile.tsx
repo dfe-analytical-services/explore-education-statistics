@@ -25,7 +25,7 @@ export interface KeyStatsFormValues {
 interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
   onRemove?: () => void;
-  onSubmit: (values: KeyStatsFormValues) => Promise<undefined>;
+  onSubmit: (values: KeyStatsFormValues) => void;
 }
 
 const EditableKeyStatTile = ({
@@ -120,9 +120,8 @@ const EditableKeyStatTile = ({
                 '',
             }}
             onSubmit={values => {
-              onSubmit(values).then(() => {
-                setShowForm(false);
-              });
+              onSubmit(values);
+              setShowForm(false);
             }}
             render={(form: FormikProps<KeyStatsFormValues>) => {
               return (

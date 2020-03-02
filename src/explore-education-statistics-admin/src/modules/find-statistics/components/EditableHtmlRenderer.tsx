@@ -12,7 +12,7 @@ export type Props = RendererProps & {
   canDelete: boolean;
   onDelete: () => void;
   editable?: boolean;
-  onContentChange: (content: string) => Promise<unknown>;
+  onContentChange: (content: string) => void;
 };
 
 const EditableHtmlRenderer = ({

@@ -78,15 +78,7 @@ const PreReleasePage = ({
           includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
         >
           {model.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-            model.content && (
-              <PublicationReleaseContent
-                editing={false}
-                release={model.content?.release}
-                styles={{}}
-                onReleaseChange={_ => {}}
-                availableDataBlocks={[]}
-              />
-            )}
+            model.content && <PublicationReleaseContent />}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
             <>

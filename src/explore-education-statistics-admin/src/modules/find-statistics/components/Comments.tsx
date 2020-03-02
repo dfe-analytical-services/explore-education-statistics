@@ -1,16 +1,19 @@
 import LoginContext from '@admin/components/Login';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import { ExtendedComment } from '@admin/services/publicationService';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
 import { User } from '@admin/services/sign-in/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from './Comments.module.scss';
 
 interface Props {
   contentBlockId: string;
+  sectionId: string;
   initialComments: ExtendedComment[];
   onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
   canResolve?: boolean;
@@ -19,6 +22,7 @@ interface Props {
 
 const Comments = ({
   contentBlockId,
+  sectionId,
   initialComments,
   onCommentsChange = () => Promise.resolve(),
   canResolve = false,
@@ -29,8 +33,8 @@ const Comments = ({
     initialComments,
   );
 
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
   const context = React.useContext(LoginContext);
-  const editingContext = React.useContext(EditingContext);
 
   const addComment = (comment: string) => {
     const user = context.user as User;
@@ -43,11 +47,11 @@ const Comments = ({
       state: 'open',
     };
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .addContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           additionalComment,
         )
@@ -69,11 +73,11 @@ const Comments = ({
   const removeComment = (index: number) => {
     const commentId = comments[index].id;
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .deleteContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           commentId,
         )
@@ -96,11 +100,11 @@ const Comments = ({
     resolvedComment.resolvedOn = new Date();
     resolvedComment.resolvedBy = context.user && context.user.name;
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .updateContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           resolvedComment,
         )

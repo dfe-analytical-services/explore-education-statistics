@@ -34,13 +34,31 @@ export type UpdateBlockFromSection = {
   };
 };
 
+export type AddBlockToSection = {
+  type: 'ADD_BLOCK_TO_SECTION';
+  payload: {
+    block: EditableContentBlock;
+    meta: Omit<RemoveBlockFromSection['payload']['meta'], 'blockId'>;
+  };
+};
+
+export type UpdateSectionContent = {
+  type: 'UPDATE_SECTION_CONTENT';
+  payload: {
+    sectionContent: EditableContentBlock[];
+    meta: Omit<RemoveBlockFromSection['payload']['meta'], 'blockId'>;
+  };
+};
+
 type ReleaseDispatchAction =
   | PageError
   | ClearState
   | SetNewState
   | SetAvailableDatablocks
   | RemoveBlockFromSection
-  | UpdateBlockFromSection;
+  | UpdateBlockFromSection
+  | AddBlockToSection
+  | UpdateSectionContent;
 
 // eslint-disable-next-line no-undef
 export default ReleaseDispatchAction;

@@ -18,7 +18,7 @@ interface Props {
   resolveComments?: boolean;
   content: string;
   useMarkdown?: boolean;
-  onContentChange?: (content: string) => Promise<unknown>;
+  onContentChange?: (content: string) => void;
   onDelete?: () => void;
 }
 
@@ -47,10 +47,12 @@ const WysiwygEditor = ({
       if (useMarkdown) {
         contentChangeContent = turndownService.turndown(contentChangeContent);
       }
-      onContentChange(contentChangeContent).then(() => {
+      onContentChange(
+        contentChangeContent,
+      ); /* .then(() => {
         setEditing(false);
         setSaved(true);
-      });
+      }); */
     } else {
       setEditing(false);
       setSaved(true);

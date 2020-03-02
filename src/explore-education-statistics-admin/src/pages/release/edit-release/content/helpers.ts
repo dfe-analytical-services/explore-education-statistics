@@ -1,13 +1,16 @@
+import { KeyStatsFormValues } from '@admin/modules/find-statistics/components/EditableKeyStatTile';
 import permissionsService from '@admin/services/permissions/service';
+import {
+  EditableContentBlock,
+  ExtendedComment,
+} from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import { ContentBlockAttachRequest } from '@admin/services/release/edit-release/content/types';
+import { Dictionary } from '@admin/types';
 import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import {
-  EditableContentBlock,
-  ExtendedComment,
-} from 'src/services/publicationService';
 import { RemoveBlockFromSection } from './actions';
 import { Dispatch } from './ReleaseContext';
 
@@ -145,32 +148,123 @@ export async function updateContentSectionDataBlock(
   sectionId: string,
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  values: KeyStatsFormValues,
   errorHandler?: (err: any) => void,
 ) {
-  // await releaseContentService.updateContentSectionDataBlock(
-  //                       releaseId,
-  //                       sectionId,
-  //                       blockId,
-  //                       values,
-  //                     )
-  //                     .then(updatedBlock => {
-  //                       setRelease({
-  //                         ...release,
-  //                         keyStatisticsSection: {
-  //                           ...release.keyStatisticsSection,
-  //                           content: release.keyStatisticsSection.content
-  //                             ? release.keyStatisticsSection.content.map(
-  //                                 contentBlock => {
-  //                                   if (contentBlock.id === updatedBlock.id) {
-  //                                     return updatedBlock;
-  //                                   }
-  //                                   return contentBlock;
-  //                                 },
-  //                               )
-  //                             : [],
-  //                         },
-  //                       });
-  //                       resolve();
-  //                     })
-  //                     .catch(handleApiErrors),
+  try {
+    const updateBlock = await releaseContentService.updateContentSectionDataBlock(
+      releaseId,
+      sectionId,
+      blockId,
+      values,
+    );
+    dispatch({
+      type: 'UPDATE_BLOCK_FROM_SECTION',
+      payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
+    });
+  } catch (err) {
+    if (errorHandler) {
+      errorHandler(err);
+    } else {
+      dispatch({
+        type: 'PAGE_ERROR',
+        payload: { pageError: 'There was a problem.' },
+      });
+    }
+  }
+}
+
+export async function updateContentSectionBlock(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  blockId: string,
+  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  bodyContent: string,
+  errorHandler?: (err: any) => void,
+) {
+  try {
+    const updateBlock = await releaseContentService.updateContentSectionBlock(
+      releaseId,
+      sectionId,
+      blockId,
+      { body: bodyContent },
+    );
+    dispatch({
+      type: 'UPDATE_BLOCK_FROM_SECTION',
+      payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
+    });
+  } catch (err) {
+    if (errorHandler) {
+      errorHandler(err);
+    } else {
+      dispatch({
+        type: 'PAGE_ERROR',
+        payload: { pageError: 'There was a problem.' },
+      });
+    }
+  }
+}
+
+export async function attachContentSectionBlock(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  block: ContentBlockAttachRequest,
+  errorHandler?: (err: any) => void,
+) {
+  try {
+    const newBlock = await releaseContentService.attachContentSectionBlock(
+      releaseId,
+      sectionId,
+      block,
+    );
+    dispatch({
+      type: 'ADD_BLOCK_TO_SECTION',
+      payload: { meta: { sectionId, sectionKey }, block: newBlock },
+    });
+  } catch (err) {
+    if (errorHandler) {
+      errorHandler(err);
+    } else {
+      dispatch({
+        type: 'PAGE_ERROR',
+        payload: { pageError: 'There was a problem.' },
+      });
+    }
+  }
+}
+
+export async function updateSectionBlockOrder(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  order: Dictionary<number>,
+  errorHandler?: (err: any) => void,
+) {
+  try {
+    const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
+      releaseId,
+      sectionId,
+      order,
+    );
+    dispatch({
+      type: 'UPDATE_SECTION_CONTENT',
+      payload: {
+        meta: { sectionId, sectionKey },
+        sectionContent,
+      },
+    });
+  } catch (err) {
+    if (errorHandler) {
+      errorHandler(err);
+    } else {
+      dispatch({
+        type: 'PAGE_ERROR',
+        payload: { pageError: 'There was a problem.' },
+      });
+    }
+  }
 }

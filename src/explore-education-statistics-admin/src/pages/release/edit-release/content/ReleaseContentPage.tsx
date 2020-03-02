@@ -2,117 +2,60 @@ import PublicationReleaseContent from '@admin/modules/find-statistics/Publicatio
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import {
-  EditableContentBlock,
-  ExtendedComment,
-} from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import permissionService from '@admin/services/permissions/service';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import { ContentSection } from '@common/services/publicationService';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { DataBlock } from '@common/services/dataBlockService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import { ReleaseProvider } from './ReleaseContext';
+import { getReleaseContent } from './helpers';
+import {
+  ReleaseProvider,
+  useReleaseDispatch,
+  useReleaseState,
+} from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';
 
-interface Model {
-  unresolvedComments: ExtendedComment[];
-  pageMode: PageMode;
-  release: ManageContentPageViewModel['release'];
-  availableDataBlocks: DataBlock[];
-  canUpdateRelease: boolean;
-}
-
-const contentSectionComments = (
-  contentSection?: ContentSection<EditableContentBlock>,
-) => {
-  if (
-    contentSection &&
-    contentSection.content &&
-    contentSection.content.length > 0
-  ) {
-    return contentSection.content.reduce<ExtendedComment[]>(
-      (allCommentsForSection, content) =>
-        content.comments
-          ? [...allCommentsForSection, ...content.comments]
-          : allCommentsForSection,
-      [],
-    );
-  }
-
-  return [];
-};
-
-const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
-  [
-    ...contentSectionComments(release.summarySection),
-    ...contentSectionComments(release.keyStatisticsSection),
-    ...release.content
-      .filter(_ => _.content !== undefined)
-      .reduce<ExtendedComment[]>(
-        (allComments, contentSection) => [
-          ...allComments,
-          ...contentSectionComments(contentSection),
-        ],
-        [],
-      ),
-  ].filter(comment => comment !== undefined && comment.state === 'open');
-
 const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
-  const [model, setModel] = useState<Model>();
+  const [pageMode, setPageMode] = useState<PageMode>('preview');
 
   const { releaseId, publication } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
+  const {
+    release,
+    canUpdateRelease,
+    unresolvedComments,
+    pageError,
+  } = useReleaseState();
+  const dispatch = useReleaseDispatch();
+
   useEffect(() => {
-    Promise.all([
-      releaseContentService.getContent(releaseId),
-      permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([{ release, availableDataBlocks }, canUpdateRelease]) => {
-        setModel({
-          unresolvedComments: getUnresolveComments(release),
-          pageMode: canUpdateRelease ? 'edit' : 'preview',
-          release,
-          availableDataBlocks,
-          canUpdateRelease,
-        });
-      })
-      .catch(handleApiErrors);
+    getReleaseContent(dispatch, releaseId);
   }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
-  const onReleaseChange = React.useCallback(
-    (newRelease: ManageContentPageViewModel['release']) => {
-      if (model) {
-        setModel({
-          ...model,
-          unresolvedComments: getUnresolveComments(newRelease),
-        });
-      }
-    },
-    [model],
-  );
+  useEffect(() => {
+    if (canUpdateRelease === true) {
+      setPageMode('edit');
+    }
+  }, [canUpdateRelease]);
 
+  if (pageError) return <>{pageError}</>;
   return (
     <>
-      {model ? (
+      {release ? (
         <>
-          {model.canUpdateRelease && (
+          {canUpdateRelease && (
             <div className="govuk-form-group">
-              {model.unresolvedComments.length > 0 && (
+              {unresolvedComments.length > 0 && (
                 <WarningMessage>
-                  There are {model.unresolvedComments.length} unresolved
-                  comments
+                  There are {unresolvedComments.length} unresolved comments
                 </WarningMessage>
               )}
 
@@ -125,7 +68,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                 <FormRadioGroup
                   id="pageMode"
                   name="pageMode"
-                  value={model.pageMode}
+                  value={pageMode}
                   legend="Set page view"
                   small
                   options={[
@@ -139,10 +82,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
                     },
                   ]}
                   onChange={event => {
-                    setModel({
-                      ...model,
-                      pageMode: event.target.value as PageMode,
-                    });
+                    setPageMode(event.target.value as PageMode);
                   }}
                 />
               </FormFieldset>
@@ -151,24 +91,22 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
 
           <div
             className={classNames('govuk-width-container', {
-              'dfe-align--left-hand-controls': model.pageMode === 'edit',
-              'dfe-hide-controls': model.pageMode === 'preview',
+              'dfe-align--left-hand-controls': pageMode === 'edit',
+              'dfe-hide-controls': pageMode === 'preview',
             })}
           >
             <div
               className={
-                model.pageMode === 'edit'
-                  ? 'dfe-page-editing'
-                  : 'dfe-page-preview'
+                pageMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
               }
             >
-              <PublicationReleaseContent
-                editing={model.pageMode === 'edit'}
-                release={model.release}
-                styles={{}}
-                onReleaseChange={c => onReleaseChange(c)}
-                availableDataBlocks={model.availableDataBlocks}
-              />
+              <EditingContext.Provider
+                value={{
+                  isEditing: pageMode === 'edit',
+                }}
+              >
+                <PublicationReleaseContent />
+              </EditingContext.Provider>
             </div>
           </div>
         </>

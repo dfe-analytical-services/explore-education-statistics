@@ -2,6 +2,7 @@ import produce from 'immer';
 import {
   EditableContentBlock,
   ExtendedComment,
+  EditableRelease,
 } from '@admin/services/publicationService';
 import { DataBlock } from '@common/services/dataBlockService';
 import {
@@ -13,7 +14,7 @@ import ReleaseDispatchAction from './actions';
 
 type Dispatch = (action: ReleaseDispatchAction) => void;
 type State = {
-  release: AbstractRelease<EditableContentBlock> | undefined;
+  release: EditableRelease | undefined;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: ExtendedComment[];
@@ -47,55 +48,126 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
     case 'SET_STATE':
     case 'SET_AVAILABLE_DATABLOCKS':
       return { ...state, ...action.payload };
-    case 'REMOVE_BLOCK_FROM_SECTION': {
-      const { release } = state;
-      const { sectionId, blockId, sectionKey } = action.payload.meta;
-      if (release === undefined || typeof release[sectionKey] === 'object') {
-        throw new Error('REMOVE_BLOCK_FROM_SECTION: failed');
-      } else if (release[sectionKey] instanceof Array) {
-        return {
-          ...state,
-          release: {
-            ...release,
-            [sectionKey]: (release[sectionKey] as ContentSection<
-              EditableContentBlock
-            >[]).map(section => {
-              if (section.id === sectionId) {
-                return {
-                  content: section.content?.filter(
-                    contentBlock => (contentBlock.id as string) !== blockId,
-                  ),
-                };
-              }
-              return section;
-            }),
-          },
-        };
-      } else if (
-        (release[sectionKey] as ContentSection<EditableContentBlock>).id ===
-        sectionId
-      ) {
-        return {
-          ...state,
-          release: {
-            ...release,
-            [sectionKey]: {
-              ...release[sectionKey],
-              content: (release[sectionKey] as ContentSection<
-                EditableContentBlock
-              >).content?.filter(
-                contentBlock => (contentBlock.id as string) !== blockId,
-              ),
-            },
-          },
-        };
-      } else {
-        throw new Error(
-          'REMOVE_BLOCK_FROM_SECTION: failed to find block for removal, in release.',
-        );
-      }
+    case 'REMOVE_BLOCK_FROM_SECTION':
+      return produce<State>(state, draft => {
+        const { sectionId, blockId, sectionKey } = action.payload.meta;
+        if (
+          draft.release === undefined ||
+          typeof draft.release[sectionKey] !== 'object'
+        ) {
+          throw new Error('REMOVE_BLOCK_FROM_SECTION: failed');
+        } else if (sectionKey === 'content') {
+          draft.release[sectionKey] = draft.release[sectionKey].map(section => {
+            if (section.id === sectionId) {
+              return {
+                content: section.content?.filter(
+                  contentBlock => (contentBlock.id as string) !== blockId,
+                ),
+              } as ContentSection<EditableContentBlock>;
+            }
+            return section;
+          });
+        } else {
+          (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content = (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content?.filter(
+            contentBlock => (contentBlock.id as string) !== blockId,
+          );
+        }
+      });
+    case 'UPDATE_BLOCK_FROM_SECTION': {
+      return produce<State>(state, draft => {
+        const { block, meta } = action.payload;
+        const { sectionId, blockId, sectionKey } = meta;
+        if (
+          draft.release === undefined ||
+          typeof draft.release[sectionKey] !== 'object'
+        ) {
+          throw new Error('UPDATE_BLOCK_FROM_SECTION: failed');
+        } else if (sectionKey === 'content') {
+          draft.release[sectionKey] = draft.release[sectionKey].map(section => {
+            if (section.id === sectionId) {
+              return {
+                content: section.content?.map(contentBlock => {
+                  if ((contentBlock.id as string) === blockId) {
+                    return block;
+                  }
+                  return contentBlock;
+                }),
+              } as ContentSection<EditableContentBlock>;
+            }
+            return section;
+          });
+        } else {
+          (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content = (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content?.map(contentBlock => {
+            if ((contentBlock.id as string) === blockId) {
+              return block;
+            }
+            return contentBlock;
+          });
+        }
+      });
     }
-    // case 'UPDATE_BLOCK_FROM_SECTION': {}
+    case 'ADD_BLOCK_TO_SECTION': {
+      return produce<State>(state, draft => {
+        const { block, meta } = action.payload;
+        const { sectionId, sectionKey } = meta;
+        if (
+          draft.release === undefined ||
+          typeof draft.release[sectionKey] !== 'object'
+        ) {
+          throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        } else if (sectionKey === 'content') {
+          draft.release[sectionKey] = draft.release[sectionKey].map(section => {
+            if (section.id === sectionId) {
+              return {
+                content: section.content?.push(block),
+              } as ContentSection<EditableContentBlock>;
+            }
+            return section;
+          });
+        } else if (
+          (draft.release[sectionKey] as ContentSection<EditableContentBlock>)
+            .content
+        ) {
+          ((draft.release[sectionKey] as ContentSection<EditableContentBlock>)
+            .content as EditableContentBlock[]).push(block);
+        } else {
+          (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content = [block];
+        }
+      });
+    }
+    case 'UPDATE_SECTION_CONTENT': {
+      return produce<State>(state, draft => {
+        const { sectionContent, meta } = action.payload;
+        const { sectionId, sectionKey } = meta;
+        if (
+          draft.release === undefined ||
+          typeof draft.release[sectionKey] !== 'object'
+        ) {
+          throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        } else if (sectionKey === 'content') {
+          draft.release[sectionKey] = draft.release[sectionKey].map(section => {
+            if (section.id === sectionId) {
+              return { ...section, content: sectionContent };
+            }
+            return section;
+          });
+        } else {
+          (draft.release[sectionKey] as ContentSection<
+            EditableContentBlock
+          >).content = sectionContent;
+        }
+      });
+    }
     default: {
       return { ...state };
     }

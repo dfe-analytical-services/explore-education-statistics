@@ -3,11 +3,9 @@ import { EditableRelease } from '@admin/services/publicationService';
 import PreviewContentBlocks, {
   ContentBlockProps,
 } from '@common/modules/find-statistics/components/ContentBlocks';
-import wrapEditableComponent, {
-  EditingContext,
-} from '@common/modules/find-statistics/util/wrapEditableComponent';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Comments from './Comments';
 import ContentBlockDraggable from './ContentBlockDraggable';
@@ -23,16 +21,12 @@ export interface Props extends ContentBlockProps {
   content: ContentType;
   sectionId: string;
   editable?: boolean;
-  canAddBlocks: boolean;
-  canAddSingleBlock?: boolean;
-  textOnly?: boolean;
   isReordering?: boolean;
   allowComments: boolean;
-  addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
-  onBlockSaveOrder?: (order: Dictionary<number>) => Promise<void>;
-  onBlockContentChange: (blockId: string, content: string) => Promise<void>;
-  onBlockDelete: (blockId: string) => Promise<void>;
+  onBlockSaveOrder?: (order: Dictionary<number>) => void;
+  onBlockContentChange: (blockId: string, content: string) => void;
+  onBlockDelete: (blockId: string) => void;
 }
 
 const EditableContentBlock = ({
@@ -40,15 +34,12 @@ const EditableContentBlock = ({
   sectionId,
   editable = true,
   onContentChange,
-  canAddBlocks = false,
   isReordering = false,
   allowComments = false,
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
 }: Props) => {
-  const editingContext = useContext(EditingContext);
-
   const [contentBlocks, setContentBlocks] = useState<ContentType>();
 
   React.useEffect(() => {
@@ -94,67 +85,59 @@ const EditableContentBlock = ({
   }
 
   return (
-    <EditingContext.Provider
-      value={{
-        ...editingContext,
-        sectionId,
-      }}
-    >
-      <DragDropContext onDragEnd={onDragEnd}>
-        <ContentBlockDroppable
-          draggable={isReordering}
-          droppableId={`${sectionId}`}
-        >
-          {contentBlocks.map((block, index) => (
-            <div
-              key={`content-section-${block.id}`}
-              id={`content-section-${block.id}`}
-              className="govuk-!-margin-bottom-9"
+    <DragDropContext onDragEnd={onDragEnd}>
+      <ContentBlockDroppable
+        draggable={isReordering}
+        droppableId={`${sectionId}`}
+      >
+        {contentBlocks.map((block, index) => (
+          <div
+            key={`content-section-${block.id}`}
+            id={`content-section-${block.id}`}
+            className="govuk-!-margin-bottom-9"
+          >
+            <ContentBlockDraggable
+              draggable={isReordering}
+              draggableId={`${block.id}`}
+              key={`${block.id}`}
+              index={index}
             >
-              <ContentBlockDraggable
-                draggable={isReordering}
-                draggableId={`${block.id}`}
-                key={`${block.id}`}
-                index={index}
-              >
-                {!isReordering && (
-                  <>
-                    {allowComments &&
-                      (editingContext.isCommenting ||
-                        editingContext.isReviewing) && (
-                        <Comments
-                          contentBlockId={block.id}
-                          initialComments={block.comments}
-                          canResolve={editingContext.isReviewing}
-                          canComment={editingContext.isCommenting}
-                          onCommentsChange={async comments => {
-                            const newBlocks = [...contentBlocks];
-                            newBlocks[index].comments = comments;
-                            setContentBlocks(newBlocks);
-                            if (onContentChange) {
-                              onContentChange(newBlocks);
-                            }
-                          }}
-                        />
-                      )}
-                  </>
-                )}
+              {!isReordering && (
+                <>
+                  {allowComments && (
+                    <Comments
+                      sectionId={sectionId}
+                      contentBlockId={block.id}
+                      initialComments={block.comments}
+                      canResolve={false}
+                      canComment
+                      onCommentsChange={async comments => {
+                        const newBlocks = [...contentBlocks];
+                        newBlocks[index].comments = comments;
+                        setContentBlocks(newBlocks);
+                        if (onContentChange) {
+                          onContentChange(newBlocks);
+                        }
+                      }}
+                    />
+                  )}
+                </>
+              )}
 
-                <EditableContentSubBlockRenderer
-                  editable={editable && !isReordering}
-                  canDelete={!!canAddBlocks && !isReordering}
-                  block={block}
-                  onContentChange={newContent =>
-                    onBlockContentChange(block.id, newContent)
-                  }
-                  onDelete={() => onBlockDelete(block.id)}
-                />
-              </ContentBlockDraggable>
-            </div>
-          ))}
-        </ContentBlockDroppable>
-      </DragDropContext>
-    </EditingContext.Provider>
+              <EditableContentSubBlockRenderer
+                editable={editable && !isReordering}
+                canDelete={!isReordering}
+                block={block}
+                onContentChange={newContent =>
+                  onBlockContentChange(block.id, newContent)
+                }
+                onDelete={() => onBlockDelete(block.id)}
+              />
+            </ContentBlockDraggable>
+          </div>
+        ))}
+      </ContentBlockDroppable>
+    </DragDropContext>
   );
 };
 

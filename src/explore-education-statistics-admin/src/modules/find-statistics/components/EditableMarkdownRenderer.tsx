@@ -10,10 +10,10 @@ import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
-    canDelete: boolean;
+    canDelete?: boolean;
     onDelete: () => void;
     editable?: boolean;
-    onContentChange: (content: string) => Promise<unknown>;
+    onContentChange: (content: string) => void;
   };
 
 const EditingMarkdownRenderer = ({

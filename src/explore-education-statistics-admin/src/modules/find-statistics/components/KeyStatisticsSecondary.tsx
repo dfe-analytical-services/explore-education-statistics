@@ -1,21 +1,18 @@
-import React, { useContext, useState } from 'react';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import Button from '@common/components/Button';
+import ModalConfirm from '@common/components/ModalConfirm';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
   AbstractRelease,
-  Publication,
   ContentSection,
+  Publication,
 } from '@common/services/publicationService';
-import { EditableContentBlock } from '@admin/services/publicationService';
-import Button from '@common/components/Button';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import ModalConfirm from '@common/components/ModalConfirm';
+import React, { useContext, useState } from 'react';
 import DatablockSelectForm from './DatablockSelectForm';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
-  setRelease: (
-    newRelease: AbstractRelease<EditableContentBlock, Publication>,
-  ) => void;
   isEditing?: boolean;
   updating?: boolean;
 }
@@ -32,12 +29,8 @@ export function hasSecondaryStats(
   );
 }
 
-export const AddSecondaryStats = ({
-  release,
-  setRelease,
-  updating = false,
-}: Props) => {
-  const { isEditing, updateAvailableDataBlocks } = useContext(EditingContext);
+export const AddSecondaryStats = ({ release, updating = false }: Props) => {
+  const { isEditing } = useContext(EditingContext);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
@@ -60,19 +53,6 @@ export const AddSecondaryStats = ({
             },
           ),
         ).then(() => {
-          if (updateAvailableDataBlocks) {
-            updateAvailableDataBlocks();
-          }
-
-          setRelease({
-            ...release,
-            keyStatisticsSecondarySection: release.keyStatisticsSecondarySection
-              ? {
-                  ...release.keyStatisticsSecondarySection,
-                  content: [] as EditableContentBlock[],
-                }
-              : undefined,
-          });
           resolve();
         });
       }
@@ -145,9 +125,6 @@ export const AddSecondaryStats = ({
                 },
               )
               .then(v => {
-                if (updateAvailableDataBlocks) {
-                  updateAvailableDataBlocks();
-                }
                 return v;
               });
             const keyStatisticsSecondarySection = await releaseContentService.getContentSection(
@@ -155,10 +132,6 @@ export const AddSecondaryStats = ({
               release.keyStatisticsSecondarySection.id,
             );
             if (keyStatisticsSecondarySection) {
-              setRelease({
-                ...release,
-                keyStatisticsSecondarySection,
-              });
               setIsFormOpen(false);
             }
           }

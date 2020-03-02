@@ -188,8 +188,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     block: ContentBlockAttachRequest,
-  ): Promise<ContentBlockAttachResponse> {
-    return client.post<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.post<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
       block,
     );

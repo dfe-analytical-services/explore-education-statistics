@@ -1,122 +1,86 @@
 import Accordion from '@admin/components/EditableAccordion';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import {
+  EditableContentBlock,
+  EditableRelease,
+} from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
-  releaseId: string;
   accordionId: string;
   sectionName: string;
-  onContentChange?: (content: ContentType[]) => void;
+  release: EditableRelease;
 }
 
 const ReleaseContentAccordion = ({
-  releaseId,
+  release,
   accordionId,
   sectionName,
-  onContentChange,
   handleApiErrors,
 }: ReleaseContentAccordionProps & ErrorControlProps) => {
-  const [content, setContent] = useState<ContentType[]>([]);
-
-  const setContentAndTriggerOnContentChange = useCallback(
-    (newContent: ContentType[]) => {
-      setContent(newContent);
-
-      if (onContentChange) {
-        onContentChange(newContent);
-      }
-    },
-    [onContentChange, setContent],
-  );
-
-  useEffect(
-    () => {
-      releaseContentService
-        .getContentSections(releaseId)
-        .then(setContentAndTriggerOnContentChange)
-        .catch(handleApiErrors);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  const { content } = release;
 
   const onReorder = useCallback(
     async (ids: Dictionary<number>) => {
       const newContent = await releaseContentService
-        .updateContentSectionsOrder(releaseId, ids)
+        .updateContentSectionsOrder(release.id, ids)
         .catch(handleApiErrors);
-
-      setContentAndTriggerOnContentChange(newContent);
     },
-    [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [release.id, handleApiErrors],
   );
 
   const onAddSection = useCallback(async () => {
     const newContent: AbstractRelease<EditableContentBlock>['content'] = [
       ...content,
       await releaseContentService
-        .addContentSection(releaseId, content.length)
+        .addContentSection(release.id, content.length)
         .catch(handleApiErrors),
     ];
-
-    setContentAndTriggerOnContentChange(newContent);
-  }, [
-    content,
-    releaseId,
-    handleApiErrors,
-    setContentAndTriggerOnContentChange,
-  ]);
+  }, [content, release.id, handleApiErrors]);
 
   const onUpdateHeading = useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
       let result;
       if (block.id) {
         result = await releaseContentService
-          .updateContentSectionHeading(releaseId, block.id, newTitle)
+          .updateContentSectionHeading(release.id, block.id, newTitle)
           .catch(handleApiErrors);
 
         const newContent = [...content];
         newContent[index].heading = newTitle;
-
-        setContentAndTriggerOnContentChange(newContent);
       }
       return result;
     },
-    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [content, release.id, handleApiErrors],
   );
 
   const updateContentSection = useCallback(
     (index: number, contentBlock?: EditableContentBlock[]) => {
       const newContent = [...content];
       newContent[index].content = contentBlock;
-
-      setContentAndTriggerOnContentChange(newContent);
     },
-    [content, setContentAndTriggerOnContentChange],
+    [content],
   );
 
   const onRemoveContentSection = useCallback(
     async (block: ContentType) => {
       if (block.id) {
         await releaseContentService
-          .removeContentSection(releaseId, block.id)
+          .removeContentSection(release.id, block.id)
           .catch(handleApiErrors);
 
         const newContent = content.filter(item => item.id !== block.id);
-
-        setContentAndTriggerOnContentChange(newContent);
       }
     },
-    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [content, release.id, handleApiErrors],
   );
 
   return (
@@ -130,6 +94,7 @@ const ReleaseContentAccordion = ({
       >
         {content.map((contentItem, index) => (
           <ReleaseContentAccordionSection
+            release={release}
             id={contentItem.id as string}
             key={contentItem.order}
             contentItem={contentItem}

@@ -1,5 +1,11 @@
 import ContentBlocks from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import {
+  deleteContentSectionBlock,
+  updateContentSectionBlock,
+  updateSectionBlockOrder,
+} from '@admin/pages/release/edit-release/content/helpers';
+import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import { EditableRelease } from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -9,31 +15,26 @@ import ChartRenderer, {
 import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import {
-  AbstractRelease,
-  Publication,
-} from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
 import KeyStatistics from './KeyStatistics';
 import { AddSecondaryStats, hasSecondaryStats } from './KeyStatisticsSecondary';
 
 interface Props {
-  release: AbstractRelease<EditableContentBlock, Publication>;
-  setRelease: (
-    newRelease: AbstractRelease<EditableContentBlock, Publication>,
-  ) => void;
+  release: EditableRelease;
 }
 
-const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
+const ReleaseHeadlines = ({ release }: Props) => {
   const { isEditing } = useContext(EditingContext);
+  const dispatch = useReleaseDispatch();
+
   const [secondaryStatsDatablock, setSecondaryStatsDatablockData] = useState<{
     datablock: DataBlock;
     data: FullTable;
@@ -73,52 +74,55 @@ const ReleaseHeadlines = ({ release, setRelease = () => {} }: Props) => {
       </h2>
 
       {hasSecondaryStats(release.keyStatisticsSecondarySection) ? (
-        <AddSecondaryStats
-          release={release}
-          setRelease={setRelease}
-          isEditing={isEditing}
-          updating
-        />
+        <AddSecondaryStats release={release} isEditing={isEditing} updating />
       ) : (
-        <AddSecondaryStats
-          release={release}
-          setRelease={setRelease}
-          isEditing={isEditing}
-        />
+        <AddSecondaryStats release={release} isEditing={isEditing} />
       )}
 
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-summary" title="Summary">
           <section id="keystats">
             {release.keyStatisticsSection && (
-              <KeyStatistics
-                release={release}
-                setRelease={setRelease}
-                isEditing={isEditing}
-              />
+              <KeyStatistics release={release} isEditing={isEditing} />
             )}
           </section>
           <section id="headlines">
-            {release.headlinesSection && (
-              <ContentBlocks
-                sectionId={release.headlinesSection.id}
-                publication={release.publication}
-                id={release.headlinesSection.id as string}
-                content={release.headlinesSection.content}
-                addContentButtonText="Add key statistics summary content"
-                canAddSingleBlock
-                textOnly
-                onContentChange={newContent =>
-                  setRelease({
-                    ...release,
-                    headlinesSection: {
-                      ...release.headlinesSection,
-                      content: newContent,
-                    },
-                  })
-                }
-              />
-            )}
+            <ContentBlocks
+              sectionId={release.headlinesSection.id}
+              publication={release.publication}
+              id={release.headlinesSection.id}
+              content={release.headlinesSection.content}
+              onBlockSaveOrder={order => {
+                updateSectionBlockOrder(
+                  dispatch,
+                  release.id,
+                  release.headlinesSection.id,
+                  'headlinesSection',
+                  order,
+                );
+              }}
+              onBlockContentChange={(blockId, bodyContent) =>
+                updateContentSectionBlock(
+                  dispatch,
+                  release.id,
+                  release.headlinesSection.id,
+                  blockId,
+                  'headlinesSection',
+                  bodyContent,
+                )
+              }
+              onBlockDelete={(blockId: string) =>
+                deleteContentSectionBlock(
+                  dispatch,
+                  release.id,
+                  release.headlinesSection.id,
+                  blockId,
+                  'headlinesSection',
+                )
+              }
+            />
+
+            {/* TODO: ADD THE ADDCONTENT BUTTON */}
           </section>
         </TabsSection>
         {release.keyStatisticsSecondarySection &&

@@ -54,10 +54,6 @@ const MethodologyContentPage = ({
         <EditingContext.Provider
           value={{
             isEditing,
-            isCommenting: false,
-            isReviewing: false,
-            releaseId: methodology.id,
-            availableDataBlocks: [],
           }}
         >
           <div
