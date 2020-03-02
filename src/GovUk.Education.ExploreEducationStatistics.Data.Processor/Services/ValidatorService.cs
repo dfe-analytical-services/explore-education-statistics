@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private static readonly List<string> MandatoryObservationColumns = new List<string>
         {
-            "time_identifier,TIME_IDENTIFIER",
+            "time_identifier",
             "time_period",
             "geographic_level"
         };
@@ -73,6 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
             var headers = subjectData.GetCsvLines().First().Split(',').ToList();
             ValidateObservationHeaders(headers, errors);
+            if (errors.Count != 0)
+            {
+                return errors;
+            }
             ValidateObservations(headers, subjectData.GetCsvLines(), errors);
 
             return errors;
@@ -129,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (!headers.Contains(mandatoryCol))
                 {
-                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " + mandatoryCol.Split(",")[0]);
+                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " + mandatoryCol);
                 }
                 if (errors.Count == 100)
                 {
