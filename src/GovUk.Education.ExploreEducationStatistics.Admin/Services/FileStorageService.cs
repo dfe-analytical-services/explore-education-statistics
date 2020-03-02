@@ -43,19 +43,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IFileTypeService _fileTypeService;
+        private readonly ContentDbContext _context;
 
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService, ContentDbContext context)
         {
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
             _fileTypeService = fileTypeService;
+            _context = context;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
@@ -84,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                         .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data,
                             metaDataInfo, overwrite))
+                        .OnSuccess(() => CreateBasicFileLink(dataFile.FileName, releaseId))
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
@@ -96,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(GetCloudBlobContainer)
                 .OnSuccess(blobContainer => 
-                    DataPathsForDeletion(blobContainer , releaseId, fileName)
+                    DataPathsForDeletion(blobContainer, releaseId, fileName)
                     .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
@@ -286,6 +289,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
+
+        private async Task<Either<ActionResult, bool>> CreateBasicFileLink(string filename, Guid releaseId)
+        {
+            var fileLink = new ReleaseFile
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = releaseId,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Id = Guid.NewGuid(),
+                    ReleaseId = releaseId,
+                    Filename = filename
+                }
+            };
+
+            _context.ReleaseFiles.Add(fileLink);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
         private static async Task<Either<ActionResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues,

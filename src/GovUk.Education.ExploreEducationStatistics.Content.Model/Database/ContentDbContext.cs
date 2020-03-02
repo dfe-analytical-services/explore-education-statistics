@@ -215,6 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<ReleaseFile> ReleaseFiles { get; set; }
+        public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<IContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
@@ -224,10 +226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
         public DbSet<User> Users { get; set; }
-        public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
@@ -276,6 +278,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFileReference>()
+                .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
