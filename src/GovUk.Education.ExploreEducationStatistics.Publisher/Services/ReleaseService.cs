@@ -113,9 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             
             _contentDbContext.Releases.Update(contentRelease);
             _statisticsDbContext.Release.Update(statisticsRelease);
-            
-            await _contentDbContext.SaveChangesAsync();
-            await _statisticsDbContext.SaveChangesAsync();
+
+            await Task.WhenAll(_contentDbContext.SaveChangesAsync(), _statisticsDbContext.SaveChangesAsync());
         }
 
         private static DateTime GetNextScheduledPublishingTime()

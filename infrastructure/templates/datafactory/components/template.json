@@ -508,16 +508,6 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "ReleaseDate",
-                                            "type": "DateTime"
-                                        },
-                                        "sink": {
-                                            "name": "ReleaseDate",
-                                            "type": "DateTime"
-                                        }
-                                    },
-                                    {
-                                        "source": {
                                             "name": "Slug",
                                             "type": "String"
                                         },
