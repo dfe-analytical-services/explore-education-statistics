@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
@@ -50,7 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     {
                         ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
 
-                        foreach (var folderAndFilename in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName))
+                        var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
+
+                        // If no batches then assume it didn't get passed initial validation stage
+                        if (!batches.Any())
+                        {
+                            pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
+                            return;
+                        }
+                        
+                        foreach (var folderAndFilename in batches)
                         {
                             availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
                         }

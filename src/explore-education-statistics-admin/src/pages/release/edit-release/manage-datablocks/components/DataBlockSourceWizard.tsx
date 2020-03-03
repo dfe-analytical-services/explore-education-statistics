@@ -3,6 +3,7 @@ import DataBlockDetailsForm, {
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   TableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
@@ -131,27 +132,62 @@ const DataBlockSourceWizard = ({
                 Data block details
               </WizardStepHeading>
 
-              {query && tableHeaders && (
-                <DataBlockDetailsForm
-                  initialValues={initialValues}
-                  query={query}
-                  tableHeaders={tableHeaders}
-                  initialDataBlock={dataBlock}
-                  releaseId={releaseId}
-                  onDataBlockSave={db => onDataBlockSave(db)}
-                >
-                  {table && tableHeaders && (
-                    <div className="govuk-!-margin-bottom-4">
-                      <div className="govuk-width-container">
-                        <TimePeriodDataTable
-                          ref={dataTableRef}
-                          fullTable={table}
-                          tableHeadersConfig={tableHeaders}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </DataBlockDetailsForm>
+              {query && tableHeaders && table && (
+                <>
+                  <div className="govuk-!-margin-bottom-4">
+                    <TableHeadersForm
+                      initialValues={tableHeaders}
+                      id="dataBlockSourceWizard-tableHeadersForm"
+                      onSubmit={async nextTableHeaders => {
+                        setTableHeaders(nextTableHeaders);
+
+                        if (dataBlock) {
+                          await onDataBlockSave({
+                            ...dataBlock,
+                            tables: [
+                              {
+                                tableHeaders: nextTableHeaders,
+                                indicators: [],
+                              },
+                            ],
+                          });
+                        }
+
+                        if (dataTableRef.current) {
+                          dataTableRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      }}
+                    />
+
+                    <TimePeriodDataTable
+                      ref={dataTableRef}
+                      fullTable={table}
+                      tableHeadersConfig={tableHeaders}
+                    />
+                  </div>
+
+                  <DataBlockDetailsForm
+                    initialValues={initialValues}
+                    query={query}
+                    tableHeaders={tableHeaders}
+                    initialDataBlock={dataBlock}
+                    releaseId={releaseId}
+                    onDataBlockSave={data =>
+                      onDataBlockSave({
+                        ...data,
+                        tables: [
+                          {
+                            tableHeaders,
+                            indicators: [],
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </>
               )}
             </>
           )}
