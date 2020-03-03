@@ -7,6 +7,8 @@ import {
   updateSectionBlockOrder,
   deleteContentSectionBlock,
   updateContentSectionBlock,
+  attachContentSectionBlock,
+  addContentSectionBlock,
 } from '@admin/pages/release/edit-release/content/helpers';
 import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import ManageReleaseContext, {
@@ -67,25 +69,6 @@ const ReleaseContentAccordionSection = ({
         type,
         order: contentItem.content ? contentItem.content.length : undefined,
       });
-      const {
-        content: newContentBlocks,
-      } = await releaseContentService.getContentSection(releaseId, sectionId);
-
-      onContentChange(newContentBlocks);
-    }
-  };
-
-  const onSectionAddDataBlock = async (datablockId: string) => {
-    if (releaseId && sectionId) {
-      await releaseContentService.attachContentSectionBlock(
-        releaseId,
-        sectionId,
-        {
-          contentBlockId: datablockId,
-          order: contentItem.content ? contentItem.content.length : 0,
-        },
-      );
-
       const {
         content: newContentBlocks,
       } = await releaseContentService.getContentSection(releaseId, sectionId);
@@ -161,14 +144,33 @@ const ReleaseContentAccordionSection = ({
           <Button
             variant="secondary"
             onClick={() => {
-              onSectionAddTextBlock('MarkdownBlock');
+              addContentSectionBlock(
+                dispatch,
+                releaseId,
+                sectionId,
+                'content',
+                {
+                  type: 'MarkdownBlock',
+                  order: contentItem.content ? contentItem.content.length : 0,
+                  body: '',
+                },
+              );
             }}
           >
             Add text block
           </Button>
           <AddDataBlockButton
-            onAddDataBlock={dataBlockId => {
-              onSectionAddDataBlock(dataBlockId);
+            onAddDataBlock={(datablockId: string) => {
+              attachContentSectionBlock(
+                dispatch,
+                releaseId,
+                sectionId,
+                'content',
+                {
+                  contentBlockId: datablockId,
+                  order: contentItem.content ? contentItem.content.length : 0,
+                },
+              );
             }}
           />
         </div>

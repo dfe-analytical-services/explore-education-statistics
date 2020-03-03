@@ -5,7 +5,10 @@ import {
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import { ContentBlockAttachRequest } from '@admin/services/release/edit-release/content/types';
+import {
+  ContentBlockAttachRequest,
+  ContentBlockPostModel,
+} from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
 import {
   AbstractRelease,
@@ -206,6 +209,39 @@ export async function updateContentSectionBlock(
   }
 }
 
+export async function addContentSectionBlock(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  block: ContentBlockPostModel,
+  errorHandler?: (err: any) => void,
+) {
+  try {
+    const newBlock = await releaseContentService.addContentSectionBlock(
+      releaseId,
+      sectionId,
+      block,
+    );
+    dispatch({
+      type: 'ADD_BLOCK_TO_SECTION',
+      payload: { meta: { sectionId, sectionKey }, block: newBlock },
+    });
+    // becuase we don't know if a datablock was used,
+    // and so it is unavailable
+    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
+  } catch (err) {
+    if (errorHandler) {
+      errorHandler(err);
+    } else {
+      dispatch({
+        type: 'PAGE_ERROR',
+        payload: { pageError: 'There was a problem.' },
+      });
+    }
+  }
+}
+
 export async function attachContentSectionBlock(
   dispatch: Dispatch,
   releaseId: string,
@@ -224,9 +260,6 @@ export async function attachContentSectionBlock(
       type: 'ADD_BLOCK_TO_SECTION',
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
-    // becuase we don't know if a datablock was used,
-    // and so it is unavailable
-    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
   } catch (err) {
     if (errorHandler) {
       errorHandler(err);

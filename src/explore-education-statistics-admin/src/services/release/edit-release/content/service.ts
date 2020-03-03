@@ -13,10 +13,8 @@ import {
 import { Dictionary } from '@common/types/util';
 import {
   ContentBlockAttachRequest,
-  ContentBlockAttachResponse,
   ContentBlockPostModel,
   ContentBlockPutModel,
-  ContentBlockViewModel,
   ContentSectionViewModel,
   ManageContentPageViewModel,
 } from './types';
@@ -72,8 +70,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     block: ContentBlockPostModel,
-  ): Promise<ContentBlockViewModel> {
-    return client.post<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.post<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
       block,
     );

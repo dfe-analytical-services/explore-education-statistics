@@ -1,11 +1,13 @@
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import {
+  addContentSectionBlock,
   deleteContentSectionBlock,
   updateContentSectionBlock,
   updateSectionBlockOrder,
 } from '@admin/pages/release/edit-release/content/helpers';
 import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { EditableRelease } from '@admin/services/publicationService';
+import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -122,7 +124,28 @@ const ReleaseHeadlines = ({ release }: Props) => {
               }
             />
 
-            {/* TODO: ADD THE ADDCONTENT BUTTON */}
+            {release.headlinesSection.content?.length === 0 && (
+              <div className="govuk-!-margin-bottom-8 dfe-align--center">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    addContentSectionBlock(
+                      dispatch,
+                      release.id,
+                      release.headlinesSection.id,
+                      'headlinesSection',
+                      {
+                        type: 'MarkdownBlock',
+                        order: 0,
+                        body: '',
+                      },
+                    );
+                  }}
+                >
+                  Add a headlines text block
+                </Button>
+              </div>
+            )}
           </section>
         </TabsSection>
         {release.keyStatisticsSecondarySection &&

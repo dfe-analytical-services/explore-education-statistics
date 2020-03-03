@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import styles from '@admin/modules/find-statistics/components/EditableContentBlock.module.scss';
+import styles from '@admin/modules/editable-components/EditableContentBlock.module.scss';
 
 const ContentBlockDraggable = ({
   draggable,
