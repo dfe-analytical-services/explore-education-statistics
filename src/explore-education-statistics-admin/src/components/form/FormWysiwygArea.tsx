@@ -4,14 +4,13 @@ import React, {
   MouseEventHandler,
   ReactNode,
 } from 'react';
-import ErrorMessage from '../ErrorMessage';
-import EditableMarkdownRenderer from '../../../../explore-education-statistics-admin/src/modules/find-statistics/components/EditableMarkdownRenderer';
+import EditableMarkdownRenderer, { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import ErrorMessage from '@common/components/ErrorMessage';
 
-export interface FormWysiwygAreaProps {
+export interface FormWysiwygAreaProps extends MarkdownRendererProps{
   error?: ReactNode | string;
   hint?: string;
   id: string;
-  toolbarStyle?: 'full' | 'reduced';
   label: ReactNode | string;
   source: string;
   name: string;
@@ -48,7 +47,6 @@ const FormWysiwygArea = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <EditableMarkdownRenderer
         {...props}
-        id={id}
         onContentChange={(content: string) => onContentChange(content)}
         source={source}
       />

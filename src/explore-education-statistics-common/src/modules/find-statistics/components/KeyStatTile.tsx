@@ -70,17 +70,15 @@ const KeyStatTile = ({
               <p className="govuk-body-s">{summary.dataSummary}</p>
             )}
           </div>
-          {summary &&
-            summary.dataDefinition &&
-            summary.dataDefinition[0] !== '' && (
-              <Details
-                summary={(summary && summary.dataDefinitionTitle) || 'Help'}
-              >
-                {summary.dataDefinition.map(data => (
-                  <ReactMarkdown key={data}>{data}</ReactMarkdown>
-                ))}
-              </Details>
-            )}
+          {summary && summary?.dataDefinition?.[0] !== '' && (
+            <Details
+              summary={(summary && summary.dataDefinitionTitle) || 'Help'}
+            >
+              {summary.dataDefinition.map(data => (
+                <ReactMarkdown key={data}>{data}</ReactMarkdown>
+              ))}
+            </Details>
+          )}
           {children}
         </>
       ) : (

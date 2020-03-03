@@ -1,6 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import Button from '@common/components/Button';
-import Details from '@common/components/Details';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import formatPretty from '@common/lib/utils/number/formatPretty';
@@ -14,7 +13,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import FormFieldWysiwygArea from '@common/components/form/FormFieldWysiwygArea';
+import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
 
 export interface KeyStatsFormValues {
   dataSummary: string;
@@ -157,7 +156,7 @@ const EditableKeyStatTile = ({
                     />
                     <FormFieldWysiwygArea
                       name="dataDefinition"
-                      toolbarStyle="reduced"
+                      toolbarConfig="reduced"
                       id={`key-stat-dataDefinition-${id}`}
                       label="Guidance text"
                       onContentChange={(content: string) => {

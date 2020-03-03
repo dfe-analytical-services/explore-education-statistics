@@ -9,9 +9,9 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
-    canDelete: boolean;
-    onDelete: () => void;
-    toolbarStyle?: 'full' | 'reduced';
+    canDelete?: boolean;
+    onDelete?: () => void;
+    toolbarConfig?: 'full' | 'reduced';
     editable?: boolean;
     onContentChange?: (content: string) => void;
   };
@@ -20,7 +20,7 @@ const EditableMarkdownRenderer = ({
   contentId,
   source,
   canDelete,
-  toolbarStyle,
+  toolbarConfig,
   onDelete,
   editable = true,
   onContentChange,
@@ -38,7 +38,7 @@ const EditableMarkdownRenderer = ({
         canDelete={canDelete}
         editable={editable}
         useMarkdown
-        toolbarStyle={toolbarStyle}
+        toolbarConfig={toolbarConfig}
         onContentChange={async (ss: string) => {
           if (
             editingContext.releaseId &&

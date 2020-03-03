@@ -17,7 +17,8 @@ interface Props {
   reviewing?: boolean;
   resolveComments?: boolean;
   content: string;
-  toolbarStyle?: 'full' | 'reduced';
+  toolbarConfig?: 'full' | 'reduced';
+  customToolbarConfig?: string[];
   useMarkdown?: boolean;
   onContentChange?: (content: string) => Promise<unknown>;
   onDelete?: () => void;
@@ -28,7 +29,8 @@ const WysiwygEditor = ({
   canDelete = false,
   content,
   onContentChange,
-  toolbarStyle,
+  toolbarConfig,
+  customToolbarConfig,
   onDelete,
   useMarkdown = false,
 }: Props) => {
@@ -56,6 +58,31 @@ const WysiwygEditor = ({
     } else {
       setEditing(false);
       setSaved(true);
+    }
+  };
+
+  const getToolbarConfig = (config?: string) => {
+    switch (config) {
+      default:
+      case 'full':
+        return [
+          'heading',
+          '|',
+          'bold',
+          'italic',
+          'link',
+          '|',
+          'bulletedList',
+          'numberedList',
+          '|',
+          'blockQuote',
+          'insertTable',
+          '|',
+          'redo',
+          'undo',
+        ];
+      case 'reduced':
+        return ['bold', 'link', '|', 'bulletedList'];
     }
   };
 
@@ -130,25 +157,7 @@ const WysiwygEditor = ({
           <CKEditor
             editor={ClassicEditor}
             config={{
-              toolbar:
-                toolbarStyle === 'full' || toolbarStyle === undefined
-                  ? [
-                      'heading',
-                      '|',
-                      'bold',
-                      'italic',
-                      'link',
-                      '|',
-                      'bulletedList',
-                      'numberedList',
-                      '|',
-                      'blockQuote',
-                      'insertTable',
-                      '|',
-                      'redo',
-                      'undo',
-                    ]
-                  : ['bold', 'link', '|', 'bulletedList'],
+              toolbar: customToolbarConfig || getToolbarConfig(toolbarConfig),
             }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {
