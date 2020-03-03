@@ -13,29 +13,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
+            
+            migrationBuilder.RenameColumn("ReleaseDate",
+                "Release",
+                "Published");
 
-            migrationBuilder.DropColumn(
-                name: "ReleaseDate",
-                table: "Release");
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "Published",
-                table: "Release",
-                nullable: true);
+            migrationBuilder.AlterColumn<DateTime>("Published", "Release", nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Published",
-                table: "Release");
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "ReleaseDate",
-                table: "Release",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
+            migrationBuilder.AlterColumn<DateTime>("Published", "Release", nullable: false);
+            
+            migrationBuilder.RenameColumn("Published",
+                "Release",
+                "ReleaseDate");
 
             // Revert to the version in the previous migration 20200217131418_Routine_DropAndCreateRelease.sql
             migrationBuilder.Sql("DROP PROCEDURE dbo.DropAndCreateRelease");
