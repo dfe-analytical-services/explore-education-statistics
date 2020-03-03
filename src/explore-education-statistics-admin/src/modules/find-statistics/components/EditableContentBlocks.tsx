@@ -263,7 +263,6 @@ const EditableContentBlock = ({
                   canDelete={!!canAddBlocks && !isReordering}
                   block={block}
                   id={id}
-                  releaseId={editingContext.releaseId}
                   index={index}
                   onContentChange={(newContent: string) =>
                     onContentBlockChange(index, newContent)
