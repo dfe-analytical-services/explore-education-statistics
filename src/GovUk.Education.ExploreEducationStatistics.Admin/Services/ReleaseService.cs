@@ -257,8 +257,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject?.Id ?? Guid.Empty);
-                    var orphanFootnotes = await _subjectService.GetFootnotesOnlyForSubjectAsync(subject?.Id ?? Guid.Empty);
+                    var dependentDataBlocks = subject == null ? new List<DataBlock>() : GetDependentDataBlocks(releaseId, subject.Id);
+                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
                     {
