@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false, AllowedChartFileTypes)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true, AllowedChartFileTypes)
                 .HandleFailuresOr(Ok);
         }
 

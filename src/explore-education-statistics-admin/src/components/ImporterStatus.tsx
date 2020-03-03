@@ -1,5 +1,5 @@
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+import { DataFile } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import importStatusService from '@admin/services/release/imports/service';
 import {
   ImportStatus,

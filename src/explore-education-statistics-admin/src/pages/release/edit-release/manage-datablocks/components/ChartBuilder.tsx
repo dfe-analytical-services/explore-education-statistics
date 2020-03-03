@@ -8,7 +8,7 @@ import ChartDataSelector, {
 } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
-import service from '@admin/services/release/edit-release/data/service';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -232,12 +232,10 @@ const ChartBuilder = ({
           axesConfiguration.major))
     ) {
       setRenderedChartProps({
+        ...chartOptions,
         type: selectedChartType.type,
-
         data,
-
         meta: metaData,
-
         axes: {
           major: {
             ...axesConfiguration.major,
@@ -249,9 +247,8 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
-        chartFileDownloadService: service.downloadChartFile,
-
-        ...chartOptions,
+        releaseId: data.releaseId,
+        getInfographic: editReleaseDataService.downloadChartFile,
       });
     } else {
       setRenderedChartProps(undefined);
