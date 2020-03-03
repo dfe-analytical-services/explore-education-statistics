@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import 'core-js/fn/array/virtual/flat-map';
+import 'core-js/features/array/flat-map';
 import '@common-test/setupGlobals';
 import '@common-test/extend-expect';
 
