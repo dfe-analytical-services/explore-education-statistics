@@ -1,36 +1,35 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using ReleaseId = System.Guid;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractDataService<TResult> : IDataService<TResult>
     {
         private readonly IObservationService _observationService;
-        private readonly ISubjectService _subjectService;
+        protected readonly IUserService _userService;
+        protected readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
 
         protected AbstractDataService(IObservationService observationService,
-            ISubjectService subjectService)
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
+            IUserService userService)
         {
             _observationService = observationService;
-            _subjectService = subjectService;
+            _persistenceHelper = persistenceHelper;
+            _userService = userService;
         }
 
-        public abstract TResult Query(ObservationQueryContext queryContext, ReleaseId? releaseId = null);
+        public abstract Task<Either<ActionResult, TResult>> Query(ObservationQueryContext queryContext);
 
-        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
+        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {
-            // If release Id is not specified then verify that the subject id passed exists for the latest release.
-            if ((releaseId == null || releaseId == Guid.Empty) && !_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
-            {
-                throw new InvalidOperationException("Subject is not for the latest release of this publication");
-            }
-
             return _observationService.FindObservations(queryContext);
         }
     }

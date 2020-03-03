@@ -2,17 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -26,8 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IObservationService _observationService;
-        private readonly ISubjectService _subjectService;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
+        private readonly IUserService _userService;
 
         public TableBuilderSubjectMetaService(IFilterService filterService,
             IFilterItemService filterItemService,
@@ -36,8 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ILogger<TableBuilderSubjectMetaService> logger,
             IMapper mapper,
             IObservationService observationService,
-            ISubjectService subjectService,
-            ITimePeriodService timePeriodService) : base(filterItemService)
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
+            ITimePeriodService timePeriodService,
+            IUserService userService) : base(filterItemService)
         {
             _filterService = filterService;
             _filterItemService = filterItemService;
@@ -46,67 +55,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
             _mapper = mapper;
             _observationService = observationService;
-            _subjectService = subjectService;
+            _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
+            _userService = userService;
         }
 
-        public TableBuilderSubjectMetaViewModel GetSubjectMeta(Guid subjectId)
+        public Task<Either<ActionResult, TableBuilderSubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            var subject = _subjectService.Find(subjectId);
-            if (subject == null)
-            {
-                throw new ArgumentException("Subject does not exist", nameof(subjectId));
-            }
-
-            return new TableBuilderSubjectMetaViewModel
-            {
-                Filters = GetFilters(subject.Id),
-                Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id),
-                TimePeriod = GetTimePeriods(subject.Id)
-            };
+            return _persistenceHelper.CheckEntityExists<Subject>(subjectId, HydrateSubject)
+                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(subject => new TableBuilderSubjectMetaViewModel
+                {
+                    Filters = GetFilters(subject.Id),
+                    Indicators = GetIndicators(subject.Id),
+                    Locations = GetObservationalUnits(subject.Id),
+                    TimePeriod = GetTimePeriods(subject.Id)
+                });
         }
 
-        public TableBuilderSubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query)
+        public Task<Either<ActionResult, TableBuilderSubjectMetaViewModel>> GetSubjectMeta(
+            SubjectMetaQueryContext query)
         {
-            var subject = _subjectService.Find(query.SubjectId);
-            if (subject == null)
-            {
-                throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
-            }
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
+                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(subject =>
+                {
+                    var observations = _observationService.FindObservations(query).AsQueryable();
 
-            var observations = _observationService.FindObservations(query).AsQueryable();
+                    var stopwatch = Stopwatch.StartNew();
+                    stopwatch.Start();
 
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+                    var filters = GetFilters(observations);
 
-            var filters = GetFilters(observations);
+                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var indicators = GetIndicators(subject.Id);
 
-            var indicators = GetIndicators(subject.Id);
+                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var locations = GetObservationalUnits(observations);
 
-            var locations = GetObservationalUnits(observations);
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                    var timePeriods = GetTimePeriods(observations);
 
-            var timePeriods = GetTimePeriods(observations);
+                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Stop();
 
-            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Stop();
-
-            return new TableBuilderSubjectMetaViewModel
-            {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = locations,
-                TimePeriod = timePeriods
-            };
+                    return new TableBuilderSubjectMetaViewModel
+                    {
+                        Filters = filters,
+                        Indicators = indicators,
+                        Locations = locations,
+                        TimePeriod = timePeriods
+                    };
+                });
         }
 
         private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
@@ -207,6 +213,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Label = unit.Name,
                 Value = value
             };
+        }
+
+        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        {
+            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            {
+                return subject;
+            }
+
+            return new ForbidResult();
+        }
+
+        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
+        {
+            return queryable.Include(subject => subject.Release);
         }
     }
 }

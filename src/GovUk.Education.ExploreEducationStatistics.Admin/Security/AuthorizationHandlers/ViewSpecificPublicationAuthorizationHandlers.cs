@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -40,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
             ViewSpecificPublicationRequirement requirement, Publication publication)
         {
-            var userId = SecurityUtils.GetUserId(authContext.User);
+            var userId = authContext.User.GetUserId();
             
             if (await _context
                 .UserReleaseRoles

@@ -3,8 +3,9 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
-import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/components/ChartRenderer';
+import { GetInfographic } from '@common/modules/charts/components/Infographic';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
@@ -23,6 +24,7 @@ import React, { Component, ReactNode, MouseEvent } from 'react';
 
 export interface DataBlockProps {
   id: string;
+  releaseId?: string;
   type: string;
   captionTitle?: string;
   dataBlockRequest?: DataBlockRequest;
@@ -31,9 +33,10 @@ export interface DataBlockProps {
   charts?: Chart[];
   summary?: Summary;
 
-  height?: number;
   showTables?: boolean;
   additionalTabContent?: ReactNode;
+
+  getInfographic?: GetInfographic;
 
   onToggle?: (section: { id: string; title: string }) => void;
 
@@ -149,13 +152,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public render() {
     const {
       captionTitle,
-      height,
       showTables,
       additionalTabContent,
       onToggle,
+      releaseId,
       id,
+      getInfographic,
     } = this.props;
+
     const { charts, tables, isLoading, isError } = this.state;
+
     return (
       <>
         {isLoading ? (
@@ -201,7 +207,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                       {chart.data &&
                       chart.meta &&
                       chart.data.result.length > 0 ? (
-                        <ChartRenderer {...chart} height={height} />
+                        <ChartRenderer
+                          {...chart}
+                          releaseId={releaseId}
+                          getInfographic={getInfographic}
+                        />
                       ) : (
                         <div>
                           Unable to render chart, invalid data configured

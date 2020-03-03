@@ -6,7 +6,7 @@ import ReleaseContentAccordion from '@admin/modules/find-statistics/components/R
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import service from '@admin/services/release/edit-release/data/service';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -166,7 +166,7 @@ const PublicationReleaseContent = ({
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          service
+                          editReleaseDataService
                             .downloadFile(path, name)
                             .catch(handleApiErrors)
                         }

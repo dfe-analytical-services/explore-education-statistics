@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ChartMetaData } from '@common/modules/charts/types/chart';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import React, { useEffect, useState } from 'react';
+import ChartRenderer, {
+  ChartRendererProps,
+} from '@common/modules/charts/components/ChartRenderer';
 import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
-import ChartRenderer, { ChartRendererProps } from './ChartRenderer';
-import { parseMetaData, ChartMetaData } from './charts/ChartFunctions';
 
 interface DataBlockWithOptionalResponse extends DataBlock {
   dataBlockResponse?: DataBlockResponse;
@@ -52,7 +55,7 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
     return (
       <>
         <TimePeriodDataTableRenderer
-          heading={datablock.heading}
+          captionTitle={datablock.heading}
           response={dataBlockResponse}
           tableHeaders={
             datablock.tables &&

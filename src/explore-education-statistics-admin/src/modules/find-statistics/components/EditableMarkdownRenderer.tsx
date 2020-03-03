@@ -1,16 +1,17 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import React, { useContext } from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
-    canDelete: boolean;
-    onDelete: () => void;
+    canDelete?: boolean;
+    onDelete?: () => void;
+    toolbarConfig?: string[];
     editable?: boolean;
     onContentChange?: (content: string) => void;
   };
@@ -19,6 +20,7 @@ const EditableMarkdownRenderer = ({
   contentId,
   source,
   canDelete,
+  toolbarConfig,
   onDelete,
   editable = true,
   onContentChange,
@@ -36,13 +38,14 @@ const EditableMarkdownRenderer = ({
         canDelete={canDelete}
         editable={editable}
         useMarkdown
-        onContentChange={async ss => {
+        toolbarConfig={toolbarConfig}
+        onContentChange={async (ss: string) => {
           if (
             editingContext.releaseId &&
             editingContext.sectionId &&
             contentId
           ) {
-            const { body } = await releaseContentService
+            await releaseContentService
               .updateContentSectionBlock(
                 editingContext.releaseId,
                 editingContext.sectionId,
@@ -52,10 +55,9 @@ const EditableMarkdownRenderer = ({
                 },
               )
               .catch(handleApiErrors);
-
-            if (onContentChange) onContentChange(body);
-            setMarkdown(body);
           }
+          if (onContentChange) onContentChange(ss);
+          setMarkdown(ss);
         }}
         onDelete={onDelete}
       />

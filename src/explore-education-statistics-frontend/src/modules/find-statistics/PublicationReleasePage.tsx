@@ -20,7 +20,7 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
@@ -34,13 +34,11 @@ interface Props {
 class PublicationReleasePage extends Component<Props> {
   private accId: string[] = generateIdList(2);
 
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    publication: string;
-    release: string;
-  }>) {
-    const { publication, release } = query;
+  public static async getInitialProps({ query }: NextPageContext) {
+    const { publication, release } = query as {
+      publication: string;
+      release: string;
+    };
 
     const request = release
       ? publicationService.getPublicationRelease(publication, release)
@@ -362,7 +360,6 @@ class PublicationReleasePage extends Component<Props> {
           data.
         </p>
         <ButtonLink
-          prefetch
           as={`/data-tables/${data.publication.slug}`}
           href={`/data-tables?publicationSlug=${data.publication.slug}`}
         >

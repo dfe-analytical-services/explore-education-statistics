@@ -131,89 +131,89 @@ DECLARE @footnote_id_20 uniqueidentifier = 'a9045d29-7c84-491d-918c-3885f11597d3
 DECLARE @footnote_id_21 uniqueidentifier = '2268f97a-5107-464f-ade6-30debc36519a';
 DECLARE @footnote_id_22 uniqueidentifier = '8a79e8c6-3552-496a-8790-d072cec8c43f';
 
-INSERT INTO Footnote (Id, Content)
-VALUES (@footnote_id_1, 'State-funded primary schools include all primary academies, including free schools.');
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_1, 'State-funded primary schools include all primary academies, including free schools.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_2,
-        'State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.');
+        'State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_3,
-        'Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.');
+        'Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_4,
-        'Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.');
+        'Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
-VALUES (@footnote_id_5, 'x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.');
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_5, 'x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_6,
-        'There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.');
+        'There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_7,
-        'Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.');
+        'Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_8,
-        'Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.');
+        'Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_9,
-        'The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.');
+        'The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_10,
-        'The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.');
+        'The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_11,
-        'Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).');
+        'Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
-VALUES (@footnote_id_12, 'The number of enrolments with one or more session of absence for specific reason.');
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_12, 'The number of enrolments with one or more session of absence for specific reason.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_13,
-        'The number of sessions missed in each band expressed as a percentage of the total number of sessions missed for that category of absence overall.');
+        'The number of sessions missed in each band expressed as a percentage of the total number of sessions missed for that category of absence overall.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
-VALUES (@footnote_id_14, 'Includes all schools with at least six enrolments who reported absence information via the school census for the associated academic year.');
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_14, 'Includes all schools with at least six enrolments who reported absence information via the school census for the associated academic year.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_15,
-        'See "Guide to absence statistics" for more information on how absence and pupil characteristic data have been linked.');
+        'See "Guide to absence statistics" for more information on how absence and pupil characteristic data have been linked.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_16,
-        'Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.');
+        'Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_17,
-        'In September 2014 the Special Educational Needs and Disability (SEND) provisions were introduced in the Children and Families Act 2014. This reform caused changes to SEN categories - Education, Health and Care (EHC) plans were introduced and SEN support replaces school action and school action plus but some pupils remain with these provision types in first year of transition (2014/15).');
+        'In September 2014 the Special Educational Needs and Disability (SEND) provisions were introduced in the Children and Families Act 2014. This reform caused changes to SEN categories - Education, Health and Care (EHC) plans were introduced and SEN support replaces school action and school action plus but some pupils remain with these provision types in first year of transition (2014/15).', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_18,
-        'Minority ethnic group includes pupils who have been classified according to their ethnic group, excluding White British.');
+        'Minority ethnic group includes pupils who have been classified according to their ethnic group, excluding White British.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_19,
-        'From 2015 SEN support replaced school action and School Action plus but some pupils remain with these provision types. Those who were formerly School Action did not provide type of need in previous years. Those who remain on school action provision are not included here but have been included within the SEN support category in other tables.');
+        'From 2015 SEN support replaced school action and School Action plus but some pupils remain with these provision types. Those who were formerly School Action did not provide type of need in previous years. Those who remain on school action provision are not included here but have been included within the SEN support category in other tables.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_20,
-        'Social Emotional and Mental Health was added as a new type of need in 2015, the previous type of need Behaviour, Emotional and Social Difficulties has been removed although it is not expected it should be a direct replacement.');
+        'Social Emotional and Mental Health was added as a new type of need in 2015, the previous type of need Behaviour, Emotional and Social Difficulties has been removed although it is not expected it should be a direct replacement.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_21,
-        'Includes pupils on the school roll for at least one session who are aged 4, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered at more than one school).');
+        'Includes pupils on the school roll for at least one session who are aged 4, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered at more than one school).', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
-INSERT INTO Footnote (Id, Content)
+INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_22,
-        'Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.');
+        'Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
 --
 -- Subjects

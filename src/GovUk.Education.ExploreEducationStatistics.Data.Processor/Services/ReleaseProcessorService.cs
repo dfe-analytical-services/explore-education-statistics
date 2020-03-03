@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
+using System.Threading;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
@@ -31,6 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
             StatisticsDbContext context)
         {
+            // Avoid potential collisions
+            var secs = new Random().Next(1, 5) * 1000;
+            Thread.Sleep(secs);
             var release = CreateOrUpdateRelease(message, context);
             return RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
         }
@@ -54,19 +57,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Release = release
                 }
             ).Entity;
-
+            
+            context.SaveChanges();
             return subject;
         }
 
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)
         {
-            var release = context.Release
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(r => r.Id.Equals(message.Release.Id));
+            Release release;
 
-            if (release == null)
+            if (!context.Release.Any((r => r.Id.Equals(message.Release.Id))))
             {
                 release = new Release
                 {
@@ -77,21 +77,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     TimeIdentifier = message.Release.TimeIdentifier,
                     Year = message.Release.Year
                 };
-                return context.Release.Add(release).Entity;
-            }
 
-            release = _mapper.Map(message.Release, release);
-            return context.Release.Update(release).Entity;
+                release = context.Release.Add(release).Entity;
+            }
+            else
+            {
+                release = _mapper.Map(message.Release, (Release) null);
+                release = context.Release.Update(release).Entity;
+            }
+            context.SaveChanges();
+            return release;
         }
 
         private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext context)
         {
-            var publication = context.Publication
-                .Include(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(p => p.Id.Equals(message.Release.Publication.Id));
+            Publication publication;
 
-            if (publication == null)
+            if (!context.Publication.Any(p => p.Id.Equals(message.Release.Publication.Id)))
             {
                 publication = new Publication
                 {
@@ -100,20 +102,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Slug = message.Release.Publication.Slug,
                     Topic = CreateOrUpdateTopic(message, context)
                 };
-                return context.Publication.Add(publication).Entity;
+                publication = context.Publication.Add(publication).Entity;
             }
-
-            publication = _mapper.Map(message.Release.Publication, publication);
-            return context.Publication.Update(publication).Entity;
+            else
+            {
+                publication = _mapper.Map(message.Release.Publication, (Publication) null);
+                publication = context.Publication.Update(publication).Entity;
+            }
+            context.SaveChanges();
+            return publication;
         }
 
         private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
         {
-            var topic = context.Topic
-                .Include(p => p.Theme)
-                .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Id));
-
-            if (topic == null)
+            Topic topic;
+            
+            if (!context.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
             {
                 topic = new Topic
                 {
@@ -122,26 +126,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Slug = message.Release.Publication.Topic.Slug,
                     Theme = CreateOrUpdateTheme(message, context)
                 };
-                return context.Topic.Add(topic).Entity;
+                topic = context.Topic.Add(topic).Entity;
             }
-
-            topic = _mapper.Map(message.Release.Publication.Topic, topic);
-            return context.Topic.Update(topic).Entity;
+            else
+            {
+                topic = _mapper.Map(message.Release.Publication.Topic, (Topic) null);
+                topic = context.Topic.Update(topic).Entity;
+            }
+            context.SaveChanges();
+            return topic;
         }
 
         private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext context)
         {
-            var theme = context.Theme
-                .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id));
-
-            if (theme == null)
+            Theme theme;
+            if (!context.Theme
+                .Any(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id)))
             {
-                theme = _mapper.Map<Theme>(message.Release.Publication.Topic.Theme);
-                return context.Theme.Add(theme).Entity;
+                theme = new Theme
+                {
+                    Id = message.Release.Publication.Topic.Theme.Id,
+                    Slug = message.Release.Publication.Topic.Theme.Slug,
+                    Title = message.Release.Publication.Topic.Theme.Title
+                };
+                theme = context.Theme.Add(theme).Entity;
             }
-
-            theme = _mapper.Map(message.Release.Publication.Topic.Theme, theme);
-            return context.Theme.Update(theme).Entity;
+            else
+            {
+                theme = _mapper.Map(message.Release.Publication.Topic.Theme, (Theme) null);
+                theme = context.Theme.Update(theme).Entity;  
+            }
+            context.SaveChanges();
+            return theme;
         }
     }
 }
