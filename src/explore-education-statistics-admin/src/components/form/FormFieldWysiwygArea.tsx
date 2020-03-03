@@ -2,7 +2,9 @@ import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import classNames from 'classnames';
-import FormWysiwygArea, { FormWysiwygAreaProps } from '@admin/components/form/FormWysiwygArea';
+import FormWysiwygArea, {
+  FormWysiwygAreaProps,
+} from '@admin/components/form/FormWysiwygArea';
 import FormGroup from '@common/components/form/FormGroup';
 
 type Props<FormValues> = {

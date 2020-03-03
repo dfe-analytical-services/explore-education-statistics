@@ -4,10 +4,12 @@ import React, {
   MouseEventHandler,
   ReactNode,
 } from 'react';
-import EditableMarkdownRenderer, { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import EditableMarkdownRenderer, {
+  MarkdownRendererProps,
+} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 import ErrorMessage from '@common/components/ErrorMessage';
 
-export interface FormWysiwygAreaProps extends MarkdownRendererProps{
+export interface FormWysiwygAreaProps extends MarkdownRendererProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
