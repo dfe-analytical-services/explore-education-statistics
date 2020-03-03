@@ -266,13 +266,29 @@ const CreatePublicationPage = ({
                     label="Publication and release contact"
                     name="selectedContactId"
                     options={model.contacts.map(contact => ({
-                      label: contact.contactName,
+                      label: `${contact.contactName} - (${contact.teamName})`,
                       value: contact.id,
                     }))}
                   />
                 </FormFieldset>
                 {form.values.selectedContactId && (
                   <SummaryList>
+                    <SummaryListItem term="Team">
+                      {
+                        getSelectedContact(
+                          form.values.selectedContactId,
+                          model.contacts,
+                        ).teamName
+                      }
+                    </SummaryListItem>
+                    <SummaryListItem term="Name">
+                      {
+                        getSelectedContact(
+                          form.values.selectedContactId,
+                          model.contacts,
+                        ).contactName
+                      }
+                    </SummaryListItem>
                     <SummaryListItem term="Email">
                       {
                         getSelectedContact(

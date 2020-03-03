@@ -7,6 +7,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -20,7 +21,7 @@ import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { Chart, ChartType } from '@common/services/publicationService';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
   dataBlock: DataBlock;
@@ -34,6 +35,8 @@ const DataBlockContentTabs = ({
   onDataBlockSave,
   handleApiErrors,
 }: Props & ErrorControlProps) => {
+  const dataTableRef = useRef<HTMLElement>(null);
+
   const [activeTab, setActiveTab] = useState<string>('');
   // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = useState<DataBlockResponse>(
@@ -47,7 +50,6 @@ const DataBlockContentTabs = ({
     setChartBuilderData({ ...dataBlockResponse });
   }, [dataBlockResponse]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [initialConfiguration, setInitialConfiguration] = useState<
     Chart | undefined
   >();
@@ -69,7 +71,7 @@ const DataBlockContentTabs = ({
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
-      (table && table.length > 0 && table[0].tableHeaders) ||
+      (table?.length && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
     setTableData({
@@ -107,7 +109,6 @@ const DataBlockContentTabs = ({
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
     const newRequest: DataBlockRequest = {
       ...dataBlock.dataBlockRequest,
@@ -126,35 +127,63 @@ const DataBlockContentTabs = ({
   };
 
   return (
-    <>
-      <Tabs
-        openId={activeTab}
-        onToggle={tab => {
-          setActiveTab(tab.id);
-        }}
-        id="editDataBlockSections"
-      >
+    <Tabs
+      openId={activeTab}
+      onToggle={tab => {
+        setActiveTab(tab.id);
+      }}
+      id="editDataBlockSections"
+    >
+      {tableData && (
         <TabsSection title="Table">
-          <div className="govuk-width-container">
-            {tableData && <TimePeriodDataTable {...tableData} />}
+          <TableHeadersForm
+            initialValues={tableData?.tableHeadersConfig}
+            id="dataBlockContentTabs-tableHeadersForm"
+            onSubmit={async nextTableHeaders => {
+              setTableData({
+                ...tableData,
+                tableHeadersConfig: nextTableHeaders,
+              });
+
+              if (dataBlock) {
+                await onDataBlockSave({
+                  ...dataBlock,
+                  tables: [
+                    {
+                      tableHeaders: nextTableHeaders,
+                      indicators: [],
+                    },
+                  ],
+                });
+              }
+
+              if (dataTableRef.current) {
+                dataTableRef.current.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }
+            }}
+          />
+
+          <TimePeriodDataTable {...tableData} ref={dataTableRef} />
+        </TabsSection>
+      )}
+      <TabsSection title="Create chart">
+        {chartBuilderData ? (
+          <div style={{ position: 'relative' }}>
+            <ChartBuilder
+              data={chartBuilderData}
+              onChartSave={onChartSave}
+              initialConfiguration={initialConfiguration}
+              onRequiresDataUpdate={reRequestdata}
+            />
           </div>
-        </TabsSection>
-        <TabsSection title="Create chart">
-          {chartBuilderData ? (
-            <div style={{ position: 'relative' }}>
-              <ChartBuilder
-                data={chartBuilderData}
-                onChartSave={onChartSave}
-                initialConfiguration={initialConfiguration}
-                onRequiresDataUpdate={reRequestdata}
-              />
-            </div>
-          ) : (
-            <LoadingSpinner text="Creating chart" />
-          )}
-        </TabsSection>
-      </Tabs>
-    </>
+        ) : (
+          <LoadingSpinner text="Creating chart" />
+        )}
+      </TabsSection>
+    </Tabs>
   );
 };
 

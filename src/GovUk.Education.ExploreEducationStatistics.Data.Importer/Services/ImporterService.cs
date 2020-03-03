@@ -143,8 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             using (var transaction = context.Database.BeginTransaction())
             {
-                context.BulkInsert(observations);
-
+                context.BulkInsert(observations, new BulkConfig
+                {
+                    BulkCopyTimeout = 120
+                });
+                
                 foreach (var o in observations)
                 {
                     foreach (var item in o.FilterItems)
@@ -157,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 }
                 context.BulkInsert(subEntities, new BulkConfig
                 {
-                    BulkCopyTimeout = 0
+                    BulkCopyTimeout = 120
                 });
                     
                 transaction.Commit();
@@ -233,6 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
             return new Observation
             {
+                Id = Guid.NewGuid(),
                 FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
@@ -240,8 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
-                CsvRow = csvRowNum,
-                Id = Guid.NewGuid()
+                CsvRow = csvRowNum
             };
         }
         
