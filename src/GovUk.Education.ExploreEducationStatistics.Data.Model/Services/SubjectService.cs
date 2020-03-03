@@ -59,9 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(f => f.ReleaseId == releaseId)
                 .ToListAsync();
              
-                return releaseFootnotes
-                    .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
-                    .ToList();
+            return releaseFootnotes
+                .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
+                .ToList();
         }
 
         public async Task<bool> DeleteAsync(Guid subjectId)
