@@ -10,12 +10,14 @@ import FormFieldSortableList from './FormFieldSortableList';
 import styles from './FormFieldSortableListGroup.module.scss';
 
 interface Props<FormValues> {
+  id: string;
   name: keyof FormValues & string;
   legend: string;
   groupLegend: string;
 }
 
 const FormFieldSortableListGroup = <T extends Dictionary<Filter[][]>>({
+  id,
   name,
   legend,
   groupLegend,
@@ -36,7 +38,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<Filter[][]>>({
                 })}
               >
                 <FormFieldset
-                  id={`sortableListGroup-${name}`}
+                  id={id}
                   legend={legend}
                   error={getError(name)}
                   legendSize="m"
@@ -71,7 +73,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<Filter[][]>>({
                           >
                             <FormFieldSortableList<T>
                               name={`${name}[${index}]`}
-                              id={`sortableList-${name}-${index}`}
+                              id={`${id}-${index}`}
                               legend={`${groupLegend} ${index + 1}`}
                               legendSize="s"
                             />

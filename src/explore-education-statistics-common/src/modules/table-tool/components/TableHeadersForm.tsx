@@ -15,12 +15,14 @@ import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
+  id?: string;
   initialValues?: TableHeadersConfig;
   onSubmit: (values: TableHeadersConfig) => void;
 }
 
 const TableHeadersForm = ({
   onSubmit,
+  id = 'tableHeadersForm',
   initialValues = {
     columnGroups: [],
     columns: [],
@@ -144,6 +146,7 @@ const TableHeadersForm = ({
                         <FormFieldSortableListGroup<
                           PickByType<TableHeadersConfig, Filter[][]>
                         >
+                          id={`${id}-rowGroups`}
                           name="rowGroups"
                           legend="Row groups"
                           groupLegend="Row group"
@@ -154,6 +157,7 @@ const TableHeadersForm = ({
                         <FormFieldSortableListGroup<
                           PickByType<TableHeadersConfig, Filter[][]>
                         >
+                          id={`${id}-columnGroups`}
                           name="columnGroups"
                           legend="Column groups"
                           groupLegend="Column group"
@@ -207,7 +211,7 @@ const TableHeadersForm = ({
                                 >
                                   <FormFieldSortableList<TableHeadersConfig>
                                     name="rows"
-                                    id="sort-rows"
+                                    id={`${id}-rows`}
                                     legend="Rows"
                                     legendSize="s"
                                   />
@@ -227,7 +231,7 @@ const TableHeadersForm = ({
                                 >
                                   <FormFieldSortableList<TableHeadersConfig>
                                     name="columns"
-                                    id="sort-columns"
+                                    id={`${id}-columns`}
                                     legend="Columns"
                                     legendSize="s"
                                   />
