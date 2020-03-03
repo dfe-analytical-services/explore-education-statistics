@@ -232,12 +232,10 @@ const ChartBuilder = ({
           axesConfiguration.major))
     ) {
       setRenderedChartProps({
+        ...chartOptions,
         type: selectedChartType.type,
-
         data,
-
         meta: metaData,
-
         axes: {
           major: {
             ...axesConfiguration.major,
@@ -249,9 +247,8 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
+        releaseId: data.releaseId,
         getInfographic: editReleaseDataService.downloadChartFile,
-
-        ...chartOptions,
       });
     } else {
       setRenderedChartProps(undefined);
