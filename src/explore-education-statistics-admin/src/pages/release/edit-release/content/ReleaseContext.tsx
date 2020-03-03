@@ -168,6 +168,31 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
         }
       });
     }
+    case 'ADD_CONTENT_SECTION': {
+      return produce<State>(state, draft => {
+        const { section } = action.payload;
+        if (draft.release) draft.release.content.push(section);
+      });
+    }
+    case 'SET_CONTENT': {
+      return produce<State>(state, draft => {
+        const { content } = action.payload;
+        if (draft.release) draft.release.content = content;
+      });
+    }
+    case 'UPDATE_CONTENT_SECTION': {
+      return produce<State>(state, draft => {
+        const { section, meta } = action.payload;
+        const { sectionId } = meta;
+        if (draft.release)
+          draft.release.content.map(accordionSection => {
+            if (accordionSection.id === sectionId) {
+              return section;
+            }
+            return accordionSection;
+          });
+      });
+    }
     default: {
       return { ...state };
     }

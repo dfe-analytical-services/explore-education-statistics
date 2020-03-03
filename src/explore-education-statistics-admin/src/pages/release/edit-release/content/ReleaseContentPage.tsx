@@ -37,7 +37,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const dispatch = useReleaseDispatch();
 
   useEffect(() => {
-    getReleaseContent(dispatch, releaseId);
+    getReleaseContent(dispatch, releaseId, handleApiErrors);
   }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
   useEffect(() => {

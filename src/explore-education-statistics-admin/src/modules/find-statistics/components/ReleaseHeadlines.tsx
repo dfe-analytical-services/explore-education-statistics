@@ -1,3 +1,4 @@
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import {
   addContentSectionBlock,
@@ -34,6 +35,7 @@ interface Props {
 }
 
 const ReleaseHeadlines = ({ release }: Props) => {
+  const { handleApiErrors } = useContext(ErrorControlContext);
   const { isEditing } = useContext(EditingContext);
   const dispatch = useReleaseDispatch();
 
@@ -101,6 +103,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
                   release.headlinesSection.id,
                   'headlinesSection',
                   order,
+                  handleApiErrors,
                 );
               }}
               onBlockContentChange={(blockId, bodyContent) =>
@@ -111,6 +114,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
                   blockId,
                   'headlinesSection',
                   bodyContent,
+                  handleApiErrors,
                 )
               }
               onBlockDelete={(blockId: string) =>
@@ -120,6 +124,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
                   release.headlinesSection.id,
                   blockId,
                   'headlinesSection',
+                  handleApiErrors,
                 )
               }
             />
@@ -139,6 +144,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
                         order: 0,
                         body: '',
                       },
+                      handleApiErrors,
                     );
                   }}
                 >

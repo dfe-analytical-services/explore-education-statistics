@@ -1,14 +1,19 @@
 import Accordion from '@admin/components/EditableAccordion';
 import {
+  addContentSection,
+  removeContentSection,
+  updateContentSectionHeading,
+  updateContentSectionsOrder,
+} from '@admin/pages/release/edit-release/content/helpers';
+import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import {
   EditableContentBlock,
   EditableRelease,
 } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
-import { Dictionary } from '@common/types/util';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
@@ -26,41 +31,8 @@ const ReleaseContentAccordion = ({
   sectionName,
   handleApiErrors,
 }: ReleaseContentAccordionProps & ErrorControlProps) => {
+  const dispatch = useReleaseDispatch();
   const { content } = release;
-
-  const onReorder = useCallback(
-    async (ids: Dictionary<number>) => {
-      const newContent = await releaseContentService
-        .updateContentSectionsOrder(release.id, ids)
-        .catch(handleApiErrors);
-    },
-    [release.id, handleApiErrors],
-  );
-
-  const onAddSection = useCallback(async () => {
-    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
-      ...content,
-      await releaseContentService
-        .addContentSection(release.id, content.length)
-        .catch(handleApiErrors),
-    ];
-  }, [content, release.id, handleApiErrors]);
-
-  const onUpdateHeading = useCallback(
-    async (block: ContentType, index: number, newTitle: string) => {
-      let result;
-      if (block.id) {
-        result = await releaseContentService
-          .updateContentSectionHeading(release.id, block.id, newTitle)
-          .catch(handleApiErrors);
-
-        const newContent = [...content];
-        newContent[index].heading = newTitle;
-      }
-      return result;
-    },
-    [content, release.id, handleApiErrors],
-  );
 
   const updateContentSection = useCallback(
     (index: number, contentBlock?: EditableContentBlock[]) => {
@@ -70,27 +42,28 @@ const ReleaseContentAccordion = ({
     [content],
   );
 
-  const onRemoveContentSection = useCallback(
-    async (block: ContentType) => {
-      if (block.id) {
-        await releaseContentService
-          .removeContentSection(release.id, block.id)
-          .catch(handleApiErrors);
-
-        const newContent = content.filter(item => item.id !== block.id);
-      }
-    },
-    [content, release.id, handleApiErrors],
-  );
-
   return (
     <>
       <Accordion
         id={accordionId}
         canReorder
         sectionName={sectionName}
-        onSaveOrder={onReorder}
-        onAddSection={onAddSection}
+        onSaveOrder={async order => {
+          updateContentSectionsOrder(
+            dispatch,
+            release.id,
+            order,
+            handleApiErrors,
+          );
+        }}
+        onAddSection={() =>
+          addContentSection(
+            dispatch,
+            release.id,
+            release.content.length,
+            handleApiErrors,
+          )
+        }
       >
         {content.map((contentItem, index) => (
           <ReleaseContentAccordionSection
@@ -100,12 +73,25 @@ const ReleaseContentAccordion = ({
             contentItem={contentItem}
             index={index}
             onHeadingChange={title =>
-              onUpdateHeading(contentItem, index, title)
+              updateContentSectionHeading(
+                dispatch,
+                release.id,
+                contentItem.id,
+                title,
+                handleApiErrors,
+              )
             }
             onContentChange={newContent =>
               updateContentSection(index, newContent)
             }
-            onRemoveSection={() => onRemoveContentSection(contentItem)}
+            onRemoveSection={() =>
+              removeContentSection(
+                dispatch,
+                release.id,
+                contentItem.id,
+                handleApiErrors,
+              )
+            }
           />
         ))}
       </Accordion>

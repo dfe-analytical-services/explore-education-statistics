@@ -137,6 +137,7 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                 contentBlockId: selectedDataBlockId,
                 order: 0,
               },
+              handleApiErrors,
             );
             setIsFormOpen(false);
           }

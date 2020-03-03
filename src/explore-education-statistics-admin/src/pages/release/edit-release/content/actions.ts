@@ -1,5 +1,11 @@
-import { EditableContentBlock } from '@admin/services/publicationService';
-import { AbstractRelease } from '@common/services/publicationService';
+import {
+  EditableContentBlock,
+  EditableRelease,
+} from '@admin/services/publicationService';
+import {
+  AbstractRelease,
+  ContentSection,
+} from '@common/services/publicationService';
 import { State } from './ReleaseContext';
 
 type PageError = { type: 'PAGE_ERROR'; payload: { pageError: string } };
@@ -50,6 +56,28 @@ export type UpdateSectionContent = {
   };
 };
 
+export type AddContentSection = {
+  type: 'ADD_CONTENT_SECTION';
+  payload: {
+    section: ContentSection<EditableContentBlock>;
+  };
+};
+
+export type SetReleaseContent = {
+  type: 'SET_CONTENT';
+  payload: {
+    content: ContentSection<EditableContentBlock>[];
+  };
+};
+
+export type UpdateContentSection = {
+  type: 'UPDATE_CONTENT_SECTION';
+  payload: {
+    meta: { sectionId: string };
+    section: ContentSection<EditableContentBlock>;
+  };
+};
+
 type ReleaseDispatchAction =
   | PageError
   | ClearState
@@ -58,7 +86,10 @@ type ReleaseDispatchAction =
   | RemoveBlockFromSection
   | UpdateBlockFromSection
   | AddBlockToSection
-  | UpdateSectionContent;
+  | UpdateSectionContent
+  | AddContentSection
+  | SetReleaseContent
+  | UpdateContentSection;
 
 // eslint-disable-next-line no-undef
 export default ReleaseDispatchAction;

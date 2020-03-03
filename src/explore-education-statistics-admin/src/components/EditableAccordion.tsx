@@ -130,10 +130,6 @@ const EditableAccordion = ({
     }
   };
 
-  const addSection = () => {
-    if (onAddSection) onAddSection().then(() => {});
-  };
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <h2 className="govuk-heading-l reorderable-relative">
@@ -143,7 +139,7 @@ const EditableAccordion = ({
           (isReordering ? (
             <button
               className="govuk-button reorderable"
-              onClick={() => saveOrder()}
+              onClick={saveOrder}
               type="button"
             >
               Save Reordering
@@ -151,7 +147,7 @@ const EditableAccordion = ({
           ) : (
             <button
               className="govuk-button govuk-button--secondary reorderable"
-              onClick={() => reorder()}
+              onClick={reorder}
               type="button"
             >
               Reorder <span className="govuk-visually-hidden"> sections </span>
@@ -190,7 +186,7 @@ const EditableAccordion = ({
             <button
               type="button"
               key="add_section"
-              onClick={() => addSection()}
+              onClick={onAddSection}
               className={classnames(styles.addSectionButton, 'govuk-button')}
             >
               Add new section

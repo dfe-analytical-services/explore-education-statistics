@@ -3,6 +3,7 @@ import permissionsService from '@admin/services/permissions/service';
 import {
   EditableContentBlock,
   ExtendedComment,
+  EditableRelease,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import {
@@ -55,7 +56,7 @@ const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
 export async function getReleaseContent(
   dispatch: Dispatch,
   releaseId: string,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   dispatch({ type: 'CLEAR_STATE' });
   try {
@@ -76,21 +77,14 @@ export async function getReleaseContent(
       },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
 export async function updateAvailableDataBlocks(
   dispatch: Dispatch,
   releaseId: string,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
@@ -101,14 +95,7 @@ export async function updateAvailableDataBlocks(
       payload: { availableDataBlocks },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -118,7 +105,7 @@ export async function deleteContentSectionBlock(
   sectionId: string,
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     await releaseContentService.deleteContentSectionBlock(
@@ -134,14 +121,7 @@ export async function deleteContentSectionBlock(
     // and so it is now available again
     updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -152,7 +132,7 @@ export async function updateContentSectionDataBlock(
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   values: KeyStatsFormValues,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const updateBlock = await releaseContentService.updateContentSectionDataBlock(
@@ -166,14 +146,7 @@ export async function updateContentSectionDataBlock(
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -184,7 +157,7 @@ export async function updateContentSectionBlock(
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   bodyContent: string,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const updateBlock = await releaseContentService.updateContentSectionBlock(
@@ -198,14 +171,7 @@ export async function updateContentSectionBlock(
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -215,7 +181,7 @@ export async function addContentSectionBlock(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   block: ContentBlockPostModel,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const newBlock = await releaseContentService.addContentSectionBlock(
@@ -231,14 +197,7 @@ export async function addContentSectionBlock(
     // and so it is unavailable
     updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -248,7 +207,7 @@ export async function attachContentSectionBlock(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   block: ContentBlockAttachRequest,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const newBlock = await releaseContentService.attachContentSectionBlock(
@@ -261,14 +220,7 @@ export async function attachContentSectionBlock(
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
   }
 }
 
@@ -278,7 +230,7 @@ export async function updateSectionBlockOrder(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   order: Dictionary<number>,
-  errorHandler?: (err: any) => void,
+  errorHandler: (err: any) => void,
 ) {
   try {
     const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
@@ -294,13 +246,99 @@ export async function updateSectionBlockOrder(
       },
     });
   } catch (err) {
-    if (errorHandler) {
-      errorHandler(err);
-    } else {
-      dispatch({
-        type: 'PAGE_ERROR',
-        payload: { pageError: 'There was a problem.' },
-      });
-    }
+    errorHandler(err);
+  }
+}
+
+export async function addContentSection(
+  dispatch: Dispatch,
+  releaseId: string,
+  order: number,
+  errorHandler: (err: any) => void,
+) {
+  try {
+    const newSection = await releaseContentService.addContentSection(
+      releaseId,
+      order,
+    );
+
+    dispatch({
+      type: 'ADD_CONTENT_SECTION',
+      payload: {
+        section: newSection,
+      },
+    });
+  } catch (err) {
+    errorHandler(err);
+  }
+}
+
+export async function updateContentSectionsOrder(
+  dispatch: Dispatch,
+  releaseId: string,
+  order: Dictionary<number>,
+  errorHandler: (err: any) => void,
+) {
+  try {
+    const content = await releaseContentService.updateContentSectionsOrder(
+      releaseId,
+      order,
+    );
+
+    dispatch({
+      type: 'SET_CONTENT',
+      payload: {
+        content,
+      },
+    });
+  } catch (err) {
+    errorHandler(err);
+  }
+}
+
+export async function removeContentSection(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  errorHandler: (err: any) => void,
+) {
+  try {
+    const content = await releaseContentService.removeContentSection(
+      releaseId,
+      sectionId,
+    );
+    dispatch({
+      type: 'SET_CONTENT',
+      payload: {
+        content,
+      },
+    });
+  } catch (err) {
+    errorHandler(err);
+  }
+}
+
+export async function updateContentSectionHeading(
+  dispatch: Dispatch,
+  releaseId: string,
+  sectionId: string,
+  title: string,
+  errorHandler: (err: any) => void,
+) {
+  try {
+    const section = await releaseContentService.updateContentSectionHeading(
+      releaseId,
+      sectionId,
+      title,
+    );
+    dispatch({
+      type: 'UPDATE_CONTENT_SECTION',
+      payload: {
+        meta: { sectionId },
+        section,
+      },
+    });
+  } catch (err) {
+    errorHandler(err);
   }
 }

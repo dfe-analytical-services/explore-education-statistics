@@ -1,14 +1,15 @@
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
+import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import {
-  updateSectionBlockOrder,
+  addContentSectionBlock,
+  attachContentSectionBlock,
   deleteContentSectionBlock,
   updateContentSectionBlock,
-  attachContentSectionBlock,
-  addContentSectionBlock,
+  updateSectionBlockOrder,
 } from '@admin/pages/release/edit-release/content/helpers';
 import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import ManageReleaseContext, {
@@ -18,8 +19,6 @@ import {
   EditableContentBlock,
   EditableRelease,
 } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import { Dictionary } from '@admin/types';
 import Button from '@common/components/Button';
 import React, { useContext } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
@@ -47,35 +46,10 @@ const ReleaseContentAccordionSection = ({
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
   const dispatch = useReleaseDispatch();
+  const { handleApiErrors } = useContext(ErrorControlContext);
   const { caption, heading } = contentItem;
   const [isReordering, setIsReordering] = React.useState(false);
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
-
-  const onBlockSaveOrder = async (order: Dictionary<number>) => {
-    if (releaseId && sectionId) {
-      const newBlocks = await releaseContentService.updateContentSectionBlocksOrder(
-        releaseId,
-        sectionId,
-        order,
-      );
-      onContentChange(newBlocks);
-    }
-  };
-
-  const onSectionAddTextBlock = async (type: 'MarkdownBlock' | 'HTMLBlock') => {
-    if (releaseId && sectionId) {
-      await releaseContentService.addContentSectionBlock(releaseId, sectionId, {
-        body: '',
-        type,
-        order: contentItem.content ? contentItem.content.length : undefined,
-      });
-      const {
-        content: newContentBlocks,
-      } = await releaseContentService.getContentSection(releaseId, sectionId);
-
-      onContentChange(newContentBlocks);
-    }
-  };
 
   return (
     <AccordionSection
@@ -114,6 +88,7 @@ const ReleaseContentAccordionSection = ({
             release.headlinesSection.id,
             'headlinesSection',
             order,
+            handleApiErrors,
           );
         }}
         onBlockContentChange={(blockId, bodyContent) =>
@@ -124,6 +99,7 @@ const ReleaseContentAccordionSection = ({
             blockId,
             'headlinesSection',
             bodyContent,
+            handleApiErrors,
           )
         }
         onBlockDelete={(blockId: string) =>
@@ -133,6 +109,7 @@ const ReleaseContentAccordionSection = ({
             release.headlinesSection.id,
             blockId,
             'headlinesSection',
+            handleApiErrors,
           )
         }
         content={contentItem.content}
@@ -154,6 +131,7 @@ const ReleaseContentAccordionSection = ({
                   order: contentItem.content ? contentItem.content.length : 0,
                   body: '',
                 },
+                handleApiErrors,
               );
             }}
           >
@@ -170,6 +148,7 @@ const ReleaseContentAccordionSection = ({
                   contentBlockId: datablockId,
                   order: contentItem.content ? contentItem.content.length : 0,
                 },
+                handleApiErrors,
               );
             }}
           />
