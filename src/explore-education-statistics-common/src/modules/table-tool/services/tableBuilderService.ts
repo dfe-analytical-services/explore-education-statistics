@@ -227,20 +227,7 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(
-    query: TableDataQuery,
-    releaseId?: string,
-  ): Promise<UnmappedFullTable> {
-    return dataApi.post(
-      '/tablebuilder',
-      query,
-      releaseId
-        ? {
-            params: {
-              releaseId,
-            },
-          }
-        : undefined,
-    );
+  getTableData(query: TableDataQuery): Promise<UnmappedFullTable> {
+    return dataApi.post('/tablebuilder', query);
   },
 };

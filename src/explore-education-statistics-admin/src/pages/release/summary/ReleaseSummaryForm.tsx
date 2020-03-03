@@ -5,6 +5,7 @@ import {
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import {
+  parseDate,
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
@@ -23,6 +24,7 @@ import { Dictionary } from '@common/types';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
+import { endOfDay, format, isValid } from 'date-fns';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;
@@ -91,7 +93,19 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
-    scheduledPublishDate: validateMandatoryDayMonthYearField,
+    scheduledPublishDate: validateMandatoryDayMonthYearField.test(
+      'validDateIfAfterToday',
+      `Schedule publish date can't be before ${format(
+        new Date(),
+        'do MMMM yyyy',
+      )}`,
+      value => {
+        return (
+          isValid(parseDate({ value })) &&
+          endOfDay(parseDate({ value })) >= endOfDay(new Date())
+        );
+      },
+    ),
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 

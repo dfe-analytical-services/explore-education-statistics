@@ -30,6 +30,7 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       tag={[
         getReleaseStatusLabel(release.status),
         // eslint-disable-next-line react/jsx-key
+        release.status !== 'Draft' && release.status !== 'HigherLevelReview' &&
         <LazyLoad
           scroll={false}
           placeholder={
