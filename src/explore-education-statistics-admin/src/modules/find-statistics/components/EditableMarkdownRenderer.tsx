@@ -11,7 +11,7 @@ export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
     canDelete?: boolean;
     onDelete?: () => void;
-    toolbarConfig?: 'full' | 'reduced';
+    toolbarConfig?: string[];
     editable?: boolean;
     onContentChange?: (content: string) => void;
   };

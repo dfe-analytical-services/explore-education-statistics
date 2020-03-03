@@ -17,12 +17,31 @@ interface Props {
   reviewing?: boolean;
   resolveComments?: boolean;
   content: string;
-  toolbarConfig?: 'full' | 'reduced';
-  customToolbarConfig?: string[];
+  toolbarConfig?: string[];
   useMarkdown?: boolean;
   onContentChange?: (content: string) => Promise<unknown>;
   onDelete?: () => void;
 }
+
+export const toolbarConfigs = {
+  full: [
+    'heading',
+    '|',
+    'bold',
+    'italic',
+    'link',
+    '|',
+    'bulletedList',
+    'numberedList',
+    '|',
+    'blockQuote',
+    'insertTable',
+    '|',
+    'redo',
+    'undo',
+  ],
+  reduced: ['bold', 'link', '|', 'bulletedList'],
+};
 
 const WysiwygEditor = ({
   editable,
@@ -30,7 +49,6 @@ const WysiwygEditor = ({
   content,
   onContentChange,
   toolbarConfig,
-  customToolbarConfig,
   onDelete,
   useMarkdown = false,
 }: Props) => {
@@ -58,31 +76,6 @@ const WysiwygEditor = ({
     } else {
       setEditing(false);
       setSaved(true);
-    }
-  };
-
-  const getToolbarConfig = (config?: string) => {
-    switch (config) {
-      default:
-      case 'full':
-        return [
-          'heading',
-          '|',
-          'bold',
-          'italic',
-          'link',
-          '|',
-          'bulletedList',
-          'numberedList',
-          '|',
-          'blockQuote',
-          'insertTable',
-          '|',
-          'redo',
-          'undo',
-        ];
-      case 'reduced':
-        return ['bold', 'link', '|', 'bulletedList'];
     }
   };
 
@@ -157,7 +150,7 @@ const WysiwygEditor = ({
           <CKEditor
             editor={ClassicEditor}
             config={{
-              toolbar: customToolbarConfig || getToolbarConfig(toolbarConfig),
+              toolbar: toolbarConfig || toolbarConfigs.full,
             }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {

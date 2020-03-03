@@ -14,6 +14,7 @@ import DataBlockService, {
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
+import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 
 export interface KeyStatsFormValues {
   dataSummary: string;
@@ -156,7 +157,7 @@ const EditableKeyStatTile = ({
                     />
                     <FormFieldWysiwygArea
                       name="dataDefinition"
-                      toolbarConfig="reduced"
+                      toolbarConfig={toolbarConfigs.reduced}
                       id={`key-stat-dataDefinition-${id}`}
                       label="Guidance text"
                       onContentChange={(content: string) => {
