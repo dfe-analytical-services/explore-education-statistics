@@ -24,7 +24,7 @@ import React, { Component, ReactNode, MouseEvent } from 'react';
 export interface DataBlockProps {
   id: string;
   type: string;
-  heading?: string;
+  captionTitle?: string;
   dataBlockRequest?: DataBlockRequest;
 
   tables?: Table[];
@@ -112,13 +112,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (chartMetadata === undefined) return;
 
-    const { charts, tables, heading } = this.props;
+    const { charts, tables, captionTitle } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
         newState.tables = [
           {
-            heading,
+            captionTitle,
             response,
             ...tables[0], /// at present only one chart
           },
@@ -148,7 +148,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      heading,
+      captionTitle,
       height,
       showTables,
       additionalTabContent,
@@ -175,9 +175,9 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <TimePeriodDataTableRenderer
-                      heading={heading}
-                      key={key}
                       {...table}
+                      captionTitle={captionTitle}
+                      key={key}
                     />
                   );
                 })}
