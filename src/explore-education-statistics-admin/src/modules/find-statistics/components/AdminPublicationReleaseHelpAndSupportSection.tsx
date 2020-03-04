@@ -2,10 +2,11 @@ import { ManageContentPageViewModel } from '@admin/services/release/edit-release
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ReleaseType } from '@common/services/publicationService';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
@@ -14,6 +15,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
   publication: ManageContentPageViewModel['release']['publication'];
   release: ManageContentPageViewModel['release'];
 }) => {
+  const { isEditing } = useContext(EditingContext);
   return (
     <>
       <h2
@@ -32,13 +34,19 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           {publication.methodology || publication.externalMethodology ? (
             <p>
               Read our{' '}
-              {publication.methodology && (
-                <Link to={`/methodologies/${publication.methodology.id}`}>
-                  {`${publication.title}: methodology`}
-                </Link>
-              )}
+              {publication.methodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
+                  <Link to={`/methodologies/${publication.methodology.id}`}>
+                    {`${publication.title}: methodology`}
+                  </Link>
+                ))}
               {!publication.methodology &&
-                publication.externalMethodology && (
+                publication.externalMethodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
                   <Link
                     to=""
                     rel="external"
@@ -47,7 +55,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
                   >
                     {`${publication.title}: methodology`}
                   </Link>
-                )}{' '}
+                ))}{' '}
               guidance.
             </p>
           ) : (
