@@ -2,8 +2,8 @@ import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-dat
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
-import { SelectOption } from '@common/components/form/FormSelect';
+import { Form, FormFieldSelect, Formik } from '@common/components/form';
+import Yup from '@common/lib/validation/yup';
 import {
   ChartCapabilities,
   ChartDefinition,
@@ -12,15 +12,23 @@ import {
 import {
   colours,
   generateKeyFromDataSet,
+  pairFiltersByValue,
   symbols,
 } from '@common/modules/charts/util/chartUtils';
+import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   ChartDataSet,
   DataSetConfiguration,
 } from '@common/services/publicationService';
-import { difference } from 'lodash';
+import { Dictionary } from '@common/types';
+import difference from 'lodash/difference';
+import mapValues from 'lodash/mapValues';
+import React, { useMemo, useState } from 'react';
 
-import React, { useEffect, useState } from 'react';
+interface FormValues {
+  filters: Dictionary<string>;
+  indicator: string;
+}
 
 export interface SelectedData {
   dataSet: {
@@ -32,8 +40,6 @@ export interface SelectedData {
 
 interface Props {
   chartType: ChartDefinition;
-  indicatorIds: string[];
-  filterIds: string[][];
   selectedData?: ChartDataSetAndConfiguration[];
   metaData: ChartMetaData;
   onDataAdded?: (data: SelectedData) => void;
@@ -47,18 +53,7 @@ export interface ChartDataSetAndConfiguration {
   configuration: DataSetConfiguration;
 }
 
-function dataName(meta: ChartMetaData, indicator: string, filters: string[]) {
-  return [
-    meta.indicators[indicator].label,
-    '(',
-    ...filters.map(filter => meta.filters[filter].label),
-    ')',
-  ].join(' ');
-}
-
 const ChartDataSelector = ({
-  indicatorIds,
-  filterIds,
   metaData,
   onDataRemoved,
   onDataAdded,
@@ -66,196 +61,208 @@ const ChartDataSelector = ({
   selectedData = [],
   capabilities,
 }: Props) => {
-  const indicatorSelectOptions = [
-    {
-      label: 'Select an indicator...',
-      value: '',
-    },
-    ...indicatorIds.map<SelectOption>(id => ({ ...metaData.indicators[id] })),
-  ];
-
-  const filterSelectOptions = filterIds
-    .map(ids => ids.map(id => metaData.filters[id]))
-    .reduce<SelectOption[]>(
-      (combinedFilters, next) => {
-        return [
-          ...combinedFilters,
-          {
-            label: next.map(id => id.label).join(', '),
-            value: next.map(id => id.value).join(','),
-          },
-        ];
+  const indicatorOptions = useMemo(
+    () => [
+      {
+        label: 'Select an indicator...',
+        value: '',
       },
-      [
-        {
-          label: 'Select a filter...',
-          value: '',
-        },
-      ],
-    );
+      ...Object.values(metaData.indicators),
+    ],
+    [metaData.indicators],
+  );
 
-  const [selectedIndicator, setSelectedIndicator] = useState<string>('');
-  const [selectedFilters, setSelectedFilters] = useState<string>('');
+  const filtersByValue: Dictionary<FilterOption> = useMemo(
+    () => pairFiltersByValue(metaData.filters),
+    [metaData.filters],
+  );
 
-  const [selectedList, setSelectedList] = useState<
-    ChartDataSetAndConfiguration[]
-  >([...selectedData]);
-
-  const [alreadyAdded, setAlreadyAdded] = useState(false);
-
-  useEffect(() => {
-    const filters = selectedFilters.split(',');
-
-    const added =
-      selectedList.find(({ dataSet }) => {
-        return (
-          dataSet.indicator === selectedIndicator &&
-          difference(dataSet.filters, filters).length === 0
-        );
-      }) !== undefined;
-
-    setAlreadyAdded(added);
-  }, [selectedIndicator, selectedFilters, selectedList]);
+  const [chartData, setChartData] = useState<ChartDataSetAndConfiguration[]>([
+    ...selectedData,
+  ]);
 
   const removeSelected = (selected: SelectedData, index: number) => {
-    const [removed] = selectedList.splice(index, 1);
-    setSelectedList([...selectedList]);
+    const newChartData = [...chartData];
+    const [removed] = newChartData.splice(index, 1);
 
-    if (onDataRemoved) onDataRemoved(removed, index);
+    setChartData(newChartData);
+
+    if (onDataRemoved) {
+      onDataRemoved(removed, index);
+    }
   };
 
   return (
-    <React.Fragment>
-      <FormGroup className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
-          <FormFieldset id="filter_fieldset" legend="Filters" legendHidden>
-            <FormSelect
-              id="filters"
-              name="filters"
-              label="Filters"
-              className="govuk-!-width-full"
-              options={filterSelectOptions}
-              value={selectedFilters}
-              onChange={e => setSelectedFilters(e.target.value)}
-              order={[]}
-            />
-          </FormFieldset>
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <FormFieldset
-            id="indicator_fieldset"
-            legend="Indicators"
-            legendHidden
-          >
-            <FormSelect
-              id="indicators"
-              name="indicators"
-              label="Indicators"
-              className="govuk-!-width-full"
-              options={indicatorSelectOptions}
-              value={selectedIndicator}
-              onChange={e => setSelectedIndicator(e.target.value)}
-              order={[]}
-            />
-          </FormFieldset>
-        </div>
-        {selectedIndicator && selectedFilters && !alreadyAdded && (
-          <div className="govuk-grid-column-one-third">
+    <Formik<FormValues>
+      enableReinitialize
+      initialValues={{
+        filters: mapValues(metaData.filters, () => ''),
+        indicator: '',
+      }}
+      validationSchema={Yup.object<FormValues>({
+        indicator: Yup.string().required('Select an indicator'),
+        filters: Yup.object(
+          mapValues(metaData.filters, filter =>
+            Yup.string().required(`Select a ${filter.legend.toLowerCase()}`),
+          ),
+        ),
+      })}
+      onSubmit={({ filters, indicator }, form) => {
+        const filterOptions = Object.values(filters);
+
+        if (
+          chartData.find(({ dataSet }) => {
+            return (
+              dataSet.indicator === indicator &&
+              difference(dataSet.filters, filterOptions).length === 0
+            );
+          })
+        ) {
+          throw new Error(
+            'The selected options have already been added to the chart',
+          );
+        }
+
+        const dataSet = {
+          filters: filterOptions,
+          indicator,
+        };
+
+        const name = `${
+          metaData.indicators[indicator].label
+        } (${dataSet.filters
+          .map(filter => filtersByValue[filter].label)
+          .join(', ')})`;
+
+        const newChartData = {
+          dataSet,
+          configuration: {
+            name,
+            value: generateKeyFromDataSet(dataSet),
+            label: name,
+            colour: colours[chartData.length % colours.length],
+            symbol: symbols[chartData.length % symbols.length],
+            unit: metaData.indicators[dataSet.indicator].unit || '',
+          },
+        };
+
+        setChartData([...chartData, newChartData]);
+
+        if (onDataAdded) {
+          onDataAdded(newChartData);
+        }
+
+        form.resetForm();
+      }}
+      render={form => (
+        <>
+          <Form {...form} id="chartDataSelectorForm" showSubmitError>
+            <div className="govuk-grid-row">
+              {Object.entries(metaData.filters).map(([filterKey, filter]) => (
+                <div className="govuk-grid-column-one-third" key={filterKey}>
+                  <FormFieldSelect
+                    id="filters"
+                    name={`filters.${filterKey}`}
+                    label={filter.legend}
+                    className="govuk-!-width-full"
+                    options={[
+                      {
+                        label: `Select ${filter.legend.toLowerCase()}...`,
+                        value: '',
+                      },
+                      ...Object.values(filter.options).flatMap(
+                        opt => opt.options,
+                      ),
+                    ]}
+                    order={[]}
+                  />
+                </div>
+              ))}
+              <div className="govuk-grid-column-one-third">
+                <FormFieldSelect
+                  id="indicators"
+                  name="indicator"
+                  label="Indicator"
+                  className="govuk-!-width-full"
+                  options={indicatorOptions}
+                  order={[]}
+                />
+              </div>
+            </div>
+
             <Button
-              type="button"
+              type="submit"
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-6"
-              onClick={() => {
-                const dataSet = {
-                  filters: selectedFilters.split(','),
-                  indicator: selectedIndicator,
-                };
-
-                const added = {
-                  dataSet,
-                  configuration: {
-                    name: dataName(
-                      metaData,
-                      dataSet.indicator,
-                      dataSet.filters,
-                    ),
-                    value: generateKeyFromDataSet(dataSet),
-                    label: dataName(
-                      metaData,
-                      dataSet.indicator,
-                      dataSet.filters,
-                    ),
-                    colour: colours[selectedList.length % colours.length],
-                    symbol: symbols[selectedList.length % symbols.length],
-                    unit: metaData.indicators[dataSet.indicator].unit || '',
-                  },
-                };
-
-                selectedList.push(added);
-                setSelectedList([...selectedList]);
-
-                if (onDataAdded) onDataAdded(added);
-              }}
             >
               Add data
             </Button>
-          </div>
-        )}
-      </FormGroup>
+          </Form>
 
-      {selectedList.length > 0 && (
-        <>
-          {selectedList.map((selected, index) => (
-            <React.Fragment
-              key={`${
-                selected.dataSet.indicator
-              }_${selected.dataSet.filters.join(',')}`}
-            >
-              <div className={styles.selectedData}>
-                <div className={styles.selectedDataRow}>
-                  <div className={styles.selectedDataFilter}>
-                    <span>
-                      {selected.dataSet.filters
-                        .map(_ => metaData.filters[_].label)
-                        .join(', ')}
-                    </span>
-                  </div>
-                  <div className={styles.selectedDataIndicator}>
-                    {metaData.indicators[selected.dataSet.indicator].label}
-                  </div>
+          {chartData.length > 0 && (
+            <>
+              <hr />
 
-                  <div className={styles.selectedDataAction}>
-                    <Button
-                      type="button"
-                      onClick={() => removeSelected(selected, index)}
-                      className="govuk-!-margin-bottom-0 govuk-button--secondary"
-                    >
-                      Remove
-                    </Button>
+              {chartData.map((selected, index) => (
+                <React.Fragment
+                  key={`${
+                    selected.dataSet.indicator
+                  }_${selected.dataSet.filters.join('_')}`}
+                >
+                  <div className={styles.selectedData}>
+                    <div className={styles.selectedDataRow}>
+                      <div className={styles.selectedDataFilter}>
+                        <span>
+                          {selected.dataSet.filters
+                            .map(filter => filtersByValue[filter].label)
+                            .join(', ')}
+                        </span>
+                      </div>
+                      <div className={styles.selectedDataIndicator}>
+                        {metaData.indicators[selected.dataSet.indicator].label}
+                      </div>
+
+                      <div className={styles.selectedDataAction}>
+                        <Button
+                          type="button"
+                          onClick={() => removeSelected(selected, index)}
+                          className="govuk-!-margin-bottom-0 govuk-button--secondary"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Details
+                        summary="Change styling"
+                        className="govuk-!-margin-bottom-3 govuk-body-s"
+                      >
+                        <ChartDataConfiguration
+                          configuration={selected.configuration}
+                          capabilities={capabilities}
+                          onConfigurationChange={(
+                            value: DataSetConfiguration,
+                          ) => {
+                            chartData[index].configuration = value;
+
+                            const newData = [...chartData];
+
+                            setChartData(newData);
+
+                            if (onDataChanged) {
+                              onDataChanged(newData);
+                            }
+                          }}
+                        />
+                      </Details>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <Details
-                    summary="Change styling"
-                    className="govuk-!-margin-bottom-3 govuk-body-s"
-                  >
-                    <ChartDataConfiguration
-                      configuration={selected.configuration}
-                      capabilities={capabilities}
-                      onConfigurationChange={(value: DataSetConfiguration) => {
-                        selectedList[index].configuration = value;
-                        const newData = [...selectedList];
-                        setSelectedList(newData);
-                        if (onDataChanged) onDataChanged(newData);
-                      }}
-                    />
-                  </Details>
-                </div>
-              </div>
-            </React.Fragment>
-          ))}
+                </React.Fragment>
+              ))}
+            </>
+          )}
         </>
       )}
-    </React.Fragment>
+    />
   );
 };
 

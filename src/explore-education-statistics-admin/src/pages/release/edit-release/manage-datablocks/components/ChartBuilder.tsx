@@ -132,25 +132,9 @@ const ChartBuilder = ({
     ChartDefinition | undefined
   >();
 
-  const indicatorIds = Object.keys(data.metaData.indicators);
   const metaData = useMemo(
     () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
     [data.metaData],
-  );
-
-  const filterIdCombinations = useMemo<string[][]>(
-    () =>
-      Object.values(
-        data.result.reduce((filterSet, result) => {
-          const filterIds = Array.from(result.filters);
-
-          return {
-            ...filterSet,
-            [filterIds.join('_')]: filterIds,
-          };
-        }, {}),
-      ),
-    [data.result],
   );
 
   const [chartOptions, setChartOptions] = useState<ChartOptions>({
@@ -487,8 +471,6 @@ const ChartBuilder = ({
                   setDataSetAndConfiguration([...newData]);
                 }}
                 metaData={metaData}
-                indicatorIds={indicatorIds}
-                filterIds={filterIdCombinations}
                 selectedData={dataSetAndConfiguration}
                 chartType={selectedChartType}
                 capabilities={selectedChartType.capabilities}

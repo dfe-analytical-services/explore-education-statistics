@@ -101,7 +101,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       render={(form: FormikProps<FormValues>) => {
         if (isActive) {
           return (
-            <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+            <Form {...form} id={formId} showSubmitError>
               <FormFieldset
                 id={`${formId}-levels`}
                 legend={stepHeading}
