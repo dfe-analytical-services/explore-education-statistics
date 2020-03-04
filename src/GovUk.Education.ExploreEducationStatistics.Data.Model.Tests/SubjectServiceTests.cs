@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publication.Id,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var subject = new Subject
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publication.Id,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var subject = new Subject
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publication.Id,
-                    ReleaseDate = DateTime.UtcNow.AddDays(1)
+                    Published = null
                 };
 
                 var subject = new Subject

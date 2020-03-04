@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Id = Guid.NewGuid(),
                 PublicationId = publication.Id,
-                ReleaseDate = DateTime.UtcNow,
+                Published = DateTime.UtcNow,
                 TimeIdentifier = AcademicYearQ1,
                 Year = 2018
             };
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Id = Guid.NewGuid(),
                 PublicationId = publication.Id,
-                ReleaseDate = DateTime.UtcNow,
+                Published = DateTime.UtcNow,
                 TimeIdentifier = AcademicYearQ4,
                 Year = 2017
             };
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Id = Guid.NewGuid(),
                 PublicationId = publication.Id,
-                ReleaseDate = DateTime.UtcNow.AddDays(1),
+                Published = null,
                 TimeIdentifier = AcademicYearQ2,
                 Year = 2018
             };
