@@ -2192,11 +2192,11 @@
                                     {
                                         "source": {
                                             "name": "ReleaseId",
-                                            "type": "String"
+                                            "type": "Guid"
                                         },
                                         "sink": {
                                             "name": "ReleaseId",
-                                            "type": "String"
+                                            "type": "Guid"
                                         }
                                     }
                                 ]
