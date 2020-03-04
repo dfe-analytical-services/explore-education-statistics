@@ -38,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         [EnumLabelValue("Sponsor", "SPO")] Sponsor,
 
-        [EnumLabelValue("Ward", "WAR")] Ward
+        [EnumLabelValue("Ward", "WAR")] Ward,
+        
+        [EnumLabelValue("Planning Area", "PA")] PlanningArea
     }
 }
