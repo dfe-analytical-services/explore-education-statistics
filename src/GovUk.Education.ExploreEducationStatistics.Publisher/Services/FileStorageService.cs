@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
                 publicContainer, copyReleaseCommand,
-                (source, destination) => CopyFilesUnlessBatchedOrMeta(source, copyReleaseCommand.ReleaseId));
+                (source, destination) => CopyFileUnlessBatchedOrMeta(source, copyReleaseCommand.ReleaseId));
         }
 
         public async Task DeleteAllContentAsyncExcludingStaging()
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private static async Task<bool> CopyFilesUnlessBatchedOrMeta(object source, Guid releaseId)
+        private static async Task<bool> CopyFileUnlessBatchedOrMeta(object source, Guid releaseId)
         {
             var item = source as CloudBlockBlob;
             if (item == null)
