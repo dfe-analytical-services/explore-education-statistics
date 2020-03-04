@@ -1,0 +1,27 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.selectedData {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  margin-bottom: govuk-spacing(2);
+
+  &:last-of-type {
+    border-bottom: 0;
+  }
+}
+
+.selectedDataRow {
+  display: flex;
+}
+
+.selectedDataFilter {
+  flex-basis: 40%;
+  flex-grow: 1;
+}
+
+.selectedDataIndicator {
+  flex-basis: 40%;
+}
+
+.selectedDataAction {
+  margin-left: auto;
+}

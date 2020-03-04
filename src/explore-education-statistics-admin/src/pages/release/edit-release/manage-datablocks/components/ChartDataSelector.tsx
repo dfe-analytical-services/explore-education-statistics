@@ -1,5 +1,4 @@
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
@@ -24,6 +23,7 @@ import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo, useState } from 'react';
+import styles from './ChartDataSelector.module.scss';
 
 interface FormValues {
   filters: Dictionary<string>;
