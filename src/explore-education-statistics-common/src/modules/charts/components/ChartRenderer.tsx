@@ -1,17 +1,17 @@
-import {
-  ChartProps,
-  StackedBarProps,
-} from '@common/modules/charts/types/chart';
 import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
 import Infographic, {
   InfographicChartProps,
 } from '@common/modules/charts/components/Infographic';
 import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import { MapProps } from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  ChartProps,
+  StackedBarProps,
+} from '@common/modules/charts/types/chart';
 import { ChartType } from '@common/services/publicationService';
 import dynamic from 'next/dynamic';
-import React from 'react';
-import { MapProps } from '@common/modules/charts/components/MapBlock';
+import React, { memo, useMemo } from 'react';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/charts/components/MapBlock'),
@@ -28,31 +28,28 @@ export interface ChartRendererProps
   type: ChartType | 'unknown';
 }
 
-function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
-  switch (type.toLowerCase()) {
-    case 'line':
-      return <LineChartBlock {...chartProps} />;
-    case 'verticalbar':
-      return <VerticalBarBlock {...chartProps} />;
-    case 'horizontalbar':
-      return <HorizontalBarBlock {...chartProps} />;
-    case 'map':
-      return <DynamicMapBlock {...chartProps} />;
-    case 'infographic': {
-      return <Infographic {...chartProps} />;
-    }
-    default:
-      return (
-        <div>
-          Unable to render chart, an unimplemented chart type was requested '
-          {type}'
-        </div>
-      );
-  }
-}
-
 function ChartRenderer(props: ChartRendererProps) {
   const { data, meta, title } = props;
+
+  const chart = useMemo(() => {
+    const { type } = props;
+
+    switch (type.toLowerCase()) {
+      case 'line':
+        return <LineChartBlock {...props} />;
+      case 'verticalbar':
+        return <VerticalBarBlock {...props} />;
+      case 'horizontalbar':
+        return <HorizontalBarBlock {...props} />;
+      case 'map':
+        return <DynamicMapBlock {...props} />;
+      case 'infographic': {
+        return <Infographic {...props} />;
+      }
+      default:
+        return <div>Unable to render invalid chart type</div>;
+    }
+  }, [props]);
 
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -61,7 +58,7 @@ function ChartRenderer(props: ChartRendererProps) {
     return (
       <>
         {title && <h3 className="govuk-heading-s">{title}</h3>}
-        <ChartTypeRenderer {...props} />
+        {chart}
       </>
     );
   }
@@ -69,4 +66,4 @@ function ChartRenderer(props: ChartRendererProps) {
   return <div>Unable to render chart, invalid data configured</div>;
 }
 
-export default ChartRenderer;
+export default memo(ChartRenderer);
