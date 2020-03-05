@@ -22,6 +22,7 @@ import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 
 interface Props {
+  captionTitle?: string;
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
 }
@@ -86,7 +87,7 @@ export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
-  ({ fullTable, tableHeadersConfig }: Props, dataTableRef) => {
+  ({ fullTable, tableHeadersConfig, captionTitle }: Props, dataTableRef) => {
     const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
@@ -202,7 +203,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         }
       >
         <FixedMultiHeaderDataTable
-          caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
+          caption={
+            <DataTableCaption
+              {...subjectMeta}
+              title={captionTitle}
+              id="dataTableCaption"
+            />
+          }
           columnHeaders={columnHeaders}
           rowHeaders={rowHeaders}
           rows={rows}

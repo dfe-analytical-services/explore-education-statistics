@@ -1,7 +1,5 @@
-/// <reference types="jest-dom/extend-expect" />
-
-declare module 'jest-dom/dist/utils' {
-  export const checkHasWindow: (element: unknown) => void;
+declare module '@testing-library/jest-dom/dist/utils' {
+  // eslint-disable-next-line import/prefer-default-export
   export const checkHtmlElement: (
     element: unknown,
     matcherFn?: Function,

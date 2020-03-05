@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
 using Moq;
 using Xunit;
 
@@ -32,10 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             );
 
-            permalinkService.Setup(s => s.GetAsync(_notFoundId)).Throws(new StorageException(new RequestResult
-            {
-                HttpStatusCode = 404
-            }, null, null));
+            permalinkService.Setup(s => s.GetAsync(_notFoundId)).ReturnsAsync(new NotFoundResult());
 
             permalinkService.Setup(s => s.CreateAsync(_query)).ReturnsAsync(
                 new PermalinkViewModel
@@ -51,34 +47,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_Permalink()
         {
-            var result = await _controller.Get(_validId) as OkObjectResult;
+            var result = await _controller.GetAsync(_validId);
 
             Assert.IsAssignableFrom<PermalinkViewModel>(result.Value);
-
-            var link = result.Value as PermalinkViewModel;
-
-            Assert.Equal(_validId, link.Id);
+            Assert.Equal(_validId, result.Value.Id);
         }
 
         [Fact]
         public async void Get_Permalink_NotFound()
         {
-            var result = await _controller.Get(_notFoundId);
-
-            Assert.NotNull(result);
-
-            Assert.IsAssignableFrom<NotFoundResult>(result);
+            var result = await _controller.GetAsync(_notFoundId);
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
         public async void Create_Permalink_Returns_Id()
         {
-            var result = await _controller.Create(_query) as OkObjectResult;
+            var result = await _controller.CreateAsync(_query);
 
-            Assert.IsAssignableFrom<PermalinkViewModel>(result.Value);
-            var link = result.Value as PermalinkViewModel;
-
-            Assert.Equal(_createdId, link.Id);
+            Assert.IsType<PermalinkViewModel>(result.Value);
+            Assert.Equal(_createdId, result.Value.Id);
         }
     }
 }

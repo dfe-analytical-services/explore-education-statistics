@@ -1,4 +1,8 @@
-import React from 'react';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import React, { useContext, useState } from 'react';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
@@ -12,11 +16,18 @@ type Props = {
 } & DataBlockProps;
 
 const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
-  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
     <div className={styles.wrapper}>
-      <DataBlock id={id} {...restOfProps} />
+      <DataBlock
+        {...restOfProps}
+        releaseId={releaseId}
+        id={id}
+        getInfographic={editReleaseDataService.downloadChartFile}
+      />
+
       <Button
         className="govuk-button--warning"
         onClick={() => setShowConfirmation(true)}

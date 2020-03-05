@@ -21,10 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
-        private readonly List<ImportMessage> messages = new List<ImportMessage>();
-
-        private const bool PROCESS_SEQUENTIALLY = true;
-
+        
         public SeedService(
             ILogger<SeedService> logger,
             IMapper mapper,
@@ -56,52 +53,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var aQueue = client.GetQueueReference("imports-available");
             aQueue.CreateIfNotExists();
 
-            if (PROCESS_SEQUENTIALLY)
-            {
-                var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
-                messages.Add(new ImportMessage
-                {
-                    SubjectId = subjectId,
-                    DataFileName = dataFileName,
-                    OrigDataFileName = dataFileName,
-                    Release = importMessageRelease,
-                    BatchNo = 1,
-                    NumBatches = 1
-                });
+            var pQueue = client.GetQueueReference("imports-pending");
 
-                if (messages.Count == maxCount)
-                {
-                    var sQueue = client.GetQueueReference("imports-pending-sequential");
-                    sQueue.CreateIfNotExists();
-                    _logger.LogInformation("Adding {count} queue messages", messages.Count);
-                    sQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(messages)));
-                }
-            }
-            else
-            {
-                var pQueue = client.GetQueueReference("imports-pending");
+            pQueue.CreateIfNotExists();
 
-                pQueue.CreateIfNotExists();
+            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release);
 
-                var cloudMessage = BuildCloudMessage(dataFileName, release);
+            _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
 
-                _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
-
-                pQueue.AddMessage(cloudMessage);
-            }
+            pQueue.AddMessage(cloudMessage);
         }
 
-        private CloudQueueMessage BuildCloudMessage(string dataFileName, Release release)
+        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release)
         {
             var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
             var message = new ImportMessage
             {
+                SubjectId = subjectId,
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
                 NumBatches = 1,
-                RowsPerBatch = 10000   // Just for info - rows per batch is actually set in host.json of the processor function
+                // Just for info - rows per batch is actually set in host.json of the processor function
+                RowsPerBatch = 3000,
+                Seeding = true
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

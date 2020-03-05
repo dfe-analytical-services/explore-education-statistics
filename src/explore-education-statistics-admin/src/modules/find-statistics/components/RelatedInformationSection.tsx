@@ -113,21 +113,29 @@ const RelatedInformationSection = ({
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
           <li>
-            {release.publication.methodology && (
-              <Link to={`/methodologies/${release.publication.methodology.id}`}>
-                {release.publication.methodology.title}
-              </Link>
-            )}
-            {release.publication.externalMethodology && (
-              <Link
-                to=""
-                href={release.publication.externalMethodology.url}
-                target="_blank"
-                rel="external"
-              >
-                {release.publication.externalMethodology.title}
-              </Link>
-            )}
+            {release.publication.methodology &&
+              (isEditing ? (
+                <a>{release.publication.methodology.title}</a>
+              ) : (
+                <Link
+                  to={`/methodologies/${release.publication.methodology.id}`}
+                >
+                  {release.publication.methodology.title}
+                </Link>
+              ))}
+            {release.publication.externalMethodology &&
+              (isEditing ? (
+                <a>{release.publication.externalMethodology.title}</a>
+              ) : (
+                <Link
+                  to=""
+                  href={release.publication.externalMethodology.url}
+                  target="_blank"
+                  rel="external"
+                >
+                  {release.publication.externalMethodology.title}
+                </Link>
+              ))}
             {!release.publication.externalMethodology &&
               !release.publication.methodology &&
               'No methodology added.'}

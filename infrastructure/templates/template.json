@@ -339,9 +339,9 @@
 
     "publishReleaseDataFunctionDisabled": {
       "type": "string",
-      "defaultValue": "true",
+      "defaultValue": "false",
       "metadata": {
-        "description": "Temporary parameter to disable the PublishReleaseDataFunction while it is being tested"
+        "description": "Disable the Publish Release Data Function in the Publisher App which triggers the Datafactory pipeline"
       }
     },
 
@@ -379,10 +379,6 @@
       "metadata": {
         "description": "Number of days to retain blobs after delete"
       }
-    },
-    "deployDatafactory": {
-      "type": "bool",
-      "defaultValue": false
     },
     "autoscalePublicApplication": {
       "type": "bool",
@@ -778,11 +774,6 @@
             ]
           },
           "connectionStrings": [
-            {
-              "name": "PublicStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
-            }
           ]
         }
       },
@@ -2173,7 +2164,7 @@
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]",
-        "RowsPerBatch": "10000",
+        "RowsPerBatch": "2000",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
@@ -2299,29 +2290,14 @@
           },
           "connectionStrings": [
             {
-              "name": "CoreStorage",
-              "type": "Custom",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "NotificationStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]",
-              "type": "Custom"
-            },
-            {
-              "name": "PublicStorage",
-              "type": "Custom",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
-            },
-            {
-              "name": "PublisherStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]",
-              "type": "Custom"
-            },
-            {
               "name": "ContentDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }
           ]
         }
@@ -2612,7 +2588,6 @@
       }
     },
     {
-      "condition": "[parameters('deployDatafactory')]",
       "name": "datafactory",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -2623,12 +2598,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "environment": {
-            "value": "[parameters('environment')]"
-          },
           "publisherAppName": {
             "value": "[variables('publisherAppName')]"
           },
@@ -2666,7 +2635,6 @@
         "enableSoftDelete": true,
         "accessPolicies": [
           {
-            "condition": "[parameters('deployDatafactory')]",
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {

@@ -64,8 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
-                BatchNo = 1,
-                NumBatches = 1
+                BatchNo = 1
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

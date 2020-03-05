@@ -1,6 +1,6 @@
 import PublicationForm from '@common/modules/table-tool/components/PublicationForm';
+import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
 
 describe('PublicationForm', () => {
   const testOptions = [

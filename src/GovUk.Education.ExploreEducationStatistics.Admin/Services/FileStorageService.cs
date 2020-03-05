@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -155,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     IEnumerable<Models.FileInfo> files = blobContainer
                         .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                        .Where(blob => !IsBatchedFile(blob, releaseId))
+                        .Where(blob => !IsBatchedDataFile(blob, releaseId))
                         .OfType<CloudBlockBlob>()
                         .Select(file => new Models.FileInfo
                         {
@@ -395,11 +396,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
 
-        private static bool IsBatchedFile(IListBlobItem blobItem, Guid releaseId)
-        {
-            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
-        }
-
         private static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
         {
             foreach (var (key, value) in values)
@@ -423,20 +419,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             
             return _fileTypeService.HasMatchingMimeType(file, CsvMimeTypes) && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
-        }
-
-        private static int CalculateNumberOfRows(Stream fileStream)
-        {
-            using (var reader = new StreamReader(fileStream))
-            {
-                var numberOfLines = 0;
-                while (reader.ReadLine() != null)
-                {
-                    ++numberOfLines;
-                }
-
-                return numberOfLines;
-            }
         }
     }
 }

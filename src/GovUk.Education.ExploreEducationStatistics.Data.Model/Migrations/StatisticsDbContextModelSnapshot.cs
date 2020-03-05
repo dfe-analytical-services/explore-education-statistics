@@ -160,7 +160,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
 
                     b.ToTable("Footnote");
                 });
@@ -359,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ReleaseDate")
+                    b.Property<DateTime?>("Published")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Slug")
@@ -550,6 +555,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .WithMany("FilterItems")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

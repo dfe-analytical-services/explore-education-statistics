@@ -17,7 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private const string ContainerName = "releases";
         private readonly CloudBlobContainer _blobContainer;
-        private readonly TimeSpan _minimumAcquireLeaseTimeSpan = TimeSpan.FromSeconds(15);
 
         public FileStorageService(string connectionString)
         {
@@ -59,50 +58,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return true;
         }
 
-        public void DeleteDatafile(string releaseId, string dataFileName)
+        public void DeleteBatchFile(string releaseId, string dataFileName)
         {
-            GetBlobReference(releaseId, dataFileName).DeleteAsync();
-        }
-        
-        public void DeleteBatches(string releaseId, string metaFileName)
-        {
-            _blobContainer.ListBlobs(FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
-                    true, BlobListingDetails.Metadata)
-                .Where(cbb => IsBatchedFile(cbb, releaseId))
-                .OfType<CloudBlockBlob>()
-                .ToList().ForEach(file =>
-                {
-                    if (BlobUtils.GetMetaFileName(file).Equals(metaFileName))
-                    {
-                        file.DeleteIfExistsAsync();
-                    }
-                });
-        }
-        public Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob)
-        {
-            return cloudBlockBlob.AcquireLeaseAsync(
-                _minimumAcquireLeaseTimeSpan,
-                Guid.NewGuid().ToString());
+            GetBlobReference(FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName).DeleteIfExists();
         }
 
-        public CloudBlockBlob GetBlobReference(string releaseId, string dataFileName)
+        public int GetNumBatchesRemaining(string releaseId, string origDataFileName)
         {
-            return _blobContainer.GetBlockBlobReference($"{releaseId}/data/{dataFileName}");
+            return _blobContainer.ListBlobs(
+                    FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
+                    true, BlobListingDetails.Metadata)
+                .Where(cbb => IsBatchedFile(cbb, releaseId))
+                .OfType<CloudBlockBlob>().Where(blob => blob.Name.Contains(origDataFileName))
+                .ToList().Count;
+        }
+
+        public static IEnumerable<string> GetBatchesRemaining(string releaseId, CloudBlobContainer blobContainer, string origDataFileName)
+        {
+            return blobContainer.ListBlobs(
+                    FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data),
+                    true, BlobListingDetails.Metadata)
+                .Where(cbb => IsBatchedFile(cbb, releaseId))
+                .OfType<CloudBlockBlob>().Where(blob => blob.Name.Contains(origDataFileName)).Select(blob => blob.Name);
+        }
+        
+        private CloudBlockBlob GetBlobReference(string fullPath)
+        {
+            return _blobContainer.GetBlockBlobReference(fullPath);
         }
         
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
         {
             return blobItem.Parent.Prefix.Equals(FileStoragePathUtils.AdminReleaseBatchesDirectoryPath(releaseId));
-        }
-        
-        private CloudBlobDirectory GetBatchDirectoryReference(string releaseId)
-        {
-            return _blobContainer.GetDirectoryReference($"{releaseId}/data/{FileStoragePathUtils.BatchesDir}");
-        }
-
-        private string GenerateCloudLockBlobLeaseName(string blobLeaseNamePrefix)
-        {
-            return $"{blobLeaseNamePrefix}.lck";
         }
 
         private async Task UploadFileAsync(
@@ -126,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await blob.SetMetadataAsync();
         }
 
-        private static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
+        public static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
         {
             return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, ContainerName,
                 new BlobContainerPermissions

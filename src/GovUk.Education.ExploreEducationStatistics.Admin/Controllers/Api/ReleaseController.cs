@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false, AllowedChartFileTypes)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true, AllowedChartFileTypes)
                 .HandleFailuresOr(Ok);
         }
 
