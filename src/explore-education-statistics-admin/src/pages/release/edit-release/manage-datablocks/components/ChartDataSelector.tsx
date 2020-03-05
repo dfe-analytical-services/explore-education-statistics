@@ -128,11 +128,13 @@ const ChartDataSelector = ({
           indicator,
         };
 
-        const name = `${
-          metaData.indicators[indicator].label
-        } (${dataSet.filters
-          .map(filter => filtersByValue[filter].label)
-          .join(', ')})`;
+        const name = `${metaData.indicators[indicator].label}${
+          dataSet.filters.length
+            ? ` (${dataSet.filters
+                .map(filter => filtersByValue[filter].label)
+                .join(', ')})`
+            : ''
+        }`;
 
         const newChartData = {
           dataSet,
@@ -210,13 +212,16 @@ const ChartDataSelector = ({
                 >
                   <div className={styles.selectedData}>
                     <div className={styles.selectedDataRow}>
-                      <div className={styles.selectedDataFilter}>
-                        <span>
-                          {selected.dataSet.filters
-                            .map(filter => filtersByValue[filter].label)
-                            .join(', ')}
-                        </span>
-                      </div>
+                      {selected.dataSet.filters.length > 0 && (
+                        <div className={styles.selectedDataFilter}>
+                          <span>
+                            {selected.dataSet.filters
+                              .map(filter => filtersByValue[filter].label)
+                              .join(', ')}
+                          </span>
+                        </div>
+                      )}
+
                       <div className={styles.selectedDataIndicator}>
                         {metaData.indicators[selected.dataSet.indicator].label}
                       </div>
