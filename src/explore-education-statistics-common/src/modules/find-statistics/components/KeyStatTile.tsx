@@ -7,6 +7,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { AxiosResponse } from 'axios';
 import React, { ReactNode, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
@@ -69,11 +70,13 @@ const KeyStatTile = ({
               <p className="govuk-body-s">{summary.dataSummary}</p>
             )}
           </div>
-          {summary && summary.dataDefinition && (
+          {summary && summary?.dataDefinition?.[0] !== '' && (
             <Details
               summary={(summary && summary.dataDefinitionTitle) || 'Help'}
             >
-              <div>{summary.dataDefinition}</div>
+              {summary.dataDefinition.map(data => (
+                <ReactMarkdown key={data}>{data}</ReactMarkdown>
+              ))}
             </Details>
           )}
           {children}

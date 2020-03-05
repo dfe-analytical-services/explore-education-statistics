@@ -1,9 +1,9 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import permissionService from '@admin/services/permissions/service';
-import service, {
+import editReleaseDataService, {
+  DataFile,
   DeleteDataFilePlan,
-} from '@admin/services/release/edit-release/data/service';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
@@ -56,7 +56,7 @@ const ReleaseDataUploadsSection = ({
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseDataFiles(releaseId),
+      editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ])
       .then(([releaseDataFiles, canUpdateReleaseResponse]) => {
@@ -76,7 +76,7 @@ const ReleaseDataUploadsSection = ({
         fileInput.value = '';
       });
 
-    const files = await service
+    const files = await editReleaseDataService
       .getReleaseDataFiles(releaseId)
       .catch(handleApiErrors);
 
@@ -146,7 +146,7 @@ const ReleaseDataUploadsSection = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
-      await service.uploadDataFiles(releaseId, {
+      await editReleaseDataService.uploadDataFiles(releaseId, {
         subjectTitle: values.subjectTitle,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
@@ -299,7 +299,7 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Data file">
                             <ButtonText
                               onClick={() =>
-                                service
+                                editReleaseDataService
                                   .downloadDataFile(
                                     releaseId,
                                     dataFile.filename,
@@ -313,7 +313,7 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Metadata file">
                             <ButtonText
                               onClick={() =>
-                                service
+                                editReleaseDataService
                                   .downloadDataMetadataFile(
                                     releaseId,
                                     dataFile.metadataFilename,
@@ -351,7 +351,7 @@ const ReleaseDataUploadsSection = ({
                               actions={
                                 <ButtonText
                                   onClick={() =>
-                                    service
+                                    editReleaseDataService
                                       .getDeleteDataFilePlan(
                                         releaseId,
                                         dataFile,
@@ -385,7 +385,7 @@ const ReleaseDataUploadsSection = ({
                 onExit={() => setDeleteDataFile(undefined)}
                 onCancel={() => setDeleteDataFile(undefined)}
                 onConfirm={async () => {
-                  await service
+                  await editReleaseDataService
                     .deleteDataFiles(
                       releaseId,
                       (deleteDataFile as DeleteDataFile).file,

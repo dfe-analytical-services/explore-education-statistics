@@ -4,6 +4,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
+import { GetInfographic } from '@common/modules/charts/components/Infographic';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
@@ -23,17 +24,19 @@ import React, { Component, ReactNode, MouseEvent } from 'react';
 
 export interface DataBlockProps {
   id: string;
+  releaseId?: string;
   type: string;
-  heading?: string;
+  captionTitle?: string;
   dataBlockRequest?: DataBlockRequest;
 
   tables?: Table[];
   charts?: Chart[];
   summary?: Summary;
 
-  height?: number;
   showTables?: boolean;
   additionalTabContent?: ReactNode;
+
+  getInfographic?: GetInfographic;
 
   onToggle?: (section: { id: string; title: string }) => void;
 
@@ -112,13 +115,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (chartMetadata === undefined) return;
 
-    const { charts, tables, heading } = this.props;
+    const { charts, tables, captionTitle } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
         newState.tables = [
           {
-            heading,
+            captionTitle,
             response,
             ...tables[0], /// at present only one chart
           },
@@ -148,18 +151,19 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      heading,
-      height,
+      captionTitle,
       showTables,
       additionalTabContent,
       onToggle,
+      releaseId,
       id,
+      getInfographic,
     } = this.props;
+
     const { charts, tables, isLoading, isError } = this.state;
+
     return (
       <>
-        {heading && <h3>{heading}</h3>}
-
         {isLoading ? (
           <LoadingSpinner text="Loading content..." />
         ) : (
@@ -175,7 +179,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 {tables.map((table, idx) => {
                   const key = `${id}0_table_${idx}`;
 
-                  return <TimePeriodDataTableRenderer key={key} {...table} />;
+                  return (
+                    <TimePeriodDataTableRenderer
+                      {...table}
+                      captionTitle={captionTitle}
+                      key={key}
+                    />
+                  );
                 })}
 
                 {additionalTabContent}
@@ -197,7 +207,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                       {chart.data &&
                       chart.meta &&
                       chart.data.result.length > 0 ? (
-                        <ChartRenderer {...chart} height={height} />
+                        <ChartRenderer
+                          {...chart}
+                          releaseId={releaseId}
+                          getInfographic={getInfographic}
+                        />
                       ) : (
                         <div>
                           Unable to render chart, invalid data configured

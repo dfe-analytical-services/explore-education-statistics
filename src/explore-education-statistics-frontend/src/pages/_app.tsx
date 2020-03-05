@@ -1,3 +1,5 @@
+import '@frontend/polyfill';
+
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';

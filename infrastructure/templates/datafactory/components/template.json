@@ -508,16 +508,6 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "ReleaseDate",
-                                            "type": "DateTime"
-                                        },
-                                        "sink": {
-                                            "name": "ReleaseDate",
-                                            "type": "DateTime"
-                                        }
-                                    },
-                                    {
-                                        "source": {
                                             "name": "Slug",
                                             "type": "String"
                                         },
@@ -2202,11 +2192,11 @@
                                     {
                                         "source": {
                                             "name": "ReleaseId",
-                                            "type": "String"
+                                            "type": "Guid"
                                         },
                                         "sink": {
                                             "name": "ReleaseId",
-                                            "type": "String"
+                                            "type": "Guid"
                                         }
                                     }
                                 ]

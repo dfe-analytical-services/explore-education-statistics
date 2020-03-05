@@ -55,7 +55,7 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
     return (
       <>
         <TimePeriodDataTableRenderer
-          heading={datablock.heading}
+          captionTitle={datablock.heading}
           response={dataBlockResponse}
           tableHeaders={
             datablock.tables &&
