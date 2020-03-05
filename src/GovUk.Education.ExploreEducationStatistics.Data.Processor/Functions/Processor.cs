@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
@@ -56,8 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            message.RowsPerBatch = GetBatchSettings(LoadAppSettings(context)).RowsPerBatch;
-            
             if (await IsDataFileValid(message, logger))
             {
                 try
@@ -188,25 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             return false;
         }
-
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
-        }
-
-        private static BatchSettings GetBatchSettings(IConfigurationRoot config)
-        {
-            return new BatchSettings
-            {
-                RowsPerBatch =
-                    Convert.ToInt32(config.GetValue<string>("RowsPerBatch"))
-            };
-        }
-
+        
         private static Exception GetInnerException(Exception ex)
         {
             return ex.InnerException ?? ex;

@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
         private readonly CloudTable _table;
+        private readonly int _rowsPerBatch;
 
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
             _table = tableStorageService.GetTableAsync("imports").Result;
+            _rowsPerBatch = Convert.ToInt32(config.GetValue<string>("RowsPerBatch"));
         }
 
         public async void Import(string dataFileName, Guid releaseId, IFormFile dataFile)
@@ -49,14 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             pQueue.CreateIfNotExists();
             aQueue.CreateIfNotExists();
-            
-            var message = BuildMessage(dataFileName, releaseId);
+            var numRows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
+            var message = BuildMessage(dataFileName, releaseId, numRows);
             
             await CreateImportTableRow(
                 releaseId,
                 dataFileName,
-                FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream()),
-                1,
+                numRows,
                 message);
             
             pQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(message)));
@@ -64,14 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
         
-        private async Task CreateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message)
+        private async Task CreateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, numBatches, JsonConvert.SerializeObject(message)))
+                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, JsonConvert.SerializeObject(message)))
             );
         }
 
-        private ImportMessage BuildMessage(string dataFileName, Guid releaseId)
+        private ImportMessage BuildMessage(string dataFileName, Guid releaseId, int numRows)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))
@@ -88,6 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
+                RowsPerBatch = _rowsPerBatch,
+                NumBatches = FileStorageUtils.GetNumBatches(numRows, _rowsPerBatch),
                 BatchNo = 1
             };
         }

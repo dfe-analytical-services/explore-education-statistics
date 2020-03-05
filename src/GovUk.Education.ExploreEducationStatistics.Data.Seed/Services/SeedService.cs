@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -41,12 +43,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             {
                 _logger.LogInformation($"Processing subject {subject.Id}");
                 var file = SamplePublications.SubjectFiles[subject.Id];
-                StoreFiles(subject.Release, file, subject.Name);
-                Seed(subject.Id,file + ".csv", subject.Release, subjects.Count);
+                StoreFilesAndSeed(subject.Release, file, subject.Name, subject);
             }
         }
+        
+        private void StoreFilesAndSeed(Release release, DataCsvFile file, string subjectName, Subject subject)
+        {
+            var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
+            var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
-        private void Seed(Guid subjectId, string dataFileName, Release release, int maxCount)
+            _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
+            int rows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
+            Seed(subject.Id,file + ".csv", subject.Release, rows);
+        }
+
+        private void Seed(Guid subjectId, string dataFileName, Release release, int rows)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -57,14 +69,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             pQueue.CreateIfNotExists();
 
-            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release);
+            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release, rows);
 
             _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
 
             pQueue.AddMessage(cloudMessage);
         }
 
-        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release)
+        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release, int rows)
         {
             var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
             var message = new ImportMessage
@@ -74,22 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
-                NumBatches = 1,
-                // Just for info - rows per batch is actually set in host.json of the processor function
-                RowsPerBatch = 3000,
+                RowsPerBatch = 4000,
+                NumBatches = FileStorageUtils.GetNumBatches(rows, 5000),
                 Seeding = true
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));
-        }
-
-        private void StoreFiles(Release release, DataCsvFile file, string subjectName)
-        {
-            var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
-            var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
-
-            _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
         }
 
         private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)

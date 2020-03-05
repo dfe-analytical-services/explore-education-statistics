@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class DatafileImport : TableEntity
     {
-        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, string message)
+        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message)
         {
             PartitionKey = releaseId;
             RowKey = dataFileName;

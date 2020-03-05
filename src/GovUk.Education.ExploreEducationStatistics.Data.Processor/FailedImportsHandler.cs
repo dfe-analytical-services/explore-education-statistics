@@ -44,13 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     // If batch was not split then just processing again by adding to pending queue
                     if (entity.Status.Equals(IStatus.QUEUED) || entity.Status.Equals(IStatus.RUNNING_PHASE_1))
                     {
+                        Console.WriteLine($"No data imported for {entity.PartitionKey} : {entity.RowKey} - Import will be re-run");
                         pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
                     // Else create a message for all remaining batches
                     else
                     {
-                        ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
-
+                        var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
                         var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
 
                         // If no batches then assume it didn't get passed initial validation stage
@@ -97,8 +97,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var fileName = folderAndFilename.Split(FileStoragePathUtils.BatchesDir + "/")[1];
             var batchNo = Int16.Parse(fileName.Substring(fileName.Length-6));
             
+            Console.WriteLine($"Recreating message queue for {fileName}");
+            
             var iMessage = new ImportMessage
             {
+                SubjectId = message.SubjectId,
                 DataFileName = $"{FileStoragePathUtils.BatchesDir}/{fileName}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,

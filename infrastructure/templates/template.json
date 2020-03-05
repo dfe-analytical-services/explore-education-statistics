@@ -1023,7 +1023,8 @@
         "OpenIdConnect:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
-        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]"
+        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
+        "RowsPerBatch": "4000"
       }
     },
     {
@@ -2164,7 +2165,6 @@
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]",
-        "RowsPerBatch": "2000",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
