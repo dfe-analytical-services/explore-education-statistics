@@ -82,13 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message)
-        {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numberOfRows, numBatches, JsonConvert.SerializeObject(message)))
-            );
-        }
-
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
         {
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(

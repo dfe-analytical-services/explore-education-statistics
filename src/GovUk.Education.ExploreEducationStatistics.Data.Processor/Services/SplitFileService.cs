@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public static int GetNumBatches(int rows, int rowsPerBatch)
+        private static int GetNumBatches(int rows, int rowsPerBatch)
         {
             return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }

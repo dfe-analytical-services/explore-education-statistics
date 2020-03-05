@@ -62,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 try
                 {
+                    logger.LogInformation($"Datafile: {message.DataFileName} is valid");
                     var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
                     logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
@@ -167,17 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
 
-            var numberOfRows = subjectData.GetCsvLines().Count();
-            var numBatches = SplitFileService.GetNumBatches(numberOfRows, message.RowsPerBatch);
-            message.NumBatches = numBatches;
-
-            await _batchService.CreateImport(
-                message.Release.Id.ToString(),
-                message.DataFileName,
-                numberOfRows,
-                numBatches,
-                message
-            );
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
 
             var errors = _validatorService.Validate(message, subjectData);
 

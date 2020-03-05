@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
 
                     // If batch was not split then just processing again by adding to pending queue
-                    if (entity.NumBatches == 1)
+                    if (entity.Status.Equals(IStatus.QUEUED) || entity.Status.Equals(IStatus.RUNNING_PHASE_1))
                     {
                         pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
@@ -71,15 +71,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         
         private static TableQuery<DatafileImport> BuildQuery()
         {
-            var f1 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString());
-            var f2 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString());
-            var combineFilters = TableQuery.CombineFilters(f1, TableOperators.Or, f2);
-            var f3 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString());
+            var combineFilters = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.QUEUED.ToString())
+                , TableOperators.Or, 
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
+
+            combineFilters = TableQuery.CombineFilters(
+                combineFilters, 
+                TableOperators.Or, 
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
+
             return new TableQuery<DatafileImport>()
-                .Where(TableQuery.CombineFilters(combineFilters, TableOperators.Or, f3));
+                .Where(TableQuery.CombineFilters(
+                    combineFilters, 
+                    TableOperators.Or, 
+                    TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString())));
         }
         
         private static string BuildMessage(ImportMessage message, string folderAndFilename)
