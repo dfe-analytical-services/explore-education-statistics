@@ -1925,6 +1925,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2017, 8, 1, 23, 59, 54, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = absenceReleaseId
                 },
 
                 // exclusions
@@ -1958,6 +1961,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2017, 8, 1, 11, 13, 22, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = exclusionsReleaseId
                 },
 
                 // Secondary and primary schools applications offers
@@ -1976,6 +1982,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2018",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2019, 8, 1, 9, 30, 33, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = applicationOffersReleaseId
                 }
             );
 
