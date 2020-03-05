@@ -1,11 +1,11 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES1435AddReleaseId : Migration
     {
-        private const string MigrationsPath = "Migrations";
         private const string MigrationId = "20200302162939";
         private const string PreviousVersionMigrationId = "20190819131247";
         

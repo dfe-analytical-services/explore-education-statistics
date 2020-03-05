@@ -1,11 +1,11 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class RemoveRedundantProcs : Migration
     {
-        private const string MigrationsPath = "Migrations";
         private const string MigrationId = "20200211122058";
         private const string OrigMigrationId = "20200103101609";
 

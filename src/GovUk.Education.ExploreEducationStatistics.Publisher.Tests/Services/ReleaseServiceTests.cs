@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -148,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Caption = "",
             Type = ContentSectionType.Generic
         };
-        
+
         private static readonly ContentSection Release1Section3 = new ContentSection
         {
             Id = Guid.NewGuid(),
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Caption = "",
             Type = ContentSectionType.Generic
         };
-        
+
         private static readonly ContentSection Release2Section3 = new ContentSection
         {
             Id = Guid.NewGuid(),
@@ -351,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             ContentSectionId = Release1Section1.Id
         };
-        
+
         private static readonly IContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
@@ -375,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             ContentSectionId = Release2Section1.Id
         };
-        
+
         private static readonly IContentBlock Release1KeyStatsDataBlock = new DataBlock
         {
             Id = Guid.NewGuid(),
@@ -413,7 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase(databaseName: "LatestRelease");
             var options = builder.Options;
 
-            var fileStorageService = new Mock<IFileStorageService>();
+            var (fileStorageService, statisticsDbContext) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -422,9 +423,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object,
+                var service = new ReleaseService(contentDbContext,
+                    statisticsDbContext.Object,
+                    fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result = service.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>());
@@ -441,7 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase(databaseName: "LatestReleaseViewModel");
             var options = builder.Options;
 
-            var fileStorageService = new Mock<IFileStorageService>();
+            var (fileStorageService, statisticsDbContext) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -453,9 +456,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object,
+                var service = new ReleaseService(contentDbContext,
+                    statisticsDbContext.Object,
+                    fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result = service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
@@ -476,24 +481,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
                 Assert.Equal(Release2SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
-                Assert.Equal("<p>Release 2 summary 2 order 0</p>", (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 2 summary 2 order 0</p>",
+                    (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release2SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
-                Assert.Equal("<p>Release 2 summary 3 order 1</p>", (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 2 summary 3 order 1</p>",
+                    (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release2SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
-                Assert.Equal("<p>Release 2 summary 1 order 2</p>", (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 2 summary 1 order 2</p>",
+                    (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
                 Assert.NotNull(content);
                 Assert.Equal(3, content.Count);
-                
+
                 Assert.Equal(Release2Section2.Id, content[0].Id);
                 Assert.Equal("Release 2 section 2 order 0", content[0].Heading);
                 Assert.Empty(content[0].Content);
-                
+
                 Assert.Equal(Release2Section3.Id, content[1].Id);
                 Assert.Equal("Release 2 section 3 order 1", content[1].Heading);
                 Assert.Empty(content[1].Content);
-                
+
                 Assert.Equal(Release2Section1.Id, content[2].Id);
                 Assert.Equal("Release 2 section 1 order 2", content[2].Heading);
                 Assert.Equal(3, content[2].Content.Count);
@@ -516,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase("ReleaseViewModel");
             var options = builder.Options;
 
-            var fileStorageService = new Mock<IFileStorageService>();
+            var (fileStorageService, statisticsDbContext) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -528,9 +536,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = new ContentDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object,
+                var service = new ReleaseService(contentDbContext,
+                    statisticsDbContext.Object,
+                    fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result = service.GetReleaseViewModel(PublicationARelease1.Id);
@@ -550,24 +560,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
                 Assert.Equal(Release1SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
-                Assert.Equal("<p>Release 1 summary 2 order 0</p>", (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 1 summary 2 order 0</p>",
+                    (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release1SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
-                Assert.Equal("<p>Release 1 summary 3 order 1</p>", (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 1 summary 3 order 1</p>",
+                    (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release1SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
-                Assert.Equal("<p>Release 1 summary 1 order 2</p>", (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
+                Assert.Equal("<p>Release 1 summary 1 order 2</p>",
+                    (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
                 Assert.NotNull(content);
                 Assert.Equal(3, content.Count);
-                
+
                 Assert.Equal(Release1Section2.Id, content[0].Id);
                 Assert.Equal("Release 1 section 2 order 0", content[0].Heading);
                 Assert.Empty(content[0].Content);
-                
+
                 Assert.Equal(Release1Section3.Id, content[1].Id);
                 Assert.Equal("Release 1 section 3 order 1", content[1].Heading);
                 Assert.Empty(content[1].Content);
-                
+
                 Assert.Equal(Release1Section1.Id, content[2].Id);
                 Assert.Equal("Release 1 section 1 order 2", content[2].Heading);
                 Assert.Equal(3, content[2].Content.Count);
@@ -581,6 +594,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"), result.RelatedInformation[0].Id);
             }
+        }
+
+        private static (Mock<IFileStorageService>,
+            Mock<StatisticsDbContext>) Mocks()
+        {
+            return (
+                new Mock<IFileStorageService>(),
+                new Mock<StatisticsDbContext>());
         }
     }
 }

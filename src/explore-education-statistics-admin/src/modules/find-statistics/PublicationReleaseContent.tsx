@@ -232,7 +232,11 @@ const PublicationReleaseContent = ({
                           ({ id, description, url }) => [
                             description,
                             <li key={id} data-testid="other-release-item">
-                              <a href={url}>{description}</a>
+                              {!editing ? (
+                                <a href={url}>{description}</a>
+                              ) : (
+                                <a>{description}</a>
+                              )}
                             </li>,
                           ],
                         ),
