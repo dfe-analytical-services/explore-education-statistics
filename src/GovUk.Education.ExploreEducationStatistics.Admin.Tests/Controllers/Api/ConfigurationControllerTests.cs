@@ -19,11 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void CheckPublicUrlConfigurationKeyExists()
+        public void CheckPublicAppUrlConfigurationKeyExists()
         {
             var configuration = GetConfiguration();
-            var configValue = configuration.GetValue<string>("PublicUrl");
-            Assert.Equal("http://localhost:3000", configValue);
+            var configValue = configuration.GetValue<string>("PublicAppUrl");
+            Assert.Equal("http://localhost:3000/", configValue);
         }
 
         [Fact]
@@ -44,19 +44,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void GetPublicUrl()
+        public void GetPublicAppUrl()
         {
             var controller = new ConfigurationController(GetConfiguration());
-            var result = controller.GetPublicUrl();
+            var result = controller.GetPublicAppUrl();
             Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.Equal("http://localhost:3000", ((OkObjectResult) result.Result).Value);
+            Assert.Equal("http://localhost:3000/", ((OkObjectResult) result.Result).Value);
         }
 
         [Fact]
-        public void GetPublicUrl_NotFound()
+        public void GetPublicAppUrl_NotFound()
         {
             var controller = new ConfigurationController(GetEmptyConfiguration());
-            var result = controller.GetPublicUrl();
+            var result = controller.GetPublicAppUrl();
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 

@@ -27,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(value);
         }
 
-        [HttpGet("api/configuration/public-url")]
-        public ActionResult<string> GetPublicUrl()
+        [HttpGet("api/configuration/public-app-url")]
+        public ActionResult<string> GetPublicAppUrl()
         {
-            var value = _configuration.GetValue<string>("PublicUrl");
+            var value = _configuration.GetValue<string>("PublicAppUrl");
             if (string.IsNullOrEmpty(value))
             {
                 return NotFound();
