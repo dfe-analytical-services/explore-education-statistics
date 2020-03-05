@@ -1,3 +1,4 @@
+import isGuid from '@common/lib/utils/string/isGuid';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
@@ -10,6 +11,14 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import compact from 'lodash/compact';
+
+const isTimePeriod = (value: string): boolean => {
+  if (isGuid(value)) {
+    return false;
+  }
+
+  return new RegExp(/^[0-9]{4,}_/).test(value);
+};
 
 /**
  * This function remaps the config filters into
@@ -37,8 +46,7 @@ export default function mapTableHeadersConfig(
     return filter ? new Indicator(filter) : undefined;
   };
 
-  // If NaN then time periods are columns
-  if (columns.length > 0 && Number.isNaN(Number(columns[0].value))) {
+  if (columns.length > 0 && isTimePeriod(columns[0].value)) {
     mappedColumns = columns.map(mapTimePeriod);
     mappedRows = rows.map(mapIndicator);
   } else {

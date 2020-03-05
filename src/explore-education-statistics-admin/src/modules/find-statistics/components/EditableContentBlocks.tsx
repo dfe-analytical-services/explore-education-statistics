@@ -11,7 +11,7 @@ import wrapEditableComponent, {
   ReleaseContentContext,
 } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Comments from './Comments';
 import ContentBlockDraggable from './ContentBlockDraggable';
@@ -36,7 +36,7 @@ export interface Props extends ContentBlockProps {
   resolveComments?: boolean;
   addContentButtonText?: string;
   onContentChange?: (content: ContentType) => void;
-  onReorderHook?: (callback: ReorderHook) => void;
+  onReorder?: (callback: ReorderHook) => void;
 }
 
 interface EditingContentBlockContext extends ReleaseContentContext {
@@ -64,25 +64,19 @@ const EditableContentBlock = ({
   canAddSingleBlock = false,
   textOnly = false,
   isReordering = false,
-  onReorderHook = undefined,
   addContentButtonText = 'Add content',
+  onReorder = undefined,
 }: Props) => {
   const editingContext = useContext(EditingContext);
-
-  const [contentBlocks, setContentBlocks] = useState<ContentType>();
-
-  React.useEffect(() => {
-    setContentBlocks(content);
-  }, [content]);
 
   const { handleApiErrors } = useContext(ErrorControlContext);
 
   React.useEffect(() => {
-    if (onReorderHook) {
-      const saveOrder: ReorderHook = async contentSectionId => {
+    if (onReorder) {
+      onReorder(async contentSectionId => {
         if (editingContext.releaseId && contentSectionId) {
-          if (contentBlocks) {
-            const newOrder = contentBlocks.reduce<Dictionary<number>>(
+          if (content) {
+            const newOrder = content.reduce<Dictionary<number>>(
               (order, next, index) => ({ ...order, [next.id]: index }),
               {},
             );
@@ -96,18 +90,17 @@ const EditableContentBlock = ({
               .catch(handleApiErrors);
 
             if (onContentChange) {
-              onContentChange(contentBlocks);
+              onContentChange(content);
             }
           }
         }
-      };
-      onReorderHook(saveOrder);
+      });
     }
   }, [
-    contentBlocks,
+    content,
     editingContext.releaseId,
     onContentChange,
-    onReorderHook,
+    onReorder,
     handleApiErrors,
   ]);
 
@@ -151,7 +144,6 @@ const EditableContentBlock = ({
         )
         .then(section => {
           if (onContentChange) onContentChange(section.content);
-          setContentBlocks(section.content);
         })
         .catch(handleApiErrors);
     }
@@ -159,14 +151,14 @@ const EditableContentBlock = ({
 
   const onContentBlockChange = React.useCallback(
     (index: number, newContent: string) => {
-      const newBlocks = [...(contentBlocks || [])];
+      const newBlocks = [...(content || [])];
       newBlocks[index].body = newContent;
-      setContentBlocks(newBlocks);
+
       if (onContentChange) {
         onContentChange(newBlocks);
       }
     },
-    [contentBlocks, onContentChange],
+    [content, onContentChange],
   );
 
   const onDeleteContent = async (contentId: string) => {
@@ -184,8 +176,6 @@ const EditableContentBlock = ({
         content: newContentBlocks,
       } = await releaseContentService.getContentSection(releaseId, sectionId);
 
-      setContentBlocks(newContentBlocks);
-
       if (onContentChange) onContentChange(newContentBlocks);
     }
   };
@@ -195,17 +185,16 @@ const EditableContentBlock = ({
       const { source, destination, type } = result;
 
       if (type === 'content' && destination) {
-        const newContentBlocks = [...(contentBlocks || [])];
+        const newContentBlocks = [...(content || [])];
         const [removed] = newContentBlocks.splice(source.index, 1);
         newContentBlocks.splice(destination.index, 0, removed);
-        setContentBlocks(newContentBlocks);
         if (onContentChange) onContentChange(newContentBlocks);
       }
     },
-    [contentBlocks, onContentChange],
+    [content, onContentChange],
   );
 
-  if (contentBlocks === undefined || contentBlocks.length === 0) {
+  if (content === undefined || content.length === 0) {
     return (
       <>
         <div className="govuk-inset-text">
@@ -235,7 +224,7 @@ const EditableContentBlock = ({
           draggable={isReordering}
           droppableId={`${sectionId}`}
         >
-          {contentBlocks.map((block, index) => (
+          {content.map((block, index) => (
             <div
               key={`content-section-${block.id}`}
               id={`content-section-${block.id}`}
@@ -257,9 +246,9 @@ const EditableContentBlock = ({
                         canResolve={editingContext.isReviewing}
                         canComment={editingContext.isCommenting}
                         onCommentsChange={async comments => {
-                          const newBlocks = [...contentBlocks];
+                          const newBlocks = [...content];
                           newBlocks[index].comments = comments;
-                          setContentBlocks(newBlocks);
+
                           if (onContentChange) {
                             onContentChange(newBlocks);
                           }
@@ -283,11 +272,11 @@ const EditableContentBlock = ({
 
                 {!isReordering &&
                   canAddBlocks &&
-                  index === contentBlocks.length - 1 && (
+                  index === content.length - 1 && (
                     <AddContentButton
                       textOnly={textOnly}
                       onClick={(type, data) =>
-                        onAddContentCallback(type, data, contentBlocks.length)
+                        onAddContentCallback(type, data, content.length)
                       }
                       availableDataBlocks={editingContext.availableDataBlocks}
                     />

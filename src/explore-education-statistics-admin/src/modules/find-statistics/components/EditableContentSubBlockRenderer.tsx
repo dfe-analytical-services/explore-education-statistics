@@ -9,6 +9,7 @@ interface Props {
   id: string;
   index: number;
   editable?: boolean;
+  releaseId?: string;
   canDelete?: boolean;
   onContentChange?: (content: string) => void;
   onDelete?: () => void;
@@ -17,6 +18,7 @@ interface Props {
 function EditableContentSubBlockRenderer({
   block,
   editable,
+  releaseId,
   onContentChange,
   canDelete = false,
   onDelete,
@@ -39,9 +41,10 @@ function EditableContentSubBlockRenderer({
       return (
         <div className="dfe-content-overflow">
           <EditableDataBlock
+            {...block}
             canDelete={canDelete}
             onDelete={onDelete}
-            {...block}
+            releaseId={releaseId}
           />
         </div>
       );

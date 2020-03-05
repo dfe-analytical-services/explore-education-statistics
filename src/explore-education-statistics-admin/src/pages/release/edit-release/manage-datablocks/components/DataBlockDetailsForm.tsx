@@ -16,12 +16,38 @@ import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, {
   ReactNode,
+  Reducer,
   useEffect,
   useReducer,
   useRef,
   useState,
 } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
+
+type BlockState = {
+  saved?: boolean;
+  error?: boolean;
+  updated?: boolean;
+};
+
+type BlockStateReducer = Reducer<BlockState, BlockState>;
+
+const reducer: BlockStateReducer = (
+  state,
+  { saved, error, updated } = {
+    saved: false,
+    error: false,
+    updated: false,
+  },
+) => {
+  if (saved || updated) {
+    return { saved: true, updated };
+  }
+  if (error) {
+    return { error: true };
+  }
+  return { saved: false, error: false };
+};
 
 interface Props {
   children?: ReactNode;
@@ -55,25 +81,10 @@ const DataBlockDetailsForm = ({
     DataBlock | undefined
   >(initialDataBlock);
 
-  const [blockState, setBlockState] = useReducer(
-    (
-      state,
-      { saved, error, updated } = {
-        saved: false,
-        error: false,
-        updated: false,
-      },
-    ) => {
-      if (saved || updated) {
-        return { saved: true, updated };
-      }
-      if (error) {
-        return { error: true };
-      }
-      return { saved: false, error: false };
-    },
-    { saved: false, error: false },
-  );
+  const [blockState, setBlockState] = useReducer<BlockStateReducer>(reducer, {
+    saved: false,
+    error: false,
+  });
 
   useEffect(() => {
     setBlockState({ saved: false, error: false });
@@ -134,7 +145,7 @@ const DataBlockDetailsForm = ({
                   id="data-block-name"
                   name="name"
                   label="Data block name"
-                  hint=" Name and save your datablock before viewing it under the
+                  hint=" Name and save your data block before viewing it under the
                     'View data blocks' tab at the top of this page."
                   percentageWidth="one-half"
                 />
@@ -164,27 +175,23 @@ const DataBlockDetailsForm = ({
                   additionalClass="govuk-!-width-two-thirds"
                 />
 
-                <Button
-                  disabled={!form.isValid}
-                  type="submit"
-                  className="govuk-!-margin-top-6"
-                >
+                <Button type="submit" className="govuk-!-margin-top-6">
                   {currentDataBlock ? 'Update data block' : 'Save data block'}
                 </Button>
               </FormGroup>
 
               {blockState.error && (
-                <div>
-                  An error occurred saving the Data Block, please try again
+                <p>
+                  An error occurred saving the data block, please try again
                   later.
-                </div>
+                </p>
               )}
               {blockState.saved && (
-                <div>
+                <p>
                   {blockState.updated
-                    ? 'The Data Block has been updated.'
-                    : 'The Data Block has been saved.'}
-                </div>
+                    ? 'The data block has been updated.'
+                    : 'The data block has been saved.'}
+                </p>
               )}
             </Form>
           </div>

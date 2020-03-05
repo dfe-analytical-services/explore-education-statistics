@@ -10,7 +10,7 @@ import TimePeriodDataTable, {
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import React from 'react';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 
 describe('TimePeriodDataTable', () => {
   test('renders table with two of every option', () => {

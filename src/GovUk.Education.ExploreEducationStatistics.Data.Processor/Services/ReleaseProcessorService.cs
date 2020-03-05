@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
+using System.Threading;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
@@ -31,6 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
             StatisticsDbContext context)
         {
+            // Avoid potential collisions
+            var secs = new Random().Next(1, 5) * 1000;
+            Thread.Sleep(secs);
             var release = CreateOrUpdateRelease(message, context);
             return RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
         }
@@ -61,18 +64,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)
         {
-            var release = context.Release
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(r => r.Id.Equals(message.Release.Id));
+            Release release;
 
-            if (release == null)
+            if (!context.Release.Any((r => r.Id.Equals(message.Release.Id))))
             {
                 release = new Release
                 {
                     Id = message.Release.Id,
-                    ReleaseDate = message.Release.ReleaseDate,
                     Slug = message.Release.Slug,
                     Publication = CreateOrUpdatePublication(message, context),
                     TimeIdentifier = message.Release.TimeIdentifier,
@@ -83,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                release = _mapper.Map(message.Release, release);
+                release = _mapper.Map(message.Release, (Release) null);
                 release = context.Release.Update(release).Entity;
             }
             context.SaveChanges();
@@ -92,12 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext context)
         {
-            var publication = context.Publication
-                .Include(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(p => p.Id.Equals(message.Release.Publication.Id));
+            Publication publication;
 
-            if (publication == null)
+            if (!context.Publication.Any(p => p.Id.Equals(message.Release.Publication.Id)))
             {
                 publication = new Publication
                 {
@@ -110,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                publication = _mapper.Map(message.Release.Publication, publication);
+                publication = _mapper.Map(message.Release.Publication, (Publication) null);
                 publication = context.Publication.Update(publication).Entity;
             }
             context.SaveChanges();
@@ -119,11 +114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
         {
-            var topic = context.Topic
-                .Include(p => p.Theme)
-                .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Id));
+            Topic topic;
             
-            if (topic == null)
+            if (!context.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
             {
                 topic = new Topic
                 {
@@ -136,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                topic = _mapper.Map(message.Release.Publication.Topic, topic);
+                topic = _mapper.Map(message.Release.Publication.Topic, (Topic) null);
                 topic = context.Topic.Update(topic).Entity;
             }
             context.SaveChanges();
@@ -145,17 +138,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext context)
         {
-            var theme = context.Theme
-                .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id));
-            
-            if (theme == null)
+            Theme theme;
+            if (!context.Theme
+                .Any(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id)))
             {
-                theme = _mapper.Map<Theme>(message.Release.Publication.Topic.Theme);
+                theme = new Theme
+                {
+                    Id = message.Release.Publication.Topic.Theme.Id,
+                    Slug = message.Release.Publication.Topic.Theme.Slug,
+                    Title = message.Release.Publication.Topic.Theme.Title
+                };
                 theme = context.Theme.Add(theme).Entity;
             }
             else
             {
-                theme = _mapper.Map(message.Release.Publication.Topic.Theme, theme);
+                theme = _mapper.Map(message.Release.Publication.Topic.Theme, (Theme) null);
                 theme = context.Theme.Update(theme).Entity;  
             }
             context.SaveChanges();

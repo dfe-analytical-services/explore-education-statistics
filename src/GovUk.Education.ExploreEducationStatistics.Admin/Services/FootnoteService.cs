@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     filterItemIds,
                     indicatorIds,
                     subjectIds)
-                .OnSuccess(_ =>
+                .OnSuccess(release =>
                 {
                     var footnote = DbSet().Add(new Footnote
                     {
@@ -75,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FilterGroups = new List<FilterGroupFootnote>(),
                         FilterItems = new List<FilterItemFootnote>(),
                         Indicators = new List<IndicatorFootnote>(),
-                        Subjects = new List<SubjectFootnote>()
+                        Subjects = new List<SubjectFootnote>(),
+                        ReleaseId = release.Id
                     }).Entity;
 
                     CreateSubjectLinks(footnote, subjectIds);

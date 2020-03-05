@@ -1,22 +1,22 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class FailedImportsHandler
     {
-        public static void CheckIncompleteImports()
+        public static void CheckIncompleteImports(string storageConnectionString)
         {
-            var tblStorageAccount = CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage"));
-            var container = FileStorageService.GetOrCreateBlobContainer(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")).Result;
+            var tblStorageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
+            var container = FileStorageService.GetOrCreateBlobContainer(storageConnectionString).Result;
             var tableClient = tblStorageAccount.CreateCloudTableClient();
             var queueClient = storageAccount.CreateCloudQueueClient();
             var availableQueue = queueClient.GetQueueReference("imports-available");
@@ -51,7 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     {
                         ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
 
-                        foreach (var folderAndFilename in FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName))
+                        var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
+
+                        // If no batches then assume it didn't get passed initial validation stage
+                        if (!batches.Any())
+                        {
+                            pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
+                            return;
+                        }
+                        
+                        foreach (var folderAndFilename in batches)
                         {
                             availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
                         }
