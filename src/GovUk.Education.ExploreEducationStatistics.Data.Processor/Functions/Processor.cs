@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -62,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 try
                 {
-                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
+                    var subjectData = await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
+                        DbUtils.CreateContentDbContext());
                     logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
@@ -95,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             try
             {
-                await _fileImportService.ImportObservations(message, DbUtils.CreateDbContext());
+                await _fileImportService.ImportObservations(message, DbUtils.CreateStatisticsDbContext());
             }
             catch (Exception e)
             {
@@ -104,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 {
                     logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
                                        $"{message.DataFileName} : {exception.Message} : transaction will be retried");
-                    throw e;
+                    throw;
                 }
                 
                 var ex = GetInnerException(e);
@@ -120,7 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
         
-        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
+        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext statisticsDbContext, 
+            ContentDbContext contentDbContext)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
@@ -131,29 +134,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
-            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
+            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
             
-            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
+            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, statisticsDbContext);
 
             if (message.Seeding)
             {
-                SampleGuids.GenerateIndicatorGuids(dbContext);
-                SampleGuids.GenerateFilterGuids(dbContext);
-                SampleGuids.GenerateFilterGroupGuids(dbContext);
+                SampleGuids.GenerateIndicatorGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
             }
 
-            await dbContext.SaveChangesAsync();
+            await statisticsDbContext.SaveChangesAsync();
 
-            _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
+            _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
             
             if (message.Seeding)
             {
-                SampleGuids.GenerateFilterGuids(dbContext);
-                SampleGuids.GenerateFilterGroupGuids(dbContext);
-                SampleGuids.GenerateFilterItemGuids(dbContext);
+                SampleGuids.GenerateFilterGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterItemGuids(statisticsDbContext);
             }
 
-            await dbContext.SaveChangesAsync();
+            await statisticsDbContext.SaveChangesAsync();
             
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
                 IStatus.RUNNING_PHASE_2);

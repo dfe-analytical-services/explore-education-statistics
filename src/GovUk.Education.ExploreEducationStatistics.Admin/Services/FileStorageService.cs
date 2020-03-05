@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -102,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(blobContainer => 
                     DataPathsForDeletion(blobContainer, releaseId, fileName)
                     .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
+                .OnSuccess(() => DeleteFileLink(fileName, releaseId))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
@@ -310,6 +312,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private async Task<Either<ActionResult, bool>> DeleteFileLink(string filename, Guid releaseId)
+        {
+            var fileLink = await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == filename)
+                .FirstOrDefaultAsync();
+
+            _context.ReleaseFiles.Remove(fileLink);
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         private static async Task<Either<ActionResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues,

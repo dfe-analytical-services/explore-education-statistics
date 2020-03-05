@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
@@ -29,13 +31,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
-            StatisticsDbContext context)
+            StatisticsDbContext context, ContentDbContext contentDbContext)
         {
             // Avoid potential collisions
             var secs = new Random().Next(1, 5) * 1000;
             Thread.Sleep(secs);
             var release = CreateOrUpdateRelease(message, context);
-            return RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
+            var subject = RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
+            
+            var releaseFileLink = contentDbContext
+                .ReleaseFiles
+                .Include(
+                    f => f.ReleaseFileReference)
+                .First(
+                    f => f.ReleaseId == release.Id 
+                    && f.ReleaseFileReference.Filename == message.DataFileName);
+
+            releaseFileLink.ReleaseFileReference.SubjectId = subject.Id;
+            contentDbContext.Update(releaseFileLink);
+            contentDbContext.SaveChanges();
+            
+            return subject;
         }
 
         private Subject RemoveAndCreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)

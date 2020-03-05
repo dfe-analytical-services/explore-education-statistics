@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public Guid ReleaseId { get; set; }
         
+        public Guid? SubjectId { get; set; }
+        
         public string Filename { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 {
                     Id = table.Column<Guid>(nullable: false),
                     ReleaseId = table.Column<Guid>(nullable: false),
+                    SubjectId = table.Column<Guid>(nullable: true),
                     Filename = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -31,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 {
                     Id = table.Column<Guid>(nullable: false),
                     ReleaseId = table.Column<Guid>(nullable: false),
-                    SubjectId = table.Column<Guid>(nullable: true),
                     ReleaseFileReferenceId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
