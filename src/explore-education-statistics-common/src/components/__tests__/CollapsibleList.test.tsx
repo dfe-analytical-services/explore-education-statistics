@@ -1,6 +1,6 @@
-import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent } from '@testing-library/react';
 import CollapsibleList from '@common/components/CollapsibleList';
+import React from 'react';
 
 describe('CollapsibleList', () => {
   test('renders 5 items with 2 visually hidden', () => {
