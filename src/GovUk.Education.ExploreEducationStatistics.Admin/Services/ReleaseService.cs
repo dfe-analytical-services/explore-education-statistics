@@ -111,6 +111,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async release =>
+                {
+                    release.Id = Guid.NewGuid();
+                    release.Created = DateTime.UtcNow;
+                    release.Status = ReleaseStatus.Draft;
+                    release.Published = null;
+
+                    release.Content = null;
+                    release.ContentBlocks = null;
+
+                    _context.Releases.Add(release);
+                    await _context.SaveChangesAsync();
+                    return await GetReleaseForIdAsync(release.Id);
+                });
+        }
+        
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
             return _persistenceHelper

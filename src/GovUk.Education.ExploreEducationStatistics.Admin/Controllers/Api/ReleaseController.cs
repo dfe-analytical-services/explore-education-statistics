@@ -101,6 +101,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
         
+        [HttpPost("release/{releaseId}/amendment")]
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
+        {
+            return await _releaseService
+                .CreateReleaseAmendmentAsync(releaseId)
+                .HandleFailuresOr(Ok);
+        }
+        
         // GET api/release/{releaseId}/data
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]

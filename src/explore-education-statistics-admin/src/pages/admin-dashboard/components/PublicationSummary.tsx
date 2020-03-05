@@ -5,18 +5,28 @@ import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSumma
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
+import service from '@admin/services/release/create-release/service';
+import withErrorControl, {
+  ErrorControlProps,
+} from '@admin/validation/withErrorControl';
+import Button from '@common/components/Button';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
 import React, { useContext } from 'react';
 import LazyLoad from 'react-lazyload';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 export interface Props {
   publication: AdminDashboardPublication;
 }
 
-const PublicationSummary = ({ publication }: Props) => {
+const PublicationSummary = ({
+  publication,
+  history,
+  handleApiErrors,
+}: Props & RouteComponentProps & ErrorControlProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   return (
     <>
@@ -55,21 +65,43 @@ const PublicationSummary = ({ publication }: Props) => {
                   <ReleaseSummary
                     release={release}
                     actions={
-                      <ButtonLink
-                        to={summaryRoute.generateLink(
-                          publication.id,
-                          release.id,
+                      <>
+                        <ButtonLink
+                          to={summaryRoute.generateLink(
+                            publication.id,
+                            release.id,
+                          )}
+                          testId={formatTestId(
+                            `Edit release link for ${
+                              publication.title
+                            }, ${getReleaseSummaryLabel(release)}`,
+                          )}
+                        >
+                          {release.permissions.canUpdateRelease
+                            ? 'Edit this release'
+                            : 'View this release'}
+                        </ButtonLink>
+
+                        {release.permissions.canUpdateRelease && (
+                          <Button
+                            onClick={() =>
+                              service
+                                .createReleaseAmendment(release.id)
+                                .then(amendment =>
+                                  history.push(
+                                    summaryRoute.generateLink(
+                                      publication.id,
+                                      amendment.id,
+                                    ),
+                                  ),
+                                )
+                                .catch(handleApiErrors)
+                            }
+                          >
+                            Amend this release
+                          </Button>
                         )}
-                        testId={formatTestId(
-                          `Edit release link for ${
-                            publication.title
-                          }, ${getReleaseSummaryLabel(release)}`,
-                        )}
-                      >
-                        {release.permissions.canUpdateRelease
-                          ? 'Edit this release'
-                          : 'View this release'}
-                      </ButtonLink>
+                      </>
                     }
                   />
                 </li>
@@ -107,4 +139,4 @@ const PublicationSummary = ({ publication }: Props) => {
   );
 };
 
-export default PublicationSummary;
+export default withErrorControl(withRouter(PublicationSummary));
