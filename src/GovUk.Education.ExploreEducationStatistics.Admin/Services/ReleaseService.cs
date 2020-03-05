@@ -122,9 +122,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Created = DateTime.UtcNow;
                     release.Status = ReleaseStatus.Draft;
                     release.Published = null;
-
+                    release.Version += 1;
+                    
+                    // TODO - copy Content
                     release.Content = null;
+                    
+                    // TODO - copy Content Blocks
                     release.ContentBlocks = null;
+
+                    // TODO - copy Linked files
+
+                    // TODO - copy stored non-data files
 
                     _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
