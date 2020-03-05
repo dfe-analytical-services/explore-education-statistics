@@ -53,6 +53,8 @@ export interface ChartDataSetAndConfiguration {
   configuration: DataSetConfiguration;
 }
 
+const formId = 'chartDataSelectorForm';
+
 const ChartDataSelector = ({
   metaData,
   onDataRemoved,
@@ -158,12 +160,12 @@ const ChartDataSelector = ({
       }}
       render={form => (
         <>
-          <Form {...form} id="chartDataSelectorForm" showSubmitError>
+          <Form {...form} id={formId} showSubmitError>
             <div className="govuk-grid-row">
               {Object.entries(metaData.filters).map(([filterKey, filter]) => (
                 <div className="govuk-grid-column-one-third" key={filterKey}>
                   <FormFieldSelect
-                    id="filters"
+                    id={`${formId}-filters-${filterKey}`}
                     name={`filters.${filterKey}`}
                     label={filter.legend}
                     className="govuk-!-width-full"
@@ -182,7 +184,7 @@ const ChartDataSelector = ({
               ))}
               <div className="govuk-grid-column-one-third">
                 <FormFieldSelect
-                  id="indicators"
+                  id={`${formId}-indicators`}
                   name="indicator"
                   label="Indicator"
                   className="govuk-!-width-full"
@@ -244,6 +246,7 @@ const ChartDataSelector = ({
                         <ChartDataConfiguration
                           configuration={selected.configuration}
                           capabilities={capabilities}
+                          id={`${formId}-chartDataConfiguration-${index}`}
                           onConfigurationChange={(
                             value: DataSetConfiguration,
                           ) => {

@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 interface Props {
   configuration: DataSetConfiguration;
   capabilities: ChartCapabilities;
-
+  id: string;
   onConfigurationChange?: (value: DataSetConfiguration) => void;
 }
 
@@ -50,6 +50,7 @@ const lineStyleOptions: SelectOption[] = [
 const ChartDataConfiguration = ({
   configuration,
   capabilities,
+  id,
   onConfigurationChange,
 }: Props) => {
   const [config, setConfig] = useState<DataSetConfiguration>(configuration);
@@ -70,7 +71,7 @@ const ChartDataConfiguration = ({
         <div className={styles.chartDataLabelConfiguration}>
           <div className={styles.chartDataItem}>
             <FormTextInput
-              id="label"
+              id={`${id}-label`}
               name="label"
               value={config.label}
               label="Label"
@@ -85,7 +86,7 @@ const ChartDataConfiguration = ({
 
           <div className={styles.chartDataItem}>
             <FormTextInput
-              id="colour"
+              id={`${id}-colour`}
               name="colour"
               label="Colour"
               type="color"
@@ -103,7 +104,7 @@ const ChartDataConfiguration = ({
           {capabilities.dataSymbols && (
             <div className={styles.chartDataItem}>
               <FormSelect
-                id="symbol"
+                id={`${id}-symbol`}
                 name="symbol"
                 label="Symbol"
                 value={configuration.symbol}
@@ -121,7 +122,7 @@ const ChartDataConfiguration = ({
           {capabilities.lineStyle && (
             <div className={styles.chartDataItem}>
               <FormSelect
-                id="lineStyle"
+                id={`${id}-lineStyle`}
                 name="lineStyle"
                 label="Style"
                 value={configuration.lineStyle}
