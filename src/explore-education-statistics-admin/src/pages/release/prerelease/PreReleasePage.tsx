@@ -37,7 +37,11 @@ const PreReleasePage = ({
       .then(preReleaseWindowStatus => {
         if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
           handleManualErrors.forbidden();
-        } else if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+        } else if (
+          ['Before', 'Within', 'After'].includes(
+            preReleaseWindowStatus.preReleaseAccess,
+          )
+        ) {
           releaseContentService
             .getContent(releaseId)
             .then(content => {
@@ -67,7 +71,7 @@ const PreReleasePage = ({
 
   return (
     <>
-      {model && (
+      {model?.content && (
         <Page
           wide
           breadcrumbs={
@@ -77,16 +81,15 @@ const PreReleasePage = ({
           }
           includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
         >
-          {model.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-            model.content && (
-              <PublicationReleaseContent
-                editing={false}
-                content={model.content}
-                styles={{}}
-                onReleaseChange={_ => {}}
-                availableDataBlocks={[]}
-              />
-            )}
+          {model.preReleaseWindowStatus.preReleaseAccess === 'Within' && (
+            <PublicationReleaseContent
+              editing={false}
+              content={model.content}
+              styles={{}}
+              onReleaseChange={_ => {}}
+              availableDataBlocks={[]}
+            />
+          )}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
             <>
@@ -94,7 +97,9 @@ const PreReleasePage = ({
                 Pre Release access is not yet available
               </h1>
               <p className="govuk-body">
-                Pre Release access is not yet available for this release.
+                Pre Release access for the {model.content.release.title} release
+                of {model.content.release.publication.title} is not yet
+                available.
               </p>
               <p className="govuk-body">
                 Pre Release access will be available from{' '}
@@ -119,16 +124,43 @@ const PreReleasePage = ({
                 )}
                 .
               </p>
-              <p className="govuk-body">Please try again later.</p>
+              <p className="govuk-body">
+                If you believe that this release should be available and you are
+                having problems accessing please contact the production team{' '}
+                <a
+                  href={`mailto:${model.content.release.publication.contact.teamEmail}`}
+                >
+                  {model.content.release.publication.contact.teamEmail}
+                </a>
+                .
+              </p>
             </>
           )}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'After' && (
             <>
               <h1 className="govuk-heading-l">Pre Release access has ended</h1>
-              <p className="govuk-body">
-                Pre Release access is no longer available for this release.
-              </p>
+              {model.content.release.published ? (
+                <>
+                  <p className="govuk-body">
+                    The {model.content.release.title} release of{' '}
+                    {model.content.release.publication.title} has now been
+                    published on the Explore Education Statistics service.
+                  </p>
+                  <p className="govuk-body">
+                    View this release{' '}
+                    <a
+                      href={`/find-statistics/${model.content.release.publication.slug}`}
+                    >
+                      /find-statistics/{model.content.release.publication.slug}
+                    </a>
+                  </p>
+                </>
+              ) : (
+                <p className="govuk-body">
+                  Pre Release access is no longer available for this release.
+                </p>
+              )}
             </>
           )}
         </Page>
