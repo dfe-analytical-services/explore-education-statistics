@@ -135,56 +135,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeATopicAPublicationA,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeATopicAPublicationBRelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeATopicAPublicationB,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeATopicBPublicationARelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeATopicBPublicationA,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeATopicBPublicationBRelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeATopicBPublicationB,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeBTopicAPublicationARelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeBTopicAPublicationA,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeBTopicAPublicationBRelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeBTopicAPublicationB,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeBTopicBPublicationARelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeBTopicBPublicationA,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var themeBTopicBPublicationBRelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     Publication = themeBTopicBPublicationB,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 context.AddRange(new List<Theme>
@@ -444,14 +444,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationA.Id,
-                    ReleaseDate = DateTime.UtcNow
+                    Published = DateTime.UtcNow
                 };
 
                 var publicationBRelease = new Release
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationB.Id,
-                    ReleaseDate = DateTime.UtcNow.AddDays(1)
+                    Published = null
                 };
 
                 context.Add(theme);

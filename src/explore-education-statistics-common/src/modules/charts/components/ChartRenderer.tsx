@@ -9,7 +9,7 @@ import Infographic, {
 import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
 import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import { ChartType } from '@common/services/publicationService';
-import dynamic from 'next-server/dynamic';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import { MapProps } from '@common/modules/charts/components/MapBlock';
 

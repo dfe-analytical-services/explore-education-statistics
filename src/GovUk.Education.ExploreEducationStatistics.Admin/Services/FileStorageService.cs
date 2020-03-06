@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     IEnumerable<Models.FileInfo> files = blobContainer
                         .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                        .Where(blob => !IsBatchedFile(blob, releaseId))
+                        .Where(blob => !IsBatchedDataFile(blob, releaseId))
                         .OfType<CloudBlockBlob>()
                         .Select(file => new Models.FileInfo
                         {
@@ -371,11 +371,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static string GetUserName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
-        }
-
-        private static bool IsBatchedFile(IListBlobItem blobItem, Guid releaseId)
-        {
-            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
         }
 
         private static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)

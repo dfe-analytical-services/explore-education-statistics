@@ -8,3 +8,11 @@
     display: none;
   }
 }
+
+.printContainer {
+  display: none;
+}
+
+:global(.js-enabled) .printContainer {
+  display: block;
+}

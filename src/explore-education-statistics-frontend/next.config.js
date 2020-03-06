@@ -155,18 +155,6 @@ const nextConfig = {
       }
     }
 
-    const originalEntry = config.entry;
-
-    config.entry = async () => {
-      const entries = await originalEntry();
-
-      if (entries['main.js'] && !entries['main.js'].includes('./polyfill.js')) {
-        entries['main.js'].unshift('./polyfill.js');
-      }
-
-      return entries;
-    };
-
     config.plugins.push(
       new DotEnvPlugin({
         path: envFilePath,
@@ -190,11 +178,6 @@ const nextConfig = {
       ...config.node,
       Buffer: false,
     };
-
-    options.defaultLoaders.babel.options.configFile = path.resolve(
-      __dirname,
-      'babel.config.js',
-    );
 
     return config;
   },

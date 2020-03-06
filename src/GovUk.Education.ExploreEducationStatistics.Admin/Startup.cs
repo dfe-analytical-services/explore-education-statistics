@@ -420,13 +420,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
