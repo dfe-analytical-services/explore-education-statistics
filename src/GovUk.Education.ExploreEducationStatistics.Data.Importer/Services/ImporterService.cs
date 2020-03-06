@@ -143,8 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             using (var transaction = context.Database.BeginTransaction())
             {
-                context.BulkInsert(observations);
-
+                context.BulkInsert(observations, new BulkConfig
+                {
+                    BulkCopyTimeout = 600
+                });
+                
                 foreach (var o in observations)
                 {
                     foreach (var item in o.FilterItems)
@@ -157,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 }
                 context.BulkInsert(subEntities, new BulkConfig
                 {
-                    BulkCopyTimeout = 0
+                    BulkCopyTimeout = 600
                 });
                     
                 transaction.Commit();

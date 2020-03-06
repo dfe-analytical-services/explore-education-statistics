@@ -17,16 +17,38 @@ interface Props {
   reviewing?: boolean;
   resolveComments?: boolean;
   content: string;
+  toolbarConfig?: string[];
   useMarkdown?: boolean;
   onContentChange?: (content: string) => Promise<unknown>;
   onDelete?: () => void;
 }
+
+export const toolbarConfigs = {
+  full: [
+    'heading',
+    '|',
+    'bold',
+    'italic',
+    'link',
+    '|',
+    'bulletedList',
+    'numberedList',
+    '|',
+    'blockQuote',
+    'insertTable',
+    '|',
+    'redo',
+    'undo',
+  ],
+  reduced: ['bold', 'link', '|', 'bulletedList'],
+};
 
 const WysiwygEditor = ({
   editable,
   canDelete = false,
   content,
   onContentChange,
+  toolbarConfig,
   onDelete,
   useMarkdown = false,
 }: Props) => {
@@ -128,22 +150,7 @@ const WysiwygEditor = ({
           <CKEditor
             editor={ClassicEditor}
             config={{
-              toolbar: [
-                'heading',
-                '|',
-                'bold',
-                'italic',
-                'link',
-                '|',
-                'bulletedList',
-                'numberedList',
-                '|',
-                'blockQuote',
-                'insertTable',
-                '|',
-                'redo',
-                'undo',
-              ],
+              toolbar: toolbarConfig || toolbarConfigs.full,
             }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {

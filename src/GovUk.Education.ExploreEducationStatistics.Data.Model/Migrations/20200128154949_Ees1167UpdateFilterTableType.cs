@@ -1,13 +1,13 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class Ees1167UpdateFilterTableType : Migration
     {
-        private const string MigrationsPath = "Migrations";
         private const string MigrationId = "20200128154949";
-        const string PreviousVersionMigrationId = "20200103101609";
+        private const string PreviousVersionMigrationId = "20200103101609";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

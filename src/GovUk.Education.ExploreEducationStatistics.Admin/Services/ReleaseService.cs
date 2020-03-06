@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -87,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var release = _mapper.Map<Release>(createRelease);
                     
+                    release.Id = Guid.NewGuid();
                     release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
                     release.SummarySection = new ContentSection
                     {
@@ -101,10 +106,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.HeadlinesSection = new ContentSection{
                         Type = ContentSectionType.Headlines
                     };
+                    release.Created = DateTime.UtcNow;
+                    release.CreatedById = _userService.GetUserId();
+                    release.OriginalId = release.Id;
                     
-                    var saved =_context.Releases.Add(release);
+                    _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(saved.Entity.Id);
+                    return await GetReleaseForIdAsync(release.Id);
                 });
         }
 
@@ -254,15 +262,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var dependentDataBlocks = GetDependentDataBlocks(releaseId, subject.Id);
-
-                    var orphanFootnotes = await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
+                    var dependentDataBlocks = subject == null ? new List<DataBlock>() : GetDependentDataBlocks(releaseId, subject.Id);
+                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseId,
                         
-                        SubjectId = subject.Id,
+                        SubjectId = subject?.Id ?? Guid.Empty,
                         
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName, 0,0, null),
                         

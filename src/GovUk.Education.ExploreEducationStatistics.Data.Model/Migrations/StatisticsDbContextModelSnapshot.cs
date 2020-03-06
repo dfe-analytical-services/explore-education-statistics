@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ReleaseDate")
+                    b.Property<DateTime?>("Published")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Slug")

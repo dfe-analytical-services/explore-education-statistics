@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
-import ViewDataBlocks from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
+import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -305,7 +305,7 @@ const ReleaseManageDataBlocksPage = ({
             </TabsSection>
             {!isLoading && dataBlockData && (
               <TabsSection title="Configure content">
-                <ViewDataBlocks
+                <DataBlockContentTabs
                   {...dataBlockData}
                   onDataBlockSave={onDataBlockSave}
                 />

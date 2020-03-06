@@ -71,7 +71,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 release = new Release
                 {
                     Id = message.Release.Id,
-                    ReleaseDate = message.Release.ReleaseDate,
                     Slug = message.Release.Slug,
                     Publication = CreateOrUpdatePublication(message, context),
                     TimeIdentifier = message.Release.TimeIdentifier,
