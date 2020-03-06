@@ -7,7 +7,7 @@ export const configurationService = {
   },
   getPublicBaseUrl(): Promise<string> {
     return client.get<string>('/configuration/public-app-url');
-  }
+  },
 };
 
 const initApplicationInsights = async () => {
