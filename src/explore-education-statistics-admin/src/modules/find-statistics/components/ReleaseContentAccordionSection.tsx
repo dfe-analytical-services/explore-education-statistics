@@ -85,8 +85,8 @@ const ReleaseContentAccordionSection = ({
           updateSectionBlockOrder(
             dispatch,
             release.id,
-            release.headlinesSection.id,
-            'headlinesSection',
+            sectionId,
+            'content',
             order,
             handleApiErrors,
           );
@@ -95,9 +95,9 @@ const ReleaseContentAccordionSection = ({
           updateContentSectionBlock(
             dispatch,
             release.id,
-            release.headlinesSection.id,
+            sectionId,
             blockId,
-            'headlinesSection',
+            'content',
             bodyContent,
             handleApiErrors,
           )
@@ -106,9 +106,9 @@ const ReleaseContentAccordionSection = ({
           deleteContentSectionBlock(
             dispatch,
             release.id,
-            release.headlinesSection.id,
+            sectionId,
             blockId,
-            'headlinesSection',
+            'content',
             handleApiErrors,
           )
         }

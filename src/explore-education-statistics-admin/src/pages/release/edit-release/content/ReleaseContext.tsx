@@ -60,6 +60,7 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
           draft.release[sectionKey] = draft.release[sectionKey].map(section => {
             if (section.id === sectionId) {
               return {
+                ...section,
                 content: section.content?.filter(
                   contentBlock => (contentBlock.id as string) !== blockId,
                 ),
@@ -90,6 +91,7 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
           draft.release[sectionKey] = draft.release[sectionKey].map(section => {
             if (section.id === sectionId) {
               return {
+                ...section,
                 content: section.content?.map(contentBlock => {
                   if ((contentBlock.id as string) === blockId) {
                     return block;
@@ -127,7 +129,13 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
           draft.release[sectionKey] = draft.release[sectionKey].map(section => {
             if (section.id === sectionId) {
               return {
-                content: section.content?.push(block),
+                ...section,
+                content: section.content
+                  ? [
+                      ...section.content,
+                      { ...block, comments: block.comments || [] },
+                    ]
+                  : [{ ...block, comments: block.comments || [] }],
               } as ContentSection<EditableContentBlock>;
             }
             return section;
