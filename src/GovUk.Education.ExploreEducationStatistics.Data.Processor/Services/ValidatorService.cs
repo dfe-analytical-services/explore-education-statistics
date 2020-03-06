@@ -4,10 +4,8 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 
@@ -36,15 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         [EnumLabelValue("Datafile has invalid number of columns")]
         DataFileHasInvalidNumberOfColumns,
 
-        [EnumLabelValue("Datafile has invalid geographic level")]
-        DataFileHasInvalidGeographicLevel,
-
-        [EnumLabelValue("Datafile has invalid time identifier")]
-        DataFileHasInvalidTimeIdentifier,
-
-        [EnumLabelValue("Datafile has invalid time period")]
-        DataFileHasInvalidTimePeriod,
-        
         [EnumLabelValue("Datafile is missing expected column")]
         DataFileMissingExpectedColumn
     }
@@ -57,20 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "time_period",
             "geographic_level"
         };
-        
-        private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.Institution,
-            GeographicLevel.Provider,
-            GeographicLevel.School
-        };
-        
+
         public Tuple<List<string>, int, int> ValidateAndCountRows(SubjectData subjectData)
         {
             var errors = new List<string>();
 
-            var metaHeaders = subjectData.GetMetaLines().First();
-            ValidateMetaHeader(metaHeaders, errors);
+            ValidateMetaHeader(subjectData.GetMetaLines().First(), errors);
 
             // If the meta header not ok then stop error checks
             if (errors.Count != 0)
@@ -79,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
+            
             var headers = subjectData.GetCsvLines().First().Split(',').ToList();
             ValidateObservationHeaders(headers, errors);
             
@@ -147,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return new Tuple<int, int>(totalRows, filteredRows);
         }
         
-        private static void ValidateObservationHeaders(List<string> headers, List<string> errors)
+        private static void ValidateObservationHeaders(ICollection<string> headers, List<string> errors)
         {
             foreach (var mandatoryCol in MandatoryObservationColumns)
             {
@@ -218,20 +200,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetYear(line, headers);
                     valid = true;
                 }
-                catch (InvalidGeographicLevelException)
+                catch (Exception e)
                 {
-                    errors.Add($"error at row {rowNumber}: " +
-                               ValidationErrorMessages.DataFileHasInvalidGeographicLevel.GetEnumLabel());
-                }
-                catch (InvalidTimeIdentifierException)
-                {
-                    errors.Add($"error at row {rowNumber}: " +
-                               ValidationErrorMessages.DataFileHasInvalidTimeIdentifier.GetEnumLabel());
-                }
-                catch (InvalidTimePeriod)
-                {
-                    errors.Add($"error at row {rowNumber}: " +
-                               ValidationErrorMessages.DataFileHasInvalidTimePeriod.GetEnumLabel());
+                    errors.Add($"error at row {rowNumber}: {e.Message}");
                 }
             }
 
@@ -250,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
             var geographicLevel = ImporterService.GetGeographicLevel(line, headers);
-            return IgnoredGeographicLevels.Contains(geographicLevel);
+            return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
         }
     }
 }

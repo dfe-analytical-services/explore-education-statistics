@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                 try
                 {
-                    message.RowsPerBatch = GetBatchSettings(LoadAppSettings(context)).RowsPerBatch;
+                    message.RowsPerBatch = Convert.ToInt32(LoadAppSettings(context).GetValue<string>("RowsPerBatch"));
                     message.TotalRows = filteredObservationCount;
                     message.NumBatches = FileStorageUtils.GetNumBatches(totalObservationCount, message.RowsPerBatch);
 
@@ -187,15 +187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 .AddJsonFile("local.settings.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
-        }
-
-        private static BatchSettings GetBatchSettings(IConfigurationRoot config)
-        {
-            return new BatchSettings
-            {
-                RowsPerBatch =
-                    Convert.ToInt32(config.GetValue<string>("RowsPerBatch"))
-            };
         }
 
         private static Exception GetInnerException(Exception ex)

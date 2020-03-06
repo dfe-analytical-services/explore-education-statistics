@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 }
             };
                 
-        private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
+        public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
             GeographicLevel.Institution,
             GeographicLevel.Provider,
@@ -187,6 +187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public static int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             var tp = CsvUtil.Value(line, headers, "time_period");
+            if (tp == null)
+            {
+                throw new InvalidTimePeriodException(null); 
+            }
             return int.Parse(tp.Substring(0, 4));
         }
 
