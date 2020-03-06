@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {

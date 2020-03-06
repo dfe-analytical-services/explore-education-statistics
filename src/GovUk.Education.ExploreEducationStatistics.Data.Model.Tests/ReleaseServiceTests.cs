@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationA.Id,
-                    ReleaseDate = DateTime.UtcNow,
+                    Published = DateTime.UtcNow,
                     Slug = "publication-a-release-1",
                     TimeIdentifier = AcademicYearQ1,
                     Year = 2018
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationA.Id,
-                    ReleaseDate = DateTime.UtcNow,
+                    Published = DateTime.UtcNow,
                     Slug = "publication-a-release-2",
                     TimeIdentifier = AcademicYearQ4,
                     Year = 2017
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationA.Id,
-                    ReleaseDate = DateTime.UtcNow.AddDays(1),
+                    Published = null,
                     Slug = "publication-a-release-3",
                     TimeIdentifier = AcademicYearQ2,
                     Year = 2018
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = publicationB.Id,
-                    ReleaseDate = DateTime.UtcNow,
+                    Published = DateTime.UtcNow,
                     Slug = "publication-b-release-1",
                     TimeIdentifier = AcademicYearQ1,
                     Year = 2018

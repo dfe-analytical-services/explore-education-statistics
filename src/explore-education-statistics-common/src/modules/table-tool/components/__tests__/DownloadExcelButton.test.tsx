@@ -1,6 +1,7 @@
 import {
   appendColumnWidths,
   appendFootnotes,
+  appendTitle,
 } from '@common/modules/table-tool/components/DownloadExcelButton';
 import { utils } from 'xlsx';
 
@@ -31,6 +32,45 @@ describe('DownloadExcelButton', () => {
     });
   });
 
+  describe('appendTitle', () => {
+    test('adds title to start of sheet', () => {
+      const sheet = utils.aoa_to_sheet([
+        ['test', 'test', 'test'],
+        ['test', 'test', 'test'],
+        ['test', 'test', 'test'],
+      ]);
+
+      expect(sheet['!ref']).toBe('A1:C3');
+
+      appendTitle(sheet, 'Test title');
+
+      expect(sheet['!ref']).toBe('A1:C5');
+
+      expect(sheet.A1.v).toBe('Test title');
+      expect(sheet.A2.v).toBe('');
+      expect(sheet.A3.v).toBe('test');
+    });
+
+    test('preserves empty existing cells', () => {
+      const sheet = utils.aoa_to_sheet([
+        ['', '', 'test'],
+        ['test', 'test', 'test'],
+        ['test', 'test', 'test'],
+      ]);
+
+      expect(sheet['!ref']).toBe('A1:C3');
+
+      appendTitle(sheet, 'Test title');
+
+      expect(sheet['!ref']).toBe('A1:C5');
+
+      expect(sheet.A1.v).toBe('Test title');
+      expect(sheet.A2.v).toBe('');
+      expect(sheet.A3.v).toBe('');
+      expect(sheet.B3.v).toBe('');
+    });
+  });
+
   describe('appendFootnotes', () => {
     test('adds single footnote to end of sheet', () => {
       const sheet = utils.aoa_to_sheet([
@@ -38,6 +78,8 @@ describe('DownloadExcelButton', () => {
         ['test', 'test', 'test'],
         ['test', 'test', 'test'],
       ]);
+
+      expect(sheet['!ref']).toBe('A1:C3');
 
       appendFootnotes(sheet, [
         {
@@ -59,6 +101,8 @@ describe('DownloadExcelButton', () => {
         ['test', 'test', 'test'],
         ['test', 'test', 'test'],
       ]);
+
+      expect(sheet['!ref']).toBe('A1:C3');
 
       appendFootnotes(sheet, [
         {

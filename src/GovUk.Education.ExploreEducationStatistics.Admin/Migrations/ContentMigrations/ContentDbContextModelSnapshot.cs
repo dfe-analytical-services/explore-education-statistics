@@ -1735,11 +1735,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OriginalId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
@@ -1771,11 +1780,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("TypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("PublicationId");
 
                     b.HasIndex("TypeId");
+
+                    b.HasIndex("OriginalId", "Version");
 
                     b.ToTable("Releases");
 
@@ -1783,19 +1799,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            Created = new DateTime(2017, 8, 1, 23, 59, 54, 0, DateTimeKind.Utc),
+                            CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
+                            OriginalId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
                             Slug = "2016-17",
                             Status = "Draft",
                             TimePeriodCoverage = "AY",
-                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                            Version = 0
                         },
                         new
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            Created = new DateTime(2017, 8, 1, 11, 13, 22, 0, DateTimeKind.Utc),
+                            CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"7\",\"Day\":\"19\"}",
+                            OriginalId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RelatedInformation = "[{\"Id\":\"f3c67bc9-6132-496e-a848-c39dfcd16f49\",\"Description\":\"Additional guidance\",\"Url\":\"http://example.com\"},{\"Id\":\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\",\"Description\":\"Statistics guide\",\"Url\":\"http://example.com\"}]",
@@ -1803,19 +1826,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Slug = "2016-17",
                             Status = "Draft",
                             TimePeriodCoverage = "AY",
-                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                            Version = 0
                         },
                         new
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            Created = new DateTime(2019, 8, 1, 9, 30, 33, 0, DateTimeKind.Utc),
+                            CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"6\",\"Day\":\"14\"}",
+                            OriginalId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
                             Slug = "2018",
                             Status = "Draft",
                             TimePeriodCoverage = "AY",
-                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                            Version = 0
                         });
                 });
 
@@ -3953,6 +3981,18 @@ Find out how and why these statistics are collected and published - [Secondary a
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Original")
+                        .WithMany()
+                        .HasForeignKey("OriginalId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
