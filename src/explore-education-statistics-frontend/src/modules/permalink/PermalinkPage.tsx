@@ -39,6 +39,7 @@ class PermalinkPage extends Component<Props> {
       <Page
         title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
         caption="Permanent data table"
+        wide
         breadcrumbs={[
           { name: 'Data tables', link: '/data-tables' },
           { name: 'Permanent link', link: '/data-tables' },
