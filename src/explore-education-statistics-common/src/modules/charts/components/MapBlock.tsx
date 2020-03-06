@@ -1,6 +1,7 @@
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
   ChartDefinition,
   ChartMetaData,
@@ -11,6 +12,7 @@ import {
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
 } from '@common/modules/charts/util/chartUtils';
+import stylesIndicators from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 
 import {
   DataBlockData,
@@ -30,8 +32,6 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import stylesIndicators from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
-import styles from '@common/modules/charts/components/MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;
@@ -296,7 +296,6 @@ const MapBlock = ({
   height,
   labels,
   axes,
-  children,
 }: MapProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
@@ -699,7 +698,6 @@ const MapBlock = ({
           </div>
         </>
       )}
-      {children}
     </>
   );
 };

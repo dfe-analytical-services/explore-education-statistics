@@ -14,7 +14,6 @@ import {
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import { ReactNode } from 'react';
 
 export interface ChartMetaData {
   filters: PublicationSubjectMeta['filters'];
@@ -30,7 +29,6 @@ export interface AbstractChartProps {
   title?: string;
   height?: number;
   width?: number;
-  children?: ReactNode[];
 }
 
 export interface ChartProps extends AbstractChartProps {
