@@ -1,14 +1,17 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import client from '@admin/services/util/service';
 
-const service = {
+export const configurationService = {
   getInsightsKey(): Promise<string> {
     return client.get<string>('/configuration/application-insights');
   },
+  getPublicBaseUrl(): Promise<string> {
+    return client.get<string>('/configuration/public-app-url');
+  }
 };
 
 const initApplicationInsights = async () => {
-  const key = await service.getInsightsKey();
+  const key = await configurationService.getInsightsKey();
   if (key) {
     const appInsights = new ApplicationInsights({
       config: {

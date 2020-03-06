@@ -10,10 +10,12 @@ import withErrorControl, {
 import { format } from 'date-fns';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import { configurationService } from '@admin/services/configurationService';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   content?: ManageContentPageViewModel;
+  publicBaseUrl?: string;
 }
 
 interface MatchProps {
@@ -42,9 +44,11 @@ const PreReleasePage = ({
             preReleaseWindowStatus.preReleaseAccess,
           )
         ) {
-          releaseContentService
-            .getContent(releaseId)
-            .then(content => {
+          Promise.all([
+            releaseContentService.getContent(releaseId),
+            configurationService.getPublicBaseUrl(),
+          ])
+            .then(([content, publicBaseUrl]) => {
               const newContent = {
                 ...content,
                 release: {
@@ -56,6 +60,7 @@ const PreReleasePage = ({
               setModel({
                 preReleaseWindowStatus,
                 content: newContent,
+                publicBaseUrl,
               });
             })
             .catch(handleApiErrors);
@@ -143,16 +148,17 @@ const PreReleasePage = ({
               {model.content.release.published ? (
                 <>
                   <p className="govuk-body">
-                    The {model.content.release.title} release of{' '}
+                    The {model.content.release.title.toLowerCase()} release of{' '}
                     {model.content.release.publication.title} has now been
                     published on the Explore Education Statistics service.
                   </p>
                   <p className="govuk-body">
                     View this release{' '}
                     <a
-                      href={`/find-statistics/${model.content.release.publication.slug}`}
+                      href={`${model.publicBaseUrl}find-statistics/${model.content.release.publication.slug}`}
                     >
-                      /find-statistics/{model.content.release.publication.slug}
+                      {model.publicBaseUrl}find-statistics/
+                      {model.content.release.publication.slug}
                     </a>
                   </p>
                 </>
