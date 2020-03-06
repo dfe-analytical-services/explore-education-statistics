@@ -331,6 +331,7 @@ export async function updateContentSectionHeading(
       sectionId,
       title,
     );
+    console.log(section);
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',
       payload: {

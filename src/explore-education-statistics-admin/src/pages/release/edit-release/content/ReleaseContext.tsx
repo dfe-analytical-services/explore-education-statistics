@@ -185,12 +185,14 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
         const { section, meta } = action.payload;
         const { sectionId } = meta;
         if (draft.release)
-          draft.release.content.map(accordionSection => {
-            if (accordionSection.id === sectionId) {
-              return section;
-            }
-            return accordionSection;
-          });
+          draft.release.content = draft.release.content.map(
+            accordionSection => {
+              if (accordionSection.id === sectionId) {
+                return section;
+              }
+              return accordionSection;
+            },
+          );
       });
     }
     default: {

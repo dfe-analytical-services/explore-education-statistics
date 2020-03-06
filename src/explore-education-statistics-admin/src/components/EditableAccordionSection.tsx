@@ -42,23 +42,20 @@ const EditableAccordionSection = ({
   const [isOpen, setIsOpen] = useState(open);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [previousOpen, setPreviousOpen] = useState(open);
-  const [currentHeading, setCurrentHeading] = useState(heading);
   const [isEditingHeading, setIsEditingHeading] = useState(false);
+
+  const [newHeading, setNewHeading] = useState(heading);
+
   if (open !== previousOpen) {
     setPreviousOpen(open);
     setIsOpen(open);
   }
 
-  const editHeading = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-
-    if (isEditingHeading && onHeadingChange && currentHeading !== heading) {
-      onHeadingChange(currentHeading).then(() => {
-        setIsEditingHeading(false);
-      });
-    } else {
-      setIsEditingHeading(!isEditingHeading);
+  const saveHeading = () => {
+    if (isEditingHeading && onHeadingChange && newHeading !== heading) {
+      onHeadingChange(newHeading);
     }
+    setIsEditingHeading(false);
   };
 
   return (
@@ -96,19 +93,19 @@ const EditableAccordionSection = ({
                 id="heading"
                 name="heading"
                 label="Edit Heading"
-                defaultValue={currentHeading}
+                defaultValue={newHeading}
                 onChange={e => {
-                  setCurrentHeading(e.target.value);
+                  setNewHeading(e.target.value);
                 }}
                 onClick={e => {
                   e.stopPropagation();
                 }}
                 onKeyPress={e => {
-                  if (e.key === 'Enter') editHeading(e);
+                  if (e.key === 'Enter') saveHeading();
                 }}
               />
             ) : (
-              currentHeading
+              heading
             )}
           </span>,
           canToggle && <span className="govuk-accordion__icon" />,
@@ -123,18 +120,30 @@ const EditableAccordionSection = ({
         id={contentId}
       >
         <div>
-          {onHeadingChange && (
+          {onHeadingChange && isEditingHeading ? (
             <a
               role="button"
               tabIndex={0}
-              onClick={editHeading}
+              onClick={saveHeading}
               onKeyPress={e => {
-                if (e.charCode === 13) editHeading(e);
+                if (e.charCode === 13) saveHeading();
+              }}
+              className="govuk-button govuk-!-margin-right-2"
+            >
+              Save title
+            </a>
+          ) : (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={() => setIsEditingHeading(!isEditingHeading)}
+              onKeyPress={e => {
+                if (e.charCode === 13) setIsEditingHeading(!isEditingHeading);
               }}
               className={`govuk-button ${!isEditingHeading &&
                 'govuk-button--secondary'} govuk-!-margin-right-2`}
             >
-              {isEditingHeading ? 'Save' : 'Edit'} title
+              Edit title
             </a>
           )}
           {headerButtons}
