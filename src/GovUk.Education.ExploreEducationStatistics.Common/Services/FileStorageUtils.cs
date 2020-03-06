@@ -204,6 +204,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
         
+        public static int GetNumBatches(int rows, int rowsPerBatch)
+        {
+            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
+        }
+        
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
