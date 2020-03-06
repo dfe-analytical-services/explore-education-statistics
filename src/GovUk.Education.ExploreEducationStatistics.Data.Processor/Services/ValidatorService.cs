@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -57,7 +58,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "geographic_level"
         };
         
-        public List<string> Validate(ImportMessage message, SubjectData subjectData)
+        private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
+        {
+            GeographicLevel.Institution,
+            GeographicLevel.Provider,
+            GeographicLevel.School
+        };
+        
+        public Tuple<List<string>, int, int> ValidateAndCountRows(SubjectData subjectData)
         {
             var errors = new List<string>();
 
@@ -67,19 +75,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // If the meta header not ok then stop error checks
             if (errors.Count != 0)
             {
-                return errors;
+                return new Tuple<List<string>, int, int>(errors, 0, 0);
             }
 
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
             var headers = subjectData.GetCsvLines().First().Split(',').ToList();
             ValidateObservationHeaders(headers, errors);
+            
             if (errors.Count != 0)
             {
-                return errors;
+                return new Tuple<List<string>, int, int>(errors, 0, 0);
             }
-            ValidateObservations(headers, subjectData.GetCsvLines(), errors);
+            var (totalRows, filteredRows) = ValidateAndCountObservations(headers, subjectData.GetCsvLines(), errors);
 
-            return errors;
+            return new Tuple<List<string>, int, int>(errors, totalRows, filteredRows);;
         }
 
         private static void ValidateMetaHeader(string header, List<string> errors)
@@ -113,9 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static void ValidateObservations(List<string> headers, IEnumerable<string> lines, List<string> errors)
+        private static Tuple<int, int> ValidateAndCountObservations(List<string> headers, IEnumerable<string> lines, List<string> errors)
         {
             var idx = 2;
+            var filteredRows = 0;
+            var totalRows  = 0;
+            
             foreach (var line in lines.Skip(1))
             {
                 if (errors.Count == 100)
@@ -123,8 +135,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     errors.Add("Only first 100 errors are returned");
                     break;
                 }
-                ValidateObservationRow(line, idx++, headers, errors);
+
+                if (ValidateObservationRow(line, idx++, headers, errors) && !IsGeographicLevelIgnored(line.Split(','), headers))
+                {
+                    filteredRows++;
+                }
+
+                totalRows++;
             }
+
+            return new Tuple<int, int>(totalRows, filteredRows);
         }
         
         private static void ValidateObservationHeaders(List<string> headers, List<string> errors)
@@ -173,8 +193,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static void ValidateObservationRow(string row, int rowNumber, List<string> headers, List<string> errors)
+        private static bool ValidateObservationRow(string row, int rowNumber, List<string> headers, List<string> errors)
         {
+            var valid = false;
             if (RowContainsQuotes(row))
             {
                 // No further checks if quotes exist
@@ -195,6 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetGeographicLevel(line, headers);
                     ImporterService.GetTimeIdentifier(line, headers);
                     ImporterService.GetYear(line, headers);
+                    valid = true;
                 }
                 catch (InvalidGeographicLevelException)
                 {
@@ -212,6 +234,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                ValidationErrorMessages.DataFileHasInvalidTimePeriod.GetEnumLabel());
                 }
             }
+
+            return valid;
         }
 
         private static bool RowContainsQuotes(string row)
@@ -222,6 +246,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static bool HasUnexpectedNumberOfColumns(string row, int numExpectedColumns)
         {
             return row.Split(',').Length != numExpectedColumns;
+        }
+        private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
+        {
+            var geographicLevel = ImporterService.GetGeographicLevel(line, headers);
+            return IgnoredGeographicLevels.Contains(geographicLevel);
         }
     }
 }

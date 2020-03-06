@@ -64,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
             var batchCount = 1;
             var numRows = enumerable.Count();
-            var numBatches = GetNumBatches(numRows, message.RowsPerBatch);
             var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
@@ -108,8 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     OrigDataFileName = message.DataFileName,
                     Release = message.Release,
                     BatchNo = batchCount,
-                    NumBatches = numBatches,
-                    RowsPerBatch = message.RowsPerBatch
+                    NumBatches = message.NumBatches,
+                    RowsPerBatch = message.RowsPerBatch,
+                    TotalRows = message.TotalRows
                 };
 
                 messages.Add(iMessage);
@@ -123,12 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 collector.Add(m);
             }
         }
-
-        private static int GetNumBatches(int rows, int rowsPerBatch)
-        {
-            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
-        }
-
+        
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
             var geographicLevel = GetGeographicLevel(line, headers);

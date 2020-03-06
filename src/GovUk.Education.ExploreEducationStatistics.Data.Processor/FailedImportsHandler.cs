@@ -27,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             pendingQueue.CreateIfNotExists();
             table.CreateIfNotExists();
             availableQueue.Clear();
-            // TODO See EES-1425
             pendingQueue.Clear();
 
             TableContinuationToken token = null;
@@ -107,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 Release = message.Release,
                 BatchNo = batchNo,
                 NumBatches = message.NumBatches,
-                RowsPerBatch = message.RowsPerBatch
+                RowsPerBatch = message.RowsPerBatch,
+                TotalRows = message.TotalRows
             };
 
             return JsonConvert.SerializeObject(iMessage);

@@ -86,8 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
-                RowsPerBatch = 4000,
-                NumBatches = FileStorageUtils.GetNumBatches(rows, 5000),
                 Seeding = true
             };
 

@@ -26,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
         private readonly CloudTable _table;
-        private readonly int _rowsPerBatch;
 
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
@@ -39,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
             _table = tableStorageService.GetTableAsync("imports").Result;
-            _rowsPerBatch = Convert.ToInt32(config.GetValue<string>("RowsPerBatch"));
         }
 
         public async void Import(string dataFileName, Guid releaseId, IFormFile dataFile)
@@ -89,8 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
-                RowsPerBatch = _rowsPerBatch,
-                NumBatches = FileStorageUtils.GetNumBatches(numRows, _rowsPerBatch),
+                NumBatches = 1,
                 BatchNo = 1
             };
         }
