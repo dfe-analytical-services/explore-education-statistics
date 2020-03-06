@@ -141,15 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             lines.RemoveAt(0);
             
             var observations = GetObservations(context, lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
-            
-            if (InsertObservations(context, observations).Equals(observations.Count))
-            {
-                _logger.LogDebug($"{observations.Count()} observations added successfully for {subject.Name}");
-            }
-            else
-            {
-                _logger.LogError($"problem adding observations for {subject.Name}");
-            }
+
+            InsertObservations(context, observations);
         }
         
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -395,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new Ward(values[0], values[1]));
         }
 
-        private static int InsertObservations(DbContext context, IEnumerable<Observation> observations)
+        private static void InsertObservations(DbContext context, IEnumerable<Observation> observations)
         {
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("Id", typeof(Guid));
@@ -442,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Value = observationsTable, TypeName = "[dbo].[ObservationType]"
             };
 
-            var rows = context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservations] @Observations", parameter);
+            context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservations] @Observations", parameter);
             
             parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
             {
@@ -450,7 +443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
 
             context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
-            return rows;
         }
     }
 }
