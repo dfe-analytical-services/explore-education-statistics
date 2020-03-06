@@ -43,59 +43,57 @@ const ReleaseContentAccordion = ({
   );
 
   return (
-    <>
-      <Accordion
-        id={accordionId}
-        canReorder
-        sectionName={sectionName}
-        onSaveOrder={async order => {
-          updateContentSectionsOrder(
-            dispatch,
-            release.id,
-            order,
-            handleApiErrors,
-          );
-        }}
-        onAddSection={() =>
-          addContentSection(
-            dispatch,
-            release.id,
-            release.content.length,
-            handleApiErrors,
-          )
-        }
-      >
-        {content.map((contentItem, index) => (
-          <ReleaseContentAccordionSection
-            release={release}
-            id={contentItem.id as string}
-            key={contentItem.order}
-            contentItem={contentItem}
-            index={index}
-            onHeadingChange={title =>
-              updateContentSectionHeading(
-                dispatch,
-                release.id,
-                contentItem.id,
-                title,
-                handleApiErrors,
-              )
-            }
-            onContentChange={newContent =>
-              updateContentSection(index, newContent)
-            }
-            onRemoveSection={() =>
-              removeContentSection(
-                dispatch,
-                release.id,
-                contentItem.id,
-                handleApiErrors,
-              )
-            }
-          />
-        ))}
-      </Accordion>
-    </>
+    <Accordion
+      id={accordionId}
+      canReorder
+      sectionName={sectionName}
+      onSaveOrder={async order => {
+        updateContentSectionsOrder(
+          dispatch,
+          release.id,
+          order,
+          handleApiErrors,
+        );
+      }}
+      onAddSection={() =>
+        addContentSection(
+          dispatch,
+          release.id,
+          release.content.length,
+          handleApiErrors,
+        )
+      }
+    >
+      {content.map((contentItem, index) => (
+        <ReleaseContentAccordionSection
+          release={release}
+          id={contentItem.id}
+          key={contentItem.id}
+          contentItem={contentItem}
+          index={index}
+          onHeadingChange={title =>
+            updateContentSectionHeading(
+              dispatch,
+              release.id,
+              contentItem.id,
+              title,
+              handleApiErrors,
+            )
+          }
+          onContentChange={newContent =>
+            updateContentSection(index, newContent)
+          }
+          onRemoveSection={() =>
+            removeContentSection(
+              dispatch,
+              release.id,
+              contentItem.id,
+              handleApiErrors,
+            )
+          }
+        />
+      ))}
+    </Accordion>
   );
 };
 

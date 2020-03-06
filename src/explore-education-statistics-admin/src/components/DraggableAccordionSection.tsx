@@ -20,13 +20,17 @@ const DraggableAccordionSection = ({
 }: DraggableAccordionSectionProps) => {
   if (isReordering) {
     return (
-      <Draggable draggableId={id} type="section" index={index}>
+      <Draggable draggableId={id} index={index}>
         {draggableProvided => (
           <div
             {...draggableProvided.draggableProps}
             ref={draggableProvided.innerRef}
             className={styles.dragContainer}
           >
+            <span
+              {...draggableProvided.dragHandleProps}
+              className={styles.dragHandle}
+            />
             {cloneElement<EditableAccordionSectionProps>(section, {
               index,
               open: false,

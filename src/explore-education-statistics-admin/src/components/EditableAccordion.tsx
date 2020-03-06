@@ -25,22 +25,20 @@ interface ChildSection {
 }
 
 const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
-  React.Children.map(children, (child, thisIndex) => {
-    if (child) {
+  React.Children.toArray(children)
+    .filter(child => !!child)
+    .map((child, index) => {
       const section = child as ReactElement<EditableAccordionSectionProps>;
 
-      const key = section.props.id || `unknown_section_id_${thisIndex}`;
+      const key = section.props.id || `unknown_section_id_${index}`;
 
       return {
         id: key,
         key,
-        index: thisIndex,
+        index,
         section,
       };
-    }
-
-    return undefined;
-  }).filter(item => !!item) as ChildSection[];
+    });
 
 const EditableAccordion = ({
   children,
@@ -157,16 +155,18 @@ const EditableAccordion = ({
       </h2>
       <DroppableAccordion id={id} isReordering={isReordering}>
         <div className="govuk-accordion" ref={ref} id={id}>
-          <div className={classnames('govuk-accordion__controls')}>
-            <button
-              type="button"
-              className="govuk-accordion__open-all"
-              aria-expanded="false"
-              onClick={() => toggleAll()}
-            >
-              Open all<span className="govuk-visually-hidden"> sections</span>
-            </button>
-          </div>
+          {!isReordering && (
+            <div className={classnames('govuk-accordion__controls')}>
+              <button
+                type="button"
+                className="govuk-accordion__open-all"
+                aria-expanded="false"
+                onClick={() => toggleAll()}
+              >
+                Open all<span className="govuk-visually-hidden"> sections</span>
+              </button>
+            </div>
+          )}
           {currentChildren.map(({ id, key, index, section }) => (
             <DraggableAccordionSection
               id={id}
