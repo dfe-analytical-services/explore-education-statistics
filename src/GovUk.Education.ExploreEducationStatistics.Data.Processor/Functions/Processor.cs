@@ -56,7 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         )
         {
             logger.LogInformation($"Validating Datafile: {message.DataFileName}");
-            
+
+            if (message.Seeding)
+            {
+                await _batchService.CreateImport(message.Release.Id.ToString(), message.DataFileName, 0, message);
+            }
+
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
             
             var (errors, totalObservationCount, filteredObservationCount) =

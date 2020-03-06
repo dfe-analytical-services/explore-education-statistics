@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task CheckComplete(string releaseId, ImportMessage message, StatisticsDbContext context);
 
         Task UpdateStoredMessage(ImportMessage message);
+
+        Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message);
     }
 }
