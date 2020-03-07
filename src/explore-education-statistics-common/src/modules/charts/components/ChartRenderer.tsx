@@ -34,7 +34,7 @@ export interface ChartRendererProps
 }
 
 function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title, legend } = props;
+  const { data, meta, title, type, legend } = props;
 
   const [legendProps, setLegendProps] = useState<LegendProps>();
 
@@ -56,8 +56,6 @@ function ChartRenderer(props: ChartRendererProps) {
   );
 
   const chart = useMemo(() => {
-    const { type } = props;
-
     switch (type.toLowerCase()) {
       case 'line':
         return <LineChartBlock {...props} renderLegend={renderLegend} />;
@@ -71,9 +69,9 @@ function ChartRenderer(props: ChartRendererProps) {
         return <Infographic {...props} />;
       }
       default:
-        return <div>Unable to render invalid chart type</div>;
+        return <p>Unable to render invalid chart type</p>;
     }
-  }, [props, renderLegend]);
+  }, [props, renderLegend, type]);
 
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -83,7 +81,7 @@ function ChartRenderer(props: ChartRendererProps) {
       <>
         {title && <h3 className="govuk-heading-s">{title}</h3>}
 
-        {legend === 'top' && legendProps && (
+        {legend === 'top' && type !== 'infographic' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
             <DefaultLegendContent {...legendProps} />
           </div>
@@ -91,7 +89,7 @@ function ChartRenderer(props: ChartRendererProps) {
 
         <div className="govuk-!-margin-bottom-6">{chart}</div>
 
-        {legend === 'bottom' && legendProps && (
+        {legend === 'bottom' && type !== 'infographic' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
             <DefaultLegendContent {...legendProps} />
           </div>
