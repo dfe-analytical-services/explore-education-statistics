@@ -84,19 +84,23 @@ function ChartRenderer(props: ChartRendererProps) {
         {title && <h3 className="govuk-heading-s">{title}</h3>}
 
         {legend === 'top' && legendProps && (
-          <DefaultLegendContent {...legendProps} />
+          <div className="govuk-!-margin-bottom-6">
+            <DefaultLegendContent {...legendProps} />
+          </div>
         )}
 
-        {chart}
+        <div className="govuk-!-margin-bottom-6">{chart}</div>
 
         {legend === 'bottom' && legendProps && (
-          <DefaultLegendContent {...legendProps} />
+          <div className="govuk-!-margin-bottom-6">
+            <DefaultLegendContent {...legendProps} />
+          </div>
         )}
       </>
     );
   }
 
-  return <div>Unable to render chart, invalid data configured</div>;
+  return <p>Unable to render chart, invalid data configured</p>;
 }
 
 export default memo(ChartRenderer);

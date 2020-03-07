@@ -94,12 +94,13 @@ const LineChartBlock = ({
         data={chartData}
         margin={{
           left: 30,
-          top: legend === 'top' ? 30 : 0,
         }}
       >
         <Tooltip content={CustomTooltip} />
 
-        {legend !== 'none' && <Legend content={renderLegend} />}
+        {legend !== 'none' && (
+          <Legend content={renderLegend} align="left" layout="vertical" />
+        )}
 
         <CartesianGrid
           strokeDasharray="3 3"
@@ -129,10 +130,6 @@ const LineChartBlock = ({
           scale="auto"
           {...majorDomainTicks}
           padding={{ left: 20, right: 20 }}
-          height={conditionallyAdd(
-            axes.major.size,
-            legend === 'bottom' ? 0 : undefined,
-          )}
           tickMargin={10}
         />
 

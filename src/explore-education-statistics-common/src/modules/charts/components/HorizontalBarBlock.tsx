@@ -12,8 +12,6 @@ import {
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-
-import classNames from 'classnames';
 import React from 'react';
 import {
   Bar,
@@ -66,11 +64,9 @@ const HorizontalBarBlock = ({
       <BarChart
         data={chartData}
         layout="vertical"
-        className={classNames({ 'legend-bottom': legend === 'bottom' })}
         stackOffset={stacked ? 'sign' : undefined}
         margin={{
           left: 30,
-          top: legend === 'top' ? 30 : 0,
         }}
       >
         <CartesianGrid
@@ -88,10 +84,6 @@ const HorizontalBarBlock = ({
           }
           scale="auto"
           {...minorDomainTicks}
-          height={conditionallyAdd(
-            axes.minor.size,
-            legend === 'bottom' ? 50 : undefined,
-          )}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -110,7 +102,9 @@ const HorizontalBarBlock = ({
 
         <Tooltip cursor={false} />
 
-        {legend !== 'none' && <Legend content={renderLegend} />}
+        {legend !== 'none' && (
+          <Legend content={renderLegend} align="left" layout="vertical" />
+        )}
 
         {Array.from(keysForChart).map(name => (
           <Bar

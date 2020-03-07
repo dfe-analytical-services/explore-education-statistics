@@ -12,8 +12,6 @@ import {
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-
-import classnames from 'classnames';
 import React from 'react';
 import {
   Bar,
@@ -65,10 +63,8 @@ const VerticalBarBlock = ({
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <BarChart
         data={chartData}
-        className={classnames({ 'legend-bottom': legend === 'bottom' })}
         margin={{
           left: 30,
-          top: legend === 'top' ? 30 : 0,
         }}
       >
         <CartesianGrid
@@ -99,16 +95,14 @@ const VerticalBarBlock = ({
           scale="auto"
           {...majorDomainTicks}
           padding={{ left: 20, right: 20 }}
-          height={conditionallyAdd(
-            axes.major.size,
-            legend === 'bottom' ? 0 : undefined,
-          )}
           tickMargin={10}
         />
 
         <Tooltip />
 
-        {legend !== 'none' && <Legend content={renderLegend} />}
+        {legend !== 'none' && (
+          <Legend content={renderLegend} align="left" layout="vertical" />
+        )}
 
         {Array.from(keysForChart).map(name => (
           <Bar
