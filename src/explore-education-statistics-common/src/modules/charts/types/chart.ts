@@ -37,7 +37,6 @@ export interface ChartProps extends AbstractChartProps {
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
-  legendHeight?: string;
   /**
    * Callback to enable us to render legends outside
    * of the chart container.

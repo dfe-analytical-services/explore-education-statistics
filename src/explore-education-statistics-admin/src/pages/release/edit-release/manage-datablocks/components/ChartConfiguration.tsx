@@ -27,7 +27,6 @@ interface Props {
 export interface ChartOptions {
   stacked: boolean;
   legend: 'none' | 'top' | 'bottom';
-  legendHeight: string;
   height?: number;
   width?: number;
   title?: string;
@@ -77,8 +76,8 @@ const ChartConfiguration = ({
           <hr />
         </>
       )}
-      <div className={styles.axesOptions}>
-        <FormGroup className={styles.formGroupWide}>
+      <div>
+        <FormGroup>
           <FormTextInput
             id="chart-title"
             name="chart-title"
@@ -110,53 +109,32 @@ const ChartConfiguration = ({
           )}
         </FormGroup>
         {selectedChartType.capabilities.hasLegend && (
-          <div className={styles.formGroup}>
-            <FormGroup>
-              <FormSelect
-                id="legend-position"
-                name="legend-position"
-                value={chartOptions.legend}
-                label="Legend position"
-                options={[
-                  { label: 'Top', value: 'top' },
-                  { label: 'Bottom', value: 'bottom' },
-                  { label: 'None', value: 'none' },
-                ]}
-                order={[]}
-                onChange={e => {
-                  updateChartOptions({
-                    ...chartOptions,
-                    // @ts-ignore
-                    legend: e.target.value,
-                  });
-                }}
-              />
-            </FormGroup>
-            {chartOptions.legend !== 'none' && (
-              <FormGroup>
-                <FormTextInput
-                  type="number"
-                  id="legend-height"
-                  name="legend-height"
-                  label="Legend height (px)"
-                  hint="Leave blank to set automatically"
-                  value={chartOptions.legendHeight}
-                  width={5}
-                  onChange={e => {
-                    updateChartOptions({
-                      ...chartOptions,
-                      legendHeight: e.target.value,
-                    });
-                  }}
-                />
-              </FormGroup>
-            )}
-          </div>
+          <FormGroup className={styles.formGroup}>
+            <FormSelect
+              id="legend-position"
+              name="legend-position"
+              value={chartOptions.legend}
+              label="Legend position"
+              options={[
+                { label: 'Top', value: 'top' },
+                { label: 'Bottom', value: 'bottom' },
+                { label: 'None', value: 'none' },
+              ]}
+              order={[]}
+              onChange={e => {
+                updateChartOptions({
+                  ...chartOptions,
+                  // @ts-ignore
+                  legend: e.target.value,
+                });
+              }}
+            />
+          </FormGroup>
         )}
 
         {selectedChartType.capabilities.canSize && (
-          <div className={styles.formGroup}>
-            <FormGroup>
+          <>
+            <FormGroup className={styles.formGroup}>
               <FormTextInput
                 type="number"
                 id="chart-height"
@@ -173,7 +151,7 @@ const ChartConfiguration = ({
                 }}
               />
             </FormGroup>
-            <FormGroup>
+            <FormGroup className={styles.formGroup}>
               <FormTextInput
                 type="number"
                 id="chart-width"
@@ -191,7 +169,7 @@ const ChartConfiguration = ({
                 }}
               />
             </FormGroup>
-          </div>
+          </>
         )}
 
         {selectedChartType.type === 'map' && meta.boundaryLevels && (

@@ -93,7 +93,6 @@ const DataBlockContentTabs = ({
       height: props.height,
       labels: props.labels,
       legend: props.legend,
-      legendHeight: props.legendHeight,
       stacked: props.stacked,
       title: props.title,
       width: props.width,
