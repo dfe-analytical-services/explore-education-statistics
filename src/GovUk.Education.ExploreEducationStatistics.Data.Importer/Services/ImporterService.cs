@@ -417,7 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     o.SchoolLaEstab,
                     o.Year,
                     o.TimeIdentifier.GetEnumValue(),
-                    "{" + string.Join(";", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
+                    "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
                     o.CsvRow
                 );
 
