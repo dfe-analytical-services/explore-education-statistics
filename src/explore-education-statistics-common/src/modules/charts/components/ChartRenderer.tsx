@@ -10,8 +10,13 @@ import {
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import { ChartType } from '@common/services/publicationService';
+import omitBy from 'lodash/fp/omitBy';
+import isEqual from 'lodash/isEqual';
+import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
+import { ContentRenderer, LegendProps } from 'recharts';
+import DefaultLegendContent from 'recharts/es6/component/DefaultLegendContent';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/charts/components/MapBlock'),
@@ -29,27 +34,46 @@ export interface ChartRendererProps
 }
 
 function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title } = props;
+  const { data, meta, title, legend } = props;
+
+  const [legendProps, setLegendProps] = useState<LegendProps>();
+
+  const renderLegend: ContentRenderer<LegendProps> = useMemo(
+    () => nextProps => {
+      const nextLegendProps = omit(nextProps, 'content');
+      // Omit functions from equality check as they will never be equal
+      const omitFunctions = omitBy(value => typeof value !== 'function');
+
+      if (
+        !isEqual(omitFunctions(nextLegendProps), omitFunctions(legendProps))
+      ) {
+        setLegendProps(nextLegendProps);
+      }
+
+      return null;
+    },
+    [legendProps],
+  );
 
   const chart = useMemo(() => {
     const { type } = props;
 
     switch (type.toLowerCase()) {
       case 'line':
-        return <LineChartBlock {...props} />;
+        return <LineChartBlock {...props} renderLegend={renderLegend} />;
       case 'verticalbar':
-        return <VerticalBarBlock {...props} />;
+        return <VerticalBarBlock {...props} renderLegend={renderLegend} />;
       case 'horizontalbar':
-        return <HorizontalBarBlock {...props} />;
+        return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
       case 'map':
-        return <DynamicMapBlock {...props} />;
+        return <DynamicMapBlock {...props} renderLegend={renderLegend} />;
       case 'infographic': {
         return <Infographic {...props} />;
       }
       default:
         return <div>Unable to render invalid chart type</div>;
     }
-  }, [props]);
+  }, [props, renderLegend]);
 
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -58,7 +82,16 @@ function ChartRenderer(props: ChartRendererProps) {
     return (
       <>
         {title && <h3 className="govuk-heading-s">{title}</h3>}
+
+        {legend === 'top' && legendProps && (
+          <DefaultLegendContent {...legendProps} />
+        )}
+
         {chart}
+
+        {legend === 'bottom' && legendProps && (
+          <DefaultLegendContent {...legendProps} />
+        )}
       </>
     );
   }

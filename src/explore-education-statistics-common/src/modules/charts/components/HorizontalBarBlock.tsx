@@ -38,7 +38,7 @@ const HorizontalBarBlock = ({
   labels,
   axes,
   legend,
-  legendHeight,
+  renderLegend,
 }: HorizontalBarProps) => {
   if (
     axes === undefined ||
@@ -70,7 +70,7 @@ const HorizontalBarBlock = ({
         stackOffset={stacked ? 'sign' : undefined}
         margin={{
           left: 30,
-          top: legend === 'top' ? 10 : 0,
+          top: legend === 'top' ? 30 : 0,
         }}
       >
         <CartesianGrid
@@ -109,9 +109,8 @@ const HorizontalBarBlock = ({
         />
 
         <Tooltip cursor={false} />
-        {(legend === 'top' || legend === 'bottom') && (
-          <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
-        )}
+
+        {legend !== 'none' && <Legend content={renderLegend} />}
 
         {Array.from(keysForChart).map(name => (
           <Bar

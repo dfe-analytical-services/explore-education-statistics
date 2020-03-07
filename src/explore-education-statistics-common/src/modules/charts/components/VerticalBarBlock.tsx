@@ -38,7 +38,7 @@ const VerticalBarBlock = ({
   axes,
   stacked,
   legend,
-  legendHeight,
+  renderLegend,
 }: VerticalBarProps) => {
   if (
     axes === undefined ||
@@ -68,7 +68,7 @@ const VerticalBarBlock = ({
         className={classnames({ 'legend-bottom': legend === 'bottom' })}
         margin={{
           left: 30,
-          top: legend === 'top' ? 10 : 0,
+          top: legend === 'top' ? 30 : 0,
         }}
       >
         <CartesianGrid
@@ -107,13 +107,8 @@ const VerticalBarBlock = ({
         />
 
         <Tooltip />
-        {(legend === 'top' || legend === 'bottom') && (
-          <Legend
-            verticalAlign={legend}
-            height={+(legendHeight || '50')}
-            margin={{ top: 5, bottom: 5 }}
-          />
-        )}
+
+        {legend !== 'none' && <Legend content={renderLegend} />}
 
         {Array.from(keysForChart).map(name => (
           <Bar

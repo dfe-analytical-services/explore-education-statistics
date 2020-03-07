@@ -16,7 +16,6 @@ import {
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
-import classNames from 'classnames';
 import React from 'react';
 import {
   CartesianGrid,
@@ -58,18 +57,16 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
 
 export type LineChartProps = ChartProps;
 
-const LineChartBlock = (props: LineChartProps) => {
-  const {
-    data,
-    meta,
-    height,
-    axes,
-    labels,
-    legend,
-    legendHeight,
-    width,
-  } = props;
-
+const LineChartBlock = ({
+  data,
+  meta,
+  height,
+  axes,
+  labels,
+  legend,
+  width,
+  renderLegend,
+}: LineChartProps) => {
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -95,17 +92,14 @@ const LineChartBlock = (props: LineChartProps) => {
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <LineChart
         data={chartData}
-        className={classNames({ 'legend-bottom': legend === 'bottom' })}
         margin={{
           left: 30,
-          top: legend === 'top' ? 10 : 0,
+          top: legend === 'top' ? 30 : 0,
         }}
       >
         <Tooltip content={CustomTooltip} />
 
-        {(legend === 'top' || legend === 'bottom') && (
-          <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
-        )}
+        {legend !== 'none' && <Legend content={renderLegend} />}
 
         <CartesianGrid
           strokeDasharray="3 3"
