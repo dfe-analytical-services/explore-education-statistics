@@ -10,8 +10,6 @@ import {
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import { ChartType } from '@common/services/publicationService';
-import omitBy from 'lodash/fp/omitBy';
-import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
@@ -41,12 +39,10 @@ function ChartRenderer(props: ChartRendererProps) {
   const renderLegend: ContentRenderer<LegendProps> = useMemo(
     () => nextProps => {
       const nextLegendProps = omit(nextProps, 'content');
-      // Omit functions from equality check as they will never be equal
-      const omitFunctions = omitBy(value => typeof value !== 'function');
 
-      if (
-        !isEqual(omitFunctions(nextLegendProps), omitFunctions(legendProps))
-      ) {
+      // Need to do a deep comparison of the props to
+      // avoid falling into an infinite rendering loop.
+      if (JSON.stringify(legendProps) !== JSON.stringify(nextLegendProps)) {
         setLegendProps(nextLegendProps);
       }
 
