@@ -56,9 +56,10 @@ const Infographic = ({
 const definition: ChartDefinition = {
   type: 'infographic',
   name: 'Infographic',
-
-  height: 600,
-
+  options: {
+    height: 600,
+    legend: 'none',
+  },
   capabilities: {
     dataSymbols: false,
     stackable: false,
@@ -70,11 +71,8 @@ const definition: ChartDefinition = {
     hasReferenceLines: false,
     hasLegend: false,
   },
-
   data: [],
-
-  axes: [],
-
+  axes: {},
   requiresGeoJson: false,
 };
 

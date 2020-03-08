@@ -133,7 +133,6 @@ const HorizontalBarBlock = ({
 const definition: ChartDefinition = {
   type: 'horizontalbar',
   name: 'Horizontal bar',
-
   capabilities: {
     dataSymbols: false,
     stackable: true,
@@ -145,7 +144,10 @@ const definition: ChartDefinition = {
     hasReferenceLines: true,
     hasLegend: true,
   },
-
+  options: {
+    height: 300,
+    legend: 'top',
+  },
   data: [
     {
       type: 'bar',
@@ -154,21 +156,19 @@ const definition: ChartDefinition = {
       targetAxis: 'yaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'major',
       title: 'Y Axis',
       type: 'major',
       defaultDataType: 'timePeriod',
     },
-    {
+    minor: {
       id: 'minor',
       title: 'X Axis',
       type: 'minor',
     },
-  ],
-
+  },
   requiresGeoJson: false,
 };
 

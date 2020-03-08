@@ -7,7 +7,7 @@ import {
   LabelValueUnitMetadata,
 } from '@common/services/dataBlockService';
 import {
-  AxesConfiguration,
+  AxisConfiguration,
   AxisGroupBy,
   AxisType,
   ChartType,
@@ -29,13 +29,13 @@ export interface AbstractChartProps {
   data: DataBlockData;
   meta: ChartMetaData;
   title?: string;
-  height?: number;
+  height: number;
   width?: number;
 }
 
 export interface ChartProps extends AbstractChartProps {
   labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
+  axes: Dictionary<AxisConfiguration>;
   legend?: 'none' | 'top' | 'bottom';
   /**
    * Callback to enable us to render legends outside
@@ -66,25 +66,27 @@ export interface ChartCapabilities {
 export interface ChartDefinition {
   type: ChartType;
   name: string;
-
-  height?: number;
-
   capabilities: ChartCapabilities;
-
+  options: {
+    stacked?: boolean;
+    legend?: 'none' | 'top' | 'bottom';
+    height: number;
+    width?: number;
+    title?: string;
+  };
   data: {
     type: string;
     title: string;
     entryCount: number | 'multiple';
     targetAxis: string;
   }[];
-
-  axes: {
+  axes: Dictionary<{
     id: string;
     title: string;
     type: AxisType;
     defaultDataType?: AxisGroupBy;
     forcedDataType?: AxisGroupBy;
-  }[];
+  }>;
 
   requiresGeoJson: boolean;
 }

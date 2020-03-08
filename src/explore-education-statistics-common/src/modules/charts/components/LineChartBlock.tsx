@@ -168,7 +168,6 @@ const LineChartBlock = ({
 const definition: ChartDefinition = {
   type: 'line',
   name: 'Line',
-
   capabilities: {
     dataSymbols: true,
     stackable: false,
@@ -180,7 +179,10 @@ const definition: ChartDefinition = {
     hasReferenceLines: true,
     hasLegend: true,
   },
-
+  options: {
+    height: 300,
+    legend: 'top',
+  },
   data: [
     {
       type: 'line',
@@ -189,21 +191,19 @@ const definition: ChartDefinition = {
       targetAxis: 'xaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'xaxis',
       title: 'X Axis',
       type: 'major',
       defaultDataType: 'timePeriod',
     },
-    {
+    minor: {
       id: 'yaxis',
       title: 'Y Axis',
       type: 'minor',
     },
-  ],
-
+  },
   requiresGeoJson: false,
 };
 

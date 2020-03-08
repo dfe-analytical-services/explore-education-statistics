@@ -131,7 +131,6 @@ const VerticalBarBlock = ({
 const definition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
-
   capabilities: {
     dataSymbols: false,
     stackable: true,
@@ -143,7 +142,10 @@ const definition: ChartDefinition = {
     hasReferenceLines: true,
     hasLegend: true,
   },
-
+  options: {
+    height: 300,
+    legend: 'top',
+  },
   data: [
     {
       type: 'bar',
@@ -152,21 +154,19 @@ const definition: ChartDefinition = {
       targetAxis: 'xaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'major',
       title: 'X Axis',
       type: 'major',
       defaultDataType: 'timePeriod',
     },
-    {
+    minor: {
       id: 'minor',
       title: 'Y Axis',
       type: 'minor',
     },
-  ],
-
+  },
   requiresGeoJson: false,
 };
 

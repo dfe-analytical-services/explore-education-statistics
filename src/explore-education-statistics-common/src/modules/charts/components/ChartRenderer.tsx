@@ -61,9 +61,8 @@ function ChartRenderer(props: ChartRendererProps) {
         return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
       case 'map':
         return <DynamicMapBlock {...props} renderLegend={renderLegend} />;
-      case 'infographic': {
+      case 'infographic':
         return <Infographic {...props} />;
-      }
       default:
         return <p>Unable to render invalid chart type</p>;
     }

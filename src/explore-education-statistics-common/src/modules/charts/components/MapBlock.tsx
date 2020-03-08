@@ -705,9 +705,6 @@ const MapBlock = ({
 const definition: ChartDefinition = {
   type: 'map',
   name: 'Geographic',
-
-  height: 600,
-
   capabilities: {
     dataSymbols: false,
     stackable: false,
@@ -719,7 +716,10 @@ const definition: ChartDefinition = {
     hasReferenceLines: false,
     hasLegend: false,
   },
-
+  options: {
+    height: 600,
+    legend: 'none',
+  },
   data: [
     {
       type: 'geojson',
@@ -728,16 +728,14 @@ const definition: ChartDefinition = {
       targetAxis: 'geojson',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'geojson',
-      title: 'geojson',
+      title: 'GeoJSON',
       type: 'major',
       forcedDataType: 'locations',
     },
-  ],
-
+  },
   requiresGeoJson: true,
 };
 
