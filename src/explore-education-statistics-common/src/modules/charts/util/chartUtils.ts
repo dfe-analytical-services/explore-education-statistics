@@ -386,7 +386,7 @@ export function populateDefaultChartProps(
   };
 }
 
-export const conditionallyAdd = (size?: string, add?: number) => {
+export const conditionallyAdd = (size?: string | number, add?: number) => {
   if (size) {
     return +size + (add === undefined ? 0 : add);
   }
@@ -459,7 +459,7 @@ function calculateMinorTicks(
   config: string | undefined,
   min: number,
   max: number,
-  spacing = '5',
+  spacing = 5,
 ): number[] | undefined {
   let spacingValue = +spacing;
 
@@ -505,9 +505,9 @@ function calculateMajorTicks(
   categories: string[],
   min: number,
   max: number,
-  spacing = '1',
+  spacing = 1,
 ): string[] | undefined {
-  let spacingValue = parseInt(spacing, 10);
+  let spacingValue = spacing;
 
   if (spacingValue <= 0) spacingValue = 1.0;
   if (
@@ -563,16 +563,16 @@ export function generateMajorAxis(
   chartData: ChartData[],
   axis: AxisConfiguration,
 ) {
-  const majorAxisCateories = chartData.map(({ name }) => name);
+  const majorAxisCategories = chartData.map(({ name }) => name);
 
   const min = parseNumberOrDefault(axis.min, 0);
-  const max = parseNumberOrDefault(axis.max, majorAxisCateories.length - 1);
+  const max = parseNumberOrDefault(axis.max, majorAxisCategories.length - 1);
 
   const domain: [AxisDomain, AxisDomain] = [min, max];
 
   const ticks = calculateMajorTicks(
     axis.tickConfig,
-    majorAxisCateories,
+    majorAxisCategories,
     min,
     max,
     axis.tickSpacing,

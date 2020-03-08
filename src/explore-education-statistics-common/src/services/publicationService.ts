@@ -134,22 +134,21 @@ export interface AxisConfiguration {
   sortBy?: string;
   sortAsc?: boolean;
   dataSets: ChartDataSet[];
-  dataRange?: [number | undefined, number | undefined];
 
   referenceLines?: ReferenceLine[];
 
-  visible?: boolean;
+  visible: boolean;
   title?: string;
   unit?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
-  size?: string;
+  size?: number;
 
   min?: string;
   max?: string;
 
   tickConfig?: 'default' | 'startEnd' | 'custom';
-  tickSpacing?: string;
+  tickSpacing?: number;
 }
 
 export interface AxesConfiguration {
@@ -158,12 +157,12 @@ export interface AxesConfiguration {
 }
 
 export interface Chart {
-  type?: ChartType;
+  type: ChartType;
   title?: string;
-  height?: number;
+  height: number;
   width?: number;
   labels?: Dictionary<DataSetConfiguration>;
-  axes?: AxesConfiguration;
+  axes?: Dictionary<AxisConfiguration>;
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
   stacked?: boolean;
