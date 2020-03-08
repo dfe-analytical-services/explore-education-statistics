@@ -8,7 +8,7 @@ import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 
 export interface Props {
-  captionTitle?: string;
+  heading?: string;
   response: DataBlockResponse;
   tableHeaders?: TableHeadersConfig;
 }
@@ -16,13 +16,13 @@ export interface Props {
 const TimePeriodDataTableRenderer = ({
   response,
   tableHeaders,
-  captionTitle,
+  heading,
 }: Props) => {
   const table = mapDataBlockResponseToFullTable(response);
   return (
     <TimePeriodDataTable
       fullTable={table}
-      captionTitle={captionTitle}
+      captionTitle={heading}
       tableHeadersConfig={
         tableHeaders
           ? mapTableHeadersConfig(tableHeaders, table.subjectMeta)

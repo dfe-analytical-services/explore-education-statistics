@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public enum IStatus
     {
+        QUEUED,
         RUNNING_PHASE_1,
         RUNNING_PHASE_2,
         RUNNING_PHASE_3,

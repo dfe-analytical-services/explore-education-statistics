@@ -178,13 +178,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return false;
         }
-        
+
+        public static bool IsBatchedDataFile(IListBlobItem blobItem, Guid releaseId)
+        {
+            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
+        }
+
         public static bool IsMetaDataFile(CloudBlob blob)
         {
             // The meta data file contains a metadata attribute referencing it's corresponding data file
             return blob.Metadata.ContainsKey(DataFileKey);
         }
-        
+
         public static int CalculateNumberOfRows(Stream fileStream)
         {
             using (var reader = new StreamReader(fileStream))
@@ -197,6 +202,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
                 return numberOfLines;
             }
+        }
+        
+        public static int GetNumBatches(int rows, int rowsPerBatch)
+        {
+            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
         
         private static DateTime ParseDateTime(string dateTime)

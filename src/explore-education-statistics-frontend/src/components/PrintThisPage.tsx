@@ -20,6 +20,7 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
       className={classNames(
         'govuk-!-margin-top-6',
         'dfe-print-hidden',
+        styles.printContainer,
         styles.mobileHidden,
       )}
     >

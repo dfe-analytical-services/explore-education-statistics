@@ -1,3 +1,4 @@
+import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   BoundaryLevel,
   DataBlockData,
@@ -16,7 +17,7 @@ import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
 
 export interface ChartMetaData {
-  filters: Dictionary<LabelValueMetadata>;
+  filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
