@@ -100,7 +100,7 @@ const VerticalBarBlock = ({
 
         <Tooltip />
 
-        {legend !== 'none' && (
+        {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
         )}
 

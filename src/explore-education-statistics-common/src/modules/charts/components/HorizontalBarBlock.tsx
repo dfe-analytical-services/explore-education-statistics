@@ -102,7 +102,7 @@ const HorizontalBarBlock = ({
 
         <Tooltip cursor={false} />
 
-        {legend !== 'none' && (
+        {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
         )}
 

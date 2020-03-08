@@ -98,7 +98,7 @@ const LineChartBlock = ({
       >
         <Tooltip content={CustomTooltip} />
 
-        {legend !== 'none' && (
+        {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
         )}
 
