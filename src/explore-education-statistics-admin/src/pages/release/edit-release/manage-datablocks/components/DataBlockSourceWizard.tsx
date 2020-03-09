@@ -54,6 +54,8 @@ const DataBlockSourceWizard = ({
   const [tableHeaders, setTableHeaders] = useState<TableHeadersConfig>();
   const [tableToolState, setTableToolState] = useState<TableToolState>();
 
+  const [captionTitle, setCaptionTitle] = useState<string>();
+
   const [initialValues, setInitialValues] = useState<
     DataBlockDetailsFormValues
   >();
@@ -105,6 +107,8 @@ const DataBlockSourceWizard = ({
       source = '',
       customFootnotes = '',
     } = dataBlock;
+
+    setCaptionTitle(title);
 
     setInitialValues({
       title,
@@ -165,6 +169,7 @@ const DataBlockSourceWizard = ({
                     <TimePeriodDataTable
                       ref={dataTableRef}
                       fullTable={table}
+                      captionTitle={captionTitle}
                       tableHeadersConfig={tableHeaders}
                     />
                   </div>
@@ -175,6 +180,7 @@ const DataBlockSourceWizard = ({
                     tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
+                    onTitleChange={title => setCaptionTitle(title)}
                     onDataBlockSave={data =>
                       onDataBlockSave({
                         ...data,
