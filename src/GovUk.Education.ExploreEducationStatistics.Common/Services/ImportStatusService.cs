@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public enum IStatus
     {
+        QUEUED,
         RUNNING_PHASE_1,
         RUNNING_PHASE_2,
         RUNNING_PHASE_3,
@@ -21,6 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     
     public class ImportStatusService : IImportStatusService
     {
+        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
+            IStatus.COMPLETE,
+            IStatus.FAILED
+        };
+        
         private readonly CloudTable _table;
 
         public ImportStatusService(
@@ -44,17 +49,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new ImportStatus
             {
                 Errors = import.Errors,
-                PercentageComplete = (GetNumBatchesComplete(import) * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
                 NumberOfRows = import.NumberOfRows,
             };
         }
-        
-        public static int GetNumBatchesComplete(DatafileImport import)
+
+        public async Task<bool> IsImportFinished(string releaseId, string dataFileName)
         {
-            return (from bool b in new BitArray(import.BatchesProcessed)
-                where b
-                select b).Count();
+            var importStatus = await GetImportStatus(releaseId, dataFileName);
+            
+            return FinishedImportStatuses
+                .Select(status => status.ToString())
+                .ToList()
+                .Contains(importStatus.Status);
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
@@ -63,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 
                 dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
+                new List<string>(){ "NumBatches", "Status", "NumberOfRows", "Errors"}));
             
             return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
         }

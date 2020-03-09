@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -162,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false, AllowedChartFileTypes)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true, AllowedChartFileTypes)
                 .HandleFailuresOr(Ok);
         }
 
@@ -181,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _fileStorageService
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
                 // add message to queue to process these files
-                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId))
+                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId, file))
                 .HandleFailuresOr(Ok);
         }
 
@@ -244,6 +245,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
+        [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string fileName, string subjectTitle)
+        {
+            return await _releaseService
+                .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
+                .HandleFailuresOr(Ok);
+        }
+        
         [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {

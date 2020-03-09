@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -44,17 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = publicFiles;
-
-                    // TODO EES-147 Every release needs an update
-                    if (releaseViewModel.Updates.Count == 0)
-                    {
-                        releaseViewModel.Updates.Add(new ReleaseNoteViewModel
-                        {
-                            Id = new Guid("262cf6c8-db96-40d8-8fb1-b55028a9f55b"),
-                            On = new DateTime(2019, 12, 01),
-                            Reason = "First published"
-                        });
-                    }
 
                     return new ManageContentPageViewModel
                     {

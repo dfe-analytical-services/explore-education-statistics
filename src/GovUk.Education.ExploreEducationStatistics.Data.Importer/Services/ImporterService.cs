@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -19,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
-        private readonly ImporterSchoolService _importerSchoolService;
         private readonly ILogger<ImporterService> _logger;
 
         private enum Columns
@@ -86,19 +87,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Columns.WARD_COLS, new[]{"ward_code", "ward_name"}
                 }
             };
+                
+        public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
+        {
+            GeographicLevel.Institution,
+            GeographicLevel.Provider,
+            GeographicLevel.School
+        };
         
         public ImporterService(
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
-            ImporterSchoolService importerSchoolService,
             ILogger<ImporterService> logger)
         {
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _logger = logger;
-            _importerSchoolService = importerSchoolService;
         }
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
@@ -116,13 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
-            _importerSchoolService.ClearCache();
             
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
             {
-                CreateFiltersLocationsAndSchoolsFromCsv(context, line, headers, subjectMeta.Filters);
+                CreateFiltersAndLocationsFromCsv(context, line, headers, subjectMeta.Filters);
             });
         }
 
@@ -131,36 +136,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
-            _importerSchoolService.ClearCache();
             
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
+            
             var observations = GetObservations(context, lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
-            
-            var subEntities = new List<ObservationFilterItem>();
-            
-            using (var transaction = context.Database.BeginTransaction())
-            {
-                context.BulkInsert(observations,
-                    new BulkConfig {WithHoldlock= true, BatchSize = observations.Count(), PreserveInsertOrder = true, SetOutputIdentity = true});
 
-                foreach (var o in observations)
-                {
-                    foreach (var item in o.FilterItems)
-                    {
-                        item.ObservationId = o.Id;
-                        item.FilterItemId = item.FilterItem.Id;
-                    }
-                    
-                    subEntities.AddRange(o.FilterItems);
-                }
-                context.BulkInsert(subEntities,
-                        new BulkConfig {WithHoldlock= true, BatchSize = subEntities.Count()});
-                    
-                transaction.Commit();
-            }
-
-            _logger.LogDebug($"{observations.Count()} observations added successfully for {subject.Name}");
+            InsertObservations(context, observations);
         }
         
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -198,6 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public static int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             var tp = CsvUtil.Value(line, headers, "time_period");
+            if (tp == null)
+            {
+                throw new InvalidTimePeriodException(null); 
+            }
             return int.Parse(tp.Substring(0, 4));
         }
 
@@ -215,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
                 return ObservationFromCsv(context, line, headers, subject, subjectMeta, csvRowNum);
-            });
+            }).Where(o => !IgnoredGeographicLevels.Contains(o.GeographicLevel));
         }
         
         private Observation ObservationFromCsv(
@@ -227,24 +213,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             int csvRowNum)
         {
             var line = raw.Split(',');
-        
+            var observationId = Guid.NewGuid();
+
             return new Observation
             {
-                FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters),
+                Id = observationId,
+                FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters, observationId),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                ProviderUrn = GetProvider(line, headers)?.Urn,
-                SchoolLaEstab = GetSchool(line, headers, context)?.LaEstab,
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
-                CsvRow = csvRowNum,
-                Id = Guid.NewGuid()
+                CsvRow = csvRowNum
             };
         }
         
-        private void CreateFiltersLocationsAndSchoolsFromCsv(
+        private void CreateFiltersAndLocationsFromCsv(
             StatisticsDbContext context,
             string raw,
             List<string> headers,
@@ -253,7 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var line = raw.Split(',');
             CreateFilterItems(context, line, headers, filtersMeta);
             GetLocationId(line, headers, context);
-            GetSchool(line, headers, context);
         }
 
         private void CreateFilterItems(
@@ -275,7 +259,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             StatisticsDbContext context,
             IReadOnlyList<string> line,
             List<string> headers,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
+            Guid observationId)
         {
             return filtersMeta.Select(filterMeta =>
             {
@@ -284,7 +269,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 
                 return new ObservationFilterItem
                 {
-                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context)
+                    ObservationId = observationId,
+                    FilterItemId = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id
                 };
             }).ToList();
         }
@@ -307,22 +293,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetSponsor(line, headers),
                 GetWard(line, headers)
             ).Id;
-        }
-
-        private School GetSchool(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
-        {
-            var school = CsvUtil.BuildType(line, headers, ColumnValues[Columns.SCHOOL_COLS], values => new School
-            {
-                AcademyOpenDate = values[0],
-                AcademyType = values[1],
-                Estab = values[2],
-                LaEstab = values[3],
-                Name = values[4],
-                Postcode = values[5],
-                Urn = values[6]
-            });
-            
-            return _importerSchoolService.Find(school, context);
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> line,
@@ -395,12 +365,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new ParliamentaryConstituency(values[0], values[1]));
         }
 
-        private static Provider GetProvider(IReadOnlyList<string> line, List<string> headers)
-        {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PROVIDER_COLS], values =>
-                new Provider(values[0], values[1], values[2], values[3]));
-        }
-
         private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
         {
             return CsvUtil.BuildType(line, headers, ColumnValues[Columns.REGION_COLS], values =>
@@ -422,6 +386,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return CsvUtil.BuildType(line, headers, ColumnValues[Columns.WARD_COLS], values =>
                 new Ward(values[0], values[1]));
+        }
+
+        private static void InsertObservations(DbContext context, IEnumerable<Observation> observations)
+        {
+            var observationsTable = new DataTable();
+            observationsTable.Columns.Add("Id", typeof(Guid));
+            observationsTable.Columns.Add("SubjectId", typeof(Guid));
+            observationsTable.Columns.Add("GeographicLevel", typeof(string));
+            observationsTable.Columns.Add("LocationId", typeof(Guid));
+            observationsTable.Columns.Add("ProviderUrn", typeof(string));
+            observationsTable.Columns.Add("SchoolLaEstab", typeof(string));
+            observationsTable.Columns.Add("Year", typeof(int));
+            observationsTable.Columns.Add("TimeIdentifier", typeof(string));
+            observationsTable.Columns.Add("Measures", typeof(string));
+            observationsTable.Columns.Add("CsvRow", typeof(long));
+            
+            var observationsFilterItemsTable = new DataTable();
+            observationsFilterItemsTable.Columns.Add("ObservationId", typeof(Guid));
+            observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
+            
+            foreach (var o in observations)
+            {
+                observationsTable.Rows.Add(
+                    o.Id,
+                    o.SubjectId,
+                    o.GeographicLevel.GetEnumValue(),
+                    o.LocationId,
+                    o.ProviderUrn,
+                    o.SchoolLaEstab,
+                    o.Year,
+                    o.TimeIdentifier.GetEnumValue(),
+                    "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
+                    o.CsvRow
+                );
+
+                foreach (var item in o.FilterItems)
+                {
+                    observationsFilterItemsTable.Rows.Add(
+                        item.ObservationId,
+                        item.FilterItemId
+                    );
+                }
+            }
+            
+            var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
+            {
+                Value = observationsTable, TypeName = "[dbo].[ObservationType]"
+            };
+
+            context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservations] @Observations", parameter);
+            
+            parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
+            {
+                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
+            };
+
+            context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
         }
     }
 }

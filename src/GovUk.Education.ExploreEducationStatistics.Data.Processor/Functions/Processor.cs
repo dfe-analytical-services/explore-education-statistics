@@ -9,9 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -55,13 +55,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            message.RowsPerBatch = GetBatchSettings(LoadAppSettings(context)).RowsPerBatch;
-            
-            if (await IsDataFileValid(message, logger))
+            logger.LogInformation($"Validating Datafile: {message.DataFileName}");
+
+            if (message.Seeding)
             {
+                await _batchService.CreateImport(message.Release.Id.ToString(), message.DataFileName, 0, message);
+            }
+
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
+            
+            var (errors, totalObservationCount, filteredObservationCount) =
+                _validatorService.ValidateAndCountRows(await _fileStorageService.GetSubjectData(message));
+
+            if (errors.Count == 0)
+            {
+                logger.LogInformation($"Validating Datafile: {message.OrigDataFileName} - complete");
+
                 try
                 {
-                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext(), false);
+                    message.RowsPerBatch = Convert.ToInt32(LoadAppSettings(context).GetValue<string>("RowsPerBatch"));
+                    message.TotalRows = filteredObservationCount;
+                    message.NumBatches = FileStorageUtils.GetNumBatches(totalObservationCount, message.RowsPerBatch);
+
+                    await _batchService.UpdateStoredMessage(message);
+                    
+                    logger.LogInformation($"Datafile: {message.DataFileName} is valid");
+                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
                     logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
                     await _splitFileService.SplitDataFile(collector, message, subjectData);
                     logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
@@ -72,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                     await _batchService.FailImport(
                         message.Release.Id.ToString(),
-                        message.DataFileName,
+                        message.OrigDataFileName,
                         new List<string> {ex.Message}
                     );
                     
@@ -82,48 +101,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
             else
             {
+                await _batchService.FailImport(
+                    message.Release.Id.ToString(),
+                    message.OrigDataFileName,
+                    errors
+                );
+                
                 logger.LogError(
                     $"Import FAILED for {message.DataFileName}...check log");
-            }
-        }
-
-        [FunctionName("ProcessUploadsSequentially")]
-        public async void ProcessUploadsSequentially(
-            [QueueTrigger("imports-pending-sequential")]
-            ImportMessage[] messages,
-            ILogger logger,
-            ExecutionContext context,
-            [Queue("imports-available")] ICollector<ImportMessage> collector
-        )
-        {
-            var batchSettings = GetBatchSettings(LoadAppSettings(context));
-
-            // Log all initial validation messages
-            var allValid = true;
-            foreach (var message in messages)
-            {
-                message.RowsPerBatch = batchSettings.RowsPerBatch;
-                if (!await IsDataFileValid(message, logger))
-                {
-                    allValid = false;
-                }
-            }
-
-            if (allValid)
-            {
-                foreach (var message in messages)
-                {
-                    logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
-                    await ProcessSubject(message, DbUtils.CreateDbContext(), true);
-                    var subjectData = await _fileStorageService.GetSubjectData(message);
-                    await _splitFileService.SplitDataFile(collector, message, subjectData);
-                    logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
-                }
-            }
-            else
-            {
-                logger.LogError(
-                    "Seeding FAILED...check log");
             }
         }
 
@@ -138,11 +123,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
             catch (Exception e)
             {
+                // If deadlock exception then throw & try up to 3 times
+                if (e is SqlException exception && exception.Number == 1205)
+                {
+                    logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
+                                       $"{message.DataFileName} : {exception.Message} : transaction will be retried");
+                    throw e;
+                }
+                
                 var ex = GetInnerException(e);
                 
                 await _batchService.FailImport(
                     message.Release.Id.ToString(),
-                    message.DataFileName,
+                    message.OrigDataFileName,
                     new List<string> {ex.Message}
                 );
                     
@@ -151,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
         
-        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext, bool isSeeding)
+        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
@@ -163,12 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
-
-            await dbContext.SaveChangesAsync();
-
+            
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
 
-            if (isSeeding)
+            if (message.Seeding)
             {
                 SampleGuids.GenerateIndicatorGuids(dbContext);
                 SampleGuids.GenerateFilterGuids(dbContext);
@@ -179,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
             
-            if (isSeeding)
+            if (message.Seeding)
             {
                 SampleGuids.GenerateFilterGuids(dbContext);
                 SampleGuids.GenerateFilterGroupGuids(dbContext);
@@ -194,41 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             return subjectData;
         }
 
-        private async Task<bool> IsDataFileValid(ImportMessage message, ILogger logger)
-        {
-            logger.LogInformation($"Validating Datafile: {message.DataFileName}");
-
-            var subjectData = await _fileStorageService.GetSubjectData(message);
-
-            var numberOfRows = subjectData.GetCsvLines().Count();
-
-            await _batchService.CreateImport(
-                message.Release.Id.ToString(),
-                message.DataFileName,
-                numberOfRows,
-                SplitFileService.GetNumBatches(numberOfRows, message.RowsPerBatch),
-                message
-            );
-
-            var errors = _validatorService.Validate(message, subjectData);
-
-            if (errors.Count <= 0)
-            {
-                logger.LogInformation($"Validating Datafile: {message.DataFileName} - complete");
-                return true;
-            }
-
-            logger.LogInformation($"Datafile: {message.DataFileName} has errors");
-
-            await _batchService.FailImport(
-                message.Release.Id.ToString(),
-                message.DataFileName,
-                errors
-            );
-
-            return false;
-        }
-
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
         {
             return new ConfigurationBuilder()
@@ -236,15 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 .AddJsonFile("local.settings.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
-        }
-
-        private static BatchSettings GetBatchSettings(IConfigurationRoot config)
-        {
-            return new BatchSettings
-            {
-                RowsPerBatch =
-                    Convert.ToInt32(config.GetValue<string>("RowsPerBatch"))
-            };
         }
 
         private static Exception GetInnerException(Exception ex)

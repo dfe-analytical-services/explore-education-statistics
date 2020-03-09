@@ -35,31 +35,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var releaseId = message.Release.Id.ToString();
 
-            // Ensure batch processed only once
-            if (!await _batchService.IsBatchProcessed(releaseId, message.OrigDataFileName, message.BatchNo))
+            // Potentially status could already be failed so don't continue
+            if (await _batchService.UpdateStatus(releaseId, message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_3))
             {
-                // Potentially status could already be failed so don't continue
-                if (await _batchService.UpdateStatus(releaseId, message.OrigDataFileName,
-                    IStatus.RUNNING_PHASE_3))
-                {
-                    var subjectData = await _fileStorageService.GetSubjectData(message);
-                    var subject = GetSubject(message, subjectData.Name, context);
-
-                    _importerService.ImportObservations(
-                        subjectData.GetCsvLines().ToList(),
-                        subject,
-                        _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
-                        message.BatchNo,
-                        message.RowsPerBatch,
-                        context
-                    );
-
-                    await _batchService.UpdateBatchCount(releaseId, message.OrigDataFileName, message.BatchNo);
-                }
+                var subjectData = await _fileStorageService.GetSubjectData(message);
+                var subject = GetSubject(message, subjectData.Name, context);
+                
+                context.Database.BeginTransaction();
+                
+                _importerService.ImportObservations(
+                    subjectData.GetCsvLines().ToList(),
+                    subject,
+                    _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
+                    message.BatchNo,
+                    message.RowsPerBatch,
+                    context
+                );
+                
+                context.Database.CommitTransaction();
+                
+                await _batchService.CheckComplete(releaseId, message, context);
             }
             else
             {
-                _logger.LogInformation($"{message.DataFileName} already processed...skipping");
+                _logger.LogInformation($"{message.DataFileName} already failed...skipping");
             }
         }
 

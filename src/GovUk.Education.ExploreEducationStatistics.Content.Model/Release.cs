@@ -14,11 +14,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Release
+    public class Release : Versioned<Release>
     {
         public Guid Id { get; set; }
-
-        public ReleaseSummary ReleaseSummary { get; set; }
         
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 

@@ -1,11 +1,10 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import {
-  deleteContentSectionBlock,
   attachContentSectionBlock,
+  deleteContentSectionBlock,
 } from '@admin/pages/release/edit-release/content/helpers';
 import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';

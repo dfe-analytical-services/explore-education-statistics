@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,14 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public PreReleaseController(IPreReleaseContactsService preReleaseContactsService)
         {
             _preReleaseContactsService = preReleaseContactsService;
-        }
-
-        [HttpGet("prerelease/contacts")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContacts()
-        {
-            return await _preReleaseContactsService
-                .GetAvailablePreReleaseContactsAsync()
-                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("release/{releaseId}/prerelease-contacts")]
