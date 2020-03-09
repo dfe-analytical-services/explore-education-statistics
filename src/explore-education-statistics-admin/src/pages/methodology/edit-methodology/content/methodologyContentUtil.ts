@@ -1,7 +1,7 @@
 import { EditableAccordionProps } from '@admin/components/EditableAccordion';
+import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
 import methodologyService from '@admin/services/methodology/service';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import { EditableAccordionSectionProps } from 'src/components/EditableAccordionSection';
 
 function accordionAddNewSection(
   methodology: MethodologyContent,
@@ -42,7 +42,7 @@ function accordionSectionUpdateHeading(
   setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
   sectionId: string,
 ): EditableAccordionSectionProps['onHeadingChange'] {
-  return async function(heading) {
+  return async function updateContentSectionHeading(heading: string) {
     const newSection = await methodologyService.updateContentSectionHeading(
       methodology.id,
       sectionId,

@@ -1,14 +1,5 @@
 import client from '@admin/services/util/service';
 
-import {
-  AncillaryFile,
-  ChartFile,
-  DataFile,
-  UploadAncillaryFileRequest,
-  UploadChartFileRequest,
-  UploadDataFilesRequest,
-} from './types';
-
 interface GetFileResponse {
   extension: string;
   name: string;
@@ -18,6 +9,17 @@ interface GetFileResponse {
   rows: number;
   userName: string;
   created: string;
+}
+
+export interface DeleteDataFilePlan {
+  dependentDataBlocks: DependentDataBlock[];
+  footnoteIds: string[];
+}
+
+export interface DependentDataBlock {
+  name: string;
+  contentSectionHeading?: string;
+  infographicFilenames: string[];
 }
 
 const getFileNameFromPath = (path: string) =>
@@ -33,11 +35,59 @@ const downloadFile = (blob: Blob, fileName: string) => {
   link.remove();
 };
 
+export interface DataFile {
+  title: string;
+  filename: string;
+  fileSize: {
+    size: number;
+    unit: string;
+  };
+  rows: number;
+  metadataFilename: string;
+  userName: string;
+  created: Date;
+  canDelete?: boolean;
+}
+
+export interface UploadDataFilesRequest {
+  subjectTitle: string;
+  dataFile: File;
+  metadataFile: File;
+}
+
+export interface AncillaryFile {
+  title: string;
+  filename: string;
+  fileSize: {
+    size: number;
+    unit: string;
+  };
+}
+
+export interface UploadAncillaryFileRequest {
+  name: string;
+  file: File;
+}
+
+export interface ChartFile {
+  title: string;
+  filename: string;
+  fileSize: {
+    size: number;
+    unit: string;
+  };
+}
+
+export interface UploadChartFileRequest {
+  name: string;
+  file: File;
+}
+
 /**
  * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
  */
 
-const service = {
+const editReleaseDataService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<GetFileResponse[]>(`/release/${releaseId}/data`)
@@ -75,6 +125,14 @@ const service = {
     return client.post<null>(
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
+    );
+  },
+  getDeleteDataFilePlan(
+    releaseId: string,
+    dataFile: DataFile,
+  ): Promise<DeleteDataFilePlan> {
+    return client.get<DeleteDataFilePlan>(
+      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
@@ -162,6 +220,11 @@ const service = {
       data,
     );
   },
+
+  async deleteChartFile(releaseId: string, fileName: string): Promise<null> {
+    return client.delete<null>(`/release/${releaseId}/chart/${fileName}`);
+  },
+
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
     return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
       responseType: 'blob',
@@ -169,4 +232,4 @@ const service = {
   },
 };
 
-export default service;
+export default editReleaseDataService;

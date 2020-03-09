@@ -20,9 +20,6 @@
     "publishReleaseContentCronSchedule": {
       "value": "0 30 * * * *"
     },
-    "publishReleaseDataFunctionDisabled": {
-      "value": "false"
-    },
     "useSubnets": {
       "value": true
     },
@@ -35,8 +32,8 @@
     "blobDeleteRetentionDays": {
       "value": 3
     },
-    "deployDatafactory": {
-      "value": true
+    "devopsSPN": {
+      "value": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e"
     }
   }
 }

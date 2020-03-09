@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import {
-  ChartMetaData,
-  ChartProps,
-  parseMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import Features from '@common/modules/charts/components/__tests__/__data__/testLocationData';
+
+import testResponseData_23_26_28__1_2_LA_JSON from '@common/modules/charts/components/__tests__/__data__/testResponseData_23_26_28__1_2_LA.json';
+import { ChartMetaData, ChartProps } from '@common/modules/charts/types/chart';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import {
   DataBlockData,
   DataBlockMetadata,
   DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-
-import Features from './testLocationData';
-
-import testResponseData_23_26_28__1_2_LA_JSON from './testResponseData_23_26_28__1_2_LA.json';
 
 const testResponseData_23_26_28__1_2_LA: DataBlockResponse = (testResponseData_23_26_28__1_2_LA_JSON as unknown) as DataBlockResponse;
 

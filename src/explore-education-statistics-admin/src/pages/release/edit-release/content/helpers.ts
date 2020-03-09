@@ -3,7 +3,6 @@ import permissionsService from '@admin/services/permissions/service';
 import {
   EditableContentBlock,
   ExtendedComment,
-  EditableRelease,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import {
@@ -15,6 +14,7 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
+import { AxiosResponse } from 'axios';
 import { RemoveBlockFromSection } from './actions';
 import { Dispatch } from './ReleaseContext';
 
@@ -56,7 +56,7 @@ const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
 export async function getReleaseContent(
   dispatch: Dispatch,
   releaseId: string,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   dispatch({ type: 'CLEAR_STATE' });
   try {
@@ -84,7 +84,7 @@ export async function getReleaseContent(
 export async function updateAvailableDataBlocks(
   dispatch: Dispatch,
   releaseId: string,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
@@ -105,7 +105,7 @@ export async function deleteContentSectionBlock(
   sectionId: string,
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     await releaseContentService.deleteContentSectionBlock(
@@ -132,7 +132,7 @@ export async function updateContentSectionDataBlock(
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   values: KeyStatsFormValues,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const updateBlock = await releaseContentService.updateContentSectionDataBlock(
@@ -157,7 +157,7 @@ export async function updateContentSectionBlock(
   blockId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   bodyContent: string,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const updateBlock = await releaseContentService.updateContentSectionBlock(
@@ -181,7 +181,7 @@ export async function addContentSectionBlock(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   block: ContentBlockPostModel,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const newBlock = await releaseContentService.addContentSectionBlock(
@@ -207,7 +207,7 @@ export async function attachContentSectionBlock(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   block: ContentBlockAttachRequest,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const newBlock = await releaseContentService.attachContentSectionBlock(
@@ -231,7 +231,7 @@ export async function updateSectionBlockOrder(
   sectionId: string,
   sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
   order: Dictionary<number>,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
@@ -255,7 +255,7 @@ export async function addContentSection(
   dispatch: Dispatch,
   releaseId: string,
   order: number,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const newSection = await releaseContentService.addContentSection(
@@ -278,7 +278,7 @@ export async function updateContentSectionsOrder(
   dispatch: Dispatch,
   releaseId: string,
   order: Dictionary<number>,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const content = await releaseContentService.updateContentSectionsOrder(
@@ -301,7 +301,7 @@ export async function removeContentSection(
   dispatch: Dispatch,
   releaseId: string,
   sectionId: string,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const content = await releaseContentService.removeContentSection(
@@ -324,7 +324,7 @@ export async function updateContentSectionHeading(
   releaseId: string,
   sectionId: string,
   title: string,
-  errorHandler: (err: any) => void,
+  errorHandler: (err: AxiosResponse) => void,
 ) {
   try {
     const section = await releaseContentService.updateContentSectionHeading(

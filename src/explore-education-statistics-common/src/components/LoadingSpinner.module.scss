@@ -3,11 +3,12 @@
 .container {
   align-items: center;
   display: inline-flex;
-  flex-direction: row;
   justify-content: center;
 }
 
 .spinner {
+  $width-modifier: 0.15;
+
   animation: spin 2s linear infinite;
   border-color: govuk-colour('light-grey');
   border-radius: 50%;
@@ -15,6 +16,30 @@
   border-top-color: govuk-colour('blue');
   display: block;
   margin-right: govuk-spacing(2);
+
+  &--xl {
+    border-width: #{80 * $width-modifier}px;
+    height: 80px;
+    width: 80px;
+  }
+
+  &--lg {
+    border-width: #{60 * $width-modifier}px;
+    height: 60px;
+    width: 60px;
+  }
+
+  &--md {
+    border-width: #{40 * $width-modifier}px;
+    height: 40px;
+    width: 40px;
+  }
+
+  &--sm {
+    border-width: #{20 * $width-modifier}px;
+    height: 20px;
+    width: 20px;
+  }
 }
 
 .inline {
