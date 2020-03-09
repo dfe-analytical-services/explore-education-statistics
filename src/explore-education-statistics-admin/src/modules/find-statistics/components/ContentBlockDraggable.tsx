@@ -15,7 +15,7 @@ const ContentBlockDraggable = ({
 }) => (
   <>
     {draggable ? (
-      <Draggable draggableId={draggableId} index={index} type="contentBlock">
+      <Draggable draggableId={draggableId} index={index}>
         {draggableProvided => (
           <div
             {...draggableProvided.draggableProps}

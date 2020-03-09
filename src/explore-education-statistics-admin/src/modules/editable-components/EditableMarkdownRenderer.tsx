@@ -1,17 +1,14 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import wrapEditableComponent, {
-  EditingContext,
-} from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext } from 'react';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React from 'react';
 import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {
     canDelete?: boolean;
     onDelete: () => void;
+    toolbarConfig?: string[];
     editable?: boolean;
     onContentChange: (content: string) => void;
   };
@@ -19,6 +16,7 @@ export type MarkdownRendererProps = RendererProps &
 const EditingMarkdownRenderer = ({
   source = '',
   canDelete,
+  toolbarConfig,
   onDelete,
   editable = true,
   onContentChange,
@@ -30,6 +28,7 @@ const EditingMarkdownRenderer = ({
         canDelete={canDelete}
         editable={editable}
         useMarkdown
+        toolbarConfig={toolbarConfig}
         onContentChange={onContentChange}
         onDelete={onDelete}
       />

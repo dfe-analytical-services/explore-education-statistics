@@ -48,7 +48,7 @@ const EditableContentBlock = ({
 
   React.useEffect(() => {
     if (!isReordering) {
-      //save
+      // save
       if (onBlockSaveOrder && contentBlocks !== undefined)
         onBlockSaveOrder(
           contentBlocks.reduce<Dictionary<number>>(
@@ -60,7 +60,7 @@ const EditableContentBlock = ({
           ),
         );
     }
-  }, [isReordering]);
+  }, [contentBlocks, isReordering, onBlockSaveOrder]);
 
   const onDragEnd = React.useCallback(
     (result: DropResult) => {
@@ -73,7 +73,7 @@ const EditableContentBlock = ({
         setContentBlocks(newContentBlocks);
       }
     },
-    [contentBlocks, onContentChange],
+    [contentBlocks],
   );
 
   if (contentBlocks === undefined || contentBlocks.length === 0) {

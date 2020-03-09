@@ -1,12 +1,11 @@
-import React, { useContext, useState } from 'react';
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import Button from '@common/components/Button';
+import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
-import Details from '@common/components/Details';
-import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import React, { useState } from 'react';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;

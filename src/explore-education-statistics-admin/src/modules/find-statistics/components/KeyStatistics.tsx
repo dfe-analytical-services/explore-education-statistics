@@ -10,6 +10,7 @@ import ManageReleaseContext, {
 } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
+import WarningMessage from '@common/components/WarningMessage';
 import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import {
   AbstractRelease,
@@ -44,7 +45,18 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   if (!keyStats) return null;
   return (
     <>
-      {isEditing && <AddKeyStatistics release={release} />}
+      {isEditing && (
+        <>
+          <WarningMessage>
+            In order to add a key statistic you first need to create a data
+            block with just one value.
+            <br />
+            Any data blocks with more than one value cannot be selected as a key
+            statistic.
+          </WarningMessage>
+          <AddKeyStatistics release={release} />
+        </>
+      )}
       <div className={styles.keyStatsContainer}>
         {keyStats.content &&
           keyStats.content.map(stat => {

@@ -4,14 +4,17 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ReleaseType } from '@common/services/publicationService';
-import React from 'react';
+import React, { useContext } from 'react';
 
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
 }: {
   release: ManageContentPageViewModel['release'];
 }) => {
+  const { isEditing } = useContext(EditingContext);
+  const { publication } = release;
   return (
     <>
       <h2
@@ -27,28 +30,31 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {release.publication.methodology ||
-          release.publication.externalMethodology ? (
+          {publication.methodology || publication.externalMethodology ? (
             <p>
               Read our{' '}
-              {release.publication.methodology && (
-                <Link
-                  to={`/methodologies/${release.publication.methodology.id}`}
-                >
-                  {`${release.publication.title}: methodology`}
-                </Link>
-              )}
-              {!release.publication.methodology &&
-                release.publication.externalMethodology && (
+              {publication.methodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
+                  <Link to={`/methodologies/${publication.methodology.id}`}>
+                    {`${publication.title}: methodology`}
+                  </Link>
+                ))}
+              {!publication.methodology &&
+                publication.externalMethodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
                   <Link
                     to=""
                     rel="external"
                     target="_blank"
-                    href={release.publication.externalMethodology.url}
+                    href={publication.externalMethodology.url}
                   >
-                    {`${release.publication.title}: methodology`}
+                    {`${publication.title}: methodology`}
                   </Link>
-                )}{' '}
+                ))}{' '}
               guidance.
             </p>
           ) : (
@@ -62,8 +68,8 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         )}
         <AccordionSection heading="Contact us" headingTag="h3">
           <ContactUsSection
-            publicationContact={release.publication.contact}
-            themeTitle={release.publication.topic.theme.title}
+            publicationContact={publication.contact}
+            themeTitle={publication.topic.theme.title}
           />
         </AccordionSection>
       </Accordion>

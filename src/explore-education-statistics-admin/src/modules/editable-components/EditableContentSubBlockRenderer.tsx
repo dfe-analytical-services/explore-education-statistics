@@ -13,6 +13,7 @@ interface Props extends MarkdownRendererProps {
 function EditableContentSubBlockRenderer({
   block,
   editable,
+  releaseId,
   onContentChange,
   canDelete = false,
   onDelete,
@@ -34,9 +35,10 @@ function EditableContentSubBlockRenderer({
         <div className="dfe-content-overflow">
           <EditableDataBlock
             editable={editable}
+            {...block}
             canDelete={canDelete}
             onDelete={onDelete}
-            {...block}
+            releaseId={releaseId}
           />
         </div>
       );

@@ -1,8 +1,6 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import Button from '@common/components/Button';
-import Details from '@common/components/Details';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import KeyStatTile, {
@@ -15,6 +13,8 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
+import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
+import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 
 export interface KeyStatsFormValues {
   dataSummary: string;
@@ -112,7 +112,7 @@ const EditableKeyStatTile = ({
                 (summary &&
                   summary.dataDefinitionTitle &&
                   summary.dataDefinitionTitle[0]) ||
-                `Define '${config.indicatorLabel}'`,
+                'Help',
               dataDefinition:
                 (summary &&
                   summary.dataDefinition &&
@@ -148,18 +148,26 @@ const EditableKeyStatTile = ({
                       />
                     </div>
                   </div>
-                  <Details summary="Guidance text" open>
+                  <div className="govuk-inset-text">
                     <FormFieldTextInput<KeyStatsFormValues>
                       id={`key-stat-dataDefinitionTitle-${id}`}
                       name="dataDefinitionTitle"
                       label="Guidance title"
                     />
-                    <FormFieldTextArea<KeyStatsFormValues>
-                      id={`key-stat-dataDefinition-${id}`}
+                    <FormFieldWysiwygArea
                       name="dataDefinition"
+                      toolbarConfig={toolbarConfigs.reduced}
+                      id={`key-stat-dataDefinition-${id}`}
                       label="Guidance text"
+                      onContentChange={(content: string) => {
+                        form.setValues({
+                          ...form.values,
+                          dataDefinition: content,
+                        });
+                      }}
+                      source={(summary && summary.dataDefinition[0]) || ''}
                     />
-                  </Details>
+                  </div>
                   <Button
                     disabled={!form.isValid}
                     type="submit"
@@ -191,7 +199,7 @@ const EditableKeyStatTile = ({
           summary={summary}
           handleApiErrors={handleApiErrors}
         >
-          <div className="govuk-!-margin-top-2">
+          <div className={styles.keyStatEdit}>
             <Button
               onClick={() => {
                 setShowForm(true);

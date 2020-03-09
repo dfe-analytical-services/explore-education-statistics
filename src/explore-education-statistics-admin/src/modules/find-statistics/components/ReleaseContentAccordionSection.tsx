@@ -116,7 +116,7 @@ const ReleaseContentAccordionSection = ({
         allowComments
       />
 
-      {!isReordering && (
+      {!isReordering && canAddBlocks && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">
           <Button
             variant="secondary"

@@ -6,7 +6,7 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
-import service from '@admin/services/release/edit-release/data/service';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
@@ -72,7 +72,7 @@ const PublicationReleaseContent = () => {
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          service
+                          editReleaseDataService
                             .downloadFile(path, name)
                             .catch(handleApiErrors)
                         }
@@ -128,7 +128,11 @@ const PublicationReleaseContent = () => {
                           ({ id, description, url }) => [
                             description,
                             <li key={id} data-testid="other-release-item">
-                              <a href={url}>{description}</a>
+                              {!isEditing ? (
+                                <a href={url}>{description}</a>
+                              ) : (
+                                <a>{description}</a>
+                              )}
                             </li>,
                           ],
                         ),

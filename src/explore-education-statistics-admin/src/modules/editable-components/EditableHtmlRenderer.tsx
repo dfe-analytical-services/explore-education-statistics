@@ -1,11 +1,7 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
 import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import wrapEditableComponent, {
-  EditingContext,
-} from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext } from 'react';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React from 'react';
 
 export type Props = RendererProps & {
   source: string;
