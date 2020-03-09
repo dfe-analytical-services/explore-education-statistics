@@ -1,4 +1,4 @@
-declare module 'recharts/es6/component/DefaultLegendContent' {
+declare module 'recharts/lib/component/DefaultLegendContent' {
   import { ComponentType } from 'react';
   import { LegendProps } from 'recharts';
 

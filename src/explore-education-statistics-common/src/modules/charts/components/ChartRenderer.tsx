@@ -14,7 +14,7 @@ import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
 import { ContentRenderer, LegendProps } from 'recharts';
-import DefaultLegendContent from 'recharts/es6/component/DefaultLegendContent';
+import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/charts/components/MapBlock'),
