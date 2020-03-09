@@ -27,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             pendingQueue.CreateIfNotExists();
             table.CreateIfNotExists();
             availableQueue.Clear();
-            // TODO See EES-1425
             pendingQueue.Clear();
 
             TableContinuationToken token = null;
@@ -42,15 +41,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
 
                     // If batch was not split then just processing again by adding to pending queue
-                    if (entity.NumBatches == 1)
+                    if (entity.Status.Equals(IStatus.QUEUED) || entity.Status.Equals(IStatus.RUNNING_PHASE_1))
                     {
+                        Console.WriteLine($"No data imported for {entity.PartitionKey} : {entity.RowKey} - Import will be re-run");
                         pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
                     // Else create a message for all remaining batches
                     else
                     {
-                        ImportMessage m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
-
+                        var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
                         var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
 
                         // If no batches then assume it didn't get passed initial validation stage
@@ -71,15 +70,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         
         private static TableQuery<DatafileImport> BuildQuery()
         {
-            var f1 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString());
-            var f2 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString());
-            var combineFilters = TableQuery.CombineFilters(f1, TableOperators.Or, f2);
-            var f3 = TableQuery.GenerateFilterCondition("Status", 
-                QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString());
+            var combineFilters = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.QUEUED.ToString())
+                , TableOperators.Or, 
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
+
+            combineFilters = TableQuery.CombineFilters(
+                combineFilters, 
+                TableOperators.Or, 
+                TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
+
             return new TableQuery<DatafileImport>()
-                .Where(TableQuery.CombineFilters(combineFilters, TableOperators.Or, f3));
+                .Where(TableQuery.CombineFilters(
+                    combineFilters, 
+                    TableOperators.Or, 
+                    TableQuery.GenerateFilterCondition("Status", 
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString())));
         }
         
         private static string BuildMessage(ImportMessage message, string folderAndFilename)
@@ -87,14 +96,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var fileName = folderAndFilename.Split(FileStoragePathUtils.BatchesDir + "/")[1];
             var batchNo = Int16.Parse(fileName.Substring(fileName.Length-6));
             
+            Console.WriteLine($"Recreating message queue for {fileName}");
+            
             var iMessage = new ImportMessage
             {
+                SubjectId = message.SubjectId,
                 DataFileName = $"{FileStoragePathUtils.BatchesDir}/{fileName}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,
                 BatchNo = batchNo,
                 NumBatches = message.NumBatches,
-                RowsPerBatch = message.RowsPerBatch
+                RowsPerBatch = message.RowsPerBatch,
+                TotalRows = message.TotalRows
             };
 
             return JsonConvert.SerializeObject(iMessage);

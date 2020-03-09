@@ -133,7 +133,7 @@ const DataBlockSourceWizard = ({
           {wizardStepProps => (
             <>
               <WizardStepHeading {...wizardStepProps}>
-                Data block details
+                {initialValues ? 'Update data block' : 'Create data block'}
               </WizardStepHeading>
 
               {query && tableHeaders && table && (
@@ -173,6 +173,8 @@ const DataBlockSourceWizard = ({
                       tableHeadersConfig={tableHeaders}
                     />
                   </div>
+
+                  <hr />
 
                   <DataBlockDetailsForm
                     initialValues={initialValues}

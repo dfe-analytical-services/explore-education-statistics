@@ -1,7 +1,10 @@
 import { ChartMetaData } from '@common/modules/charts/types/chart';
 import {
+  FilterOption,
+  PublicationSubjectMeta,
+} from '@common/modules/table-tool/services/tableBuilderService';
+import {
   DataBlockMetadata,
-  LabelValueMetadata,
   Location,
   Result,
 } from '@common/services/dataBlockService';
@@ -280,7 +283,20 @@ export function createDataForAxis(
   );
 }
 
-const FindFirstInDictionaries = (
+export function pairFiltersByValue(
+  filters: PublicationSubjectMeta['filters'],
+): Dictionary<FilterOption> {
+  return Object.values(filters)
+    .flatMap(filter =>
+      Object.values(filter.options).flatMap(filterGroup => filterGroup.options),
+    )
+    .reduce<Dictionary<FilterOption>>((acc, filter) => {
+      acc[filter.value] = filter;
+      return acc;
+    }, {});
+}
+
+const findFirstInDictionaries = (
   metaDataObjects: (Dictionary<LabelConfiguration> | undefined)[],
   name: string,
 ) => (result: string | undefined, meta?: Dictionary<LabelConfiguration>) =>
@@ -294,7 +310,7 @@ export function mapNameToNameLabel(
     ...(keepOriginalValue ? { __name: name } : {}),
     name:
       metaDataObjects.reduce(
-        FindFirstInDictionaries(metaDataObjects, name),
+        findFirstInDictionaries(metaDataObjects, name),
         '',
       ) || name,
     ...otherdata,
@@ -342,7 +358,7 @@ export function createSortedAndMappedDataForAxis(
       labels,
       meta.timePeriod,
       meta.locations,
-      meta.filters,
+      pairFiltersByValue(meta.filters),
       meta.indicators,
     ),
   );
@@ -569,21 +585,8 @@ export function parseMetaData(
 ): ChartMetaData | undefined {
   if (metaData === undefined) return undefined;
 
-  const allFilters: LabelValueMetadata[] = Object.values(
-    metaData.filters,
-  ).reduce<LabelValueMetadata[]>((filters, { options }) => {
-    return filters.concat(...Object.values(options).map(_ => _.options));
-  }, []);
-
   return {
-    filters: allFilters.reduce(
-      (f, { label, value }) => ({
-        ...f,
-        [value]: { label, value },
-      }),
-      {},
-    ),
-
+    filters: metaData.filters,
     indicators: metaData.indicators,
     locations: metaData.locations,
     boundaryLevels: metaData.boundaryLevels,

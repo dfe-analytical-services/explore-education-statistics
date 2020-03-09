@@ -179,7 +179,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
         return isActive ? (
           <div ref={ref}>
-            <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+            <Form {...form} id={formId} showSubmitError>
               {stepHeading}
 
               <FormGroup>

@@ -1,5 +1,6 @@
 export type ImportStatusCode =
   | 'COMPLETE'
+  | 'QUEUED'
   | 'RUNNING_PHASE_1'
   | 'RUNNING_PHASE_2'
   | 'RUNNING_PHASE_3'
