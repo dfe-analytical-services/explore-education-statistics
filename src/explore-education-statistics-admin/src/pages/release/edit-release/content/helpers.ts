@@ -219,6 +219,7 @@ export async function attachContentSectionBlock(
       type: 'ADD_BLOCK_TO_SECTION',
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
+    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
   } catch (err) {
     errorHandler(err);
   }

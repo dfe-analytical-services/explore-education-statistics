@@ -5,10 +5,7 @@ import {
   EditableRelease,
 } from '@admin/services/publicationService';
 import { DataBlock } from '@common/services/dataBlockService';
-import {
-  AbstractRelease,
-  ContentSection,
-} from '@common/services/publicationService';
+import { ContentSection } from '@common/services/publicationService';
 import React, { createContext, useContext, useReducer } from 'react';
 import ReleaseDispatchAction from './actions';
 
@@ -18,23 +15,14 @@ type State = {
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: ExtendedComment[];
-  pageError?: string;
 };
 type ReleaseProviderProps = { children: React.ReactNode };
 
 const ReleaseStateContext = createContext<State | undefined>(undefined);
 const ReleaseDispatchContext = createContext<Dispatch | undefined>(undefined);
 
-function releaseReducer(state: State, action: ReleaseDispatchAction) {
+export function releaseReducer(state: State, action: ReleaseDispatchAction) {
   switch (action.type) {
-    case 'PAGE_ERROR':
-      return produce<State>(state, draft => {
-        draft.release = undefined;
-        draft.canUpdateRelease = false;
-        draft.availableDataBlocks = [];
-        draft.unresolvedComments = [];
-        draft.pageError = action.payload.pageError;
-      });
     case 'CLEAR_STATE':
       return produce<State>(state, draft => {
         return {
@@ -42,7 +30,6 @@ function releaseReducer(state: State, action: ReleaseDispatchAction) {
           canUpdateRelease: false,
           availableDataBlocks: [],
           unresolvedComments: [],
-          pageError: undefined,
         };
       });
     case 'SET_STATE':

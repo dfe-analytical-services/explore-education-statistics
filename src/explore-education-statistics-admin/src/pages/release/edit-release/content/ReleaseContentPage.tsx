@@ -28,12 +28,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     ManageReleaseContext,
   ) as ManageRelease;
 
-  const {
-    release,
-    canUpdateRelease,
-    unresolvedComments,
-    pageError,
-  } = useReleaseState();
+  const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
   const dispatch = useReleaseDispatch();
 
   useEffect(() => {
@@ -46,7 +41,6 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     }
   }, [canUpdateRelease]);
 
-  if (pageError) return <>{pageError}</>;
   return (
     <>
       {release ? (

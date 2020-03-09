@@ -1,16 +1,12 @@
-import {
-  EditableContentBlock,
-  EditableRelease,
-} from '@admin/services/publicationService';
+import { EditableContentBlock } from '@admin/services/publicationService';
 import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
 import { State } from './ReleaseContext';
 
-type PageError = { type: 'PAGE_ERROR'; payload: { pageError: string } };
 type ClearState = { type: 'CLEAR_STATE' };
-type SetNewState = { type: 'SET_STATE'; payload: State };
+type SetState = { type: 'SET_STATE'; payload: State };
 type SetAvailableDatablocks = {
   type: 'SET_AVAILABLE_DATABLOCKS';
   payload: Pick<State, 'availableDataBlocks'>;
@@ -79,9 +75,8 @@ export type UpdateContentSection = {
 };
 
 type ReleaseDispatchAction =
-  | PageError
   | ClearState
-  | SetNewState
+  | SetState
   | SetAvailableDatablocks
   | RemoveBlockFromSection
   | UpdateBlockFromSection
