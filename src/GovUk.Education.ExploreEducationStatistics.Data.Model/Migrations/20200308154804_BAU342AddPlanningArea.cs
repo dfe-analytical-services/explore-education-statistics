@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP TYPE dbo.LocationType");
             
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Type_LocationType.sql");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservations.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertLocation.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
