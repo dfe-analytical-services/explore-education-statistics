@@ -2,13 +2,15 @@ import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
-  ChartDataB,
   ChartDefinition,
   ChartMetaData,
   ChartProps,
+} from '@common/modules/charts/types/chart';
+import {
+  ChartData,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/util/chartUtils';
 
 import {
   DataBlockData,
@@ -28,8 +30,8 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import stylesIndicators from '../SummaryRenderer.module.scss';
-import styles from './MapBlock.module.scss';
+import stylesIndicators from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from '@common/modules/charts/components/MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;
@@ -71,14 +73,14 @@ interface MapClickEvent extends LeafletMouseEvent {
 function getLocationsForDataSet(
   data: DataBlockData,
   meta: ChartMetaData,
-  chartData: ChartDataB[],
+  chartData: ChartData[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
 
   return [
     { label: 'Select...', value: '' },
     ...allLocationIds.reduce(
-      (locations: { label: string; value: string }[], next: string) => {
+      (locations: { label: string; value: string }[], next) => {
         const { label, value } = (meta.locations || {})[next];
 
         return [...locations, { label, value }];
@@ -98,7 +100,7 @@ function getLocationsForDataSet(
 function getGeometryForOptions(
   meta: ChartMetaData,
   selectedDataSet: DataSetConfiguration,
-  sourceData: ChartDataB[],
+  sourceData: ChartData[],
   min: number,
   scale: number,
 ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
@@ -112,19 +114,19 @@ function getGeometryForOptions(
           ...meta.locations[id].geoJson[0].properties,
           measures,
           color: selectedDataSet.colour,
-          data: Number.parseFloat(data),
-          scaledData: (Number.parseFloat(data) - min) * scale,
+          data: Number(data),
+          scaledData: (Number(data) - min) * scale,
         },
       };
     }),
   };
 }
 
-function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
+function calculateMinAndScaleForSourceData(sourceData: ChartData[]) {
   const { min, max } = sourceData.reduce(
     // eslint-disable-next-line no-shadow
     ({ min, max }, { data }) => {
-      const dataVal = Number.parseFloat(data);
+      const dataVal = Number(data);
       return {
         min: dataVal < min ? dataVal : min,
         max: dataVal > max ? dataVal : max,
@@ -146,11 +148,11 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
 function generateGeometryAndLegendForSelectedOptions(
   meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
-  chartData: ChartDataB[],
+  chartData: ChartData[],
   selectedDataSet: string,
 ) {
   const sourceData = chartData
-    .map<ChartDataB>(entry => ({ ...entry, data: entry[selectedDataSet] }))
+    .map<ChartData>(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(
       ({ data, __name: id }) =>
         data !== undefined && meta.locations[id] && meta.locations[id].geoJson,
@@ -321,7 +323,7 @@ const MapBlock = ({
 
   const [results, setResults] = React.useState<IdValue[]>([]);
 
-  const [chartData, setChartData] = React.useState<ChartDataB[]>();
+  const [chartData, setChartData] = React.useState<ChartData[]>();
 
   // enforce that the Map only responds to being grouped by locations
   const [axisMajor, setAxisMajor] = React.useState<AxisConfiguration>({
@@ -338,8 +340,8 @@ const MapBlock = ({
 
   // initialise
   React.useEffect(() => {
-    import('@common/services/UKGeoJson').then(imported => {
-      setUkGeometry(imported.default);
+    import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
+      setUkGeometry(imported.default as FeatureCollection);
     });
   }, []);
 

@@ -1,46 +1,54 @@
 import {
   AbstractChartProps,
   ChartDefinition,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import * as React from 'react';
+} from '@common/modules/charts/types/chart';
+import React, { useEffect, useState } from 'react';
+
+export type GetInfographic = (
+  releaseId: string,
+  fileName: string,
+) => Promise<Blob>;
 
 export interface InfographicChartProps extends AbstractChartProps {
+  releaseId?: string;
   fileId?: string;
-
-  chartFileDownloadService?: (
-    releaseId: string,
-    fileName: string,
-  ) => Promise<Blob>;
+  getInfographic?: GetInfographic;
 }
 
 const Infographic = ({
-  data,
+  releaseId,
   fileId,
-  chartFileDownloadService,
-  width,
-  height,
+  getInfographic,
+  width = 0,
+  height = 0,
   children,
 }: InfographicChartProps) => {
-  const [file, setFile] = React.useState<string>();
+  const [file, setFile] = useState<string>();
 
-  React.useEffect(() => {
-    if (fileId && chartFileDownloadService) {
-      chartFileDownloadService(data.releaseId, fileId).then(blob => {
+  useEffect(() => {
+    if (fileId && releaseId && getInfographic) {
+      getInfographic(releaseId, fileId).then(blob => {
         const a = new FileReader();
         // @ts-ignore
         a.onload = (e: ProgressEvent) => setFile(e.target.result);
         a.readAsDataURL(blob);
       });
     }
-  }, [chartFileDownloadService, data.releaseId, fileId]);
+  }, [getInfographic, fileId, releaseId]);
 
-  if (fileId === undefined || fileId === '')
+  if (fileId === undefined || fileId === '') {
     return <div>Infographic not configured</div>;
+  }
 
   return (
     <>
       {file && (
-        <img alt="infographic" src={file} width={width} height={height} />
+        <img
+          alt="infographic"
+          src={file}
+          width={width > 0 ? width : undefined}
+          height={height > 0 ? height : undefined}
+        />
       )}
       {children}
     </>

@@ -1,13 +1,9 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
-} from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
+} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import getDefaultTableHeaderConfig, {
-  TableHeadersConfig,
-} from '@common/modules/table-tool/utils/tableHeaders';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   TableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
@@ -15,6 +11,12 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/table-tool/utils/tableHeaders';
 import {
   DataBlock,
   DataBlockResponse,
@@ -33,7 +35,7 @@ interface CreateDataBlockProps {
   onTableToolLoaded?: () => void;
 }
 
-const CreateDataBlocks = ({
+const DataBlockSourceWizard = ({
   releaseId,
   dataBlock,
   dataBlockResponse,
@@ -59,15 +61,13 @@ const CreateDataBlocks = ({
   useEffect(() => {
     if (dataBlock && dataBlockResponse) {
       if (dataBlock.dataBlockRequest) {
-        initialiseFromQuery(dataBlock.dataBlockRequest, releaseId).then(
-          state => {
-            setTableToolState(state);
+        initialiseFromQuery(dataBlock.dataBlockRequest).then(state => {
+          setTableToolState(state);
 
-            if (onTableToolLoaded) {
-              onTableToolLoaded();
-            }
-          },
-        );
+          if (onTableToolLoaded) {
+            onTableToolLoaded();
+          }
+        });
       }
 
       setQuery(dataBlock.dataBlockRequest);
@@ -75,15 +75,18 @@ const CreateDataBlocks = ({
       const dataTable = mapDataBlockResponseToFullTable(dataBlockResponse);
       setTable(dataTable);
 
-      if (dataBlock?.tables && dataBlock.tables.length > 0) {
-        setTableHeaders({
-          ...dataBlock?.tables?.[0]?.tableHeaders,
-        });
+      if (dataBlock?.tables?.length) {
+        setTableHeaders(
+          mapTableHeadersConfig(
+            dataBlock?.tables?.[0]?.tableHeaders,
+            dataTable.subjectMeta,
+          ),
+        );
       } else {
         setTableHeaders(getDefaultTableHeaderConfig(dataTable.subjectMeta));
       }
     }
-  }, [dataBlock, dataBlockResponse, onTableToolLoaded, releaseId]);
+  }, [dataBlock, dataBlockResponse, onTableToolLoaded]);
 
   useEffect(() => {
     if (!dataBlock) {
@@ -126,30 +129,67 @@ const CreateDataBlocks = ({
           {wizardStepProps => (
             <>
               <WizardStepHeading {...wizardStepProps}>
-                Data block details
+                {initialValues ? 'Update data block' : 'Create data block'}
               </WizardStepHeading>
 
-              {query && tableHeaders && (
-                <DataBlockDetailsForm
-                  initialValues={initialValues}
-                  query={query}
-                  tableHeaders={tableHeaders}
-                  initialDataBlock={dataBlock}
-                  releaseId={releaseId}
-                  onDataBlockSave={db => onDataBlockSave(db)}
-                >
-                  {table && tableHeaders && (
-                    <div className="govuk-!-margin-bottom-4">
-                      <div className="govuk-width-container">
-                        <TimePeriodDataTable
-                          ref={dataTableRef}
-                          fullTable={table}
-                          tableHeadersConfig={tableHeaders}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </DataBlockDetailsForm>
+              {query && tableHeaders && table && (
+                <>
+                  <div className="govuk-!-margin-bottom-4">
+                    <TableHeadersForm
+                      initialValues={tableHeaders}
+                      id="dataBlockSourceWizard-tableHeadersForm"
+                      onSubmit={async nextTableHeaders => {
+                        setTableHeaders(nextTableHeaders);
+
+                        if (dataBlock) {
+                          await onDataBlockSave({
+                            ...dataBlock,
+                            tables: [
+                              {
+                                tableHeaders: nextTableHeaders,
+                                indicators: [],
+                              },
+                            ],
+                          });
+                        }
+
+                        if (dataTableRef.current) {
+                          dataTableRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      }}
+                    />
+
+                    <TimePeriodDataTable
+                      ref={dataTableRef}
+                      fullTable={table}
+                      tableHeadersConfig={tableHeaders}
+                    />
+                  </div>
+
+                  <hr />
+
+                  <DataBlockDetailsForm
+                    initialValues={initialValues}
+                    query={query}
+                    tableHeaders={tableHeaders}
+                    initialDataBlock={dataBlock}
+                    releaseId={releaseId}
+                    onDataBlockSave={data =>
+                      onDataBlockSave({
+                        ...data,
+                        tables: [
+                          {
+                            tableHeaders,
+                            indicators: [],
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </>
               )}
             </>
           )}
@@ -159,4 +199,4 @@ const CreateDataBlocks = ({
   ) : null;
 };
 
-export default CreateDataBlocks;
+export default DataBlockSourceWizard;

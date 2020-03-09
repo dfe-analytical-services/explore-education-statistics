@@ -1,14 +1,16 @@
 import {
-  ChartDataB,
   ChartDefinition,
+  StackedBarProps,
+} from '@common/modules/charts/types/chart';
+import {
+  ChartData,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-  StackedBarProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/util/chartUtils';
 
 import classnames from 'classnames';
 import React, { Component } from 'react';
@@ -24,7 +26,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import './charts.scss';
+import '@common/modules/charts/components/charts.scss';
 
 export type VerticalBarProps = StackedBarProps;
 
@@ -94,7 +96,7 @@ export default class VerticalBarBlock extends Component<VerticalBarProps> {
     )
       return <div>Unable to render chart, chart incorrectly configured</div>;
 
-    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+    const chartData: ChartData[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,

@@ -1,28 +1,24 @@
-import {
-  ChartSymbol,
-  DataSetConfiguration,
-  LineStyle,
-} from '@common/services/publicationService';
-import * as React from 'react';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import {
   FormFieldset,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import {
-  ChartCapabilities,
-  colours,
-  symbols,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import { SelectOption } from '@common/components/form/FormSelect';
-
-import styles from './graph-builder.module.scss';
+import { ChartCapabilities } from '@common/modules/charts/types/chart';
+import { colours, symbols } from '@common/modules/charts/util/chartUtils';
+import {
+  ChartSymbol,
+  DataSetConfiguration,
+  LineStyle,
+} from '@common/services/publicationService';
+import React, { useState } from 'react';
 
 interface Props {
   configuration: DataSetConfiguration;
   capabilities: ChartCapabilities;
-
+  id: string;
   onConfigurationChange?: (value: DataSetConfiguration) => void;
 }
 
@@ -54,11 +50,10 @@ const lineStyleOptions: SelectOption[] = [
 const ChartDataConfiguration = ({
   configuration,
   capabilities,
+  id,
   onConfigurationChange,
 }: Props) => {
-  const [config, setConfig] = React.useState<DataSetConfiguration>(
-    configuration,
-  );
+  const [config, setConfig] = useState<DataSetConfiguration>(configuration);
 
   const updateConfig = (newConfig: DataSetConfiguration) => {
     setConfig(newConfig);
@@ -76,7 +71,7 @@ const ChartDataConfiguration = ({
         <div className={styles.chartDataLabelConfiguration}>
           <div className={styles.chartDataItem}>
             <FormTextInput
-              id="label"
+              id={`${id}-label`}
               name="label"
               value={config.label}
               label="Label"
@@ -91,7 +86,7 @@ const ChartDataConfiguration = ({
 
           <div className={styles.chartDataItem}>
             <FormTextInput
-              id="colour"
+              id={`${id}-colour`}
               name="colour"
               label="Colour"
               type="color"
@@ -109,7 +104,7 @@ const ChartDataConfiguration = ({
           {capabilities.dataSymbols && (
             <div className={styles.chartDataItem}>
               <FormSelect
-                id="symbol"
+                id={`${id}-symbol`}
                 name="symbol"
                 label="Symbol"
                 value={configuration.symbol}
@@ -127,7 +122,7 @@ const ChartDataConfiguration = ({
           {capabilities.lineStyle && (
             <div className={styles.chartDataItem}>
               <FormSelect
-                id="lineStyle"
+                id={`${id}-lineStyle`}
                 name="lineStyle"
                 label="Style"
                 value={configuration.lineStyle}

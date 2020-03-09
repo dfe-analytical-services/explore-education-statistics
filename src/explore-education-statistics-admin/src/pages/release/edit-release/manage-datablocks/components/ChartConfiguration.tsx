@@ -1,29 +1,18 @@
-import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
-import service from '@admin/services/release/edit-release/data/service';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { ErrorControlProps } from '@admin/validation/withErrorControl';
-import Button from '@common/components/Button';
 import {
   FormCheckbox,
   FormGroup,
-  Formik,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { SelectOption } from '@common/components/form/FormSelect';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/types/chart';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import { FormikProps } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
+import InfographicChartForm from './InfographicChartForm';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -46,146 +35,6 @@ export interface ChartOptions {
   geographicId?: string;
 }
 
-interface InfographicChartOptionsProps {
-  releaseId: string;
-  fileId?: string;
-  onChange: (fileId: string) => void;
-}
-
-const loadChartFilesAndMapToSelectOptionAsync = (
-  releaseId: string,
-): Promise<SelectOption[]> => {
-  return service.getChartFiles(releaseId).then(chartFiles => {
-    return [
-      {
-        label: 'Upload a new file',
-        value: '',
-      },
-      ...chartFiles.map(({ title, filename }) => ({
-        label: title,
-        value: filename,
-      })),
-    ];
-  });
-};
-
-interface FormValues {
-  name: string;
-  file: File | null;
-  fileId: string;
-}
-
-const InfographicChartOptions = ({
-  releaseId,
-  fileId,
-  onChange,
-  handleApiErrors,
-}: InfographicChartOptionsProps & ErrorControlProps) => {
-  const [chartFileOptions, setChartFileOptions] = React.useState<
-    SelectOption[]
-  >([]);
-
-  const [uploading, setUploading] = React.useState(false);
-
-  const formId = 'fileUploadForm';
-
-  const errorCodeMappings = [
-    errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_FILE',
-      'file',
-      'Choose a unique file',
-    ),
-  ];
-
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      if (values.file) {
-        setUploading(true);
-
-        await service
-          .uploadChartFile(releaseId, {
-            name: values.name,
-            file: values.file as File,
-          })
-          .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
-          .then(setChartFileOptions)
-          .then(() => onChange((values.file as File).name))
-          .finally(() => {
-            setUploading(false);
-          });
-      }
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
-
-  React.useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId)
-      .then(setChartFileOptions)
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
-
-  return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={{
-        name: '',
-        file: null,
-        fileId: fileId || '',
-      }}
-      validationSchema={Yup.object<FormValues>({
-        name: Yup.string().required('Enter a name'),
-        file: Yup.mixed().required('Choose a file'),
-        fileId: Yup.string(),
-      })}
-      onSubmit={submitFormHandler}
-      render={(form: FormikProps<FormValues>) => {
-        return (
-          <Form id={formId}>
-            <FormFieldSelect
-              id={`${formId}-fileId`}
-              name="fileId"
-              label="Select the file to show"
-              order={[]}
-              options={chartFileOptions}
-              value={fileId}
-              onChange={e => {
-                form.setFieldValue('fileId', e.target.value);
-                return onChange(e.target.value);
-              }}
-            />
-
-            {!form.values.fileId && (
-              <>
-                <FormFieldTextInput
-                  id={`${formId}-name`}
-                  name="name"
-                  label="Select a name to give the file"
-                  width={10}
-                />
-
-                <FormFieldFileSelector<FormValues>
-                  id={`${formId}-file`}
-                  name="file"
-                  label="Select a file to upload"
-                  form={form}
-                />
-
-                <Button
-                  type="submit"
-                  disabled={!form.values.file || !form.values.name || uploading}
-                >
-                  Upload
-                </Button>
-              </>
-            )}
-          </Form>
-        );
-      }}
-    />
-  );
-};
 const ChartConfiguration = ({
   chartOptions: initialChartOptions,
   selectedChartType,
@@ -196,24 +45,24 @@ const ChartConfiguration = ({
   handleApiErrors,
   handleManualErrors,
 }: Props & ErrorControlProps) => {
-  const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
+  const [chartOptions, setChartOptions] = useState<ChartOptions>(
     initialChartOptions,
   );
   const updateChartOptions = (options: ChartOptions) => {
     setChartOptions(options);
     if (onChange) onChange(options);
   };
-  const [chartWidth, setChartWidth] = React.useState(
+  const [chartWidth, setChartWidth] = useState(
     `${initialChartOptions.width || ''}`,
   );
-  const [chartHeight, setChartHeight] = React.useState(
+  const [chartHeight, setChartHeight] = useState(
     `${initialChartOptions.height || ''}`,
   );
   return (
     <>
       {selectedChartType.type === 'infographic' && (
         <>
-          <InfographicChartOptions
+          <InfographicChartForm
             releaseId={data.releaseId}
             fileId={chartOptions.fileId || ''}
             onChange={fileId => {
@@ -286,6 +135,7 @@ const ChartConfiguration = ({
             {chartOptions.legend !== 'none' && (
               <FormGroup>
                 <FormTextInput
+                  type="number"
                   id="legend-height"
                   name="legend-height"
                   label="Legend height (px)"
@@ -308,6 +158,7 @@ const ChartConfiguration = ({
           <div className={styles.formGroup}>
             <FormGroup>
               <FormTextInput
+                type="number"
                 id="chart-height"
                 name="chart-height"
                 label="Chart height (px)"
@@ -324,6 +175,7 @@ const ChartConfiguration = ({
             </FormGroup>
             <FormGroup>
               <FormTextInput
+                type="number"
                 id="chart-width"
                 name="chart-width"
                 label="Chart width (px)"

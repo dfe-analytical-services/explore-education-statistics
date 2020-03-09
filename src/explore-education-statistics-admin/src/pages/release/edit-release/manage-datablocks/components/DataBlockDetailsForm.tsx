@@ -14,11 +14,35 @@ import {
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React, { ReactNode } from 'react';
+import React, { Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
+type BlockState = {
+  saved?: boolean;
+  error?: boolean;
+  updated?: boolean;
+};
+
+type BlockStateReducer = Reducer<BlockState, BlockState>;
+
+const reducer: BlockStateReducer = (
+  state,
+  { saved, error, updated } = {
+    saved: false,
+    error: false,
+    updated: false,
+  },
+) => {
+  if (saved || updated) {
+    return { saved: true, updated };
+  }
+  if (error) {
+    return { error: true };
+  }
+  return { saved: false, error: false };
+};
+
 interface Props {
-  children?: ReactNode;
   initialValues?: DataBlockDetailsFormValues;
   query: TableDataQuery;
   tableHeaders: TableHeadersConfig;
@@ -35,7 +59,6 @@ export interface DataBlockDetailsFormValues {
 }
 
 const DataBlockDetailsForm = ({
-  children,
   initialValues = { title: '', name: '', source: '', customFootnotes: '' },
   query,
   tableHeaders,
@@ -43,33 +66,18 @@ const DataBlockDetailsForm = ({
   initialDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const formikRef = React.useRef<Formik<DataBlockDetailsFormValues>>(null);
+  const formikRef = useRef<Formik<DataBlockDetailsFormValues>>(null);
 
-  const [currentDataBlock, setCurrentDataBlock] = React.useState<
+  const [currentDataBlock, setCurrentDataBlock] = useState<
     DataBlock | undefined
   >(initialDataBlock);
 
-  const [blockState, setBlockState] = React.useReducer(
-    (
-      state,
-      { saved, error, updated } = {
-        saved: false,
-        error: false,
-        updated: false,
-      },
-    ) => {
-      if (saved || updated) {
-        return { saved: true, updated };
-      }
-      if (error) {
-        return { error: true };
-      }
-      return { saved: false, error: false };
-    },
-    { saved: false, error: false },
-  );
+  const [blockState, setBlockState] = useReducer<BlockStateReducer>(reducer, {
+    saved: false,
+    error: false,
+  });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setBlockState({ saved: false, error: false });
   }, [query, tableHeaders, releaseId]);
 
@@ -121,67 +129,59 @@ const DataBlockDetailsForm = ({
       onSubmit={saveDataBlock}
       render={(form: FormikProps<DataBlockDetailsFormValues>) => {
         return (
-          <div>
-            <Form {...form} id="dataBlockDetails">
-              <FormGroup>
-                <FormFieldTextInput<DataBlockDetailsFormValues>
-                  id="data-block-name"
-                  name="name"
-                  label="Data block name"
-                  hint=" Name and save your datablock before viewing it under the
+          <Form {...form} id="dataBlockDetails">
+            <h2>Data block details</h2>
+
+            <FormGroup>
+              <FormFieldTextInput<DataBlockDetailsFormValues>
+                id="data-block-name"
+                name="name"
+                label="Data block name"
+                hint=" Name and save your data block before viewing it under the
                     'View data blocks' tab at the top of this page."
-                  percentageWidth="one-half"
-                />
+                percentageWidth="one-half"
+              />
 
-                <hr />
-                {children}
+              <FormFieldTextArea<DataBlockDetailsFormValues>
+                id="data-block-title"
+                name="title"
+                label="Table title"
+                additionalClass="govuk-!-width-two-thirds"
+                rows={2}
+              />
 
-                <FormFieldTextArea<DataBlockDetailsFormValues>
-                  id="data-block-title"
-                  name="title"
-                  label="Table title"
-                  additionalClass="govuk-!-width-two-thirds"
-                  rows={2}
-                />
+              <FormFieldTextInput<DataBlockDetailsFormValues>
+                id="data-block-source"
+                name="source"
+                label="Source"
+                percentageWidth="two-thirds"
+              />
 
-                <FormFieldTextInput<DataBlockDetailsFormValues>
-                  id="data-block-source"
-                  name="source"
-                  label="Source"
-                  percentageWidth="two-thirds"
-                />
+              <FormFieldTextArea<DataBlockDetailsFormValues>
+                id="data-block-footnotes"
+                name="customFootnotes"
+                label="Footnotes"
+                additionalClass="govuk-!-width-two-thirds"
+              />
 
-                <FormFieldTextArea<DataBlockDetailsFormValues>
-                  id="data-block-footnotes"
-                  name="customFootnotes"
-                  label="Footnotes"
-                  additionalClass="govuk-!-width-two-thirds"
-                />
+              <Button type="submit" className="govuk-!-margin-top-6">
+                {currentDataBlock ? 'Update data block' : 'Save data block'}
+              </Button>
+            </FormGroup>
 
-                <Button
-                  disabled={!form.isValid}
-                  type="submit"
-                  className="govuk-!-margin-top-6"
-                >
-                  {currentDataBlock ? 'Update data block' : 'Save data block'}
-                </Button>
-              </FormGroup>
-
-              {blockState.error && (
-                <div>
-                  An error occurred saving the Data Block, please try again
-                  later.
-                </div>
-              )}
-              {blockState.saved && (
-                <div>
-                  {blockState.updated
-                    ? 'The Data Block has been updated.'
-                    : 'The Data Block has been saved.'}
-                </div>
-              )}
-            </Form>
-          </div>
+            {blockState.error && (
+              <p>
+                An error occurred saving the data block, please try again later.
+              </p>
+            )}
+            {blockState.saved && (
+              <p>
+                {blockState.updated
+                  ? 'The data block has been updated.'
+                  : 'The data block has been saved.'}
+              </p>
+            )}
+          </Form>
         );
       }}
     />

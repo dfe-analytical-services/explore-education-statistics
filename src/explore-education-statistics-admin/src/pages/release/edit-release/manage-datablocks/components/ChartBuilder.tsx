@@ -1,7 +1,14 @@
+import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
+import ChartConfiguration, {
+  ChartOptions,
+} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector, {
   ChartDataSetAndConfiguration,
   SelectedData,
-} from '@admin/modules/chart-builder/ChartDataSelector';
+} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
+import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -11,17 +18,20 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
+} from '@common/modules/charts/components/ChartRenderer';
+import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import Infographic from '@common/modules/charts/components/Infographic';
+import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import {
   ChartDefinition,
+  ChartMetaData,
+} from '@common/modules/charts/types/chart';
+import {
   generateKeyFromDataSet,
   parseMetaData,
-  ChartMetaData,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
-import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+} from '@common/modules/charts/util/chartUtils';
 import {
   DataBlockRerequest,
   DataBlockResponse,
@@ -33,16 +43,13 @@ import {
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React from 'react';
-import ChartConfiguration, {
-  ChartOptions,
-} from '@admin/modules/chart-builder/ChartConfiguration';
-import classnames from 'classnames';
-import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
-import service from '@admin/services/release/edit-release/data/service';
-import ChartAxisConfiguration from './ChartAxisConfiguration';
-import ChartTypeSelector from './ChartTypeSelector';
-import styles from './graph-builder.module.scss';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface Props {
   data: DataBlockResponse;
@@ -121,32 +128,16 @@ const ChartBuilder = ({
   handleApiErrors,
   handleManualErrors,
 }: Props & ErrorControlProps) => {
-  const [selectedChartType, setSelectedChartType] = React.useState<
+  const [selectedChartType, setSelectedChartType] = useState<
     ChartDefinition | undefined
   >();
 
-  const indicatorIds = Object.keys(data.metaData.indicators);
-  const metaData = React.useMemo(
+  const metaData = useMemo(
     () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
     [data.metaData],
   );
 
-  const filterIdCombinations = React.useMemo<string[][]>(
-    () =>
-      Object.values(
-        data.result.reduce((filterSet, result) => {
-          const filterIds = Array.from(result.filters);
-
-          return {
-            ...filterSet,
-            [filterIds.join('_')]: filterIds,
-          };
-        }, {}),
-      ),
-    [data.result],
-  );
-
-  const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
+  const [chartOptions, setChartOptions] = useState<ChartOptions>({
     stacked: false,
     legend: 'top',
     legendHeight: '42',
@@ -154,17 +145,15 @@ const ChartBuilder = ({
     title: '',
   });
 
-  const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
-    {},
-  );
+  const previousAxesConfiguration = useRef<Dictionary<AxisConfiguration>>({});
 
-  const [chartSaveState, setChartSaveState] = React.useState(SaveState.Unsaved);
+  const [chartSaveState, setChartSaveState] = useState(SaveState.Unsaved);
 
-  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
+  const [axesConfiguration, realSetAxesConfiguration] = useState<
     Dictionary<AxisConfiguration>
   >({});
 
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<
+  const [dataSetAndConfiguration, setDataSetAndConfiguration] = useState<
     ChartDataSetAndConfiguration[]
   >([]);
 
@@ -190,10 +179,10 @@ const ChartBuilder = ({
     setDataSetAndConfiguration(newDataSets);
   };
 
-  const [chartLabels, setChartLabels] = React.useState<
+  const [chartLabels, setChartLabels] = useState<
     Dictionary<DataSetConfiguration>
   >({});
-  React.useEffect(() => {
+  useEffect(() => {
     setChartLabels({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
         (mapped, { configuration }) => ({
@@ -206,18 +195,18 @@ const ChartBuilder = ({
     });
   }, [dataSetAndConfiguration, axesConfiguration, data, metaData]);
 
-  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
-    ChartDataSet[]
-  >([]);
-  React.useEffect(() => {
+  const [majorAxisDataSets, setMajorAxisDataSets] = useState<ChartDataSet[]>(
+    [],
+  );
+  useEffect(() => {
     setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
   }, [dataSetAndConfiguration]);
 
   // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = React.useState<
+  const [renderedChartProps, setRenderedChartProps] = useState<
     ChartRendererProps
   >();
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       selectedChartType &&
       (selectedChartType.axes.length === 0 ||
@@ -226,12 +215,10 @@ const ChartBuilder = ({
           axesConfiguration.major))
     ) {
       setRenderedChartProps({
+        ...chartOptions,
         type: selectedChartType.type,
-
         data,
-
         meta: metaData,
-
         axes: {
           major: {
             ...axesConfiguration.major,
@@ -243,9 +230,8 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
-        chartFileDownloadService: service.downloadChartFile,
-
-        ...chartOptions,
+        releaseId: data.releaseId,
+        getInfographic: editReleaseDataService.downloadChartFile,
       });
     } else {
       setRenderedChartProps(undefined);
@@ -261,9 +247,9 @@ const ChartBuilder = ({
     majorAxisDataSets,
   ]);
 
-  const previousSelectionChartType = React.useRef<ChartDefinition>();
+  const previousSelectionChartType = useRef<ChartDefinition>();
   // set defaults for a selected chart type
-  React.useEffect(() => {
+  useEffect(() => {
     if (previousSelectionChartType.current !== selectedChartType) {
       previousSelectionChartType.current = selectedChartType;
 
@@ -378,7 +364,7 @@ const ChartBuilder = ({
     };
   };
 
-  const saveChart = React.useCallback(async () => {
+  const saveChart = useCallback(async () => {
     setChartSaveState(SaveState.Unsaved);
     if (renderedChartProps && onChartSave) {
       try {
@@ -391,7 +377,7 @@ const ChartBuilder = ({
   }, [onChartSave, renderedChartProps]);
 
   // initial chart options set up
-  React.useEffect(() => {
+  useEffect(() => {
     const initial = extractInitialChartOptions(initialConfiguration);
 
     setChartSaveState(SaveState.Unsaved);
@@ -454,19 +440,13 @@ const ChartBuilder = ({
         <Details summary="Chart preview" open>
           <div className="govuk-width-container">
             {renderedChartProps === undefined ? (
-              <div
-                className={classnames(styles.preview)}
-                style={{
-                  width: chartOptions.width && `${chartOptions.width}px`,
-                  height: chartOptions.height && `${chartOptions.height}px`,
-                }}
-              >
+              <div className={styles.previewPlaceholder}>
                 {selectedChartType.axes.length > 0 ? (
-                  <span>Add data to view a preview of the chart</span>
+                  <p>Add data to view a preview of the chart</p>
                 ) : (
-                  <span>
+                  <p>
                     Configure the {selectedChartType.name} to view a preview
-                  </span>
+                  </p>
                 )}
               </div>
             ) : (
@@ -491,8 +471,6 @@ const ChartBuilder = ({
                   setDataSetAndConfiguration([...newData]);
                 }}
                 metaData={metaData}
-                indicatorIds={indicatorIds}
-                filterIds={filterIdCombinations}
                 selectedData={dataSetAndConfiguration}
                 chartType={selectedChartType}
                 capabilities={selectedChartType.capabilities}

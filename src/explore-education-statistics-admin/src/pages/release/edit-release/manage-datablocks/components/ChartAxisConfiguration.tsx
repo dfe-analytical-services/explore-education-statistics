@@ -1,3 +1,4 @@
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import {
   FormCheckbox,
   FormFieldset,
@@ -9,10 +10,12 @@ import {
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
-  ChartDataB,
   ChartMetaData,
+} from '@common/modules/charts/types/chart';
+import {
+  ChartData,
   createSortedAndMappedDataForAxis,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
@@ -21,9 +24,8 @@ import {
   DataSetConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
-import * as React from 'react';
 import { Dictionary } from '@common/types';
-import styles from './graph-builder.module.scss';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   id: string;
@@ -65,7 +67,7 @@ const getAxisLabels = (
     dataSets,
   };
 
-  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
     configurationWithDataSet,
     data.result,
     meta,
@@ -94,26 +96,26 @@ const ChartAxisConfiguration = ({
   onConfigurationChange,
   dataSets = [],
 }: Props) => {
-  const [axisConfiguration, setAxisConfiguration] = React.useState<
-    AxisConfiguration
-  >(configuration);
+  const [axisConfiguration, setAxisConfiguration] = useState<AxisConfiguration>(
+    configuration,
+  );
 
-  const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
+  const [sortOptions, setSortOptions] = useState<SelectOption[]>(() =>
     getSortOptions(labels),
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAxisConfiguration(configuration);
   }, [configuration]);
 
-  const [limitOptions, setLimitOptions] = React.useState<SelectOption[]>(() =>
+  const [limitOptions, setLimitOptions] = useState<SelectOption[]>(() =>
     getAxisLabels(configuration, data, meta, labels, dataSets),
   );
 
-  const [dataRangeMin, setDataRangeMin] = React.useState<string>(
+  const [dataRangeMin, setDataRangeMin] = useState<string>(
     `${configuration.dataRange || [''][0]}`,
   );
-  const [dataRangeMax, setDataRangeMax] = React.useState<string>(
+  const [dataRangeMax, setDataRangeMax] = useState<string>(
     `${configuration.dataRange || ['', ''][1]}`,
   );
 
@@ -156,7 +158,7 @@ const ChartAxisConfiguration = ({
     return 1;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAxisConfiguration(configuration);
     setSortOptions(getSortOptions(labels));
 
@@ -165,11 +167,11 @@ const ChartAxisConfiguration = ({
     // updateAxisConfiguration({dataRange: configuration.dataRange});
   }, [configuration, data, meta, labels, dataSets]);
 
-  const [referenceLine, setReferenceLine] = React.useState<ReferenceLine>({
+  const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
     label: '',
   });
-  const [referenceOptions] = React.useState<SelectOption[]>(() => {
+  const [referenceOptions] = useState<SelectOption[]>(() => {
     if (axisConfiguration.groupBy) {
       return [
         { label: 'Select', value: '' },

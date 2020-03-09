@@ -1,15 +1,17 @@
+import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
-  ChartDataB,
   ChartDefinition,
   ChartProps,
+} from '@common/modules/charts/types/chart';
+import {
+  ChartData,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
-  CustomToolTip,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+} from '@common/modules/charts/util/chartUtils';
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
@@ -31,7 +33,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import './charts.scss';
+import '@common/modules/charts/components/charts.scss';
 
 const LineStyles: Dictionary<string> = {
   solid: '',
@@ -80,7 +82,7 @@ const LineChartBlock = (props: LineChartProps) => {
   )
     return <div>Unable to render chart, chart incorrectly configured</div>;
 
-  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
     axes.major,
     data.result,
     meta,
@@ -103,7 +105,7 @@ const LineChartBlock = (props: LineChartProps) => {
             top: legend === 'top' ? 10 : 0,
           }}
         >
-          <Tooltip content={CustomToolTip} />
+          <Tooltip content={CustomTooltip} />
 
           {(legend === 'top' || legend === 'bottom') && (
             <Legend verticalAlign={legend} height={+(legendHeight || '50')} />

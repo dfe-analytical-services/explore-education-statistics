@@ -1,7 +1,7 @@
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import { ChartDefinition } from '@common/modules/charts/types/chart';
 import classnames from 'classnames';
 import React from 'react';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import styles from './graph-builder.module.scss';
 
 interface Props {
   chartTypes: ChartDefinition[];
