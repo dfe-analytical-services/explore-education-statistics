@@ -114,32 +114,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    release.Id = Guid.NewGuid();
-                    release.Created = DateTime.UtcNow;
-                    release.Status = ReleaseStatus.Draft;
-                    release.Published = null;
-                    release.Version += 1;
+                    var amendment = release.CreateReleaseAmendment(DateTime.UtcNow, _userService.GetUserId());
+                    _context.Releases.Add(amendment);
+                    await _context.SaveChangesAsync();
                     
-                    // TODO - copy Content
-                    release.Content = null;
-                    
-                    // TODO - copy Content Blocks
-                    release.ContentBlocks = null;
-
                     // TODO - copy Linked files
 
                     // TODO - copy stored non-data files
 
-                    _context.Releases.Add(release);
-                    await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(release.Id);
-                });
+                    return release;
+                })
+                .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id));
         }
-        
+
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
         {
             return _persistenceHelper
@@ -424,6 +415,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.Type);
+        }
+        
+        public static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        {
+            // Require publication / release / contact / type graph to be able to work out:
+            // If the release is the latest
+            // The contact
+            // The type
+            return values.Include(r => r.Publication)
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(c => c.Content)
+                .Include(r => r.Updates)
+                .Include(r => r.ContentBlocks)
+                .ThenInclude(r => r.ContentBlock);
         }
     }
 
