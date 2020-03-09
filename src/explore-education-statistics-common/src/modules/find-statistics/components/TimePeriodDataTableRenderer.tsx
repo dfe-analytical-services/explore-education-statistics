@@ -1,4 +1,5 @@
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
@@ -12,14 +13,20 @@ export interface Props {
   tableHeaders?: TableHeadersConfig;
 }
 
-const TimePeriodDataTableRenderer = ({ response, tableHeaders }: Props) => {
+const TimePeriodDataTableRenderer = ({
+  response,
+  tableHeaders,
+  heading,
+}: Props) => {
   const table = mapDataBlockResponseToFullTable(response);
-
   return (
     <TimePeriodDataTable
       fullTable={table}
+      captionTitle={heading}
       tableHeadersConfig={
-        tableHeaders ?? getDefaultTableHeaderConfig(table.subjectMeta)
+        tableHeaders
+          ? mapTableHeadersConfig(tableHeaders, table.subjectMeta)
+          : getDefaultTableHeaderConfig(table.subjectMeta)
       }
     />
   );

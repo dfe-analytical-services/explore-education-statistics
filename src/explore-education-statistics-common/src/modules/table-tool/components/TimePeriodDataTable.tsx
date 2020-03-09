@@ -22,6 +22,7 @@ import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 
 interface Props {
+  captionTitle?: string;
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
 }
@@ -85,8 +86,40 @@ export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
   }, [] as HeaderGroup[]);
 };
 
+/**
+ * Create table headers in either the row or column direction.
+ * This function will join together the configurations for
+ * the row/cols and the row/colgroups if possible, but will
+ * aim to optimise the viewing experience for the user.
+ */
+const createHeaders = (
+  rowColGroups: Filter[][],
+  rowCols: Filter[],
+): HeaderGroup[] => {
+  const groupHeaders = createGroupHeaders(rowColGroups);
+  const headers = {
+    headers: rowCols.map(rowCol => ({
+      text: rowCol.label,
+    })),
+  };
+
+  // If we have multiple row/col headers, we can just
+  // create a combination of the groups and the headers.
+  // This is a typical combination of headers.
+  if (rowCols.length > 1) {
+    return [...groupHeaders, headers];
+  }
+
+  // We only have one or zero row/col headers, so we want
+  // to show the group headers instead if possible.
+  // If there are no groups headers, we fallback to
+  // showing the row/col headers so that there are
+  // at least some headers in that direction.
+  return groupHeaders.length ? groupHeaders : [headers];
+};
+
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
-  ({ fullTable, tableHeadersConfig }: Props, dataTableRef) => {
+  ({ fullTable, tableHeadersConfig, captionTitle }: Props, dataTableRef) => {
     const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
@@ -98,29 +131,14 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: HeaderGroup[] =
-      tableHeadersConfig.columns.length > 1
-        ? [
-            ...createGroupHeaders(tableHeadersConfig.columnGroups),
-            {
-              headers: tableHeadersConfig.columns.map(column => ({
-                text: column.label,
-              })),
-            },
-          ]
-        : createGroupHeaders(tableHeadersConfig.columnGroups);
-
-    const rowHeaders: HeaderGroup[] =
-      tableHeadersConfig.rows.length > 1
-        ? [
-            ...createGroupHeaders(tableHeadersConfig.rowGroups),
-            {
-              headers: tableHeadersConfig.rows.map(row => ({
-                text: row.label,
-              })),
-            },
-          ]
-        : createGroupHeaders(tableHeadersConfig.rowGroups);
+    const columnHeaders = createHeaders(
+      tableHeadersConfig.columnGroups,
+      tableHeadersConfig.columns,
+    );
+    const rowHeaders = createHeaders(
+      tableHeadersConfig.rowGroups,
+      tableHeadersConfig.rows,
+    );
 
     const rowHeadersCartesian = cartesian(
       ...tableHeadersConfig.rowGroups,
@@ -202,7 +220,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         }
       >
         <FixedMultiHeaderDataTable
-          caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
+          caption={
+            <DataTableCaption
+              {...subjectMeta}
+              title={captionTitle}
+              id="dataTableCaption"
+            />
+          }
           columnHeaders={columnHeaders}
           rowHeaders={rowHeaders}
           rows={rows}
