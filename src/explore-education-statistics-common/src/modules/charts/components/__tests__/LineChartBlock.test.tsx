@@ -1,26 +1,18 @@
-import {
-  AxesConfiguration,
-  ChartMetaData,
-  ChartProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import PrototypeData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
+import Chart from '@common/modules/charts/components/LineChartBlock';
+import { ChartMetaData, ChartProps } from '@common/modules/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
+import { AxesConfiguration } from '@common/services/publicationService';
+import { render } from '@testing-library/react';
 import React from 'react';
-
-import { render } from 'react-testing-library';
-import Chart from '../VerticalBarBlock';
-
-import testData from './__data__/testBlockData';
-import { expectTicks } from './testUtils';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = {
-  ...testData.AbstractChartProps,
-  height: 900,
-};
+const props = PrototypeData.AbstractChartProps;
 const { axes } = props;
 
-describe('VerticalBarBlock', () => {
+describe('LineChartBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
 
@@ -49,10 +41,10 @@ describe('VerticalBarBlock', () => {
       container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
-    // expect there to be rectangles for all 3 data sets across both years
+    // expect there to be lines for all 3 data sets
     expect(
-      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
-    ).toBe(6);
+      Array.from(container.querySelectorAll('.recharts-line')).length,
+    ).toBe(3);
   });
 
   test('major axis can be hidden', () => {
@@ -130,31 +122,44 @@ describe('VerticalBarBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('can stack data', () => {
+  test('can set dashed line styles', () => {
     const { container } = render(
-      // @ts-ignore
       <Chart
         {...{
           ...props,
-          axes: {
-            ...props.axes,
-            minor: {
-              ...props.axes.minor,
-              min: '-10',
-              max: '20',
+          labels: {
+            '23_1_2_____': {
+              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
+              lineStyle: 'dashed',
             },
           },
         }}
-        stacked
-        legend="none"
       />,
     );
 
-    // Unsure how to tell stacked data apart, other than the snapshot
+    expect(
+      container.querySelector('.recharts-line-curve[stroke-dasharray="5 5"]'),
+    ).toBeInTheDocument();
+  });
+
+  test('can set dotted line styles', () => {
+    const { container } = render(
+      <Chart
+        {...{
+          ...props,
+          labels: {
+            '23_1_2_____': {
+              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
+              lineStyle: 'dotted',
+            },
+          },
+        }}
+      />,
+    );
 
     expect(
-      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
-    ).toBe(6);
+      container.querySelector('.recharts-line-curve[stroke-dasharray="2 2"]'),
+    ).toBeInTheDocument();
   });
 
   test('can render major axis reference line', () => {
@@ -183,6 +188,7 @@ describe('VerticalBarBlock', () => {
       container.querySelector('.recharts-reference-line'),
     ).toBeInTheDocument();
   });
+
   test('can render minor axis reference line', () => {
     const { container } = render(
       // @ts-ignore
@@ -193,6 +199,8 @@ describe('VerticalBarBlock', () => {
             ...props.axes,
             minor: {
               ...props.axes.minor,
+              min: '-10',
+              max: '10',
               referenceLines: [
                 {
                   label: 'hello',

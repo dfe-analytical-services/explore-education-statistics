@@ -1,6 +1,6 @@
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render } from '@testing-library/react';
 import WizardStepFormActions from '../WizardStepFormActions';
 
 describe('WizardStepFormActions', () => {

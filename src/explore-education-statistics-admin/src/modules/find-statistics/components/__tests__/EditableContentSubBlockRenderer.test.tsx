@@ -1,6 +1,6 @@
-import React from 'react';
-import { render } from 'react-testing-library';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { render } from '@testing-library/react';
+import React from 'react';
 import EditableContentSubBlockRenderer from '../../../editable-components/EditableContentSubBlockRenderer';
 
 describe('EditableContentSubBlockRenderer', () => {
@@ -19,7 +19,7 @@ describe('EditableContentSubBlockRenderer', () => {
             body: 'test',
           }}
           onDelete={() => {}}
-          onContentChange={async content => {}}
+          onContentChange={async () => {}}
         />
       </EditingContext.Provider>,
     );
@@ -44,7 +44,7 @@ describe('EditableContentSubBlockRenderer', () => {
             body: 'test',
           }}
           onDelete={() => {}}
-          onContentChange={async content => {}}
+          onContentChange={async () => {}}
         />
       </EditingContext.Provider>,
     );

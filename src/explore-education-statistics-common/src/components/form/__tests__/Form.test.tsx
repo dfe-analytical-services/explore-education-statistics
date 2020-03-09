@@ -1,7 +1,7 @@
 import Yup from '@common/lib/validation/yup';
+import { fireEvent, render, wait } from '@testing-library/react';
 import { Formik } from 'formik';
 import React from 'react';
-import { fireEvent, render, wait } from 'react-testing-library';
 import Form from '../Form';
 
 describe('Form', () => {
@@ -186,7 +186,7 @@ describe('Form', () => {
         }}
       >
         {() => (
-          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
+          <Form id="test-form" showSubmitError>
             The form
           </Form>
         )}
@@ -226,7 +226,7 @@ describe('Form', () => {
         onSubmit={onSubmit}
       >
         {() => (
-          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
+          <Form id="test-form" showSubmitError>
             The form
           </Form>
         )}
@@ -272,7 +272,7 @@ describe('Form', () => {
         onSubmit={onSubmit}
       >
         {formik => (
-          <Form id="test-form" displayErrorMessageOnUncaughtErrors>
+          <Form id="test-form" showSubmitError>
             The form
             <button type="button" onClick={formik.handleReset}>
               Reset form

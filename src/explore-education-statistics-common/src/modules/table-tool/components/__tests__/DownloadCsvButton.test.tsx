@@ -4,7 +4,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render } from '@testing-library/react';
 import { writeFile } from 'xlsx';
 import DownloadCsvButton, { getCsvData } from '../DownloadCsvButton';
 

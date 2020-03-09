@@ -1,22 +1,22 @@
-import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
-import {
-  AxesConfiguration,
-  ChartMetaData,
-  ChartProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
+import Chart from '@common/modules/charts/components/HorizontalBarBlock';
+import { ChartMetaData, ChartProps } from '@common/modules/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
+import { AxesConfiguration } from '@common/services/publicationService';
+import { render } from '@testing-library/react';
 import React from 'react';
-
-import { render } from 'react-testing-library';
-import Chart from '../LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = PrototypeData.AbstractChartProps;
+const props = {
+  ...testData.AbstractChartProps,
+  width: 900,
+};
+
 const { axes } = props;
 
-describe('LineChartBlock', () => {
+describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
 
@@ -45,10 +45,10 @@ describe('LineChartBlock', () => {
       container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
-    // expect there to be lines for all 3 data sets
+    // expect there to be rectangles for all 3 data sets across both years
     expect(
-      Array.from(container.querySelectorAll('.recharts-line')).length,
-    ).toBe(3);
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 
   test('major axis can be hidden', () => {
@@ -66,7 +66,7 @@ describe('LineChartBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -86,7 +86,7 @@ describe('LineChartBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -126,44 +126,31 @@ describe('LineChartBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('can set dashed line styles', () => {
+  test('can stack data', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
-          labels: {
-            '23_1_2_____': {
-              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
-              lineStyle: 'dashed',
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              min: '-10',
+              max: '20',
             },
           },
         }}
+        stacked
+        legend="none"
       />,
     );
 
-    expect(
-      container.querySelector('.recharts-line-curve[stroke-dasharray="5 5"]'),
-    ).toBeInTheDocument();
-  });
-
-  test('can set dotted line styles', () => {
-    const { container } = render(
-      <Chart
-        {...{
-          ...props,
-          labels: {
-            '23_1_2_____': {
-              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
-              lineStyle: 'dotted',
-            },
-          },
-        }}
-      />,
-    );
+    // Unsure how to tell stacked data apart, other than the snapshot
 
     expect(
-      container.querySelector('.recharts-line-curve[stroke-dasharray="2 2"]'),
-    ).toBeInTheDocument();
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 
   test('can render major axis reference line', () => {
@@ -192,7 +179,6 @@ describe('LineChartBlock', () => {
       container.querySelector('.recharts-reference-line'),
     ).toBeInTheDocument();
   });
-
   test('can render minor axis reference line', () => {
     const { container } = render(
       // @ts-ignore
@@ -203,8 +189,6 @@ describe('LineChartBlock', () => {
             ...props.axes,
             minor: {
               ...props.axes.minor,
-              min: '-10',
-              max: '10',
               referenceLines: [
                 {
                   label: 'hello',
@@ -294,7 +278,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '3', '9', '20');
+    expectTicks(container, 'x', '-3', '3', '9', '20');
   });
 
   test('Can limit range of minor ticks to start and end', () => {
@@ -312,7 +296,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '20');
+    expectTicks(container, 'x', '-3', '20');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -333,7 +317,7 @@ describe('LineChartBlock', () => {
 
     expectTicks(
       container,
-      'y',
+      'x',
       '-3',
       '-2',
       '-1',
@@ -365,7 +349,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can limit range of major ticks to start and end', () => {
@@ -382,7 +366,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can limit range of minor ticks to custom', () => {
@@ -400,7 +384,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can sort by name', () => {
@@ -418,7 +402,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can sort by name descending', () => {
@@ -436,7 +420,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2015/16', '2014/15');
+    expectTicks(container, 'y', '2015/16', '2014/15');
   });
 
   test('Can filter a data range', () => {
@@ -455,6 +439,6 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15');
+    expectTicks(container, 'y', '2014/15');
   });
 });

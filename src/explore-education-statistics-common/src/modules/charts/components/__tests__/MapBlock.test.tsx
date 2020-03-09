@@ -1,10 +1,7 @@
-/* eslint-disable */
+import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import { render, wait } from '@testing-library/react';
 import React from 'react';
-
-import { render, wait } from 'react-testing-library';
-
-import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import MapBlock from '../MapBlock';
 
 describe('MapBlock', () => {
   test('renders', async () => {
