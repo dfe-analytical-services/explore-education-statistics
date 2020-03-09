@@ -57,10 +57,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   2013/14
-    user checks results table column heading contains  1   2   2014/15
-    user checks results table column heading contains  1   3   2015/16
-    user checks results table column heading contains  1   4   2016/17
+    user checks results table column heading contains  css:table  1   1   2013/14
+    user checks results table column heading contains  css:table  1   2   2014/15
+    user checks results table column heading contains  css:table  1   3   2015/16
+    user checks results table column heading contains  css:table  1   4   2016/17
 
 Validate results table row headings
     [Tags]   HappyPath
@@ -122,12 +122,11 @@ Create table again
 
 Validate new table column headings
     [Tags]   HappyPath
-    user checks results table column heading contains  1   1   2014/15
-    user checks results table column heading contains  1   2   2015/16
+    user checks results table column heading contains  css:table  1   1   2014/15
+    user checks results table column heading contains  css:table  1   2   2015/16
 
 Validate Barnet Number of pupil enrolments row
     [Tags]  HappyPath
-    sleep  100000
     ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     224

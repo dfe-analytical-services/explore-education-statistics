@@ -102,11 +102,11 @@ Validate Key Statistics data block -- Data tables tab
    user clicks element   css:#headlines-section-2-tab   # Click Table tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks results table column heading contains  1   1   2012/13
-   user checks results table column heading contains  1   2   2013/14
-   user checks results table column heading contains  1   3   2014/15
-   user checks results table column heading contains  1   4   2015/16
-   user checks results table column heading contains  1   5   2016/17
+   user checks results table column heading contains  css:table  1   1   2012/13
+   user checks results table column heading contains  css:table  1   2   2013/14
+   user checks results table column heading contains  css:table  1   3   2014/15
+   user checks results table column heading contains  css:table  1   4   2015/16
+   user checks results table column heading contains  css:table  1   5   2016/17
 
    ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Authorised absence rate
    user checks row contains heading  ${row}   Authorised absence rate
@@ -155,9 +155,9 @@ Validate accordion sections order
 Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath
     user opens accordion section  Regional and local authority (LA) breakdown
-    user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in St Albans, Medway, Windsor and Maidenhead, Oadby and Wigston, South Derbyshire, Elmbridge, South Bucks, Bury, North Dorset, High Peak and 316 other locations... for 2016/17
+    user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
-    #user checks results table column heading contains  1   1   2016/17
+    user checks results table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
 
     ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Authorised absence rate
     user checks row contains heading  ${row}   Authorised absence rate
@@ -179,6 +179,16 @@ Validate Regional and local authority (LA) breakdown table
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    1.1%
     
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Authorised absence rate
+    user checks row contains heading  ${row}   Authorised absence rate
+    user checks row cell contains text  ${row}   1    2.7%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Overall absence rate
+    user checks row contains heading  ${row}   Overall absence rate
+    user checks row cell contains text  ${row}   1    4.4%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Unauthorised absence rate
+    user checks row contains heading  ${row}   Unauthorised absence rate
+    user checks row cell contains text  ${row}   1    1.7%
+
     #TODO: More
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected

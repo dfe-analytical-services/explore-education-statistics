@@ -175,7 +175,7 @@ def user_checks_previous_table_tool_step_contains(step, key, value):
 
   try:
     sl.driver.find_element_by_xpath(
-      f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/../dd[text()="{value}"]')
+      f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
   except:
     sl.capture_page_screenshot()
     raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
@@ -211,8 +211,9 @@ def user_checks_category_checkbox_is_selected(subheading_label, category_label):
 def user_clicks_select_all_for_category(category_label):
   sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
 
-def user_checks_results_table_column_heading_contains(row, column, expected):
-  elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
+def user_checks_results_table_column_heading_contains(table_selector, row, column, expected):
+  table_elem = sl.get_webelement(table_selector)
+  elem = table_elem.find_element_by_xpath(f'.//thead/tr[{row}]/th[{column}]')
   if expected not in elem.text:
     raise AssertionError(
       f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
