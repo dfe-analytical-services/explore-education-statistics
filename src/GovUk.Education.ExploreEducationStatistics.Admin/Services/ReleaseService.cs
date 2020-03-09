@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -115,20 +116,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
+                // TODO DW - correct permission check
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
-                {
-                    var amendment = release.CreateReleaseAmendment(DateTime.UtcNow, _userService.GetUserId());
-                    _context.Releases.Add(amendment);
-                    await _context.SaveChangesAsync();
-                    
-                    // TODO - copy Linked files
+                .OnSuccess(originalRelease =>
+                    CreateBasicReleaseAmendment(originalRelease)
+                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Ancillary))
+                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Chart))
+                    .OnSuccess(amendment => CopyDataFileLinks(originalRelease, amendment))
+                    .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+        }
 
-                    // TODO - copy stored non-data files
+        private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
+        {
+            var amendment = release.CreateReleaseAmendment(DateTime.UtcNow, _userService.GetUserId());
+            _context.Releases.Add(amendment);
+            await _context.SaveChangesAsync();
+            return amendment;
+        }
 
-                    return release;
-                })
-                .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id));
+        private async Task<Either<ActionResult, Release>> CopyDataFileLinks(Release originalRelease, Release newRelease)
+        {
+            var releaseFileCopies = _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == originalRelease.Id)
+                .Select(f => f.CreateReleaseAmendment(newRelease));
+
+            await _context.AddRangeAsync(releaseFileCopies);
+            await _context.SaveChangesAsync();
+            return newRelease;
+        }
+
+        private Task<Either<ActionResult, Release>> CopyReleaseFilesOfType(
+            Guid originalReleaseId, Release newRelease, ReleaseFileTypes type)
+        {
+            return _fileStorageService
+                .CopyReleaseFilesAsync(originalReleaseId, newRelease.Id, type);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)

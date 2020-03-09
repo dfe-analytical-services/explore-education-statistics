@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileStorageService.CsvMimeTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedCsvMimeTypes.ToList(), expectedToSucceed);
             });
         }
         
