@@ -11,7 +11,7 @@ interface Props {
   children: ReactNode;
   id: string;
   submitId?: string;
-  displayErrorMessageOnUncaughtErrors?: boolean;
+  showSubmitError?: boolean;
 }
 
 /**
@@ -36,7 +36,7 @@ const Form = ({
   id,
   submitId = `${id}-submit`,
   formik,
-  displayErrorMessageOnUncaughtErrors = false,
+  showSubmitError = false,
 }: Props & { formik: FormikContext<{}> }) => {
   const { errors, touched } = formik;
 
@@ -77,7 +77,7 @@ const Form = ({
           await formik.submitForm();
         } catch (error) {
           if (error) {
-            if (displayErrorMessageOnUncaughtErrors) {
+            if (showSubmitError) {
               setSubmitError({
                 id: submitId,
                 message: error.message,

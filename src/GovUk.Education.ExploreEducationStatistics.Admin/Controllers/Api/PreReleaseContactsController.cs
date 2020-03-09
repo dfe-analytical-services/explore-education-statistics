@@ -21,14 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _preReleaseContactsService = preReleaseContactsService;
         }
 
-        [HttpGet("prerelease/contacts")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContacts()
-        {
-            return await _preReleaseContactsService
-                .GetAvailablePreReleaseContactsAsync()
-                .HandleFailuresOr(Ok);
-        }
-
         [HttpGet("release/{releaseId}/prerelease-contacts")]
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForRelease(Guid releaseId)
         {

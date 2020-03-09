@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NCrontab;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -18,16 +19,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFileStorageService fileStorageService,
+            IConfiguration configuration,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _fileStorageService = fileStorageService;
+            _configuration = configuration;
             _mapper = mapper;
         }
 
@@ -117,11 +121,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await Task.WhenAll(_contentDbContext.SaveChangesAsync(), _statisticsDbContext.SaveChangesAsync());
         }
 
-        private static DateTime GetNextScheduledPublishingTime()
+        private DateTime GetNextScheduledPublishingTime()
         {
-            var publishReleasesCronSchedule = Environment.GetEnvironmentVariable("PublishReleasesCronSchedule");
+            var publishReleasesCronSchedule = _configuration.GetSection("Values")
+                ?.GetValue<string>("PublishReleaseContentCronSchedule");
             return TryParseCronSchedule(publishReleasesCronSchedule, out var cronSchedule)
-                ? cronSchedule.GetNextOccurrence(DateTime.UtcNow) : DateTime.UtcNow;
+                ? cronSchedule.GetNextOccurrence(DateTime.UtcNow)
+                : DateTime.UtcNow;
         }
 
         private static bool TryParseCronSchedule(string cronExpression, out CrontabSchedule cronSchedule)

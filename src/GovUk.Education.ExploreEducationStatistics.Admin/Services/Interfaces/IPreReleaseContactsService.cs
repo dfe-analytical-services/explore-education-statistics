@@ -8,8 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPreReleaseContactsService
     {
-        Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetAvailablePreReleaseContactsAsync();
-        
         Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForReleaseAsync(Guid releaseId);
 
         Task<Either<ActionResult, List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToReleaseAsync(Guid releaseId, string email);
