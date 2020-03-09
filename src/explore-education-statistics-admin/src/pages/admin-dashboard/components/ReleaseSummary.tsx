@@ -28,7 +28,10 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       tag={[
         getReleaseStatusLabel(release.status),
         // eslint-disable-next-line react/jsx-key
-        <ReleaseServiceStatus exclude="details" releaseId={release.id} />,
+        release.status !== 'Draft' &&
+          release.status !== 'HigherLevelReview' && (
+            <ReleaseServiceStatus exclude="details" releaseId={release.id} />
+          ),
       ]}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">

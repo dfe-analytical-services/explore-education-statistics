@@ -1,7 +1,7 @@
-import React, { cloneElement, ReactElement, ReactNode } from 'react';
-import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
-import { Draggable } from 'react-beautiful-dnd';
 import styles from '@admin/components/DraggableAccordionSection.module.scss';
+import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import React, { cloneElement, ReactElement } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 
 interface DraggableAccordionSectionProps {
   id: string;

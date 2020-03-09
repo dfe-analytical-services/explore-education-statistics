@@ -33,7 +33,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
 
   useEffect(() => {
     getReleaseContent(dispatch, releaseId, handleApiErrors);
-  }, [releaseId, publication.themeId, publication, handleApiErrors]);
+  }, [releaseId, publication.themeId, publication, handleApiErrors, dispatch]);
 
   useEffect(() => {
     if (canUpdateRelease === true) {

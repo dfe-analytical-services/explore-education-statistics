@@ -37,7 +37,7 @@ const MethodologyPage = ({
     } catch (err) {
       handleApiErrors(err);
     }
-  }, [methodologyId]);
+  }, [handleApiErrors, methodologyId]);
 
   useEffect(() => {
     refreshMethodology();

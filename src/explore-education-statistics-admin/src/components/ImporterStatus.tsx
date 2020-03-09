@@ -1,5 +1,5 @@
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+import { DataFile } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import importStatusService from '@admin/services/release/imports/service';
 import {
   ImportStatus,
@@ -23,6 +23,8 @@ interface Props extends ErrorControlProps {
 export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
   switch (importstatusCode) {
     case 'NOT_FOUND':
+      return 'Not Found';
+    case 'QUEUED':
       return 'Queued';
     case 'RUNNING_PHASE_1':
       return 'Validating';
@@ -62,6 +64,8 @@ class ImporterStatus extends Component<Props> {
   private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
     switch (importstatusCode) {
       case 'NOT_FOUND':
+        return [styles.ragStatusAmber];
+      case 'QUEUED':
         return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_1':
         return [styles.ragStatusAmber];
@@ -103,7 +107,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
-            running: 'NOT_FOUND,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
+            running: 'NOT_FOUND,QUEUED,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
               importStatus.status,
             ),
           }),
@@ -157,13 +161,13 @@ class ImporterStatus extends Component<Props> {
               {currentStatus && getImportStatusLabel(currentStatus.status)}
             </strong>
             {running && (
-              <>
-                <LoadingSpinner
-                  inline
-                  size={22}
-                  screenReaderMessage="Currently processing data"
-                />{' '}
-              </>
+              <LoadingSpinner
+                alert
+                hideText
+                inline
+                size="sm"
+                text="Currently processing data"
+              />
             )}
           </div>
           {currentStatus &&

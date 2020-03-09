@@ -1,7 +1,9 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import permissionService from '@admin/services/permissions/service';
-import service from '@admin/services/release/edit-release/data/service';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+import editReleaseDataService, {
+  DataFile,
+  DeleteDataFilePlan,
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import withErrorControl, {
@@ -35,18 +37,12 @@ interface Props {
   releaseId: string;
 }
 
-const formId = 'dataFileUploadForm';
+interface DeleteDataFile {
+  plan: DeleteDataFilePlan;
+  file: DataFile;
+}
 
-const emptyDataFile: DataFile = {
-  canDelete: false,
-  fileSize: { size: 0, unit: '' },
-  filename: '',
-  metadataFilename: '',
-  rows: 0,
-  title: '',
-  userName: '',
-  created: new Date(),
-};
+const formId = 'dataFileUploadForm';
 
 const ReleaseDataUploadsSection = ({
   publicationId,
@@ -54,13 +50,13 @@ const ReleaseDataUploadsSection = ({
   handleApiErrors,
 }: Props & ErrorControlProps) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
+  const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseDataFiles(releaseId),
+      editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ])
       .then(([releaseDataFiles, canUpdateReleaseResponse]) => {
@@ -80,7 +76,7 @@ const ReleaseDataUploadsSection = ({
         fileInput.value = '';
       });
 
-    const files = await service
+    const files = await editReleaseDataService
       .getReleaseDataFiles(releaseId)
       .catch(handleApiErrors);
 
@@ -150,7 +146,7 @@ const ReleaseDataUploadsSection = ({
 
   const submitFormHandler = submitWithFormikValidation<FormValues>(
     async (values, actions) => {
-      await service.uploadDataFiles(releaseId, {
+      await editReleaseDataService.uploadDataFiles(releaseId, {
         subjectTitle: values.subjectTitle,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
@@ -302,7 +298,7 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Data file">
                             <ButtonText
                               onClick={() =>
-                                service
+                                editReleaseDataService
                                   .downloadDataFile(
                                     releaseId,
                                     dataFile.filename,
@@ -316,7 +312,7 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Metadata file">
                             <ButtonText
                               onClick={() =>
-                                service
+                                editReleaseDataService
                                   .downloadDataMetadataFile(
                                     releaseId,
                                     dataFile.metadataFilename,
@@ -353,7 +349,20 @@ const ReleaseDataUploadsSection = ({
                               term="Actions"
                               actions={
                                 <ButtonText
-                                  onClick={() => setDeleteDataFile(dataFile)}
+                                  onClick={() =>
+                                    editReleaseDataService
+                                      .getDeleteDataFilePlan(
+                                        releaseId,
+                                        dataFile,
+                                      )
+                                      .then(plan => {
+                                        setDeleteDataFile({
+                                          plan,
+                                          file: dataFile,
+                                        });
+                                      })
+                                      .catch(handleApiErrors)
+                                  }
                                 >
                                   Delete files
                                 </ButtonText>
@@ -368,25 +377,69 @@ const ReleaseDataUploadsSection = ({
               </>
             )}
 
-            <ModalConfirm
-              mounted={deleteDataFile && deleteDataFile.title.length > 0}
-              title="Confirm deletion of selected data files"
-              onExit={() => setDeleteDataFile(emptyDataFile)}
-              onCancel={() => setDeleteDataFile(emptyDataFile)}
-              onConfirm={async () => {
-                await service
-                  .deleteDataFiles(releaseId, deleteDataFile)
-                  .catch(handleApiErrors)
-                  .finally(() => {
-                    setDeleteDataFile(emptyDataFile);
-                    resetPage(form);
-                  });
-              }}
-            >
-              <p>
-                This data will no longer be available for use in this release
-              </p>
-            </ModalConfirm>
+            {deleteDataFile && (
+              <ModalConfirm
+                mounted
+                title="Confirm deletion of selected data files"
+                onExit={() => setDeleteDataFile(undefined)}
+                onCancel={() => setDeleteDataFile(undefined)}
+                onConfirm={async () => {
+                  await editReleaseDataService
+                    .deleteDataFiles(
+                      releaseId,
+                      (deleteDataFile as DeleteDataFile).file,
+                    )
+                    .catch(handleApiErrors)
+                    .finally(() => {
+                      setDeleteDataFile(undefined);
+                      resetPage(form);
+                    });
+                }}
+              >
+                <p>
+                  This data will no longer be available for use in this release.
+                </p>
+                {deleteDataFile.plan.dependentDataBlocks.length > 0 && (
+                  <p>
+                    The following data blocks will also be deleted:
+                    <ul>
+                      {deleteDataFile.plan.dependentDataBlocks.map(block => (
+                        <li key={block.name}>
+                          <p>{block.name}</p>
+                          {block.contentSectionHeading && (
+                            <p>
+                              {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                            </p>
+                          )}
+                          {block.infographicFilenames.length > 0 && (
+                            <p>
+                              The following infographic files will also be
+                              removed:
+                              <ul>
+                                {block.infographicFilenames.map(filename => (
+                                  <li key={filename}>
+                                    <p>{filename}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </p>
+                )}
+                {deleteDataFile.plan.footnoteIds.length > 0 && (
+                  <p>
+                    {deleteDataFile.plan.footnoteIds.length}{' '}
+                    {deleteDataFile.plan.footnoteIds.length > 1
+                      ? 'footnotes'
+                      : 'footnote'}{' '}
+                    will be removed.
+                  </p>
+                )}
+              </ModalConfirm>
+            )}
           </Form>
         );
       }}

@@ -24,14 +24,12 @@ const ReleaseDispatchContext = createContext<Dispatch | undefined>(undefined);
 export function releaseReducer(state: State, action: ReleaseDispatchAction) {
   switch (action.type) {
     case 'CLEAR_STATE':
-      return produce<State>(state, draft => {
-        return {
-          release: undefined,
-          canUpdateRelease: false,
-          availableDataBlocks: [],
-          unresolvedComments: [],
-        };
-      });
+      return {
+        release: undefined,
+        canUpdateRelease: false,
+        availableDataBlocks: [],
+        unresolvedComments: [],
+      };
     case 'SET_STATE':
     case 'SET_AVAILABLE_DATABLOCKS':
       return { ...state, ...action.payload };
