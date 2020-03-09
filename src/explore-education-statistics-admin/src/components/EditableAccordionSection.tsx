@@ -7,6 +7,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
+import ButtonText from '@common/components/ButtonText';
 import styles from './EditableAccordionSection.module.scss';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
@@ -128,17 +129,12 @@ const EditableAccordionSection = ({
         )}
         {!!onRemoveSection && (
           <>
-            <a
-              role="button"
-              tabIndex={0}
+            <ButtonText
               onClick={() => setShowRemoveModal(true)}
-              onKeyPress={e => {
-                if (e.key === 'Enter') setShowRemoveModal(true);
-              }}
               className={styles.edit}
             >
               (Remove section)
-            </a>
+            </ButtonText>
             <ModalConfirm
               title="Are you sure?"
               mounted={showRemoveModal}
