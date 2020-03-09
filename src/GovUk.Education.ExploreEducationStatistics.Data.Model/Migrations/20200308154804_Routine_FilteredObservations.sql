@@ -130,5 +130,5 @@ DECLARE
          @rscRegionsList = @rscRegionsList,
          @sponsorList = @sponsorList,
          @wardsList = @wardsList,
-         @planningAreaList = @planningAreasList,
+         @planningAreasList = @planningAreasList,
          @filterItemList = @filterItemList;
