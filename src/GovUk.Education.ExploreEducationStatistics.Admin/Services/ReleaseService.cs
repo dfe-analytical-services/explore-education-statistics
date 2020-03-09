@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -120,10 +119,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
+                    .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Ancillary))
                     .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Chart))
                     .OnSuccess(amendment => CopyDataFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+        }
+
+        private async Task<Either<ActionResult, Release>> CopyReleaseTeam(Guid originalReleaseId, Release amendment)
+        {
+            var newRoles = _context
+                .UserReleaseRoles
+                .Where(r => r.ReleaseId == originalReleaseId)
+                .Select(r => r.CreateReleaseAmendment(amendment));
+
+            await _context.AddRangeAsync(newRoles);
+            await _context.SaveChangesAsync();
+            return amendment;
         }
 
         private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
