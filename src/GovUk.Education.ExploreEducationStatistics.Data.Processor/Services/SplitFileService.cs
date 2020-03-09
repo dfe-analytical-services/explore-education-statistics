@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var enumerable = csvLines.ToList();
             var header = enumerable.First();
-            var headers = header.Split(',').ToList();
+            var headers = header.SplitCsvLine();
             var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
             var batchCount = 1;
             var numRows = enumerable.Count();

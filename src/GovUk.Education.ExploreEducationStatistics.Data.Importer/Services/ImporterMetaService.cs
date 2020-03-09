@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static List<string> GetHeaders(IEnumerable<string> lines)
         {
-            return lines.First().Split(',').ToList();
+            return lines.First().SplitCsvLine();
         }
 
         private static IEnumerable<MetaRow> GetMetaRows(
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public static MetaRow GetMetaRow(string line, List<string> headers)
         {
-            return CsvUtil.BuildType(line.Split(','), 
+            return CsvUtil.BuildType(line.SplitCsvLine(), 
                 headers, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow
             {
                 ColumnName = values[0],

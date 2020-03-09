@@ -129,5 +129,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Equal("FOO_BAR", "FooBar".ScreamingSnakeCase());
             Assert.Equal("FOO_BAR", "FooBAr".ScreamingSnakeCase());
         }
+        
+        [Fact]
+        public void CsvSplitIgnoresEscapeCommas()
+        {
+            const string line = "201516,Academic year,National,E92000001,England,NART,Final - R14,Total,Total,Engineering\\, and \\,Manufacturing Technologies,59850,74.1";
+            Assert.Equal(12, line.SplitCsvLine().Count);
+        }
     }
 }

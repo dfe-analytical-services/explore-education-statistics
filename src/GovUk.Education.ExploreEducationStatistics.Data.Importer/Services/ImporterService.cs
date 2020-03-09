@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
             
-            var headers = lines.First().Split(',').ToList();
+            var headers = lines.First().SplitCsvLine();
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
             {
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
             
-            var headers = lines.First().Split(',').ToList();
+            var headers = lines.First().SplitCsvLine();
             lines.RemoveAt(0);
             
             var observations = GetObservations(context, lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta,
             int csvRowNum)
         {
-            var line = raw.Split(',');
+            var line = raw.SplitCsvLine();
             var observationId = Guid.NewGuid();
 
             return new Observation
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
-            var line = raw.Split(',');
+            var line = raw.SplitCsvLine();
             CreateFilterItems(context, line, headers, filtersMeta);
             GetLocationId(line, headers, context);
         }

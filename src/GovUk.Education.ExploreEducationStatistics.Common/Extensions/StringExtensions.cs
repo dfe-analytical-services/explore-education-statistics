@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
@@ -51,6 +53,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
 
             return SnakeCase(input).ToUpper();
+        }
+        
+        public static List<string> SplitCsvLine(this string line)
+        {
+            return Regex.Split(line, @"(?<!\\),").Select(s => s.Replace("\\", "")).ToList();
         }
     }
 }

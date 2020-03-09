@@ -59,8 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             ValidateMetaRows(subjectData.GetMetaLines(), errors);
+
+            var headers = subjectData.GetCsvLines().First().SplitCsvLine();
             
-            var headers = subjectData.GetCsvLines().First().Split(',').ToList();
             ValidateObservationHeaders(headers, errors);
             
             if (errors.Count != 0)
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static void ValidateMetaRows(IEnumerable<string> lines, List<string> errors)
         {
             var idx = 2;
-            var headers = lines.First().Split(',').ToList();
+            var headers = lines.First().SplitCsvLine();
 
             foreach (var line in lines.Skip(1))
             {
@@ -117,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     break;
                 }
 
-                if (ValidateObservationRow(line, idx++, headers, errors) && !IsGeographicLevelIgnored(line.Split(','), headers))
+                if (ValidateObservationRow(line, idx++, headers, errors) && !IsGeographicLevelIgnored(line.SplitCsvLine(), headers))
                 {
                     filteredRows++;
                 }
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    var line = row.Split(',');
+                    var line = row.SplitCsvLine();
                     ImporterService.GetGeographicLevel(line, headers);
                     ImporterService.GetTimeIdentifier(line, headers);
                     ImporterService.GetYear(line, headers);
@@ -215,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private static bool HasUnexpectedNumberOfColumns(string row, int numExpectedColumns)
         {
-            return row.Split(',').Length != numExpectedColumns;
+            return row.SplitCsvLine().Count != numExpectedColumns;
         }
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
