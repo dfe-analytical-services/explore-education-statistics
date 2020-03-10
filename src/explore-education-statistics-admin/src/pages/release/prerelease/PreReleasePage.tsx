@@ -10,12 +10,10 @@ import withErrorControl, {
 import { format } from 'date-fns';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { configurationService } from '@admin/services/configurationService';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   content?: ManageContentPageViewModel;
-  publicBaseUrl?: string;
 }
 
 interface MatchProps {
@@ -39,16 +37,10 @@ const PreReleasePage = ({
       .then(preReleaseWindowStatus => {
         if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
           handleManualErrors.forbidden();
-        } else if (
-          ['Before', 'Within', 'After'].includes(
-            preReleaseWindowStatus.preReleaseAccess,
-          )
-        ) {
-          Promise.all([
-            releaseContentService.getContent(releaseId),
-            configurationService.getPublicBaseUrl(),
-          ])
-            .then(([content, publicBaseUrl]) => {
+        } else if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+          releaseContentService
+            .getContent(releaseId)
+            .then(content => {
               const newContent = {
                 ...content,
                 release: {
@@ -60,7 +52,6 @@ const PreReleasePage = ({
               setModel({
                 preReleaseWindowStatus,
                 content: newContent,
-                publicBaseUrl,
               });
             })
             .catch(handleApiErrors);
@@ -76,7 +67,7 @@ const PreReleasePage = ({
 
   return (
     <>
-      {model?.content && (
+      {model && (
         <Page
           wide
           breadcrumbs={
@@ -86,15 +77,16 @@ const PreReleasePage = ({
           }
           includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
         >
-          {model.preReleaseWindowStatus.preReleaseAccess === 'Within' && (
-            <PublicationReleaseContent
-              editing={false}
-              content={model.content}
-              styles={{}}
-              onReleaseChange={_ => {}}
-              availableDataBlocks={[]}
-            />
-          )}
+          {model.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
+            model.content && (
+              <PublicationReleaseContent
+                editing={false}
+                content={model.content}
+                styles={{}}
+                onReleaseChange={_ => {}}
+                availableDataBlocks={[]}
+              />
+            )}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
             <>
@@ -102,9 +94,7 @@ const PreReleasePage = ({
                 Pre Release access is not yet available
               </h1>
               <p className="govuk-body">
-                Pre Release access for the {model.content.release.title} release
-                of {model.content.release.publication.title} is not yet
-                available.
+                Pre Release access is not yet available for this release.
               </p>
               <p className="govuk-body">
                 Pre Release access will be available from{' '}
@@ -129,44 +119,16 @@ const PreReleasePage = ({
                 )}
                 .
               </p>
-              <p className="govuk-body">
-                If you believe that this release should be available and you are
-                having problems accessing please contact the production team{' '}
-                <a
-                  href={`mailto:${model.content.release.publication.contact.teamEmail}`}
-                >
-                  {model.content.release.publication.contact.teamEmail}
-                </a>
-                .
-              </p>
+              <p className="govuk-body">Please try again later.</p>
             </>
           )}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'After' && (
             <>
               <h1 className="govuk-heading-l">Pre Release access has ended</h1>
-              {model.content.release.published ? (
-                <>
-                  <p className="govuk-body">
-                    The {model.content.release.title.toLowerCase()} release of{' '}
-                    {model.content.release.publication.title} has now been
-                    published on the Explore Education Statistics service.
-                  </p>
-                  <p className="govuk-body">
-                    View this release{' '}
-                    <a
-                      href={`${model.publicBaseUrl}find-statistics/${model.content.release.publication.slug}`}
-                    >
-                      {model.publicBaseUrl}find-statistics/
-                      {model.content.release.publication.slug}
-                    </a>
-                  </p>
-                </>
-              ) : (
-                <p className="govuk-body">
-                  Pre Release access is no longer available for this release.
-                </p>
-              )}
+              <p className="govuk-body">
+                Pre Release access is no longer available for this release.
+              </p>
             </>
           )}
         </Page>
