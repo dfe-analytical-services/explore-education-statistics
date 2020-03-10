@@ -145,7 +145,7 @@ Reorder England to be row
     [Tags]  HappyPath
     user waits until page contains element   xpath://legend[text()="Column group 2"]
     user checks page does not contain element   xpath://legend[text()="Row group 1"]
-    user sets focus to element   xpath://legend[text()="Column group 1"]/../../..
+    user sets focus to element   xpath://legend[text()="Column group 2"]/../../..
     user presses keys    SPACE
     user presses keys    ARROW_UP
     user presses keys    SPACE
