@@ -5,6 +5,20 @@ import {
 } from '@common/services/publicationService';
 import { State } from './ReleaseContext';
 
+type BlockMeta = {
+  sectionId: string;
+  blockId: string;
+  sectionKey: keyof Pick<
+    AbstractRelease<EditableContentBlock>,
+    | 'summarySection'
+    | 'keyStatisticsSection'
+    | 'keyStatisticsSecondarySection'
+    | 'headlinesSection'
+    | 'content'
+  >;
+};
+type SectionMeta = Omit<BlockMeta, 'blockId'>;
+
 type ClearState = { type: 'CLEAR_STATE' };
 type SetState = { type: 'SET_STATE'; payload: State };
 type SetAvailableDatablocks = {
@@ -14,25 +28,14 @@ type SetAvailableDatablocks = {
 export type RemoveBlockFromSection = {
   type: 'REMOVE_BLOCK_FROM_SECTION';
   payload: {
-    meta: {
-      sectionId: string;
-      blockId: string;
-      sectionKey: keyof Pick<
-        AbstractRelease<EditableContentBlock>,
-        | 'summarySection'
-        | 'keyStatisticsSection'
-        | 'keyStatisticsSecondarySection'
-        | 'headlinesSection'
-        | 'content'
-      >;
-    };
+    meta: BlockMeta;
   };
 };
 export type UpdateBlockFromSection = {
   type: 'UPDATE_BLOCK_FROM_SECTION';
   payload: {
     block: EditableContentBlock;
-    meta: RemoveBlockFromSection['payload']['meta'];
+    meta: BlockMeta;
   };
 };
 
@@ -40,7 +43,7 @@ export type AddBlockToSection = {
   type: 'ADD_BLOCK_TO_SECTION';
   payload: {
     block: EditableContentBlock;
-    meta: Omit<RemoveBlockFromSection['payload']['meta'], 'blockId'>;
+    meta: SectionMeta;
   };
 };
 
@@ -48,7 +51,7 @@ export type UpdateSectionContent = {
   type: 'UPDATE_SECTION_CONTENT';
   payload: {
     sectionContent: EditableContentBlock[];
-    meta: Omit<RemoveBlockFromSection['payload']['meta'], 'blockId'>;
+    meta: SectionMeta;
   };
 };
 
