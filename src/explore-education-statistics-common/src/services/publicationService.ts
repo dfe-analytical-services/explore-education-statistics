@@ -144,8 +144,8 @@ export interface AxisConfiguration {
   labelPosition?: LabelPosition;
   size?: number;
 
-  min?: string;
-  max?: string;
+  min?: number;
+  max?: number;
 
   tickConfig?: 'default' | 'startEnd' | 'custom';
   tickSpacing?: number;

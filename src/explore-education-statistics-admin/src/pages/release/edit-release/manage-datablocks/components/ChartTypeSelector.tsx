@@ -4,41 +4,41 @@ import classnames from 'classnames';
 import React from 'react';
 
 interface Props {
-  chartTypes: ChartDefinition[];
-  selectedChartType?: ChartDefinition;
-  onSelectChart: (chart: ChartDefinition) => void | undefined;
+  chartDefinitions: ChartDefinition[];
+  selectedChartDefinition?: ChartDefinition;
   geoJsonAvailable: boolean;
+  onSelectChart: (chart: ChartDefinition) => void | undefined;
 }
 
 const ChartTypeSelector = ({
-  chartTypes,
-  onSelectChart,
-  selectedChartType,
+  chartDefinitions,
+  selectedChartDefinition,
   geoJsonAvailable,
+  onSelectChart,
 }: Props) => {
   return (
     <div className={styles.chartContainer}>
-      {chartTypes.map(chartType => (
-        <React.Fragment key={chartType.type}>
-          {!chartType.requiresGeoJson || geoJsonAvailable ? (
+      {chartDefinitions.map(definition => (
+        <React.Fragment key={definition.type}>
+          {!definition.requiresGeoJson || geoJsonAvailable ? (
             <button
               type="button"
               className={classnames(styles.chart, {
-                [styles.selected]: chartType === selectedChartType,
+                [styles.selected]: definition === selectedChartDefinition,
               })}
               onClick={() => {
-                if (onSelectChart) onSelectChart(chartType);
+                if (onSelectChart) onSelectChart(definition);
               }}
             >
-              <span className={styles.title}>{chartType.name}</span>
+              <span className={styles.title}>{definition.name}</span>
               <span
-                className={classnames(styles.img, styles[chartType.type])}
+                className={classnames(styles.img, styles[definition.type])}
               />
             </button>
           ) : (
             <div className={styles.chartTypeUnavailable}>
               <span className={styles.title}>
-                <strong>{chartType.name}</strong>
+                <strong>{definition.name}</strong>
               </span>
               <p>This chart type is not available.</p>
               <p>There is no map data for this data block.</p>

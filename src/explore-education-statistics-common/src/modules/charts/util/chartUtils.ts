@@ -329,17 +329,16 @@ export function createSortedDataForAxis(
     meta,
   ).map(mapFunction);
 
-  const sorted = sortChartData(
+  const sortedData = sortChartData(
     chartData,
     axisConfiguration.sortBy,
     axisConfiguration.sortAsc !== false,
   );
 
-  if (axisConfiguration.dataRange) {
-    return sorted.slice(...axisConfiguration.dataRange);
-  }
-
-  return sorted;
+  return sortedData.slice(
+    axisConfiguration.min ?? 0,
+    axisConfiguration.max ?? sortedData.length,
+  );
 }
 
 export function createSortedAndMappedDataForAxis(
@@ -422,12 +421,21 @@ export function calculateDataRange(chartData: ChartData[]) {
 }
 
 const parseNumberOrDefault = (
-  number: string | undefined,
-  def: number,
+  number: string | number | undefined,
+  defaultValue: number,
 ): number => {
-  const parsed = number === undefined ? undefined : Number.parseFloat(number);
+  let parsed = defaultValue;
 
-  if (parsed === undefined || Number.isNaN(parsed)) return def;
+  if (typeof number === 'string') {
+    parsed = Number.parseFloat(number);
+  } else if (typeof number === 'number') {
+    parsed = number;
+  }
+
+  if (Number.isNaN(parsed)) {
+    return defaultValue;
+  }
+
   return parsed;
 };
 

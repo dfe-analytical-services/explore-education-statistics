@@ -1,3 +1,7 @@
+import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   BoundaryLevel,
@@ -90,3 +94,10 @@ export interface ChartDefinition {
 
   requiresGeoJson: boolean;
 }
+
+export const chartDefinitions: ChartDefinition[] = [
+  LineChartBlock.definition,
+  VerticalBarBlock.definition,
+  HorizontalBarBlock.definition,
+  MapBlock.definition,
+];

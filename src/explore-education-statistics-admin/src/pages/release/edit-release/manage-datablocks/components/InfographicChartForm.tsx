@@ -30,10 +30,10 @@ interface FormValues {
   fileId: string;
 }
 
-interface InfographicChartOptionsProps {
+interface Props {
   releaseId: string;
   fileId?: string;
-  onChange: (fileId: string) => void;
+  onSubmit: (fileId: string) => void;
 }
 
 const loadChartFilesAndMapToSelectOptionAsync = (
@@ -53,11 +53,7 @@ const loadChartFilesAndMapToSelectOptionAsync = (
   });
 };
 
-const InfographicChartForm = ({
-  releaseId,
-  fileId,
-  onChange,
-}: InfographicChartOptionsProps) => {
+const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -76,7 +72,7 @@ const InfographicChartForm = ({
         })
         .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
         .then(setChartFileOptions)
-        .then(() => onChange((values.file as File).name))
+        .then(() => onSubmit((values.file as File).name))
         .finally(() => {
           setUploading(false);
         });
@@ -135,7 +131,7 @@ const InfographicChartForm = ({
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),
                         )
                         .then(setChartFileOptions);
-                    onChange('');
+                    onSubmit('');
                     toggleDeleteFile(false);
                   }}
                 >

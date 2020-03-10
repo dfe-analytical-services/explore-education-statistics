@@ -42,10 +42,11 @@ interface Props {
   chartType: ChartDefinition;
   selectedData?: ChartDataSetAndConfiguration[];
   metaData: ChartMetaData;
+  capabilities: ChartCapabilities;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
   onDataChanged?: (data: SelectedData[]) => void;
-  capabilities: ChartCapabilities;
+  onSubmit: (data: SelectedData[]) => void;
 }
 
 export interface ChartDataSetAndConfiguration {
@@ -57,11 +58,12 @@ const formId = 'chartDataSelectorForm';
 
 const ChartDataSelector = ({
   metaData,
+  capabilities,
+  selectedData = [],
   onDataRemoved,
   onDataAdded,
   onDataChanged,
-  selectedData = [],
-  capabilities,
+  onSubmit,
 }: Props) => {
   const indicatorOptions = useMemo(
     () => [
@@ -125,18 +127,18 @@ const ChartDataSelector = ({
           );
         }
 
-        const dataSet = {
-          filters: filterOptions,
-          indicator,
-        };
-
         const name = `${metaData.indicators[indicator].label}${
-          dataSet.filters.length
-            ? ` (${dataSet.filters
+          filterOptions.length
+            ? ` (${filterOptions
                 .map(filter => filtersByValue[filter].label)
                 .join(', ')})`
             : ''
         }`;
+
+        const dataSet = {
+          filters: filterOptions,
+          indicator,
+        };
 
         const newChartData = {
           dataSet,
@@ -146,7 +148,7 @@ const ChartDataSelector = ({
             label: name,
             colour: colours[chartData.length % colours.length],
             symbol: symbols[chartData.length % symbols.length],
-            unit: metaData.indicators[dataSet.indicator].unit || '',
+            unit: metaData.indicators[indicator].unit || '',
           },
         };
 
@@ -250,9 +252,12 @@ const ChartDataSelector = ({
                           onConfigurationChange={(
                             value: DataSetConfiguration,
                           ) => {
-                            chartData[index].configuration = value;
-
                             const newData = [...chartData];
+
+                            newData[index] = {
+                              ...newData[index],
+                              configuration: value,
+                            };
 
                             setChartData(newData);
 
@@ -268,6 +273,16 @@ const ChartDataSelector = ({
               ))}
             </>
           )}
+
+          <hr />
+
+          <Button
+            onClick={() => {
+              onSubmit(selectedData);
+            }}
+          >
+            Save chart options
+          </Button>
         </>
       )}
     />

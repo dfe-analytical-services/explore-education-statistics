@@ -1,59 +1,55 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import Button from '@common/components/Button';
+import Effect from '@common/components/Effect';
 import {
-  FormCheckbox,
+  Form,
+  FormFieldSelect,
+  FormFieldTextInput,
   FormGroup,
-  FormSelect,
-  FormTextInput,
+  Formik,
 } from '@common/components/form';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
 } from '@common/modules/charts/types/chart';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import React, { useState } from 'react';
+import React from 'react';
+import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
 
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
-  onChange: (chartOptions: ChartOptions) => void;
   data: DataBlockResponse;
   meta: ChartMetaData;
-
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
+  onChange: (chartOptions: ChartOptions) => void;
+  onSubmit: (chartOptions: ChartOptions) => void;
 }
 
 export interface ChartOptions {
-  stacked: boolean;
-  legend: 'none' | 'top' | 'bottom';
-  height?: number;
+  stacked?: boolean;
+  legend?: 'none' | 'top' | 'bottom';
+  height: number;
   width?: number;
   title?: string;
   fileId?: string;
   geographicId?: string;
 }
 
+const formId = 'chartConfigurationForm';
+
 const ChartConfiguration = ({
-  chartOptions: initialChartOptions,
+  chartOptions,
   selectedChartType,
-  onChange,
   meta,
   data,
   onBoundaryLevelChange,
+  onChange,
+  onSubmit,
 }: Props) => {
-  const [chartOptions, setChartOptions] = useState<ChartOptions>(
-    initialChartOptions,
-  );
-  const updateChartOptions = (options: ChartOptions) => {
-    setChartOptions(options);
-    if (onChange) onChange(options);
-  };
-  const [chartWidth, setChartWidth] = useState(
-    `${initialChartOptions.width || ''}`,
-  );
-  const [chartHeight, setChartHeight] = useState(
-    `${initialChartOptions.height || ''}`,
-  );
   return (
     <>
       {selectedChartType.type === 'infographic' && (
@@ -61,8 +57,8 @@ const ChartConfiguration = ({
           <InfographicChartForm
             releaseId={data.releaseId}
             fileId={chartOptions.fileId || ''}
-            onChange={fileId => {
-              updateChartOptions({
+            onSubmit={fileId => {
+              onChange({
                 ...chartOptions,
                 fileId,
               });
@@ -71,140 +67,119 @@ const ChartConfiguration = ({
           <hr />
         </>
       )}
-      <div>
-        <FormGroup>
-          <FormTextInput
-            id="chart-title"
-            name="chart-title"
-            label="Chart title"
-            value={chartOptions.title}
-            percentageWidth="three-quarters"
-            onChange={e => {
-              updateChartOptions({
-                ...chartOptions,
-                title: e.target.value,
-              });
-            }}
-          />
-          {selectedChartType.capabilities.stackable && (
-            <FormCheckbox
-              id="stacked"
-              name="stacked"
-              label="Stacked bars"
-              checked={chartOptions.stacked}
-              value="stacked"
-              className={styles['margin-top-30']}
-              onChange={e => {
-                updateChartOptions({
-                  ...chartOptions,
-                  stacked: e.target.checked,
-                });
-              }}
-            />
-          )}
-        </FormGroup>
-        {selectedChartType.capabilities.hasLegend && (
-          <FormGroup className={styles.formGroup}>
-            <FormSelect
-              id="legend-position"
-              name="legend-position"
-              value={chartOptions.legend}
-              label="Legend position"
-              options={[
-                { label: 'Top', value: 'top' },
-                { label: 'Bottom', value: 'bottom' },
-                { label: 'None', value: 'none' },
-              ]}
-              order={[]}
-              onChange={e => {
-                updateChartOptions({
-                  ...chartOptions,
-                  // @ts-ignore
-                  legend: e.target.value,
-                });
-              }}
-            />
-          </FormGroup>
-        )}
 
-        {selectedChartType.capabilities.canSize && (
-          <>
-            <FormGroup className={styles.formGroup}>
-              <FormTextInput
-                type="number"
-                id="chart-height"
-                name="chart-height"
-                label="Chart height (px)"
-                value={chartHeight}
-                width={5}
-                onChange={e => {
-                  setChartHeight(e.target.value);
-                  updateChartOptions({
-                    ...chartOptions,
-                    height: parseInt(e.target.value, 10) || undefined,
-                  });
-                }}
+      <Formik<ChartOptions>
+        initialValues={chartOptions}
+        enableReinitialize
+        onSubmit={onSubmit}
+        validationSchema={Yup.object<ChartOptions>({
+          height: Yup.number().required('Must set a chart height'),
+          legend: Yup.string().oneOf(
+            ['bottom', 'top', 'none'],
+            'Must set a legend position',
+          ) as Schema<ChartOptions['legend']>,
+          stacked: Yup.boolean(),
+        })}
+        render={form => (
+          <Form id={formId}>
+            <Effect value={form.values} onChange={onChange} />
+
+            <FormGroup>
+              <FormFieldTextInput<ChartOptions>
+                id={`${formId}-title`}
+                name="title"
+                label="Chart title"
+                percentageWidth="three-quarters"
               />
             </FormGroup>
-            <FormGroup className={styles.formGroup}>
-              <FormTextInput
-                type="number"
-                id="chart-width"
-                name="chart-width"
-                label="Chart width (px)"
-                hint="Leave blank to set as full width"
-                value={chartWidth}
-                width={5}
-                onChange={e => {
-                  setChartWidth(e.target.value);
-                  updateChartOptions({
-                    ...chartOptions,
-                    width: parseInt(e.target.value, 10) || undefined,
-                  });
-                }}
-              />
-            </FormGroup>
-          </>
-        )}
 
-        {selectedChartType.type === 'map' && meta.boundaryLevels && (
-          <>
-            {meta.boundaryLevels.length === 1 && (
-              <div>
-                Using <em>{meta.boundaryLevels[0].label}</em>
-              </div>
-            )}
-            {meta.boundaryLevels.length > 1 && (
-              <FormGroup className={styles.formGroup}>
-                <FormSelect
-                  id="geographicId"
-                  label="Select a version of geographical data to use"
-                  name="geographicId"
-                  order={[]}
-                  options={[
-                    { label: 'Latest', value: '' },
-                    ...meta.boundaryLevels.map(({ id, label }) => ({
-                      value: id,
-                      label,
-                    })),
-                  ]}
-                  onChange={e => {
-                    if (onBoundaryLevelChange) {
-                      onBoundaryLevelChange(e.target.value);
-                    }
-
-                    updateChartOptions({
-                      ...chartOptions,
-                      geographicId: e.target.value,
-                    });
-                  }}
-                  value={chartOptions.geographicId}
+            {selectedChartType.capabilities.stackable && (
+              <FormGroup>
+                <FormFieldCheckbox<ChartOptions>
+                  id={`${formId}-stacked`}
+                  name="stacked"
+                  label="Stacked bars"
+                  className={styles['margin-top-30']}
                 />
               </FormGroup>
             )}
-          </>
+
+            {selectedChartType.capabilities.hasLegend && (
+              <FormGroup>
+                <FormFieldSelect<ChartOptions>
+                  id={`${formId}-position`}
+                  name="legend"
+                  label="Legend position"
+                  options={[
+                    { label: 'Top', value: 'top' },
+                    { label: 'Bottom', value: 'bottom' },
+                    { label: 'None', value: 'none' },
+                  ]}
+                  order={[]}
+                />
+              </FormGroup>
+            )}
+
+            {selectedChartType.capabilities.canSize && (
+              <>
+                <FormGroup>
+                  <FormFieldTextInput<ChartOptions>
+                    type="number"
+                    id={`${formId}-height`}
+                    name="height"
+                    label="Chart height (px)"
+                    width={5}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <FormFieldTextInput<ChartOptions>
+                    type="number"
+                    id={`${formId}-width`}
+                    name="width"
+                    label="Chart width (px)"
+                    hint="Leave blank to set as full width"
+                    width={5}
+                  />
+                </FormGroup>
+              </>
+            )}
+
+            {selectedChartType.type === 'map' && meta.boundaryLevels && (
+              <>
+                {meta.boundaryLevels.length === 1 && (
+                  <div>
+                    Using <em>{meta.boundaryLevels[0].label}</em>
+                  </div>
+                )}
+                {meta.boundaryLevels.length > 1 && (
+                  <FormGroup>
+                    <FormFieldSelect<ChartOptions>
+                      id={`${formId}-geographicId`}
+                      label="Select a version of geographical data to use"
+                      name="geographicId"
+                      order={[]}
+                      options={[
+                        { label: 'Latest', value: '' },
+                        ...meta.boundaryLevels.map(({ id, label }) => ({
+                          value: id,
+                          label,
+                        })),
+                      ]}
+                      onChange={e => {
+                        if (onBoundaryLevelChange) {
+                          onBoundaryLevelChange(e.target.value);
+                        }
+                      }}
+                    />
+                  </FormGroup>
+                )}
+              </>
+            )}
+
+            <Button type="submit">Save chart options</Button>
+          </Form>
         )}
-      </div>
+      />
     </>
   );
 };
