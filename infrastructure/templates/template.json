@@ -1980,7 +1980,7 @@
         // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         "cors": {
           "allowedOrigins": [
-            "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+            "[concat('https://', parameters('domain'))]",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"
