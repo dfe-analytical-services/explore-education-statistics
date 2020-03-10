@@ -2006,7 +2006,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]",
         "BaseUrl": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]",
-        "WebApplicationBaseUrl": "[variables('publicAppUrl')]",
+        "WebApplicationBaseUrl": "[concat(variables('publicAppUrl'), '/')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]",
         "TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]",
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
