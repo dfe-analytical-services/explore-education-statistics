@@ -9,18 +9,15 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
-  availablePreReleaseContacts: PrereleaseContactDetails[];
   preReleaseContactsForRelease: PrereleaseContactDetails[];
   inviting: boolean;
   removing: boolean;
@@ -41,13 +38,10 @@ const PrereleaseAccessManagement = ({
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    Promise.all([
-      dashboardService.getAvailablePreReleaseContacts(),
-      dashboardService.getPreReleaseContactsForRelease(release.id),
-    ])
-      .then(([availablePreReleaseContacts, preReleaseContactsForRelease]) =>
+    dashboardService
+      .getPreReleaseContactsForRelease(release.id)
+      .then(preReleaseContactsForRelease =>
         setModel({
-          availablePreReleaseContacts,
           preReleaseContactsForRelease,
           inviting: false,
           removing: false,
@@ -81,8 +75,6 @@ const PrereleaseAccessManagement = ({
         resetForm();
 
         setModel({
-          availablePreReleaseContacts:
-            (model && model.availablePreReleaseContacts) || [],
           preReleaseContactsForRelease: updatedContacts,
           inviting: false,
           removing: false,
@@ -112,7 +104,7 @@ const PrereleaseAccessManagement = ({
               email: Yup.string().email('Enter a valid email address'),
             })}
             onSubmit={submitFormHandler}
-            render={(form: FormikProps<FormValues>) => {
+            render={() => {
               return (
                 <Form id={formId}>
                   <FormFieldset
@@ -120,37 +112,9 @@ const PrereleaseAccessManagement = ({
                     legendSize="s"
                     id={`pre-release-selection-${release.id}`}
                   >
-                    <FormFieldSelect
-                      id={`preReleaseAccessContact-${release.id}`}
-                      name="preReleaseAccessContact"
-                      label="Select user"
-                      options={[
-                        {
-                          label: 'Please select',
-                          value: '',
-                        },
-                        ...model.availablePreReleaseContacts
-                          .filter(
-                            contact =>
-                              !model.preReleaseContactsForRelease.find(
-                                c => c.email === contact.email,
-                              ),
-                          )
-                          .map(contact => ({
-                            label: contact.email,
-                            value: contact.email,
-                          })),
-                      ]}
-                      order={[]}
-                      className="govuk-!-width-one-third"
-                      onChange={event =>
-                        inviteUserByEmail(event.target.value, form.resetForm)
-                      }
-                      disabled={model.inviting || model.removing}
-                    />
                     <FormFieldTextInput
                       id={`${formId}-email`}
-                      label="or invite a new user"
+                      label="Invite a new user"
                       name="email"
                       disabled={model.inviting || model.removing}
                     />
