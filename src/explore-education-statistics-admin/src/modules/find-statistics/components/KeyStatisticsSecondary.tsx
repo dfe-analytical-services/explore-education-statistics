@@ -1,8 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import {
-  attachContentSectionBlock,
-  deleteContentSectionBlock,
-} from '@admin/pages/release/edit-release/content/helpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -40,7 +37,10 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
 
   const { isEditing } = useContext(EditingContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
-  const dispatch = useReleaseDispatch();
+  const {
+    attachContentSectionBlock,
+    deleteContentSectionBlock,
+  } = useReleaseActions();
 
   if (!isEditing) return null;
   if (!isFormOpen)
@@ -71,14 +71,12 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
               release.keyStatisticsSecondarySection.content.forEach(
                 (content: EditableContentBlock) => {
                   deleteContentSectionBlock(
-                    dispatch,
                     release.id,
                     // @ts-ignore will be defined, due to above if statement
                     release.keyStatisticsSecondarySection.id,
                     content.id,
                     'keyStatisticsSecondarySection',
-                    handleApiErrors,
-                  );
+                  ).catch(handleApiErrors);
                 },
               );
             }
@@ -114,21 +112,18 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                 release.keyStatisticsSecondarySection.content.map(
                   async (content: EditableContentBlock) => {
                     const response = await deleteContentSectionBlock(
-                      dispatch,
                       release.id,
                       // @ts-ignore will be defined, due to above if statement
                       release.keyStatisticsSecondarySection.id,
                       content.id,
                       'keyStatisticsSecondarySection',
-                      handleApiErrors,
-                    );
+                    ).catch(handleApiErrors);
                     return response;
                   },
                 ),
               );
             }
             await attachContentSectionBlock(
-              dispatch,
               release.id,
               release.keyStatisticsSecondarySection.id,
               'keyStatisticsSecondarySection',
@@ -136,8 +131,7 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                 contentBlockId: selectedDataBlockId,
                 order: 0,
               },
-              handleApiErrors,
-            );
+            ).catch(handleApiErrors);
             setIsFormOpen(false);
           }
         }}

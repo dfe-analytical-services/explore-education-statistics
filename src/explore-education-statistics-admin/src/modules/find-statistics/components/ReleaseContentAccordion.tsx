@@ -1,11 +1,5 @@
 import Accordion from '@admin/components/EditableAccordion';
-import {
-  addContentSection,
-  removeContentSection,
-  updateContentSectionHeading,
-  updateContentSectionsOrder,
-} from '@admin/pages/release/edit-release/content/helpers';
-import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import {
   EditableContentBlock,
   EditableRelease,
@@ -31,7 +25,12 @@ const ReleaseContentAccordion = ({
   sectionName,
   handleApiErrors,
 }: ReleaseContentAccordionProps & ErrorControlProps) => {
-  const dispatch = useReleaseDispatch();
+  const {
+    addContentSection,
+    removeContentSection,
+    updateContentSectionHeading,
+    updateContentSectionsOrder,
+  } = useReleaseActions();
 
   return (
     <Accordion
@@ -39,18 +38,10 @@ const ReleaseContentAccordion = ({
       canReorder
       sectionName={sectionName}
       onSaveOrder={async order => {
-        updateContentSectionsOrder(
-          dispatch,
-          release.id,
-          order,
-          handleApiErrors,
-        );
+        updateContentSectionsOrder(release.id, order).catch(handleApiErrors);
       }}
       onAddSection={() =>
-        addContentSection(
-          dispatch,
-          release.id,
-          release.content.length,
+        addContentSection(release.id, release.content.length).catch(
           handleApiErrors,
         )
       }
@@ -64,18 +55,13 @@ const ReleaseContentAccordion = ({
           index={index}
           onHeadingChange={title =>
             updateContentSectionHeading(
-              dispatch,
               release.id,
               accordionSection.id,
               title,
-              handleApiErrors,
-            )
+            ).catch(handleApiErrors)
           }
           onRemoveSection={() =>
-            removeContentSection(
-              dispatch,
-              release.id,
-              accordionSection.id,
+            removeContentSection(release.id, accordionSection.id).catch(
               handleApiErrors,
             )
           }

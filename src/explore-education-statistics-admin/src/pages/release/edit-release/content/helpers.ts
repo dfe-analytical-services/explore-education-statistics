@@ -14,9 +14,8 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { AxiosResponse } from 'axios';
 import { RemoveBlockFromSection } from './actions';
-import { Dispatch } from './ReleaseContext';
+import { useReleaseDispatch } from './ReleaseContext';
 
 const contentSectionComments = (
   contentSection?: ContentSection<EditableContentBlock>,
@@ -53,13 +52,11 @@ const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
       ),
   ].filter(comment => comment !== undefined && comment.state === 'open');
 
-export async function getReleaseContent(
-  dispatch: Dispatch,
-  releaseId: string,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  dispatch({ type: 'CLEAR_STATE' });
-  try {
+export default function useReleaseActions() {
+  const dispatch = useReleaseDispatch();
+
+  async function getReleaseContent(releaseId: string) {
+    dispatch({ type: 'CLEAR_STATE' });
     const {
       release,
       availableDataBlocks,
@@ -76,17 +73,8 @@ export async function getReleaseContent(
         canUpdateRelease,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function updateAvailableDataBlocks(
-  dispatch: Dispatch,
-  releaseId: string,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateAvailableDataBlocks(releaseId: string) {
     const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
       releaseId,
     );
@@ -94,20 +82,13 @@ export async function updateAvailableDataBlocks(
       type: 'SET_AVAILABLE_DATABLOCKS',
       payload: { availableDataBlocks },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function deleteContentSectionBlock(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  blockId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function deleteContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+  ) {
     await releaseContentService.deleteContentSectionBlock(
       releaseId,
       sectionId,
@@ -119,22 +100,15 @@ export async function deleteContentSectionBlock(
     });
     // becuase we don't know if a datablock was removed,
     // and so it is now available again
-    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
-  } catch (err) {
-    errorHandler(err);
+    updateAvailableDataBlocks(releaseId);
   }
-}
-
-export async function updateContentSectionDataBlock(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  blockId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  values: KeyStatsFormValues,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateContentSectionDataBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    values: KeyStatsFormValues,
+  ) {
     const updateBlock = await releaseContentService.updateContentSectionDataBlock(
       releaseId,
       sectionId,
@@ -145,21 +119,14 @@ export async function updateContentSectionDataBlock(
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function updateContentSectionBlock(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  blockId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  bodyContent: string,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    bodyContent: string,
+  ) {
     const updateBlock = await releaseContentService.updateContentSectionBlock(
       releaseId,
       sectionId,
@@ -170,20 +137,13 @@ export async function updateContentSectionBlock(
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function addContentSectionBlock(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  block: ContentBlockPostModel,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function addContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    block: ContentBlockPostModel,
+  ) {
     const newBlock = await releaseContentService.addContentSectionBlock(
       releaseId,
       sectionId,
@@ -195,21 +155,14 @@ export async function addContentSectionBlock(
     });
     // becuase we don't know if a datablock was used,
     // and so it is unavailable
-    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
-  } catch (err) {
-    errorHandler(err);
+    updateAvailableDataBlocks(releaseId);
   }
-}
-
-export async function attachContentSectionBlock(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  block: ContentBlockAttachRequest,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function attachContentSectionBlock(
+    releaseId: string,
+    sectionId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    block: ContentBlockAttachRequest,
+  ) {
     const newBlock = await releaseContentService.attachContentSectionBlock(
       releaseId,
       sectionId,
@@ -219,21 +172,14 @@ export async function attachContentSectionBlock(
       type: 'ADD_BLOCK_TO_SECTION',
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
-    updateAvailableDataBlocks(dispatch, releaseId, errorHandler);
-  } catch (err) {
-    errorHandler(err);
+    updateAvailableDataBlocks(releaseId);
   }
-}
-
-export async function updateSectionBlockOrder(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
-  order: Dictionary<number>,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateSectionBlockOrder(
+    releaseId: string,
+    sectionId: string,
+    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    order: Dictionary<number>,
+  ) {
     const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
       releaseId,
       sectionId,
@@ -246,64 +192,35 @@ export async function updateSectionBlockOrder(
         sectionContent,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function addContentSection(
-  dispatch: Dispatch,
-  releaseId: string,
-  order: number,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function addContentSection(releaseId: string, order: number) {
     const newSection = await releaseContentService.addContentSection(
       releaseId,
       order,
     );
-
     dispatch({
       type: 'ADD_CONTENT_SECTION',
       payload: {
         section: newSection,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function updateContentSectionsOrder(
-  dispatch: Dispatch,
-  releaseId: string,
-  order: Dictionary<number>,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateContentSectionsOrder(
+    releaseId: string,
+    order: Dictionary<number>,
+  ) {
     const content = await releaseContentService.updateContentSectionsOrder(
       releaseId,
       order,
     );
-
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function removeContentSection(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function removeContentSection(releaseId: string, sectionId: string) {
     const content = await releaseContentService.removeContentSection(
       releaseId,
       sectionId,
@@ -314,19 +231,12 @@ export async function removeContentSection(
         content,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
-}
-
-export async function updateContentSectionHeading(
-  dispatch: Dispatch,
-  releaseId: string,
-  sectionId: string,
-  title: string,
-  errorHandler: (err: AxiosResponse) => void,
-) {
-  try {
+  async function updateContentSectionHeading(
+    releaseId: string,
+    sectionId: string,
+    title: string,
+  ) {
     const section = await releaseContentService.updateContentSectionHeading(
       releaseId,
       sectionId,
@@ -339,7 +249,19 @@ export async function updateContentSectionHeading(
         section,
       },
     });
-  } catch (err) {
-    errorHandler(err);
   }
+  return {
+    getReleaseContent,
+    updateAvailableDataBlocks,
+    deleteContentSectionBlock,
+    updateContentSectionDataBlock,
+    updateContentSectionBlock,
+    addContentSectionBlock,
+    attachContentSectionBlock,
+    updateSectionBlockOrder,
+    addContentSection,
+    updateContentSectionsOrder,
+    removeContentSection,
+    updateContentSectionHeading,
+  };
 }

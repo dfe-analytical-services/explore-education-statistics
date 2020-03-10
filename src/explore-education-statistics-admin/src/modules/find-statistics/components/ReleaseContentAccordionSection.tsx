@@ -4,14 +4,7 @@ import AccordionSection, {
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import {
-  addContentSectionBlock,
-  attachContentSectionBlock,
-  deleteContentSectionBlock,
-  updateContentSectionBlock,
-  updateSectionBlockOrder,
-} from '@admin/pages/release/edit-release/content/helpers';
-import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -40,12 +33,18 @@ const ReleaseContentAccordionSection = ({
   canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
-  const dispatch = useReleaseDispatch();
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const {
+    addContentSectionBlock,
+    attachContentSectionBlock,
+    deleteContentSectionBlock,
+    updateContentSectionBlock,
+    updateSectionBlockOrder,
+  } = useReleaseActions();
 
   return (
     <AccordionSection
@@ -78,34 +77,28 @@ const ReleaseContentAccordionSection = ({
         sectionId={sectionId}
         onBlockSaveOrder={order => {
           updateSectionBlockOrder(
-            dispatch,
             release.id,
             sectionId,
             'content',
             order,
-            handleApiErrors,
-          );
+          ).catch(handleApiErrors);
         }}
         onBlockContentChange={(blockId, bodyContent) =>
           updateContentSectionBlock(
-            dispatch,
             release.id,
             sectionId,
             blockId,
             'content',
             bodyContent,
-            handleApiErrors,
-          )
+          ).catch(handleApiErrors)
         }
         onBlockDelete={(blockId: string) =>
           deleteContentSectionBlock(
-            dispatch,
             release.id,
             sectionId,
             blockId,
             'content',
-            handleApiErrors,
-          )
+          ).catch(handleApiErrors)
         }
         content={sectionContent}
         allowComments
@@ -116,35 +109,21 @@ const ReleaseContentAccordionSection = ({
           <Button
             variant="secondary"
             onClick={() => {
-              addContentSectionBlock(
-                dispatch,
-                releaseId,
-                sectionId,
-                'content',
-                {
-                  type: 'MarkdownBlock',
-                  order: sectionContent.length,
-                  body: '',
-                },
-                handleApiErrors,
-              );
+              addContentSectionBlock(releaseId, sectionId, 'content', {
+                type: 'MarkdownBlock',
+                order: sectionContent.length,
+                body: '',
+              }).catch(handleApiErrors);
             }}
           >
             Add text block
           </Button>
           <AddDataBlockButton
             onAddDataBlock={(datablockId: string) => {
-              attachContentSectionBlock(
-                dispatch,
-                releaseId,
-                sectionId,
-                'content',
-                {
-                  contentBlockId: datablockId,
-                  order: sectionContent.length,
-                },
-                handleApiErrors,
-              );
+              attachContentSectionBlock(releaseId, sectionId, 'content', {
+                contentBlockId: datablockId,
+                order: sectionContent.length,
+              }).catch(handleApiErrors);
             }}
           />
         </div>

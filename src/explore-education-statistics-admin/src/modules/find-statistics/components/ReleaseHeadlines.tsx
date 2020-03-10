@@ -1,12 +1,6 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
-import {
-  addContentSectionBlock,
-  deleteContentSectionBlock,
-  updateContentSectionBlock,
-  updateSectionBlockOrder,
-} from '@admin/pages/release/edit-release/content/helpers';
-import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -38,7 +32,12 @@ interface Props {
 const ReleaseHeadlines = ({ release }: Props) => {
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { isEditing } = useContext(EditingContext);
-  const dispatch = useReleaseDispatch();
+  const {
+    addContentSectionBlock,
+    deleteContentSectionBlock,
+    updateContentSectionBlock,
+    updateSectionBlockOrder,
+  } = useReleaseActions();
 
   const [secondaryStatsDatablock, setSecondaryStatsDatablockData] = useState<{
     datablock: DataBlock;
@@ -99,34 +98,28 @@ const ReleaseHeadlines = ({ release }: Props) => {
               content={release.headlinesSection.content}
               onBlockSaveOrder={order => {
                 updateSectionBlockOrder(
-                  dispatch,
                   release.id,
                   release.headlinesSection.id,
                   'headlinesSection',
                   order,
-                  handleApiErrors,
-                );
+                ).catch(handleApiErrors);
               }}
               onBlockContentChange={(blockId, bodyContent) =>
                 updateContentSectionBlock(
-                  dispatch,
                   release.id,
                   release.headlinesSection.id,
                   blockId,
                   'headlinesSection',
                   bodyContent,
-                  handleApiErrors,
-                )
+                ).catch(handleApiErrors)
               }
               onBlockDelete={(blockId: string) =>
                 deleteContentSectionBlock(
-                  dispatch,
                   release.id,
                   release.headlinesSection.id,
                   blockId,
                   'headlinesSection',
-                  handleApiErrors,
-                )
+                ).catch(handleApiErrors)
               }
             />
 
@@ -136,7 +129,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
                   variant="secondary"
                   onClick={() => {
                     addContentSectionBlock(
-                      dispatch,
                       release.id,
                       release.headlinesSection.id,
                       'headlinesSection',
@@ -145,8 +137,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
                         order: 0,
                         body: '',
                       },
-                      handleApiErrors,
-                    );
+                    ).catch(handleApiErrors);
                   }}
                 >
                   Add a headlines text block

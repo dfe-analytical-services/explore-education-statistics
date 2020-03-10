@@ -4,7 +4,7 @@ import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-st
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import { addContentSectionBlock } from '@admin/pages/release/edit-release/content/helpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import {
   useReleaseDispatch,
   useReleaseState,
@@ -32,7 +32,7 @@ const PublicationReleaseContent = () => {
   const { isEditing } = useContext(EditingContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { release } = useReleaseState();
-  const dispatch = useReleaseDispatch();
+  const { addContentSectionBlock } = useReleaseActions();
 
   const releaseCount = React.useMemo(() => {
     if (release) {
@@ -75,7 +75,6 @@ const PublicationReleaseContent = () => {
                     variant="secondary"
                     onClick={() => {
                       addContentSectionBlock(
-                        dispatch,
                         release.id,
                         release.summarySection.id,
                         'summarySection',
@@ -84,8 +83,7 @@ const PublicationReleaseContent = () => {
                           order: 0,
                           body: '',
                         },
-                        handleApiErrors,
-                      );
+                      ).catch(handleApiErrors);
                     }}
                   >
                     Add a summary text block

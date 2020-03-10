@@ -1,10 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import {
-  attachContentSectionBlock,
-  deleteContentSectionBlock,
-  updateContentSectionDataBlock,
-} from '@admin/pages/release/edit-release/content/helpers';
-import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -28,7 +23,10 @@ export interface KeyStatisticsProps {
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
   const { handleApiErrors } = useContext(ErrorControlContext);
-  const dispatch = useReleaseDispatch();
+  const {
+    deleteContentSectionBlock,
+    updateContentSectionDataBlock,
+  } = useReleaseActions();
 
   const [keyStats, setKeyStats] = useState<
     AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
@@ -69,24 +67,20 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                   isEditing={isEditing}
                   onRemove={() => {
                     deleteContentSectionBlock(
-                      dispatch,
                       releaseId,
                       release.keyStatisticsSection.id as string,
                       stat.id,
                       'keyStatisticsSection',
-                      handleApiErrors,
-                    );
+                    ).catch(handleApiErrors);
                   }}
                   onSubmit={values =>
                     updateContentSectionDataBlock(
-                      dispatch,
                       releaseId,
                       release.keyStatisticsSection.id as string,
                       stat.id,
                       'keyStatisticsSection',
                       values,
-                      handleApiErrors,
-                    )
+                    ).catch(handleApiErrors)
                   }
                 />
               ) : null;
@@ -103,7 +97,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
   const { handleApiErrors } = useContext(ErrorControlContext);
-  const dispatch = useReleaseDispatch();
+  const { attachContentSectionBlock } = useReleaseActions();
 
   const another =
     release.keyStatisticsSection.content &&
@@ -116,7 +110,6 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
         <KeyIndicatorSelectForm
           onSelect={async datablockId => {
             attachContentSectionBlock(
-              dispatch,
               releaseId,
               release.keyStatisticsSection.id,
               'keyStatisticsSection',
@@ -127,8 +120,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
                     release.keyStatisticsSection.content.length) ||
                   0,
               },
-              handleApiErrors,
-            );
+            ).catch(handleApiErrors);
             setIsFormOpen(false);
           }}
           onCancel={() => setIsFormOpen(false)}

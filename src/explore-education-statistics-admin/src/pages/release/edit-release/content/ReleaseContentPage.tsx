@@ -12,12 +12,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { getReleaseContent } from './helpers';
-import {
-  ReleaseProvider,
-  useReleaseDispatch,
-  useReleaseState,
-} from './ReleaseContext';
+import useReleaseActions from './helpers';
+import { ReleaseProvider, useReleaseState } from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';
 
@@ -29,11 +25,11 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   ) as ManageRelease;
 
   const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
-  const dispatch = useReleaseDispatch();
+  const { getReleaseContent } = useReleaseActions();
 
   useEffect(() => {
-    getReleaseContent(dispatch, releaseId, handleApiErrors);
-  }, [releaseId, publication.themeId, publication, handleApiErrors, dispatch]);
+    getReleaseContent(releaseId).catch(handleApiErrors);
+  }, [releaseId, publication.themeId, publication, handleApiErrors]);
 
   useEffect(() => {
     if (canUpdateRelease === true) {
