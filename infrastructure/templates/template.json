@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "domain": {
+      "type": "string"
+    },
     "subscription": {
       "type": "string",
       "metadata": {
@@ -552,8 +555,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -632,8 +634,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -767,8 +768,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -836,8 +836,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
