@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "32cbe6ca-62cb-4885-bc86-18c8155cc6af",
+		"_postman_id": "4635611b-ef09-472f-b78f-0e0c44e75b73",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -668,10 +668,9 @@
 											"script": {
 												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
 												"exec": [
-													"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
-													"",
-													"pm.test(\"Response text should be correct\", function () {",
-													"   pm.expect(pm.response.text()).to.contain(\"Subject does not exist\");",
+													"pm.test(\"Status code is 404\", function () { ",
+													"    pm.response.to.have.status(404); ",
+													"    var respJson = pm.response.json();",
 													"});"
 												],
 												"type": "text/javascript"

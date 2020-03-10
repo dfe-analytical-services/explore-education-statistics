@@ -1,0 +1,5 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,region_code,region_name,lad_code,lad_name,local_enterprise_partnership_code,local_enterprise_partnership_name,rsc_region_lead_name,opportunity_area_code,opportunity_area_name,pcon_code,pcon_name,ward_code,ward_name,admission_numbers
+2018,Calendar year,Local authority,E92000001,England,330,TEST001,LA Name 1 – 1,,,,,,,,,,,,,,3962
+2018,Calendar year,Local authority,E92000001,England,370,TEST002,LA Name 2 – 1,,,,,,,,,,,,,,8123
+2018,Calendar year,Local authority,E92000001,England,203,TEST003,LA Name 3 – 1,,,,,,,,,,,,,,5669
+2018,Calendar year,Local authority,E92000001,England,202,TEST004,LA Name 4 – same,,,,,,,,,,,,,,2399
