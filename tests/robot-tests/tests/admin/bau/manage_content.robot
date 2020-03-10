@@ -14,7 +14,7 @@ Create Manage content test publication
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
-    user creates publication  Manage content test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson
+    user creates publication  Manage content test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson - (Special educational needs statistics team)
 
 Verify Manage content test publication is created
     [Tags]  HappyPath
@@ -50,7 +50,7 @@ Add release note to release
     user presses keys  Test release note one
     user clicks element   xpath://button[text()="Add note"]
     # TODO: Check release note is there
-    user checks page contains element   xpath://span[text()="See all 1 updates"]
+    user waits until page contains element   xpath://span[text()="See all 1 updates"]
     user clicks element   xpath://span[text()="See all 1 updates"]
     ${date}=  get datetime   %d %B %Y
     user checks page contains element   xpath://*[@data-testid="last-updated-element"]/time[text()="${date}"]
@@ -92,19 +92,24 @@ Add accordion sections to release
 
     # TODO: Validate that three accordion sections exist
 
-Add three content blocks to Test section one
+Add content block to Test section one
     [Tags]  HappyPath
     ${section_one}=  user gets editable accordion section element  Test section one
     user opens editable accordion section   ${section_one}
-    user clicks add content for editable accordion section   ${section_one}
-    user clicks add content for editable accordion section   ${section_one}
+
     user clicks add content for editable accordion section   ${section_one}
     set global variable   ${section_one}   ${section_one}
 
 Add text to newly created content blocks
     [Tags]  HappyPath
     user adds content to accordion section content block  ${section_one}   1    block one test text
+
+Create two more blocks and add text to them
+    [Tags]  HappyPath
+    user clicks add content for editable accordion section   ${section_one}
     user adds content to accordion section content block  ${section_one}   2    block two test text
+
+    user clicks add content for editable accordion section   ${section_one}
     user adds content to accordion section content block  ${section_one}   3    block three test text
 
     user checks accordion section contains X blocks   ${section_one}    3
@@ -119,4 +124,3 @@ Validate two remaining content blocks
     [Tags]  HappyPath
     user checks accordion section content block contains text   ${section_one}   1   block one test text
     user checks accordion section content block contains text   ${section_one}   2   block three test text
-
