@@ -14,7 +14,7 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { RemoveBlockFromSection } from './actions';
+import { RemoveBlockFromSection, ContentSectionKeys } from './actions';
 import { useReleaseDispatch } from './ReleaseContext';
 
 const contentSectionComments = (
@@ -87,7 +87,7 @@ export default function useReleaseActions() {
     releaseId: string,
     sectionId: string,
     blockId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
   ) {
     await releaseContentService.deleteContentSectionBlock(
       releaseId,
@@ -106,7 +106,7 @@ export default function useReleaseActions() {
     releaseId: string,
     sectionId: string,
     blockId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
     values: KeyStatsFormValues,
   ) {
     const updateBlock = await releaseContentService.updateContentSectionDataBlock(
@@ -124,7 +124,7 @@ export default function useReleaseActions() {
     releaseId: string,
     sectionId: string,
     blockId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
     bodyContent: string,
   ) {
     const updateBlock = await releaseContentService.updateContentSectionBlock(
@@ -141,7 +141,7 @@ export default function useReleaseActions() {
   async function addContentSectionBlock(
     releaseId: string,
     sectionId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
     block: ContentBlockPostModel,
   ) {
     const newBlock = await releaseContentService.addContentSectionBlock(
@@ -160,7 +160,7 @@ export default function useReleaseActions() {
   async function attachContentSectionBlock(
     releaseId: string,
     sectionId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
     block: ContentBlockAttachRequest,
   ) {
     const newBlock = await releaseContentService.attachContentSectionBlock(
@@ -177,7 +177,7 @@ export default function useReleaseActions() {
   async function updateSectionBlockOrder(
     releaseId: string,
     sectionId: string,
-    sectionKey: RemoveBlockFromSection['payload']['meta']['sectionKey'],
+    sectionKey: ContentSectionKeys,
     order: Dictionary<number>,
   ) {
     const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(

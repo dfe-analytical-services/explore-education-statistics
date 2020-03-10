@@ -5,17 +5,18 @@ import {
 } from '@common/services/publicationService';
 import { State } from './ReleaseContext';
 
+export type ContentSectionKeys = keyof Pick<
+  AbstractRelease<EditableContentBlock>,
+  | 'summarySection'
+  | 'keyStatisticsSection'
+  | 'keyStatisticsSecondarySection'
+  | 'headlinesSection'
+  | 'content'
+>;
 type BlockMeta = {
   sectionId: string;
   blockId: string;
-  sectionKey: keyof Pick<
-    AbstractRelease<EditableContentBlock>,
-    | 'summarySection'
-    | 'keyStatisticsSection'
-    | 'keyStatisticsSecondarySection'
-    | 'headlinesSection'
-    | 'content'
-  >;
+  sectionKey: ContentSectionKeys;
 };
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
