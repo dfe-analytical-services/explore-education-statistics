@@ -402,7 +402,7 @@
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
-    "publicAppUrl": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]",
+    "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storageeescore')]",
