@@ -1,6 +1,7 @@
 import AccordionSection, {
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
+import Button from '@common/components/Button';
 import { FormTextInput } from '@common/components/form';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -101,6 +102,7 @@ const EditableAccordionSection = ({
                 }}
                 onKeyPress={e => {
                   if (e.key === 'Enter') saveHeading();
+                  if (e.key === 'Esc') setIsEditingHeading(false);
                 }}
               />
             ) : (
@@ -120,42 +122,19 @@ const EditableAccordionSection = ({
       >
         <div>
           {onHeadingChange && isEditingHeading ? (
-            <a
-              role="button"
-              tabIndex={0}
-              onClick={saveHeading}
-              onKeyPress={e => {
-                if (e.charCode === 13) saveHeading();
-              }}
-              className="govuk-button govuk-!-margin-right-2"
-            >
-              Save title
-            </a>
+            <Button onClick={saveHeading}>Save title</Button>
           ) : (
-            <a
-              role="button"
-              tabIndex={0}
+            <Button
+              type="button"
               onClick={() => setIsEditingHeading(!isEditingHeading)}
-              onKeyPress={e => {
-                if (e.charCode === 13) setIsEditingHeading(!isEditingHeading);
-              }}
-              className={`govuk-button ${!isEditingHeading &&
-                'govuk-button--secondary'} govuk-!-margin-right-2`}
+              variant="secondary"
             >
               Edit title
-            </a>
+            </Button>
           )}
           {headerButtons}
           {!!onRemoveSection && (
-            <a
-              role="button"
-              tabIndex={0}
-              onClick={() => setShowRemoveModal(true)}
-              onKeyPress={e => {
-                if (e.key === 'Enter') setShowRemoveModal(true);
-              }}
-              className="govuk-button govuk-button--warning"
-            >
+            <Button onClick={() => setShowRemoveModal(true)} variant="warning">
               Remove section
               {showRemoveModal && (
                 <ModalConfirm
@@ -171,7 +150,7 @@ const EditableAccordionSection = ({
                   </p>
                 </ModalConfirm>
               )}
-            </a>
+            </Button>
           )}
         </div>
 

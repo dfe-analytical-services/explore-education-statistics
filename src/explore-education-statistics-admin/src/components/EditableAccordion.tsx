@@ -2,6 +2,8 @@
 import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
 import DroppableAccordion from '@admin/components/DroppableAccordion';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
+import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
 import classnames from 'classnames';
@@ -131,40 +133,35 @@ const EditableAccordion = ({
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <h2 className="govuk-heading-l reorderable-relative">
+        {sectionName}
         {isError && <span className={styles.error}>An error occurred</span>}
         {canReorder &&
           currentChildren.length > 1 &&
-          (isReordering ? (
-            <button
-              className="govuk-button reorderable"
-              onClick={saveOrder}
-              type="button"
-            >
-              Save Reordering
-            </button>
-          ) : (
-            <button
-              className="govuk-button govuk-button--secondary reorderable"
+          (!isReordering ? (
+            <Button
+              variant="secondary"
+              className="reorderable"
               onClick={reorder}
-              type="button"
             >
               Reorder <span className="govuk-visually-hidden"> sections </span>
-            </button>
+            </Button>
+          ) : (
+            <Button className="reorderable" onClick={saveOrder}>
+              Save order
+            </Button>
           ))}
-        {sectionName}
       </h2>
       <DroppableAccordion id={id} isReordering={isReordering}>
         <div className="govuk-accordion" ref={ref} id={id}>
           {!isReordering && (
-            <div className={classnames('govuk-accordion__controls')}>
-              <button
-                type="button"
+            <div className="govuk-accordion__controls">
+              <ButtonText
                 className="govuk-accordion__open-all"
                 aria-expanded="false"
                 onClick={() => toggleAll()}
               >
                 Open all<span className="govuk-visually-hidden"> sections</span>
-              </button>
+              </ButtonText>
             </div>
           )}
           {currentChildren.map(({ id, key, index, section }) => (
@@ -183,14 +180,13 @@ const EditableAccordion = ({
       {canReorder && (
         <div className="govuk-accordion" style={{ border: 'none' }}>
           <div className={classnames('govuk-accordion__controls')}>
-            <button
-              type="button"
+            <Button
               key="add_section"
               onClick={onAddSection}
-              className={classnames(styles.addSectionButton, 'govuk-button')}
+              className={styles.addSectionButton}
             >
               Add new section
-            </button>
+            </Button>
           </div>
         </div>
       )}
