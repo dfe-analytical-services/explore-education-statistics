@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var value = _configuration.GetSection("AppInsights")?.GetValue<string>("InstrumentationKey");
             if (string.IsNullOrEmpty(value))
             {
-                return NotFound();
+                return Ok("");
             }
 
             return Ok(value);
