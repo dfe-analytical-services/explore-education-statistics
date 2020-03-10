@@ -128,7 +128,7 @@ const EditableKeyStatTile = ({
               return (
                 <Form id={`key-stats-form-${id}`}>
                   <span className="govuk-heading-s">{name}</span>
-                  <div className={styles.keyStat}>
+                  <div className={styles.keyStat} data-testid="key-stat-tile">
                     <h3
                       className="govuk-heading-s"
                       data-testid="key-stat-tile-title"

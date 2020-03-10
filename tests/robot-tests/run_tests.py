@@ -125,7 +125,7 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
     assert callable(get_identity_info)
     print('done!')
 
-    if f"admin{os.sep}analyst" not in args.tests:  # Don't need BAU user if running admin/analyst tests
+    if "general_public" not in args.tests:  # Don't need BAU user if running general_public tests
         if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists('IDENTITY_COOKIE_BAU.txt'):
             print('Getting BAU user authentication information from local files...', end='')
             with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
@@ -156,7 +156,7 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
             print('done!')
         else:
             print('Logging in to obtain ANALYST user authentication information...', end='', flush=True)
-            os.environ["IDENTITY_LOCAL_STORAGE_ANALYST"], os.environ['IDENTITY_COOKIE_ANALYST'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
+            os.environ["IDENTITY_LOCAL_STORAGE_ANALYST"], os.environ['IDENTITY_COOKIE_ANALYST'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ANALYST_EMAIL'), os.getenv('ANALYST_PASSWORD'), chromedriver_version=args.chromedriver_version)
 
             # Save auth info to files for efficiency
             with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'w') as ls_file:

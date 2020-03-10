@@ -141,6 +141,7 @@ const ReleaseFileUploadsSection = ({
 
                 <Button
                   type="submit"
+                  id="upload-file-button"
                   className="govuk-button govuk-!-margin-right-6"
                 >
                   Upload file
