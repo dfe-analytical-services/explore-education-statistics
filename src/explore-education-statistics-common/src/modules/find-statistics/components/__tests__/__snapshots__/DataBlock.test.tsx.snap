@@ -3,7 +3,7 @@
 exports[`DataBlock renders map instead of chart 1`] = `
 <section
   aria-labelledby="test-datablock-charts-tab"
-  class="govuk-tabs__panel dfe-content-overflow panel"
+  class="govuk-tabs__panel panel"
   id="test-datablock-charts"
   role="tabpanel"
   tabindex="-1"
