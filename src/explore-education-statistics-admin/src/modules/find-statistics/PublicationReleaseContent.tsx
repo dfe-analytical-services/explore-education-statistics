@@ -4,9 +4,14 @@ import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-st
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import { addContentSectionBlock } from '@admin/pages/release/edit-release/content/helpers';
+import {
+  useReleaseDispatch,
+  useReleaseState,
+} from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
@@ -27,6 +32,7 @@ const PublicationReleaseContent = () => {
   const { isEditing } = useContext(EditingContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { release } = useReleaseState();
+  const dispatch = useReleaseDispatch();
 
   const releaseCount = React.useMemo(() => {
     if (release) {
@@ -56,12 +62,37 @@ const PublicationReleaseContent = () => {
           </div>
 
           {release.summarySection && (
-            <ContentBlocks
-              sectionId={release.summarySection.id}
-              publication={release.publication}
-              id={release.summarySection.id as string}
-              content={release.summarySection.content}
-            />
+            <>
+              <ContentBlocks
+                sectionId={release.summarySection.id}
+                publication={release.publication}
+                id={release.summarySection.id as string}
+                content={release.summarySection.content}
+              />
+              {release.summarySection.content?.length === 0 && (
+                <div className="govuk-!-margin-bottom-8 dfe-align--center">
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      addContentSectionBlock(
+                        dispatch,
+                        release.id,
+                        release.summarySection.id,
+                        'summarySection',
+                        {
+                          type: 'MarkdownBlock',
+                          order: 0,
+                          body: '',
+                        },
+                        handleApiErrors,
+                      );
+                    }}
+                  >
+                    Add a summary text block
+                  </Button>
+                </div>
+              )}
+            </>
           )}
 
           {release.downloadFiles && !isEditing && (
