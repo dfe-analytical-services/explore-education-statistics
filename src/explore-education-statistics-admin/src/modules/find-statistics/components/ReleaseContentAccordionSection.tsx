@@ -37,7 +37,7 @@ const ReleaseContentAccordionSection = ({
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
   const {
     addContentSectionBlock,
     attachContentSectionBlock,

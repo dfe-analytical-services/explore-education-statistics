@@ -31,7 +31,7 @@ const Comments = ({
   const [newComment, setNewComment] = useState<string>('');
   const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
   const context = useContext(LoginContext);
 
   const addComment = (comment: string) => {

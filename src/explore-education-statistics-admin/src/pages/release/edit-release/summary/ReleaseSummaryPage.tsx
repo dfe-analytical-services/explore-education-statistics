@@ -37,9 +37,7 @@ interface ReleaseSummaryModel {
 const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useContext(ManageReleaseContext);
 
   useEffect(() => {
     Promise.all([

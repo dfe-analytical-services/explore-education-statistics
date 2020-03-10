@@ -20,9 +20,7 @@ type PageMode = 'edit' | 'preview';
 const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [pageMode, setPageMode] = useState<PageMode>('preview');
 
-  const { releaseId, publication } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { releaseId, publication } = useContext(ManageReleaseContext);
 
   const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
   const { getReleaseContent } = useReleaseActions();

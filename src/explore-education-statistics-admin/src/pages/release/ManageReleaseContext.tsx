@@ -2,8 +2,8 @@ import { BasicPublicationDetails } from '@admin/services/common/types';
 import * as React from 'react';
 
 export interface ManageRelease {
-  publication: BasicPublicationDetails;
+  publication?: BasicPublicationDetails;
   releaseId: string;
 }
 
-export default React.createContext<ManageRelease | undefined>(undefined);
+export default React.createContext<ManageRelease>({ releaseId: '' });

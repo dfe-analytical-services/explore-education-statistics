@@ -36,7 +36,7 @@ interface DataBlockData {
 const ReleaseManageDataBlocksPage = ({
   handleApiErrors,
 }: ErrorControlProps) => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
 
   const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');

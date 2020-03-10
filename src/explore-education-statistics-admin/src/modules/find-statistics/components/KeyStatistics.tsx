@@ -21,7 +21,7 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const {
     deleteContentSectionBlock,
@@ -95,7 +95,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { attachContentSectionBlock } = useReleaseActions();
 

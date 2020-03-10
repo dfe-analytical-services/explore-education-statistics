@@ -31,9 +31,7 @@ const ReleaseSummaryEditPage = ({
     ReleaseSummaryDetails
   >();
 
-  const { releaseId, publication } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { releaseId, publication } = useContext(ManageReleaseContext);
 
   useEffect(() => {
     service

@@ -25,9 +25,7 @@ export interface FootnotesData {
 }
 
 const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useContext(ManageReleaseContext);
 
   const [footnotesData, setFootnotesData] = useState<FootnotesData>();
   const [activeTab, setActiveTab] = useState<string>('');

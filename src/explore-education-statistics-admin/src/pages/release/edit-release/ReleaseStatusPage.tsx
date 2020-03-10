@@ -46,7 +46,7 @@ const ReleaseStatusPage = ({
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
 
   useEffect(() => {
     Promise.all([
