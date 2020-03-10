@@ -1,27 +1,34 @@
-import { useImmerReducer } from 'use-immer';
 import {
   EditableContentBlock,
-  ExtendedComment,
   EditableRelease,
+  ExtendedComment,
 } from '@admin/services/publicationService';
 import { DataBlock } from '@common/services/dataBlockService';
 import { ContentSection } from '@common/services/publicationService';
-import React, { createContext, useContext } from 'react';
+import React, { createContext, ReactNode, useContext } from 'react';
+import { Reducer, useImmerReducer } from 'use-immer';
 import ReleaseDispatchAction from './actions';
 
-type Dispatch = (action: ReleaseDispatchAction) => void;
-type State = {
+type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+type ReleaseContextState = {
   release: EditableRelease | undefined;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: ExtendedComment[];
 };
-type ReleaseProviderProps = { children: React.ReactNode };
+type ReleaseProviderProps = { children: ReactNode };
 
-const ReleaseStateContext = createContext<State | undefined>(undefined);
-const ReleaseDispatchContext = createContext<Dispatch | undefined>(undefined);
+const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
+  undefined,
+);
+const ReleaseDispatchContext = createContext<
+  ReleaseContextDispatch | undefined
+>(undefined);
 
-export function releaseReducer(draft: State, action: ReleaseDispatchAction) {
+export const releaseReducer: Reducer<
+  ReleaseContextState,
+  ReleaseDispatchAction
+> = (draft, action) => {
   switch (action.type) {
     case 'CLEAR_STATE':
       return {
@@ -188,7 +195,7 @@ export function releaseReducer(draft: State, action: ReleaseDispatchAction) {
       return draft;
     }
   }
-}
+};
 
 function ReleaseProvider({ children }: ReleaseProviderProps) {
   const [state, dispatch] = useImmerReducer(releaseReducer, {
@@ -223,10 +230,10 @@ function useReleaseDispatch() {
 }
 
 export {
-  // eslint-disable-next-line no-undef
-  State,
-  // eslint-disable-next-line no-undef
-  Dispatch,
+  //eslint-disable-next-line no-undef
+  ReleaseContextState,
+  //eslint-disable-next-line no-undef
+  ReleaseContextDispatch,
   ReleaseProvider,
   useReleaseState,
   useReleaseDispatch,

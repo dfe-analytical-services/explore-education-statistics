@@ -3,7 +3,7 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { State } from './ReleaseContext';
+import { ReleaseContextState } from './ReleaseContext';
 
 export type ContentSectionKeys = keyof Pick<
   AbstractRelease<EditableContentBlock>,
@@ -21,10 +21,10 @@ type BlockMeta = {
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
 type ClearState = { type: 'CLEAR_STATE' };
-type SetState = { type: 'SET_STATE'; payload: State };
+type SetState = { type: 'SET_STATE'; payload: ReleaseContextState };
 type SetAvailableDatablocks = {
   type: 'SET_AVAILABLE_DATABLOCKS';
-  payload: Pick<State, 'availableDataBlocks'>;
+  payload: Pick<ReleaseContextState, 'availableDataBlocks'>;
 };
 export type RemoveBlockFromSection = {
   type: 'REMOVE_BLOCK_FROM_SECTION';

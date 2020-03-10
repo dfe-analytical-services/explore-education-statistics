@@ -20,11 +20,7 @@ import { useReleaseDispatch } from './ReleaseContext';
 const contentSectionComments = (
   contentSection?: ContentSection<EditableContentBlock>,
 ) => {
-  if (
-    contentSection &&
-    contentSection.content &&
-    contentSection.content.length > 0
-  ) {
+  if (contentSection?.content?.length) {
     return contentSection.content.reduce<ExtendedComment[]>(
       (allCommentsForSection, content) => {
         content.comments.forEach(comment =>
