@@ -1,7 +1,5 @@
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
@@ -11,7 +9,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useReleaseActions from './helpers';
 import { ReleaseProvider, useReleaseState } from './ReleaseContext';
 
@@ -20,14 +18,14 @@ type PageMode = 'edit' | 'preview';
 const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [pageMode, setPageMode] = useState<PageMode>('preview');
 
-  const { releaseId, publication } = useContext(ManageReleaseContext);
+  const { releaseId, publication } = useManageReleaseContext();
 
   const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
   const { getReleaseContent } = useReleaseActions();
 
   useEffect(() => {
     getReleaseContent(releaseId).catch(handleApiErrors);
-  }, [releaseId, publication.themeId, publication, handleApiErrors]);
+  }, [releaseId, publication?.themeId, publication, handleApiErrors]);
 
   useEffect(() => {
     if (canUpdateRelease === true) {

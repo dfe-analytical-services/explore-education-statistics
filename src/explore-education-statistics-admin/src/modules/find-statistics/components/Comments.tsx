@@ -1,7 +1,5 @@
 import LoginContext from '@admin/components/Login';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { ExtendedComment } from '@admin/services/publicationService';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
 import { User } from '@admin/services/sign-in/types';
@@ -31,7 +29,7 @@ const Comments = ({
   const [newComment, setNewComment] = useState<string>('');
   const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
   const context = useContext(LoginContext);
 
   const addComment = (comment: string) => {

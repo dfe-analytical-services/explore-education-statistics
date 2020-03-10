@@ -1,6 +1,4 @@
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
@@ -31,7 +29,7 @@ const ReleaseSummaryEditPage = ({
     ReleaseSummaryDetails
   >();
 
-  const { releaseId, publication } = useContext(ManageReleaseContext);
+  const { releaseId, publication } = useManageReleaseContext();
 
   useEffect(() => {
     service
@@ -70,8 +68,9 @@ const ReleaseSummaryEditPage = ({
     ...errorCodeMappings,
   );
 
-  const cancelHandler = () =>
+  const cancelHandler = () => {
     history.push(summaryRoute.generateLink(publication.id, releaseId));
+  };
 
   return (
     <>

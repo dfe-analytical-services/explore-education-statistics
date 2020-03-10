@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedTimePeriodCoverageLabel,
   getTimePeriodCoverageDateRangeStringLong,
@@ -12,8 +10,8 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import service from '@admin/services/release/edit-release/summary/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import withErrorControl, {
   ErrorControlProps,
@@ -25,7 +23,7 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
@@ -37,7 +35,7 @@ interface ReleaseSummaryModel {
 const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
-  const { publication, releaseId } = useContext(ManageReleaseContext);
+  const { publication, releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([

@@ -1,7 +1,7 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import ManageReleaseContext, {
-  ManageRelease,
+  useManageReleaseContext,
 } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -21,7 +21,7 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
   const { handleApiErrors } = useContext(ErrorControlContext);
   const {
     deleteContentSectionBlock,
@@ -95,7 +95,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { attachContentSectionBlock } = useReleaseActions();
 

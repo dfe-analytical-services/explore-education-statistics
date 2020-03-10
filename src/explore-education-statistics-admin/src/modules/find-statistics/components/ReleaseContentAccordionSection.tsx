@@ -5,9 +5,7 @@ import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import React, { useContext, useState } from 'react';
@@ -37,7 +35,7 @@ const ReleaseContentAccordionSection = ({
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
   const {
     addContentSectionBlock,
     attachContentSectionBlock,

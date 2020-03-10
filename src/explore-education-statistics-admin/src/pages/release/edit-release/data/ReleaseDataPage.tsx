@@ -1,6 +1,4 @@
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
@@ -25,7 +23,7 @@ export interface FootnotesData {
 }
 
 const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
-  const { publication, releaseId } = useContext(ManageReleaseContext);
+  const { publication, releaseId } = useManageReleaseContext();
 
   const [footnotesData, setFootnotesData] = useState<FootnotesData>();
   const [activeTab, setActiveTab] = useState<string>('');

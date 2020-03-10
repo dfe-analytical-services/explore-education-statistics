@@ -1,5 +1,6 @@
 import ManageReleaseContext, {
   ManageRelease,
+  useManageReleaseContext,
 } from '@admin/pages/release/ManageReleaseContext';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -22,7 +23,7 @@ const EditableDataBlock = ({
   editable,
   ...restOfProps
 }: Props) => {
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (

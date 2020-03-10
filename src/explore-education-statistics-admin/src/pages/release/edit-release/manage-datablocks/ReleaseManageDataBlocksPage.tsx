@@ -1,9 +1,7 @@
 /* eslint-disable no-shadow */
-import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/service';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import withErrorControl, {
@@ -21,7 +19,6 @@ import dataBlockService, {
 } from '@common/services/dataBlockService';
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -36,7 +33,7 @@ interface DataBlockData {
 const ReleaseManageDataBlocksPage = ({
   handleApiErrors,
 }: ErrorControlProps) => {
-  const { releaseId } = useContext(ManageReleaseContext);
+  const { releaseId } = useManageReleaseContext();
 
   const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
