@@ -68,17 +68,24 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
         <ModalConfirm
           onConfirm={() => {
             if (release.keyStatisticsSecondarySection?.content) {
-              release.keyStatisticsSecondarySection.content.forEach(
-                (content: EditableContentBlock) => {
-                  deleteContentSectionBlock(
-                    release.id,
-                    // @ts-ignore will be defined, due to above if statement
-                    release.keyStatisticsSecondarySection.id,
-                    content.id,
-                    'keyStatisticsSecondarySection',
-                  ).catch(handleApiErrors);
-                },
-              );
+              try {
+                Promise.all(
+                  release.keyStatisticsSecondarySection.content.map(
+                    async (content: EditableContentBlock) => {
+                      if (release.keyStatisticsSecondarySection?.content) {
+                        await deleteContentSectionBlock(
+                          release.id,
+                          release.keyStatisticsSecondarySection.id,
+                          content.id,
+                          'keyStatisticsSecondarySection',
+                        );
+                      }
+                    },
+                  ),
+                );
+              } catch (err) {
+                handleApiErrors(err);
+              }
             }
             setShowConfirmation(false);
           }}
@@ -108,20 +115,24 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
             release.keyStatisticsSecondarySection.id
           ) {
             if (release.keyStatisticsSecondarySection?.content) {
-              await Promise.all(
-                release.keyStatisticsSecondarySection.content.map(
-                  async (content: EditableContentBlock) => {
-                    const response = await deleteContentSectionBlock(
-                      release.id,
-                      // @ts-ignore will be defined, due to above if statement
-                      release.keyStatisticsSecondarySection.id,
-                      content.id,
-                      'keyStatisticsSecondarySection',
-                    ).catch(handleApiErrors);
-                    return response;
-                  },
-                ),
-              );
+              try {
+                await Promise.all(
+                  release.keyStatisticsSecondarySection.content.map(
+                    async (content: EditableContentBlock) => {
+                      if (release.keyStatisticsSecondarySection?.content) {
+                        await deleteContentSectionBlock(
+                          release.id,
+                          release.keyStatisticsSecondarySection.id,
+                          content.id,
+                          'keyStatisticsSecondarySection',
+                        );
+                      }
+                    },
+                  ),
+                );
+              } catch (err) {
+                handleApiErrors(err);
+              }
             }
             await attachContentSectionBlock(
               release.id,
