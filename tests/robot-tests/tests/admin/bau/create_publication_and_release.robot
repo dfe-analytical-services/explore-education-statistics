@@ -25,7 +25,7 @@ Select an existing methodology
 
 Select contact "Sean Gibson"
     [Tags]  HappyPath
-    user selects from list by label  css:#createPublicationForm-selectedContactId   Sean Gibson
+    user selects from list by label  css:#createPublicationForm-selectedContactId   Sean Gibson - (Special educational needs statistics team)
     user checks summary list item "Email" should be "sen.statistics@education.gov.uk"
     user checks summary list item "Telephone" should be "01325340987"
 
