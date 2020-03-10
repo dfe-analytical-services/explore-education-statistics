@@ -112,9 +112,7 @@ const LineChartBlock = ({
           type="number"
           dataKey="value"
           hide={axes.minor.visible === false}
-          unit={
-            (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) || ''
-          }
+          unit={axes.minor?.unit}
           scale="auto"
           {...minorDomainTicks}
           width={conditionallyAdd(axes.minor.size)}
@@ -124,9 +122,7 @@ const LineChartBlock = ({
           type="category"
           dataKey="name"
           hide={axes.major.visible === false}
-          unit={
-            (axes.major.unit && axes.major.unit !== '' && axes.major.unit) || ''
-          }
+          unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
           padding={{ left: 20, right: 20 }}
@@ -149,23 +145,21 @@ const LineChartBlock = ({
           />
         ))}
 
-        {axes.major.referenceLines &&
-          axes.major.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              x={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+        {axes.major.referenceLines?.map(referenceLine => (
+          <ReferenceLine
+            key={`${referenceLine.position}_${referenceLine.label}`}
+            x={referenceLine.position}
+            label={referenceLine.label}
+          />
+        ))}
 
-        {axes.minor.referenceLines &&
-          axes.minor.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              y={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+        {axes.minor?.referenceLines?.map(referenceLine => (
+          <ReferenceLine
+            key={`${referenceLine.position}_${referenceLine.label}`}
+            y={referenceLine.position}
+            label={referenceLine.label}
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

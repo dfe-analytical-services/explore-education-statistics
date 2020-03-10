@@ -71,17 +71,15 @@ const HorizontalBarBlock = ({
       >
         <CartesianGrid
           strokeDasharray="3 3"
-          horizontal={axes.minor && axes.minor.showGrid !== false}
-          vertical={axes.major && axes.major.showGrid !== false}
+          horizontal={axes.minor?.showGrid !== false}
+          vertical={axes.major.showGrid !== false}
         />
 
         <XAxis
           type="number"
           dataKey="value"
-          hide={axes.minor.visible === false}
-          unit={
-            (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) || ''
-          }
+          hide={axes.minor?.visible === false}
+          unit={axes.minor?.unit}
           scale="auto"
           {...minorDomainTicks}
           padding={{ left: 20, right: 20 }}
@@ -92,9 +90,7 @@ const HorizontalBarBlock = ({
           type="category"
           dataKey="name"
           hide={axes.major.visible === false}
-          unit={
-            (axes.major.unit && axes.major.unit !== '' && axes.major.unit) || ''
-          }
+          unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
           width={conditionallyAdd(axes.major.size)}
@@ -106,7 +102,7 @@ const HorizontalBarBlock = ({
           <Legend content={renderLegend} align="left" layout="vertical" />
         )}
 
-        {Array.from(keysForChart).map(name => (
+        {keysForChart.map(name => (
           <Bar
             key={name}
             {...populateDefaultChartProps(name, labels[name])}
@@ -114,25 +110,21 @@ const HorizontalBarBlock = ({
           />
         ))}
 
-        {axes.major &&
-          axes.major.referenceLines &&
-          axes.major.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              y={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+        {axes.major.referenceLines?.map(referenceLine => (
+          <ReferenceLine
+            key={`${referenceLine.position}_${referenceLine.label}`}
+            y={referenceLine.position}
+            label={referenceLine.label}
+          />
+        ))}
 
-        {axes.minor &&
-          axes.minor.referenceLines &&
-          axes.minor.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              x={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+        {axes.minor?.referenceLines?.map(referenceLine => (
+          <ReferenceLine
+            key={`${referenceLine.position}_${referenceLine.label}`}
+            x={referenceLine.position}
+            label={referenceLine.label}
+          />
+        ))}
       </BarChart>
     </ResponsiveContainer>
   );
