@@ -22,17 +22,15 @@ const EditingMarkdownRenderer = ({
   onContentChange,
 }: MarkdownRendererProps) => {
   return (
-    <>
-      <WysiwygEditor
-        content={source}
-        canDelete={canDelete}
-        editable={editable}
-        useMarkdown
-        toolbarConfig={toolbarConfig}
-        onContentChange={onContentChange}
-        onDelete={onDelete}
-      />
-    </>
+    <WysiwygEditor
+      content={source}
+      canDelete={canDelete}
+      editable={editable}
+      useMarkdown
+      toolbarConfig={toolbarConfig}
+      onContentChange={onContentChange}
+      onDelete={onDelete}
+    />
   );
 };
 const EditableMarkdownRenderer = wrapEditableComponent(
