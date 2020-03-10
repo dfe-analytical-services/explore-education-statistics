@@ -5,7 +5,7 @@ import PreviewContentBlocks, {
 } from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Comments from '../find-statistics/components/Comments';
 import ContentBlockDraggable from '../find-statistics/components/ContentBlockDraggable';
@@ -23,17 +23,15 @@ export interface Props extends ContentBlockProps {
   editable?: boolean;
   isReordering?: boolean;
   allowComments: boolean;
-  onContentChange?: (content: ContentType) => void;
   onBlockSaveOrder?: (order: Dictionary<number>) => void;
   onBlockContentChange: (blockId: string, content: string) => void;
   onBlockDelete: (blockId: string) => void;
 }
 
-const EditableContentBlock = ({
+const EditableContentBlocks = ({
   content = [],
   sectionId,
   editable = true,
-  onContentChange,
   isReordering = false,
   allowComments = false,
   onBlockSaveOrder,
@@ -41,14 +39,17 @@ const EditableContentBlock = ({
   onBlockDelete,
 }: Props) => {
   const [contentBlocks, setContentBlocks] = useState<ContentType>();
+  const isInitialMount = useRef(true);
 
   React.useEffect(() => {
     setContentBlocks(content);
   }, [content]);
 
   React.useEffect(() => {
-    if (!isReordering) {
-      // save
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else if (!isReordering) {
+      // save order
       if (onBlockSaveOrder && contentBlocks !== undefined)
         onBlockSaveOrder(
           contentBlocks.reduce<Dictionary<number>>(
@@ -60,21 +61,18 @@ const EditableContentBlock = ({
           ),
         );
     }
-  }, [contentBlocks, isReordering, onBlockSaveOrder]);
+  }, [isReordering]);
 
-  const onDragEnd = React.useCallback(
-    (result: DropResult) => {
-      const { source, destination, type } = result;
+  const onDragEnd = React.useCallback((result: DropResult) => {
+    const { source, destination, type } = result;
 
-      if (type === 'content' && destination) {
-        const newContentBlocks = [...(contentBlocks || [])];
-        const [removed] = newContentBlocks.splice(source.index, 1);
-        newContentBlocks.splice(destination.index, 0, removed);
-        setContentBlocks(newContentBlocks);
-      }
-    },
-    [contentBlocks],
-  );
+    if (type === 'content' && destination) {
+      const newContentBlocks = [...(contentBlocks || [])];
+      const [removed] = newContentBlocks.splice(source.index, 1);
+      newContentBlocks.splice(destination.index, 0, removed);
+      setContentBlocks(newContentBlocks);
+    }
+  }, []);
 
   if (contentBlocks === undefined || contentBlocks.length === 0) {
     return (
@@ -115,9 +113,6 @@ const EditableContentBlock = ({
                         const newBlocks = [...contentBlocks];
                         newBlocks[index].comments = comments;
                         setContentBlocks(newBlocks);
-                        if (onContentChange) {
-                          onContentChange(newBlocks);
-                        }
                       }}
                     />
                   )}
@@ -142,7 +137,7 @@ const EditableContentBlock = ({
 };
 
 const ContentBlocks = wrapEditableComponent(
-  EditableContentBlock,
+  EditableContentBlocks,
   PreviewContentBlocks,
 );
 

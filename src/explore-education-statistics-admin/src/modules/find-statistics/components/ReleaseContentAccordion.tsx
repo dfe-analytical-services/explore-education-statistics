@@ -14,7 +14,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
-import React, { useCallback } from 'react';
+import React from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
@@ -32,15 +32,6 @@ const ReleaseContentAccordion = ({
   handleApiErrors,
 }: ReleaseContentAccordionProps & ErrorControlProps) => {
   const dispatch = useReleaseDispatch();
-  const { content } = release;
-
-  const updateContentSection = useCallback(
-    (index: number, contentBlock?: EditableContentBlock[]) => {
-      const newContent = [...content];
-      newContent[index].content = contentBlock;
-    },
-    [content],
-  );
 
   return (
     <Accordion
@@ -64,30 +55,27 @@ const ReleaseContentAccordion = ({
         )
       }
     >
-      {content.map((contentItem, index) => (
+      {release.content.map((accordionSection, index) => (
         <ReleaseContentAccordionSection
           release={release}
-          id={contentItem.id}
-          key={contentItem.id}
-          contentItem={contentItem}
+          id={accordionSection.id}
+          key={accordionSection.id}
+          contentItem={accordionSection}
           index={index}
           onHeadingChange={title =>
             updateContentSectionHeading(
               dispatch,
               release.id,
-              contentItem.id,
+              accordionSection.id,
               title,
               handleApiErrors,
             )
-          }
-          onContentChange={newContent =>
-            updateContentSection(index, newContent)
           }
           onRemoveSection={() =>
             removeContentSection(
               dispatch,
               release.id,
-              contentItem.id,
+              accordionSection.id,
               handleApiErrors,
             )
           }

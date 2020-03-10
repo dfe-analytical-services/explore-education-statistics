@@ -15,12 +15,9 @@ import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/Re
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import {
-  EditableContentBlock,
-  EditableRelease,
-} from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
@@ -28,7 +25,6 @@ export interface ReleaseContentAccordionSectionProps {
   contentItem: ContentType;
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
-  onContentChange: (content?: EditableContentBlock[]) => void;
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
   canAddBlocks?: boolean;
   release: EditableRelease;
@@ -40,7 +36,6 @@ const ReleaseContentAccordionSection = ({
   index,
   contentItem,
   onHeadingChange,
-  onContentChange,
   onRemoveSection,
   canAddBlocks = true,
   ...restOfProps
@@ -48,7 +43,8 @@ const ReleaseContentAccordionSection = ({
   const dispatch = useReleaseDispatch();
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { caption, heading } = contentItem;
-  const [isReordering, setIsReordering] = React.useState(false);
+  const { content: sectionContent = [] } = contentItem;
+  const [isReordering, setIsReordering] = useState(false);
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   return (
@@ -80,7 +76,6 @@ const ReleaseContentAccordionSection = ({
         id={`${heading}-content`}
         isReordering={isReordering}
         sectionId={sectionId}
-        onContentChange={onContentChange}
         onBlockSaveOrder={order => {
           updateSectionBlockOrder(
             dispatch,
@@ -112,7 +107,7 @@ const ReleaseContentAccordionSection = ({
             handleApiErrors,
           )
         }
-        content={contentItem.content}
+        content={sectionContent}
         allowComments
       />
 
@@ -128,7 +123,7 @@ const ReleaseContentAccordionSection = ({
                 'content',
                 {
                   type: 'MarkdownBlock',
-                  order: contentItem.content ? contentItem.content.length : 0,
+                  order: sectionContent.length,
                   body: '',
                 },
                 handleApiErrors,
@@ -146,7 +141,7 @@ const ReleaseContentAccordionSection = ({
                 'content',
                 {
                   contentBlockId: datablockId,
-                  order: contentItem.content ? contentItem.content.length : 0,
+                  order: sectionContent.length,
                 },
                 handleApiErrors,
               );
