@@ -17,7 +17,7 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import ContentBlocks from '../editable-components/EditableContentBlocks';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
@@ -34,7 +34,7 @@ const PublicationReleaseContent = () => {
   const { release } = useReleaseState();
   const { addContentSectionBlock } = useReleaseActions();
 
-  const releaseCount = React.useMemo(() => {
+  const releaseCount = useMemo(() => {
     if (release) {
       return (
         release.publication.otherReleases.length +

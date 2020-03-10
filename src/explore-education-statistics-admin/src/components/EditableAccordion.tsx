@@ -7,7 +7,14 @@ import ButtonText from '@common/components/ButtonText';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
 import classnames from 'classnames';
-import React, { createRef, ReactElement, ReactNode } from 'react';
+import React, {
+  createRef,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
@@ -51,19 +58,17 @@ const EditableAccordion = ({
   onAddSection,
 }: EditableAccordionProps) => {
   const ref = createRef<HTMLDivElement>();
-  const [openAll, setOpenAll] = React.useState(false);
-  const [isReordering, setIsReordering] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
+  const [openAll, setOpenAll] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const [currentChildren, setCurrentChildren] = React.useState<ChildSection[]>(
-    [],
-  );
+  const [currentChildren, setCurrentChildren] = useState<ChildSection[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentChildren(mapReactNodeToChildSection(children));
   }, [children]);
 
-  const goToHash = React.useCallback(() => {
+  const goToHash = useCallback(() => {
     if (ref.current && window.location.hash) {
       try {
         const anchor = ref.current.querySelector(
@@ -79,7 +84,7 @@ const EditableAccordion = ({
     }
   }, [ref]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener('hashchange', goToHash);
 
     return () => {

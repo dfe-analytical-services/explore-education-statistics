@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@common/components/Button';
 import DatablockSelectForm from './DatablockSelectForm';
 
@@ -7,7 +7,7 @@ interface AddContentButtonProps {
 }
 
 const AddDataBlockButton = ({ onAddDataBlock }: AddContentButtonProps) => {
-  const [showForm, setShowForm] = React.useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   return showForm ? (
     <DatablockSelectForm

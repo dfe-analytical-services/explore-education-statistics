@@ -1,15 +1,14 @@
 import styles from '@admin/components/wysiwyg.module.scss';
+// @ts-ignore
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
-// @ts-ignore
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
-import classnames from 'classnames';
-import React, { ChangeEvent } from 'react';
-import marked from 'marked';
-import TurndownService from 'turndown';
 import ModalConfirm from '@common/components/ModalConfirm';
+import classnames from 'classnames';
+import marked from 'marked';
+import React, { ChangeEvent, useMemo, useState } from 'react';
+import TurndownService from 'turndown';
 
 interface Props {
   editable?: boolean;
@@ -52,15 +51,15 @@ const WysiwygEditor = ({
   onDelete,
   useMarkdown = false,
 }: Props) => {
-  const [editing, setEditing] = React.useState(false);
-  const [saved, setSaved] = React.useState(false);
-  const [temporaryContent, setTemporaryContent] = React.useState(() => {
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [temporaryContent, setTemporaryContent] = useState(() => {
     if (useMarkdown) return marked(content);
     return content;
   });
-  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const turndownService = React.useMemo(() => new TurndownService(), []);
+  const turndownService = useMemo(() => new TurndownService(), []);
 
   const save = () => {
     setEditing(false);

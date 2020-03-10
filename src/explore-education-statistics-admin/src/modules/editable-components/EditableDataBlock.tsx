@@ -7,7 +7,7 @@ import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from './EditableDataBlock.module.scss';
 
 type Props = {
@@ -23,7 +23,7 @@ const EditableDataBlock = ({
   ...restOfProps
 }: Props) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
-  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
     <div className={styles.wrapper}>

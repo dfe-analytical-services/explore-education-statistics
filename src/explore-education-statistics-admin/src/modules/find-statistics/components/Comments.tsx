@@ -8,7 +8,7 @@ import { User } from '@admin/services/sign-in/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React, { createRef, useContext, useState } from 'react';
 import styles from './Comments.module.scss';
 
 interface Props {
@@ -28,13 +28,11 @@ const Comments = ({
   canResolve = false,
   canComment = false,
 }: Props) => {
-  const [newComment, setNewComment] = React.useState<string>('');
-  const [comments, setComments] = React.useState<ExtendedComment[]>(
-    initialComments,
-  );
+  const [newComment, setNewComment] = useState<string>('');
+  const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
-  const context = React.useContext(LoginContext);
+  const context = useContext(LoginContext);
 
   const addComment = (comment: string) => {
     const user = context.user as User;
@@ -120,7 +118,7 @@ const Comments = ({
     }
   };
 
-  const ref = React.createRef<HTMLDivElement>();
+  const ref = createRef<HTMLDivElement>();
 
   return (
     <>

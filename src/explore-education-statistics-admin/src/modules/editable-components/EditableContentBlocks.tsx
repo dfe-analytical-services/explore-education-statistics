@@ -5,7 +5,7 @@ import PreviewContentBlocks, {
 } from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Comments from '../find-statistics/components/Comments';
 import ContentBlockDraggable from '../find-statistics/components/ContentBlockDraggable';
@@ -41,11 +41,11 @@ const EditableContentBlocks = ({
   const [contentBlocks, setContentBlocks] = useState<ContentType>();
   const isInitialMount = useRef(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setContentBlocks(content);
   }, [content]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else if (!isReordering) {
@@ -63,7 +63,7 @@ const EditableContentBlocks = ({
     }
   }, [isReordering]);
 
-  const onDragEnd = React.useCallback((result: DropResult) => {
+  const onDragEnd = useCallback((result: DropResult) => {
     const { source, destination, type } = result;
 
     if (type === 'content' && destination) {
