@@ -34,6 +34,9 @@
     },
     "devopsSPN": {
       "value": "7c7b8f7c-e1aa-40ff-bc3a-5d4cfa98e49e"
+    },
+    "domain": {
+      "value": "dev.explore-education-statistics.service.gov.uk"
     }
   }
 }
