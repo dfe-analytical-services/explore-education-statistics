@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var configSection = configuration.GetSection("AppInsights");
             Assert.NotNull(configSection);
             var configValue = configSection.GetValue<string>("InstrumentationKey");
-            Assert.Equal("change-me", configValue);
+            Assert.Equal("", configValue);
         }
 
         [Fact]
@@ -32,15 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = new ConfigurationController(GetConfiguration());
             var result = controller.GetInsightsKey();
             Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.Equal("change-me", ((OkObjectResult) result.Result).Value);
-        }
-
-        [Fact]
-        public void GetInsightsKey_NotFound()
-        {
-            var controller = new ConfigurationController(GetEmptyConfiguration());
-            var result = controller.GetInsightsKey();
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.Equal("", ((OkObjectResult) result.Result).Value);
         }
 
         [Fact]
