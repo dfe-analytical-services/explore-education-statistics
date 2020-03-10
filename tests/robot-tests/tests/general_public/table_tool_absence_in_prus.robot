@@ -57,10 +57,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   2013/14
-    user checks results table column heading contains  1   2   2014/15
-    user checks results table column heading contains  1   3   2015/16
-    user checks results table column heading contains  1   4   2016/17
+    user checks results table column heading contains  css:table  1   1   2013/14
+    user checks results table column heading contains  css:table  1   2   2014/15
+    user checks results table column heading contains  css:table  1   3   2015/16
+    user checks results table column heading contains  css:table  1   4   2016/17
 
 Validate results table row headings
     [Tags]   HappyPath
@@ -122,47 +122,47 @@ Create table again
 
 Validate new table column headings
     [Tags]   HappyPath
-    user checks results table column heading contains  1   1   2014/15
-    user checks results table column heading contains  1   2   2015/16
+    user checks results table column heading contains  css:table  1   1   2014/15
+    user checks results table column heading contains  css:table  1   2   2015/16
 
 Validate Barnet Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnet   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     224
     user checks row cell contains text  ${row}    2     210
 
 Validate Barnet Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnet   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     38,345
     user checks row cell contains text  ${row}    2     36,820
 
 Validate Barnsley Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnsley   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Barnsley   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     149
     user checks row cell contains text  ${row}    2     146
 
 Validate Barnsley Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Barnsley   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Barnsley   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     31,938
     user checks row cell contains text  ${row}    2     36,250
 
 Validate Bedford Number of pupil enrolments row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Bedford   Number of pupil enrolments
+    ${row}=  user gets row with group and indicator   xpath://table  Bedford   Number of pupil enrolments
     user checks row contains heading  ${row}  Number of pupil enrolments
     user checks row cell contains text  ${row}    1     176
     user checks row cell contains text  ${row}    2     178
 
 Validate Bedford Number of sessions possible row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   Bedford   Number of sessions possible
+    ${row}=  user gets row with group and indicator   xpath://table  Bedford   Number of sessions possible
     user checks row contains heading  ${row}  Number of sessions possible
     user checks row cell contains text  ${row}    1     17,687
     user checks row cell contains text  ${row}    2     21,847

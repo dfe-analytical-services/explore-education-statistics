@@ -3,7 +3,7 @@ Resource    ../../libs/admin-common.robot
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       user signs in
+Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
@@ -25,7 +25,7 @@ Select an existing methodology
 
 Select contact "Sean Gibson"
     [Tags]  HappyPath
-    user selects from list by label  css:#createPublicationForm-selectedContactId   Sean Gibson
+    user selects from list by label  css:#createPublicationForm-selectedContactId   Sean Gibson - (Special educational needs statistics team)
     user checks summary list item "Email" should be "sen.statistics@education.gov.uk"
     user checks summary list item "Telephone" should be "01325340987"
 

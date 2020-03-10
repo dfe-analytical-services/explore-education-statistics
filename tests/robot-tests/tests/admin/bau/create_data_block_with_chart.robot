@@ -4,7 +4,7 @@ Library  Collections
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       user signs in
+Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
@@ -14,7 +14,7 @@ Create Datablock test publication
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
-    user creates publication  Datablock test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson
+    user creates publication  Datablock test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson - (Special educational needs statistics team)
 
 Verify Datablock test publication is created
     [Tags]  HappyPath
@@ -96,25 +96,25 @@ Create table
 
 Validate table's column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1  1   2005
-    user checks results table column heading contains  1  2   2006
-    user checks results table column heading contains  1  3   2007
-    user checks results table column heading contains  1  4   2008
-    user checks results table column heading contains  1  5   2009
-    user checks results table column heading contains  1  6   2010
-    user checks results table column heading contains  1  7   2011
-    user checks results table column heading contains  1  8   2012
-    user checks results table column heading contains  1  9   2013
-    user checks results table column heading contains  1  10  2014
-    user checks results table column heading contains  1  11  2015
-    user checks results table column heading contains  1  12  2016
+    user checks results table column heading contains  css:table  1  1   2005
+    user checks results table column heading contains  css:table  1  2   2006
+    user checks results table column heading contains  css:table  1  3   2007
+    user checks results table column heading contains  css:table  1  4   2008
+    user checks results table column heading contains  css:table  1  5   2009
+    user checks results table column heading contains  css:table  1  6   2010
+    user checks results table column heading contains  css:table  1  7   2011
+    user checks results table column heading contains  css:table  1  8   2012
+    user checks results table column heading contains  css:table  1  9   2013
+    user checks results table column heading contains  css:table  1  10  2014
+    user checks results table column heading contains  css:table  1  11  2015
+    user checks results table column heading contains  css:table  1  12  2016
 
     scroll element into view   xpath://table/thead/tr[1]/th[16]
 
-    user checks results table column heading contains  1  13  2017
-    user checks results table column heading contains  1  14  2018
-    user checks results table column heading contains  1  15  2019
-    user checks results table column heading contains  1  16  2020
+    user checks results table column heading contains  css:table  1  13  2017
+    user checks results table column heading contains  css:table  1  14  2018
+    user checks results table column heading contains  css:table  1  15  2019
+    user checks results table column heading contains  css:table  1  16  2020
 
 Validate table row Bolton 001 (E02000984)
     [Tags]  HappyPath
