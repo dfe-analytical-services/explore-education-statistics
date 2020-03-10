@@ -14,7 +14,7 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { RemoveBlockFromSection, ContentSectionKeys } from './actions';
+import { ContentSectionKeys } from './actions';
 import { useReleaseDispatch } from './ReleaseContext';
 
 const contentSectionComments = (
@@ -26,10 +26,12 @@ const contentSectionComments = (
     contentSection.content.length > 0
   ) {
     return contentSection.content.reduce<ExtendedComment[]>(
-      (allCommentsForSection, content) =>
-        content.comments
-          ? [...allCommentsForSection, ...content.comments]
-          : allCommentsForSection,
+      (allCommentsForSection, content) => {
+        content.comments.forEach(comment =>
+          allCommentsForSection.push(comment),
+        );
+        return allCommentsForSection;
+      },
       [],
     );
   }
@@ -74,6 +76,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   async function updateAvailableDataBlocks(releaseId: string) {
     const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
       releaseId,
@@ -83,6 +86,7 @@ export default function useReleaseActions() {
       payload: { availableDataBlocks },
     });
   }
+
   async function deleteContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -102,6 +106,7 @@ export default function useReleaseActions() {
     // and so it is now available again
     updateAvailableDataBlocks(releaseId);
   }
+
   async function updateContentSectionDataBlock(
     releaseId: string,
     sectionId: string,
@@ -120,6 +125,7 @@ export default function useReleaseActions() {
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
   }
+
   async function updateContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -138,6 +144,7 @@ export default function useReleaseActions() {
       payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
     });
   }
+
   async function addContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -157,6 +164,7 @@ export default function useReleaseActions() {
     // and so it is unavailable
     updateAvailableDataBlocks(releaseId);
   }
+
   async function attachContentSectionBlock(
     releaseId: string,
     sectionId: string,
@@ -174,6 +182,7 @@ export default function useReleaseActions() {
     });
     updateAvailableDataBlocks(releaseId);
   }
+
   async function updateSectionBlockOrder(
     releaseId: string,
     sectionId: string,
@@ -193,6 +202,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   async function addContentSection(releaseId: string, order: number) {
     const newSection = await releaseContentService.addContentSection(
       releaseId,
@@ -205,6 +215,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   async function updateContentSectionsOrder(
     releaseId: string,
     order: Dictionary<number>,
@@ -220,6 +231,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   async function removeContentSection(releaseId: string, sectionId: string) {
     const content = await releaseContentService.removeContentSection(
       releaseId,
@@ -232,6 +244,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   async function updateContentSectionHeading(
     releaseId: string,
     sectionId: string,
@@ -250,6 +263,7 @@ export default function useReleaseActions() {
       },
     });
   }
+
   return {
     getReleaseContent,
     updateAvailableDataBlocks,

@@ -56,18 +56,13 @@ const ReleaseContentAccordionSection = ({
       onRemoveSection={onRemoveSection}
       sectionId={sectionId}
       headerButtons={
-        <a
-          role="button"
-          tabIndex={0}
+        <Button
           onClick={() => setIsReordering(!isReordering)}
-          onKeyPress={e => {
-            if (e.key === 'Enter') setIsReordering(!isReordering);
-          }}
           className={`govuk-button ${!isReordering &&
-            'govuk-button--secondary'} govuk-!-margin-right-2`}
+            'govuk-button--secondary'}`}
         >
           {isReordering ? 'Save order' : 'Reorder'}
-        </a>
+        </Button>
       }
       {...restOfProps}
     >

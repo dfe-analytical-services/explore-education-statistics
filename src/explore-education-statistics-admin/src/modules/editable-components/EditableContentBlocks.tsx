@@ -111,7 +111,7 @@ const EditableContentBlocks = ({
                       canComment
                       onCommentsChange={async comments => {
                         const newBlocks = [...contentBlocks];
-                        newBlocks[index].comments = comments;
+                        newBlocks[index] = { ...newBlocks[index], comments };
                         setContentBlocks(newBlocks);
                       }}
                     />
