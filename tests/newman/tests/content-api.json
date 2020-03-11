@@ -98,57 +98,6 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "Get Specific Publication",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "9e15d6ea-ffcb-4c8e-9b64-06688bc8eb62",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () { ",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Publication id matches the publication requested\", function () { ",
-											"    pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
-											"});",
-											"",
-											"pm.test(\"Title should match requested publication\", function () {",
-											"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence in schools in England\"); ",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england",
-									"host": [
-										"{{content_api_url}}"
-									],
-									"path": [
-										"content",
-										"publication",
-										"pupil-absence-in-schools-in-england"
-									]
-								}
-							},
-							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
