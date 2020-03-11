@@ -64,16 +64,16 @@
 }
 
 .editableContentEditing {
-  background: govuk-colour('red');
+  background: govuk-colour('light-grey');
   border: 2px solid #000;
   cursor: pointer;
   margin: 0;
-  padding: 0 0 2.3rem;
+  padding: 0 0 2.45rem;
   position: relative;
 
   .editableButton {
     border: 0;
-    bottom: 0;
+    bottom: 2px;
     display: inline !important;
     margin: 0;
     padding: 0;
@@ -87,7 +87,7 @@
   }
 
   :global(.ck-focused) {
-    border: 2px solid $govuk-focus-colour !important;
+    border-color: $govuk-input-border-colour !important;
   }
 }
 
