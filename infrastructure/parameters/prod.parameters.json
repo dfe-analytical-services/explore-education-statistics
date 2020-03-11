@@ -25,6 +25,9 @@
     },
     "devopsSPN": {
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"
+    },
+    "domain": {
+      "value": "s101p02-as-ees-public.azurewebsites.net"
     }
   }
 }

@@ -122,8 +122,9 @@ def user_checks_accordion_section_contains_text(accordion_section, details_compo
     raise AssertionError(f'Details component "{details_component}" not found in accordion section "{accordion_section}"')
 
 def user_opens_details_dropdown(exact_details_text):
+  sl.scroll_element_into_view(f'xpath://*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
   try:
-    elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+    elem = sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
   except NoSuchElementException:
     raise AssertionError(f'No such detail component "{exact_details_text}" found')
 
@@ -133,7 +134,7 @@ def user_opens_details_dropdown(exact_details_text):
 
 def user_closes_details_dropdown(exact_details_text):
   try:
-    elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+    elem = sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
   except:
     raise AssertionError(f'Cannot find details component "{exact_details_text}"')
   elem.click()
@@ -174,7 +175,7 @@ def user_checks_previous_table_tool_step_contains(step, key, value):
 
   try:
     sl.driver.find_element_by_xpath(
-      f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/../dd[text()="{value}"]')
+      f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
   except:
     sl.capture_page_screenshot()
     raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
@@ -210,8 +211,9 @@ def user_checks_category_checkbox_is_selected(subheading_label, category_label):
 def user_clicks_select_all_for_category(category_label):
   sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
 
-def user_checks_results_table_column_heading_contains(row, column, expected):
-  elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
+def user_checks_results_table_column_heading_contains(table_selector, row, column, expected):
+  table_elem = sl.get_webelement(table_selector)
+  elem = table_elem.find_element_by_xpath(f'.//thead/tr[{row}]/th[{column}]')
   if expected not in elem.text:
     raise AssertionError(
       f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
@@ -220,8 +222,9 @@ def user_gets_row_with_heading(heading):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
   return elem
 
-def user_gets_row_with_group_and_indicator(group, indicator):
-  elems = sl.driver.find_elements_by_xpath(f'//table/tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
+  table_elem = sl.get_webelement(table_selector)
+  elems = table_elem.find_elements_by_xpath(f'.//tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
   for elem in elems:
     try:
       elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
@@ -257,6 +260,11 @@ def user_checks_results_table_cell_contains(row, column, expected):
     raise AssertionError(
       f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
+def user_checks_list_contains_x_elements(list_locator, num):
+  labels = sl.get_list_items(list_locator)
+  if len(labels) != int(num):
+    raise AssertionError(f'Found {len(labels)} in list, not {num}. Locator: "{list_locator}"')
+
 def user_checks_list_contains_label(list_locator, label):
   labels = sl.get_list_items(list_locator)
   if label not in labels:
@@ -270,4 +278,4 @@ def user_checks_list_does_not_contain_label(list_locator, label):
 def user_checks_selected_list_label(list_locator, label):
   selected_label = sl.get_selected_list_label(list_locator)
   if selected_label != label:
-    raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label} for list "{list_Locator}"')
+    raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')

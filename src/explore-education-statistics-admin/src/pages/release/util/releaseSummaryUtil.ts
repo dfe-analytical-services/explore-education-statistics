@@ -121,9 +121,11 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-export const getReleaseSummaryLabel = (release: AdminDashboardRelease) => `
-  ${release.timePeriodCoverage.label}, 
-  ${getTimePeriodCoverageDateRangeStringLong(release.releaseName)} 
-  ${getLiveLatestLabel(release.live, release.latestRelease)}`;
+export const getReleaseSummaryLabel = (release: AdminDashboardRelease) =>
+  `${
+    release.timePeriodCoverage.label
+  }, ${getTimePeriodCoverageDateRangeStringLong(
+    release.releaseName,
+  )} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
 export default {};
