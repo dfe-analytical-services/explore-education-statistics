@@ -129,7 +129,8 @@ const ReleaseServiceStatus = ({
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(([key, val]) => {
-                if (key === 'overallStage') return null;
+                if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))
+                  return null;
                 const { color, text } = statusDetailColor(val);
 
                 if (!color) {
