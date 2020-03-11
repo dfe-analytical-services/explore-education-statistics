@@ -21,6 +21,8 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
 
   private unregisterCallback?: H.UnregisterCallback;
 
+  private isHandlingErrors = true;
+
   private handleManualErrors = {
     forbidden: () => {
       this.setState({
@@ -49,9 +51,21 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 
   private handleApiErrors = (error: AxiosError) => {
-    this.setState({
-      errorCode: error.response?.status || 500,
-    });
+    if (this.isHandlingErrors) {
+      this.setState({
+        errorCode: error.response?.status || 500,
+      });
+    }
+  };
+
+  private withoutErrorHandling = async (callback: () => void) => {
+    this.isHandlingErrors = false;
+
+    try {
+      await callback();
+    } finally {
+      this.isHandlingErrors = true;
+    }
   };
 
   public componentDidCatch() {
@@ -61,14 +75,18 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 
   public render() {
-    const { handleApiErrors, handleManualErrors } = this;
+    const { handleApiErrors, handleManualErrors, withoutErrorHandling } = this;
     const { children } = this.props;
     const { errorCode } = this.state;
 
     if (!errorCode) {
       return (
         <ErrorControlContextProvider
-          value={{ handleApiErrors, handleManualErrors }}
+          value={{
+            handleApiErrors,
+            handleManualErrors,
+            withoutErrorHandling,
+          }}
         >
           {children}
         </ErrorControlContextProvider>
