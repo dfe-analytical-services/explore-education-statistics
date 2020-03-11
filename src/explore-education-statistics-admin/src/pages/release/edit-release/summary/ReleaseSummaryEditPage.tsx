@@ -1,3 +1,5 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -9,9 +11,6 @@ import { summaryRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
@@ -26,7 +25,7 @@ import { RouteComponentProps } from 'react-router';
 const ReleaseSummaryEditPage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
   >();

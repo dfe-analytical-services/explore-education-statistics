@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
+import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React, { useContext } from 'react';
+import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
 
 export type MarkdownRendererProps = RendererProps &
   ReactMarkdownProps & {

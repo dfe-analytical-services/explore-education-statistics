@@ -1,14 +1,13 @@
 /* eslint-disable no-shadow */
-import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
+import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/service';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -35,7 +34,7 @@ interface DataBlockData {
 
 const ReleaseManageDataBlocksPage = ({
   handleApiErrors,
-}: ErrorControlProps) => {
+}: ErrorControlState) => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
@@ -175,34 +174,36 @@ const ReleaseManageDataBlocksPage = ({
   );
 
   const onDataBlockSave = useMemo(
-    () => async (db: DataBlock) => {
+    () => async (db: DataBlock): Promise<DataBlock> => {
       setIsSaving(true);
 
-      let newDataBlock;
-      let newDataBlocksList;
+      try {
+        let newDataBlock;
+        let newDataBlocksList;
 
-      if (db.id) {
-        newDataBlock = await dataBlocksService
-          .putDataBlock(db.id, db)
-          .catch(handleApiErrors);
-        newDataBlocksList = [
-          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
-          newDataBlock,
-        ];
-      } else {
-        newDataBlock = await dataBlocksService
-          .postDataBlock(releaseId, db)
-          .catch(handleApiErrors);
-        newDataBlocksList = [...dataBlocks, newDataBlock];
+        if (db.id) {
+          newDataBlock = await dataBlocksService.putDataBlock(db.id, db);
+          newDataBlocksList = [
+            ...dataBlocks.filter(db => db.id !== selectedDataBlock),
+            newDataBlock,
+          ];
+        } else {
+          newDataBlock = await dataBlocksService.postDataBlock(releaseId, db);
+          newDataBlocksList = [...dataBlocks, newDataBlock];
+        }
+        setDataBlocks(newDataBlocksList);
+
+        setSelectedDataBlock(newDataBlock.id || '');
+
+        doLoad(releaseId, selectedDataBlock, newDataBlocksList);
+
+        setIsSaving(false);
+
+        return newDataBlock;
+      } catch (err) {
+        handleApiErrors(err);
+        throw err;
       }
-      setDataBlocks(newDataBlocksList);
-
-      setSelectedDataBlock(newDataBlock.id || '');
-      doLoad(releaseId, selectedDataBlock, newDataBlocksList);
-
-      setIsSaving(false);
-
-      return newDataBlock;
     },
     [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
   );

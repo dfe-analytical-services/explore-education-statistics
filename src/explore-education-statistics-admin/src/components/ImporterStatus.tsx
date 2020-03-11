@@ -1,3 +1,5 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import { DataFile } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import importStatusService from '@admin/services/release/imports/service';
@@ -5,16 +7,13 @@ import {
   ImportStatus,
   ImportStatusCode,
 } from '@admin/services/release/imports/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
-interface Props extends ErrorControlProps {
+interface Props extends ErrorControlState {
   releaseId: string;
   dataFile: DataFile;
   onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;

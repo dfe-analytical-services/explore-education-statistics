@@ -1,8 +1,7 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ErrorBoundary, {
-  ErrorControlContext,
-} from '@admin/components/ErrorBoundary';
+import ErrorBoundary from '@admin/components/ErrorBoundary';
 import LoginContext from '@admin/components/Login';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
 import { User } from '@admin/services/sign-in/types';
 import React, { useContext } from 'react';

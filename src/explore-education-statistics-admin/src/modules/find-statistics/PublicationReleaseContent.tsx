@@ -1,4 +1,6 @@
 import Link from '@admin/components/Link';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
@@ -7,9 +9,6 @@ import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
@@ -52,7 +51,7 @@ const PublicationReleaseContent = ({
   onReleaseChange,
   handleApiErrors,
   availableDataBlocks: initialAvailableDataBlocks,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [release, setRelease] = useState(content.release);
 
   const setReleaseAndTriggerOnReleaseChange = useCallback(

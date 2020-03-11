@@ -2,6 +2,8 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -9,9 +11,6 @@ import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -24,7 +23,7 @@ interface Model {
   scheduledReleases: AdminDashboardRelease[];
 }
 
-const AdminDashboardPage = ({ handleApiErrors }: ErrorControlProps) => {
+const AdminDashboardPage = ({ handleApiErrors }: ErrorControlState) => {
   const { user } = useContext(LoginContext);
   const [model, setModel] = useState<Model>();
   useEffect(() => {

@@ -1,9 +1,8 @@
 import Accordion from '@admin/components/EditableAccordion';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
 import { Dictionary } from '@common/types/util';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -26,7 +25,7 @@ const ReleaseContentAccordion = ({
   sectionName,
   onContentChange,
   handleApiErrors,
-}: ReleaseContentAccordionProps & ErrorControlProps) => {
+}: ReleaseContentAccordionProps & ErrorControlState) => {
   const [content, setContent] = useState<ContentType[]>([]);
 
   const setContentAndTriggerOnContentChange = useCallback(
@@ -42,11 +41,16 @@ const ReleaseContentAccordion = ({
 
   const onReorder = useCallback(
     async (ids: Dictionary<number>) => {
-      const newContent = await releaseContentService
-        .updateContentSectionsOrder(releaseId, ids)
-        .catch(handleApiErrors);
+      try {
+        const newContent = await releaseContentService.updateContentSectionsOrder(
+          releaseId,
+          ids,
+        );
 
-      setContentAndTriggerOnContentChange(newContent);
+        setContentAndTriggerOnContentChange(newContent);
+      } catch (err) {
+        handleApiErrors(err);
+      }
     },
     [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
   );
@@ -63,14 +67,19 @@ const ReleaseContentAccordion = ({
   );
 
   const onAddSection = useCallback(async () => {
-    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
-      ...content,
-      await releaseContentService
-        .addContentSection(releaseId, content.length)
-        .catch(handleApiErrors),
-    ];
+    try {
+      const newContent: AbstractRelease<EditableContentBlock>['content'] = [
+        ...content,
+        await releaseContentService.addContentSection(
+          releaseId,
+          content.length,
+        ),
+      ];
 
-    setContentAndTriggerOnContentChange(newContent);
+      setContentAndTriggerOnContentChange(newContent);
+    } catch (err) {
+      handleApiErrors(err);
+    }
   }, [
     content,
     releaseId,

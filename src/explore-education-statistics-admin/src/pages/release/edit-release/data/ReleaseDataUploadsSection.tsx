@@ -1,4 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
   DataFile,
@@ -6,9 +8,8 @@ import editReleaseDataService, {
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -21,10 +22,8 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import remove from 'lodash/remove';
+import React, { useEffect, useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -48,7 +47,7 @@ const ReleaseDataUploadsSection = ({
   publicationId,
   releaseId,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
@@ -76,11 +75,12 @@ const ReleaseDataUploadsSection = ({
         fileInput.value = '';
       });
 
-    const files = await editReleaseDataService
-      .getReleaseDataFiles(releaseId)
-      .catch(handleApiErrors);
-
-    setDataFiles(files);
+    try {
+      const files = await editReleaseDataService.getReleaseDataFiles(releaseId);
+      setDataFiles(files);
+    } catch (err) {
+      handleApiErrors(err);
+    }
   };
 
   const statusChangeHandler = async (

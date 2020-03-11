@@ -1,14 +1,13 @@
 import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
 import dashboardService from '@admin/services/dashboard/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps, Switch, Route } from 'react-router';
+import { Route, RouteComponentProps, Switch } from 'react-router';
 import PageNotFoundPage from '../errors/PageNotFoundPage';
 import PublicationAssignMethodologyPage from './topic/publication/PublicationAssignMethodologyPage';
 
@@ -19,7 +18,7 @@ interface Props
       themeId?: string;
       topicId?: string;
     }>,
-    ErrorControlProps {}
+    ErrorControlState {}
 
 const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(

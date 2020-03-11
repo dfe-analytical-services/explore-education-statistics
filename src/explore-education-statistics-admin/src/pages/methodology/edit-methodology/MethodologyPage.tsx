@@ -2,12 +2,11 @@ import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/service';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -23,7 +22,7 @@ const MethodologyPage = ({
   match,
   location,
   handleApiErrors,
-}: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
+}: RouteComponentProps<{ methodologyId: string }> & ErrorControlState) => {
   const { methodologyId } = match.params;
   const [methodology, setMethodology] = useState<MethodologyContent>();
 

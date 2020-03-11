@@ -1,4 +1,4 @@
-import { ApiErrorHandler } from '@admin/validation/withErrorControl';
+import { ApiErrorHandler } from '@admin/contexts/ErrorControlContext';
 import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,

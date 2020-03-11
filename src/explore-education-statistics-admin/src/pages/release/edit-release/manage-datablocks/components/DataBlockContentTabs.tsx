@@ -1,8 +1,7 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ChartBuilder from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -34,7 +33,7 @@ const DataBlockContentTabs = ({
   dataBlockResponse,
   onDataBlockSave,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const dataTableRef = useRef<HTMLElement>(null);
 
   const [activeTab, setActiveTab] = useState<string>('');

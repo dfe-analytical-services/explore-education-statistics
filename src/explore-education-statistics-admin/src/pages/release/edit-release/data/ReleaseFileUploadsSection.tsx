@@ -1,11 +1,12 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
   AncillaryFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -17,10 +18,8 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import remove from 'lodash/remove';
+import React, { useEffect, useState } from 'react';
 
 interface FormValues {
   name: string;
@@ -38,7 +37,7 @@ const ReleaseFileUploadsSection = ({
   publicationId,
   releaseId,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);

@@ -1,4 +1,6 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
+import { toolbarConfigs } from '@admin/components/WysiwygEditor';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -13,8 +15,6 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
-import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 
 export interface KeyStatsFormValues {
   dataSummary: string;

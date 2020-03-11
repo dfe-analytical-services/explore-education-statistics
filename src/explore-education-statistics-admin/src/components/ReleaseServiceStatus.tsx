@@ -1,9 +1,8 @@
 import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import dashboardService from '@admin/services/dashboard/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { forceCheck } from 'react-lazyload';
@@ -23,7 +22,7 @@ const ReleaseServiceStatus = ({
   refreshPeriod = 10000,
   exclude,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStatus>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',

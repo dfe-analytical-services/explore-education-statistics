@@ -1,15 +1,15 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
@@ -19,7 +19,6 @@ import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import ButtonText from '@common/components/ButtonText';
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -42,7 +41,7 @@ const statusMap: {
 
 const ReleaseStatusPage = ({
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 

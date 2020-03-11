@@ -1,15 +1,14 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
 import { Dictionary } from '@admin/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, FormGroup, Formik } from '@common/components/form';
@@ -42,7 +41,7 @@ interface CreatePublicationModel {
 const CreatePublicationPage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps<{ topicId: string }> & ErrorControlProps) => {
+}: RouteComponentProps<{ topicId: string }> & ErrorControlState) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;

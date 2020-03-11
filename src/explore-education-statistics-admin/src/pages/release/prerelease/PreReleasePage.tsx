@@ -1,12 +1,11 @@
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import permissionService from '@admin/services/permissions/service';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import { format } from 'date-fns';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -24,7 +23,7 @@ const PreReleasePage = ({
   handleApiErrors,
   handleManualErrors,
   match,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps<MatchProps> & ErrorControlState) => {
   const [model, setModel] = useState<Model>();
 
   const { user } = useContext(LoginContext);

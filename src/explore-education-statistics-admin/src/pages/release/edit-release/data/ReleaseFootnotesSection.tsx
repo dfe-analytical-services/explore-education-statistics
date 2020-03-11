@@ -1,19 +1,18 @@
-import {
-  Footnote,
-  FootnoteProps,
-} from '@admin/services/release/edit-release/footnotes/types';
-import footnotesService from '@admin/services/release/edit-release/footnotes/service';
-import Link from '@admin/components/Link';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import ModalConfirm from '@common/components/ModalConfirm';
-import React, { useState } from 'react';
 import FootnotesList from '@admin/components/footnotes/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
 } from '@admin/components/footnotes/form/FootnoteForm';
+import Link from '@admin/components/Link';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { FootnotesData } from '@admin/pages/release/edit-release/data/ReleaseDataPage';
+import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import {
+  Footnote,
+  FootnoteProps,
+} from '@admin/services/release/edit-release/footnotes/types';
+import ModalConfirm from '@common/components/ModalConfirm';
+import React, { useState } from 'react';
 
 interface Props {
   publicationId: string;
@@ -28,7 +27,7 @@ const ReleaseFootnotesSection = ({
   onSubmit,
   onDelete,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
   });

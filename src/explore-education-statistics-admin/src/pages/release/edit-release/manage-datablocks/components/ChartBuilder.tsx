@@ -1,3 +1,5 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
 import ChartConfiguration, {
   ChartOptions,
@@ -9,9 +11,6 @@ import ChartDataSelector, {
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -127,7 +126,7 @@ const ChartBuilder = ({
   onRequiresDataUpdate,
   handleApiErrors,
   handleManualErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [selectedChartType, setSelectedChartType] = useState<
     ChartDefinition | undefined
   >();

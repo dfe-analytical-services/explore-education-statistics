@@ -1,9 +1,8 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -51,7 +50,7 @@ const ReleaseNotesSection = ({
   release,
   logEvent = nullLogEvent,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(

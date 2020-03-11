@@ -1,10 +1,9 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { BasicMethodology, IdTitlePair } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import {
   FormFieldRadioGroup,
@@ -38,7 +37,7 @@ const AssignMethodologyForm = ({
   externalMethodology: currentExternalMethodology,
   handleApiErrors,
   refreshPublication,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [formOpen, setFormOpen] = useState(false);
   const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
 

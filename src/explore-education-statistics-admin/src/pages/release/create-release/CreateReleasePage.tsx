@@ -1,5 +1,7 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
@@ -13,9 +15,6 @@ import {
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import {
   errorCodeAndFieldNameToFieldError,
@@ -48,7 +47,7 @@ const CreateReleasePage = ({
   match,
   history,
   handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps<MatchProps> & ErrorControlState) => {
   const { publicationId } = match.params;
 
   const [model, setModel] = useState<Model>();

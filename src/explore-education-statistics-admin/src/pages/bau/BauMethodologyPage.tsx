@@ -1,16 +1,15 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import React, { useEffect, useState } from 'react';
-import methodologyService from '@admin/services/methodology/service';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
+import methodologyService from '@admin/services/methodology/service';
 import { MethodologyStatusListItem } from '@admin/services/methodology/types';
+import React, { useEffect, useState } from 'react';
 
 interface Model {
   methodologies: MethodologyStatusListItem[];
 }
 
-const BauMethodologyPage = ({ handleApiErrors }: ErrorControlProps) => {
+const BauMethodologyPage = ({ handleApiErrors }: ErrorControlState) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {

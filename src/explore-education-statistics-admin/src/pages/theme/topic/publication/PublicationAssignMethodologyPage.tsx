@@ -1,9 +1,8 @@
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import service from '@admin/services/common/service.ts';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -17,7 +16,7 @@ const PublicationAssignMethodologyPage = ({
   topicId: string;
   publicationId: string;
 }> &
-  ErrorControlProps) => {
+  ErrorControlState) => {
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   const getPublication = () => {

@@ -1,25 +1,24 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/service';
 import {
   EditableContentBlock,
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import permissionService from '@admin/services/permissions/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
+import { DataBlock } from '@common/services/dataBlockService';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { DataBlock } from '@common/services/dataBlockService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 type PageMode = 'edit' | 'preview';
 
@@ -66,7 +65,7 @@ const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
       ),
   ].filter(comment => comment !== undefined && comment.state === 'open');
 
-const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseContentPage = ({ handleApiErrors }: ErrorControlState) => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(

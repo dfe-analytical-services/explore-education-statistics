@@ -1,10 +1,9 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
@@ -34,7 +33,7 @@ interface Props {
 const PrereleaseAccessManagement = ({
   release,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {

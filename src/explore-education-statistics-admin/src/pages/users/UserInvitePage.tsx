@@ -1,21 +1,20 @@
-import ButtonText from '@common/components/ButtonText';
-import React from 'react';
-import Page from '@admin/components/Page';
-import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@admin/components/Link';
+import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import userService from '@admin/services/users/service';
 import { UserInvite } from '@admin/services/users/types';
-import { RouteComponentProps } from 'react-router';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import Button from '@common/components/Button';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import Form from '@common/components/form/Form';
-import { FormFieldset, Formik } from '@common/components/form';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
+import { FormFieldset, Formik } from '@common/components/form';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   userEmail: string;
@@ -24,7 +23,7 @@ interface FormValues {
 const UserInvitePage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const formId = 'inviteUserForm';
 
   const errorCodeMappings = [

@@ -1,17 +1,16 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import React, { useEffect, useState } from 'react';
+import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
-import Link from '@admin/components/Link';
+import React, { useEffect, useState } from 'react';
 
 interface Model {
   users: UserStatus[];
 }
 
-const BauUsersPage = ({ handleApiErrors }: ErrorControlProps) => {
+const BauUsersPage = ({ handleApiErrors }: ErrorControlState) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {

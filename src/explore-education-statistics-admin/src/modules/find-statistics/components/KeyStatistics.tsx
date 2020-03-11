@@ -1,9 +1,9 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import Button from '@common/components/Button';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import WarningMessage from '@common/components/WarningMessage';
+import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
   AbstractRelease,

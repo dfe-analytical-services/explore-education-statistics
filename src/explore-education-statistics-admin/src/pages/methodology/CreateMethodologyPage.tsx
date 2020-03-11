@@ -1,14 +1,13 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import methodologyService from '@admin/services/methodology/service';
 import { CreateMethodologyRequest } from '@admin/services/methodology/types';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
@@ -45,7 +44,7 @@ interface CreateMethodologyModel {
 const CreateMethodologyPage = ({
   history,
   handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {

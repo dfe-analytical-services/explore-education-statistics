@@ -1,5 +1,7 @@
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
@@ -9,19 +11,16 @@ import {
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
 import permissionService from '@admin/services/permissions/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import FormSelect from '@common/components/form/FormSelect';
-import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
+import FormSelect from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import orderBy from 'lodash/orderBy';
+import React, { useContext, useEffect, useState } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -53,7 +52,7 @@ export interface Props
       themeId?: string;
       topicId?: string;
     }>,
-    ErrorControlProps {}
+    ErrorControlState {}
 
 const ManagePublicationsAndReleasesTab = ({
   match,

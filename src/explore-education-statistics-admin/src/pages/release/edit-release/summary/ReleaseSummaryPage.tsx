@@ -1,4 +1,6 @@
 import Link from '@admin/components/Link';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -12,12 +14,9 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import service from '@admin/services/release/edit-release/summary/service';
 import permissionService from '@admin/services/permissions/service';
+import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -34,7 +33,7 @@ interface ReleaseSummaryModel {
   canEditRelease: boolean;
 }
 
-const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlState) => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useContext(

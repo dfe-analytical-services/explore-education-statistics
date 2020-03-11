@@ -1,4 +1,4 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { EditableRelease } from '@admin/services/publicationService';

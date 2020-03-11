@@ -1,7 +1,7 @@
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
@@ -50,7 +50,7 @@ const InfographicChartForm = ({
   fileId,
   onChange,
   handleApiErrors,
-}: InfographicChartOptionsProps & ErrorControlProps) => {
+}: InfographicChartOptionsProps & ErrorControlState) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);

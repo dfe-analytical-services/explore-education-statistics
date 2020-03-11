@@ -2,12 +2,11 @@ import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
@@ -22,7 +21,7 @@ const ManageReleasePageContainer = ({
   match,
   location,
   handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps<MatchProps> & ErrorControlState) => {
   const { publicationId, releaseId } = match.params;
 
   const [publication, setPublication] = useState<BasicPublicationDetails>();

@@ -1,11 +1,10 @@
 import StatusBlock from '@admin/components/StatusBlock';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { MethodologyStatus } from '@admin/services/common/types';
 import service from '@admin/services/methodology/service';
 import permissionService from '@admin/services/permissions/service';
 import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
@@ -37,7 +36,7 @@ const statusMap: {
 const MethodologyStatusPage = ({
   match,
   handleApiErrors,
-}: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
+}: RouteComponentProps<{ methodologyId: string }> & ErrorControlState) => {
   const { methodologyId } = match.params;
 
   const [model, setModel] = useState<Model>();

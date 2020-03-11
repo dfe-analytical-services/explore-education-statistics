@@ -1,22 +1,21 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import ButtonText from '@common/components/ButtonText';
-import { BasicLink } from '@common/services/publicationService';
-import React, { useState, useContext } from 'react';
-import { FormikProps } from 'formik';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Link from '@admin/components/Link';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import {
-  Formik,
-  FormFieldset,
   Form,
+  FormFieldset,
   FormFieldTextInput,
+  Formik,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { BasicLink } from '@common/services/publicationService';
+import { FormikProps } from 'formik';
+import React, { useContext, useState } from 'react';
 import EditableLink from './EditableLink';
 
 interface Props {
@@ -26,7 +25,7 @@ interface Props {
 const RelatedInformationSection = ({
   release,
   handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props & ErrorControlState) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 

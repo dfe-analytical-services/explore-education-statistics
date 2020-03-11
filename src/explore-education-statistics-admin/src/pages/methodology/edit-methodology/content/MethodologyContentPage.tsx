@@ -1,9 +1,8 @@
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import withErrorControl from '@admin/hocs/withErrorControl';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import { FormFieldset, FormRadioGroup } from '@common/components/form';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -18,7 +17,7 @@ import util from './methodologyContentUtil';
 const MethodologyContentPage = ({
   methodology,
   setMethodology,
-}: ErrorControlProps & MethodologyTabProps) => {
+}: ErrorControlState & MethodologyTabProps) => {
   const [isEditing, setIsEditing] = useState(true);
 
   if (methodology)
