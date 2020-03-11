@@ -130,17 +130,15 @@ export const releaseReducer: Reducer<
       if (!draft.release?.[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
       }
+
       if (sectionKey === 'content') {
-        draft.release[sectionKey] = draft.release[sectionKey].map(section => {
-          if (section.id === sectionId) {
-            return { ...section, content: sectionContent };
-          }
-          return section;
-        });
-      } else {
-        (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content = sectionContent;
+        const matchingSection = draft.release[sectionKey].find(
+          section => section.id === sectionId,
+        );
+        if (matchingSection) matchingSection.content = sectionContent;
+      } else if (draft.release?.[sectionKey]) {
+        const matchingSection = draft.release[sectionKey];
+        if (matchingSection) matchingSection.content = sectionContent;
       }
       return draft;
     }
