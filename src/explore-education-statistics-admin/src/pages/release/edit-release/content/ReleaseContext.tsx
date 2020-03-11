@@ -99,31 +99,28 @@ export const releaseReducer: Reducer<
       if (!draft.release?.[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
       }
+
       if (sectionKey === 'content') {
-        draft.release[sectionKey] = draft.release[sectionKey].map(section => {
-          if (section.id === sectionId) {
-            return {
-              ...section,
-              content: section.content
-                ? [
-                    ...section.content,
-                    { ...block, comments: block.comments || [] },
-                  ]
-                : [{ ...block, comments: block.comments || [] }],
-            } as ContentSection<EditableContentBlock>;
+        // .comments needs initialising to array as will be undefined if empty
+        const newBlock = { ...block, comments: block.comments || [] };
+        const matchingSection = draft.release[sectionKey].find(
+          section => section.id === sectionId,
+        );
+        if (!matchingSection) return draft;
+        if (Array.isArray(matchingSection.content)) {
+          matchingSection.content.push(newBlock);
+        } else {
+          matchingSection.content = [newBlock];
+        }
+      } else if (draft.release?.[sectionKey]) {
+        const matchingSection = draft.release[sectionKey];
+        if (matchingSection) {
+          if (Array.isArray(matchingSection.content)) {
+            matchingSection.content.push(block);
+          } else {
+            matchingSection.content = [block];
           }
-          return section;
-        });
-      } else if (
-        (draft.release[sectionKey] as ContentSection<EditableContentBlock>)
-          .content
-      ) {
-        ((draft.release[sectionKey] as ContentSection<EditableContentBlock>)
-          .content as EditableContentBlock[]).push(block);
-      } else {
-        (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content = [block];
+        }
       }
       return draft;
     }
