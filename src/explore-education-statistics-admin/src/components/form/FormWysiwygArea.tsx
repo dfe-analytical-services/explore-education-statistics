@@ -6,7 +6,7 @@ import React, {
 } from 'react';
 import EditableMarkdownRenderer, {
   MarkdownRendererProps,
-} from '@admin/modules/editable-components/EditableMarkdownRenderer';
+} from '@admin/components/editable/EditableMarkdownRenderer';
 import ErrorMessage from '@common/components/ErrorMessage';
 
 export interface FormWysiwygAreaProps

@@ -1,6 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
-import { useReleaseDispatch } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';

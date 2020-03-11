@@ -17,15 +17,13 @@ type PageMode = 'edit' | 'preview';
 
 const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const [pageMode, setPageMode] = useState<PageMode>('preview');
-
-  const { releaseId, publication } = useManageReleaseContext();
-
+  const { releaseId } = useManageReleaseContext();
   const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
   const { getReleaseContent } = useReleaseActions();
 
   useEffect(() => {
     getReleaseContent(releaseId).catch(handleApiErrors);
-  }, [releaseId, publication?.themeId, publication, handleApiErrors]);
+  }, [releaseId, handleApiErrors]);
 
   useEffect(() => {
     if (canUpdateRelease === true) {

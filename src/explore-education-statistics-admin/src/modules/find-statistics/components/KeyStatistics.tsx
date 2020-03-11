@@ -12,7 +12,7 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
-import EditableKeyStatTile from '../../editable-components/EditableKeyStatTile';
+import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 
 export interface KeyStatisticsProps {

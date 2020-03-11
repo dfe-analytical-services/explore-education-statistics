@@ -18,7 +18,7 @@ import {
   dateToDayMonthYear,
   dayMonthYearValuesToInputs,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const ReleaseSummaryEditPage = ({

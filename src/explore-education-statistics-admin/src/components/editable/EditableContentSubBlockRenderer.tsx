@@ -1,8 +1,8 @@
-import EditableDataBlock from '@admin/modules/editable-components/EditableDataBlock';
-import EditableHtmlRenderer from '@admin/modules/editable-components/EditableHtmlRenderer';
+import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
+import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
 import EditableMarkdownRenderer, {
   MarkdownRendererProps,
-} from '@admin/modules/editable-components/EditableMarkdownRenderer';
+} from '@admin/components/editable/EditableMarkdownRenderer';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import React from 'react';
 

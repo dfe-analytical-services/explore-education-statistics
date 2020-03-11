@@ -1,3 +1,4 @@
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
@@ -5,10 +6,7 @@ import BasicReleaseSummary from '@admin/modules/find-statistics/components/Basic
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
-import {
-  useReleaseDispatch,
-  useReleaseState,
-} from '@admin/pages/release/edit-release/content/ReleaseContext';
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
@@ -18,7 +16,6 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext, useMemo } from 'react';
-import ContentBlocks from '../editable-components/EditableContentBlocks';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';

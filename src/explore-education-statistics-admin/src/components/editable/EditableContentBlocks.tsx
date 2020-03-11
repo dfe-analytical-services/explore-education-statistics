@@ -1,3 +1,5 @@
+import Comments from '@admin/modules/find-statistics/components/Comments';
+import ContentBlockDraggable from '@admin/modules/find-statistics/components/ContentBlockDraggable';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { EditableRelease } from '@admin/services/publicationService';
 import PreviewContentBlocks, {
@@ -7,8 +9,6 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 import { Dictionary } from '@common/types/util';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import Comments from '../find-statistics/components/Comments';
-import ContentBlockDraggable from '../find-statistics/components/ContentBlockDraggable';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 type ContentType = EditableRelease['content'][0]['content'];

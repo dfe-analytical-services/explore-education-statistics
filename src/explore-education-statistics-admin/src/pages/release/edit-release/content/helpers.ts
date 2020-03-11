@@ -1,4 +1,4 @@
-import { KeyStatsFormValues } from '@admin/modules/editable-components/EditableKeyStatTile';
+import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
 import permissionsService from '@admin/services/permissions/service';
 import {
   EditableContentBlock,

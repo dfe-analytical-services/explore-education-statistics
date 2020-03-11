@@ -1,13 +1,11 @@
 import {
-  EditableContentBlock,
   EditableRelease,
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { DataBlock } from '@common/services/dataBlockService';
-import { ContentSection } from '@common/services/publicationService';
+import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
-import remove from 'lodash/remove';
 import ReleaseDispatchAction from './actions';
 
 type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
@@ -30,7 +28,6 @@ export const releaseReducer: Reducer<
   ReleaseContextState,
   ReleaseDispatchAction
 > = (draft, action) => {
-  console.log(action.type);
   switch (action.type) {
     case 'CLEAR_STATE': {
       return {
@@ -205,11 +202,11 @@ function useReleaseDispatch() {
 }
 
 export {
-  //eslint-disable-next-line no-undef
-  ReleaseContextState,
-  //eslint-disable-next-line no-undef
-  ReleaseContextDispatch,
   ReleaseProvider,
   useReleaseState,
   useReleaseDispatch,
+  // eslint-disable-next-line no-undef
+  ReleaseContextState,
+  // eslint-disable-next-line no-undef
+  ReleaseContextDispatch,
 };

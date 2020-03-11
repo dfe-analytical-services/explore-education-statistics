@@ -1,6 +1,6 @@
-import React from 'react';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { FormTextInputProps } from '@common/components/form/FormTextInput';
-import { RendererProps } from '../find-statistics/PublicationReleaseContent';
+import React from 'react';
 
 export type TextRendererProps = RendererProps & FormTextInputProps;
 

@@ -1,14 +1,11 @@
-import ManageReleaseContext, {
-  ManageRelease,
-  useManageReleaseContext,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
 import classNames from 'classnames';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './EditableDataBlock.module.scss';
 
 type Props = {

@@ -1,5 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';

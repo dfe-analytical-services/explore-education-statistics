@@ -2,7 +2,7 @@ import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import ContentBlocks from '@admin/modules/editable-components/EditableContentBlocks';
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
