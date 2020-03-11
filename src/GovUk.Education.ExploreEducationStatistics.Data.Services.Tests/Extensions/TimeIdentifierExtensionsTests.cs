@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(SixHalfTerms.IsAlike(SixHalfTerms));
             Assert.True(January.IsAlike(January));
             Assert.True(SpringTerm.IsAlike(SpringTerm));
+            Assert.True(ReportingYear.IsAlike(ReportingYear));
         }
 
         [Fact]
