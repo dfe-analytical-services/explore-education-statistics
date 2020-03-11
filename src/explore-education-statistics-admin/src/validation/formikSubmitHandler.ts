@@ -26,11 +26,11 @@ const isServerValidationError = <T extends {}>(error: T) => {
   );
 };
 
-const submitWithFormikValidation = <FormValues>(
+function submitWithFormikValidation<FormValues>(
   submitFn: FormikSubmitHandler<FormValues>,
   handleApiErrors: ApiErrorHandler,
   ...messageMappers: ServerValidationMessageMapper[]
-) => {
+) {
   return async (values: FormValues, actions: FormikActions<FormValues>) => {
     try {
       await submitFn(values, actions);
@@ -52,6 +52,6 @@ const submitWithFormikValidation = <FormValues>(
       }
     }
   };
-};
+}
 
 export default submitWithFormikValidation;
