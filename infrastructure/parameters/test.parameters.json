@@ -27,10 +27,10 @@
       "value": "test.explore-education-statistics.service.gov.uk"
     },
     "contentApiUrl": {
-      "value": "content.dev.explore-education-statistics.service.gov.uk"
+      "value": "content.test.explore-education-statistics.service.gov.uk"
     },
     "dataApiUrl": {
-      "value": "data.dev.explore-education-statistics.service.gov.uk"
+      "value": "data.test.explore-education-statistics.service.gov.uk"
     }
   }
 }
