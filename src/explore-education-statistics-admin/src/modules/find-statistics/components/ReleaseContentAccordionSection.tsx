@@ -4,7 +4,7 @@ import AccordionSection, {
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';

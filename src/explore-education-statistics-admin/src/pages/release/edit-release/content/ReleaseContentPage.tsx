@@ -10,7 +10,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
-import useReleaseActions from './helpers';
+import useReleaseActions from './ReleaseContextActionHelpers';
 import { ReleaseProvider, useReleaseState } from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';

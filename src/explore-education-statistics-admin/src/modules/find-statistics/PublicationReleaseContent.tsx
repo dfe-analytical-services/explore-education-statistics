@@ -5,7 +5,7 @@ import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-st
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';

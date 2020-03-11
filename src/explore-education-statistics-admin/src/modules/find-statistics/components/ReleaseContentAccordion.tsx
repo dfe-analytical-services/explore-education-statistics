@@ -1,5 +1,5 @@
 import Accordion from '@admin/components/EditableAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
 import {
   EditableContentBlock,
   EditableRelease,

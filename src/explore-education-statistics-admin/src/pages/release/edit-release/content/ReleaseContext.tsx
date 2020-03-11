@@ -6,7 +6,7 @@ import { DataBlock } from '@common/services/dataBlockService';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
-import ReleaseDispatchAction from './actions';
+import ReleaseDispatchAction from './ReleaseContextActionTypes';
 
 type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
 type ReleaseContextState = {

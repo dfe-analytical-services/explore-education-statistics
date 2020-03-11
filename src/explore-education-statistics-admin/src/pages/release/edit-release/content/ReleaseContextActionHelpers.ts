@@ -14,7 +14,7 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { ContentSectionKeys } from './actions';
+import { ContentSectionKeys } from './ReleaseContextActionTypes';
 import { useReleaseDispatch } from './ReleaseContext';
 
 const contentSectionComments = (
