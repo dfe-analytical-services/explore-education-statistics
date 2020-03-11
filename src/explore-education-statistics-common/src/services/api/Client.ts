@@ -7,53 +7,70 @@ import {
 
 export type AxiosErrorHandler = (error: AxiosError) => void;
 
-class Client {
-  public readonly api: AxiosInstance;
+export interface ClientRequestConfig extends AxiosRequestConfig {
+  onError?: AxiosErrorHandler;
+}
 
-  public constructor(api: AxiosInstance) {
-    this.api = api;
+class Client {
+  public readonly axios: AxiosInstance;
+
+  public errorHandler?: AxiosErrorHandler;
+
+  public constructor(axios: AxiosInstance) {
+    this.axios = axios;
   }
 
   public get<T = unknown>(
     url: string,
-    config?: AxiosRequestConfig,
+    config?: ClientRequestConfig,
   ): Promise<T> {
-    return Client.unboxResponse(this.api.get(url, config));
+    return this.unboxResponse(this.axios.get(url, config), config);
   }
 
   public post<T = unknown>(
     url: string,
     data?: unknown,
-    config?: AxiosRequestConfig,
+    config?: ClientRequestConfig,
   ): Promise<T> {
-    return Client.unboxResponse(this.api.post(url, data, config));
+    return this.unboxResponse(this.axios.post(url, data, config), config);
   }
 
   public put<T = unknown>(
     url: string,
     data?: unknown,
-    config?: AxiosRequestConfig,
+    config?: ClientRequestConfig,
   ): Promise<T> {
-    return Client.unboxResponse(this.api.put(url, data, config));
+    return this.unboxResponse(this.axios.put(url, data, config), config);
   }
 
   public patch<T = unknown>(
     url: string,
     data?: unknown,
-    config?: AxiosRequestConfig,
+    config?: ClientRequestConfig,
   ): Promise<T> {
-    return Client.unboxResponse(this.api.patch(url, data, config));
+    return this.unboxResponse(this.axios.patch(url, data, config), config);
   }
 
   public delete<T = unknown>(
     url: string,
-    config?: AxiosRequestConfig,
+    config?: ClientRequestConfig,
   ): Promise<T> {
-    return Client.unboxResponse(this.api.delete(url, config));
+    return this.unboxResponse(this.axios.delete(url, config), config);
   }
 
-  private static unboxResponse<T>(promise: AxiosPromise<T>) {
-    return promise.then(({ data }) => data);
+  private unboxResponse<T>(
+    promise: AxiosPromise<T>,
+    config?: ClientRequestConfig,
+  ) {
+    const response = promise.then(({ data }) => data);
+
+    if (config?.onError) {
+      response.catch(config.onError);
+    } else if (this.errorHandler) {
+      response.catch(this.errorHandler);
+    }
+
+    return response;
   }
 }
 

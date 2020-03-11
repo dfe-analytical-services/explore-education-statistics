@@ -2,7 +2,7 @@ import { ErrorControlContextProvider } from '@admin/contexts/ErrorControlContext
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import * as H from 'history';
 import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -48,11 +48,10 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
     }
   }
 
-  private handleApiErrors = (error: AxiosResponse) => {
+  private handleApiErrors = (error: AxiosError) => {
     this.setState({
-      errorCode: error.status || 500,
+      errorCode: error.response?.status || 500,
     });
-    throw error;
   };
 
   public componentDidCatch() {

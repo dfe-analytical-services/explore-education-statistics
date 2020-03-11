@@ -46,6 +46,9 @@ const ConfigureAxios = ({ children }: ConfigureAxiosProps) => {
   useEffect(() => {
     clients.forEach(api => {
       configureAxios(api.axios);
+
+      // eslint-disable-next-line no-param-reassign
+      api.errorHandler = handleApiErrors;
     });
 
     setLoading(false);
