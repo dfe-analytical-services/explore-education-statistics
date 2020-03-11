@@ -136,20 +136,19 @@ const EditableAccordionSection = ({
           {!!onRemoveSection && (
             <Button onClick={() => setShowRemoveModal(true)} variant="warning">
               Remove section
-              {showRemoveModal && (
-                <ModalConfirm
-                  title="Are you sure?"
-                  onConfirm={onRemoveSection}
-                  onExit={() => setShowRemoveModal(false)}
-                  onCancel={() => setShowRemoveModal(false)}
-                >
-                  <p>
-                    Are you sure you want to remove the following section?
-                    <br />
-                    <strong>"{heading}"</strong>
-                  </p>
-                </ModalConfirm>
-              )}
+              <ModalConfirm
+                title="Are you sure?"
+                mounted={showRemoveModal}
+                onConfirm={onRemoveSection}
+                onExit={() => setShowRemoveModal(false)}
+                onCancel={() => setShowRemoveModal(false)}
+              >
+                <p>
+                  Are you sure you want to remove the following section?
+                  <br />
+                  <strong>"{heading}"</strong>
+                </p>
+              </ModalConfirm>
             </Button>
           )}
         </div>
