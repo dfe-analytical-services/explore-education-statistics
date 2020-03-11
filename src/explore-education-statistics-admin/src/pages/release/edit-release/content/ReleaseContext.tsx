@@ -69,42 +69,34 @@ export const releaseReducer: Reducer<
     case 'UPDATE_BLOCK_FROM_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
-      if (!draft.release || !draft.release[sectionKey]) {
+      if (!draft.release?.[sectionKey]) {
         throw new Error('UPDATE_BLOCK_FROM_SECTION: failed');
       }
       if (sectionKey === 'content') {
-        draft.release[sectionKey] = draft.release[sectionKey].map(section => {
-          if (section.id === sectionId) {
-            return {
-              ...section,
-              content: section.content?.map(contentBlock => {
-                if ((contentBlock.id as string) === blockId) {
-                  return block;
-                }
-                return contentBlock;
-              }),
-            } as ContentSection<EditableContentBlock>;
-          }
-          return section;
-        });
-      } else {
-        (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content = (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content?.map(contentBlock => {
-          if ((contentBlock.id as string) === blockId) {
-            return block;
-          }
-          return contentBlock;
-        });
+        const matchingSection = draft.release[sectionKey].find(
+          section => section.id === sectionId,
+        );
+        if (matchingSection?.content) {
+          const blockIndex = matchingSection.content.findIndex(
+            contentBlock => contentBlock.id === blockId,
+          );
+          matchingSection.content[blockIndex] = block;
+        }
+      } else if (draft.release?.[sectionKey]?.content) {
+        const matchingSectionContent = draft.release?.[sectionKey].content;
+        const blockIndex = matchingSectionContent.findIndex(
+          contentBlock => contentBlock.id === blockId,
+        );
+        if (blockIndex !== -1) {
+          matchingSectionContent[blockIndex] = block;
+        }
       }
       return draft;
     }
     case 'ADD_BLOCK_TO_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.release || !draft.release[sectionKey]) {
+      if (!draft.release?.[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
       }
       if (sectionKey === 'content') {
@@ -138,7 +130,7 @@ export const releaseReducer: Reducer<
     case 'UPDATE_SECTION_CONTENT': {
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.release || !draft.release[sectionKey]) {
+      if (!draft.release?.[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
       }
       if (sectionKey === 'content') {
