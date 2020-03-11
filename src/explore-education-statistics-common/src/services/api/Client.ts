@@ -1,4 +1,11 @@
-import { AxiosInstance, AxiosPromise, AxiosRequestConfig } from 'axios';
+import {
+  AxiosError,
+  AxiosInstance,
+  AxiosPromise,
+  AxiosRequestConfig,
+} from 'axios';
+
+export type AxiosErrorHandler = (error: AxiosError) => void;
 
 class Client {
   public readonly api: AxiosInstance;

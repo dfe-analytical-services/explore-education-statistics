@@ -1,14 +1,12 @@
-import { AxiosResponse } from 'axios';
+import { AxiosErrorHandler } from '@common/services/api/Client';
 import React, { createContext, ReactNode, useContext } from 'react';
-
-export type ApiErrorHandler = (error: AxiosResponse) => void;
 
 export interface ManualErrorHandler {
   forbidden: () => void;
 }
 
 export interface ErrorControlState {
-  handleApiErrors: ApiErrorHandler;
+  handleApiErrors: AxiosErrorHandler;
   handleManualErrors: ManualErrorHandler;
 }
 

@@ -1,8 +1,9 @@
-import { ApiErrorHandler } from '@admin/contexts/ErrorControlContext';
 import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,
 } from '@common/components/form/util/serverValidationHandler';
+import { AxiosErrorHandler } from '@common/services/api/Client';
+import { AxiosError } from 'axios';
 import { FormikActions } from 'formik';
 
 export type FormikSubmitHandler<FormValues> = (
@@ -10,15 +11,14 @@ export type FormikSubmitHandler<FormValues> = (
   formikActions: FormikActions<FormValues>,
 ) => Promise<void>;
 
-const isServerValidationError = <T extends {}>(error: T) => {
-  const errorWithData = (error as unknown) as { data: unknown };
-  const { data } = errorWithData;
-
-  if (!data) {
+const isServerValidationError = (error: AxiosError) => {
+  if (!error.isAxiosError || !error.response?.data) {
     return false;
   }
 
-  const errorDataAsValidationError = (data as unknown) as ServerValidationErrors;
+  const errorDataAsValidationError = error.response
+    .data as ServerValidationErrors;
+
   return (
     errorDataAsValidationError.errors !== undefined &&
     errorDataAsValidationError.status !== undefined &&
@@ -28,26 +28,28 @@ const isServerValidationError = <T extends {}>(error: T) => {
 
 function submitWithFormikValidation<FormValues>(
   submitFn: FormikSubmitHandler<FormValues>,
-  handleApiErrors: ApiErrorHandler,
+  handleApiErrors: AxiosErrorHandler,
   ...messageMappers: ServerValidationMessageMapper[]
 ) {
   return async (values: FormValues, actions: FormikActions<FormValues>) => {
     try {
       await submitFn(values, actions);
     } catch (error) {
-      if (!isServerValidationError(error)) {
-        handleApiErrors(error);
+      const typedError: AxiosError = error;
+
+      if (!isServerValidationError(typedError)) {
+        handleApiErrors(typedError);
       } else {
         const validationHandler = handleServerSideValidation(...messageMappers);
 
         const errorHandled = validationHandler(
-          error.data as ServerValidationErrors,
+          typedError.response?.data,
           actions.setFieldError,
           actions.setError,
         );
 
         if (!errorHandled) {
-          handleApiErrors(error);
+          handleApiErrors(typedError);
         }
       }
     }

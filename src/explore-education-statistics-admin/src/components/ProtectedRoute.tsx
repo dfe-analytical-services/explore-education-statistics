@@ -1,5 +1,4 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
 import LoginContext from '@admin/components/Login';
 import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
@@ -80,14 +79,12 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const routeComponent = (props: any) => (
     <ProtectedRoutes>
-      <ErrorBoundary>
-        <AuthenticationCheckingComponent
-          component={component}
-          allowAnonymousUsers={allowAnonymousUsers}
-          protectionAction={protectionAction}
-          {...props}
-        />
-      </ErrorBoundary>
+      <AuthenticationCheckingComponent
+        component={component}
+        allowAnonymousUsers={allowAnonymousUsers}
+        protectionAction={protectionAction}
+        {...props}
+      />
     </ProtectedRoutes>
   );
 
