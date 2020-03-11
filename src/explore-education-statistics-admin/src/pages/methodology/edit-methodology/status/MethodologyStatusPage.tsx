@@ -1,6 +1,4 @@
 import StatusBlock from '@admin/components/StatusBlock';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyStatus } from '@admin/services/common/types';
 import service from '@admin/services/methodology/service';
@@ -13,7 +11,7 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -35,8 +33,7 @@ const statusMap: {
 
 const MethodologyStatusPage = ({
   match,
-  handleApiErrors,
-}: RouteComponentProps<{ methodologyId: string }> & ErrorControlState) => {
+}: RouteComponentProps<{ methodologyId: string }>) => {
   const { methodologyId } = match.params;
 
   const [model, setModel] = useState<Model>();
@@ -47,29 +44,27 @@ const MethodologyStatusPage = ({
       service.getMethodologyStatus(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
-    ])
-      .then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
-        const statusOptions: RadioOption[] = [
-          {
-            label: 'In draft',
-            value: 'Draft',
-            disabled: !canMarkAsDraft,
-          },
-          {
-            label: 'Approved for publication',
-            value: 'Approved',
-            disabled: !canApprove,
-          },
-        ];
+    ]).then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
+      const statusOptions: RadioOption[] = [
+        {
+          label: 'In draft',
+          value: 'Draft',
+          disabled: !canMarkAsDraft,
+        },
+        {
+          label: 'Approved for publication',
+          value: 'Approved',
+          disabled: !canApprove,
+        },
+      ];
 
-        setModel({
-          methodologyStatus,
-          statusOptions,
-          editable: statusOptions.some(option => !option.disabled),
-        });
-      })
-      .catch(handleApiErrors);
-  }, [methodologyId, handleApiErrors, showForm]);
+      setModel({
+        methodologyStatus,
+        statusOptions,
+        editable: statusOptions.some(option => !option.disabled),
+      });
+    });
+  }, [methodologyId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     await service.updateMethodologyStatus(methodologyId, values).then(() => {
@@ -162,4 +157,4 @@ const MethodologyStatusPage = ({
   );
 };
 
-export default withErrorControl(withRouter(MethodologyStatusPage));
+export default MethodologyStatusPage;

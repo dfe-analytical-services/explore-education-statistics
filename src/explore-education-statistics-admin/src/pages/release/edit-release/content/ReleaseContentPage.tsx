@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import ManageReleaseContext, {
   ManageRelease,
@@ -65,7 +63,7 @@ const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
       ),
   ].filter(comment => comment !== undefined && comment.state === 'open');
 
-const ReleaseContentPage = ({ handleApiErrors }: ErrorControlState) => {
+const ReleaseContentPage = () => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(
@@ -76,18 +74,16 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlState) => {
     Promise.all([
       releaseContentService.getContent(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([newContent, canUpdateRelease]) => {
-        setModel({
-          unresolvedComments: getUnresolveComments(newContent.release),
-          pageMode: canUpdateRelease ? 'edit' : 'preview',
-          content: newContent,
-          availableDataBlocks: newContent.availableDataBlocks,
-          canUpdateRelease,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, publication.themeId, publication, handleApiErrors]);
+    ]).then(([newContent, canUpdateRelease]) => {
+      setModel({
+        unresolvedComments: getUnresolveComments(newContent.release),
+        pageMode: canUpdateRelease ? 'edit' : 'preview',
+        content: newContent,
+        availableDataBlocks: newContent.availableDataBlocks,
+        canUpdateRelease,
+      });
+    });
+  }, [releaseId, publication.themeId, publication]);
 
   const onReleaseChange = React.useCallback(
     (newRelease: ManageContentPageViewModel['release']) => {
@@ -177,4 +173,4 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlState) => {
   );
 };
 
-export default withErrorControl(ReleaseContentPage);
+export default ReleaseContentPage;

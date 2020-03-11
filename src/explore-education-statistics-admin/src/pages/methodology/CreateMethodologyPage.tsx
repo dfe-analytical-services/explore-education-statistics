@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
@@ -51,20 +50,16 @@ interface CreateMethodologyModel {
 
 const CreateMethodologyPage = ({
   history,
-  handleApiErrors,
 }: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {
-    service
-      .getPublicationAndReleaseContacts()
-      .then(contacts => {
-        setModel({
-          contacts,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+    service.getPublicationAndReleaseContacts().then(contacts => {
+      setModel({
+        contacts,
+      });
+    });
+  }, []);
 
   const cancelHandler = () => history.push('/methodologies');
 
@@ -212,4 +207,4 @@ const CreateMethodologyPage = ({
   );
 };
 
-export default withErrorControl(CreateMethodologyPage);
+export default CreateMethodologyPage;

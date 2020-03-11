@@ -1,7 +1,5 @@
 import Accordion from '@admin/components/EditableAccordion';
 import AccordionSection from '@admin/components/EditableAccordionSection';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { FormFieldset, FormRadioGroup } from '@common/components/form';
 import FormattedDate from '@common/components/FormattedDate';
@@ -17,7 +15,7 @@ import util from './methodologyContentUtil';
 const MethodologyContentPage = ({
   methodology,
   setMethodology,
-}: ErrorControlState & MethodologyTabProps) => {
+}: MethodologyTabProps) => {
   const [isEditing, setIsEditing] = useState(true);
 
   if (methodology)
@@ -161,4 +159,4 @@ const MethodologyContentPage = ({
   return <LoadingSpinner />;
 };
 
-export default withErrorControl(MethodologyContentPage);
+export default MethodologyContentPage;

@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   EditFormValues,
@@ -60,8 +58,7 @@ interface Model {
 const CreateReleasePage = ({
   match,
   history,
-  handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlState) => {
+}: RouteComponentProps<MatchProps>) => {
   const { publicationId } = match.params;
 
   const [model, setModel] = useState<Model>();
@@ -70,15 +67,13 @@ const CreateReleasePage = ({
     Promise.all([
       service.getTemplateRelease(publicationId),
       service.getPublication(publicationId),
-    ])
-      .then(([templateRelease, publication]) => {
-        setModel({
-          templateRelease,
-          publication: publication as Publication,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, handleApiErrors]);
+    ]).then(([templateRelease, publication]) => {
+      setModel({
+        templateRelease,
+        publication: publication as Publication,
+      });
+    });
+  }, [publicationId]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
@@ -179,4 +174,4 @@ const CreateReleasePage = ({
   );
 };
 
-export default withErrorControl(withRouter(CreateReleasePage));
+export default withRouter(CreateReleasePage);

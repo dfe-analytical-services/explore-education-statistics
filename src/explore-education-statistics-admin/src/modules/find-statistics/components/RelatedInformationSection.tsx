@@ -1,6 +1,4 @@
 import Link from '@admin/components/Link';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Button from '@common/components/Button';
@@ -22,10 +20,7 @@ interface Props {
   release: ManageContentPageViewModel['release'];
 }
 
-const RelatedInformationSection = ({
-  release,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+const RelatedInformationSection = ({ release }: Props) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
@@ -33,21 +28,15 @@ const RelatedInformationSection = ({
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      relatedInformationService
-        .create(release.id, link)
-        .then(newLinks => {
-          setLinks(newLinks);
-          resolve();
-        })
-        .catch(handleApiErrors);
+      relatedInformationService.create(release.id, link).then(newLinks => {
+        setLinks(newLinks);
+        resolve();
+      });
     });
   };
 
   const removeLink = (linkId: string) => {
-    relatedInformationService
-      .delete(release.id, linkId)
-      .then(setLinks)
-      .catch(handleApiErrors);
+    relatedInformationService.delete(release.id, linkId).then(setLinks);
   };
 
   const renderLinkForm = () => {
@@ -155,4 +144,4 @@ const RelatedInformationSection = ({
   );
 };
 
-export default withErrorControl(RelatedInformationSection);
+export default RelatedInformationSection;

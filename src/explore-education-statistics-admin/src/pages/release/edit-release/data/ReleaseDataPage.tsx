@@ -1,4 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
 import ManageReleaseContext, {
   ManageRelease,
@@ -24,7 +23,7 @@ export interface FootnotesData {
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataPage = ({ handleApiErrors }: ErrorControlState) => {
+const ReleaseDataPage = () => {
   const { publication, releaseId } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
@@ -36,23 +35,21 @@ const ReleaseDataPage = ({ handleApiErrors }: ErrorControlState) => {
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
-        setFootnotesData({
-          footnoteMeta: meta,
-          footnotes: footnotesList,
-          footnoteMetaGetters: generateFootnoteMetaMap(meta),
-          canUpdateRelease: canUpdateReleaseResult,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors, releaseId]);
+    ]).then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
+      setFootnotesData({
+        footnoteMeta: meta,
+        footnotes: footnotesList,
+        footnoteMetaGetters: generateFootnoteMetaMap(meta),
+        canUpdateRelease: canUpdateReleaseResult,
+      });
+    });
+  }, [releaseId]);
 
   useEffect(() => {
     if (activeTab === 'footnotes') {
       getFootnoteData();
     }
-  }, [activeTab]);
+  }, [activeTab, getFootnoteData]);
 
   return (
     <>

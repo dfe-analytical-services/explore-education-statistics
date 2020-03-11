@@ -2,8 +2,6 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -23,38 +21,36 @@ interface Model {
   scheduledReleases: AdminDashboardRelease[];
 }
 
-const AdminDashboardPage = ({ handleApiErrors }: ErrorControlState) => {
+const AdminDashboardPage = () => {
   const { user } = useContext(LoginContext);
   const [model, setModel] = useState<Model>();
   useEffect(() => {
     Promise.all([
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
-    ])
-      .then(([draftReleases, scheduledReleases]) => {
-        const contactResultsByRelease = scheduledReleases.map(release =>
-          dashboardService
-            .getPreReleaseContactsForRelease(release.id)
-            .then(contacts => ({
-              releaseId: release.id,
-              contacts,
-            })),
-        );
+    ]).then(([draftReleases, scheduledReleases]) => {
+      const contactResultsByRelease = scheduledReleases.map(release =>
+        dashboardService
+          .getPreReleaseContactsForRelease(release.id)
+          .then(contacts => ({
+            releaseId: release.id,
+            contacts,
+          })),
+      );
 
-        return Promise.all(contactResultsByRelease).then(contactResults => {
-          const preReleaseContactsByScheduledRelease: Dictionary<PrereleaseContactDetails[]> = {};
-          contactResults.forEach(result => {
-            const { releaseId, contacts } = result;
-            preReleaseContactsByScheduledRelease[releaseId] = contacts;
-          });
-          setModel({
-            draftReleases,
-            scheduledReleases,
-          });
+      return Promise.all(contactResultsByRelease).then(contactResults => {
+        const preReleaseContactsByScheduledRelease: Dictionary<PrereleaseContactDetails[]> = {};
+        contactResults.forEach(result => {
+          const { releaseId, contacts } = result;
+          preReleaseContactsByScheduledRelease[releaseId] = contacts;
         });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+        setModel({
+          draftReleases,
+          scheduledReleases,
+        });
+      });
+    });
+  }, []);
 
   return (
     <>
@@ -172,4 +168,4 @@ const AdminDashboardPage = ({ handleApiErrors }: ErrorControlState) => {
   );
 };
 
-export default withErrorControl(AdminDashboardPage);
+export default AdminDashboardPage;

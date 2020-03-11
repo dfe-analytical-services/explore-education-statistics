@@ -1,7 +1,5 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ManageReleaseContext, {
   ManageRelease,
@@ -18,7 +16,6 @@ import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -47,9 +44,7 @@ const statusMap: {
   Approved: 'Approved',
 };
 
-const ReleaseStatusPage = ({
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlState) => {
+const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
@@ -61,34 +56,32 @@ const ReleaseStatusPage = ({
       permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
-    ])
-      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
-        const statusOptions: RadioOption[] = [
-          {
-            label: 'In draft',
-            value: 'Draft',
-            disabled: !canMarkAsDraft,
-          },
-          {
-            label: 'Ready for higher review',
-            value: 'HigherLevelReview',
-            disabled: !canSubmit,
-          },
-          {
-            label: 'Approved for publication',
-            value: 'Approved',
-            disabled: !canApprove,
-          },
-        ];
+    ]).then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
+      const statusOptions: RadioOption[] = [
+        {
+          label: 'In draft',
+          value: 'Draft',
+          disabled: !canMarkAsDraft,
+        },
+        {
+          label: 'Ready for higher review',
+          value: 'HigherLevelReview',
+          disabled: !canSubmit,
+        },
+        {
+          label: 'Approved for publication',
+          value: 'Approved',
+          disabled: !canApprove,
+        },
+      ];
 
-        setModel({
-          releaseStatus,
-          statusOptions,
-          editable: statusOptions.some(option => !option.disabled),
-        });
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, showForm]);
+      setModel({
+        releaseStatus,
+        statusOptions,
+        editable: statusOptions.some(option => !option.disabled),
+      });
+    });
+  }, [releaseId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     await service.updateReleaseStatus(releaseId, values).then(() => {
@@ -188,4 +181,4 @@ const ReleaseStatusPage = ({
   );
 };
 
-export default withErrorControl(ReleaseStatusPage);
+export default ReleaseStatusPage;

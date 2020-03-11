@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
 import ChartConfiguration, {
   ChartOptions,
@@ -124,9 +122,7 @@ const ChartBuilder = ({
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
-  handleApiErrors,
-  handleManualErrors,
-}: Props & ErrorControlState) => {
+}: Props) => {
   const [selectedChartType, setSelectedChartType] = useState<
     ChartDefinition | undefined
   >();
@@ -493,8 +489,6 @@ const ChartBuilder = ({
               }}
               meta={metaData}
               data={data}
-              handleApiErrors={handleApiErrors}
-              handleManualErrors={handleManualErrors}
             />
           </TabsSection>
 
@@ -547,4 +541,4 @@ const ChartBuilder = ({
   );
 };
 
-export default withErrorControl(ChartBuilder);
+export default ChartBuilder;

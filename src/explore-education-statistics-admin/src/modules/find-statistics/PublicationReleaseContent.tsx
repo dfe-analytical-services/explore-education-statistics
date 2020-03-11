@@ -1,6 +1,4 @@
 import Link from '@admin/components/Link';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
@@ -49,9 +47,8 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
   onReleaseChange,
-  handleApiErrors,
   availableDataBlocks: initialAvailableDataBlocks,
-}: Props & ErrorControlState) => {
+}: Props) => {
   const [release, setRelease] = useState(content.release);
 
   const setReleaseAndTriggerOnReleaseChange = useCallback(
@@ -169,9 +166,7 @@ const PublicationReleaseContent = ({
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService
-                            .downloadFile(path, name)
-                            .catch(handleApiErrors)
+                          editReleaseDataService.downloadFile(path, name)
                         }
                         className="govuk-link"
                       >
@@ -282,4 +277,4 @@ const PublicationReleaseContent = ({
   );
 };
 
-export default withErrorControl(PublicationReleaseContent);
+export default PublicationReleaseContent;

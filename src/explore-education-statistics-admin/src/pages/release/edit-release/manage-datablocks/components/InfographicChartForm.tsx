@@ -1,4 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
@@ -58,8 +57,7 @@ const InfographicChartForm = ({
   releaseId,
   fileId,
   onChange,
-  handleApiErrors,
-}: InfographicChartOptionsProps & ErrorControlState) => {
+}: InfographicChartOptionsProps) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -86,10 +84,10 @@ const InfographicChartForm = ({
   }, errorCodeMappings);
 
   useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId)
-      .then(setChartFileOptions)
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+    loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
+      setChartFileOptions,
+    );
+  }, [releaseId]);
 
   const selectedFile = chartFileOptions.find(
     fileOption => fileOption.value === fileId,
@@ -136,8 +134,7 @@ const InfographicChartForm = ({
                         .then(() =>
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),
                         )
-                        .then(setChartFileOptions)
-                        .catch(handleApiErrors);
+                        .then(setChartFileOptions);
                     onChange('');
                     toggleDeleteFile(false);
                   }}

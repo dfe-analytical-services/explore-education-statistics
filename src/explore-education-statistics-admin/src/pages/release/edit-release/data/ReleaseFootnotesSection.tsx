@@ -3,8 +3,6 @@ import FootnoteForm, {
   FootnoteFormConfig,
 } from '@admin/components/footnotes/form/FootnoteForm';
 import Link from '@admin/components/Link';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import { FootnotesData } from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import {
@@ -26,8 +24,7 @@ const ReleaseFootnotesSection = ({
   footnotesData,
   onSubmit,
   onDelete,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+}: Props) => {
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
   });
@@ -65,8 +62,7 @@ const ReleaseFootnotesSection = ({
                 footnotes: updatedFootnotes,
               });
             }
-          })
-          .catch(handleApiErrors);
+          });
       } else {
         footnotesService
           .createFootnote(footnote)
@@ -75,8 +71,7 @@ const ReleaseFootnotesSection = ({
               ...footnotesData,
               footnotes: [...footnotesData.footnotes, newFootnote],
             });
-          })
-          .catch(handleApiErrors);
+          });
       }
       _setFootnoteForm({ state: 'cancel' });
     },
@@ -117,8 +112,7 @@ const ReleaseFootnotesSection = ({
                   footnotesService
                     .deleteFootnote((footnoteToBeDeleted as Footnote).id)
                     .then(() => setFootnoteToBeDeleted(undefined))
-                    .then(onDelete)
-                    .catch(handleApiErrors);
+                    .then(onDelete);
                 }}
               >
                 The footnote:
@@ -143,4 +137,4 @@ const ReleaseFootnotesSection = ({
   );
 };
 
-export default withErrorControl(ReleaseFootnotesSection);
+export default ReleaseFootnotesSection;

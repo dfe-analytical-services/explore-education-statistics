@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
@@ -46,11 +44,7 @@ const emptyReleaseNote: ReleaseNote = {
   reason: '',
 };
 
-const ReleaseNotesSection = ({
-  release,
-  logEvent = nullLogEvent,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
@@ -71,8 +65,7 @@ const ReleaseNotesSection = ({
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        })
-        .catch(handleApiErrors);
+        });
     });
   };
 
@@ -86,8 +79,7 @@ const ReleaseNotesSection = ({
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        })
-        .catch(handleApiErrors);
+        });
     });
   };
 
@@ -297,7 +289,6 @@ const ReleaseNotesSection = ({
             await releaseNoteService
               .delete(deletedReleaseNote.id, release.id)
               .then(setReleaseNotes)
-              .catch(handleApiErrors)
               .finally(() => setDeletedReleaseNote(emptyReleaseNote));
           }}
         >
@@ -308,4 +299,4 @@ const ReleaseNotesSection = ({
   );
 };
 
-export default withErrorControl(ReleaseNotesSection);
+export default ReleaseNotesSection;

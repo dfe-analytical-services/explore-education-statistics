@@ -2,8 +2,6 @@ import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
@@ -20,18 +18,14 @@ interface MatchProps {
 const ManageReleasePageContainer = ({
   match,
   location,
-  handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlState) => {
+}: RouteComponentProps<MatchProps>) => {
   const { publicationId, releaseId } = match.params;
 
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   useEffect(() => {
-    service
-      .getBasicPublicationDetails(publicationId)
-      .then(setPublication)
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    service.getBasicPublicationDetails(publicationId).then(setPublication);
+  }, [publicationId, releaseId]);
 
   const currentRouteIndex =
     viewRoutes.findIndex(
@@ -130,4 +124,4 @@ const ManageReleasePageContainer = ({
   );
 };
 
-export default withErrorControl(ManageReleasePageContainer);
+export default ManageReleasePageContainer;

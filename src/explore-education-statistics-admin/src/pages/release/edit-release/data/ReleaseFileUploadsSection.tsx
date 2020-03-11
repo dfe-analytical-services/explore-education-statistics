@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
@@ -51,11 +49,7 @@ interface Props {
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({
-  publicationId,
-  releaseId,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
@@ -65,13 +59,11 @@ const ReleaseFileUploadsSection = ({
     Promise.all([
       editReleaseDataService.getAncillaryFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([filesResult, canUpdateReleaseResult]) => {
-        setFiles(filesResult);
-        setCanUpdateRelease(canUpdateReleaseResult);
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    ]).then(([filesResult, canUpdateReleaseResult]) => {
+      setFiles(filesResult);
+      setCanUpdateRelease(canUpdateReleaseResult);
+    });
+  }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -184,12 +176,10 @@ const ReleaseFileUploadsSection = ({
                           <SummaryListItem term="File">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService
-                                  .downloadAncillaryFile(
-                                    releaseId,
-                                    file.filename,
-                                  )
-                                  .catch(handleApiErrors)
+                                editReleaseDataService.downloadAncillaryFile(
+                                  releaseId,
+                                  file.filename,
+                                )
                               }
                             >
                               {file.filename}
@@ -227,9 +217,10 @@ const ReleaseFileUploadsSection = ({
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
               onConfirm={async () => {
-                await editReleaseDataService
-                  .deleteAncillaryFile(releaseId, deleteFileName)
-                  .catch(handleApiErrors);
+                await editReleaseDataService.deleteAncillaryFile(
+                  releaseId,
+                  deleteFileName,
+                );
                 setDeleteFileName('');
                 resetPage(form);
               }}
@@ -245,4 +236,4 @@ const ReleaseFileUploadsSection = ({
   );
 };
 
-export default withErrorControl(ReleaseFileUploadsSection);
+export default ReleaseFileUploadsSection;

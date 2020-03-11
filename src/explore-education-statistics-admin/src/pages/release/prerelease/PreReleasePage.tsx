@@ -1,7 +1,9 @@
 import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
+import {
+  ErrorControlState,
+  useErrorControl,
+} from '@admin/contexts/ErrorControlContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import permissionService from '@admin/services/permissions/service';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
@@ -20,10 +22,9 @@ interface MatchProps {
 }
 
 const PreReleasePage = ({
-  handleApiErrors,
-  handleManualErrors,
   match,
 }: RouteComponentProps<MatchProps> & ErrorControlState) => {
+  const { handleManualErrors } = useErrorControl();
   const [model, setModel] = useState<Model>();
 
   const { user } = useContext(LoginContext);
@@ -37,32 +38,27 @@ const PreReleasePage = ({
         if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
           handleManualErrors.forbidden();
         } else if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
-          releaseContentService
-            .getContent(releaseId)
-            .then(content => {
-              const newContent = {
-                ...content,
-                release: {
-                  ...content.release,
-                  prerelease: true,
-                },
-              };
+          releaseContentService.getContent(releaseId).then(content => {
+            const newContent = {
+              ...content,
+              release: {
+                ...content.release,
+                prerelease: true,
+              },
+            };
 
-              setModel({
-                preReleaseWindowStatus,
-                content: newContent,
-              });
-            })
-            .catch(handleApiErrors);
+            setModel({
+              preReleaseWindowStatus,
+              content: newContent,
+            });
+          });
         } else {
           setModel({
             preReleaseWindowStatus,
           });
         }
-      })
-
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, handleManualErrors]);
+      });
+  }, [releaseId, handleManualErrors]);
 
   return (
     <>
@@ -136,4 +132,4 @@ const PreReleasePage = ({
   );
 };
 
-export default withErrorControl(withRouter(PreReleasePage));
+export default withRouter(PreReleasePage);

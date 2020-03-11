@@ -1,6 +1,4 @@
 import Accordion from '@admin/components/EditableAccordion';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { AbstractRelease } from '@common/services/publicationService';
@@ -24,8 +22,7 @@ const ReleaseContentAccordion = ({
   accordionId,
   sectionName,
   onContentChange,
-  handleApiErrors,
-}: ReleaseContentAccordionProps & ErrorControlState) => {
+}: ReleaseContentAccordionProps) => {
   const [content, setContent] = useState<ContentType[]>([]);
 
   const setContentAndTriggerOnContentChange = useCallback(
@@ -41,59 +38,44 @@ const ReleaseContentAccordion = ({
 
   const onReorder = useCallback(
     async (ids: Dictionary<number>) => {
-      try {
-        const newContent = await releaseContentService.updateContentSectionsOrder(
-          releaseId,
-          ids,
-        );
+      const newContent = await releaseContentService.updateContentSectionsOrder(
+        releaseId,
+        ids,
+      );
 
-        setContentAndTriggerOnContentChange(newContent);
-      } catch (err) {
-        handleApiErrors(err);
-      }
+      setContentAndTriggerOnContentChange(newContent);
     },
-    [releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [releaseId, setContentAndTriggerOnContentChange],
   );
 
   useEffect(
     () => {
       releaseContentService
         .getContentSections(releaseId)
-        .then(setContentAndTriggerOnContentChange)
-        .catch(handleApiErrors);
+        .then(setContentAndTriggerOnContentChange);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
   const onAddSection = useCallback(async () => {
-    try {
-      const newContent: AbstractRelease<EditableContentBlock>['content'] = [
-        ...content,
-        await releaseContentService.addContentSection(
-          releaseId,
-          content.length,
-        ),
-      ];
+    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
+      ...content,
+      await releaseContentService.addContentSection(releaseId, content.length),
+    ];
 
-      setContentAndTriggerOnContentChange(newContent);
-    } catch (err) {
-      handleApiErrors(err);
-    }
-  }, [
-    content,
-    releaseId,
-    handleApiErrors,
-    setContentAndTriggerOnContentChange,
-  ]);
+    setContentAndTriggerOnContentChange(newContent);
+  }, [content, releaseId, setContentAndTriggerOnContentChange]);
 
   const onUpdateHeading = useCallback(
     async (block: ContentType, index: number, newTitle: string) => {
       let result;
       if (block.id) {
-        result = await releaseContentService
-          .updateContentSectionHeading(releaseId, block.id, newTitle)
-          .catch(handleApiErrors);
+        result = await releaseContentService.updateContentSectionHeading(
+          releaseId,
+          block.id,
+          newTitle,
+        );
 
         const newContent = [...content];
         newContent[index].heading = newTitle;
@@ -102,7 +84,7 @@ const ReleaseContentAccordion = ({
       }
       return result;
     },
-    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [content, releaseId, setContentAndTriggerOnContentChange],
   );
 
   const updateContentSection = useCallback(
@@ -118,16 +100,14 @@ const ReleaseContentAccordion = ({
   const onRemoveContentSection = useCallback(
     async (block: ContentType) => {
       if (block.id) {
-        await releaseContentService
-          .removeContentSection(releaseId, block.id)
-          .catch(handleApiErrors);
+        await releaseContentService.removeContentSection(releaseId, block.id);
 
         const newContent = content.filter(item => item.id !== block.id);
 
         setContentAndTriggerOnContentChange(newContent);
       }
     },
-    [content, releaseId, handleApiErrors, setContentAndTriggerOnContentChange],
+    [content, releaseId, setContentAndTriggerOnContentChange],
   );
 
   return (
@@ -160,4 +140,4 @@ const ReleaseContentAccordion = ({
   );
 };
 
-export default withErrorControl(ReleaseContentAccordion);
+export default ReleaseContentAccordion;

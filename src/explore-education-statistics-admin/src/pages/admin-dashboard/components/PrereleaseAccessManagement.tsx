@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
@@ -30,10 +28,7 @@ interface Props {
   release: AdminDashboardRelease;
 }
 
-const PrereleaseAccessManagement = ({
-  release,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+const PrereleaseAccessManagement = ({ release }: Props) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -45,9 +40,8 @@ const PrereleaseAccessManagement = ({
           inviting: false,
           removing: false,
         }),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors, release.id]);
+      );
+  }, [release.id]);
 
   const formId = `invitePrereleaseAccessUsers-${release.id}`;
 
@@ -78,8 +72,7 @@ const PrereleaseAccessManagement = ({
           inviting: false,
           removing: false,
         });
-      })
-      .catch(handleApiErrors);
+      });
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
@@ -152,8 +145,7 @@ const PrereleaseAccessManagement = ({
                             preReleaseContactsForRelease: updatedContacts,
                             removing: false,
                           }),
-                        )
-                        .catch(handleApiErrors);
+                        );
                     }}
                   >
                     Remove
@@ -171,4 +163,4 @@ const PrereleaseAccessManagement = ({
   );
 };
 
-export default withErrorControl(PrereleaseAccessManagement);
+export default PrereleaseAccessManagement;

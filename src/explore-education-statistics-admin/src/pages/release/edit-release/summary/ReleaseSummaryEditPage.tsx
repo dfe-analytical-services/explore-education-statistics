@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ManageReleaseContext, {
   ManageRelease,
@@ -36,10 +34,7 @@ const errorCodeMappings = [
   ),
 ];
 
-const ReleaseSummaryEditPage = ({
-  history,
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlState) => {
+const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
   >();
@@ -49,13 +44,10 @@ const ReleaseSummaryEditPage = ({
   ) as ManageRelease;
 
   useEffect(() => {
-    service
-      .getReleaseSummaryDetails(releaseId)
-      .then(release => {
-        setReleaseSummaryDetails(release);
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+    service.getReleaseSummaryDetails(releaseId).then(release => {
+      setReleaseSummaryDetails(release);
+    });
+  }, [releaseId]);
 
   const handleSubmit = useFormSubmit<EditFormValues>(async values => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
@@ -101,4 +93,4 @@ const ReleaseSummaryEditPage = ({
   );
 };
 
-export default withErrorControl(ReleaseSummaryEditPage);
+export default ReleaseSummaryEditPage;

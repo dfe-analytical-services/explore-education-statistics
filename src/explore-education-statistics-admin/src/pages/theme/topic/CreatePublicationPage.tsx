@@ -1,8 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
@@ -48,8 +46,7 @@ interface CreatePublicationModel {
 
 const CreatePublicationPage = ({
   history,
-  handleApiErrors,
-}: RouteComponentProps<{ topicId: string }> & ErrorControlState) => {
+}: RouteComponentProps<{ topicId: string }>) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
   const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
@@ -58,16 +55,14 @@ const CreatePublicationPage = ({
     Promise.all([
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
-    ])
-      .then(([methodologies, contacts]) => {
-        setModel({
-          methodologies,
-          contacts,
-          topic,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [topic, handleApiErrors]);
+    ]).then(([methodologies, contacts]) => {
+      setModel({
+        methodologies,
+        contacts,
+        topic,
+      });
+    });
+  }, [topic]);
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     const methodology: Dictionary<string | undefined | ExternalMethodology> = {
@@ -322,4 +317,4 @@ const CreatePublicationPage = ({
   );
 };
 
-export default withErrorControl(CreatePublicationPage);
+export default CreatePublicationPage;

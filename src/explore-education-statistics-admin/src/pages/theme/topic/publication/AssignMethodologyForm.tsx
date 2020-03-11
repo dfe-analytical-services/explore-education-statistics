@@ -1,5 +1,3 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { BasicMethodology, IdTitlePair } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
@@ -58,19 +56,15 @@ const AssignMethodologyForm = ({
   publicationId,
   methodology: currentMethodology,
   externalMethodology: currentExternalMethodology,
-  handleApiErrors,
   refreshPublication,
-}: Props & ErrorControlState) => {
+}: Props) => {
   const [formOpen, setFormOpen] = useState(false);
   const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
 
   useEffect(() => {
     setFormOpen(false);
-    service
-      .getMethodologies()
-      .then(setMethodologies)
-      .catch(handleApiErrors);
-  }, [currentMethodology, currentExternalMethodology, handleApiErrors]);
+    service.getMethodologies().then(setMethodologies);
+  }, [currentMethodology, currentExternalMethodology]);
 
   const handleSubmit = useFormSubmit<AssignMethodologyFormValues>(
     async values => {
@@ -260,4 +254,4 @@ const AssignMethodologyForm = ({
   );
 };
 
-export default withErrorControl(AssignMethodologyForm);
+export default AssignMethodologyForm;

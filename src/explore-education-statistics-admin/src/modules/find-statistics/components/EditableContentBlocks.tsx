@@ -1,4 +1,3 @@
-import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import AddContentButton from '@admin/modules/find-statistics/components/AddContentButton';
 import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
 import { EditableRelease } from '@admin/services/publicationService';
@@ -69,8 +68,6 @@ const EditableContentBlock = ({
 }: Props) => {
   const editingContext = useContext(EditingContext);
 
-  const { handleApiErrors } = useContext(ErrorControlContext);
-
   React.useEffect(() => {
     if (onReorder) {
       onReorder(async contentSectionId => {
@@ -81,13 +78,11 @@ const EditableContentBlock = ({
               {},
             );
 
-            await releaseContentService
-              .updateContentSectionBlocksOrder(
-                editingContext.releaseId,
-                contentSectionId,
-                newOrder,
-              )
-              .catch(handleApiErrors);
+            await releaseContentService.updateContentSectionBlocksOrder(
+              editingContext.releaseId,
+              contentSectionId,
+              newOrder,
+            );
 
             if (onContentChange) {
               onContentChange(content);
@@ -96,13 +91,7 @@ const EditableContentBlock = ({
         }
       });
     }
-  }, [
-    content,
-    editingContext.releaseId,
-    onContentChange,
-    onReorder,
-    handleApiErrors,
-  ]);
+  }, [content, editingContext.releaseId, onContentChange, onReorder]);
 
   const onAddContentCallback = (
     type: string,
@@ -144,8 +133,7 @@ const EditableContentBlock = ({
         )
         .then(section => {
           if (onContentChange) onContentChange(section.content);
-        })
-        .catch(handleApiErrors);
+        });
     }
   };
 
@@ -164,9 +152,11 @@ const EditableContentBlock = ({
   const onDeleteContent = async (contentId: string) => {
     const { releaseId } = editingContext;
     if (releaseId && sectionId && contentId) {
-      await releaseContentService
-        .deleteContentSectionBlock(releaseId, sectionId, contentId)
-        .catch(handleApiErrors);
+      await releaseContentService.deleteContentSectionBlock(
+        releaseId,
+        sectionId,
+        contentId,
+      );
 
       if (editingContext.updateAvailableDataBlocks) {
         editingContext.updateAvailableDataBlocks();

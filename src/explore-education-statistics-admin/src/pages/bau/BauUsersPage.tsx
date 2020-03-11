@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
 import React, { useEffect, useState } from 'react';
@@ -10,19 +8,16 @@ interface Model {
   users: UserStatus[];
 }
 
-const BauUsersPage = ({ handleApiErrors }: ErrorControlState) => {
+const BauUsersPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    userService
-      .getUsers()
-      .then(users => {
-        setModel({
-          users,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+    userService.getUsers().then(users => {
+      setModel({
+        users,
+      });
+    });
+  }, []);
   return (
     <Page
       wide
@@ -73,4 +68,4 @@ const BauUsersPage = ({ handleApiErrors }: ErrorControlState) => {
   );
 };
 
-export default withErrorControl(BauUsersPage);
+export default BauUsersPage;

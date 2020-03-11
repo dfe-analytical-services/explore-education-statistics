@@ -1,11 +1,6 @@
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import React from 'react';
-import { MethodologyTabProps } from '../MethodologyPage';
 
-const MethodologySummaryPage = ({
-  handleApiErrors,
-}: ErrorControlState & MethodologyTabProps) => {
+const MethodologySummaryPage = () => {
   return (
     <>
       <h2 className="govuk-heading-l">Methodology summary</h2>
@@ -16,4 +11,4 @@ const MethodologySummaryPage = ({
   );
 };
 
-export default withErrorControl(MethodologySummaryPage);
+export default MethodologySummaryPage;

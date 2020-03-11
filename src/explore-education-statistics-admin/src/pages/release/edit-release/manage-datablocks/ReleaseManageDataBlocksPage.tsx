@@ -1,6 +1,4 @@
 /* eslint-disable no-shadow */
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
 import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import ManageReleaseContext, {
@@ -32,9 +30,7 @@ interface DataBlockData {
   dataBlockResponse: DataBlockResponse;
 }
 
-const ReleaseManageDataBlocksPage = ({
-  handleApiErrors,
-}: ErrorControlState) => {
+const ReleaseManageDataBlocksPage = () => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
@@ -52,15 +48,9 @@ const ReleaseManageDataBlocksPage = ({
 
   const [deleteDataBlock, setDeleteDataBlock] = useState<DataBlock>();
 
-  const updateDataBlocks = useCallback(
-    (rId: string) => {
-      return dataBlocksService
-        .getDataBlocks(rId)
-        .then(setDataBlocks)
-        .catch(handleApiErrors);
-    },
-    [handleApiErrors],
-  );
+  const updateDataBlocks = useCallback((rId: string) => {
+    return dataBlocksService.getDataBlocks(rId).then(setDataBlocks);
+  }, []);
 
   useEffect(() => {
     updateDataBlocks(releaseId);
@@ -87,8 +77,7 @@ const ReleaseManageDataBlocksPage = ({
       dataBlocksService
         .deleteDataBlock(db.id)
         .then(() => updateDataBlocks(releaseId))
-        .then(() => setSelectedDataBlock(''))
-        .catch(handleApiErrors);
+        .then(() => setSelectedDataBlock(''));
     }
   };
 
@@ -111,9 +100,7 @@ const ReleaseManageDataBlocksPage = ({
       const request = db.dataBlockRequest;
       if (request === undefined) return {};
 
-      const response = await dataBlockService
-        .getDataBlockForSubject(request)
-        .catch(handleApiErrors);
+      const response = await dataBlockService.getDataBlockForSubject(request);
 
       if (response === undefined) return {};
 
@@ -126,7 +113,7 @@ const ReleaseManageDataBlocksPage = ({
         },
       };
     },
-    [handleApiErrors],
+    [],
   );
 
   const currentlyLoadingDataBlockId = useRef<string>();
@@ -177,35 +164,30 @@ const ReleaseManageDataBlocksPage = ({
     () => async (db: DataBlock): Promise<DataBlock> => {
       setIsSaving(true);
 
-      try {
-        let newDataBlock;
-        let newDataBlocksList;
+      let newDataBlock;
+      let newDataBlocksList;
 
-        if (db.id) {
-          newDataBlock = await dataBlocksService.putDataBlock(db.id, db);
-          newDataBlocksList = [
-            ...dataBlocks.filter(db => db.id !== selectedDataBlock),
-            newDataBlock,
-          ];
-        } else {
-          newDataBlock = await dataBlocksService.postDataBlock(releaseId, db);
-          newDataBlocksList = [...dataBlocks, newDataBlock];
-        }
-        setDataBlocks(newDataBlocksList);
-
-        setSelectedDataBlock(newDataBlock.id || '');
-
-        doLoad(releaseId, selectedDataBlock, newDataBlocksList);
-
-        setIsSaving(false);
-
-        return newDataBlock;
-      } catch (err) {
-        handleApiErrors(err);
-        throw err;
+      if (db.id) {
+        newDataBlock = await dataBlocksService.putDataBlock(db.id, db);
+        newDataBlocksList = [
+          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
+          newDataBlock,
+        ];
+      } else {
+        newDataBlock = await dataBlocksService.postDataBlock(releaseId, db);
+        newDataBlocksList = [...dataBlocks, newDataBlock];
       }
+      setDataBlocks(newDataBlocksList);
+
+      setSelectedDataBlock(newDataBlock.id || '');
+
+      doLoad(releaseId, selectedDataBlock, newDataBlocksList);
+
+      setIsSaving(false);
+
+      return newDataBlock;
     },
-    [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
+    [dataBlocks, doLoad, releaseId, selectedDataBlock],
   );
 
   useEffect(() => {
@@ -321,4 +303,4 @@ const ReleaseManageDataBlocksPage = ({
   );
 };
 
-export default withErrorControl(ReleaseManageDataBlocksPage);
+export default ReleaseManageDataBlocksPage;

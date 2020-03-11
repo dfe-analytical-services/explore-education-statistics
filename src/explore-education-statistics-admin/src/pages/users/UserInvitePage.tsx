@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
 import { UserInvite } from '@admin/services/users/types';
@@ -119,4 +118,4 @@ const UserInvitePage = ({
   );
 };
 
-export default withErrorControl(UserInvitePage);
+export default UserInvitePage;

@@ -1,6 +1,4 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
@@ -86,11 +84,7 @@ interface DeleteDataFile {
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataUploadsSection = ({
-  publicationId,
-  releaseId,
-  handleApiErrors,
-}: Props & ErrorControlState) => {
+const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
@@ -100,13 +94,11 @@ const ReleaseDataUploadsSection = ({
     Promise.all([
       editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([releaseDataFiles, canUpdateReleaseResponse]) => {
-        setDataFiles(releaseDataFiles);
-        setCanUpdateRelease(canUpdateReleaseResponse);
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
+      setDataFiles(releaseDataFiles);
+      setCanUpdateRelease(canUpdateReleaseResponse);
+    });
+  }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -118,12 +110,8 @@ const ReleaseDataUploadsSection = ({
         fileInput.value = '';
       });
 
-    try {
-      const files = await editReleaseDataService.getReleaseDataFiles(releaseId);
-      setDataFiles(files);
-    } catch (err) {
-      handleApiErrors(err);
-    }
+    const files = await editReleaseDataService.getReleaseDataFiles(releaseId);
+    setDataFiles(files);
   };
 
   const statusChangeHandler = async (
@@ -295,12 +283,10 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Data file">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService
-                                  .downloadDataFile(
-                                    releaseId,
-                                    dataFile.filename,
-                                  )
-                                  .catch(handleApiErrors)
+                                editReleaseDataService.downloadDataFile(
+                                  releaseId,
+                                  dataFile.filename,
+                                )
                               }
                             >
                               {dataFile.filename}
@@ -309,12 +295,10 @@ const ReleaseDataUploadsSection = ({
                           <SummaryListItem term="Metadata file">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService
-                                  .downloadDataMetadataFile(
-                                    releaseId,
-                                    dataFile.metadataFilename,
-                                  )
-                                  .catch(handleApiErrors)
+                                editReleaseDataService.downloadDataMetadataFile(
+                                  releaseId,
+                                  dataFile.metadataFilename,
+                                )
                               }
                             >
                               {dataFile.metadataFilename}
@@ -358,7 +342,6 @@ const ReleaseDataUploadsSection = ({
                                           file: dataFile,
                                         });
                                       })
-                                      .catch(handleApiErrors)
                                   }
                                 >
                                   Delete files
@@ -386,7 +369,6 @@ const ReleaseDataUploadsSection = ({
                       releaseId,
                       (deleteDataFile as DeleteDataFile).file,
                     )
-                    .catch(handleApiErrors)
                     .finally(() => {
                       setDeleteDataFile(undefined);
                       resetPage(form);
@@ -444,4 +426,4 @@ const ReleaseDataUploadsSection = ({
   );
 };
 
-export default withErrorControl(ReleaseDataUploadsSection);
+export default ReleaseDataUploadsSection;

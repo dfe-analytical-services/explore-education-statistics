@@ -2,7 +2,6 @@ import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
 import dashboardService from '@admin/services/dashboard/service';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -20,7 +19,7 @@ interface Props
     }>,
     ErrorControlState {}
 
-const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
+const ThemeTopicWrapper = ({ match }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -37,24 +36,16 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
       setState('OKAY');
     } else {
       setState('LOADING');
-      dashboardService
-        .getMyThemesAndTopics()
-        .then(themeList => {
-          const { themeId, topicId } = match.params;
-          const theme = themeList.find(({ id }) => id === themeId);
-          if (!theme) return setState('404');
-          const topic = theme.topics.find(({ id }) => id === topicId);
-          if (!topic) return setState('404');
-          return setSelectedThemeAndTopic({ theme, topic });
-        })
-        .catch(handleApiErrors);
+      dashboardService.getMyThemesAndTopics().then(themeList => {
+        const { themeId, topicId } = match.params;
+        const theme = themeList.find(({ id }) => id === themeId);
+        if (!theme) return setState('404');
+        const topic = theme.topics.find(({ id }) => id === topicId);
+        if (!topic) return setState('404');
+        return setSelectedThemeAndTopic({ theme, topic });
+      });
     }
-  }, [
-    match.params,
-    selectedThemeAndTopic,
-    setSelectedThemeAndTopic,
-    handleApiErrors,
-  ]);
+  }, [match.params, selectedThemeAndTopic, setSelectedThemeAndTopic]);
 
   const page404 = (
     <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
@@ -88,4 +79,4 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
   }
 };
 
-export default withErrorControl(ThemeTopicWrapper);
+export default ThemeTopicWrapper;

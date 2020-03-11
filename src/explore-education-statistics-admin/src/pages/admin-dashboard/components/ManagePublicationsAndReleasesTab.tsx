@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
-import withErrorControl from '@admin/hocs/withErrorControl';
 import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
@@ -47,17 +45,12 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
-export interface Props
-  extends RouteComponentProps<{
-      themeId?: string;
-      topicId?: string;
-    }>,
-    ErrorControlState {}
-
 const ManagePublicationsAndReleasesTab = ({
   match,
-  handleApiErrors,
-}: Props) => {
+}: RouteComponentProps<{
+  themeId?: string;
+  topicId?: string;
+}>) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -119,9 +112,8 @@ const ManagePublicationsAndReleasesTab = ({
       .getMyThemesAndTopics()
       .then(themeList =>
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+      );
+  }, []);
 
   useEffect(() => {
     if (themes) {
@@ -284,4 +276,4 @@ const ManagePublicationsAndReleasesTab = ({
   );
 };
 
-export default withErrorControl(withRouter(ManagePublicationsAndReleasesTab));
+export default withRouter(ManagePublicationsAndReleasesTab);
