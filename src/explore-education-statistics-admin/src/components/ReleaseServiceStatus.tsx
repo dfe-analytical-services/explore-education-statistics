@@ -6,6 +6,7 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { forceCheck } from 'react-lazyload';
 
 interface Props {
   releaseId: string;
@@ -54,6 +55,7 @@ const ReleaseServiceStatus = ({
           }
         }
       })
+      .then(forceCheck)
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors, refreshPeriod]);
 
