@@ -1,8 +1,13 @@
+import { produce } from 'immer';
 import {
   EditableContentBlock,
   EditableRelease,
 } from '@admin/services/publicationService';
-import { releaseReducer } from '../ReleaseContext';
+import {
+  releaseReducer as originalReleaseReducer,
+  ReleaseContextState,
+} from '../ReleaseContext';
+import ReleaseDispatchAction from '../actions';
 
 const basicRelease: EditableRelease = {
   id: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
@@ -286,6 +291,11 @@ const basicDataBlock = {
     subjectId: 'subjectId',
   },
 };
+
+const releaseReducer = (
+  initial: ReleaseContextState,
+  action: ReleaseDispatchAction,
+) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContext', () => {
   test('CLEAR_STATE clears state', () => {

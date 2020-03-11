@@ -7,6 +7,7 @@ import { DataBlock } from '@common/services/dataBlockService';
 import { ContentSection } from '@common/services/publicationService';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
+import remove from 'lodash/remove';
 import ReleaseDispatchAction from './actions';
 
 type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
@@ -29,56 +30,49 @@ export const releaseReducer: Reducer<
   ReleaseContextState,
   ReleaseDispatchAction
 > = (draft, action) => {
+  console.log(action.type);
   switch (action.type) {
-    case 'CLEAR_STATE':
+    case 'CLEAR_STATE': {
       return {
         release: undefined,
         canUpdateRelease: false,
         availableDataBlocks: [],
         unresolvedComments: [],
       };
+    }
     case 'SET_STATE':
-    case 'SET_AVAILABLE_DATABLOCKS':
+    case 'SET_AVAILABLE_DATABLOCKS': {
       return { ...draft, ...action.payload };
+    }
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
-      if (
-        draft.release === undefined ||
-        typeof draft.release[sectionKey] !== 'object'
-      ) {
+      if (!draft.release?.[sectionKey]) {
         throw new Error('REMOVE_BLOCK_FROM_SECTION: failed');
-      } else if (sectionKey === 'content') {
-        draft.release[sectionKey] = draft.release[sectionKey].map(section => {
-          if (section.id === sectionId) {
-            return {
-              ...section,
-              content: section.content?.filter(
-                contentBlock => (contentBlock.id as string) !== blockId,
-              ),
-            } as ContentSection<EditableContentBlock>;
-          }
-          return section;
-        });
-      } else {
-        (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content = (draft.release[sectionKey] as ContentSection<
-          EditableContentBlock
-        >).content?.filter(
-          contentBlock => (contentBlock.id as string) !== blockId,
+      }
+
+      if (sectionKey === 'content') {
+        const matchingSection = draft.release[sectionKey].find(
+          section => section.id === sectionId,
+        );
+        if (matchingSection?.content) {
+          remove(matchingSection.content, content => content.id === blockId);
+        }
+      } else if (draft.release?.[sectionKey]?.content) {
+        remove(
+          draft.release?.[sectionKey]?.content,
+          content => content.id === blockId,
         );
       }
+
       return draft;
     }
     case 'UPDATE_BLOCK_FROM_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
-      if (
-        draft.release === undefined ||
-        typeof draft.release[sectionKey] !== 'object'
-      ) {
+      if (!draft.release || !draft.release[sectionKey]) {
         throw new Error('UPDATE_BLOCK_FROM_SECTION: failed');
-      } else if (sectionKey === 'content') {
+      }
+      if (sectionKey === 'content') {
         draft.release[sectionKey] = draft.release[sectionKey].map(section => {
           if (section.id === sectionId) {
             return {
@@ -110,12 +104,10 @@ export const releaseReducer: Reducer<
     case 'ADD_BLOCK_TO_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (
-        draft.release === undefined ||
-        typeof draft.release[sectionKey] !== 'object'
-      ) {
+      if (!draft.release || !draft.release[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
-      } else if (sectionKey === 'content') {
+      }
+      if (sectionKey === 'content') {
         draft.release[sectionKey] = draft.release[sectionKey].map(section => {
           if (section.id === sectionId) {
             return {
@@ -146,12 +138,10 @@ export const releaseReducer: Reducer<
     case 'UPDATE_SECTION_CONTENT': {
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (
-        draft.release === undefined ||
-        typeof draft.release[sectionKey] !== 'object'
-      ) {
+      if (!draft.release || !draft.release[sectionKey]) {
         throw new Error('ADD_BLOCK_TO_SECTION: failed');
-      } else if (sectionKey === 'content') {
+      }
+      if (sectionKey === 'content') {
         draft.release[sectionKey] = draft.release[sectionKey].map(section => {
           if (section.id === sectionId) {
             return { ...section, content: sectionContent };
