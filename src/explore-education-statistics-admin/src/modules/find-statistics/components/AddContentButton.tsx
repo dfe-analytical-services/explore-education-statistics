@@ -1,6 +1,6 @@
-import React from 'react';
 import Button from '@common/components/Button';
 import { DataBlock } from '@common/services/dataBlockService';
+import React from 'react';
 import DatablockSelectForm from './DatablockSelectForm';
 
 interface AddContentButtonProps {
@@ -32,7 +32,7 @@ const AddContentButton = ({
         )}
         {!textOnly && (
           <Button variant="secondary" onClick={() => setShowDataBlocks(true)}>
-            Add DataBlock
+            Add data block
           </Button>
         )}
       </div>
