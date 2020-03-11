@@ -159,12 +159,10 @@ export const releaseReducer: Reducer<
       const { sectionId } = meta;
 
       if (draft.release) {
-        draft.release.content = draft.release.content.map(accordionSection => {
-          if (accordionSection.id === sectionId) {
-            return section;
-          }
-          return accordionSection;
-        });
+        const sectionIndex = draft.release.content.findIndex(
+          accordionSection => accordionSection.id === sectionId,
+        );
+        if (sectionIndex !== -1) draft.release.content[sectionIndex] = section;
       }
       return draft;
     }

@@ -63,16 +63,19 @@ const EditableContentBlocks = ({
     }
   }, [isReordering]);
 
-  const onDragEnd = useCallback((result: DropResult) => {
-    const { source, destination, type } = result;
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      const { source, destination, type } = result;
 
-    if (type === 'content' && destination) {
-      const newContentBlocks = [...(contentBlocks || [])];
-      const [removed] = newContentBlocks.splice(source.index, 1);
-      newContentBlocks.splice(destination.index, 0, removed);
-      setContentBlocks(newContentBlocks);
-    }
-  }, []);
+      if (type === 'content' && destination) {
+        const newContentBlocks = [...(contentBlocks || [])];
+        const [removed] = newContentBlocks.splice(source.index, 1);
+        newContentBlocks.splice(destination.index, 0, removed);
+        setContentBlocks(newContentBlocks);
+      }
+    },
+    [contentBlocks],
+  );
 
   if (contentBlocks === undefined || contentBlocks.length === 0) {
     return (
