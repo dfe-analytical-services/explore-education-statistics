@@ -1,10 +1,10 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyStatus } from '@admin/services/common/types';
 import service from '@admin/services/methodology/service';
 import permissionService from '@admin/services/permissions/service';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
@@ -71,23 +71,22 @@ const MethodologyStatusPage = ({
       .catch(handleApiErrors);
   }, [methodologyId, handleApiErrors, showForm]);
 
-  if (!model) return null;
-
-  const formId = 'methodologyStatusForm';
-
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      await service.updateMethodologyStatus(methodologyId, values).then(() => {
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    await service.updateMethodologyStatus(methodologyId, values).then(() => {
+      if (model) {
         setModel({
           ...model,
           methodologyStatus: values.status,
         });
+      }
 
-        setShowForm(false);
-      });
-    },
-    handleApiErrors,
-  );
+      setShowForm(false);
+    });
+  });
+
+  if (!model) return null;
+
+  const formId = 'methodologyStatusForm';
 
   return (
     <>
@@ -115,7 +114,7 @@ const MethodologyStatusPage = ({
             status: model.methodologyStatus,
             internalReleaseNote: '',
           }}
-          onSubmit={submitFormHandler}
+          onSubmit={handleSubmit}
           validationSchema={Yup.object<FormValues>({
             status: Yup.mixed().required('Choose a status'),
             internalReleaseNote: Yup.string().required(

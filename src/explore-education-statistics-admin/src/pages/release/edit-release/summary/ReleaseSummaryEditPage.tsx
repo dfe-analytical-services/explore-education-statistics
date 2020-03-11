@@ -1,5 +1,6 @@
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -10,7 +11,6 @@ import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/releas
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
@@ -21,6 +21,20 @@ import {
 } from '@common/services/publicationService';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'timePeriodCoverageStartYear',
+    'Choose a unique combination of time period and start year',
+  ),
+  errorCodeAndFieldNameToFieldError(
+    'PARTIAL_DATE_NOT_VALID',
+    'NextReleaseDate',
+    'nextReleaseDate',
+    'Enter a valid date',
+  ),
+];
 
 const ReleaseSummaryEditPage = ({
   history,
@@ -43,33 +57,15 @@ const ReleaseSummaryEditPage = ({
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'SLUG_NOT_UNIQUE',
-      'timePeriodCoverageStartYear',
-      'Choose a unique combination of time period and start year',
-    ),
-    errorCodeAndFieldNameToFieldError(
-      'PARTIAL_DATE_NOT_VALID',
-      'NextReleaseDate',
-      'nextReleaseDate',
-      'Enter a valid date',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<EditFormValues>(async values => {
+    const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
+      releaseId,
+      values,
+    );
 
-  const submitFormHandler = submitWithFormikValidation<EditFormValues>(
-    async values => {
-      const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
-        releaseId,
-        values,
-      );
-
-      await service.updateReleaseSummaryDetails(updatedReleaseDetails);
-      history.push(summaryRoute.generateLink(publication.id, releaseId));
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    await service.updateReleaseSummaryDetails(updatedReleaseDetails);
+    history.push(summaryRoute.generateLink(publication.id, releaseId));
+  }, errorCodeMappings);
 
   const cancelHandler = () =>
     history.push(summaryRoute.generateLink(publication.id, releaseId));
@@ -96,7 +92,7 @@ const ReleaseSummaryEditPage = ({
                 releaseSummaryDetails.nextReleaseDate,
               ),
             })}
-            onSubmitHandler={submitFormHandler}
+            onSubmitHandler={handleSubmit}
             onCancelHandler={cancelHandler}
           />
         </>

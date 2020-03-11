@@ -1,9 +1,9 @@
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { BasicMethodology, IdTitlePair } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Button from '@common/components/Button';
 import {
   FormFieldRadioGroup,
@@ -17,6 +17,29 @@ import Yup from '@common/lib/validation/yup';
 import { Form, FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'METHODOLOGY_DOES_NOT_EXIST',
+    'methodologyChoice',
+    'There was a problem adding the selected methodology',
+  ),
+  errorCodeToFieldError(
+    'METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED',
+    'methodologyChoice',
+    'Choose a methodology that is Live or ready to be published',
+  ),
+  errorCodeToFieldError(
+    'METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED',
+    'methodologyChoice',
+    'Either an existing methodology or an external methodology link must be provided',
+  ),
+  errorCodeToFieldError(
+    'CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY',
+    'methodologyChoice',
+    'Either an existing methodology or an external methodology link must be provided',
+  ),
+];
 
 export interface AssignMethodologyFormValues {
   methodologyChoice?: 'existing' | 'external' | 'later';
@@ -49,32 +72,7 @@ const AssignMethodologyForm = ({
       .catch(handleApiErrors);
   }, [currentMethodology, currentExternalMethodology, handleApiErrors]);
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'METHODOLOGY_DOES_NOT_EXIST',
-      'methodologyChoice',
-      'There was a problem adding the selected methodology',
-    ),
-    errorCodeToFieldError(
-      'METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED',
-      'methodologyChoice',
-      'Choose a methodology that is Live or ready to be published',
-    ),
-    errorCodeToFieldError(
-      'METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED',
-      'methodologyChoice',
-      'Either an existing methodology or an external methodology link must be provided',
-    ),
-    errorCodeToFieldError(
-      'CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY',
-      'methodologyChoice',
-      'Either an existing methodology or an external methodology link must be provided',
-    ),
-  ];
-
-  const submitFormHandler = submitWithFormikValidation<
-    AssignMethodologyFormValues
-  >(
+  const handleSubmit = useFormSubmit<AssignMethodologyFormValues>(
     async values => {
       const newMethodology = {
         externalMethodology:
@@ -91,8 +89,7 @@ const AssignMethodologyForm = ({
         ...newMethodology,
       });
     },
-    handleApiErrors,
-    ...errorCodeMappings,
+    errorCodeMappings,
   );
 
   if (!formOpen)
@@ -171,7 +168,7 @@ const AssignMethodologyForm = ({
             }),
           })}
           onSubmit={(values, actions) => {
-            submitFormHandler(values, actions).then(refreshPublication);
+            handleSubmit(values, actions).then(refreshPublication);
           }}
           render={(form: FormikProps<AssignMethodologyFormValues>) => (
             <Form id={formId}>

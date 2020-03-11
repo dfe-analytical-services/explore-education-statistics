@@ -1,13 +1,13 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
   DataFile,
   DeleteDataFilePlan,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -24,6 +24,49 @@ import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_DATA_FILE',
+    'dataFile',
+    'Choose a unique data file name',
+  ),
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_METADATA_FILE',
+    'metadataFile',
+    'Choose a unique metadata file name',
+  ),
+  errorCodeToFieldError(
+    'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
+    'dataFile',
+    'Choose a different file name for data and metadata files',
+  ),
+  errorCodeToFieldError(
+    'DATA_FILE_CANNOT_BE_EMPTY',
+    'dataFile',
+    'Choose a data file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'METADATA_FILE_CANNOT_BE_EMPTY',
+    'metadataFile',
+    'Choose a metadata file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'DATA_FILE_MUST_BE_CSV_FILE',
+    'dataFile',
+    'Data file must be a csv file',
+  ),
+  errorCodeToFieldError(
+    'META_FILE_MUST_BE_CSV_FILE',
+    'metadataFile',
+    'Meta file must be a csv file',
+  ),
+  errorCodeToFieldError(
+    'SUBJECT_TITLE_MUST_BE_UNIQUE',
+    'subjectTitle',
+    'Subject title must be unique',
+  ),
+];
 
 interface FormValues {
   subjectTitle: string;
@@ -101,62 +144,15 @@ const ReleaseDataUploadsSection = ({
     setDataFiles(updatedDataFiles);
   };
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_DATA_FILE',
-      'dataFile',
-      'Choose a unique data file name',
-    ),
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_METADATA_FILE',
-      'metadataFile',
-      'Choose a unique metadata file name',
-    ),
-    errorCodeToFieldError(
-      'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
-      'dataFile',
-      'Choose a different file name for data and metadata files',
-    ),
-    errorCodeToFieldError(
-      'DATA_FILE_CANNOT_BE_EMPTY',
-      'dataFile',
-      'Choose a data file that is not empty',
-    ),
-    errorCodeToFieldError(
-      'METADATA_FILE_CANNOT_BE_EMPTY',
-      'metadataFile',
-      'Choose a metadata file that is not empty',
-    ),
-    errorCodeToFieldError(
-      'DATA_FILE_MUST_BE_CSV_FILE',
-      'dataFile',
-      'Data file must be a csv file',
-    ),
-    errorCodeToFieldError(
-      'META_FILE_MUST_BE_CSV_FILE',
-      'metadataFile',
-      'Meta file must be a csv file',
-    ),
-    errorCodeToFieldError(
-      'SUBJECT_TITLE_MUST_BE_UNIQUE',
-      'subjectTitle',
-      'Subject title must be unique',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await editReleaseDataService.uploadDataFiles(releaseId, {
+      subjectTitle: values.subjectTitle,
+      dataFile: values.dataFile as File,
+      metadataFile: values.metadataFile as File,
+    });
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await editReleaseDataService.uploadDataFiles(releaseId, {
-        subjectTitle: values.subjectTitle,
-        dataFile: values.dataFile as File,
-        metadataFile: values.metadataFile as File,
-      });
-
-      await resetPage(actions);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    await resetPage(actions);
+  }, errorCodeMappings);
 
   return (
     <Formik<FormValues>
@@ -166,7 +162,7 @@ const ReleaseDataUploadsSection = ({
         dataFile: null,
         metadataFile: null,
       }}
-      onSubmit={submitFormHandler}
+      onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')

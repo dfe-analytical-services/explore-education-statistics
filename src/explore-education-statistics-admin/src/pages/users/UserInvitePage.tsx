@@ -2,9 +2,9 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
 import { UserInvite } from '@admin/services/users/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
@@ -16,38 +16,34 @@ import Yup from '@common/lib/validation/yup';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'USER_ALREADY_EXISTS',
+    'userEmail',
+    'User already exists',
+  ),
+];
+
 interface FormValues {
   userEmail: string;
 }
 
 const UserInvitePage = ({
   history,
-  handleApiErrors,
 }: RouteComponentProps & ErrorControlState) => {
   const formId = 'inviteUserForm';
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'USER_ALREADY_EXISTS',
-      'userEmail',
-      'User already exists',
-    ),
-  ];
   const cancelHandler = () => history.push('/administration/users');
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      const submission: UserInvite = {
-        email: values.userEmail,
-      };
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    const submission: UserInvite = {
+      email: values.userEmail,
+    };
 
-      await userService.inviteUser(submission);
+    await userService.inviteUser(submission);
 
-      history.push(`/administration/users`);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    history.push(`/administration/users`);
+  }, errorCodeMappings);
 
   return (
     <Page
@@ -91,7 +87,7 @@ const UserInvitePage = ({
                 .required('Provide the users email')
                 .email('Provide a valid email address'),
             })}
-            onSubmit={submitFormHandler}
+            onSubmit={handleSubmit}
             render={_ => {
               return (
                 <Form id={formId}>

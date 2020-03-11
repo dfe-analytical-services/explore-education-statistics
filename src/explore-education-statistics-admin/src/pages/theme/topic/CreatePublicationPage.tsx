@@ -3,12 +3,12 @@ import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
 import { Dictionary } from '@admin/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, FormGroup, Formik } from '@common/components/form';
@@ -26,6 +26,14 @@ import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'publicationTitle',
+    'Choose a unique title',
+  ),
+];
 
 interface FormValues extends AssignMethodologyFormValues {
   publicationTitle: string;
@@ -61,35 +69,26 @@ const CreatePublicationPage = ({
       .catch(handleApiErrors);
   }, [topic, handleApiErrors]);
 
-  const submitFormHandler = submitWithFormikValidation(
-    async (values: FormValues) => {
-      const methodology: Dictionary<
-        string | undefined | ExternalMethodology
-      > = {
-        selectedMethodologyId: undefined,
-        externalMethodology: undefined,
-      };
-      if (values.methodologyChoice === 'existing') {
-        methodology.selectedMethodologyId = values.selectedMethodologyId as string;
-      }
-      if (values.methodologyChoice === 'external') {
-        methodology.externalMethodology = values.externalMethodology;
-      }
-      await service.createPublication({
-        topicId: topic.id,
-        ...values,
-        ...methodology,
-      });
+  const handleSubmit = useFormSubmit(async (values: FormValues) => {
+    const methodology: Dictionary<string | undefined | ExternalMethodology> = {
+      selectedMethodologyId: undefined,
+      externalMethodology: undefined,
+    };
+    if (values.methodologyChoice === 'existing') {
+      methodology.selectedMethodologyId = values.selectedMethodologyId as string;
+    }
+    if (values.methodologyChoice === 'external') {
+      methodology.externalMethodology = values.externalMethodology;
+    }
+    await service.createPublication({
+      topicId: topic.id,
+      ...values,
+      ...methodology,
+    });
 
-      history.push(appRouteList.adminDashboard.path as string);
-    },
-    handleApiErrors,
-    errorCodeToFieldError(
-      'SLUG_NOT_UNIQUE',
-      'publicationTitle',
-      'Choose a unique title',
-    ),
-  );
+    history.push(appRouteList.adminDashboard.path as string);
+  }, errorCodeMappings);
+
   const cancelHandler = () => {
     history.push(appRouteList.adminDashboard.path as string);
   };
@@ -170,7 +169,7 @@ const CreatePublicationPage = ({
               }),
             }),
           })}
-          onSubmit={submitFormHandler}
+          onSubmit={handleSubmit}
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>

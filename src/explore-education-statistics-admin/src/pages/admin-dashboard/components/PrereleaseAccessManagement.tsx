@@ -1,9 +1,9 @@
 import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import withErrorControl from '@admin/hocs/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
@@ -82,13 +82,9 @@ const PrereleaseAccessManagement = ({
       .catch(handleApiErrors);
   };
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await inviteUserByEmail(values.email, actions.resetForm);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await inviteUserByEmail(values.email, actions.resetForm);
+  }, errorCodeMappings);
 
   return (
     <>
@@ -102,7 +98,7 @@ const PrereleaseAccessManagement = ({
             validationSchema={Yup.object<FormValues>({
               email: Yup.string().email('Enter a valid email address'),
             })}
-            onSubmit={submitFormHandler}
+            onSubmit={handleSubmit}
             render={() => {
               return (
                 <Form id={formId}>
