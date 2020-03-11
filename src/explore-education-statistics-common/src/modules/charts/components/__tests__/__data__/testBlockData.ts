@@ -434,7 +434,6 @@ const AbstractChartProps: ChartProps = {
   height: 300,
 
   legend: 'top',
-  legendHeight: '50',
 
   labels: {
     '23_1_2_____': {

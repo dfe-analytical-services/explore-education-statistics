@@ -140,7 +140,6 @@ const ChartBuilder = ({
   const [chartOptions, setChartOptions] = useState<ChartOptions>({
     stacked: false,
     legend: 'top',
-    legendHeight: '42',
     height: 300,
     title: '',
   });
@@ -314,7 +313,6 @@ const ChartBuilder = ({
       type,
       stacked = false,
       legend = 'top',
-      legendHeight = '42',
       height = 300,
       width,
       title = '',
@@ -325,7 +323,6 @@ const ChartBuilder = ({
     }: Chart = {
       stacked: false,
       legend: 'top',
-      legendHeight: '42',
       height: 300,
       title: '',
     },
@@ -352,7 +349,6 @@ const ChartBuilder = ({
       options: {
         stacked,
         legend,
-        legendHeight,
         height,
         width,
         title,
