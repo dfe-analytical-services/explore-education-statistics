@@ -152,6 +152,8 @@ const ChartAxisConfiguration = ({
         onSubmit(normalizeValues(values));
       }}
       validationSchema={Yup.object<Partial<AxisConfiguration>>({
+        size: Yup.number().positive('Size of axis must be positive'),
+        sortAsc: Yup.boolean(),
         tickConfig: Yup.string().oneOf([
           'default',
           'startEnd',
@@ -161,6 +163,8 @@ const ChartAxisConfiguration = ({
           is: 'custom',
           then: Yup.number().positive('Tick spacing must be positive'),
         }),
+        max: Yup.number(),
+        min: Yup.number(),
       })}
       render={form => (
         <Form id={id}>
@@ -264,7 +268,7 @@ const ChartAxisConfiguration = ({
                         name="max"
                         type="number"
                         width={10}
-                        label="Maximum Value"
+                        label="Maximum value"
                       />
                     </FormGroup>
                   </div>
