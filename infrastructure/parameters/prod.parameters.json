@@ -28,6 +28,12 @@
     },
     "domain": {
       "value": "s101p02-as-ees-public.azurewebsites.net"
+    },
+    "contentApiUrl": {
+      "value": "s101p02-as-ees-content.azurewebsites.net"
+    },
+    "dataApiUrl": {
+      "value": "s101p02-as-ees-data.azurewebsites.net"
     }
   }
 }

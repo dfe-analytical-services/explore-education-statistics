@@ -5,6 +5,12 @@
     "domain": {
       "type": "string"
     },
+    "contentApiUrl": {
+      "type": "string"
+    },
+    "dataApiUrl": {
+      "type": "string"
+    },
     "subscription": {
       "type": "string",
       "metadata": {
@@ -1183,11 +1189,11 @@
             },
             {
               "name": "CONTENT_API_BASE_URL",
-              "value": "[concat('https://', variables('contentAppName'),'.azurewebsites.net/api')]"
+              "value": "[concat('https://', parameters('contentApiUrl'),'/api')]"
             },
             {
               "name": "DATA_API_BASE_URL",
-              "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/api')]"
+              "value": "[concat('https://', parameters('dataApiUrl'),'/api')]"
             },
             {
               "name": "FUNCTION_API_BASE_URL",
