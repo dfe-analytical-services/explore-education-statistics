@@ -1,7 +1,7 @@
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import permissionService from '@admin/services/permissions/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';

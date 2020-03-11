@@ -1,8 +1,6 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import useReleaseActions from '@admin/pages/release/edit-release/content/helpers';
-import ManageReleaseContext, {
-  useManageReleaseContext,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
