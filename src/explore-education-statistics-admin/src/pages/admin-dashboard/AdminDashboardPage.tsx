@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -13,7 +13,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAndReleasesTab';
 
 interface Model {
@@ -22,7 +22,7 @@ interface Model {
 }
 
 const AdminDashboardPage = () => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
   const [model, setModel] = useState<Model>();
   useEffect(() => {
     Promise.all([

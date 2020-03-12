@@ -1,8 +1,19 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
 import permissionService from '@admin/services/permissions/service';
-import LoginContext from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/sign-in/types';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+const AuthContext = createContext<Authentication>({
+  user: undefined,
+});
 
 interface Props {
   children: ReactNode;
@@ -13,13 +24,7 @@ interface State {
   user?: User;
 }
 
-/**
- * A component that surrounds all authentication-aware Routes and provides the logged-in user details
- *
- * @param children
- * @constructor
- */
-const ProtectedRoutes = ({ children }: Props) => {
+export const AuthContextProvider = ({ children }: Props) => {
   const [authState, setAuthState] = useState<State>({
     ready: false,
     user: undefined,
@@ -38,12 +43,12 @@ const ProtectedRoutes = ({ children }: Props) => {
         const permissions = validToken
           ? await permissionService.getGlobalPermissions()
           : {
-              canAccessSystem: false,
-              canAccessPrereleasePages: false,
-              canAccessAnalystPages: false,
-              canAccessUserAdministrationPages: false,
-              canAccessMethodologyAdministrationPages: false,
-            };
+            canAccessSystem: false,
+            canAccessPrereleasePages: false,
+            canAccessAnalystPages: false,
+            canAccessUserAdministrationPages: false,
+            canAccessMethodologyAdministrationPages: false,
+          };
 
         const user: User = {
           id: userId,
@@ -70,35 +75,37 @@ const ProtectedRoutes = ({ children }: Props) => {
     }
   }, []);
 
-  const handleAuthenticationStateChanged = useCallback(() => {
-    setAuthState({
-      ready: false,
-      user: undefined,
-    });
-    populateAuthenticationState();
-  }, [populateAuthenticationState]);
-
   useEffect(() => {
-    const subscriptionId = authService.subscribe(
-      handleAuthenticationStateChanged,
-    );
+    const subscriptionId = authService.subscribe(() => {
+      setAuthState({
+        ready: false,
+        user: undefined,
+      });
+
+      populateAuthenticationState();
+    });
 
     populateAuthenticationState();
 
     return () => {
       authService.unsubscribe(subscriptionId);
     };
-  }, [populateAuthenticationState, handleAuthenticationStateChanged]);
+  }, [populateAuthenticationState]);
 
-  const authenticationContext: Authentication = {
-    user: authState.user,
-  };
+  const loginContext: Authentication = useMemo(
+    () => ({
+      user: authState.user,
+    }),
+    [authState.user],
+  );
 
   return authState.ready ? (
-    <LoginContext.Provider value={authenticationContext}>
+    <AuthContext.Provider value={loginContext}>
       {children}
-    </LoginContext.Provider>
+    </AuthContext.Provider>
   ) : null;
 };
 
-export default ProtectedRoutes;
+export function useAuthContext() {
+  return useContext(AuthContext);
+}

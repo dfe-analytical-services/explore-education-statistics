@@ -1,5 +1,5 @@
-import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import {
   ErrorControlState,
   useErrorControl,
@@ -9,7 +9,7 @@ import permissionService from '@admin/services/permissions/service';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { format } from 'date-fns';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface Model {
@@ -27,7 +27,7 @@ const PreReleasePage = ({
   const { handleManualErrors } = useErrorControl();
   const [model, setModel] = useState<Model>();
 
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   const { releaseId } = match.params;
 

@@ -3,6 +3,7 @@ import ConfigureAxios from '@admin/components/ConfigureAxios';
 import ErrorBoundary from '@admin/components/ErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
+import { AuthContextProvider } from '@admin/contexts/AuthContext';
 import React from 'react';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
@@ -29,20 +30,22 @@ function App() {
 
   return (
     <ThemeAndTopic>
-      <BrowserRouter>
-        <ErrorBoundary>
-          <ConfigureAxios>
-            <Switch>
-              {authRoutes}
-              {appRoutes}
-              <ProtectedRoute
-                allowAnonymousUsers
-                component={PageNotFoundPage}
-              />
-            </Switch>
-          </ConfigureAxios>
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ConfigureAxios>
+        <AuthContextProvider>
+          <BrowserRouter>
+            <ErrorBoundary>
+              <Switch>
+                {authRoutes}
+                {appRoutes}
+                <ProtectedRoute
+                  allowAnonymousUsers
+                  component={PageNotFoundPage}
+                />
+              </Switch>
+            </ErrorBoundary>
+          </BrowserRouter>
+        </AuthContextProvider>
+      </ConfigureAxios>
     </ThemeAndTopic>
   );
 }
