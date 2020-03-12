@@ -1,7 +1,6 @@
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
@@ -15,6 +14,15 @@ import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_FILE',
+    'file',
+    'Choose a unique file',
+  ),
+];
 
 interface FormValues {
   name: string;
@@ -49,8 +57,7 @@ const InfographicChartForm = ({
   releaseId,
   fileId,
   onChange,
-  handleApiErrors,
-}: InfographicChartOptionsProps & ErrorControlProps) => {
+}: InfographicChartOptionsProps) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -58,42 +65,29 @@ const InfographicChartForm = ({
 
   const formId = 'fileUploadForm';
 
-  const errorCodeMappings = [
-    errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_FILE',
-      'file',
-      'Choose a unique file',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    if (values.file) {
+      setUploading(true);
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      if (values.file) {
-        setUploading(true);
-
-        await editReleaseDataService
-          .uploadChartFile(releaseId, {
-            name: values.name,
-            file: values.file as File,
-          })
-          .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
-          .then(setChartFileOptions)
-          .then(() => onChange((values.file as File).name))
-          .finally(() => {
-            setUploading(false);
-          });
-      }
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+      await editReleaseDataService
+        .uploadChartFile(releaseId, {
+          name: values.name,
+          file: values.file as File,
+        })
+        .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
+        .then(setChartFileOptions)
+        .then(() => onChange((values.file as File).name))
+        .finally(() => {
+          setUploading(false);
+        });
+    }
+  }, errorCodeMappings);
 
   useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId)
-      .then(setChartFileOptions)
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+    loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
+      setChartFileOptions,
+    );
+  }, [releaseId]);
 
   const selectedFile = chartFileOptions.find(
     fileOption => fileOption.value === fileId,
@@ -112,7 +106,7 @@ const InfographicChartForm = ({
         file: Yup.mixed().required('Choose a file'),
         fileId: Yup.string(),
       })}
-      onSubmit={submitFormHandler}
+      onSubmit={handleSubmit}
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
@@ -140,8 +134,7 @@ const InfographicChartForm = ({
                         .then(() =>
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),
                         )
-                        .then(setChartFileOptions)
-                        .catch(handleApiErrors);
+                        .then(setChartFileOptions);
                     onChange('');
                     toggleDeleteFile(false);
                   }}

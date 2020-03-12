@@ -5,16 +5,13 @@ import {
   ImportStatus,
   ImportStatusCode,
 } from '@admin/services/release/imports/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
-interface Props extends ErrorControlProps {
+interface Props {
   releaseId: string;
   dataFile: DataFile;
   onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
@@ -93,8 +90,6 @@ class ImporterStatus extends Component<Props> {
       this.setState({ isFetching: true });
     }
 
-    const { handleApiErrors } = this.props;
-
     // NOTE: The intervalRef check is because the request may be in progress
     // when the timer is canceled. This prevents setState being called after
     // the component has unmounted.
@@ -121,7 +116,6 @@ class ImporterStatus extends Component<Props> {
             running: false,
           }),
       )
-      .catch(handleApiErrors)
       .finally(() => {
         const { current } = this.state;
         const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
@@ -187,4 +181,4 @@ class ImporterStatus extends Component<Props> {
   }
 }
 
-export default withErrorControl(ImporterStatus);
+export default ImporterStatus;
