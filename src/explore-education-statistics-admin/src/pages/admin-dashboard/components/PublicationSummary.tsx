@@ -6,9 +6,6 @@ import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummary
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import service from '@admin/services/release/create-release/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
@@ -24,8 +21,7 @@ export interface Props {
 const PublicationSummary = ({
   publication,
   history,
-  handleApiErrors,
-}: Props & RouteComponentProps & ErrorControlProps) => {
+}: Props & RouteComponentProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   // BAU-324 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
@@ -128,7 +124,7 @@ const PublicationSummary = ({
       {amendReleaseId && (
         <ModalConfirm
           title="Confirm you want to amend this live release"
-          onConfirm={async () => {
+          onConfirm={async () =>
             service
               .createReleaseAmendment(amendReleaseId)
               .then(amendment =>
@@ -136,8 +132,7 @@ const PublicationSummary = ({
                   summaryRoute.generateLink(publication.id, amendment.id),
                 ),
               )
-              .catch(handleApiErrors);
-          }}
+          }
           onExit={() => setAmendReleaseId(undefined)}
           onCancel={() => setAmendReleaseId(undefined)}
           mounted
@@ -152,4 +147,4 @@ const PublicationSummary = ({
   );
 };
 
-export default withErrorControl(withRouter(PublicationSummary));
+export default withRouter(PublicationSummary);
