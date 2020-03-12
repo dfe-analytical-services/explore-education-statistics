@@ -28,6 +28,8 @@ const PublicationSummary = ({
 }: Props & RouteComponentProps & ErrorControlProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
+  // BAU-324 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
+  const showAmendmentButton = () => false;
   return (
     <>
       <SummaryList>
@@ -80,14 +82,15 @@ const PublicationSummary = ({
                           ? 'Edit this release'
                           : 'View this release'}
                       </ButtonLink>
-                      {release.permissions.canMakeAmendmentOfRelease && (
-                        <Button
-                          className="govuk-button--secondary govuk-!-margin-left-4"
-                          onClick={() => setAmendReleaseId(release.id)}
-                        >
-                          Amend this release
-                        </Button>
-                      )}
+                      {showAmendmentButton() &&
+                        release.permissions.canMakeAmendmentOfRelease && (
+                          <Button
+                            className="govuk-button--secondary govuk-!-margin-left-4"
+                            onClick={() => setAmendReleaseId(release.id)}
+                          >
+                            Amend this release
+                          </Button>
+                        )}
                     </>
                   }
                 />
