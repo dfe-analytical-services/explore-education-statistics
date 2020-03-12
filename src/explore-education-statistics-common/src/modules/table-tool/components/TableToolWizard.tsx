@@ -66,6 +66,7 @@ export interface TableToolWizardProps {
   releaseId?: string;
   initialState?: TableToolState;
   finalStep?: (props: FinalStepProps) => ReactElement;
+  scrollOnMount?: boolean;
   onTableCreated?: (response: {
     query: TableDataQuery;
     table: FullTable;
