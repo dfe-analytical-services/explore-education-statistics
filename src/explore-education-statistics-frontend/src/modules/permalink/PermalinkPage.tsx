@@ -8,8 +8,10 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextPageContext } from 'next';
 import React, { Component } from 'react';
+import styles from './PermalinkPage.module.scss';
 
 interface Props {
   permalink: string;
@@ -58,6 +60,14 @@ class PermalinkPage extends Component<Props> {
             </dl>
           </div>
           <div className="govuk-grid-column-one-third">
+            <PrintThisPage
+              alignCentre
+              noMargin
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
             {/* <RelatedAside>
               <h3>Related content</h3>
             </RelatedAside> */}
@@ -74,21 +84,25 @@ class PermalinkPage extends Component<Props> {
               : getDefaultTableHeaderConfig(fullTable.subjectMeta)
           }
         />
-        <DownloadCsvButton
-          publicationSlug={`permalink-${data.created}-${data.title}`}
-          fullTable={fullTable}
-        />
-        <p className="govuk-body-s">Source: DfE prototype example statistics</p>
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          Create your own tables online
-        </h2>
-        <p>
-          Use our tool to build tables using our range of national and regional
-          data.
-        </p>
-        <ButtonLink as="/data-tables/" href="/data-tables">
-          Create tables
-        </ButtonLink>
+        <div className={styles.hidePrint}>
+          <DownloadCsvButton
+            publicationSlug={`permalink-${data.created}-${data.title}`}
+            fullTable={fullTable}
+          />
+          <p className="govuk-body-s">
+            Source: DfE prototype example statistics
+          </p>
+          <h2 className="govuk-heading-m govuk-!-margin-top-9">
+            Create your own tables online
+          </h2>
+          <p>
+            Use our tool to build tables using our range of national and
+            regional data.
+          </p>
+          <ButtonLink as="/data-tables/" href="/data-tables">
+            Create tables
+          </ButtonLink>
+        </div>
       </Page>
     );
   }

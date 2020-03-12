@@ -6,7 +6,17 @@ import {
 } from '@frontend/services/googleAnalyticsService';
 import styles from './PrintThisPage.module.scss';
 
-const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
+interface Props {
+  noMargin?: boolean;
+  alignCentre?: boolean;
+}
+
+const PrintThisPage = ({
+  analytics,
+  noMargin,
+  alignCentre,
+  ...props
+}: AnalyticProps & Props) => {
   const openPrint = () => {
     if (analytics) {
       logEvent(analytics.category, analytics.action, window.location.pathname);
@@ -18,7 +28,10 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
   return (
     <div
       className={classNames(
-        'govuk-!-margin-top-6',
+        {
+          'govuk-!-margin-top-6': !noMargin,
+          [styles.alignCentre]: alignCentre,
+        },
         'dfe-print-hidden',
         styles.printContainer,
         styles.mobileHidden,
