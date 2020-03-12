@@ -65,19 +65,26 @@ parser.add_argument("--chromedriver",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
 """
-NOTE(mark): The admin password to access the admin app is stored in the CI pipeline 
-            as a secret variable, which means it cannot be accessed like a normal 
-            environment variable, and instead must be passed to this script as 
-            an argument.
+NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
+            as secret variables, which means they cannot be accessed like normal 
+            environment variables, and instead must be passed to this script as 
+            arguments.
 """
 parser.add_argument("--admin-pass",
                     dest="admin_pass",
                     default=None,
                     help="manually specify the admin password")
+parser.add_argument("--analyst-pass",
+                    dest="analyst_pass",
+                    default=None,
+                    help="manually specify the analyst password")
 args = parser.parse_args()
 
 if args.admin_pass:
     os.environ['ADMIN_PASSWORD'] = args.admin_pass
+
+if args.analyst_pass:
+    os.environ['ANALYST_PASSWORD'] = args.analyst_pass
 
 # Default values
 timeout = 20

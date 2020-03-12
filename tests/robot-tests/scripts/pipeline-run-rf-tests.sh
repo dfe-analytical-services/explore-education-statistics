@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# NOTE(mark): The admin password to access to Admin app is stored in the CI pipeline
-# as a secret variable, which means it cannot be accessed as a normal environment
-# variable, and instead must be passed as an argument to this script
+# NOTE(mark): The admin and analyst passwords to access to Admin app are stored in the CI pipeline
+# as secret variables, which means they cannot be accessed as normal environment
+# variables, and instead must be passed as an argument to this script
 
-[ "$#" -eq 3 ] || { echo "Requires three arguments. Usage: 'pipeline-run-rf-tests.sh [admin_pass] [env] [test_file]'. Exiting..."; exit 1; }
+[ "$#" -eq 4 ] || { echo "Requires four arguments. Usage: 'pipeline-run-rf-tests.sh [admin_pass] [analyst_pass] [env] [test_file]'. Exiting..."; exit 1; }
 
 google-chrome-stable --version
 
 python -m pip install --upgrade pip
 pip install pipenv
 pipenv install
-pipenv run python run_tests.py --admin-pass $1 -e $2 --ci --chromedriver 78.0.3904.70 --file $3
+pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --chromedriver 78.0.3904.70 --file $4
