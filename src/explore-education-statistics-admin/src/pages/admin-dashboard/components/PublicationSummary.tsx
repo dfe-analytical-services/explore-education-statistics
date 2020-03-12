@@ -10,10 +10,11 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 export interface Props {
@@ -26,6 +27,7 @@ const PublicationSummary = ({
   handleApiErrors,
 }: Props & RouteComponentProps & ErrorControlProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
+  const [amendReleaseId, setAmendReleaseId] = useState<string>();
   return (
     <>
       <SummaryList>
@@ -81,19 +83,7 @@ const PublicationSummary = ({
                       {release.permissions.canMakeAmendmentOfRelease && (
                         <Button
                           className="govuk-button--secondary govuk-!-margin-left-4"
-                          onClick={() =>
-                            service
-                              .createReleaseAmendment(release.id)
-                              .then(amendment =>
-                                history.push(
-                                  summaryRoute.generateLink(
-                                    publication.id,
-                                    amendment.id,
-                                  ),
-                                ),
-                              )
-                              .catch(handleApiErrors)
-                          }
+                          onClick={() => setAmendReleaseId(release.id)}
                         >
                           Amend this release
                         </Button>
@@ -131,6 +121,30 @@ const PublicationSummary = ({
           </ButtonLink>
         </SummaryListItem>
       </SummaryList>
+
+      {amendReleaseId && (
+        <ModalConfirm
+          title="Confirm you want to amend this live release"
+          onConfirm={async () => {
+            service
+              .createReleaseAmendment(amendReleaseId)
+              .then(amendment =>
+                history.push(
+                  summaryRoute.generateLink(publication.id, amendment.id),
+                ),
+              )
+              .catch(handleApiErrors);
+          }}
+          onExit={() => setAmendReleaseId(undefined)}
+          onCancel={() => setAmendReleaseId(undefined)}
+          mounted
+        >
+          <p>
+            Please note, any changes made to this live release must be approved
+            before updates can be published.
+          </p>
+        </ModalConfirm>
+      )}
     </>
   );
 };
