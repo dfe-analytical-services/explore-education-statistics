@@ -149,9 +149,9 @@ const DataBlockDetailsForm = ({
                 name="title"
                 label="Table title"
                 onChange={e => {
-                  e.preventDefault();
-                  // eslint-disable-next-line no-unused-expressions
-                  onTitleChange && onTitleChange(e.currentTarget.value);
+                  const newTitle = e.target.value;
+                  form.setValues({ ...form.values, title: newTitle });
+                  if (onTitleChange) onTitleChange(newTitle);
                 }}
                 additionalClass="govuk-!-width-two-thirds"
                 rows={2}
