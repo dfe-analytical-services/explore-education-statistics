@@ -1,6 +1,6 @@
-import LoginContext from '@admin/components/Login';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React from 'react';
 import Link from './Link';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const PageFooter = ({ wide }: Props) => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   return (
     <footer className="govuk-footer" role="contentinfo">

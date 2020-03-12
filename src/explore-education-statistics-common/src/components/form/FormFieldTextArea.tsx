@@ -36,7 +36,19 @@ const FormFieldTextArea = <T extends {}>(props: Props<T>) => {
               [formGroupClass || '']: formGroupClass,
             })}
           >
-            <FormTextArea {...childProps} {...field} error={errorMessage} />
+            <FormTextArea
+              {...childProps}
+              {...field}
+              onChange={e => {
+                if (childProps.onChange) {
+                  childProps.onChange(e);
+                }
+                if (!e.isDefaultPrevented()) {
+                  field.onChange(e);
+                }
+              }}
+              error={errorMessage}
+            />
           </FormGroup>
         );
       }}

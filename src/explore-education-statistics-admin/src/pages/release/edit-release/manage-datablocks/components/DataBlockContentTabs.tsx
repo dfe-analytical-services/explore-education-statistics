@@ -1,8 +1,5 @@
 import ChartBuilder from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -33,8 +30,7 @@ const DataBlockContentTabs = ({
   dataBlock,
   dataBlockResponse,
   onDataBlockSave,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
 
   const [activeTab, setActiveTab] = useState<string>('');
@@ -93,7 +89,6 @@ const DataBlockContentTabs = ({
       height: props.height,
       labels: props.labels,
       legend: props.legend,
-      legendHeight: props.legendHeight,
       stacked: props.stacked,
       title: props.title,
       width: props.width,
@@ -116,14 +111,11 @@ const DataBlockContentTabs = ({
       includeGeoJson: false,
     };
 
-    dataBlockService
-      .getDataBlockForSubject(newRequest)
-      .then(response => {
-        if (response) {
-          setChartBuilderData({ ...response });
-        }
-      })
-      .catch(handleApiErrors);
+    dataBlockService.getDataBlockForSubject(newRequest).then(response => {
+      if (response) {
+        setChartBuilderData({ ...response });
+      }
+    });
   };
 
   return (
@@ -187,4 +179,4 @@ const DataBlockContentTabs = ({
   );
 };
 
-export default withErrorControl(DataBlockContentTabs);
+export default DataBlockContentTabs;

@@ -100,18 +100,18 @@ class PublicationReleasePage extends Component<Props> {
                       <FormattedDate>{data.published}</FormattedDate>
                     </strong>
                   </dd>
-                  <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
-                    <dd data-testid="next-update">
-                      {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                  {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                    <div>
+                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dd data-testid="next-update">
                         <strong>
                           <FormattedDate>
                             {dayMonthYearToDate(data.nextReleaseDate)}
                           </FormattedDate>
                         </strong>
-                      )}
-                    </dd>
-                  </div>
+                      </dd>
+                    </div>
+                  )}
                 </dl>
                 <Link
                   className="dfe-print-hidden"

@@ -1,17 +1,20 @@
-import {
-  ChartProps,
-  StackedBarProps,
-} from '@common/modules/charts/types/chart';
 import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
 import Infographic, {
   InfographicChartProps,
 } from '@common/modules/charts/components/Infographic';
 import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
-import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
-import { ChartType } from '@common/services/publicationService';
-import dynamic from 'next/dynamic';
-import React from 'react';
 import { MapProps } from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  ChartProps,
+  StackedBarProps,
+} from '@common/modules/charts/types/chart';
+import { ChartType } from '@common/services/publicationService';
+import omit from 'lodash/omit';
+import dynamic from 'next/dynamic';
+import React, { memo, useMemo, useState } from 'react';
+import { ContentRenderer, LegendProps } from 'recharts';
+import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/charts/components/MapBlock'),
@@ -28,31 +31,43 @@ export interface ChartRendererProps
   type: ChartType | 'unknown';
 }
 
-function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
-  switch (type.toLowerCase()) {
-    case 'line':
-      return <LineChartBlock {...chartProps} />;
-    case 'verticalbar':
-      return <VerticalBarBlock {...chartProps} />;
-    case 'horizontalbar':
-      return <HorizontalBarBlock {...chartProps} />;
-    case 'map':
-      return <DynamicMapBlock {...chartProps} />;
-    case 'infographic': {
-      return <Infographic {...chartProps} />;
-    }
-    default:
-      return (
-        <div>
-          Unable to render chart, an unimplemented chart type was requested '
-          {type}'
-        </div>
-      );
-  }
-}
-
 function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title } = props;
+  const { data, meta, title, type, legend } = props;
+
+  const [legendProps, setLegendProps] = useState<LegendProps>();
+
+  const renderLegend: ContentRenderer<LegendProps> = useMemo(
+    () => nextProps => {
+      const nextLegendProps = omit(nextProps, 'content');
+
+      // Need to do a deep comparison of the props to
+      // avoid falling into an infinite rendering loop.
+      if (JSON.stringify(legendProps) !== JSON.stringify(nextLegendProps)) {
+        setLegendProps(nextLegendProps);
+      }
+
+      return null;
+    },
+    [legendProps],
+  );
+
+  const chart = useMemo(() => {
+    switch (type.toLowerCase()) {
+      case 'line':
+        return <LineChartBlock {...props} renderLegend={renderLegend} />;
+      case 'verticalbar':
+        return <VerticalBarBlock {...props} renderLegend={renderLegend} />;
+      case 'horizontalbar':
+        return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
+      case 'map':
+        return <DynamicMapBlock {...props} renderLegend={renderLegend} />;
+      case 'infographic': {
+        return <Infographic {...props} />;
+      }
+      default:
+        return <p>Unable to render invalid chart type</p>;
+    }
+  }, [props, renderLegend, type]);
 
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -61,12 +76,25 @@ function ChartRenderer(props: ChartRendererProps) {
     return (
       <>
         {title && <h3 className="govuk-heading-s">{title}</h3>}
-        <ChartTypeRenderer {...props} />
+
+        {legend === 'top' && type !== 'infographic' && legendProps && (
+          <div className="govuk-!-margin-bottom-6">
+            <DefaultLegendContent {...legendProps} />
+          </div>
+        )}
+
+        <div className="govuk-!-margin-bottom-6">{chart}</div>
+
+        {legend === 'bottom' && type !== 'infographic' && legendProps && (
+          <div className="govuk-!-margin-bottom-6">
+            <DefaultLegendContent {...legendProps} />
+          </div>
+        )}
       </>
     );
   }
 
-  return <div>Unable to render chart, invalid data configured</div>;
+  return <p>Unable to render chart, invalid data configured</p>;
 }
 
-export default ChartRenderer;
+export default memo(ChartRenderer);

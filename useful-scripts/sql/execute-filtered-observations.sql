@@ -33,6 +33,8 @@ begin
 
 	declare @wardsList IdListVarcharType
 
+	declare @planningAreasList IdListVarcharType
+
 	declare @filterItemList IdListGuidType
 	insert @filterItemList values (83), (86)
 
@@ -55,5 +57,6 @@ begin
 			@rscRegionsList,
 			@sponsorList,
 			@wardsList,
+			@planningAreasList,
 			@filterItemList
 end

@@ -27,11 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Region region = null,
             RscRegion rscRegion = null,
             Sponsor sponsor = null,
-            Ward ward = null)
+            Ward ward = null,
+            PlanningArea planningArea = null)
         {
             var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
-                parliamentaryConstituency, region, rscRegion, sponsor, ward);
+                parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
 
             if (GetCache().TryGetValue(cacheKey, out Location location))
             {
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             location = LookupOrCreate(context, country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
-                parliamentaryConstituency, region, rscRegion, sponsor, ward);
+                parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
             GetCache().Set(cacheKey, location);
 
             return location;
@@ -58,13 +59,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Region region,
             RscRegion rscRegion,
             Sponsor sponsor,
-            Ward ward)
+            Ward ward,
+            PlanningArea planningArea)
         {
             var observationalUnits = new IObservationalUnit[]
             {
                 country, institution, localAuthority, localAuthorityDistrict, localEnterprisePartnership,
                 mayoralCombinedAuthority, multiAcademyTrust, parliamentaryConstituency, opportunityArea, region,
-                rscRegion, sponsor, ward
+                rscRegion, sponsor, ward, planningArea
             };
 
             const string separator = "_";
@@ -88,7 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Region region = null,
             RscRegion rscRegion = null,
             Sponsor sponsor = null,
-            Ward ward = null)
+            Ward ward = null,
+            PlanningArea planningArea = null)
         {
             var location = Lookup(
                 context,
@@ -104,7 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 region,
                 rscRegion,
                 sponsor,
-                ward);
+                ward,
+                planningArea);
 
             if (location == null)
             {
@@ -123,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Region = region ?? Region.Empty(),
                     RscRegion = rscRegion ?? RscRegion.Empty(),
                     Sponsor = sponsor ?? Sponsor.Empty(),
-                    Ward = ward ?? Ward.Empty()
+                    Ward = ward ?? Ward.Empty(),
+                    PlanningArea = planningArea ?? PlanningArea.Empty()
                 });
 
                 return entityEntry.Entity;
@@ -146,7 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Region region = null,
             RscRegion rscRegion = null,
             Sponsor sponsor = null,
-            Ward ward = null)
+            Ward ward = null,
+            PlanningArea planningArea = null)
         {
             var predicateBuilder = PredicateBuilder.True<Location>()
                 .And(location => location.Country.Code == country.Code && location.Country.Name == country.Name);
@@ -208,7 +214,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             predicateBuilder = predicateBuilder
                 .And(location => location.Ward.Code == (ward != null ? ward.Code : null)
                                  && location.Ward.Name == (ward != null ? ward.Name : null));
-
+            
+            predicateBuilder = predicateBuilder
+                .And(location => location.PlanningArea.Code == (planningArea != null ? planningArea.Code : null)
+                                 && location.PlanningArea.Name == (planningArea != null ? planningArea.Name : null));
+            
             return context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
         }
     }
