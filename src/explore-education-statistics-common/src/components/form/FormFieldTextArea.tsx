@@ -43,7 +43,7 @@ const FormFieldTextArea = <T extends {}>(props: Props<T>) => {
                 if (childProps.onChange) {
                   childProps.onChange(e);
                 }
-                if (e.isDefaultPrevented()) {
+                if (!e.isDefaultPrevented()) {
                   field.onChange(e);
                 }
               }}

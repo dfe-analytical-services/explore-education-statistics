@@ -149,9 +149,7 @@ const DataBlockDetailsForm = ({
                 name="title"
                 label="Table title"
                 onChange={e => {
-                  const newTitle = e.target.value;
-                  form.setValues({ ...form.values, title: newTitle });
-                  if (onTitleChange) onTitleChange(newTitle);
+                  if (onTitleChange) onTitleChange(e.target.value);
                 }}
                 additionalClass="govuk-!-width-two-thirds"
                 rows={2}
