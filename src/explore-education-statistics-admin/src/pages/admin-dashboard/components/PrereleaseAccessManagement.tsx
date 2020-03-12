@@ -1,10 +1,7 @@
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
@@ -31,10 +28,7 @@ interface Props {
   release: AdminDashboardRelease;
 }
 
-const PrereleaseAccessManagement = ({
-  release,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const PrereleaseAccessManagement = ({ release }: Props) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -46,9 +40,8 @@ const PrereleaseAccessManagement = ({
           inviting: false,
           removing: false,
         }),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors, release.id]);
+      );
+  }, [release.id]);
 
   const formId = `invitePrereleaseAccessUsers-${release.id}`;
 
@@ -79,17 +72,12 @@ const PrereleaseAccessManagement = ({
           inviting: false,
           removing: false,
         });
-      })
-      .catch(handleApiErrors);
+      });
   };
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await inviteUserByEmail(values.email, actions.resetForm);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await inviteUserByEmail(values.email, actions.resetForm);
+  }, errorCodeMappings);
 
   return (
     <>
@@ -103,7 +91,7 @@ const PrereleaseAccessManagement = ({
             validationSchema={Yup.object<FormValues>({
               email: Yup.string().email('Enter a valid email address'),
             })}
-            onSubmit={submitFormHandler}
+            onSubmit={handleSubmit}
             render={() => {
               return (
                 <Form id={formId}>
@@ -157,8 +145,7 @@ const PrereleaseAccessManagement = ({
                             preReleaseContactsForRelease: updatedContacts,
                             removing: false,
                           }),
-                        )
-                        .catch(handleApiErrors);
+                        );
                     }}
                   >
                     Remove
@@ -176,4 +163,4 @@ const PrereleaseAccessManagement = ({
   );
 };
 
-export default withErrorControl(PrereleaseAccessManagement);
+export default PrereleaseAccessManagement;

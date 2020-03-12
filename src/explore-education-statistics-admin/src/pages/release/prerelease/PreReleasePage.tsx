@@ -1,14 +1,15 @@
-import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import {
+  ErrorControlState,
+  useErrorControl,
+} from '@admin/contexts/ErrorControlContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import permissionService from '@admin/services/permissions/service';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import { format } from 'date-fns';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface Model {
@@ -21,13 +22,12 @@ interface MatchProps {
 }
 
 const PreReleasePage = ({
-  handleApiErrors,
-  handleManualErrors,
   match,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps<MatchProps> & ErrorControlState) => {
+  const { handleManualErrors } = useErrorControl();
   const [model, setModel] = useState<Model>();
 
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   const { releaseId } = match.params;
 
@@ -38,32 +38,27 @@ const PreReleasePage = ({
         if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
           handleManualErrors.forbidden();
         } else if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
-          releaseContentService
-            .getContent(releaseId)
-            .then(content => {
-              const newContent = {
-                ...content,
-                release: {
-                  ...content.release,
-                  prerelease: true,
-                },
-              };
+          releaseContentService.getContent(releaseId).then(content => {
+            const newContent = {
+              ...content,
+              release: {
+                ...content.release,
+                prerelease: true,
+              },
+            };
 
-              setModel({
-                preReleaseWindowStatus,
-                content: newContent,
-              });
-            })
-            .catch(handleApiErrors);
+            setModel({
+              preReleaseWindowStatus,
+              content: newContent,
+            });
+          });
         } else {
           setModel({
             preReleaseWindowStatus,
           });
         }
-      })
-
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, handleManualErrors]);
+      });
+  }, [releaseId, handleManualErrors]);
 
   return (
     <>
@@ -137,4 +132,4 @@ const PreReleasePage = ({
   );
 };
 
-export default withErrorControl(withRouter(PreReleasePage));
+export default withRouter(PreReleasePage);

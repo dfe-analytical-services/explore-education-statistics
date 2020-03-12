@@ -1,11 +1,11 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import { AxiosErrorHandler } from '@common/services/api/Client';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { AxiosResponse } from 'axios';
 import React, { ReactNode, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './SummaryRenderer.module.scss';
@@ -13,7 +13,7 @@ import styles from './SummaryRenderer.module.scss';
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   dataBlockResponse?: DataBlockResponse;
   children?: ReactNode;
-  handleApiErrors?: (error: AxiosResponse) => void;
+  handleApiErrors?: AxiosErrorHandler;
 }
 
 export interface KeyStatConfig {

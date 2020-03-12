@@ -1,5 +1,4 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
-import { ErrorControlProps } from '@admin/validation/withErrorControl';
 import {
   FormCheckbox,
   FormGroup,
@@ -41,9 +40,7 @@ const ChartConfiguration = ({
   meta,
   data,
   onBoundaryLevelChange,
-  handleApiErrors,
-  handleManualErrors,
-}: Props & ErrorControlProps) => {
+}: Props) => {
   const [chartOptions, setChartOptions] = useState<ChartOptions>(
     initialChartOptions,
   );
@@ -70,8 +67,6 @@ const ChartConfiguration = ({
                 fileId,
               });
             }}
-            handleApiErrors={handleApiErrors}
-            handleManualErrors={handleManualErrors}
           />
           <hr />
         </>

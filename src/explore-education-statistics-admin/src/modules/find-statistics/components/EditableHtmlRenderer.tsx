@@ -1,10 +1,10 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import React, { useContext } from 'react';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React, { useContext } from 'react';
 
 export type Props = RendererProps & {
   source: string;
@@ -40,19 +40,23 @@ const EditableHtmlRenderer = ({
             editingContext.sectionId &&
             contentId
           ) {
-            const { body } = await releaseContentService
-              .updateContentSectionBlock(
+            try {
+              const {
+                body,
+              } = await releaseContentService.updateContentSectionBlock(
                 editingContext.releaseId,
                 editingContext.sectionId,
                 contentId,
                 {
                   body: ss,
                 },
-              )
-              .catch(handleApiErrors);
+              );
 
-            if (onContentChange) onContentChange(body);
-            setHtml(body);
+              if (onContentChange) onContentChange(body);
+              setHtml(body);
+            } catch (err) {
+              handleApiErrors(err);
+            }
           }
         }}
         onDelete={onDelete}
