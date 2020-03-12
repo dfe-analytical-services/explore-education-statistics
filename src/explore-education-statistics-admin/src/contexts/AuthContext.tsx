@@ -43,12 +43,12 @@ export const AuthContextProvider = ({ children }: Props) => {
         const permissions = validToken
           ? await permissionService.getGlobalPermissions()
           : {
-            canAccessSystem: false,
-            canAccessPrereleasePages: false,
-            canAccessAnalystPages: false,
-            canAccessUserAdministrationPages: false,
-            canAccessMethodologyAdministrationPages: false,
-          };
+              canAccessSystem: false,
+              canAccessPrereleasePages: false,
+              canAccessAnalystPages: false,
+              canAccessUserAdministrationPages: false,
+              canAccessMethodologyAdministrationPages: false,
+            };
 
         const user: User = {
           id: userId,
@@ -76,13 +76,8 @@ export const AuthContextProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    const subscriptionId = authService.subscribe(() => {
-      setAuthState({
-        ready: false,
-        user: undefined,
-      });
-
-      populateAuthenticationState();
+    const subscriptionId = authService.subscribe(async () => {
+      await populateAuthenticationState();
     });
 
     populateAuthenticationState();
@@ -100,9 +95,7 @@ export const AuthContextProvider = ({ children }: Props) => {
   );
 
   return authState.ready ? (
-    <AuthContext.Provider value={loginContext}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={loginContext}>{children}</AuthContext.Provider>
   ) : null;
 };
 
