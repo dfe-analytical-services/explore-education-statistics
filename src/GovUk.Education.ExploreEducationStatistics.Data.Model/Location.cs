@@ -20,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public RscRegion RscRegion { get; set; }
         public Sponsor Sponsor { get; set; }
         public Ward Ward { get; set; }
+        public PlanningArea PlanningArea { get; set; }
+        
         public ICollection<Observation> Observations { get; set; }
     }
 }
