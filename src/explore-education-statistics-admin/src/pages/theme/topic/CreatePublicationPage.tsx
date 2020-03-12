@@ -144,7 +144,10 @@ const CreatePublicationPage = ({
               contact => contact.contactName,
             )[0].id,
             methodologyChoice: 'existing',
-            selectedMethodologyId: '',
+            selectedMethodologyId: orderBy(
+              model.methodologies,
+              methodology => methodology.title,
+            )[0].id,
             externalMethodology: { title: '', url: 'https://' },
           }}
           validationSchema={Yup.object<FormValues>({

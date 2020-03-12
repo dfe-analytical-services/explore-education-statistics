@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -90,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var release = _mapper.Map<Release>(createRelease);
                     
+                    release.Id = Guid.NewGuid();
                     release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
                     release.SummarySection = new ContentSection
                     {
@@ -104,10 +106,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.HeadlinesSection = new ContentSection{
                         Type = ContentSectionType.Headlines
                     };
+                    release.Created = DateTime.UtcNow;
+                    release.CreatedById = _userService.GetUserId();
+                    release.OriginalId = release.Id;
                     
-                    var saved =_context.Releases.Add(release);
+                    _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(saved.Entity.Id);
+                    return await GetReleaseForIdAsync(release.Id);
                 });
         }
 
@@ -321,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         SubjectId = subject?.Id ?? Guid.Empty,
                         
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName, 0,0, null),
+                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName, 0, null),
                         
                         DependentDataBlocks = dependentDataBlocks.
                             Select(block => new DependentDataBlock

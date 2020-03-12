@@ -26,7 +26,7 @@ export interface DataBlockProps {
   id: string;
   releaseId?: string;
   type: string;
-  captionTitle?: string;
+  heading?: string;
   dataBlockRequest?: DataBlockRequest;
 
   tables?: Table[];
@@ -115,13 +115,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (chartMetadata === undefined) return;
 
-    const { charts, tables, captionTitle } = this.props;
+    const { charts, tables, heading } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
         newState.tables = [
           {
-            captionTitle,
+            heading,
             response,
             ...tables[0], /// at present only one chart
           },
@@ -151,7 +151,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      captionTitle,
+      heading,
       showTables,
       additionalTabContent,
       onToggle,
@@ -182,7 +182,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   return (
                     <TimePeriodDataTableRenderer
                       {...table}
-                      captionTitle={captionTitle}
+                      heading={heading}
                       key={key}
                     />
                   );

@@ -16,8 +16,6 @@ describe('LineChartBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
 
-    expect(container).toMatchSnapshot();
-
     // axes
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
@@ -37,14 +35,18 @@ describe('LineChartBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
+    // Legend
     expect(
       container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
+    const legendItems = container.querySelectorAll('.recharts-legend-item');
+
+    expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
+    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
 
     // expect there to be lines for all 3 data sets
-    expect(
-      Array.from(container.querySelectorAll('.recharts-line')).length,
-    ).toBe(3);
+    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
   });
 
   test('major axis can be hidden', () => {

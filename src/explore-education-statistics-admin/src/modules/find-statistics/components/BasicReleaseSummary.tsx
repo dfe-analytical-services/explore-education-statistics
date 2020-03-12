@@ -72,18 +72,18 @@ const BasicReleaseSummary = ({ release }: Props) => {
                   </strong>
                 )}
               </dd>
-              <div>
-                <dt className="govuk-caption-m">Next update: </dt>
-                <dd>
-                  {dayMonthYearIsComplete(release.nextReleaseDate) && (
+              {dayMonthYearIsComplete(release.nextReleaseDate) && (
+                <div>
+                  <dt className="govuk-caption-m">Next update: </dt>
+                  <dd>
                     <strong>
                       <FormattedDate>
                         {dayMonthYearToDate(release.nextReleaseDate)}
                       </FormattedDate>
                     </strong>
-                  )}
-                </dd>
-              </div>
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
 

@@ -22,6 +22,15 @@
     },
     "devopsSPN": {
       "value": "10ddc034-bdb0-4655-92ba-4ad6c490d68a"
+    },
+    "domain": {
+      "value": "test.explore-education-statistics.service.gov.uk"
+    },
+    "contentApiUrl": {
+      "value": "content.test.explore-education-statistics.service.gov.uk"
+    },
+    "dataApiUrl": {
+      "value": "data.test.explore-education-statistics.service.gov.uk"
     }
   }
 }

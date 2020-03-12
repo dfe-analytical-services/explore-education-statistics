@@ -14,8 +14,6 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
 import React, { useContext } from 'react';
-import LazyLoad from 'react-lazyload';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 export interface Props {
@@ -58,57 +56,54 @@ const PublicationSummary = ({
             )}
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
-          <LazyLoad placeholder={<LoadingSpinner />} once>
-            <ul className="govuk-list dfe-admin">
-              {publication.releases.map(release => (
-                <li key={release.id}>
-                  <ReleaseSummary
-                    release={release}
-                    actions={
-                      <>
-                        <ButtonLink
-                          to={summaryRoute.generateLink(
-                            publication.id,
-                            release.id,
-                          )}
-                          testId={formatTestId(
-                            `Edit release link for ${
-                              publication.title
-                            }, ${getReleaseSummaryLabel(release)}`,
-                          )}
-                        >
-                          {release.permissions.canUpdateRelease
-                            ? 'Edit this release'
-                            : 'View this release'}
-                        </ButtonLink>
-
-                        {release.permissions.canUpdateRelease && (
-                          <Button
-                            onClick={() =>
-                              service
-                                .createReleaseAmendment(release.id)
-                                .then(amendment =>
-                                  history.push(
-                                    summaryRoute.generateLink(
-                                      publication.id,
-                                      amendment.id,
-                                    ),
-                                  ),
-                                )
-                                .catch(handleApiErrors)
-                            }
-                          >
-                            Amend this release
-                          </Button>
+          <ul className="govuk-list dfe-admin">
+            {publication.releases.map(release => (
+              <li key={release.id}>
+                <ReleaseSummary
+                  release={release}
+                  actions={
+                    <>
+                      <ButtonLink
+                        to={summaryRoute.generateLink(
+                          publication.id,
+                          release.id,
                         )}
-                      </>
-                    }
-                  />
-                </li>
-              ))}
-              {publication.releases.length < 1 && <>No releases created</>}
-            </ul>
-          </LazyLoad>
+                        testId={formatTestId(
+                          `Edit release link for ${
+                            publication.title
+                          }, ${getReleaseSummaryLabel(release)}`,
+                        )}
+                      >
+                        {release.permissions.canUpdateRelease
+                          ? 'Edit this release'
+                          : 'View this release'}
+                      </ButtonLink>
+                      {release.permissions.canUpdateRelease && (
+                        <Button
+                          onClick={() =>
+                            service
+                              .createReleaseAmendment(release.id)
+                              .then(amendment =>
+                                history.push(
+                                  summaryRoute.generateLink(
+                                    publication.id,
+                                    amendment.id,
+                                  ),
+                                ),
+                              )
+                              .catch(handleApiErrors)
+                          }
+                        >
+                          Amend this release
+                        </Button>
+                      )}
+                    </>
+                  }
+                />
+              </li>
+            ))}
+            {publication.releases.length < 1 && <>No releases created</>}
+          </ul>
         </SummaryListItem>
       </SummaryList>
       <SummaryList>

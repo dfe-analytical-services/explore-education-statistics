@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.BulkExtensions" Version="3.0.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19269.1" />
   </ItemGroup>
 

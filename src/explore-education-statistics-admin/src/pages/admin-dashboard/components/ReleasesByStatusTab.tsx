@@ -31,7 +31,10 @@ const ReleasesByStatusTab = ({
       {releasesByPublication && Object.keys(releasesByPublication).length > 0 && (
         <>
           {Object.keys(releasesByPublication).map(publication => (
-            <React.Fragment key={publication}>
+            <div
+              key={publication}
+              data-testid={`releaseByStatusTab ${publication}`}
+            >
               <hr />
               <h3>{publication}</h3>
               {releasesByPublication[publication].map(release => (
@@ -43,7 +46,7 @@ const ReleasesByStatusTab = ({
                   {children && children(release)}
                 </ReleaseSummary>
               ))}
-            </React.Fragment>
+            </div>
           ))}
         </>
       )}

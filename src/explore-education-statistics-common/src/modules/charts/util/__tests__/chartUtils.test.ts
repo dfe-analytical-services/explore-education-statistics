@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ChartMetaData } from '@common/modules/charts/types/chart';
+
+import Data from '@common/modules/charts/util/__tests__/__data__/chartUtils.data';
 import {
   createDataForAxis,
   createSortedDataForAxis,
@@ -9,8 +11,6 @@ import {
   AxisConfiguration,
   ChartDataSet,
 } from '@common/services/publicationService';
-
-import Data from '@common/modules/charts/util/__tests__/__data__/chartUtils.data';
 
 describe('chartUtils', () => {
   const dataSet23_1_72: ChartDataSet = {
@@ -261,9 +261,5 @@ describe('chartUtils', () => {
     expect(chartMeta.indicators).not.toBeUndefined();
     expect(chartMeta.locations).not.toBeUndefined();
     expect(chartMeta.timePeriod).not.toBeUndefined();
-
-    expect(chartMeta.filters['1']).not.toBeUndefined();
-    expect(chartMeta.filters['1'].label).toEqual('All pupils');
-    expect(chartMeta.filters['1'].value).toEqual('1');
   });
 });

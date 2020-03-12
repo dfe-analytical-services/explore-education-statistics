@@ -41,7 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var subject = GetSubject(message, subjectData.Name, context);
-
+                
+                context.Database.BeginTransaction();
+                
                 _importerService.ImportObservations(
                     subjectData.GetCsvLines().ToList(),
                     subject,
@@ -51,7 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     context
                 );
                 
-                await _batchService.CheckComplete(releaseId, message);
+                context.Database.CommitTransaction();
+                
+                await _batchService.CheckComplete(releaseId, message, context);
             }
             else
             {

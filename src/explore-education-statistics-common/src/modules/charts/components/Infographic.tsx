@@ -21,7 +21,6 @@ const Infographic = ({
   getInfographic,
   width = 0,
   height = 0,
-  children,
 }: InfographicChartProps) => {
   const [file, setFile] = useState<string>();
 
@@ -50,7 +49,6 @@ const Infographic = ({
           height={height > 0 ? height : undefined}
         />
       )}
-      {children}
     </>
   );
 };

@@ -34,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context, ContentDbContext contentDbContext)
         {
             // Avoid potential collisions
-            var secs = new Random().Next(1, 5) * 1000;
-            Thread.Sleep(secs);
+            Thread.Sleep(new Random().Next(1, 5) * 1000);
             var release = CreateOrUpdateRelease(message, context);
             var subject = RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
             
@@ -64,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             if (subject != null)
             {
                 context.Subject.Remove(subject);
+                context.SaveChanges();
             }
 
             subject = context.Subject.Add(new Subject

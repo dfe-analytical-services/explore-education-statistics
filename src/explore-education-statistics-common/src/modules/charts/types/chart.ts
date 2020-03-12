@@ -1,3 +1,4 @@
+import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   BoundaryLevel,
   DataBlockData,
@@ -14,9 +15,10 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
+import { LegendProps } from 'recharts';
 
 export interface ChartMetaData {
-  filters: Dictionary<LabelValueMetadata>;
+  filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
@@ -29,14 +31,20 @@ export interface AbstractChartProps {
   title?: string;
   height?: number;
   width?: number;
-  children?: ReactNode[];
 }
 
 export interface ChartProps extends AbstractChartProps {
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
-  legendHeight?: string;
+  /**
+   * Callback to enable us to render legends outside
+   * of the chart container.
+   * This is a bit of a hack because no such API
+   * technically exists in Recharts, however, we can get
+   * around this by using the Legend's `content` prop.
+   */
+  renderLegend?: (props: LegendProps) => ReactNode;
 }
 
 export interface StackedBarProps extends ChartProps {
