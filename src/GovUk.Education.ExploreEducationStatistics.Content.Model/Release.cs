@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.Created = createdDate;
             amendment.CreatedBy = null;
             amendment.CreatedById = createdByUserId;
-            amendment.Version += Version;
+            amendment.Version = Version + 1;
             
             amendment.Content = amendment
                 .Content

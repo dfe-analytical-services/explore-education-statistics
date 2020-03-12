@@ -13,6 +13,11 @@ const service = {
   canUpdateRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
+  // BAU-324 - temporary stopgap to stop the updating of Release Amendment data files until Phase 2 of
+  // Release Versioning is tackled
+  canUpdateReleaseDataFiles: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/update-data-files`);
+  },
   canMarkReleaseAsDraft: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/status/draft`);
   },

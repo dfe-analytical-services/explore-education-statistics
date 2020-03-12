@@ -37,12 +37,12 @@ const ReleaseDataPage = ({ handleApiErrors }: ErrorControlProps) => {
       footnotesService.getReleaseFootnoteData(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ])
-      .then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
+      .then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
         setFootnotesData({
           footnoteMeta: meta,
           footnotes: footnotesList,
           footnoteMetaGetters: generateFootnoteMetaMap(meta),
-          canUpdateRelease: canUpdateReleaseResult,
+          canUpdateRelease,
         });
       })
       .catch(handleApiErrors);
