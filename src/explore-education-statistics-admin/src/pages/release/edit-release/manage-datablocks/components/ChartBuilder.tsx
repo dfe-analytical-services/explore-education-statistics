@@ -9,7 +9,6 @@ import {
 } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import ButtonText from '@common/components/ButtonText';
-
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
