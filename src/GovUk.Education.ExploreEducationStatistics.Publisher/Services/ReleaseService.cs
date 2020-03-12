@@ -123,8 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private DateTime GetNextScheduledPublishingTime()
         {
-            var publishReleasesCronSchedule = _configuration.GetSection("Values")
-                ?.GetValue<string>("PublishReleaseContentCronSchedule");
+            var publishReleasesCronSchedule = _configuration.GetSection("Values")?.GetValue<string>("PublishReleaseContentCronSchedule");
             return TryParseCronSchedule(publishReleasesCronSchedule, out var cronSchedule)
                 ? cronSchedule.GetNextOccurrence(DateTime.UtcNow)
                 : DateTime.UtcNow;

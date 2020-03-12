@@ -13,8 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Heading { get; set; }
 
-        public string CustomFootnotes { get; set; }
-
         public string Name { get; set; }
 
         public string Source { get; set; }
