@@ -4010,7 +4010,6 @@
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.\");",
 													"                break;",
 													"            default:",
-													"                pm.expect(true).to.equal(false, `Didn't expect this footnote to appear!, id: \"${respJson.subjectMeta.footnotes[i].id}\"`)",
 													"                break;",
 													"        }",
 													"    }",
