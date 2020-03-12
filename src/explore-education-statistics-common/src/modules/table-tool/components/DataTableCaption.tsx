@@ -33,10 +33,11 @@ export function generateTableTitle({
   const locationsString = ` in ${commaList(
     locations.length > 10 && !expanded
       ? locations
-          .slice(0, 10)
           .map(location => location.label)
+          .sort()
+          .slice(0, 10)
           .concat(`${locations.length - 10} other locations...`)
-      : locations.map(location => location.label),
+      : locations.map(location => location.label).sort(),
   )}`;
 
   return `Table showing ${indicatorString}'${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;

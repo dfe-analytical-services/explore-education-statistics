@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
@@ -14,38 +16,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class BatchService : IBatchService
     {
         private readonly IFileStorageService _fileStorageService;
-        private readonly IImportStatusService _importStatusService;
         private readonly ILogger<IBatchService> _logger;
         private readonly CloudTable _table;
 
         public BatchService(
             ITableStorageService tblStorageService,
             IFileStorageService fileStorageService,
-            IImportStatusService importStatusService,
             ILogger<IBatchService> logger)
         {
             _table = tblStorageService.GetTableAsync("imports").Result;
             _fileStorageService = fileStorageService;
-            _importStatusService = importStatusService;
             _logger = logger;
         }
 
-        public async Task CheckComplete(string releaseId, ImportMessage message)
+        public async Task CheckComplete(string releaseId, ImportMessage message, StatisticsDbContext context)
         {
             var import = await GetImport(releaseId, message.OrigDataFileName);
-            
+
             if (message.NumBatches > 1)
             {
                 _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
             }
             
-            if (message.NumBatches == 1 || _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName) == 0)
+            if (import.Status.Equals(IStatus.RUNNING_PHASE_3)
+            && (message.NumBatches == 1 || _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName) == 0))
             {
-                await UpdateStatus(releaseId, message.OrigDataFileName,
-                    import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
-                );
+                var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
+                
+                if (!observationCount.Equals(message.TotalRows))
+                {
+                    await FailImport(releaseId, message.OrigDataFileName, 
+                        new List<string> {$"Number of observations inserted ({observationCount}) " +
+                                          $"does not equal that expected ({message.TotalRows}) : Please delete & retry"});
+                }
+                else
+                {
+                    await UpdateStatus(releaseId, message.OrigDataFileName,
+                        import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED);
+                }
 
-                _logger.LogInformation(import.Errors.Equals("")
+                _logger.LogInformation(import.Errors.Equals("") && observationCount.Equals(message.TotalRows)
                     ? $"All batches imported for {releaseId} : {message.OrigDataFileName} with no errors"
                     : $"All batches imported for {releaseId} : {message.OrigDataFileName} but with errors - check storage log");
             }
@@ -65,6 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return true;
         }
         
+        public async Task UpdateStoredMessage(ImportMessage message)
+        {
+            var import = await GetImport(message.Release.Id.ToString(), message.OrigDataFileName);
+            import.Message = JsonConvert.SerializeObject(message);
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+        }
+        
         public async Task<IStatus> GetStatus(string releaseId, string origDataFileName)
         {
             var import = await GetImport(releaseId, origDataFileName);
@@ -81,11 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
         }
-
-        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches, ImportMessage message)
+        
+        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numberOfRows, numBatches, JsonConvert.SerializeObject(message)))
+                new DatafileImport(releaseId, dataFileName, numberOfRows, JsonConvert.SerializeObject(message)))
             );
         }
 

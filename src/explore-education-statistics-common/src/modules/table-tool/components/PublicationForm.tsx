@@ -109,7 +109,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         return (
           <>
             {isActive ? (
-              <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+              <Form {...form} id={formId} showSubmitError>
                 <FormFieldset
                   error={getError('publicationId')}
                   id={`${formId}-publicationId`}

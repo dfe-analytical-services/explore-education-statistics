@@ -123,8 +123,12 @@ const PublicationReleaseContent = ({
     >
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">
-          {release.coverageTitle}{' '}
-          {getTimePeriodCoverageDateRangeStringShort(release.releaseName, '/')}
+          {`${
+            release.coverageTitle
+          } ${getTimePeriodCoverageDateRangeStringShort(
+            release.releaseName,
+            '/',
+          )}`}
         </span>
         {publication.title}
       </h1>

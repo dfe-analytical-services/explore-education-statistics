@@ -6,6 +6,7 @@ import withErrorControl, {
 } from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { forceCheck } from 'react-lazyload';
 
 interface Props {
   releaseId: string;
@@ -54,6 +55,7 @@ const ReleaseServiceStatus = ({
           }
         }
       })
+      .then(forceCheck)
       .catch(handleApiErrors);
   }, [releaseId, handleApiErrors, refreshPeriod]);
 
@@ -127,7 +129,8 @@ const ReleaseServiceStatus = ({
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(([key, val]) => {
-                if (key === 'overallStage') return null;
+                if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))
+                  return null;
                 const { color, text } = statusDetailColor(val);
 
                 if (!color) {

@@ -1,3 +1,5 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
 .chartContainer {
   display: flex;
 }
@@ -113,29 +115,6 @@
   }
 }
 
-.selectedData {
-  border-bottom: 1px solid #b1b4b6;
-  margin-bottom: 1em;
-}
-
-.selectedDataRow {
-  display: flex;
-  flex-basis: 50%;
-}
-
-.selectedDataFilter {
-  flex-shrink: 0;
-  width: 34%;
-}
-
-.selectedDataIndicator {
-  width: 30%;
-}
-
-.selectedDataAction {
-  margin-left: auto;
-}
-
 .fullWidth {
   width: 100%;
 }
@@ -156,7 +135,7 @@
 
 .axisRange {
   display: flex;
-  flex-wrap: 0;
+  flex-wrap: nowrap;
 
   .formGroup {
     width: 50%;
@@ -167,16 +146,14 @@
   margin-top: 30px;
 }
 
-.preview {
+.previewPlaceholder {
   align-items: center;
-  background-color: #eee;
+  background-color: govuk-colour('light-grey');
   display: flex;
+  font-size: 1.5rem;
+  font-weight: $govuk-font-weight-bold;
+  height: 300px;
   justify-content: center;
-
-  span {
-    font-size: 1.5em;
-    font-weight: bold;
-  }
 }
 
 .chartTypeUnavailable {

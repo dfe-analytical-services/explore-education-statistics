@@ -26,7 +26,6 @@
   .recharts-tooltip-item-list li {
     margin: 0;
     padding: 0;
-    white-space: wrap;
   }
 
   .recharts-tooltip-item {
@@ -37,13 +36,6 @@
   .recharts-tooltip-item-value,
   .recharts-tooltip-item-unit {
     font-weight: bold;
-  }
-}
-
-.legend-bottom .recharts-legend-wrapper ul {
-  /* stylelint-disable-next-line */
-  li {
-    align-self: flex-end;
   }
 }
 

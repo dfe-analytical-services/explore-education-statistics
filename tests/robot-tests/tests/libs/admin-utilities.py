@@ -29,9 +29,9 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError(f'Cannot find accordion section number "{num}"')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Edit Section Title)"]').click()
+        elem.find_element_by_xpath('.//a[.="(Edit section title)"]').click()
     except:
-        raise AssertionError('Cannot click "(Edit Section Title)" link!')
+        raise AssertionError('Cannot click "(Edit section title)" link!')
 
     try:
         elem.find_element_by_xpath('.//input[@id="heading"]').clear()
@@ -44,16 +44,15 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError('Failed to press keys!?!')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Save Section Title)"]').click()
+        elem.find_element_by_xpath('.//a[.="(Save section title)"]').click()
     except:
-        raise AssertionError('Cannot click "(Save Section Title)" link!')
+        raise AssertionError('Cannot click "(Save section title)" link!')
 
 def user_gets_editable_accordion_section_element(section_title):
     try:
         elem = sl.driver.find_element_by_xpath(f'//*[@id="contents-accordion"]//span[text()="{section_title}"]/../../..')
     except:
         raise AssertionError(f'Cannot find accordion section titled "{section_title}"')
-
     return elem
 
 def user_opens_editable_accordion_section(section_elem):
@@ -64,9 +63,14 @@ def user_opens_editable_accordion_section(section_elem):
 
 def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=10):
     try:
-        section_elem.find_element_by_xpath('.//button[text()="Add content"]').click()
-    except:
-        raise AssertionError(f'Failed to click "Add content" button for accordion section element')
+        elem = section_elem.find_element_by_xpath('.//button[text()="Add content"]')
+    except Exception as e:
+        raise AssertionError(f'Failed to get "Add content" button element for accordion section element\nException: ', e)
+
+    try:
+        elem.click()
+    except Exception as e:
+        raise AssertionError(f'Failed to click "Add content" button for accordion section element\nException: ', e)
 
     max_time = time.time() + timeout
     while time.time() < max_time:
@@ -110,9 +114,9 @@ def user_checks_accordion_section_content_block_contains_text(section_elem, bloc
 
 def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
     try:
-        section_elem.find_element_by_xpath(f'(.//button[text()="Delete"])[{block_num}]').click()
+        elem = section_elem.find_element_by_xpath(f'(.//button[text()="Delete"])[{block_num}]').click()
     except:
-        raise AssertionError(f'Failed to find/click Delete button for content block number {block_num}')
+        raise AssertionError(f'Failed to find Delete button for content block number {block_num}')
 
     try:
         sl.driver.find_element_by_xpath(f'//button[text()="Confirm"]').click()
