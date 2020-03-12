@@ -1,5 +1,4 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
-import ConfigureAxios from '@admin/components/ConfigureAxios';
 import ErrorBoundary from '@admin/components/ErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
@@ -30,22 +29,20 @@ function App() {
 
   return (
     <ThemeAndTopic>
-      <ConfigureAxios>
+      <BrowserRouter>
         <AuthContextProvider>
-          <BrowserRouter>
-            <ErrorBoundary>
-              <Switch>
-                {authRoutes}
-                {appRoutes}
-                <ProtectedRoute
-                  allowAnonymousUsers
-                  component={PageNotFoundPage}
-                />
-              </Switch>
-            </ErrorBoundary>
-          </BrowserRouter>
+          <ErrorBoundary>
+            <Switch>
+              {authRoutes}
+              {appRoutes}
+              <ProtectedRoute
+                allowAnonymousUsers
+                component={PageNotFoundPage}
+              />
+            </Switch>
+          </ErrorBoundary>
         </AuthContextProvider>
-      </ConfigureAxios>
+      </BrowserRouter>
     </ThemeAndTopic>
   );
 }

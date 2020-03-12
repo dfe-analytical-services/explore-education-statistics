@@ -1,12 +1,15 @@
 import '@admin/polyfill';
 
 import initApplicationInsights from '@admin/services/applicationInsightsService';
+import configureAxios from '@admin/services/util/configureAxios';
 import '@common/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
 process.env.APP_ROOT_ID = 'root';
+
+configureAxios();
 
 import('./App').then(({ default: App }) => {
   ReactDOM.render(<App />, document.getElementById('root'));

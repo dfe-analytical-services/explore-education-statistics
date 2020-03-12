@@ -2,6 +2,7 @@ import { ErrorControlContextProvider } from '@admin/contexts/ErrorControlContext
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
+import { clients } from '@admin/services/util/configureAxios';
 import { AxiosError } from 'axios';
 import * as H from 'history';
 import React from 'react';
@@ -41,6 +42,11 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
       this.setState({
         errorCode: undefined,
       });
+    });
+
+    clients.forEach(client => {
+      // eslint-disable-next-line no-param-reassign
+      client.errorHandler = this.handleApiErrors;
     });
   }
 
