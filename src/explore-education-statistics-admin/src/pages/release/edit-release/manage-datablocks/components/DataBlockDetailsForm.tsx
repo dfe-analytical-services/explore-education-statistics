@@ -48,6 +48,7 @@ interface Props {
   tableHeaders: TableHeadersConfig;
   releaseId: string;
   initialDataBlock?: DataBlock;
+  onTitleChange?: (title: string) => void;
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
@@ -64,6 +65,7 @@ const DataBlockDetailsForm = ({
   tableHeaders,
   releaseId,
   initialDataBlock,
+  onTitleChange,
   onDataBlockSave,
 }: Props) => {
   const formikRef = useRef<Formik<DataBlockDetailsFormValues>>(null);
@@ -146,6 +148,9 @@ const DataBlockDetailsForm = ({
                 id="data-block-title"
                 name="title"
                 label="Table title"
+                onChange={e => {
+                  if (onTitleChange) onTitleChange(e.target.value);
+                }}
                 additionalClass="govuk-!-width-two-thirds"
                 rows={2}
               />
