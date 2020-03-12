@@ -98,10 +98,39 @@ Validate Key Statistics data block -- Summary tab
     #user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
 
 Validate Key Statistics data block -- Data tables tab
-   [Tags]  HappyPath
+   [Tags]  HappyPath    Failing
    user clicks element   css:#headlines-section-2-tab   # Click Table tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
-   # TODO Verify table
+
+   user checks results table column heading contains  css:table  1   1   2012/13
+   user checks results table column heading contains  css:table  1   2   2013/14
+   user checks results table column heading contains  css:table  1   3   2014/15
+   user checks results table column heading contains  css:table  1   4   2015/16
+   user checks results table column heading contains  css:table  1   5   2016/17
+
+   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Authorised absence rate
+   user checks row contains heading  ${row}   Authorised absence rate
+   user checks row cell contains text  ${row}   1    4.2
+   user checks row cell contains text  ${row}   2    3.5
+   user checks row cell contains text  ${row}   3    3.5
+   user checks row cell contains text  ${row}   4    3.4
+   user checks row cell contains text  ${row}   5    3.4
+
+   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Unauthorised absence rateh
+   user checks row contains heading  ${row}   Unauthorised absence rate
+   user checks row cell contains text  ${row}   1    1.1
+   user checks row cell contains text  ${row}   2    1.1
+   user checks row cell contains text  ${row}   3    1.1
+   user checks row cell contains text  ${row}   4    1.1
+   user checks row cell contains text  ${row}   5    1.3
+
+   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Overall absence rateh
+   user checks row contains heading  ${row}   Overall absence rate
+   user checks row cell contains text  ${row}   1    5.3
+   user checks row cell contains text  ${row}   2    4.5
+   user checks row cell contains text  ${row}   3    4.6
+   user checks row cell contains text  ${row}   4    4.6
+   user checks row cell contains text  ${row}   5    4.7
 
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
@@ -122,6 +151,45 @@ Validate accordion sections order
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
     user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
+
+Validate Regional and local authority (LA) breakdown table
+    [Tags]  HappyPath
+    user opens accordion section  Regional and local authority (LA) breakdown
+    user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
+
+    user checks results table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
+
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Authorised absence rate
+    user checks row contains heading  ${row}   Authorised absence rate
+    user checks row cell contains text  ${row}   1    3.4%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Overall absence rate
+    user checks row contains heading  ${row}   Overall absence rate
+    user checks row cell contains text  ${row}   1    4.3%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Unauthorised absence rate
+    user checks row contains heading  ${row}   Unauthorised absence rate
+    user checks row cell contains text  ${row}   1    0.9%
+
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Authorised absence rate
+    user checks row contains heading  ${row}   Authorised absence rate
+    user checks row cell contains text  ${row}   1    3.1%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Overall absence rate
+    user checks row contains heading  ${row}   Overall absence rate
+    user checks row cell contains text  ${row}   1    4.2%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Unauthorised absence rate
+    user checks row contains heading  ${row}   Unauthorised absence rate
+    user checks row cell contains text  ${row}   1    1.1%
+    
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Authorised absence rate
+    user checks row contains heading  ${row}   Authorised absence rate
+    user checks row cell contains text  ${row}   1    2.7%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Overall absence rate
+    user checks row contains heading  ${row}   Overall absence rate
+    user checks row cell contains text  ${row}   1    4.4%
+    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Unauthorised absence rate
+    user checks row contains heading  ${row}   Unauthorised absence rate
+    user checks row cell contains text  ${row}   1    1.7%
+
+    #TODO: More
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898

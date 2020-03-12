@@ -2,6 +2,15 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "domain": {
+      "type": "string"
+    },
+    "contentApiUrl": {
+      "type": "string"
+    },
+    "dataApiUrl": {
+      "type": "string"
+    },
     "subscription": {
       "type": "string",
       "metadata": {
@@ -399,7 +408,7 @@
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
-    "publicAppUrl": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]",
+    "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storageeescore')]",
@@ -552,8 +561,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -632,8 +640,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -767,8 +774,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -836,8 +842,7 @@
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
-              "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
-              "[concat('http://', variables('publicAppName'),'.azurewebsites.net')]",
+              "[concat('https://', parameters('domain'))]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -1184,11 +1189,11 @@
             },
             {
               "name": "CONTENT_API_BASE_URL",
-              "value": "[concat('https://', variables('contentAppName'),'.azurewebsites.net/api')]"
+              "value": "[concat('https://', parameters('contentApiUrl'),'/api')]"
             },
             {
               "name": "DATA_API_BASE_URL",
-              "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/api')]"
+              "value": "[concat('https://', parameters('dataApiUrl'),'/api')]"
             },
             {
               "name": "FUNCTION_API_BASE_URL",
@@ -1981,7 +1986,7 @@
         // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         "cors": {
           "allowedOrigins": [
-            "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
+            "[concat('https://', parameters('domain'))]",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"
@@ -2007,7 +2012,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]",
         "BaseUrl": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]",
-        "WebApplicationBaseUrl": "[variables('publicAppUrl')]",
+        "WebApplicationBaseUrl": "[concat(variables('publicAppUrl'), '/')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]",
         "TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-token'), '2018-02-14').secretUriWithVersion, ')')]",
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",

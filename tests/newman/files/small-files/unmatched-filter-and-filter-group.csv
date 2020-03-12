@@ -1,0 +1,21 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,region_code,region_name,lad_code,lad_name,local_enterprise_partnership_code,local_enterprise_partnership_name,rsc_region_lead_name,opportunity_area_code,opportunity_area_name,pcon_code,pcon_name,ward_code,ward_name,filter_one_group,some_filter_one,filter_two_group,some_filter_two,filter_three_group,some_filter_three,filter_four_group,some_filter_four,admission_numbers
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Total,Total,Total,Total,Total,Total,Total,Total,3962
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,One F1,One F1,One or Three,One F2,One or Two,One F3,One F4,One F4,8123
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Two or Three,Two F1,Two F2,Two F2,One or Two,Two F3,Two F4,Two F4,5669
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Two or Three,Three F1,One or Three,Three F2,Three F3,Three F3,Three F4,Three F4,2399
+2017,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Total,Total,Total,Total,Total,Total,Total,Total,8530
+2017,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,One F1,One F1,One or Three,One F2,One or Two,One F3,One F4,One F4,5032
+2017,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Two or Three,Two F1,Two F2,Two F2,One or Two,Two F3,Two F4,Two F4,6981
+2017,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Two or Three,Three F1,One or Three,Three F2,Three F3,Three F3,Three F4,Three F4,4180
+2016,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Total,Total,Total,Total,Total,Total,Total,Total,8856
+2016,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,One F1,One F1,One or Three,One F2,One or Two,One F3,One F4,One F4,7419
+2016,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Two or Three,Two F1,Two F2,Two F2,One or Two,Two F3,Two F4,Two F4,8427
+2016,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Two or Three,Three F1,One or Three,Three F2,Three F3,Three F3,Three F4,Three F4,3548
+2015,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Total,Total,Total,Total,Total,Total,Total,Total,9303
+2015,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,One F1,One F1,One or Three,One F2,One or Two,One F3,One F4,One F4,1134
+2015,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Two or Three,Two F1,Two F2,Two F2,One or Two,Two F3,Two F4,Two F4,6114
+2015,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Two or Three,Three F1,One or Three,Three F2,Three F3,Three F3,Three F4,Three F4,9790
+2014,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Total,Total,Total,Total,Total,Total,Total,Total,3708
+2014,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,One F1,One F1,One or Three,One F2,One or Two,One F3,One F4,One F4,9854
+2014,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Two or Three,Two F1,Two F2,Two F2,One or Two,Two F3,Two F4,Two F4,8247
+2014,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Two or Three,Three F1,One or Three,Three F2,Three F3,Three F3,Three F4,Three F4,9790

@@ -139,10 +139,7 @@ const CreatePublicationPage = ({
           enableReinitialize
           initialValues={{
             publicationTitle: '',
-            selectedContactId: orderBy(
-              model.contacts,
-              contact => contact.contactName,
-            )[0].id,
+            selectedContactId: '',
             methodologyChoice: 'existing',
             selectedMethodologyId: '',
             externalMethodology: { title: '', url: 'https://' },
@@ -194,10 +191,17 @@ const CreatePublicationPage = ({
                           id={`${formId}-selectedMethodologyId`}
                           name="selectedMethodologyId"
                           label="Select methodology"
-                          options={model.methodologies.map(methodology => ({
-                            label: methodology.title,
-                            value: methodology.id,
-                          }))}
+                          options={[
+                            { label: 'Choose a methodology', value: '' },
+                            ...orderBy(
+                              model.methodologies.map(methodology => ({
+                                label: methodology.title,
+                                value: methodology.id,
+                              })),
+                              'label',
+                            ),
+                          ]}
+                          order={[]}
                         />
                       ),
                     },
@@ -265,10 +269,17 @@ const CreatePublicationPage = ({
                     id={`${formId}-selectedContactId`}
                     label="Publication and release contact"
                     name="selectedContactId"
-                    options={model.contacts.map(contact => ({
-                      label: `${contact.contactName} - (${contact.teamName})`,
-                      value: contact.id,
-                    }))}
+                    options={[
+                      { label: 'Choose a contact', value: '' },
+                      ...orderBy(
+                        model.contacts.map(contact => ({
+                          label: `${contact.contactName} - (${contact.teamName})`,
+                          value: contact.id,
+                        })),
+                        'label',
+                      ),
+                    ]}
+                    order={[]}
                   />
                 </FormFieldset>
                 {form.values.selectedContactId && (

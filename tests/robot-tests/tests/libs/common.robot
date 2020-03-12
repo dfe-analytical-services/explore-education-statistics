@@ -24,6 +24,8 @@ set to local storage
   execute javascript  localStorage.setItem('${key}', '${value}');
 
 user signs in
+
+user signs in as bau1
   user opens the browser
 
   environment variable should be set   ADMIN_URL
@@ -37,6 +39,24 @@ user signs in
 
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading   Bau1
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+user signs in as analyst1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading     Sign-in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
+  environment variable should be set   IDENTITY_COOKIE_ANALYST
+  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading   Analyst1
   user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
@@ -251,6 +271,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
+  scroll element into view  xpath://dl//dt[contains(text(),"${dtText}")]
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user selects from list by label
@@ -326,3 +347,8 @@ user checks publication bullet contains link
 user checks publication bullet does not contain link
   [Arguments]   ${publication}   ${link}
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+
+user waits until page contains key stat tile
+  [Arguments]  ${title}  ${value}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]
+

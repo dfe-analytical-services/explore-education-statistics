@@ -3,7 +3,7 @@
 exports[`DataBlock renders map instead of chart 1`] = `
 <section
   aria-labelledby="test-datablock-charts-tab"
-  class="govuk-tabs__panel dfe-content-overflow panel"
+  class="govuk-tabs__panel panel"
   id="test-datablock-charts"
   role="tabpanel"
   tabindex="-1"
@@ -16,281 +16,285 @@ exports[`DataBlock renders map instead of chart 1`] = `
   >
     If you are using a keyboard or a screen reader you may wish to view the accessible table instead. Press enter to switch to the data tables tab.
   </a>
-  <form>
-    <div
-      class="govuk-form-group"
-    >
-      <fieldset
-        class="govuk-fieldset"
-        id="data-and-location"
-      >
-        <legend
-          class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
-        >
-          Select data and location to view indicators
-        </legend>
-        <div
-          class="mapContainer"
-        >
-          <div
-            class="govuk-form-group mapIndicator"
-          >
-            <label
-              class="govuk-label"
-              for="selectedIndicator"
-            >
-              1. Select data to view
-            </label>
-            <select
-              class="govuk-select govuk-!-width-full"
-              id="selectedIndicator"
-              name="selectedIndicator"
-            >
-              <option
-                value="23_1_2_____"
-              >
-                Label 23_1_2
-              </option>
-              <option
-                value="26_1_2_____"
-              >
-                Label 26_1_2
-              </option>
-              <option
-                value="28_1_2_____"
-              >
-                Label 28_1_2
-              </option>
-            </select>
-          </div>
-          <div
-            class="govuk-form-group mapLocation"
-          >
-            <label
-              class="govuk-label"
-              for="selectedLocation"
-            >
-              2. Select a location
-            </label>
-            <select
-              class="govuk-select"
-              id="selectedLocation"
-              name="selectedLocation"
-            >
-              <option
-                value=""
-              >
-                Select...
-              </option>
-              <option
-                value="E92000001"
-              >
-                England
-              </option>
-              <option
-                value="S92000001"
-              >
-                Scotland
-              </option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-  </form>
   <div
-    class="mapContainer"
+    class="govuk-!-margin-bottom-6"
   >
-    <div
-      class="mapView"
-    >
+    <form>
       <div
-        class="map dfe-print-break-avoid leaflet-container leaflet-grab leaflet-touch-drag"
-        style="width: 800px; height: 600px; position: relative;"
-        tabindex="0"
+        class="govuk-form-group"
       >
-        <div
-          class="leaflet-pane leaflet-map-pane"
-          style="left: 0px; top: 0px;"
+        <fieldset
+          class="govuk-fieldset"
+          id="data-and-location"
         >
-          <div
-            class="leaflet-pane leaflet-tile-pane"
-          />
-          <div
-            class="leaflet-pane leaflet-shadow-pane"
-          />
-          <div
-            class="leaflet-pane leaflet-overlay-pane"
+          <legend
+            class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
           >
-            <svg
-              height="0"
-              pointer-events="none"
-              style="left: 0px; top: 0px;"
-              viewBox="0 0 0 0"
-              width="0"
-            >
-              <g>
-                <path
-                  class="uk leaflet-interactive"
-                  d="M-3 3L-3 -3L3 -3L3 3z"
-                  fill="#3388ff"
-                  fill-opacity="0.2"
-                  fill-rule="evenodd"
-                  stroke="#3388ff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-opacity="1"
-                  stroke-width="3"
-                />
-                <path
-                  class="leaflet-interactive"
-                  d="M0 0"
-                  fill="#3f0000"
-                  fill-opacity="0.2"
-                  fill-rule="evenodd"
-                  stroke="#3388ff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-opacity="1"
-                  stroke-width="3"
-                />
-              </g>
-            </svg>
-          </div>
+            Select data and location to view indicators
+          </legend>
           <div
-            class="leaflet-pane leaflet-marker-pane"
-          />
-          <div
-            class="leaflet-pane leaflet-tooltip-pane"
-          />
-          <div
-            class="leaflet-pane leaflet-popup-pane"
-          />
-        </div>
-        <div
-          class="leaflet-control-container"
-        >
-          <div
-            class="leaflet-top leaflet-left"
+            class="mapContainer"
           >
             <div
-              class="leaflet-control-zoom leaflet-bar leaflet-control"
+              class="govuk-form-group mapIndicator"
             >
-              <a
-                aria-label="Zoom in"
-                class="leaflet-control-zoom-in"
-                href="#"
-                role="button"
-                title="Zoom in"
+              <label
+                class="govuk-label"
+                for="selectedIndicator"
               >
-                +
-              </a>
-              <a
-                aria-label="Zoom out"
-                class="leaflet-control-zoom-out"
-                href="#"
-                role="button"
-                title="Zoom out"
+                1. Select data to view
+              </label>
+              <select
+                class="govuk-select govuk-!-width-full"
+                id="selectedIndicator"
+                name="selectedIndicator"
               >
-                −
-              </a>
+                <option
+                  value="23_1_2_____"
+                >
+                  Label 23_1_2
+                </option>
+                <option
+                  value="26_1_2_____"
+                >
+                  Label 26_1_2
+                </option>
+                <option
+                  value="28_1_2_____"
+                >
+                  Label 28_1_2
+                </option>
+              </select>
+            </div>
+            <div
+              class="govuk-form-group mapLocation"
+            >
+              <label
+                class="govuk-label"
+                for="selectedLocation"
+              >
+                2. Select a location
+              </label>
+              <select
+                class="govuk-select"
+                id="selectedLocation"
+                name="selectedLocation"
+              >
+                <option
+                  value=""
+                >
+                  Select...
+                </option>
+                <option
+                  value="E92000001"
+                >
+                  England
+                </option>
+                <option
+                  value="S92000001"
+                >
+                  Scotland
+                </option>
+              </select>
             </div>
           </div>
+        </fieldset>
+      </div>
+    </form>
+    <div
+      class="mapContainer"
+    >
+      <div
+        class="mapView"
+      >
+        <div
+          class="map dfe-print-break-avoid leaflet-container leaflet-grab leaflet-touch-drag"
+          style="width: 800px; height: 600px; position: relative;"
+          tabindex="0"
+        >
           <div
-            class="leaflet-top leaflet-right"
-          />
-          <div
-            class="leaflet-bottom leaflet-left"
-          />
-          <div
-            class="leaflet-bottom leaflet-right"
+            class="leaflet-pane leaflet-map-pane"
+            style="left: 0px; top: 0px;"
           >
             <div
-              class="leaflet-control-attribution leaflet-control"
+              class="leaflet-pane leaflet-tile-pane"
+            />
+            <div
+              class="leaflet-pane leaflet-shadow-pane"
+            />
+            <div
+              class="leaflet-pane leaflet-overlay-pane"
             >
-              <a
-                href="https://leafletjs.com"
-                title="A JS library for interactive maps"
+              <svg
+                height="0"
+                pointer-events="none"
+                style="left: 0px; top: 0px;"
+                viewBox="0 0 0 0"
+                width="0"
               >
-                Leaflet
-              </a>
+                <g>
+                  <path
+                    class="uk leaflet-interactive"
+                    d="M-3 3L-3 -3L3 -3L3 3z"
+                    fill="#3388ff"
+                    fill-opacity="0.2"
+                    fill-rule="evenodd"
+                    stroke="#3388ff"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-opacity="1"
+                    stroke-width="3"
+                  />
+                  <path
+                    class="leaflet-interactive"
+                    d="M0 0"
+                    fill="#3f0000"
+                    fill-opacity="0.2"
+                    fill-rule="evenodd"
+                    stroke="#3388ff"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-opacity="1"
+                    stroke-width="3"
+                  />
+                </g>
+              </svg>
+            </div>
+            <div
+              class="leaflet-pane leaflet-marker-pane"
+            />
+            <div
+              class="leaflet-pane leaflet-tooltip-pane"
+            />
+            <div
+              class="leaflet-pane leaflet-popup-pane"
+            />
+          </div>
+          <div
+            class="leaflet-control-container"
+          >
+            <div
+              class="leaflet-top leaflet-left"
+            >
+              <div
+                class="leaflet-control-zoom leaflet-bar leaflet-control"
+              >
+                <a
+                  aria-label="Zoom in"
+                  class="leaflet-control-zoom-in"
+                  href="#"
+                  role="button"
+                  title="Zoom in"
+                >
+                  +
+                </a>
+                <a
+                  aria-label="Zoom out"
+                  class="leaflet-control-zoom-out"
+                  href="#"
+                  role="button"
+                  title="Zoom out"
+                >
+                  −
+                </a>
+              </div>
+            </div>
+            <div
+              class="leaflet-top leaflet-right"
+            />
+            <div
+              class="leaflet-bottom leaflet-left"
+            />
+            <div
+              class="leaflet-bottom leaflet-right"
+            >
+              <div
+                class="leaflet-control-attribution leaflet-control"
+              >
+                <a
+                  href="https://leafletjs.com"
+                  title="A JS library for interactive maps"
+                >
+                  Leaflet
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div
-      aria-live="assertive"
-      class="mapControls"
-    >
       <div
-        class="mapKey"
+        aria-live="assertive"
+        class="mapControls"
       >
-        <h3
-          class="govuk-heading-s"
+        <div
+          class="mapKey"
         >
-          Key to 
-          Label 23_1_2
-        </h3>
-        <dl
-          class="govuk-list"
-        >
-          <dd
-            class="legend"
+          <h3
+            class="govuk-heading-s"
           >
-            <span
-              class="rate0"
-              style="background-color: rgb(63, 0, 0);"
-            >
-               
-            </span>
-             -3% to -3%
-          </dd>
-          <dd
-            class="legend"
+            Key to 
+            Label 23_1_2
+          </h3>
+          <dl
+            class="govuk-list"
           >
-            <span
-              class="rate1"
-              style="background-color: rgb(111, 0, 0);"
+            <dd
+              class="legend"
             >
-               
-            </span>
-             -3% to -3%
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate2"
-              style="background-color: rgb(159, 0, 0);"
+              <span
+                class="rate0"
+                style="background-color: rgb(63, 0, 0);"
+              >
+                 
+              </span>
+               -3% to -3%
+            </dd>
+            <dd
+              class="legend"
             >
-               
-            </span>
-             -3% to -2%
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate3"
-              style="background-color: rgb(207, 0, 0);"
+              <span
+                class="rate1"
+                style="background-color: rgb(111, 0, 0);"
+              >
+                 
+              </span>
+               -3% to -3%
+            </dd>
+            <dd
+              class="legend"
             >
-               
-            </span>
-             -2% to -2%
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate4"
-              style="background-color: rgb(255, 0, 0);"
+              <span
+                class="rate2"
+                style="background-color: rgb(159, 0, 0);"
+              >
+                 
+              </span>
+               -3% to -2%
+            </dd>
+            <dd
+              class="legend"
             >
-               
-            </span>
-             -2% to -2%
-          </dd>
-        </dl>
+              <span
+                class="rate3"
+                style="background-color: rgb(207, 0, 0);"
+              >
+                 
+              </span>
+               -2% to -2%
+            </dd>
+            <dd
+              class="legend"
+            >
+              <span
+                class="rate4"
+                style="background-color: rgb(255, 0, 0);"
+              >
+                 
+              </span>
+               -2% to -2%
+            </dd>
+          </dl>
+        </div>
       </div>
     </div>
   </div>

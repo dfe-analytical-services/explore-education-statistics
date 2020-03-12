@@ -7,6 +7,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
+import ButtonText from '@common/components/ButtonText';
 import styles from './EditableAccordionSection.module.scss';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
@@ -127,31 +128,27 @@ const EditableAccordionSection = ({
           <span className="govuk-accordion__section-summary">{caption}</span>
         )}
         {!!onRemoveSection && (
-          <a
-            role="button"
-            tabIndex={0}
-            onClick={() => setShowRemoveModal(true)}
-            onKeyPress={e => {
-              if (e.key === 'Enter') setShowRemoveModal(true);
-            }}
-            className={styles.edit}
-          >
-            (Remove section)
-            {showRemoveModal && (
-              <ModalConfirm
-                title="Are you sure?"
-                onConfirm={onRemoveSection}
-                onExit={() => setShowRemoveModal(false)}
-                onCancel={() => setShowRemoveModal(false)}
-              >
-                <p>
-                  Are you sure you want to remove the following section?
-                  <br />
-                  <strong>"{heading}"</strong>
-                </p>
-              </ModalConfirm>
-            )}
-          </a>
+          <>
+            <ButtonText
+              onClick={() => setShowRemoveModal(true)}
+              className={styles.edit}
+            >
+              (Remove section)
+            </ButtonText>
+            <ModalConfirm
+              title="Are you sure?"
+              mounted={showRemoveModal}
+              onConfirm={onRemoveSection}
+              onCancel={() => setShowRemoveModal(false)}
+              onExit={() => setShowRemoveModal(false)}
+            >
+              <p>
+                Are you sure you want to remove the following section?
+                <br />
+                <strong>"{heading}"</strong>
+              </p>
+            </ModalConfirm>
+          </>
         )}
       </div>
       {children && (

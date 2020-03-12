@@ -64,21 +64,30 @@
 }
 
 .editableContentEditing {
+  background: govuk-colour('light-grey');
   border: 2px solid #000;
   cursor: pointer;
   margin: 0;
-  padding: 0;
+  padding: 0 0 2.45rem;
   position: relative;
 
   .editableButton {
     border: 0;
+    bottom: 2px;
     display: inline !important;
     margin: 0;
     padding: 0;
     position: absolute;
     right: 0;
-    top: 0;
     z-index: 1000;
+  }
+
+  :global(.govuk-button) {
+    margin-bottom: 0;
+  }
+
+  :global(.ck-focused) {
+    border-color: $govuk-input-border-colour !important;
   }
 }
 
