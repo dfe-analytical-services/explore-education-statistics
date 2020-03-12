@@ -24,6 +24,9 @@ const service = {
   canApproveRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/status/approve`);
   },
+  canMakeAmendmentOfRelease: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/amend`);
+  },
   canCreatePublicationForTopic: (topicId: string): Promise<boolean> => {
     return client.get(`/permissions/topic/${topicId}/publication/create`);
   },

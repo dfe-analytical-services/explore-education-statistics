@@ -78,8 +78,9 @@ const PublicationSummary = ({
                           ? 'Edit this release'
                           : 'View this release'}
                       </ButtonLink>
-                      {release.permissions.canUpdateRelease && (
+                      {release.permissions.canMakeAmendmentOfRelease && (
                         <Button
+                          className="govuk-button--secondary govuk-!-margin-left-4"
                           onClick={() =>
                             service
                               .createReleaseAmendment(release.id)

@@ -82,6 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
                 
+                // does this user have permission to make an amendment of an existing release?
+                options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement()));
+
+                
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
@@ -151,8 +156,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
             services
-                .AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler
+                .AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler
                 >();
+            services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
 
             /**
              * Release management
@@ -162,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForSpecificReleaseAuthorizationHandler>();
 
             /**

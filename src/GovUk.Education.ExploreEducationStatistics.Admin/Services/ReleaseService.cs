@@ -119,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
-                // TODO DW - correct permission check
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))

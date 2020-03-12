@@ -20,37 +20,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             
         }
-    }
     
-    public class CanSeeAllPublicationsAuthorizationHandler : HasClaimAuthorizationHandler<
+        public class CanSeeAllPublicationsAuthorizationHandler : HasClaimAuthorizationHandler<
             ViewSpecificPublicationRequirement>
-    {
-        public CanSeeAllPublicationsAuthorizationHandler() 
-            : base(SecurityClaimTypes.AccessAllReleases) {}
-    }
-    
-    public class HasRoleOnAnyChildReleaseAuthorizationHandler
-        : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
-    {
-        private readonly ContentDbContext _context;
-
-        public HasRoleOnAnyChildReleaseAuthorizationHandler(ContentDbContext context)
         {
-            _context = context;
+            public CanSeeAllPublicationsAuthorizationHandler() 
+                : base(SecurityClaimTypes.AccessAllReleases) {}
         }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
-            ViewSpecificPublicationRequirement requirement, Publication publication)
+    
+        public class HasRoleOnAnyChildReleaseAuthorizationHandler
+            : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
         {
-            var userId = authContext.User.GetUserId();
-            
-            if (await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .Where(r => r.UserId == userId)
-                .AnyAsync(r => r.Release.PublicationId == publication.Id))
+            private readonly ContentDbContext _context;
+
+            public HasRoleOnAnyChildReleaseAuthorizationHandler(ContentDbContext context)
             {
-                authContext.Succeed(requirement);
+                _context = context;
+            }
+
+            protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
+                ViewSpecificPublicationRequirement requirement, Publication publication)
+            {
+                var userId = authContext.User.GetUserId();
+            
+                if (await _context
+                    .UserReleaseRoles
+                    .Include(r => r.Release)
+                    .Where(r => r.UserId == userId)
+                    .AnyAsync(r => r.Release.PublicationId == publication.Id))
+                {
+                    authContext.Succeed(requirement);
+                }
             }
         }
     }

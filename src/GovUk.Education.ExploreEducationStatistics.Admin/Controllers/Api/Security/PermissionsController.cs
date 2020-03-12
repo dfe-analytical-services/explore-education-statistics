@@ -82,6 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanApproveRelease);
         }
 
+        [HttpGet("release/{releaseId}/amend")]
+        public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseId)
+        {
+            return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanMakeAmendmentOfRelease);
+        }
+
         [HttpGet("release/{releaseId}/prerelease/status")]
         public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseId)
         {

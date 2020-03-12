@@ -49,6 +49,7 @@ export interface AdminDashboardRelease {
   higherReviewComments: Comment[];
   permissions: {
     canUpdateRelease: boolean;
+    canMakeAmendmentOfRelease: boolean;
   };
 }
 
