@@ -1,9 +1,6 @@
 import Page from '@admin/components/Page';
 import service from '@admin/services/common/service.ts';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -11,20 +8,17 @@ import AssignMethodologyForm from './AssignMethodologyForm';
 
 const PublicationAssignMethodologyPage = ({
   match,
-  handleApiErrors,
 }: RouteComponentProps<{
   themeId: string;
   topicId: string;
   publicationId: string;
-}> &
-  ErrorControlProps) => {
+}>) => {
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   const getPublication = () => {
     service
       .getBasicPublicationDetails(match.params.publicationId)
-      .then(setPublication)
-      .catch(handleApiErrors);
+      .then(setPublication);
   };
   useEffect(getPublication, [match.params.publicationId]);
 
@@ -60,4 +54,4 @@ const PublicationAssignMethodologyPage = ({
   );
 };
 
-export default withErrorControl(PublicationAssignMethodologyPage);
+export default PublicationAssignMethodologyPage;

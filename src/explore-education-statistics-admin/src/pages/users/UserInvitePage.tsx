@@ -1,21 +1,27 @@
-import ButtonText from '@common/components/ButtonText';
-import React from 'react';
-import Page from '@admin/components/Page';
-import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@admin/components/Link';
+import Page from '@admin/components/Page';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
 import { UserInvite } from '@admin/services/users/types';
-import { RouteComponentProps } from 'react-router';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import Form from '@common/components/form/Form';
+import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'USER_ALREADY_EXISTS',
+    'userEmail',
+    'User already exists',
+  ),
+];
 
 interface FormValues {
   userEmail: string;
@@ -23,32 +29,20 @@ interface FormValues {
 
 const UserInvitePage = ({
   history,
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const formId = 'inviteUserForm';
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'USER_ALREADY_EXISTS',
-      'userEmail',
-      'User already exists',
-    ),
-  ];
   const cancelHandler = () => history.push('/administration/users');
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      const submission: UserInvite = {
-        email: values.userEmail,
-      };
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    const submission: UserInvite = {
+      email: values.userEmail,
+    };
 
-      await userService.inviteUser(submission);
+    await userService.inviteUser(submission);
 
-      history.push(`/administration/users`);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    history.push(`/administration/users`);
+  }, errorCodeMappings);
 
   return (
     <Page
@@ -92,7 +86,7 @@ const UserInvitePage = ({
                 .required('Provide the users email')
                 .email('Provide a valid email address'),
             })}
-            onSubmit={submitFormHandler}
+            onSubmit={handleSubmit}
             render={_ => {
               return (
                 <Form id={formId}>
@@ -124,4 +118,4 @@ const UserInvitePage = ({
   );
 };
 
-export default withErrorControl(UserInvitePage);
+export default UserInvitePage;

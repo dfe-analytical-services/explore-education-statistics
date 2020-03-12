@@ -7,9 +7,6 @@ import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
@@ -50,9 +47,8 @@ const PublicationReleaseContent = ({
   styles,
   logEvent = nullLogEvent,
   onReleaseChange,
-  handleApiErrors,
   availableDataBlocks: initialAvailableDataBlocks,
-}: Props & ErrorControlProps) => {
+}: Props) => {
   const [release, setRelease] = useState(content.release);
 
   const setReleaseAndTriggerOnReleaseChange = useCallback(
@@ -170,9 +166,7 @@ const PublicationReleaseContent = ({
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService
-                            .downloadFile(path, name)
-                            .catch(handleApiErrors)
+                          editReleaseDataService.downloadFile(path, name)
                         }
                         className="govuk-link"
                       >
@@ -283,4 +277,4 @@ const PublicationReleaseContent = ({
   );
 };
 
-export default withErrorControl(PublicationReleaseContent);
+export default PublicationReleaseContent;

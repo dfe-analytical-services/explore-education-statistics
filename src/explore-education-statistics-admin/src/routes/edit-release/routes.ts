@@ -1,14 +1,15 @@
-import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import ReleaseContentPage from '@admin/pages/release/edit-release/content/ReleaseContentPage';
+import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
+import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
+import { ComponentType } from 'react';
 
 export interface ReleaseRoute {
   path: string;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  component: (props: any) => JSX.Element;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>;
   title: string;
   generateLink: (publicationId: string, releaseId: string) => string;
 }
@@ -16,8 +17,8 @@ export interface ReleaseRoute {
 const createReadonlyRoute = (
   section: string,
   title: string,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  component: (props: any) => JSX.Element,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>,
 ): ReleaseRoute => {
   const path = `/publication/:publicationId/release/:releaseId/${section}`;
   return {
@@ -34,8 +35,8 @@ const createReadonlyRoute = (
 const createEditRoute = (
   section: string,
   title: string,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  component: (props: any) => JSX.Element,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>,
 ): ReleaseRoute => {
   const path = `/publication/:publicationId/release/:releaseId/${section}/edit`;
   return {

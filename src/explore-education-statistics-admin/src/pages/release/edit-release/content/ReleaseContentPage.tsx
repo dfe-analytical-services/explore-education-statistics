@@ -2,24 +2,21 @@ import PublicationReleaseContent from '@admin/modules/find-statistics/Publicatio
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/service';
 import {
   EditableContentBlock,
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import permissionService from '@admin/services/permissions/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
+import { DataBlock } from '@common/services/dataBlockService';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { DataBlock } from '@common/services/dataBlockService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 type PageMode = 'edit' | 'preview';
 
@@ -66,7 +63,7 @@ const getUnresolveComments = (release: ManageContentPageViewModel['release']) =>
       ),
   ].filter(comment => comment !== undefined && comment.state === 'open');
 
-const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseContentPage = () => {
   const [model, setModel] = useState<Model>();
 
   const { releaseId, publication } = useContext(
@@ -77,18 +74,16 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
     Promise.all([
       releaseContentService.getContent(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([newContent, canUpdateRelease]) => {
-        setModel({
-          unresolvedComments: getUnresolveComments(newContent.release),
-          pageMode: canUpdateRelease ? 'edit' : 'preview',
-          content: newContent,
-          availableDataBlocks: newContent.availableDataBlocks,
-          canUpdateRelease,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, publication.themeId, publication, handleApiErrors]);
+    ]).then(([newContent, canUpdateRelease]) => {
+      setModel({
+        unresolvedComments: getUnresolveComments(newContent.release),
+        pageMode: canUpdateRelease ? 'edit' : 'preview',
+        content: newContent,
+        availableDataBlocks: newContent.availableDataBlocks,
+        canUpdateRelease,
+      });
+    });
+  }, [releaseId, publication.themeId, publication]);
 
   const onReleaseChange = React.useCallback(
     (newRelease: ManageContentPageViewModel['release']) => {
@@ -178,4 +173,4 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(ReleaseContentPage);
+export default ReleaseContentPage;
