@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITableStorageService _tableStorageService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
-	private readonly IFootnoteService _footnoteService;
+	    private readonly IFootnoteService _footnoteService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies

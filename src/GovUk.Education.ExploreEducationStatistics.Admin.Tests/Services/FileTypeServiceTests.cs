@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -159,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = ImageTypes.Contains(type);
-                AssertHasMatchingMimeType(type, ReleasesController.AllowedChartFileTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedChartFileTypes.ToList(), expectedToSucceed);
             });
         }
         
@@ -169,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // check that all types are valid for ancillary file uploads
             AllTypes.ForEach(type =>
             {
-                AssertHasMatchingMimeType(type, ReleasesController.AllowedAncillaryFileTypes.ToList(), true);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedAncillaryFileTypes.ToList(), true);
             });
         }
         
