@@ -5,13 +5,12 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
-import releaseService from '@admin/services/release/edit-release/summary/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
+import releaseService from '@admin/services/release/edit-release/summary/service';
 import { ReleasePublicationStatus } from '@admin/services/release/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
-import { ReleaseStatus } from '@common/services/publicationService';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
 
@@ -131,10 +130,12 @@ const ManageReleasePageContainer = ({
             value={{
               publication,
               releaseId,
-              onChangeReleaseStatus: (status: ReleaseStatus) =>
+              onChangeReleaseStatus: (
+                updatedStatus: Partial<ReleasePublicationStatus>,
+              ) =>
                 setReleasePublicationStatus({
                   ...releasePublicationStatus,
-                  status,
+                  ...updatedStatus,
                 }),
             }}
           >

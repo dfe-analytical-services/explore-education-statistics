@@ -6,14 +6,14 @@ import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import {Form, FormFieldRadioGroup, Formik} from '@common/components/form';
+import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import {RadioOption} from '@common/components/form/FormRadioGroup';
-import {errorCodeToFieldError} from '@common/components/form/util/serverValidationHandler';
+import { RadioOption } from '@common/components/form/FormRadioGroup';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
-import {ReleaseStatus} from '@common/services/publicationService';
-import {FormikProps} from 'formik';
-import React, {useContext, useEffect, useState} from 'react';
+import { ReleaseStatus } from '@common/services/publicationService';
+import { FormikProps } from 'formik';
+import React, { useContext, useEffect, useState } from 'react';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -94,8 +94,9 @@ const ReleaseStatusPage = () => {
 
     setShowForm(false);
 
-    onChangeReleaseStatus(values.releaseStatus);
-
+    onChangeReleaseStatus({
+      status: values.releaseStatus,
+    });
   }, errorCodeMappings);
 
   if (!model) return null;
