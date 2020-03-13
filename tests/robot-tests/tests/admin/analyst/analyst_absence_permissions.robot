@@ -100,7 +100,7 @@ Validate Analyst1 can see Manage content page key stats
 
 Validate Analyst1 can see Manage content page accordion sections
     [Tags]  HappyPath
-    user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
+    user waits until page contains accordion section  About these statistics
     user checks accordion is in position  About these statistics            1
     user checks accordion is in position  Pupil absence rates               2
     user checks accordion is in position  Persistent absence                3
@@ -112,6 +112,7 @@ Validate Analyst1 can see Manage content page accordion sections
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
     user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
+    user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
 
 Validate Analyst1 cannot Approve a Pupil absence in schools in England release
     [Tags]  HappyPath

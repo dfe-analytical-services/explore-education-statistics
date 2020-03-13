@@ -163,7 +163,7 @@ user waits until page contains heading
 
 user waits until page contains accordion section
   [Arguments]   ${section_title}
-  user waits until page contains element  xpath://*[@class="govuk-accordion__section-button" and text()="${section_title}"]
+  user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]
 
 user checks element contains
   [Arguments]   ${element}    ${text}
