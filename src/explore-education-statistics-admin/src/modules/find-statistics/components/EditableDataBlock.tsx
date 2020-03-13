@@ -16,7 +16,7 @@ type Props = {
 } & DataBlockProps;
 
 const EditableDataBlock = ({ id, onDelete, ...restOfProps }: Props) => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (

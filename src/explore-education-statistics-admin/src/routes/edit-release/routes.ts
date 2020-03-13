@@ -1,7 +1,7 @@
 import ReleaseContentPage from '@admin/pages/release/edit-release/content/ReleaseContentPage';
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
-import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
+import ReleasePublishStatusPage from '@admin/pages/release/edit-release/status/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
 import { ComponentType } from 'react';

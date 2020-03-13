@@ -194,6 +194,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
+        [HttpGet("releases/{releaseId}/publication-status")]
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleasePublicationStatusAsync(Guid releaseId)
+        {
+            return await _releaseService
+                .GetReleasePublicationStatusAsync(releaseId)
+                .HandleFailuresOr(Ok);
+        }
+
         [HttpPut("releases/{releaseId}/summary")]
         public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
             Guid releaseId)

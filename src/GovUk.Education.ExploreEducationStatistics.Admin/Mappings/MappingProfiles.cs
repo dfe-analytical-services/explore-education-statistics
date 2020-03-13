@@ -184,6 +184,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ContentSection, ContentSectionViewModel>();
 
             CreateMap<Methodology, ManageMethodologyContentViewModel>();
+
+            CreateMap<Release, ReleasePublicationStatusViewModel>();
         }
     }
 }

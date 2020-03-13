@@ -27,4 +27,10 @@ export interface BaseReleaseSummaryDetailsRequest {
   nextReleaseDate: DayMonthYearValues;
 }
 
+export interface ReleasePublicationStatus {
+  status: ReleaseStatus;
+  amendment: boolean;
+  live: boolean;
+}
+
 export default {};

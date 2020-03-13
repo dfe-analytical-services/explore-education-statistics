@@ -1,13 +1,10 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import {
-  ErrorControlContext,
-  useErrorControl,
-} from '@admin/contexts/ErrorControlContext';
+import { useErrorControl } from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
 import { User } from '@admin/services/sign-in/types';
-import React, { useContext } from 'react';
-import { Redirect, Route, RouteComponentProps, RouteProps } from 'react-router';
+import React from 'react';
+import { Redirect, Route, RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;

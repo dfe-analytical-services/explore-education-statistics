@@ -2,12 +2,16 @@ import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
+import releaseService from '@admin/services/release/edit-release/summary/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
+import { ReleasePublicationStatus } from '@admin/services/release/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
-import React, { useEffect, useState } from 'react';
+import { ReleaseStatus } from '@common/services/publicationService';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
 
@@ -23,9 +27,18 @@ const ManageReleasePageContainer = ({
   const { publicationId, releaseId } = match.params;
 
   const [publication, setPublication] = useState<BasicPublicationDetails>();
+  const [releasePublicationStatus, setReleasePublicationStatus] = useState<
+    ReleasePublicationStatus
+  >();
 
   useEffect(() => {
-    service.getBasicPublicationDetails(publicationId).then(setPublication);
+    Promise.all([
+      service.getBasicPublicationDetails(publicationId),
+      releaseService.getReleasePublicationStatus(releaseId),
+    ]).then(([publicationDetails, publicationStatus]) => {
+      setPublication(publicationDetails);
+      setReleasePublicationStatus(publicationStatus);
+    });
   }, [publicationId, releaseId]);
 
   const currentRouteIndex =
@@ -58,12 +71,17 @@ const ManageReleasePageContainer = ({
 
   return (
     <>
-      {publication && (
+      {publication && releasePublicationStatus && (
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <h1 className="govuk-heading-xl">
-                <span className="govuk-caption-xl">Edit release</span>
+                <span className="govuk-caption-xl">
+                  {releasePublicationStatus &&
+                  releasePublicationStatus.amendment
+                    ? 'Amend release'
+                    : 'Edit release'}
+                </span>
                 {publication.title}
               </h1>
             </div>
@@ -84,6 +102,16 @@ const ManageReleasePageContainer = ({
             </div>
           </div>
 
+          <Tag>{getReleaseStatusLabel(releasePublicationStatus.status)}</Tag>
+
+          {releasePublicationStatus.amendment && (
+            <Tag className="govuk-!-margin-left-2">Amendment</Tag>
+          )}
+
+          {releasePublicationStatus.live && (
+            <Tag className="govuk-!-margin-left-2">Live</Tag>
+          )}
+
           <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
             <ul className="app-navigation__list govuk-!-margin-bottom-0">
               {viewRoutes.map(route => (
@@ -103,6 +131,11 @@ const ManageReleasePageContainer = ({
             value={{
               publication,
               releaseId,
+              onChangeReleaseStatus: (status: ReleaseStatus) =>
+                setReleasePublicationStatus({
+                  ...releasePublicationStatus,
+                  status,
+                }),
             }}
           >
             {releaseRoutes.manageReleaseRoutes.map(route => (

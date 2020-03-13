@@ -1,21 +1,19 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
+import {Form, FormFieldRadioGroup, Formik} from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { RadioOption } from '@common/components/form/FormRadioGroup';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import {RadioOption} from '@common/components/form/FormRadioGroup';
+import {errorCodeToFieldError} from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
-import { ReleaseStatus } from '@common/services/publicationService';
-import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import {ReleaseStatus} from '@common/services/publicationService';
+import {FormikProps} from 'formik';
+import React, {useContext, useEffect, useState} from 'react';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -48,7 +46,7 @@ const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId, onChangeReleaseStatus } = useContext(ManageReleaseContext);
 
   useEffect(() => {
     Promise.all([
@@ -84,17 +82,20 @@ const ReleaseStatusPage = () => {
   }, [releaseId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    await service.updateReleaseStatus(releaseId, values).then(() => {
-      if (model) {
-        setModel({
-          ...model,
-          releaseStatus: values.releaseStatus,
-          statusOptions: model.statusOptions,
-        });
-      }
+    await service.updateReleaseStatus(releaseId, values);
 
-      setShowForm(false);
-    });
+    if (model) {
+      setModel({
+        ...model,
+        releaseStatus: values.releaseStatus,
+        statusOptions: model.statusOptions,
+      });
+    }
+
+    setShowForm(false);
+
+    onChangeReleaseStatus(values.releaseStatus);
+
   }, errorCodeMappings);
 
   if (!model) return null;

@@ -56,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public bool Live => Published.HasValue && (Compare(UtcNow, Published.Value) > 0);
 
+        [NotMapped] public bool Amendment => Version > 0 && !Live;
+
         public string Slug { get; set; }
 
         public Guid PublicationId { get; set; }

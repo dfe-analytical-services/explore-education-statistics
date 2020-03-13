@@ -1,4 +1,7 @@
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import {
+  ReleasePublicationStatus,
+  ReleaseSummaryDetails,
+} from '@admin/services/release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import client from '@admin/services/util/service';
 
@@ -12,6 +15,13 @@ const service = {
     return client.put(
       `/releases/${updateRequest.releaseId}/summary`,
       updateRequest,
+    );
+  },
+  getReleasePublicationStatus(
+    releaseId: string,
+  ): Promise<ReleasePublicationStatus> {
+    return client.get<ReleasePublicationStatus>(
+      `/releases/${releaseId}/publication-status`,
     );
   },
 };
