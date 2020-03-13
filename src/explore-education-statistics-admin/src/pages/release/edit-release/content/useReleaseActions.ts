@@ -74,7 +74,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const updateAvailableDataBlocks = useCallback(
@@ -87,7 +87,7 @@ export default function useReleaseActions() {
         payload: { availableDataBlocks },
       });
     },
-    [],
+    [dispatch],
   );
 
   const deleteContentSectionBlock = useCallback(
@@ -115,7 +115,7 @@ export default function useReleaseActions() {
       // and so it is now available again
       updateAvailableDataBlocks({ releaseId });
     },
-    [],
+    [dispatch],
   );
 
   const updateContentSectionDataBlock = useCallback(
@@ -146,7 +146,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const updateContentSectionBlock = useCallback(
@@ -177,7 +177,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const addContentSectionBlock = useCallback(
@@ -205,7 +205,7 @@ export default function useReleaseActions() {
       // and so it is unavailable
       updateAvailableDataBlocks({ releaseId });
     },
-    [],
+    [dispatch],
   );
 
   const attachContentSectionBlock = useCallback(
@@ -231,7 +231,7 @@ export default function useReleaseActions() {
       });
       updateAvailableDataBlocks({ releaseId });
     },
-    [],
+    [dispatch],
   );
 
   const updateSectionBlockOrder = useCallback(
@@ -259,7 +259,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const addContentSection = useCallback(
@@ -275,7 +275,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const updateContentSectionsOrder = useCallback(
@@ -297,7 +297,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const removeContentSection = useCallback(
@@ -319,7 +319,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   const updateContentSectionHeading = useCallback(
@@ -345,7 +345,7 @@ export default function useReleaseActions() {
         },
       });
     },
-    [],
+    [dispatch],
   );
 
   return {
