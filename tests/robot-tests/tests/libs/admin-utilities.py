@@ -104,6 +104,8 @@ def user_adds_content_to_accordion_section_content_block(section_elem, block_num
     except:
         raise AssertionError(f'Failed to find Save button for content block')
 
+    sl.wait_until_page_contains_element(f'//p[text()="{content}"]')
+
 def user_checks_accordion_section_content_block_contains_text(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(
