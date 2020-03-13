@@ -1,10 +1,6 @@
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import {
-  DataBlockLocation,
-  DataBlockRequest,
-} from '@common/services/dataBlockService';
-import { Dictionary } from '@common/types';
-import { PositionType } from 'recharts';
+import { DataBlockRequest } from '@common/services/dataBlockService';
 import { contentApi } from './api';
 
 export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
@@ -63,112 +59,7 @@ export interface DataQuery {
   body: string;
 }
 
-export interface ReferenceLine {
-  label: string;
-  position: number | string;
-}
-
-export interface Axis {
-  title: string;
-  key?: string[];
-  min?: number;
-  max?: number;
-  size?: number;
-}
-
-export type ChartType =
-  | 'line'
-  | 'verticalbar'
-  | 'horizontalbar'
-  | 'map'
-  | 'infographic';
-
-export interface ChartDataSet {
-  indicator: string;
-  filters: string[];
-  location?: DataBlockLocation;
-  timePeriod?: string;
-}
-
-export interface OptionalChartDataSet {
-  indicator?: string;
-  filters?: string[];
-  location?: string[];
-  timePeriod?: string;
-}
-
-export type ChartSymbol =
-  | 'circle'
-  | 'cross'
-  | 'diamond'
-  | 'square'
-  | 'star'
-  | 'triangle'
-  | 'wye';
-
-export type LineStyle = 'solid' | 'dashed' | 'dotted';
-
-export interface LabelConfiguration {
-  label: string;
-}
-
-export interface DataSetConfiguration extends LabelConfiguration {
-  value: string;
-  name?: string;
-  unit?: string;
-  colour?: string;
-  symbol?: ChartSymbol;
-  lineStyle?: LineStyle;
-}
-
-export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
-
-export type AxisType = 'major' | 'minor';
-
-export type LabelPosition = 'axis' | 'graph' | PositionType;
-
-export interface AxisConfiguration {
-  name: string;
-  type: AxisType;
-  groupBy?: AxisGroupBy;
-  sortBy?: string;
-  sortAsc?: boolean;
-  dataSets: ChartDataSet[];
-
-  referenceLines?: ReferenceLine[];
-
-  visible: boolean;
-  title?: string;
-  unit?: string;
-  showGrid?: boolean;
-  labelPosition?: LabelPosition;
-  size?: number;
-
-  min?: number;
-  max?: number;
-
-  tickConfig?: 'default' | 'startEnd' | 'custom';
-  tickSpacing?: number;
-}
-
-export interface AxesConfiguration {
-  major: AxisConfiguration;
-  minor?: AxisConfiguration;
-}
-
-export interface Chart {
-  type: ChartType;
-  title?: string;
-  height: number;
-  width?: number;
-  labels?: Dictionary<DataSetConfiguration>;
-  axes?: Dictionary<AxisConfiguration>;
-  legend?: 'none' | 'top' | 'bottom';
-  legendHeight?: string;
-  stacked?: boolean;
-  fileId?: string;
-  geographicId?: string;
-}
+export type Chart = ChartRendererProps;
 
 export interface Table {
   indicators: string[];

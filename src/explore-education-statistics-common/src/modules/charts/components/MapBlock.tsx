@@ -3,9 +3,13 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
+  AxisConfiguration,
+  AxisGroupBy,
+  ChartDataSet,
   ChartDefinition,
   ChartMetaData,
   ChartProps,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -18,12 +22,6 @@ import {
   DataBlockData,
   DataBlockGeoJsonProperties,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -44,10 +42,13 @@ type MapBlockProperties = DataBlockGeoJsonProperties & {
 
 export type MapFeature = Feature<Geometry, MapBlockProperties>;
 
-export interface MapProps extends ChartProps {
+export interface MapBlockProps extends ChartProps {
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
   geographicId?: string;
+  axes: {
+    major: AxisConfiguration;
+  };
 }
 
 interface IdValue {
@@ -296,7 +297,7 @@ const MapBlock = ({
   height,
   labels,
   axes,
-}: MapProps) => {
+}: MapBlockProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
   const container = React.createRef<HTMLDivElement>();
@@ -733,7 +734,9 @@ const definition: ChartDefinition = {
       id: 'geojson',
       title: 'GeoJSON',
       type: 'major',
-      forcedDataType: 'locations',
+      constants: {
+        groupBy: 'locations',
+      },
     },
   },
   requiresGeoJson: true,

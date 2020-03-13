@@ -1,15 +1,16 @@
-import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import HorizontalBarBlock, {
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
 import Infographic, {
   InfographicChartProps,
 } from '@common/modules/charts/components/Infographic';
-import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
-import { MapProps } from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
-import {
-  ChartProps,
-  StackedBarProps,
-} from '@common/modules/charts/types/chart';
-import { ChartType } from '@common/services/publicationService';
+import LineChartBlock, {
+  LineChartProps,
+} from '@common/modules/charts/components/LineChartBlock';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock, {
+  VerticalBarProps,
+} from '@common/modules/charts/components/VerticalBarBlock';
 import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
@@ -23,16 +24,25 @@ const DynamicMapBlock = dynamic(
   },
 );
 
-export interface ChartRendererProps
-  extends ChartProps,
-    StackedBarProps,
-    MapProps,
-    InfographicChartProps {
-  type: ChartType | 'unknown';
-}
+export type ChartRendererProps =
+  | ({
+      type: 'line';
+    } & LineChartProps)
+  | ({
+      type: 'verticalbar';
+    } & VerticalBarProps)
+  | ({
+      type: 'horizontalbar';
+    } & HorizontalBarProps)
+  | ({
+      type: 'map';
+    } & MapBlockProps)
+  | ({
+      type: 'infographic';
+    } & InfographicChartProps);
 
 function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title, type, legend } = props;
+  const { data, meta, title } = props;
 
   const [legendProps, setLegendProps] = useState<LegendProps>();
 
@@ -52,7 +62,7 @@ function ChartRenderer(props: ChartRendererProps) {
   );
 
   const chart = useMemo(() => {
-    switch (type.toLowerCase()) {
+    switch (props.type) {
       case 'line':
         return <LineChartBlock {...props} renderLegend={renderLegend} />;
       case 'verticalbar':
@@ -66,7 +76,7 @@ function ChartRenderer(props: ChartRendererProps) {
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [props, renderLegend, type]);
+  }, [props, renderLegend]);
 
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -76,7 +86,7 @@ function ChartRenderer(props: ChartRendererProps) {
       <>
         {title && <h3 className="govuk-heading-s">{title}</h3>}
 
-        {legend === 'top' && type !== 'infographic' && legendProps && (
+        {props.type !== 'infographic' && props.legend === 'top' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
             <DefaultLegendContent {...legendProps} />
           </div>
@@ -84,11 +94,13 @@ function ChartRenderer(props: ChartRendererProps) {
 
         <div className="govuk-!-margin-bottom-6">{chart}</div>
 
-        {legend === 'bottom' && type !== 'infographic' && legendProps && (
-          <div className="govuk-!-margin-bottom-6">
-            <DefaultLegendContent {...legendProps} />
-          </div>
-        )}
+        {props.type !== 'infographic' &&
+          props.legend === 'bottom' &&
+          legendProps && (
+            <div className="govuk-!-margin-bottom-6">
+              <DefaultLegendContent {...legendProps} />
+            </div>
+          )}
       </>
     );
   }

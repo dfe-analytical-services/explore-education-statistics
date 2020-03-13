@@ -15,28 +15,30 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
+import { HorizontalBarProps } from '@common/modules/charts/components/HorizontalBarBlock';
 import Infographic from '@common/modules/charts/components/Infographic';
+import { LineChartProps } from '@common/modules/charts/components/LineChartBlock';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
+import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
 import {
-  ChartDefinition,
+  AxesConfiguration,
+  AxisConfiguration,
   chartDefinitions,
   ChartMetaData,
+  ChartProps,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  Chart,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo, useState } from 'react';
 
 interface Props {
   data: DataBlockResponse;
-  initialConfiguration?: Chart;
+  initialConfiguration?: ChartRendererProps;
   onChartSave?: (
     props: ChartRendererProps,
   ) => Promise<ChartRendererProps | undefined>;
@@ -83,21 +85,24 @@ function generateAxesMetaData(
 }
 
 const isChartRenderable = (
-  currentProps: Partial<ChartRendererProps>,
-  chartDefinition?: ChartDefinition,
-): currentProps is ChartRendererProps => {
+  props: ChartRendererProps | undefined,
+): props is ChartRendererProps => {
+  if (!props) {
+    return false;
+  }
+
   // Chart definition may be an infographic
   // and can be rendered without any axes.
-  if (chartDefinition && Object.keys(chartDefinition.axes).length === 0) {
+  if (props.type === 'infographic' && props.fileId && props.releaseId) {
     return true;
   }
 
   return Boolean(
-    currentProps.type &&
-      currentProps.labels &&
-      currentProps.axes?.major?.dataSets.length &&
-      currentProps.data &&
-      currentProps.meta,
+    props.type &&
+      props.labels &&
+      props.axes?.major?.dataSets.length &&
+      props.data &&
+      props.meta,
   );
 };
 
@@ -124,13 +129,17 @@ const ChartBuilder = ({
   );
 
   const createChartRendererProps = useCallback(
-    (currentState: ChartBuilderState): ChartRendererProps => {
+    (currentState: ChartBuilderState): ChartRendererProps | undefined => {
       const {
         axes: axesConfiguration,
         definition,
         options,
         dataSetAndConfiguration,
       } = currentState;
+
+      if (!definition) {
+        return undefined;
+      }
 
       const axes: Dictionary<AxisConfiguration> = {};
 
@@ -148,35 +157,73 @@ const ChartBuilder = ({
         };
       }
 
-      return {
+      const labels: Dictionary<DataSetConfiguration> = {
+        ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
+          (acc, { configuration }) => {
+            acc[configuration.value] = configuration;
+
+            return acc;
+          },
+          {},
+        ),
+        ...generateAxesMetaData(axes, data, metaData),
+      };
+
+      const baseProps: ChartProps = {
         ...options,
         data,
-        axes,
-        type: definition?.type ?? 'unknown',
+        axes: {},
         meta: metaData,
-        labels: {
-          ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-            (acc, { configuration }) => {
-              acc[configuration.value] = configuration;
-
-              return acc;
-            },
-            {},
-          ),
-          ...generateAxesMetaData(axes, data, metaData),
-        },
-        releaseId: data.releaseId,
-        getInfographic: editReleaseDataService.downloadChartFile,
+        labels,
       };
+
+      switch (definition.type) {
+        case 'infographic':
+          return {
+            ...baseProps,
+            labels: {},
+            type: 'infographic',
+            releaseId: data.releaseId,
+            getInfographic: editReleaseDataService.downloadChartFile,
+          };
+        case 'line':
+          return {
+            ...baseProps,
+            type: 'line',
+            axes: axes as LineChartProps['axes'],
+          };
+        case 'horizontalbar':
+          return {
+            ...baseProps,
+            type: 'horizontalbar',
+            axes: axes as HorizontalBarProps['axes'],
+          };
+        case 'verticalbar':
+          return {
+            ...baseProps,
+            type: 'verticalbar',
+            axes: axes as VerticalBarProps['axes'],
+          };
+        case 'map':
+          return {
+            ...baseProps,
+            type: 'map',
+            axes: axes as MapBlockProps['axes'],
+          };
+        default:
+          return undefined;
+      }
     },
     [data, metaData],
   );
 
-  const chartProps = useMemo<ChartRendererProps>(() => {
+  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     return createChartRendererProps(chartBuilderState);
   }, [chartBuilderState, createChartRendererProps]);
 
-  const [finalChartProps, setFinalChartProps] = useState(chartProps);
+  const [finalChartProps, setFinalChartProps] = useState<
+    ChartRendererProps | undefined
+  >(chartProps);
 
   const {
     axes: axesConfiguration,
@@ -199,7 +246,7 @@ const ChartBuilder = ({
 
   const saveChart = useCallback(
     async (nextChartProps: ChartRendererProps) => {
-      if (!isChartRenderable(nextChartProps, definition)) {
+      if (!isChartRenderable(nextChartProps)) {
         return;
       }
 
@@ -208,15 +255,19 @@ const ChartBuilder = ({
         setFinalChartProps(nextChartProps);
       }
     },
-    [definition, onChartSave],
+    [onChartSave],
   );
 
   const handleChartDataSubmit = useCallback(async () => {
-    await saveChart(finalChartProps);
+    if (finalChartProps) {
+      await saveChart(finalChartProps);
+    }
   }, [finalChartProps, saveChart]);
 
   const handleChartSave = useCallback(async () => {
-    await saveChart(chartProps);
+    if (chartProps) {
+      await saveChart(chartProps);
+    }
   }, [chartProps, saveChart]);
 
   return (
@@ -290,30 +341,32 @@ const ChartBuilder = ({
             />
           </TabsSection>
 
-          {Object.entries(axesConfiguration).map(([key, axis]) => (
-            <TabsSection
-              key={key}
-              id={`${key}-tab`}
-              title={axis.name}
-              headingTitle={axis.name}
-            >
-              <ChartAxisConfiguration
-                id={key}
-                configuration={axis}
-                capabilities={definition.capabilities}
-                data={data}
-                meta={metaData}
-                labels={chartProps.labels}
-                dataSets={
-                  axis.type === 'major'
-                    ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                    : []
-                }
-                onChange={actions.updateChartAxis}
-                onSubmit={handleChartSave}
-              />
-            </TabsSection>
-          ))}
+          {Object.entries(axesConfiguration as Required<AxesConfiguration>).map(
+            ([key, axis]) => (
+              <TabsSection
+                key={key}
+                id={`${key}-tab`}
+                title={axis.name}
+                headingTitle={axis.name}
+              >
+                <ChartAxisConfiguration
+                  id={key}
+                  configuration={axis}
+                  capabilities={definition.capabilities}
+                  data={data}
+                  meta={metaData}
+                  labels={chartProps?.labels}
+                  dataSets={
+                    axis.type === 'major'
+                      ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
+                      : []
+                  }
+                  onChange={actions.updateChartAxis}
+                  onSubmit={handleChartSave}
+                />
+              </TabsSection>
+            ),
+          )}
         </Tabs>
       )}
     </div>

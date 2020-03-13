@@ -6,20 +6,89 @@ import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tabl
 import {
   BoundaryLevel,
   DataBlockData,
+  DataBlockLocation,
   DataBlockLocationMetadata,
   LabelValueMetadata,
   LabelValueUnitMetadata,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  AxisType,
-  ChartType,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
-import { LegendProps } from 'recharts';
+import { LegendProps, PositionType } from 'recharts';
+
+export type ChartType =
+  | 'line'
+  | 'verticalbar'
+  | 'horizontalbar'
+  | 'map'
+  | 'infographic';
+
+export interface ChartDataSet {
+  indicator: string;
+  filters: string[];
+  location?: DataBlockLocation;
+  timePeriod?: string;
+}
+
+export type ChartSymbol =
+  | 'circle'
+  | 'cross'
+  | 'diamond'
+  | 'square'
+  | 'star'
+  | 'triangle'
+  | 'wye';
+
+export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
+export interface LabelConfiguration {
+  label: string;
+}
+
+export interface DataSetConfiguration extends LabelConfiguration {
+  value: string;
+  name?: string;
+  unit?: string;
+  colour?: string;
+  symbol?: ChartSymbol;
+  lineStyle?: LineStyle;
+}
+
+export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
+export type AxisType = 'major' | 'minor';
+export type LabelPosition = 'axis' | 'graph' | PositionType;
+
+export interface ReferenceLine {
+  label: string;
+  position: number | string;
+}
+
+export interface AxisConfiguration {
+  name: string;
+  type: AxisType;
+  groupBy?: AxisGroupBy;
+  sortBy?: string;
+  sortAsc?: boolean;
+  dataSets: ChartDataSet[];
+
+  referenceLines?: ReferenceLine[];
+
+  visible: boolean;
+  title?: string;
+  unit?: string;
+  showGrid?: boolean;
+  labelPosition?: LabelPosition;
+  size?: number;
+
+  min?: number;
+  max?: number;
+
+  tickConfig?: 'default' | 'startEnd' | 'custom';
+  tickSpacing?: number;
+}
+
+export type AxesConfiguration = {
+  [key in AxisType]?: AxisConfiguration;
+};
 
 export interface ChartMetaData {
   filters: PublicationSubjectMeta['filters'];
@@ -29,17 +98,14 @@ export interface ChartMetaData {
   timePeriod: Dictionary<LabelValueMetadata>;
 }
 
-export interface AbstractChartProps {
+export interface ChartProps {
   data: DataBlockData;
   meta: ChartMetaData;
   title?: string;
   height: number;
   width?: number;
-}
-
-export interface ChartProps extends AbstractChartProps {
   labels: Dictionary<DataSetConfiguration>;
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
   /**
    * Callback to enable us to render legends outside
@@ -88,8 +154,12 @@ export interface ChartDefinition {
     id: string;
     title: string;
     type: AxisType;
-    defaultDataType?: AxisGroupBy;
-    forcedDataType?: AxisGroupBy;
+    defaults?: {
+      groupBy?: AxisGroupBy;
+    };
+    constants?: {
+      groupBy?: AxisGroupBy;
+    };
   }>;
 
   requiresGeoJson: boolean;

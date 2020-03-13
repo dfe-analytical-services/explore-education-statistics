@@ -6,13 +6,13 @@ import {
 } from '@common/components/form';
 
 import { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/charts/types/chart';
-import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import {
+  ChartCapabilities,
   ChartSymbol,
   DataSetConfiguration,
   LineStyle,
-} from '@common/services/publicationService';
+} from '@common/modules/charts/types/chart';
+import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import React, { useState } from 'react';
 
 interface Props {

@@ -1,6 +1,6 @@
 import {
-  AbstractChartProps,
   ChartDefinition,
+  ChartProps,
 } from '@common/modules/charts/types/chart';
 import React, { useEffect, useState } from 'react';
 
@@ -9,7 +9,7 @@ export type GetInfographic = (
   fileName: string,
 ) => Promise<Blob>;
 
-export interface InfographicChartProps extends AbstractChartProps {
+export interface InfographicChartProps extends ChartProps {
   releaseId?: string;
   fileId?: string;
   getInfographic?: GetInfographic;

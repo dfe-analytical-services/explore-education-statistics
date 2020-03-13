@@ -1,5 +1,6 @@
 import '@common/modules/charts/components/charts.scss';
 import {
+  AxisConfiguration,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
@@ -25,7 +26,12 @@ import {
   YAxis,
 } from 'recharts';
 
-export type HorizontalBarProps = StackedBarProps;
+export interface HorizontalBarProps extends StackedBarProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const HorizontalBarBlock = ({
   data,
@@ -78,8 +84,8 @@ const HorizontalBarBlock = ({
         <XAxis
           type="number"
           dataKey="value"
-          hide={axes.minor?.visible === false}
-          unit={axes.minor?.unit}
+          hide={axes.minor.visible === false}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
           padding={{ left: 20, right: 20 }}
@@ -118,7 +124,7 @@ const HorizontalBarBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             x={referenceLine.position}
@@ -161,7 +167,9 @@ const definition: ChartDefinition = {
       id: 'major',
       title: 'Y Axis',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
     minor: {
       id: 'minor',

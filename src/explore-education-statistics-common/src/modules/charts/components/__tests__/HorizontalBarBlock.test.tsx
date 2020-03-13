@@ -1,16 +1,17 @@
 import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
-import Chart from '@common/modules/charts/components/HorizontalBarBlock';
-import { ChartMetaData, ChartProps } from '@common/modules/charts/types/chart';
+import HorizontalBarBlock, {
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
+import { ChartMetaData } from '@common/modules/charts/types/chart';
 import { DataBlockData } from '@common/services/dataBlockService';
-import { AxesConfiguration } from '@common/services/publicationService';
 import { render } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = {
-  ...testData.AbstractChartProps,
+const props: HorizontalBarProps = {
+  ...(testData.chartProps1 as HorizontalBarProps),
   width: 900,
 };
 
@@ -18,7 +19,7 @@ const { axes } = props;
 
 describe('HorizontalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<Chart {...props} />);
+    const { container } = render(<HorizontalBarBlock {...props} />);
 
     // axes
     expect(
@@ -56,7 +57,7 @@ describe('HorizontalBarBlock', () => {
 
   test('major axis can be hidden', () => {
     const { container } = render(
-      <Chart
+      <HorizontalBarBlock
         {...props}
         axes={{
           ...axes,
@@ -75,11 +76,10 @@ describe('HorizontalBarBlock', () => {
 
   test('minor axis can be hidden', () => {
     const { container } = render(
-      <Chart
+      <HorizontalBarBlock
         {...props}
         axes={{
           ...axes,
-          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -95,11 +95,10 @@ describe('HorizontalBarBlock', () => {
 
   test('both axes can be hidden', () => {
     const { container } = render(
-      <Chart
+      <HorizontalBarBlock
         {...props}
         axes={{
           ...axes,
-          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -122,7 +121,9 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('can hide legend', () => {
-    const { container } = render(<Chart {...props} legend="none" />);
+    const { container } = render(
+      <HorizontalBarBlock {...props} legend="none" />,
+    );
 
     expect(
       container.querySelector('.recharts-default-legend'),
@@ -131,16 +132,15 @@ describe('HorizontalBarBlock', () => {
 
   test('can stack data', () => {
     const { container } = render(
-      // @ts-ignore
-      <Chart
+      <HorizontalBarBlock
         {...{
           ...props,
           axes: {
             ...props.axes,
             minor: {
               ...props.axes.minor,
-              min: '-10',
-              max: '20',
+              min: -10,
+              max: 20,
             },
           },
         }}
@@ -158,7 +158,7 @@ describe('HorizontalBarBlock', () => {
 
   test('can render major axis reference line', () => {
     const { container } = render(
-      <Chart
+      <HorizontalBarBlock
         {...{
           ...props,
           axes: {
@@ -184,8 +184,7 @@ describe('HorizontalBarBlock', () => {
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
-      // @ts-ignore
-      <Chart
+      <HorizontalBarBlock
         {...{
           ...props,
           axes: {
@@ -211,12 +210,13 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('dies gracefully with bad data', () => {
-    const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
-    const invalidMeta: ChartMetaData = (undefined as unknown) as ChartMetaData;
-    const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
+    const invalidData = (undefined as unknown) as DataBlockData;
+    const invalidMeta = (undefined as unknown) as ChartMetaData;
+    const invalidAxes = (undefined as unknown) as HorizontalBarProps['axes'];
 
     const { container } = render(
-      <Chart
+      <HorizontalBarBlock
+        height={300}
         data={invalidData}
         labels={{}}
         meta={invalidMeta}
@@ -226,13 +226,13 @@ describe('HorizontalBarBlock', () => {
     expect(container).toHaveTextContent('Unable to render chart');
   });
 
-  test('Can change width of chart', () => {
+  test('can change width of chart', () => {
     const propsWithSize = {
       ...props,
       width: 200,
     };
 
-    const { container } = render(<Chart {...propsWithSize} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithSize} />);
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -246,13 +246,13 @@ describe('HorizontalBarBlock', () => {
     }
   });
 
-  test('Can change height of chart', () => {
+  test('can change height of chart', () => {
     const propsWithSize = {
       ...props,
       height: 200,
     };
 
-    const { container } = render(<Chart {...propsWithSize} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithSize} />);
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -266,12 +266,11 @@ describe('HorizontalBarBlock', () => {
     }
   });
 
-  test('Can limit range of minor ticks to default', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of minor ticks to default', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         major: props.axes.major,
-        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'default',
@@ -279,17 +278,16 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'x', '-3', '3', '9', '20');
   });
 
-  test('Can limit range of minor ticks to start and end', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of minor ticks to start and end', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         major: props.axes.major,
-        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'startEnd',
@@ -297,26 +295,25 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'x', '-3', '20');
   });
 
-  test('Can limit range of minor ticks to custom', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of minor ticks to custom', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         major: props.axes.major,
-        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'custom',
-          tickSpacing: '1',
+          tickSpacing: 1,
         },
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(
       container,
@@ -338,8 +335,8 @@ describe('HorizontalBarBlock', () => {
     );
   });
 
-  test('Can limit range of major ticks to default', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of major ticks to default', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -350,13 +347,13 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
-  test('Can limit range of major ticks to start and end', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of major ticks to start and end', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -367,31 +364,31 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
-  test('Can limit range of minor ticks to custom', () => {
-    const propsWithTicks: ChartProps = {
+  test('can limit range of minor ticks to custom', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
         major: {
           ...props.axes.major,
           tickConfig: 'custom',
-          tickSpacing: '2',
+          tickSpacing: 2,
         },
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
-  test('Can sort by name', () => {
-    const propsWithTicks: ChartProps = {
+  test('can sort by name', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -403,13 +400,13 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
-  test('Can sort by name descending', () => {
-    const propsWithTicks: ChartProps = {
+  test('can sort by name descending', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -421,13 +418,13 @@ describe('HorizontalBarBlock', () => {
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2015/16', '2014/15');
   });
 
-  test('Can filter a data range', () => {
-    const propsWithTicks: ChartProps = {
+  test('can filter a data range', () => {
+    const propsWithTicks: HorizontalBarProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -435,12 +432,13 @@ describe('HorizontalBarBlock', () => {
           ...props.axes.major,
           sortBy: 'name',
           sortAsc: true,
-          dataRange: [0, 1],
+          min: 0,
+          max: 1,
         },
       },
     };
 
-    const { container } = render(<Chart {...propsWithTicks} />);
+    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15');
   });

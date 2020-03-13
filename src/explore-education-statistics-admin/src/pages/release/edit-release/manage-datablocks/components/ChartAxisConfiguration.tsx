@@ -16,21 +16,19 @@ import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
 import {
+  AxisConfiguration,
+  AxisGroupBy,
   ChartCapabilities,
+  ChartDataSet,
   ChartMetaData,
+  DataSetConfiguration,
+  ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  DataSetConfiguration,
-  ReferenceLine,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
@@ -41,7 +39,7 @@ interface Props {
   configuration: AxisConfiguration;
   data: DataBlockData;
   meta: ChartMetaData;
-  labels: Dictionary<DataSetConfiguration>;
+  labels?: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   dataSets: ChartDataSet[];
   onChange: (configuration: AxisConfiguration) => void;
@@ -53,7 +51,7 @@ const ChartAxisConfiguration = ({
   configuration,
   data,
   meta,
-  labels,
+  labels = {},
   capabilities,
   dataSets = [],
   onChange,

@@ -1,20 +1,21 @@
 import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
-import MapBlock from '@common/modules/charts/components/MapBlock';
+import MapBlock, {
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
+
+const chartProps: MapBlockProps = testData.AbstractMultipleChartProps as MapBlockProps;
 
 describe('MapBlock', () => {
   test('renders', async () => {
     const { container } = render(
       <MapBlock
-        {...{
-          ...testData.AbstractMultipleChartProps,
-          axes: {
-            ...testData.AbstractMultipleChartProps.axes,
-            major: {
-              ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: 'locations',
-            },
+        {...chartProps}
+        axes={{
+          major: {
+            ...chartProps.axes.major,
+            groupBy: 'locations',
           },
         }}
         height={600}
@@ -30,14 +31,11 @@ describe('MapBlock', () => {
   test('includes all locations in select', async () => {
     const { container } = render(
       <MapBlock
-        {...{
-          ...testData.AbstractMultipleChartProps,
-          axes: {
-            ...testData.AbstractMultipleChartProps.axes,
-            major: {
-              ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: 'locations',
-            },
+        {...chartProps}
+        axes={{
+          major: {
+            ...chartProps.axes.major,
+            groupBy: 'locations',
           },
         }}
         height={600}
@@ -64,14 +62,11 @@ describe('MapBlock', () => {
   test('includes all indicators in select', async () => {
     const { container } = render(
       <MapBlock
-        {...{
-          ...testData.AbstractMultipleChartProps,
-          axes: {
-            ...testData.AbstractMultipleChartProps.axes,
-            major: {
-              ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: 'locations',
-            },
+        {...chartProps}
+        axes={{
+          major: {
+            ...chartProps.axes.major,
+            groupBy: 'locations',
           },
         }}
         height={600}
@@ -99,17 +94,15 @@ describe('MapBlock', () => {
   });
 
   test('include all indicators from reduced selection', async () => {
+    const largeDataChartProps: MapBlockProps = testData.AbstractLargeDataChartProps_smaller_datasets as MapBlockProps;
+
     const { container } = render(
       <MapBlock
-        {...{
-          ...testData.AbstractLargeDataChartProps_smaller_datasets,
-          axes: {
-            ...testData.AbstractLargeDataChartProps_smaller_datasets.axes,
-            major: {
-              ...testData.AbstractLargeDataChartProps_smaller_datasets.axes
-                .major,
-              groupBy: 'locations',
-            },
+        {...largeDataChartProps}
+        axes={{
+          major: {
+            ...largeDataChartProps.axes.major,
+            groupBy: 'locations',
           },
         }}
         height={600}

@@ -426,7 +426,7 @@ const metaData: DataBlockMetadata = {
 
 const chartMetaData: ChartMetaData = parseMetaData(metaData) as ChartMetaData;
 
-const AbstractChartProps: ChartProps = {
+const chartProps1: ChartProps = {
   data,
   meta: chartMetaData,
 
@@ -490,7 +490,7 @@ const AbstractChartProps: ChartProps = {
   },
 };
 
-const AbstractChartProps2: ChartProps = {
+const chartProps2: ChartProps = {
   data: data2,
   meta: {
     ...chartMetaData,
@@ -590,6 +590,7 @@ const AbstractMultipleChartProps: ChartProps = {
       name: '23',
       type: 'major',
       groupBy: 'timePeriod',
+      visible: true,
       dataSets: [
         {
           indicator: '23',
@@ -680,6 +681,7 @@ const AbstractLargeDataChartProps: ChartProps = {
       name: '23',
       type: 'major',
       groupBy: 'locations',
+      visible: true,
       dataSets: [
         {
           indicator: '23',
@@ -867,8 +869,8 @@ const response: DataBlockResponse = {
 };
 
 export default {
-  AbstractChartProps,
-  AbstractChartProps2,
+  chartProps1,
+  chartProps2,
   AbstractMultipleChartProps,
   AbstractMissingDataChartProps,
   AbstractLargeDataChartProps,

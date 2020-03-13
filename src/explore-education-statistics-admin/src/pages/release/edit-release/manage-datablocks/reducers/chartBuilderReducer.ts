@@ -1,12 +1,14 @@
 import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import {
+  AxesConfiguration,
+  AxisConfiguration,
+  AxisType,
   ChartDefinition,
   chartDefinitions,
 } from '@common/modules/charts/types/chart';
 import { generateKeyFromDataSet } from '@common/modules/charts/util/chartUtils';
-import { AxisConfiguration, Chart } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
+import { Chart } from '@common/services/publicationService';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
@@ -15,7 +17,7 @@ export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
   dataSetAndConfiguration: ChartDataSetAndConfiguration[];
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
 }
 
 export type ChartBuilderActions =
@@ -57,27 +59,24 @@ export const chartBuilderReducer: Reducer<
       };
 
       draft.axes = mapValues(action.payload.axes, (axisDefinition, key) => {
-        const previousConfig = draft.axes[key] ?? {};
+        const previousConfig = draft.axes[key as AxisType] ?? {};
 
         return {
-          referenceLines: [],
           min: 0,
-          tickSpacing: 1,
-          unit: '',
-          tickConfig: 'default',
-          visible: true,
+          referenceLines: [],
           showGrid: true,
-          size: '50',
-          sortBy: 'name',
+          size: 50,
           sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          visible: true,
+          unit: '',
+          ...(axisDefinition.defaults ?? {}),
           ...previousConfig,
-          // hard-coded defaults
+          ...(axisDefinition.constants ?? {}),
           type: axisDefinition.type,
           name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-          groupBy:
-            axisDefinition.forcedDataType ||
-            previousConfig.groupBy ||
-            axisDefinition.defaultDataType,
           dataSets:
             axisDefinition.type === 'major'
               ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)

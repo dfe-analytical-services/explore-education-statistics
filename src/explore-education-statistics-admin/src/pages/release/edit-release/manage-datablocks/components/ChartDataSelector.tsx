@@ -5,8 +5,10 @@ import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import {
   ChartCapabilities,
+  ChartDataSet,
   ChartDefinition,
   ChartMetaData,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import {
   colours,
@@ -15,10 +17,6 @@ import {
   symbols,
 } from '@common/modules/charts/util/chartUtils';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
-import {
-  ChartDataSet,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';

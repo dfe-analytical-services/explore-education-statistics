@@ -1,4 +1,12 @@
-import { ChartMetaData } from '@common/modules/charts/types/chart';
+import {
+  AxisConfiguration,
+  AxisGroupBy,
+  ChartDataSet,
+  ChartMetaData,
+  ChartSymbol,
+  DataSetConfiguration,
+  LabelConfiguration,
+} from '@common/modules/charts/types/chart';
 import {
   FilterOption,
   PublicationSubjectMeta,
@@ -8,14 +16,6 @@ import {
   Location,
   Result,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  ChartSymbol,
-  DataSetConfiguration,
-  LabelConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import difference from 'lodash/difference';
 import omit from 'lodash/omit';

@@ -1,5 +1,6 @@
 import '@common/modules/charts/components/charts.scss';
 import {
+  AxisConfiguration,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
@@ -25,7 +26,12 @@ import {
   YAxis,
 } from 'recharts';
 
-export type VerticalBarProps = StackedBarProps;
+export interface VerticalBarProps extends StackedBarProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const VerticalBarBlock = ({
   data,
@@ -69,15 +75,15 @@ const VerticalBarBlock = ({
       >
         <CartesianGrid
           strokeDasharray="3 3"
-          vertical={axes.minor?.showGrid !== false}
+          vertical={axes.minor.showGrid !== false}
           horizontal={axes.major.showGrid !== false}
         />
 
         <YAxis
           type="number"
           dataKey="value"
-          hide={axes.minor?.visible === false}
-          unit={axes.minor?.unit}
+          hide={axes.minor.visible === false}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
           width={conditionallyAdd(axes.minor?.size)}
@@ -116,7 +122,7 @@ const VerticalBarBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             y={referenceLine.position}
@@ -159,7 +165,9 @@ const definition: ChartDefinition = {
       id: 'major',
       title: 'X Axis',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
     minor: {
       id: 'minor',

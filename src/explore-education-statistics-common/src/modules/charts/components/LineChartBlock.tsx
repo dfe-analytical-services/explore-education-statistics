@@ -1,8 +1,10 @@
 import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
+  AxisConfiguration,
   ChartDefinition,
   ChartProps,
+  ChartSymbol,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -13,7 +15,6 @@ import {
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 
 import React from 'react';
@@ -55,7 +56,12 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
-export type LineChartProps = ChartProps;
+export interface LineChartProps extends ChartProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const LineChartBlock = ({
   data,
@@ -112,7 +118,7 @@ const LineChartBlock = ({
           type="number"
           dataKey="value"
           hide={axes.minor.visible === false}
-          unit={axes.minor?.unit}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
           width={conditionallyAdd(axes.minor.size)}
@@ -153,7 +159,7 @@ const LineChartBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             y={referenceLine.position}
@@ -196,7 +202,9 @@ const definition: ChartDefinition = {
       id: 'xaxis',
       title: 'X Axis',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
     minor: {
       id: 'yaxis',
