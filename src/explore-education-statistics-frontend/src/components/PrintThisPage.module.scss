@@ -19,9 +19,3 @@
   display: block;
   margin-top: govuk-spacing(6);
 }
-
-:global(.js-enabled .dfe-align--centre) {
-  &.printContainer {
-    margin-top: govuk-spacing(0);
-  }
-}
