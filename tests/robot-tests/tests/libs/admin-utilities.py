@@ -79,6 +79,7 @@ def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout
             return
         except:
             time.sleep(0.5)
+    sl.capture_page_screenshot()
     raise AssertionError('Failed to find new empty content section')
 
 def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):

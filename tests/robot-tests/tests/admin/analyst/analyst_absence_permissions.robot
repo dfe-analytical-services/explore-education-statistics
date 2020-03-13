@@ -81,7 +81,7 @@ Validate Analyst1 can see subjects for Absence 2016/17 release
     user waits until page contains element   css:#publicationSubjectForm-subjectId
     user checks element count is x   xpath://*[@id="publicationSubjectForm-subjectId"]//*[@class="govuk-radios__item"]    7
 
-Validate Analyst1 can see Manage content page contents
+Validate Analyst1 can see Manage content page
     [Tags]  HappyPath
     user clicks element   xpath://a[text()="Manage content"]
     user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
@@ -90,11 +90,16 @@ Validate Analyst1 can see Manage content page contents
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
 
+Validate Analyst1 can see Manage content page key stats
+    [Tags]  HappyPath   Failing
+    [Documentation]   EES-1508
     user waits until page contains key stat tile   Overall absence rate        4.6%    60
     user waits until page contains key stat tile   Authorised absence rate     3.5%
     user waits until page contains key stat tile   Unauthorised absence rate   1.1%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3
 
+Validate Analyst1 can see Manage content page accordion sections
+    [Tags]  HappyPath
     user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
     user checks accordion is in position  About these statistics            1
     user checks accordion is in position  Pupil absence rates               2
