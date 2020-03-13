@@ -27,13 +27,13 @@
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"
     },
     "domain": {
-      "value": "s101p01-as-ees-public.azurewebsites.net"
+      "value": "s101p02-as-ees-public.azurewebsites.net"
     },
     "contentApiUrl": {
-      "value": "s101p01-as-ees-content.azurewebsites.net"
+      "value": "s101p02-as-ees-content.azurewebsites.net"
     },
     "dataApiUrl": {
-      "value": "s101p01-as-ees-data.azurewebsites.net"
+      "value": "s101p02-as-ees-data.azurewebsites.net"
     }
   }
 }
