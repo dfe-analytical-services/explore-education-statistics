@@ -16,7 +16,7 @@ import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
 import { HorizontalBarProps } from '@common/modules/charts/components/HorizontalBarBlock';
-import Infographic from '@common/modules/charts/components/Infographic';
+import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
 import { LineChartProps } from '@common/modules/charts/components/LineChartBlock';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
@@ -281,7 +281,7 @@ const ChartBuilder = ({
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
         <ButtonText
           onClick={() => {
-            actions.updateChartDefinition(Infographic.definition);
+            actions.updateChartDefinition(InfographicBlock.definition);
           }}
         >
           Choose an infographic as alternative

@@ -1,9 +1,9 @@
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import Infographic, {
+import InfographicBlock, {
   InfographicChartProps,
-} from '@common/modules/charts/components/Infographic';
+} from '@common/modules/charts/components/InfographicBlock';
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
@@ -72,7 +72,7 @@ function ChartRenderer(props: ChartRendererProps) {
       case 'map':
         return <DynamicMapBlock {...props} renderLegend={renderLegend} />;
       case 'infographic':
-        return <Infographic {...props} />;
+        return <InfographicBlock {...props} />;
       default:
         return <p>Unable to render invalid chart type</p>;
     }

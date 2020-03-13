@@ -4,7 +4,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import { GetInfographic } from '@common/modules/charts/components/Infographic';
+import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,

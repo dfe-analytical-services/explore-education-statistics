@@ -1,4 +1,5 @@
 import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
 import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
 import MapBlock from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
@@ -170,4 +171,5 @@ export const chartDefinitions: ChartDefinition[] = [
   VerticalBarBlock.definition,
   HorizontalBarBlock.definition,
   MapBlock.definition,
+  InfographicBlock.definition,
 ];
