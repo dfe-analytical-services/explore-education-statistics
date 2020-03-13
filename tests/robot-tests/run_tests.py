@@ -61,7 +61,7 @@ parser.add_argument("--ci",
                     help="specify that the test are running as part of the CI pipeline")
 parser.add_argument("--chromedriver",
                     dest="chromedriver_version",
-                    default="78.0.3904.70",
+                    default="80.0.3987.106",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
 """

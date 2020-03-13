@@ -18,7 +18,7 @@ def wait_until_page_contains_xpath(context, selector):
             return
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
 
-def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN", chromedriver_version='78.0.3904.70'):
+def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN", chromedriver_version='80.0.3987.106'):
     cdi.install(file_directory="./webdriver/",
                 verbose=False,
                 chmod=True,
