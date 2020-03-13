@@ -11,7 +11,7 @@ Library    utilities.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          20
+${timeout}          30
 ${implicit_wait}    3
 
 *** Keywords ***
