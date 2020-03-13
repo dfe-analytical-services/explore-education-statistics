@@ -61,7 +61,7 @@ def user_opens_editable_accordion_section(section_elem):
     except:
         raise AssertionError('Cannot click accordion section element')
 
-def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=10):
+def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=30):
     try:
         elem = section_elem.find_element_by_xpath('.//button[text()="Add content"]')
     except Exception as e:
