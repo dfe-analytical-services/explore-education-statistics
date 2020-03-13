@@ -38,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             PROVIDER_COLS,
             REGION_COLS,
             SPONSOR_COLS,
-            WARD_COLS
+            WARD_COLS,
+            PLANNING_AREA_COLS
         }
 
         private static readonly Dictionary<Columns, string[]> ColumnValues =
@@ -85,7 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 },
                 {
                     Columns.WARD_COLS, new[]{"ward_code", "ward_name"}
-                }
+                },
+                {
+                    Columns.PLANNING_AREA_COLS, new[]{"planning_area_code", "planning_area_name"}
+                },
             };
                 
         public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
@@ -291,7 +295,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetRegion(line, headers),
                 GetRscRegion(line, headers),
                 GetSponsor(line, headers),
-                GetWard(line, headers)
+                GetWard(line, headers),
+                GetPlanningArea(line, headers)
             ).Id;
         }
 
@@ -386,6 +391,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return CsvUtil.BuildType(line, headers, ColumnValues[Columns.WARD_COLS], values =>
                 new Ward(values[0], values[1]));
+        }
+        
+        private static PlanningArea GetPlanningArea(IReadOnlyList<string> line, List<string> headers)
+        {
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PLANNING_AREA_COLS], values =>
+                new PlanningArea(values[0], values[1]));
         }
 
         private static void InsertObservations(DbContext context, IEnumerable<Observation> observations)

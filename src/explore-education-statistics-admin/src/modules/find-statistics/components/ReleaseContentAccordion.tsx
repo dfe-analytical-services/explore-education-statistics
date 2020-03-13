@@ -4,9 +4,6 @@ import {
   EditableContentBlock,
   EditableRelease,
 } from '@admin/services/publicationService';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
@@ -23,8 +20,7 @@ const ReleaseContentAccordion = ({
   release,
   accordionId,
   sectionName,
-  handleApiErrors,
-}: ReleaseContentAccordionProps & ErrorControlProps) => {
+}: ReleaseContentAccordionProps) => {
   const {
     addContentSection,
     removeContentSection,
@@ -37,17 +33,15 @@ const ReleaseContentAccordion = ({
       addContentSection({
         releaseId: release.id,
         order: release.content.length,
-      }).catch(handleApiErrors),
-    [release.id],
+      }),
+    [release.id, release.content.length, addContentSection],
   );
 
   const reorderAccordionSections = useCallback(
     async order => {
-      updateContentSectionsOrder({ releaseId: release.id, order }).catch(
-        handleApiErrors,
-      );
+      updateContentSectionsOrder({ releaseId: release.id, order });
     },
-    [release.id],
+    [release.id, updateContentSectionsOrder],
   );
   return (
     <Accordion
@@ -69,13 +63,13 @@ const ReleaseContentAccordion = ({
               releaseId: release.id,
               sectionId: accordionSection.id,
               title,
-            }).catch(handleApiErrors)
+            })
           }
           onRemoveSection={() =>
             removeContentSection({
               releaseId: release.id,
               sectionId: accordionSection.id,
-            }).catch(handleApiErrors)
+            })
           }
         />
       ))}
@@ -83,4 +77,4 @@ const ReleaseContentAccordion = ({
   );
 };
 
-export default withErrorControl(ReleaseContentAccordion);
+export default ReleaseContentAccordion;

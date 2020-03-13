@@ -31,7 +31,7 @@ const DatablockSelectForm = ({
       <section>
         <Details
           className="govuk-!-margin-top-3"
-          summary="Datablock preview"
+          summary="Data block preview"
           open
           onToggle={() => {}}
         >

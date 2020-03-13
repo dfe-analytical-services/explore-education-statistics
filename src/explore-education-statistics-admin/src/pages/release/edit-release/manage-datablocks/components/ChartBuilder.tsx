@@ -9,9 +9,6 @@ import ChartDataSelector, {
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -125,9 +122,7 @@ const ChartBuilder = ({
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
-  handleApiErrors,
-  handleManualErrors,
-}: Props & ErrorControlProps) => {
+}: Props) => {
   const [selectedChartType, setSelectedChartType] = useState<
     ChartDefinition | undefined
   >();
@@ -140,7 +135,6 @@ const ChartBuilder = ({
   const [chartOptions, setChartOptions] = useState<ChartOptions>({
     stacked: false,
     legend: 'top',
-    legendHeight: '42',
     height: 300,
     title: '',
   });
@@ -314,7 +308,6 @@ const ChartBuilder = ({
       type,
       stacked = false,
       legend = 'top',
-      legendHeight = '42',
       height = 300,
       width,
       title = '',
@@ -325,7 +318,6 @@ const ChartBuilder = ({
     }: Chart = {
       stacked: false,
       legend: 'top',
-      legendHeight: '42',
       height: 300,
       title: '',
     },
@@ -352,7 +344,6 @@ const ChartBuilder = ({
       options: {
         stacked,
         legend,
-        legendHeight,
         height,
         width,
         title,
@@ -498,8 +489,6 @@ const ChartBuilder = ({
               }}
               meta={metaData}
               data={data}
-              handleApiErrors={handleApiErrors}
-              handleManualErrors={handleManualErrors}
             />
           </TabsSection>
 
@@ -552,4 +541,4 @@ const ChartBuilder = ({
   );
 };
 
-export default withErrorControl(ChartBuilder);
+export default ChartBuilder;

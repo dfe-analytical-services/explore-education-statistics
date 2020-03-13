@@ -1,4 +1,4 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
@@ -9,8 +9,7 @@ import {
   AbstractRelease,
   Publication,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState, useCallback } from 'react';
-import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
+import React, { useCallback, useEffect, useState } from 'react';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 
 export interface KeyStatisticsProps {
@@ -20,7 +19,6 @@ export interface KeyStatisticsProps {
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const { releaseId } = useManageReleaseContext();
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const {
     deleteContentSectionBlock,
     updateContentSectionDataBlock,
@@ -69,7 +67,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                       sectionId: release.keyStatisticsSection.id as string,
                       blockId: stat.id,
                       sectionKey: 'keyStatisticsSection',
-                    }).catch(handleApiErrors);
+                    });
                   }}
                   onSubmit={values =>
                     updateContentSectionDataBlock({
@@ -78,7 +76,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                       blockId: stat.id,
                       sectionKey: 'keyStatisticsSection',
                       values,
-                    }).catch(handleApiErrors)
+                    })
                   }
                 />
               ) : null;
@@ -92,9 +90,6 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-
-  const { releaseId } = useManageReleaseContext();
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const { attachContentSectionBlock } = useReleaseActions();
 
   const another =
@@ -105,7 +100,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const addKeyStatToSection = useCallback(
     (datablockId: string) => {
       attachContentSectionBlock({
-        releaseId,
+        releaseId: release.id,
         sectionId: release.keyStatisticsSection.id,
         sectionKey: 'keyStatisticsSection',
         block: {
@@ -115,10 +110,10 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
               release.keyStatisticsSection.content.length) ||
             0,
         },
-      }).catch(handleApiErrors);
+      });
       setIsFormOpen(false);
     },
-    [release?.id, release?.keyStatisticsSection.id],
+    [release.id, release.keyStatisticsSection, attachContentSectionBlock],
   );
 
   return (

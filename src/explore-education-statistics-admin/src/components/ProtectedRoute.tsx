@@ -1,13 +1,10 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ErrorBoundary, {
-  ErrorControlContext,
-} from '@admin/components/ErrorBoundary';
-import LoginContext from '@admin/components/Login';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
 import { User } from '@admin/services/sign-in/types';
 import React, { useContext } from 'react';
-import { Redirect, Route, RouteProps } from 'react-router';
-import ProtectedRoutes from './ProtectedRoutes';
+import { Redirect, Route, RouteComponentProps, RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;
@@ -22,7 +19,7 @@ const AuthenticationCheckingComponent = ({
   protectionAction,
   ...props
 }: ProtectedRouteProps) => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   const { handleManualErrors } = useContext(ErrorControlContext);
 
@@ -67,32 +64,26 @@ const AuthenticationCheckingComponent = ({
  * status and then renders the protected component if the user has been
  * successfully authenticated, or redirects the user to the sign-in page
  * if in need of authentication.
- *
- * @param component
- * @param rest
- * @constructor
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const ProtectedRoute = ({
   component,
   allowAnonymousUsers = false,
   protectionAction,
   ...rest
 }: ProtectedRouteProps) => {
-  const routeComponent = (props: any) => (
-    <ProtectedRoutes>
-      <ErrorBoundary>
+  return (
+    <Route
+      {...rest}
+      component={(props: RouteComponentProps) => (
         <AuthenticationCheckingComponent
+          {...props}
           component={component}
           allowAnonymousUsers={allowAnonymousUsers}
           protectionAction={protectionAction}
-          {...props}
         />
-      </ErrorBoundary>
-    </ProtectedRoutes>
+      )}
+    />
   );
-
-  return <Route {...rest} component={routeComponent} />;
 };
 
 export default ProtectedRoute;

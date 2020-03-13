@@ -13,9 +13,6 @@ import {
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -32,7 +29,7 @@ interface ReleaseSummaryModel {
   canEditRelease: boolean;
 }
 
-const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseSummaryPage = () => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useManageReleaseContext();
@@ -43,24 +40,22 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
       commonService.getReleaseTypes(),
       commonService.getTimePeriodCoverageGroups(),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(
-        ([
+    ]).then(
+      ([
+        releaseSummaryDetails,
+        releaseTypes,
+        timePeriodCoverageGroups,
+        canEditRelease,
+      ]) => {
+        setModel({
           releaseSummaryDetails,
-          releaseTypes,
           timePeriodCoverageGroups,
+          releaseTypes,
           canEditRelease,
-        ]) => {
-          setModel({
-            releaseSummaryDetails,
-            timePeriodCoverageGroups,
-            releaseTypes,
-            canEditRelease,
-          });
-        },
-      )
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+        });
+      },
+    );
+  }, [releaseId]);
 
   return (
     <>
@@ -123,4 +118,4 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(ReleaseSummaryPage);
+export default ReleaseSummaryPage;

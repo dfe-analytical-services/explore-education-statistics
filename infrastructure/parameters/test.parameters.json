@@ -25,6 +25,12 @@
     },
     "domain": {
       "value": "test.explore-education-statistics.service.gov.uk"
+    },
+    "contentApiUrl": {
+      "value": "content.test.explore-education-statistics.service.gov.uk"
+    },
+    "dataApiUrl": {
+      "value": "data.test.explore-education-statistics.service.gov.uk"
     }
   }
 }

@@ -1,4 +1,3 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
@@ -30,7 +29,6 @@ interface Props {
 }
 
 const ReleaseHeadlines = ({ release }: Props) => {
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const { isEditing } = useContext(EditingContext);
   const {
     addContentSectionBlock,
@@ -80,8 +78,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
         order: 0,
         body: '',
       },
-    }).catch(handleApiErrors);
-  }, [release?.id, release?.headlinesSection.id]);
+    });
+  }, [release.id, release.headlinesSection.id, addContentSectionBlock]);
 
   const headlinesBlockUpdate = useCallback(
     (blockId, bodyContent) => {
@@ -91,9 +89,9 @@ const ReleaseHeadlines = ({ release }: Props) => {
         blockId,
         sectionKey: 'headlinesSection',
         bodyContent,
-      }).catch(handleApiErrors);
+      });
     },
-    [release?.id, release?.headlinesSection.id],
+    [release.id, release.headlinesSection.id, updateContentSectionBlock],
   );
 
   const headlinesBlockDelete = useCallback(
@@ -103,9 +101,9 @@ const ReleaseHeadlines = ({ release }: Props) => {
         sectionId: release.headlinesSection.id,
         blockId,
         sectionKey: 'headlinesSection',
-      }).catch(handleApiErrors);
+      });
     },
-    [release?.id, release?.headlinesSection.id],
+    [release.id, release.headlinesSection.id, deleteContentSectionBlock],
   );
 
   return (

@@ -1,8 +1,5 @@
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -10,20 +7,20 @@ import WarningMessage from '@common/components/WarningMessage';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
+import { useReleaseState } from './ReleaseContext';
 import useReleaseActions from './useReleaseActions';
-import { ReleaseProvider, useReleaseState } from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';
 
-const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseContentPage = () => {
   const [pageMode, setPageMode] = useState<PageMode>('preview');
   const { releaseId } = useManageReleaseContext();
   const { release, canUpdateRelease, unresolvedComments } = useReleaseState();
   const { getReleaseContent } = useReleaseActions();
 
   useEffect(() => {
-    getReleaseContent({ releaseId }).catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+    getReleaseContent({ releaseId });
+  }, [releaseId, getReleaseContent]);
 
   useEffect(() => {
     if (canUpdateRelease === true) {
@@ -101,8 +98,4 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(props => (
-  <ReleaseProvider>
-    <ReleaseContentPage {...props} />
-  </ReleaseProvider>
-));
+export default ReleaseContentPage;

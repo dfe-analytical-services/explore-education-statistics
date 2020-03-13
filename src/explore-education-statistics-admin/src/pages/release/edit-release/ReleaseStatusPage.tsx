@@ -1,12 +1,9 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/service';
 import service from '@admin/services/release/edit-release/status/service';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
@@ -17,7 +14,14 @@ import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
+    'releaseStatus',
+    'Enter a publish scheduled date before approving',
+  ),
+];
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -38,9 +42,7 @@ const statusMap: {
   Approved: 'Approved',
 };
 
-const ReleaseStatusPage = ({
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
@@ -52,62 +54,50 @@ const ReleaseStatusPage = ({
       permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
-    ])
-      .then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
-        const statusOptions: RadioOption[] = [
-          {
-            label: 'In draft',
-            value: 'Draft',
-            disabled: !canMarkAsDraft,
-          },
-          {
-            label: 'Ready for higher review',
-            value: 'HigherLevelReview',
-            disabled: !canSubmit,
-          },
-          {
-            label: 'Approved for publication',
-            value: 'Approved',
-            disabled: !canApprove,
-          },
-        ];
+    ]).then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
+      const statusOptions: RadioOption[] = [
+        {
+          label: 'In draft',
+          value: 'Draft',
+          disabled: !canMarkAsDraft,
+        },
+        {
+          label: 'Ready for higher review',
+          value: 'HigherLevelReview',
+          disabled: !canSubmit,
+        },
+        {
+          label: 'Approved for publication',
+          value: 'Approved',
+          disabled: !canApprove,
+        },
+      ];
 
-        setModel({
-          releaseStatus,
-          statusOptions,
-          editable: statusOptions.some(option => !option.disabled),
-        });
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, showForm]);
+      setModel({
+        releaseStatus,
+        statusOptions,
+        editable: statusOptions.some(option => !option.disabled),
+      });
+    });
+  }, [releaseId, showForm]);
 
-  if (!model) return null;
-
-  const formId = 'releaseStatusForm';
-
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
-      'releaseStatus',
-      'Enter a publish scheduled date before approving',
-    ),
-  ];
-
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      await service.updateReleaseStatus(releaseId, values).then(() => {
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    await service.updateReleaseStatus(releaseId, values).then(() => {
+      if (model) {
         setModel({
           ...model,
           releaseStatus: values.releaseStatus,
           statusOptions: model.statusOptions,
         });
+      }
 
-        setShowForm(false);
-      });
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+      setShowForm(false);
+    });
+  }, errorCodeMappings);
+
+  if (!model) return null;
+
+  const formId = 'releaseStatusForm';
 
   return (
     <>
@@ -141,7 +131,7 @@ const ReleaseStatusPage = ({
             releaseStatus: model.releaseStatus,
             internalReleaseNote: '',
           }}
-          onSubmit={submitFormHandler}
+          onSubmit={handleSubmit}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
             internalReleaseNote: Yup.string().required(
@@ -189,4 +179,4 @@ const ReleaseStatusPage = ({
   );
 };
 
-export default withErrorControl(ReleaseStatusPage);
+export default ReleaseStatusPage;

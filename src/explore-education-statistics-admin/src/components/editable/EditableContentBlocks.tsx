@@ -49,7 +49,6 @@ const EditableContentBlocks = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else if (!isReordering) {
-      // save order
       if (onBlockSaveOrder && contentBlocks !== undefined)
         onBlockSaveOrder(
           contentBlocks.reduce<Dictionary<number>>(

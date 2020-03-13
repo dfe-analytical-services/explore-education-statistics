@@ -1,4 +1,3 @@
-import withErrorControl from '@admin/validation/withErrorControl';
 import React from 'react';
 
 const MethodologySummaryPage = () => {
@@ -12,4 +11,4 @@ const MethodologySummaryPage = () => {
   );
 };
 
-export default withErrorControl(MethodologySummaryPage);
+export default MethodologySummaryPage;

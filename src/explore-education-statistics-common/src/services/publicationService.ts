@@ -159,17 +159,13 @@ export interface AxesConfiguration {
 
 export interface Chart {
   type?: ChartType;
-
   title?: string;
   height?: number;
   width?: number;
-
   labels?: Dictionary<DataSetConfiguration>;
   axes?: AxesConfiguration;
-
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
-
   stacked?: boolean;
   fileId?: string;
   geographicId?: string;

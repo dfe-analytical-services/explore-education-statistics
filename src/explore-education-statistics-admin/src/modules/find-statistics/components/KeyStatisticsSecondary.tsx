@@ -1,4 +1,3 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -33,9 +32,8 @@ export function hasSecondaryStats(
 export const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-
   const { isEditing } = useContext(EditingContext);
-  const { handleApiErrors } = useContext(ErrorControlContext);
+
   const {
     attachContentSectionBlock,
     deleteContentSectionBlock,
@@ -67,24 +65,20 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
         <ModalConfirm
           onConfirm={() => {
             if (release.keyStatisticsSecondarySection?.content) {
-              try {
-                Promise.all(
-                  release.keyStatisticsSecondarySection.content.map(
-                    async (content: EditableContentBlock) => {
-                      if (release.keyStatisticsSecondarySection?.content) {
-                        await deleteContentSectionBlock({
-                          releaseId: release.id,
-                          sectionId: release.keyStatisticsSecondarySection.id,
-                          blockId: content.id,
-                          sectionKey: 'keyStatisticsSecondarySection',
-                        });
-                      }
-                    },
-                  ),
-                );
-              } catch (err) {
-                handleApiErrors(err);
-              }
+              Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async (content: EditableContentBlock) => {
+                    if (release.keyStatisticsSecondarySection?.content) {
+                      await deleteContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.keyStatisticsSecondarySection.id,
+                        blockId: content.id,
+                        sectionKey: 'keyStatisticsSecondarySection',
+                      });
+                    }
+                  },
+                ),
+              );
             }
             setShowConfirmation(false);
           }}
@@ -114,24 +108,20 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
             release.keyStatisticsSecondarySection.id
           ) {
             if (release.keyStatisticsSecondarySection?.content) {
-              try {
-                await Promise.all(
-                  release.keyStatisticsSecondarySection.content.map(
-                    async (content: EditableContentBlock) => {
-                      if (release.keyStatisticsSecondarySection?.content) {
-                        await deleteContentSectionBlock({
-                          releaseId: release.id,
-                          sectionId: release.keyStatisticsSecondarySection.id,
-                          blockId: content.id,
-                          sectionKey: 'keyStatisticsSecondarySection',
-                        });
-                      }
-                    },
-                  ),
-                );
-              } catch (err) {
-                handleApiErrors(err);
-              }
+              await Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async (content: EditableContentBlock) => {
+                    if (release.keyStatisticsSecondarySection?.content) {
+                      await deleteContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.keyStatisticsSecondarySection.id,
+                        blockId: content.id,
+                        sectionKey: 'keyStatisticsSecondarySection',
+                      });
+                    }
+                  },
+                ),
+              );
             }
             await attachContentSectionBlock({
               releaseId: release.id,
@@ -141,7 +131,7 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                 contentBlockId: selectedDataBlockId,
                 order: 0,
               },
-            }).catch(handleApiErrors);
+            });
             setIsFormOpen(false);
           }
         }}

@@ -15,8 +15,8 @@ import AdminDocumentationManageDataBlocks from '@admin/pages/documentation/Docum
 import AdminDocumentationStyle from '@admin/pages/documentation/DocumentationStyle';
 import AdminDocumentationUsingDashboard from '@admin/pages/documentation/DocumentationUsingDashboard';
 import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
-import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
+import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';

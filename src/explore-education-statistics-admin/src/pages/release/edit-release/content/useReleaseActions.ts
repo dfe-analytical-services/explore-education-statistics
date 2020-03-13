@@ -115,7 +115,7 @@ export default function useReleaseActions() {
       // and so it is now available again
       updateAvailableDataBlocks({ releaseId });
     },
-    [dispatch],
+    [dispatch, updateAvailableDataBlocks],
   );
 
   const updateContentSectionDataBlock = useCallback(
@@ -205,7 +205,7 @@ export default function useReleaseActions() {
       // and so it is unavailable
       updateAvailableDataBlocks({ releaseId });
     },
-    [dispatch],
+    [dispatch, updateAvailableDataBlocks],
   );
 
   const attachContentSectionBlock = useCallback(
@@ -231,7 +231,7 @@ export default function useReleaseActions() {
       });
       updateAvailableDataBlocks({ releaseId });
     },
-    [dispatch],
+    [dispatch, updateAvailableDataBlocks],
   );
 
   const updateSectionBlockOrder = useCallback(

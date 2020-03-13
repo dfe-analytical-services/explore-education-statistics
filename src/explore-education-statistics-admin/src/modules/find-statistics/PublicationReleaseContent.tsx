@@ -1,5 +1,4 @@
 import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
@@ -27,7 +26,6 @@ export interface RendererProps {
 
 const PublicationReleaseContent = () => {
   const { isEditing } = useContext(EditingContext);
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const { release } = useReleaseState();
   const {
     addContentSectionBlock,
@@ -56,8 +54,8 @@ const PublicationReleaseContent = () => {
           order: 0,
           body: '',
         },
-      }).catch(handleApiErrors);
-  }, [release?.id, release?.summarySection.id]);
+      });
+  }, [release, addContentSectionBlock]);
 
   const summaryBlockUpdate = useCallback(
     (blockId, bodyContent) => {
@@ -68,9 +66,9 @@ const PublicationReleaseContent = () => {
           blockId,
           sectionKey: 'summarySection',
           bodyContent,
-        }).catch(handleApiErrors);
+        });
     },
-    [release?.id, release?.summarySection.id],
+    [release, updateContentSectionBlock],
   );
 
   const summaryBlockDelete = useCallback(
@@ -81,9 +79,9 @@ const PublicationReleaseContent = () => {
           sectionId: release.summarySection.id,
           blockId,
           sectionKey: 'summarySection',
-        }).catch(handleApiErrors);
+        });
     },
-    [release?.id, release?.summarySection.id],
+    [release, deleteContentSectionBlock],
   );
 
   if (release === undefined) return null;
@@ -135,9 +133,7 @@ const PublicationReleaseContent = () => {
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService
-                            .downloadFile(path, name)
-                            .catch(handleApiErrors)
+                          editReleaseDataService.downloadFile(path, name)
                         }
                         className="govuk-link"
                       >

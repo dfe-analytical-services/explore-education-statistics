@@ -1,4 +1,4 @@
-import LoginContext from '@admin/components/Login';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { ExtendedComment } from '@admin/services/publicationService';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
@@ -6,7 +6,7 @@ import { User } from '@admin/services/sign-in/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
-import React, { createRef, useContext, useState } from 'react';
+import React, { createRef, useState } from 'react';
 import styles from './Comments.module.scss';
 
 interface Props {
@@ -30,7 +30,7 @@ const Comments = ({
   const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
   const { releaseId } = useManageReleaseContext();
-  const context = useContext(LoginContext);
+  const context = useAuthContext();
 
   const addComment = (comment: string) => {
     const user = context.user as User;

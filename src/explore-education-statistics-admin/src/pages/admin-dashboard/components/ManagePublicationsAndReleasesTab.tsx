@@ -9,19 +9,16 @@ import {
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
 import permissionService from '@admin/services/permissions/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import FormSelect from '@common/components/form/FormSelect';
-import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
+import FormSelect from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import orderBy from 'lodash/orderBy';
+import React, { useContext, useEffect, useState } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -48,17 +45,12 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
-export interface Props
-  extends RouteComponentProps<{
-      themeId?: string;
-      topicId?: string;
-    }>,
-    ErrorControlProps {}
-
 const ManagePublicationsAndReleasesTab = ({
   match,
-  handleApiErrors,
-}: Props) => {
+}: RouteComponentProps<{
+  themeId?: string;
+  topicId?: string;
+}>) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -120,9 +112,8 @@ const ManagePublicationsAndReleasesTab = ({
       .getMyThemesAndTopics()
       .then(themeList =>
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+      );
+  }, []);
 
   useEffect(() => {
     if (themes) {
@@ -285,4 +276,4 @@ const ManagePublicationsAndReleasesTab = ({
   );
 };
 
-export default withErrorControl(withRouter(ManagePublicationsAndReleasesTab));
+export default withRouter(ManagePublicationsAndReleasesTab);

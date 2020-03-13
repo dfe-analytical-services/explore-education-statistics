@@ -1,11 +1,10 @@
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/service';
 import editReleaseDataService, {
   AncillaryFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -17,10 +16,26 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import remove from 'lodash/remove';
+import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_FILE',
+    'file',
+    'Choose a unique file name',
+  ),
+  errorCodeToFieldError(
+    'FILE_CANNOT_BE_EMPTY',
+    'file',
+    'Choose a file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'FILE_TYPE_INVALID',
+    'file',
+    'Choose a file of an allowed format',
+  ),
+];
 
 interface FormValues {
   name: string;
@@ -34,11 +49,7 @@ interface Props {
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({
-  publicationId,
-  releaseId,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
@@ -48,13 +59,11 @@ const ReleaseFileUploadsSection = ({
     Promise.all([
       editReleaseDataService.getAncillaryFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([filesResult, canUpdateReleaseResult]) => {
-        setFiles(filesResult);
-        setCanUpdateRelease(canUpdateReleaseResult);
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    ]).then(([filesResult, canUpdateReleaseResult]) => {
+      setFiles(filesResult);
+      setCanUpdateRelease(canUpdateReleaseResult);
+    });
+  }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -71,36 +80,14 @@ const ReleaseFileUploadsSection = ({
     setFiles(latestFiles);
   };
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_FILE',
-      'file',
-      'Choose a unique file name',
-    ),
-    errorCodeToFieldError(
-      'FILE_CANNOT_BE_EMPTY',
-      'file',
-      'Choose a file that is not empty',
-    ),
-    errorCodeToFieldError(
-      'FILE_TYPE_INVALID',
-      'file',
-      'Choose a file of an allowed format',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await editReleaseDataService.uploadAncillaryFile(releaseId, {
+      name: values.name,
+      file: values.file as File,
+    });
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await editReleaseDataService.uploadAncillaryFile(releaseId, {
-        name: values.name,
-        file: values.file as File,
-      });
-
-      await resetPage(actions);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    await resetPage(actions);
+  }, errorCodeMappings);
 
   return (
     <Formik<FormValues>
@@ -109,7 +96,7 @@ const ReleaseFileUploadsSection = ({
         name: '',
         file: null,
       }}
-      onSubmit={submitFormHandler}
+      onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
@@ -189,12 +176,10 @@ const ReleaseFileUploadsSection = ({
                           <SummaryListItem term="File">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService
-                                  .downloadAncillaryFile(
-                                    releaseId,
-                                    file.filename,
-                                  )
-                                  .catch(handleApiErrors)
+                                editReleaseDataService.downloadAncillaryFile(
+                                  releaseId,
+                                  file.filename,
+                                )
                               }
                             >
                               {file.filename}
@@ -232,9 +217,10 @@ const ReleaseFileUploadsSection = ({
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
               onConfirm={async () => {
-                await editReleaseDataService
-                  .deleteAncillaryFile(releaseId, deleteFileName)
-                  .catch(handleApiErrors);
+                await editReleaseDataService.deleteAncillaryFile(
+                  releaseId,
+                  deleteFileName,
+                );
                 setDeleteFileName('');
                 resetPage(form);
               }}
@@ -250,4 +236,4 @@ const ReleaseFileUploadsSection = ({
   );
 };
 
-export default withErrorControl(ReleaseFileUploadsSection);
+export default ReleaseFileUploadsSection;

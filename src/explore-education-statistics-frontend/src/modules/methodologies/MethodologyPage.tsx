@@ -25,7 +25,6 @@ class MethodologyPage extends Component<Props> {
 
   public static async getInitialProps({ query }: NextPageContext) {
     const { publication } = query;
-
     const request = methodologyService.getMethodology(publication as string);
 
     const data = await request;

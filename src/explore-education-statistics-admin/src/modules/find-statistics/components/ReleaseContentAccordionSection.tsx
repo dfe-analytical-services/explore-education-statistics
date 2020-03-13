@@ -1,14 +1,12 @@
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
@@ -31,11 +29,9 @@ const ReleaseContentAccordionSection = ({
   canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
-  const { releaseId } = useManageReleaseContext();
   const {
     addContentSectionBlock,
     attachContentSectionBlock,
@@ -46,7 +42,7 @@ const ReleaseContentAccordionSection = ({
 
   const addBlockToAccordionSection = useCallback(() => {
     addContentSectionBlock({
-      releaseId,
+      releaseId: release.id,
       sectionId,
       sectionKey: 'content',
       block: {
@@ -54,22 +50,22 @@ const ReleaseContentAccordionSection = ({
         order: sectionContent.length,
         body: '',
       },
-    }).catch(handleApiErrors);
-  }, [release.id, sectionId]);
+    });
+  }, [release.id, sectionId, sectionContent.length, addContentSectionBlock]);
 
   const attachDataBlockToAccordionSection = useCallback(
     (datablockId: string) => {
       attachContentSectionBlock({
-        releaseId,
+        releaseId: release.id,
         sectionId,
         sectionKey: 'content',
         block: {
           contentBlockId: datablockId,
           order: sectionContent.length,
         },
-      }).catch(handleApiErrors);
+      });
     },
-    [release.id, sectionId],
+    [release.id, sectionId, sectionContent.length, attachContentSectionBlock],
   );
 
   const updateBlockInAccordionSection = useCallback(
@@ -80,9 +76,9 @@ const ReleaseContentAccordionSection = ({
         blockId,
         sectionKey: 'content',
         bodyContent,
-      }).catch(handleApiErrors);
+      });
     },
-    [release.id, sectionId],
+    [release.id, sectionId, updateContentSectionBlock],
   );
 
   const removeBlockFromAccordionSection = useCallback(
@@ -92,8 +88,8 @@ const ReleaseContentAccordionSection = ({
         sectionId,
         blockId,
         sectionKey: 'content',
-      }).catch(handleApiErrors),
-    [release.id, sectionId],
+      }),
+    [release.id, sectionId, deleteContentSectionBlock],
   );
 
   const reorderBlocksInAccordionSection = useCallback(
@@ -103,9 +99,9 @@ const ReleaseContentAccordionSection = ({
         sectionId,
         sectionKey: 'content',
         order,
-      }).catch(handleApiErrors);
+      });
     },
-    [release.id, sectionId],
+    [release.id, sectionId, updateSectionBlockOrder],
   );
 
   return (

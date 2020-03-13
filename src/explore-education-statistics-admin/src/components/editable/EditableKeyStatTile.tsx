@@ -1,4 +1,5 @@
-import { ErrorControlContext } from '@admin/components/ErrorBoundary';
+import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
+import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -12,9 +13,7 @@ import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
-import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
-import { toolbarConfigs } from '@admin/components/WysiwygEditor';
+import React, { useEffect, useState } from 'react';
 
 export interface KeyStatsFormValues {
   dataSummary: string;
@@ -39,7 +38,6 @@ const EditableKeyStatTile = ({
   summary,
   ...props
 }: EditableKeyStatProps) => {
-  const { handleApiErrors } = useContext(ErrorControlContext);
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >(response);
@@ -55,24 +53,22 @@ const EditableKeyStatTile = ({
       DataBlockService.getDataBlockForSubject({
         ...dataBlockRequest,
         includeGeoJson: false,
-      })
-        .then(newResponse => {
-          if (newResponse) {
-            setDataBlockResponse(newResponse);
-            const [indicatorKey, theIndicator] = Object.entries(
-              newResponse.metaData.indicators,
-            )[0];
-            setConfig({
-              indicatorLabel: theIndicator.label,
-              value: `${formatPretty(
-                newResponse.result[0].measures[indicatorKey],
-              )}${theIndicator.unit}`,
-            });
-          }
-        })
-        .catch(handleApiErrors);
+      }).then(newResponse => {
+        if (newResponse) {
+          setDataBlockResponse(newResponse);
+          const [indicatorKey, theIndicator] = Object.entries(
+            newResponse.metaData.indicators,
+          )[0];
+          setConfig({
+            indicatorLabel: theIndicator.label,
+            value: `${formatPretty(
+              newResponse.result[0].measures[indicatorKey],
+            )}${theIndicator.unit}`,
+          });
+        }
+      });
     }
-  }, [dataBlockRequest, dataBlockResponse, handleApiErrors]);
+  }, [dataBlockRequest, dataBlockResponse]);
 
   if (!dataBlockResponse) {
     return (
@@ -94,7 +90,6 @@ const EditableKeyStatTile = ({
         {...props}
         dataBlockResponse={dataBlockResponse}
         summary={summary}
-        handleApiErrors={handleApiErrors}
       />
     );
   }
@@ -197,7 +192,6 @@ const EditableKeyStatTile = ({
           {...props}
           dataBlockResponse={dataBlockResponse}
           summary={summary}
-          handleApiErrors={handleApiErrors}
         >
           <div className={styles.keyStatEdit}>
             <Button

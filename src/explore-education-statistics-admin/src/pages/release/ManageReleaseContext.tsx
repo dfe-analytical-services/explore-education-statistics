@@ -1,5 +1,5 @@
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import React, { useContext, createContext } from 'react';
+import { useContext, createContext } from 'react';
 
 export interface ManageRelease {
   publication: BasicPublicationDetails;

@@ -1,28 +1,22 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import React, { useEffect, useState } from 'react';
-import methodologyService from '@admin/services/methodology/service';
 import Page from '@admin/components/Page';
+import methodologyService from '@admin/services/methodology/service';
 import { MethodologyStatusListItem } from '@admin/services/methodology/types';
+import React, { useEffect, useState } from 'react';
 
 interface Model {
   methodologies: MethodologyStatusListItem[];
 }
 
-const BauMethodologyPage = ({ handleApiErrors }: ErrorControlProps) => {
+const BauMethodologyPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService
-      .getMethodologies()
-      .then(methodologies => {
-        setModel({
-          methodologies,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+    methodologyService.getMethodologies().then(methodologies => {
+      setModel({
+        methodologies,
+      });
+    });
+  }, []);
 
   return (
     <Page
@@ -75,4 +69,4 @@ const BauMethodologyPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(BauMethodologyPage);
+export default BauMethodologyPage;

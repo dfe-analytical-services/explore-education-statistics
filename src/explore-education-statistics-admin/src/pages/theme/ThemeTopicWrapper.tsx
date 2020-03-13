@@ -1,14 +1,12 @@
 import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
 import dashboardService from '@admin/services/dashboard/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps, Switch, Route } from 'react-router';
+import { Route, RouteComponentProps, Switch } from 'react-router';
 import PageNotFoundPage from '../errors/PageNotFoundPage';
 import PublicationAssignMethodologyPage from './topic/publication/PublicationAssignMethodologyPage';
 
@@ -19,9 +17,9 @@ interface Props
       themeId?: string;
       topicId?: string;
     }>,
-    ErrorControlProps {}
+    ErrorControlState {}
 
-const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
+const ThemeTopicWrapper = ({ match }: Props) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -38,24 +36,16 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
       setState('OKAY');
     } else {
       setState('LOADING');
-      dashboardService
-        .getMyThemesAndTopics()
-        .then(themeList => {
-          const { themeId, topicId } = match.params;
-          const theme = themeList.find(({ id }) => id === themeId);
-          if (!theme) return setState('404');
-          const topic = theme.topics.find(({ id }) => id === topicId);
-          if (!topic) return setState('404');
-          return setSelectedThemeAndTopic({ theme, topic });
-        })
-        .catch(handleApiErrors);
+      dashboardService.getMyThemesAndTopics().then(themeList => {
+        const { themeId, topicId } = match.params;
+        const theme = themeList.find(({ id }) => id === themeId);
+        if (!theme) return setState('404');
+        const topic = theme.topics.find(({ id }) => id === topicId);
+        if (!topic) return setState('404');
+        return setSelectedThemeAndTopic({ theme, topic });
+      });
     }
-  }, [
-    match.params,
-    selectedThemeAndTopic,
-    setSelectedThemeAndTopic,
-    handleApiErrors,
-  ]);
+  }, [match.params, selectedThemeAndTopic, setSelectedThemeAndTopic]);
 
   const page404 = (
     <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
@@ -89,4 +79,4 @@ const ThemeTopicWrapper = ({ match, handleApiErrors }: Props) => {
   }
 };
 
-export default withErrorControl(ThemeTopicWrapper);
+export default ThemeTopicWrapper;

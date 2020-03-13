@@ -16,11 +16,9 @@ const props = {
 
 const { axes } = props;
 
-describe('HorzontalBarBlock', () => {
+describe('HorizontalBarBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<Chart {...props} />);
-
-    expect(container).toMatchSnapshot();
 
     // axes
     expect(
@@ -41,14 +39,19 @@ describe('HorzontalBarBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
+    // Legend
     expect(
       container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
+    const legendItems = container.querySelectorAll('.recharts-legend-item');
+
+    expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
+    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
+
     // expect there to be rectangles for all 3 data sets across both years
-    expect(
-      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
-    ).toBe(6);
+    expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(6);
   });
 
   test('major axis can be hidden', () => {
