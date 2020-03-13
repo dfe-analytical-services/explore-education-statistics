@@ -87,8 +87,8 @@ if args.analyst_pass:
     os.environ['ANALYST_PASSWORD'] = args.analyst_pass
 
 # Default values
-timeout = 20
-implicit_wait = 20
+timeout = 30
+implicit_wait = 5
 
 # Install chromedriver and add it to PATH
 cdi.install(file_directory='./webdriver/',
@@ -173,27 +173,6 @@ if args.tests and "general_public" not in args.tests:  # Auth not required with 
             print(' done!')
         assert os.getenv('IDENTITY_LOCAL_STORAGE_ANALYST') is not None
         assert os.getenv('IDENTITY_COOKIE_ANALYST') is not None
-
-    # For Prerelease user
-    #if os.path.exists('IDENTITY_LOCAL_STORAGE_PR.txt') and os.path.exists('IDENTITY_COOKIE_PR.txt'):
-    #    print('Getting prerelease user authentication information from local files...', end='')
-    #    with open('IDENTITY_LOCAL_STORAGE_PR.txt', 'r') as ls_file:
-    #        os.environ['IDENTITY_LOCAL_STORAGE_PR'] = ls_file.read()
-    #    with open('IDENTITY_COOKIE_PR.txt', 'r') as cookie_file:
-    #        os.environ['IDENTITY_COOKIE_PR'] = cookie_file.read()
-    #    print('done!')
-    #else:
-    #    print('Logging in to obtain prerelease user authentication information...', end='', flush=True)
-    #    os.environ["IDENTITY_LOCAL_STORAGE_PR"], os.environ['IDENTITY_COOKIE_PR'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('PRERELEASE_EMAIL'), os.getenv('PRERELEASE_PASSWORD'), first_name="Prerelease3", last_name="EESADMIN", chromedriver_version=args.chromedriver_version)
-
-    #    # Save auth info to files for efficiency
-    #    with open('IDENTITY_LOCAL_STORAGE_PR.txt', 'w') as ls_file:
-    #        ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_PR'])
-    #    with open('IDENTITY_COOKIE_PR.txt', 'w') as cookie_file:
-    #        cookie_file.write(os.environ['IDENTITY_COOKIE_PR'])
-    #    print(' done!')
-    #assert os.getenv('IDENTITY_LOCAL_STORAGE_PR') is not None
-    #assert os.getenv('IDENTITY_COOKIE_PR') is not None
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments
     if args.env in ['local', 'dev']:
