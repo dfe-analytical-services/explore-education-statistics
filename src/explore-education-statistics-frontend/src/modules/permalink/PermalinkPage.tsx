@@ -61,8 +61,7 @@ class PermalinkPage extends Component<Props> {
           </div>
           <div className="govuk-grid-column-one-third">
             <PrintThisPage
-              alignCentre
-              noMargin
+              className="dfe-align--centre"
               analytics={{
                 category: 'Page print',
                 action: 'Print this page link selected',

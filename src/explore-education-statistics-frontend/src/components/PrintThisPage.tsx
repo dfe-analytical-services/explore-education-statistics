@@ -7,14 +7,12 @@ import {
 import styles from './PrintThisPage.module.scss';
 
 interface Props {
-  noMargin?: boolean;
-  alignCentre?: boolean;
+  className?: string;
 }
 
 const PrintThisPage = ({
   analytics,
-  noMargin,
-  alignCentre,
+  className,
   ...props
 }: AnalyticProps & Props) => {
   const openPrint = () => {
@@ -28,10 +26,7 @@ const PrintThisPage = ({
   return (
     <div
       className={classNames(
-        {
-          'govuk-!-margin-top-6': !noMargin,
-          [styles.alignCentre]: alignCentre,
-        },
+        className,
         'dfe-print-hidden',
         styles.printContainer,
         styles.mobileHidden,
