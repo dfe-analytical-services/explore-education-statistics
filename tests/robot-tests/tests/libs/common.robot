@@ -158,8 +158,8 @@ user waits until page contains link
   page should contain link   ${link_text}
 
 user waits until page contains heading
-  [Arguments]   ${text}    ${timeout}=20
-  wait until page contains element   xpath://h1[contains(.,"${text}")]   ${timeout}
+  [Arguments]   ${text}    ${wait}=${timeout}
+  wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
 
 user waits until page contains accordion section
   [Arguments]   ${section_title}
@@ -350,6 +350,6 @@ user checks publication bullet does not contain link
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
 user waits until page contains key stat tile
-  [Arguments]  ${title}   ${value}   ${timeout}=20
-  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${timeout}
+  [Arguments]  ${title}   ${value}   ${wait}=${timeout}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    timeout=${wait}
 

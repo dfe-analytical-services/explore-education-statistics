@@ -60,7 +60,7 @@ Validate Analyst1 can see "Upload data files" button
     [Tags]  HappyPath
     user clicks element   xpath://a[text()="Manage data"]
     user waits until page contains element  xpath://legend[text()="Add new data to release"]
-    user checks page contains element   css:#upload-data-files-button
+    user waits until page contains element   css:#upload-data-files-button
 
 Validate Analyst1 can see "Add another footnote" button
     [Tags]  HappyPath
