@@ -8,4 +8,8 @@
   > div > p {
     margin: 0;
   }
+
+  @media print {
+    display: none;
+  }
 }
