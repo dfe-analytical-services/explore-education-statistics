@@ -14,8 +14,9 @@ import {
   AbstractRelease,
   ContentSection,
 } from '@common/services/publicationService';
-import { ContentSectionKeys } from './ReleaseContextActionTypes';
+import { useCallback } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
+import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
 const contentSectionComments = (
   contentSection?: ContentSection<EditableContentBlock>,
@@ -53,267 +54,299 @@ const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
 export default function useReleaseActions() {
   const dispatch = useReleaseDispatch();
 
-  async function getReleaseContent({ releaseId }: { releaseId: string }) {
-    dispatch({ type: 'CLEAR_STATE' });
-    const {
-      release,
-      availableDataBlocks,
-    } = await releaseContentService.getContent(releaseId);
-    const canUpdateRelease = await permissionsService.canUpdateRelease(
-      releaseId,
-    );
-    dispatch({
-      type: 'SET_STATE',
-      payload: {
-        unresolvedComments: getUnresolveComments(release),
+  const getReleaseContent = useCallback(
+    async ({ releaseId }: { releaseId: string }) => {
+      dispatch({ type: 'CLEAR_STATE' });
+      const {
         release,
         availableDataBlocks,
-        canUpdateRelease,
-      },
-    });
-  }
+      } = await releaseContentService.getContent(releaseId);
+      const canUpdateRelease = await permissionsService.canUpdateRelease(
+        releaseId,
+      );
+      dispatch({
+        type: 'SET_STATE',
+        payload: {
+          unresolvedComments: getUnresolveComments(release),
+          release,
+          availableDataBlocks,
+          canUpdateRelease,
+        },
+      });
+    },
+    [],
+  );
 
-  async function updateAvailableDataBlocks({
-    releaseId,
-  }: {
-    releaseId: string;
-  }) {
-    const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
-      releaseId,
-    );
-    dispatch({
-      type: 'SET_AVAILABLE_DATABLOCKS',
-      payload: { availableDataBlocks },
-    });
-  }
+  const updateAvailableDataBlocks = useCallback(
+    async ({ releaseId }: { releaseId: string }) => {
+      const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
+        releaseId,
+      );
+      dispatch({
+        type: 'SET_AVAILABLE_DATABLOCKS',
+        payload: { availableDataBlocks },
+      });
+    },
+    [],
+  );
 
-  async function deleteContentSectionBlock({
-    releaseId,
-    sectionId,
-    blockId,
-    sectionKey,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    blockId: string;
-    sectionKey: ContentSectionKeys;
-  }) {
-    await releaseContentService.deleteContentSectionBlock(
-      releaseId,
-      sectionId,
-      blockId,
-    );
-    dispatch({
-      type: 'REMOVE_BLOCK_FROM_SECTION',
-      payload: { meta: { sectionId, blockId, sectionKey } },
-    });
-    // becuase we don't know if a datablock was removed,
-    // and so it is now available again
-    updateAvailableDataBlocks({ releaseId });
-  }
-
-  async function updateContentSectionDataBlock({
-    releaseId,
-    sectionId,
-    blockId,
-    sectionKey,
-    values,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    blockId: string;
-    sectionKey: ContentSectionKeys;
-    values: KeyStatsFormValues;
-  }) {
-    const updateBlock = await releaseContentService.updateContentSectionDataBlock(
+  const deleteContentSectionBlock = useCallback(
+    async ({
       releaseId,
       sectionId,
       blockId,
+      sectionKey,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+    }) => {
+      await releaseContentService.deleteContentSectionBlock(
+        releaseId,
+        sectionId,
+        blockId,
+      );
+      dispatch({
+        type: 'REMOVE_BLOCK_FROM_SECTION',
+        payload: { meta: { sectionId, blockId, sectionKey } },
+      });
+      // becuase we don't know if a datablock was removed,
+      // and so it is now available again
+      updateAvailableDataBlocks({ releaseId });
+    },
+    [],
+  );
+
+  const updateContentSectionDataBlock = useCallback(
+    async ({
+      releaseId,
+      sectionId,
+      blockId,
+      sectionKey,
       values,
-    );
-    dispatch({
-      type: 'UPDATE_BLOCK_FROM_SECTION',
-      payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
-    });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+      values: KeyStatsFormValues;
+    }) => {
+      const updateBlock = await releaseContentService.updateContentSectionDataBlock(
+        releaseId,
+        sectionId,
+        blockId,
+        values,
+      );
+      dispatch({
+        type: 'UPDATE_BLOCK_FROM_SECTION',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          block: updateBlock,
+        },
+      });
+    },
+    [],
+  );
 
-  async function updateContentSectionBlock({
-    releaseId,
-    sectionId,
-    blockId,
-    sectionKey,
-    bodyContent,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    blockId: string;
-    sectionKey: ContentSectionKeys;
-    bodyContent: string;
-  }) {
-    const updateBlock = await releaseContentService.updateContentSectionBlock(
+  const updateContentSectionBlock = useCallback(
+    async ({
       releaseId,
       sectionId,
       blockId,
-      { body: bodyContent },
-    );
-    dispatch({
-      type: 'UPDATE_BLOCK_FROM_SECTION',
-      payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
-    });
-  }
+      sectionKey,
+      bodyContent,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+      bodyContent: string;
+    }) => {
+      const updateBlock = await releaseContentService.updateContentSectionBlock(
+        releaseId,
+        sectionId,
+        blockId,
+        { body: bodyContent },
+      );
+      dispatch({
+        type: 'UPDATE_BLOCK_FROM_SECTION',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          block: updateBlock,
+        },
+      });
+    },
+    [],
+  );
 
-  async function addContentSectionBlock({
-    releaseId,
-    sectionId,
-    sectionKey,
-    block,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    sectionKey: ContentSectionKeys;
-    block: ContentBlockPostModel;
-  }) {
-    const newBlock = await releaseContentService.addContentSectionBlock(
+  const addContentSectionBlock = useCallback(
+    async ({
       releaseId,
       sectionId,
+      sectionKey,
       block,
-    );
-    dispatch({
-      type: 'ADD_BLOCK_TO_SECTION',
-      payload: { meta: { sectionId, sectionKey }, block: newBlock },
-    });
-    // becuase we don't know if a datablock was used,
-    // and so it is unavailable
-    updateAvailableDataBlocks({ releaseId });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      block: ContentBlockPostModel;
+    }) => {
+      const newBlock = await releaseContentService.addContentSectionBlock(
+        releaseId,
+        sectionId,
+        block,
+      );
+      dispatch({
+        type: 'ADD_BLOCK_TO_SECTION',
+        payload: { meta: { sectionId, sectionKey }, block: newBlock },
+      });
+      // becuase we don't know if a datablock was used,
+      // and so it is unavailable
+      updateAvailableDataBlocks({ releaseId });
+    },
+    [],
+  );
 
-  async function attachContentSectionBlock({
-    releaseId,
-    sectionId,
-    sectionKey,
-    block,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    sectionKey: ContentSectionKeys;
-    block: ContentBlockAttachRequest;
-  }) {
-    const newBlock = await releaseContentService.attachContentSectionBlock(
+  const attachContentSectionBlock = useCallback(
+    async ({
       releaseId,
       sectionId,
+      sectionKey,
       block,
-    );
-    dispatch({
-      type: 'ADD_BLOCK_TO_SECTION',
-      payload: { meta: { sectionId, sectionKey }, block: newBlock },
-    });
-    updateAvailableDataBlocks({ releaseId });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      block: ContentBlockAttachRequest;
+    }) => {
+      const newBlock = await releaseContentService.attachContentSectionBlock(
+        releaseId,
+        sectionId,
+        block,
+      );
+      dispatch({
+        type: 'ADD_BLOCK_TO_SECTION',
+        payload: { meta: { sectionId, sectionKey }, block: newBlock },
+      });
+      updateAvailableDataBlocks({ releaseId });
+    },
+    [],
+  );
 
-  async function updateSectionBlockOrder({
-    releaseId,
-    sectionId,
-    sectionKey,
-    order,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    sectionKey: ContentSectionKeys;
-    order: Dictionary<number>;
-  }) {
-    const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
+  const updateSectionBlockOrder = useCallback(
+    async ({
       releaseId,
       sectionId,
+      sectionKey,
       order,
-    );
-    dispatch({
-      type: 'UPDATE_SECTION_CONTENT',
-      payload: {
-        meta: { sectionId, sectionKey },
-        sectionContent,
-      },
-    });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      order: Dictionary<number>;
+    }) => {
+      const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
+        releaseId,
+        sectionId,
+        order,
+      );
+      dispatch({
+        type: 'UPDATE_SECTION_CONTENT',
+        payload: {
+          meta: { sectionId, sectionKey },
+          sectionContent,
+        },
+      });
+    },
+    [],
+  );
 
-  async function addContentSection({
-    releaseId,
-    order,
-  }: {
-    releaseId: string;
-    order: number;
-  }) {
-    const newSection = await releaseContentService.addContentSection(
+  const addContentSection = useCallback(
+    async ({ releaseId, order }: { releaseId: string; order: number }) => {
+      const newSection = await releaseContentService.addContentSection(
+        releaseId,
+        order,
+      );
+      dispatch({
+        type: 'ADD_CONTENT_SECTION',
+        payload: {
+          section: newSection,
+        },
+      });
+    },
+    [],
+  );
+
+  const updateContentSectionsOrder = useCallback(
+    async ({
       releaseId,
       order,
-    );
-    dispatch({
-      type: 'ADD_CONTENT_SECTION',
-      payload: {
-        section: newSection,
-      },
-    });
-  }
+    }: {
+      releaseId: string;
+      order: Dictionary<number>;
+    }) => {
+      const content = await releaseContentService.updateContentSectionsOrder(
+        releaseId,
+        order,
+      );
+      dispatch({
+        type: 'SET_CONTENT',
+        payload: {
+          content,
+        },
+      });
+    },
+    [],
+  );
 
-  async function updateContentSectionsOrder({
-    releaseId,
-    order,
-  }: {
-    releaseId: string;
-    order: Dictionary<number>;
-  }) {
-    const content = await releaseContentService.updateContentSectionsOrder(
-      releaseId,
-      order,
-    );
-    dispatch({
-      type: 'SET_CONTENT',
-      payload: {
-        content,
-      },
-    });
-  }
-
-  async function removeContentSection({
-    releaseId,
-    sectionId,
-  }: {
-    releaseId: string;
-    sectionId: string;
-  }) {
-    const content = await releaseContentService.removeContentSection(
+  const removeContentSection = useCallback(
+    async ({
       releaseId,
       sectionId,
-    );
-    dispatch({
-      type: 'SET_CONTENT',
-      payload: {
-        content,
-      },
-    });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+    }) => {
+      const content = await releaseContentService.removeContentSection(
+        releaseId,
+        sectionId,
+      );
+      dispatch({
+        type: 'SET_CONTENT',
+        payload: {
+          content,
+        },
+      });
+    },
+    [],
+  );
 
-  async function updateContentSectionHeading({
-    releaseId,
-    sectionId,
-    title,
-  }: {
-    releaseId: string;
-    sectionId: string;
-    title: string;
-  }) {
-    const section = await releaseContentService.updateContentSectionHeading(
+  const updateContentSectionHeading = useCallback(
+    async ({
       releaseId,
       sectionId,
       title,
-    );
-    dispatch({
-      type: 'UPDATE_CONTENT_SECTION',
-      payload: {
-        meta: { sectionId },
-        section,
-      },
-    });
-  }
+    }: {
+      releaseId: string;
+      sectionId: string;
+      title: string;
+    }) => {
+      const section = await releaseContentService.updateContentSectionHeading(
+        releaseId,
+        sectionId,
+        title,
+      );
+      dispatch({
+        type: 'UPDATE_CONTENT_SECTION',
+        payload: {
+          meta: { sectionId },
+          section,
+        },
+      });
+    },
+    [],
+  );
 
   return {
     getReleaseContent,

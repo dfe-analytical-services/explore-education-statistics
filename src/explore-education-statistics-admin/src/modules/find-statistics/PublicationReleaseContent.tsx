@@ -15,7 +15,7 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useCallback } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
@@ -29,7 +29,11 @@ const PublicationReleaseContent = () => {
   const { isEditing } = useContext(EditingContext);
   const { handleApiErrors } = useContext(ErrorControlContext);
   const { release } = useReleaseState();
-  const { addContentSectionBlock } = useReleaseActions();
+  const {
+    addContentSectionBlock,
+    updateContentSectionBlock,
+    deleteContentSectionBlock,
+  } = useReleaseActions();
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -40,6 +44,47 @@ const PublicationReleaseContent = () => {
     }
     return 0;
   }, [release]);
+
+  const addSummaryBlock = useCallback(() => {
+    if (release)
+      addContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.summarySection.id,
+        sectionKey: 'summarySection',
+        block: {
+          type: 'MarkdownBlock',
+          order: 0,
+          body: '',
+        },
+      }).catch(handleApiErrors);
+  }, [release?.id, release?.summarySection.id]);
+
+  const summaryBlockUpdate = useCallback(
+    (blockId, bodyContent) => {
+      if (release)
+        updateContentSectionBlock({
+          releaseId: release.id,
+          sectionId: release.headlinesSection.id,
+          blockId,
+          sectionKey: 'summarySection',
+          bodyContent,
+        }).catch(handleApiErrors);
+    },
+    [release?.id, release?.summarySection.id],
+  );
+
+  const summaryBlockDelete = useCallback(
+    (blockId: string) => {
+      if (release)
+        deleteContentSectionBlock({
+          releaseId: release.id,
+          sectionId: release.headlinesSection.id,
+          blockId,
+          sectionKey: 'summarySection',
+        }).catch(handleApiErrors);
+    },
+    [release?.id, release?.summarySection.id],
+  );
 
   if (release === undefined) return null;
   return (
@@ -69,24 +114,12 @@ const PublicationReleaseContent = () => {
                 publication={release.publication}
                 id={release.summarySection.id as string}
                 content={release.summarySection.content}
+                onBlockContentChange={summaryBlockUpdate}
+                onBlockDelete={summaryBlockDelete}
               />
               {release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--center">
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      addContentSectionBlock({
-                        releaseId: release.id,
-                        sectionId: release.summarySection.id,
-                        sectionKey: 'summarySection',
-                        block: {
-                          type: 'MarkdownBlock',
-                          order: 0,
-                          body: '',
-                        },
-                      }).catch(handleApiErrors);
-                    }}
-                  >
+                  <Button variant="secondary" onClick={addSummaryBlock}>
                     Add a summary text block
                   </Button>
                 </div>

@@ -21,7 +21,7 @@ import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import KeyStatistics from './KeyStatistics';
 import { AddSecondaryStats, hasSecondaryStats } from './KeyStatisticsSecondary';
 
@@ -36,7 +36,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
     addContentSectionBlock,
     deleteContentSectionBlock,
     updateContentSectionBlock,
-    updateSectionBlockOrder,
   } = useReleaseActions();
 
   const [secondaryStatsDatablock, setSecondaryStatsDatablockData] = useState<{
@@ -71,6 +70,44 @@ const ReleaseHeadlines = ({ release }: Props) => {
     }
   }, [release.keyStatisticsSecondarySection]);
 
+  const addHeadlinesBlock = useCallback(() => {
+    addContentSectionBlock({
+      releaseId: release.id,
+      sectionId: release.headlinesSection.id,
+      sectionKey: 'headlinesSection',
+      block: {
+        type: 'MarkdownBlock',
+        order: 0,
+        body: '',
+      },
+    }).catch(handleApiErrors);
+  }, [release?.id, release?.headlinesSection.id]);
+
+  const headlinesBlockUpdate = useCallback(
+    (blockId, bodyContent) => {
+      updateContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.headlinesSection.id,
+        blockId,
+        sectionKey: 'headlinesSection',
+        bodyContent,
+      }).catch(handleApiErrors);
+    },
+    [release?.id, release?.headlinesSection.id],
+  );
+
+  const headlinesBlockDelete = useCallback(
+    (blockId: string) => {
+      deleteContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.headlinesSection.id,
+        blockId,
+        sectionKey: 'headlinesSection',
+      }).catch(handleApiErrors);
+    },
+    [release?.id, release?.headlinesSection.id],
+  );
+
   return (
     <section id="headlines">
       <h2 className="dfe-print-break-before">
@@ -84,7 +121,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       )}
 
       <Tabs id="releaseHeadlingsTabs">
-        <TabsSection id="headline-summary" title="Summary">
+        <TabsSection id="headline-headlines" title="Headlines">
           <section id="keystats">
             {release.keyStatisticsSection && (
               <KeyStatistics release={release} isEditing={isEditing} />
@@ -96,50 +133,13 @@ const ReleaseHeadlines = ({ release }: Props) => {
               publication={release.publication}
               id={release.headlinesSection.id}
               content={release.headlinesSection.content}
-              onBlockSaveOrder={order => {
-                updateSectionBlockOrder({
-                  releaseId: release.id,
-                  sectionId: release.headlinesSection.id,
-                  sectionKey: 'headlinesSection',
-                  order,
-                }).catch(handleApiErrors);
-              }}
-              onBlockContentChange={(blockId, bodyContent) =>
-                updateContentSectionBlock({
-                  releaseId: release.id,
-                  sectionId: release.headlinesSection.id,
-                  blockId,
-                  sectionKey: 'headlinesSection',
-                  bodyContent,
-                }).catch(handleApiErrors)
-              }
-              onBlockDelete={(blockId: string) =>
-                deleteContentSectionBlock({
-                  releaseId: release.id,
-                  sectionId: release.headlinesSection.id,
-                  blockId,
-                  sectionKey: 'headlinesSection',
-                }).catch(handleApiErrors)
-              }
+              onBlockContentChange={headlinesBlockUpdate}
+              onBlockDelete={headlinesBlockDelete}
             />
 
             {release.headlinesSection.content?.length === 0 && (
               <div className="govuk-!-margin-bottom-8 dfe-align--center">
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    addContentSectionBlock({
-                      releaseId: release.id,
-                      sectionId: release.headlinesSection.id,
-                      sectionKey: 'headlinesSection',
-                      block: {
-                        type: 'MarkdownBlock',
-                        order: 0,
-                        body: '',
-                      },
-                    }).catch(handleApiErrors);
-                  }}
-                >
+                <Button variant="secondary" onClick={addHeadlinesBlock}>
                   Add a headlines text block
                 </Button>
               </div>

@@ -9,7 +9,7 @@ import {
   AbstractRelease,
   Publication,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 
@@ -102,25 +102,30 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
     release.keyStatisticsSection.content.length > 0 &&
     ' another ';
 
+  const addKeyStatToSection = useCallback(
+    (datablockId: string) => {
+      attachContentSectionBlock({
+        releaseId,
+        sectionId: release.keyStatisticsSection.id,
+        sectionKey: 'keyStatisticsSection',
+        block: {
+          contentBlockId: datablockId,
+          order:
+            (release.keyStatisticsSection.content &&
+              release.keyStatisticsSection.content.length) ||
+            0,
+        },
+      }).catch(handleApiErrors);
+      setIsFormOpen(false);
+    },
+    [release?.id, release?.keyStatisticsSection.id],
+  );
+
   return (
     <>
       {isFormOpen ? (
         <KeyIndicatorSelectForm
-          onSelect={async datablockId => {
-            attachContentSectionBlock({
-              releaseId,
-              sectionId: release.keyStatisticsSection.id,
-              sectionKey: 'keyStatisticsSection',
-              block: {
-                contentBlockId: datablockId,
-                order:
-                  (release.keyStatisticsSection.content &&
-                    release.keyStatisticsSection.content.length) ||
-                  0,
-              },
-            }).catch(handleApiErrors);
-            setIsFormOpen(false);
-          }}
+          onSelect={addKeyStatToSection}
           onCancel={() => setIsFormOpen(false)}
         />
       ) : (

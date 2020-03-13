@@ -8,7 +8,7 @@ import withErrorControl, {
   ErrorControlProps,
 } from '@admin/validation/withErrorControl';
 import { AbstractRelease } from '@common/services/publicationService';
-import React from 'react';
+import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
@@ -32,22 +32,30 @@ const ReleaseContentAccordion = ({
     updateContentSectionsOrder,
   } = useReleaseActions();
 
+  const addAccordionSection = useCallback(
+    () =>
+      addContentSection({
+        releaseId: release.id,
+        order: release.content.length,
+      }).catch(handleApiErrors),
+    [release.id],
+  );
+
+  const reorderAccordionSections = useCallback(
+    async order => {
+      updateContentSectionsOrder({ releaseId: release.id, order }).catch(
+        handleApiErrors,
+      );
+    },
+    [release.id],
+  );
   return (
     <Accordion
       id={accordionId}
       canReorder
       sectionName={sectionName}
-      onSaveOrder={async order => {
-        updateContentSectionsOrder({ releaseId: release.id, order }).catch(
-          handleApiErrors,
-        );
-      }}
-      onAddSection={() =>
-        addContentSection({
-          releaseId: release.id,
-          order: release.content.length,
-        }).catch(handleApiErrors)
-      }
+      onSaveOrder={reorderAccordionSections}
+      onAddSection={addAccordionSection}
     >
       {release.content.map((accordionSection, index) => (
         <ReleaseContentAccordionSection
