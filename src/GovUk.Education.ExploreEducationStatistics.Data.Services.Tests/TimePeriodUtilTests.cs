@@ -128,6 +128,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             Assert.Throws<ArgumentException>(() =>
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, SixHalfTerms)));
+            
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, ReportingYear)));
         }
 
         [Fact]
@@ -180,6 +183,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             CollectionAssert.AreEquivalent(expected,
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear)).ToList());
+        }
+        
+        [Fact]
+        public void RangeIsGeneratedForReportingYearQuery()
+        {
+            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
+            {
+                (2018, ReportingYear),
+                (2019, ReportingYear)
+            };
+
+            CollectionAssert.AreEquivalent(expected,
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, ReportingYear, 2019, ReportingYear)).ToList());
         }
 
         [Fact]
