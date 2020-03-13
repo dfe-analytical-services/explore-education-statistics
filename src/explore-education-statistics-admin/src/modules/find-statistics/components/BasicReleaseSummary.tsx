@@ -2,6 +2,7 @@ import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryU
 import commonService from '@admin/services/common/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
+import Tag from '@common/components/Tag';
 import {
   AbstractRelease,
   dayMonthYearIsComplete,
@@ -54,13 +55,9 @@ const BasicReleaseSummary = ({ release }: Props) => {
         <>
           <div className="govuk-grid-column-three-quarters">
             {release.prerelease ? (
-              <span className={`govuk-tag ${styles.ragStatusRed}`}>
-                Pre Release
-              </span>
+              <Tag className={`${styles.ragStatusRed}`}>Pre Release</Tag>
             ) : (
-              <span className="govuk-tag">
-                {getReleaseStatusLabel(release.status)}
-              </span>
+              <Tag>{getReleaseStatusLabel(release.status)}</Tag>
             )}
 
             <dl className="dfe-meta-content">

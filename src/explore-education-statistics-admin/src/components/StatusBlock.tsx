@@ -1,3 +1,4 @@
+import Tag from '@common/components/Tag';
 import React from 'react';
 import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
@@ -23,11 +24,9 @@ const StatusBlock = ({ color, text, className }: StatusBlockProps) => {
   };
 
   return (
-    <>
-      <strong className={classNames('govuk-tag', colorClass(), className)}>
-        {text}
-      </strong>
-    </>
+    <Tag className={classNames(colorClass(), className)} strong>
+      {text}
+    </Tag>
   );
 };
 

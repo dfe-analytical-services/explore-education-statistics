@@ -1,6 +1,9 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
+import {
+  ErrorControlContext,
+  useErrorControl,
+} from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
 import { User } from '@admin/services/sign-in/types';
 import React, { useContext } from 'react';
@@ -13,24 +16,31 @@ interface ProtectedRouteProps extends RouteProps {
 
 const basicAccessCheck = (user: User) => user.permissions.canAccessSystem;
 
-const AuthenticationCheckingComponent = ({
+/**
+ * Creates a <Route> that firstly checks the user's authentication
+ * status and then renders the protected component if the user has been
+ * successfully authorized, redirects the user to the sign-in page
+ * if in need of authentication, or renders a Forbidden page if not
+ * authorized.
+ */
+const ProtectedRoute = ({
   component,
   allowAnonymousUsers = false,
   protectionAction,
-  ...props
+  ...rest
 }: ProtectedRouteProps) => {
   const { user } = useAuthContext();
 
-  const { handleManualErrors } = useContext(ErrorControlContext);
+  const { handleManualErrors } = useErrorControl();
 
-  let protectedByAction = false;
+  let accessDenied = false;
 
   if (user) {
     const accessCheck = protectionAction || basicAccessCheck;
-    protectedByAction = !accessCheck(user);
+    accessDenied = !accessCheck(user);
   } else {
     const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
-    protectedByAction = denyAccessToNonLoggedInUsers;
+    accessDenied = denyAccessToNonLoggedInUsers;
   }
 
   if (!component) {
@@ -47,43 +57,12 @@ const AuthenticationCheckingComponent = ({
     );
   }
 
-  if (typeof protectedByAction !== 'undefined' && protectedByAction) {
+  if (accessDenied) {
     handleManualErrors.forbidden();
     return null;
   }
 
-  if (typeof protectedByAction !== 'undefined' && !protectedByAction) {
-    return React.createElement(component, props);
-  }
-
-  return null;
-};
-
-/**
- * Creates a <Route> that firstly checks the user's authentication
- * status and then renders the protected component if the user has been
- * successfully authenticated, or redirects the user to the sign-in page
- * if in need of authentication.
- */
-const ProtectedRoute = ({
-  component,
-  allowAnonymousUsers = false,
-  protectionAction,
-  ...rest
-}: ProtectedRouteProps) => {
-  return (
-    <Route
-      {...rest}
-      component={(props: RouteComponentProps) => (
-        <AuthenticationCheckingComponent
-          {...props}
-          component={component}
-          allowAnonymousUsers={allowAnonymousUsers}
-          protectionAction={protectionAction}
-        />
-      )}
-    />
-  );
+  return <Route component={component} {...rest} />;
 };
 
 export default ProtectedRoute;

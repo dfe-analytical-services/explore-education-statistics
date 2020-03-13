@@ -1,12 +1,13 @@
+import Tag from '@common/components/Tag';
 import React from 'react';
 
 const PageBanner = () => {
   return (
     <div className="govuk-phase-banner">
       <p className="govuk-phase-banner__content">
-        <strong className="govuk-tag govuk-phase-banner__content__tag">
+        <Tag className="govuk-phase-banner__content__tag" strong>
           Beta
-        </strong>
+        </Tag>
 
         <span className="govuk-phase-banner__text">
           This is a new service – your{' '}

@@ -8,6 +8,7 @@ import {
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
@@ -144,16 +145,16 @@ class ImporterStatus extends Component<Props> {
       <SummaryListItem term="Status">
         <div>
           <div className={styles.currentStatusContainer}>
-            <strong
+            <Tag
               className={classNames(
                 'govuk-!-margin-right-1',
-                'govuk-tag',
                 currentStatus &&
                   this.getImportStatusClass(currentStatus.status),
               )}
+              strong
             >
               {currentStatus && getImportStatusLabel(currentStatus.status)}
-            </strong>
+            </Tag>
             {running && (
               <LoadingSpinner
                 alert

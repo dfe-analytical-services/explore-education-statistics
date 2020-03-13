@@ -6,6 +6,7 @@ import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import RelatedInformation from '@common/components/RelatedInformation';
+import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
