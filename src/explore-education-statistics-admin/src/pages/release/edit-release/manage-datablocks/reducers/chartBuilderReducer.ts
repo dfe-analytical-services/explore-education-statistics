@@ -76,7 +76,6 @@ export const chartBuilderReducer: Reducer<
           ...previousConfig,
           ...(axisDefinition.constants ?? {}),
           type: axisDefinition.type,
-          name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
           dataSets:
             axisDefinition.type === 'major'
               ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)

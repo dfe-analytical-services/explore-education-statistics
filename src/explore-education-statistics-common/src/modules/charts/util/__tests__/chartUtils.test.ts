@@ -38,7 +38,6 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72],
@@ -80,7 +79,6 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axis: AxisConfiguration = {
-      name: meta.indicators['99'].label,
       type: 'major',
       groupBy: 'timePeriod',
       sortBy: '99_1_72_____',
@@ -124,7 +122,6 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
@@ -171,7 +168,6 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
@@ -218,7 +214,6 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axisConfig: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],

@@ -342,30 +342,36 @@ const ChartBuilder = ({
           </TabsSection>
 
           {Object.entries(axesConfiguration as Required<AxesConfiguration>).map(
-            ([key, axis]) => (
-              <TabsSection
-                key={key}
-                id={`${key}-tab`}
-                title={axis.name}
-                headingTitle={axis.name}
-              >
-                <ChartAxisConfiguration
-                  id={key}
-                  configuration={axis}
-                  capabilities={definition.capabilities}
-                  data={data}
-                  meta={metaData}
-                  labels={chartProps?.labels}
-                  dataSets={
-                    axis.type === 'major'
-                      ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                      : []
-                  }
-                  onChange={actions.updateChartAxis}
-                  onSubmit={handleChartSave}
-                />
-              </TabsSection>
-            ),
+            ([key, axis]) => {
+              const title = `${definition?.axes[axis.type]} (${
+                axis.type
+              } axis)`;
+
+              return (
+                <TabsSection
+                  key={key}
+                  id={`${key}-tab`}
+                  title={title}
+                  headingTitle={title}
+                >
+                  <ChartAxisConfiguration
+                    id={key}
+                    configuration={axis}
+                    capabilities={definition.capabilities}
+                    data={data}
+                    meta={metaData}
+                    labels={chartProps?.labels}
+                    dataSets={
+                      key === 'major'
+                        ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
+                        : []
+                    }
+                    onChange={actions.updateChartAxis}
+                    onSubmit={handleChartSave}
+                  />
+                </TabsSection>
+              );
+            },
           )}
         </Tabs>
       )}

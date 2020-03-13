@@ -461,7 +461,6 @@ const chartProps1: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [
@@ -481,9 +480,7 @@ const chartProps1: ChartProps = {
       visible: true,
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },
@@ -529,7 +526,6 @@ const chartProps2: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [
@@ -549,9 +545,7 @@ const chartProps2: ChartProps = {
       visible: true,
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },
@@ -587,7 +581,6 @@ const AbstractMultipleChartProps: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'timePeriod',
       visible: true,
@@ -607,9 +600,7 @@ const AbstractMultipleChartProps: ChartProps = {
       ],
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },
@@ -678,7 +669,6 @@ const AbstractLargeDataChartProps: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'locations',
       visible: true,
@@ -698,9 +688,7 @@ const AbstractLargeDataChartProps: ChartProps = {
       ],
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },
@@ -759,7 +747,6 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'locations',
       dataSets: [
@@ -775,9 +762,7 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
       visible: true,
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },
@@ -834,7 +819,6 @@ const AbstractMissingDataChartProps: ChartProps = {
 
   axes: {
     major: {
-      name: '23',
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [
@@ -854,9 +838,7 @@ const AbstractMissingDataChartProps: ChartProps = {
       visible: true,
     },
     minor: {
-      name: 'minor',
       type: 'minor',
-      title: '',
       visible: true,
       dataSets: [],
     },

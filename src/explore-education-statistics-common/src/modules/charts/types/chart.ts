@@ -64,7 +64,6 @@ export interface ReferenceLine {
 }
 
 export interface AxisConfiguration {
-  name: string;
   type: AxisType;
   groupBy?: AxisGroupBy;
   sortBy?: string;
@@ -74,7 +73,6 @@ export interface AxisConfiguration {
   referenceLines?: ReferenceLine[];
 
   visible: boolean;
-  title?: string;
   unit?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
