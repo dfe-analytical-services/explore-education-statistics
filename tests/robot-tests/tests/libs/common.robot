@@ -271,8 +271,6 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
-  user waits until page contains element  xpath://dl//dt[contains(text(),"${dtText}")]
-  scroll element into view  xpath://dl//dt[contains(text(),"${dtText}")]
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user selects from list by label
@@ -351,5 +349,5 @@ user checks publication bullet does not contain link
 
 user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
-  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    timeout=${wait}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${wait}
 
