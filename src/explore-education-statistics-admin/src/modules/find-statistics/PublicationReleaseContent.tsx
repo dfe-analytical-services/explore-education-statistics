@@ -64,7 +64,7 @@ const PublicationReleaseContent = () => {
       if (release)
         updateContentSectionBlock({
           releaseId: release.id,
-          sectionId: release.headlinesSection.id,
+          sectionId: release.summarySection.id,
           blockId,
           sectionKey: 'summarySection',
           bodyContent,
@@ -78,7 +78,7 @@ const PublicationReleaseContent = () => {
       if (release)
         deleteContentSectionBlock({
           releaseId: release.id,
-          sectionId: release.headlinesSection.id,
+          sectionId: release.summarySection.id,
           blockId,
           sectionKey: 'summarySection',
         }).catch(handleApiErrors);
