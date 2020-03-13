@@ -79,6 +79,7 @@ Validate Analyst1 can see subjects for Absence 2016/17 release
     user clicks element   xpath://a[text()="Manage data blocks"]
     user waits until page contains element   xpath://h2[text()="Create new data block"]
     user waits until page contains element   css:#publicationSubjectForm-subjectId
+    user waits until page contains element   xpath://label[text()="Absence by characteristic"]
     user checks element count is x   xpath://*[@id="publicationSubjectForm-subjectId"]//*[@class="govuk-radios__item"]    7
 
 Validate Analyst1 can see Manage content page

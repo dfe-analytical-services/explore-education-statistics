@@ -67,6 +67,12 @@ def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout
     except Exception as e:
         raise AssertionError(f'Failed to get "Add content" button element for accordion section element\nException: ', e)
 
+    max_time = time.time() + timeout
+    while (not elem.is_enabled()) and (time.time() < max_time):
+        time.sleep(0.5)
+    if time.time() >= max_time:
+        raise AssertionError(f'Failed to click "Add content" button for accordion section element. It wasn\'t enabled!')
+
     try:
         elem.click()
     except Exception as e:
