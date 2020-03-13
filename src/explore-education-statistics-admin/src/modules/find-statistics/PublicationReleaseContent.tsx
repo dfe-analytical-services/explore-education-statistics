@@ -5,7 +5,7 @@ import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-st
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
@@ -75,16 +75,16 @@ const PublicationReleaseContent = () => {
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      addContentSectionBlock(
-                        release.id,
-                        release.summarySection.id,
-                        'summarySection',
-                        {
+                      addContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.summarySection.id,
+                        sectionKey: 'summarySection',
+                        block: {
                           type: 'MarkdownBlock',
                           order: 0,
                           body: '',
                         },
-                      ).catch(handleApiErrors);
+                      }).catch(handleApiErrors);
                     }}
                   >
                     Add a summary text block

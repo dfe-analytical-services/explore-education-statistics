@@ -10,7 +10,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
-import useReleaseActions from './ReleaseContextActionHelpers';
+import useReleaseActions from './useReleaseActions';
 import { ReleaseProvider, useReleaseState } from './ReleaseContext';
 
 type PageMode = 'edit' | 'preview';
@@ -22,7 +22,7 @@ const ReleaseContentPage = ({ handleApiErrors }: ErrorControlProps) => {
   const { getReleaseContent } = useReleaseActions();
 
   useEffect(() => {
-    getReleaseContent(releaseId).catch(handleApiErrors);
+    getReleaseContent({ releaseId }).catch(handleApiErrors);
   }, [releaseId, handleApiErrors]);
 
   useEffect(() => {

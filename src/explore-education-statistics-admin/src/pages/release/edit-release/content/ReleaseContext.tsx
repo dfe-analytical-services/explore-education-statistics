@@ -8,8 +8,8 @@ import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
 import ReleaseDispatchAction from './ReleaseContextActionTypes';
 
-type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
-type ReleaseContextState = {
+export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+export type ReleaseContextState = {
   release: EditableRelease | undefined;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
@@ -54,11 +54,10 @@ export const releaseReducer: Reducer<
         if (matchingSection?.content) {
           remove(matchingSection.content, content => content.id === blockId);
         }
-      } else if (draft.release?.[sectionKey]?.content) {
-        remove(
-          draft.release?.[sectionKey]?.content,
-          content => content.id === blockId,
-        );
+      } else if (draft.release[sectionKey]) {
+        const matchingSection = draft.release[sectionKey];
+        if (matchingSection?.content)
+          remove(matchingSection.content, content => content.id === blockId);
       }
 
       return draft;
@@ -79,13 +78,15 @@ export const releaseReducer: Reducer<
           );
           matchingSection.content[blockIndex] = block;
         }
-      } else if (draft.release?.[sectionKey]?.content) {
-        const matchingSectionContent = draft.release?.[sectionKey].content;
-        const blockIndex = matchingSectionContent.findIndex(
-          contentBlock => contentBlock.id === blockId,
-        );
-        if (blockIndex !== -1) {
-          matchingSectionContent[blockIndex] = block;
+      } else if (draft.release[sectionKey]) {
+        const matchingSection = draft.release[sectionKey];
+        if (matchingSection?.content) {
+          const blockIndex = matchingSection.content.findIndex(
+            contentBlock => contentBlock.id === blockId,
+          );
+          if (blockIndex !== -1) {
+            matchingSection.content[blockIndex] = block;
+          }
         }
       }
       return draft;
@@ -201,12 +202,4 @@ function useReleaseDispatch() {
   return context;
 }
 
-export {
-  ReleaseProvider,
-  useReleaseState,
-  useReleaseDispatch,
-  // eslint-disable-next-line no-undef
-  ReleaseContextState,
-  // eslint-disable-next-line no-undef
-  ReleaseContextDispatch,
-};
+export { ReleaseProvider, useReleaseState, useReleaseDispatch };

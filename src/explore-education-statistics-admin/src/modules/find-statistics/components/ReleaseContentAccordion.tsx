@@ -1,5 +1,5 @@
 import Accordion from '@admin/components/EditableAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import {
   EditableContentBlock,
   EditableRelease,
@@ -38,12 +38,15 @@ const ReleaseContentAccordion = ({
       canReorder
       sectionName={sectionName}
       onSaveOrder={async order => {
-        updateContentSectionsOrder(release.id, order).catch(handleApiErrors);
+        updateContentSectionsOrder({ releaseId: release.id, order }).catch(
+          handleApiErrors,
+        );
       }}
       onAddSection={() =>
-        addContentSection(release.id, release.content.length).catch(
-          handleApiErrors,
-        )
+        addContentSection({
+          releaseId: release.id,
+          order: release.content.length,
+        }).catch(handleApiErrors)
       }
     >
       {release.content.map((accordionSection, index) => (
@@ -54,16 +57,17 @@ const ReleaseContentAccordion = ({
           contentItem={accordionSection}
           index={index}
           onHeadingChange={title =>
-            updateContentSectionHeading(
-              release.id,
-              accordionSection.id,
+            updateContentSectionHeading({
+              releaseId: release.id,
+              sectionId: accordionSection.id,
               title,
-            ).catch(handleApiErrors)
+            }).catch(handleApiErrors)
           }
           onRemoveSection={() =>
-            removeContentSection(release.id, accordionSection.id).catch(
-              handleApiErrors,
-            )
+            removeContentSection({
+              releaseId: release.id,
+              sectionId: accordionSection.id,
+            }).catch(handleApiErrors)
           }
         />
       ))}

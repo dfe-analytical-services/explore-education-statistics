@@ -1,5 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -64,21 +64,21 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                   {...stat}
                   isEditing={isEditing}
                   onRemove={() => {
-                    deleteContentSectionBlock(
+                    deleteContentSectionBlock({
                       releaseId,
-                      release.keyStatisticsSection.id as string,
-                      stat.id,
-                      'keyStatisticsSection',
-                    ).catch(handleApiErrors);
+                      sectionId: release.keyStatisticsSection.id as string,
+                      blockId: stat.id,
+                      sectionKey: 'keyStatisticsSection',
+                    }).catch(handleApiErrors);
                   }}
                   onSubmit={values =>
-                    updateContentSectionDataBlock(
+                    updateContentSectionDataBlock({
                       releaseId,
-                      release.keyStatisticsSection.id as string,
-                      stat.id,
-                      'keyStatisticsSection',
+                      sectionId: release.keyStatisticsSection.id as string,
+                      blockId: stat.id,
+                      sectionKey: 'keyStatisticsSection',
                       values,
-                    ).catch(handleApiErrors)
+                    }).catch(handleApiErrors)
                   }
                 />
               ) : null;
@@ -107,18 +107,18 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
       {isFormOpen ? (
         <KeyIndicatorSelectForm
           onSelect={async datablockId => {
-            attachContentSectionBlock(
+            attachContentSectionBlock({
               releaseId,
-              release.keyStatisticsSection.id,
-              'keyStatisticsSection',
-              {
+              sectionId: release.keyStatisticsSection.id,
+              sectionKey: 'keyStatisticsSection',
+              block: {
                 contentBlockId: datablockId,
                 order:
                   (release.keyStatisticsSection.content &&
                     release.keyStatisticsSection.content.length) ||
                   0,
               },
-            ).catch(handleApiErrors);
+            }).catch(handleApiErrors);
             setIsFormOpen(false);
           }}
           onCancel={() => setIsFormOpen(false)}

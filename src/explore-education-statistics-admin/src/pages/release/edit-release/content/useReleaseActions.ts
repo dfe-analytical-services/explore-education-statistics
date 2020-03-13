@@ -53,7 +53,7 @@ const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
 export default function useReleaseActions() {
   const dispatch = useReleaseDispatch();
 
-  async function getReleaseContent(releaseId: string) {
+  async function getReleaseContent({ releaseId }: { releaseId: string }) {
     dispatch({ type: 'CLEAR_STATE' });
     const {
       release,
@@ -73,7 +73,11 @@ export default function useReleaseActions() {
     });
   }
 
-  async function updateAvailableDataBlocks(releaseId: string) {
+  async function updateAvailableDataBlocks({
+    releaseId,
+  }: {
+    releaseId: string;
+  }) {
     const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
       releaseId,
     );
@@ -83,12 +87,17 @@ export default function useReleaseActions() {
     });
   }
 
-  async function deleteContentSectionBlock(
-    releaseId: string,
-    sectionId: string,
-    blockId: string,
-    sectionKey: ContentSectionKeys,
-  ) {
+  async function deleteContentSectionBlock({
+    releaseId,
+    sectionId,
+    blockId,
+    sectionKey,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    blockId: string;
+    sectionKey: ContentSectionKeys;
+  }) {
     await releaseContentService.deleteContentSectionBlock(
       releaseId,
       sectionId,
@@ -100,16 +109,22 @@ export default function useReleaseActions() {
     });
     // becuase we don't know if a datablock was removed,
     // and so it is now available again
-    updateAvailableDataBlocks(releaseId);
+    updateAvailableDataBlocks({ releaseId });
   }
 
-  async function updateContentSectionDataBlock(
-    releaseId: string,
-    sectionId: string,
-    blockId: string,
-    sectionKey: ContentSectionKeys,
-    values: KeyStatsFormValues,
-  ) {
+  async function updateContentSectionDataBlock({
+    releaseId,
+    sectionId,
+    blockId,
+    sectionKey,
+    values,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    blockId: string;
+    sectionKey: ContentSectionKeys;
+    values: KeyStatsFormValues;
+  }) {
     const updateBlock = await releaseContentService.updateContentSectionDataBlock(
       releaseId,
       sectionId,
@@ -122,13 +137,19 @@ export default function useReleaseActions() {
     });
   }
 
-  async function updateContentSectionBlock(
-    releaseId: string,
-    sectionId: string,
-    blockId: string,
-    sectionKey: ContentSectionKeys,
-    bodyContent: string,
-  ) {
+  async function updateContentSectionBlock({
+    releaseId,
+    sectionId,
+    blockId,
+    sectionKey,
+    bodyContent,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    blockId: string;
+    sectionKey: ContentSectionKeys;
+    bodyContent: string;
+  }) {
     const updateBlock = await releaseContentService.updateContentSectionBlock(
       releaseId,
       sectionId,
@@ -141,12 +162,17 @@ export default function useReleaseActions() {
     });
   }
 
-  async function addContentSectionBlock(
-    releaseId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    block: ContentBlockPostModel,
-  ) {
+  async function addContentSectionBlock({
+    releaseId,
+    sectionId,
+    sectionKey,
+    block,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    sectionKey: ContentSectionKeys;
+    block: ContentBlockPostModel;
+  }) {
     const newBlock = await releaseContentService.addContentSectionBlock(
       releaseId,
       sectionId,
@@ -158,15 +184,20 @@ export default function useReleaseActions() {
     });
     // becuase we don't know if a datablock was used,
     // and so it is unavailable
-    updateAvailableDataBlocks(releaseId);
+    updateAvailableDataBlocks({ releaseId });
   }
 
-  async function attachContentSectionBlock(
-    releaseId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    block: ContentBlockAttachRequest,
-  ) {
+  async function attachContentSectionBlock({
+    releaseId,
+    sectionId,
+    sectionKey,
+    block,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    sectionKey: ContentSectionKeys;
+    block: ContentBlockAttachRequest;
+  }) {
     const newBlock = await releaseContentService.attachContentSectionBlock(
       releaseId,
       sectionId,
@@ -176,15 +207,20 @@ export default function useReleaseActions() {
       type: 'ADD_BLOCK_TO_SECTION',
       payload: { meta: { sectionId, sectionKey }, block: newBlock },
     });
-    updateAvailableDataBlocks(releaseId);
+    updateAvailableDataBlocks({ releaseId });
   }
 
-  async function updateSectionBlockOrder(
-    releaseId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    order: Dictionary<number>,
-  ) {
+  async function updateSectionBlockOrder({
+    releaseId,
+    sectionId,
+    sectionKey,
+    order,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    sectionKey: ContentSectionKeys;
+    order: Dictionary<number>;
+  }) {
     const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
       releaseId,
       sectionId,
@@ -199,7 +235,13 @@ export default function useReleaseActions() {
     });
   }
 
-  async function addContentSection(releaseId: string, order: number) {
+  async function addContentSection({
+    releaseId,
+    order,
+  }: {
+    releaseId: string;
+    order: number;
+  }) {
     const newSection = await releaseContentService.addContentSection(
       releaseId,
       order,
@@ -212,10 +254,13 @@ export default function useReleaseActions() {
     });
   }
 
-  async function updateContentSectionsOrder(
-    releaseId: string,
-    order: Dictionary<number>,
-  ) {
+  async function updateContentSectionsOrder({
+    releaseId,
+    order,
+  }: {
+    releaseId: string;
+    order: Dictionary<number>;
+  }) {
     const content = await releaseContentService.updateContentSectionsOrder(
       releaseId,
       order,
@@ -228,7 +273,13 @@ export default function useReleaseActions() {
     });
   }
 
-  async function removeContentSection(releaseId: string, sectionId: string) {
+  async function removeContentSection({
+    releaseId,
+    sectionId,
+  }: {
+    releaseId: string;
+    sectionId: string;
+  }) {
     const content = await releaseContentService.removeContentSection(
       releaseId,
       sectionId,
@@ -241,11 +292,15 @@ export default function useReleaseActions() {
     });
   }
 
-  async function updateContentSectionHeading(
-    releaseId: string,
-    sectionId: string,
-    title: string,
-  ) {
+  async function updateContentSectionHeading({
+    releaseId,
+    sectionId,
+    title,
+  }: {
+    releaseId: string;
+    sectionId: string;
+    title: string;
+  }) {
     const section = await releaseContentService.updateContentSectionHeading(
       releaseId,
       sectionId,

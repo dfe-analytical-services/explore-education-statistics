@@ -1,5 +1,5 @@
 import { ErrorControlContext } from '@admin/components/ErrorBoundary';
-import useReleaseActions from '@admin/pages/release/edit-release/content/ReleaseContextActionHelpers';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -72,12 +72,12 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                   release.keyStatisticsSecondarySection.content.map(
                     async (content: EditableContentBlock) => {
                       if (release.keyStatisticsSecondarySection?.content) {
-                        await deleteContentSectionBlock(
-                          release.id,
-                          release.keyStatisticsSecondarySection.id,
-                          content.id,
-                          'keyStatisticsSecondarySection',
-                        );
+                        await deleteContentSectionBlock({
+                          releaseId: release.id,
+                          sectionId: release.keyStatisticsSecondarySection.id,
+                          blockId: content.id,
+                          sectionKey: 'keyStatisticsSecondarySection',
+                        });
                       }
                     },
                   ),
@@ -119,12 +119,12 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                   release.keyStatisticsSecondarySection.content.map(
                     async (content: EditableContentBlock) => {
                       if (release.keyStatisticsSecondarySection?.content) {
-                        await deleteContentSectionBlock(
-                          release.id,
-                          release.keyStatisticsSecondarySection.id,
-                          content.id,
-                          'keyStatisticsSecondarySection',
-                        );
+                        await deleteContentSectionBlock({
+                          releaseId: release.id,
+                          sectionId: release.keyStatisticsSecondarySection.id,
+                          blockId: content.id,
+                          sectionKey: 'keyStatisticsSecondarySection',
+                        });
                       }
                     },
                   ),
@@ -133,15 +133,15 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
                 handleApiErrors(err);
               }
             }
-            await attachContentSectionBlock(
-              release.id,
-              release.keyStatisticsSecondarySection.id,
-              'keyStatisticsSecondarySection',
-              {
+            await attachContentSectionBlock({
+              releaseId: release.id,
+              sectionId: release.keyStatisticsSecondarySection.id,
+              sectionKey: 'keyStatisticsSecondarySection',
+              block: {
                 contentBlockId: selectedDataBlockId,
                 order: 0,
               },
-            ).catch(handleApiErrors);
+            }).catch(handleApiErrors);
             setIsFormOpen(false);
           }
         }}
