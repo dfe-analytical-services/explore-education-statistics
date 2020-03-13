@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
     [Tags]  HappyPath
-    user checks list contains x elements   css:#selectTheme   1
+    user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
     user checks list contains label   css:#selectTheme   Pupils and schools
     user checks list contains x elements   css:#selectTopic   2
     user checks list contains label   css:#selectTopic   Exclusions
@@ -17,7 +17,7 @@ Validate Analyst1 can see correct themes and topics
 
 Validate Analyst1 can see correct draft releases
     [Tags]  HappyPath
-    user checks element should contain   css:#draft-releases-tab   View draft releases (2)
+    user checks element should contain   css:#draft-releases-tab   View draft releases
     user clicks element   css:#draft-releases-tab
     user checks draft releases tab contains publication  Pupil absence in schools in England
     user checks draft releases tab publication has release   Pupil absence in schools in England    Academic Year, 2016 to 2017 (Live - Latest release)
@@ -47,6 +47,7 @@ Validate Analyst1 can see Absence release summary
     user opens details dropdown  Academic Year, 2016 to 2017 (Live - Latest release)
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year, 2016 to 2017 (Live - Latest release)"]
     user waits until page contains heading  Pupil absence in schools in England
+    user waits until page contains element  xpath://h2[text()="Release summary"]
     user checks summary list item "Publication title" should be "Pupil absence in schools in England"
     user checks summary list item "Time period" should be "Academic Year"
     user checks summary list item "Release period" should be "2016 to 2017"
@@ -77,18 +78,19 @@ Validate Analyst1 can see subjects for Absence 2016/17 release
     [Tags]  HappyPath
     user clicks element   xpath://a[text()="Manage data blocks"]
     user waits until page contains element   xpath://h2[text()="Create new data block"]
+    user waits until page contains element   css:#publicationSubjectForm-subjectId
     user checks element count is x   xpath://*[@id="publicationSubjectForm-subjectId"]//*[@class="govuk-radios__item"]    7
 
 Validate Analyst1 can see Manage content page contents
     [Tags]  HappyPath
     user clicks element   xpath://a[text()="Manage content"]
-    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]
+    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
 
     user waits until page contains element   css:#pageMode
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
 
-    user waits until page contains key stat tile   Overall absence rate        4.6%
+    user waits until page contains key stat tile   Overall absence rate        4.6%    60
     user waits until page contains key stat tile   Authorised absence rate     3.5%
     user waits until page contains key stat tile   Unauthorised absence rate   1.1%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3

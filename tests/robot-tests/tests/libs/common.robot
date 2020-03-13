@@ -158,8 +158,8 @@ user waits until page contains link
   page should contain link   ${link_text}
 
 user waits until page contains heading
-  [Arguments]   ${text}
-  wait until page contains element   xpath://h1[contains(.,"${text}")]
+  [Arguments]   ${text}    ${timeout}=20
+  wait until page contains element   xpath://h1[contains(.,"${text}")]   ${timeout}
 
 user waits until page contains accordion section
   [Arguments]   ${section_title}
@@ -271,6 +271,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
+  user waits until page contains element  xpath://dl//dt[contains(text(),"${dtText}")]
   scroll element into view  xpath://dl//dt[contains(text(),"${dtText}")]
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
@@ -349,6 +350,6 @@ user checks publication bullet does not contain link
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
 user waits until page contains key stat tile
-  [Arguments]  ${title}  ${value}
-  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]
+  [Arguments]  ${title}   ${value}   ${timeout}=20
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${timeout}
 
