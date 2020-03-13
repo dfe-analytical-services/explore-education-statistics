@@ -1,6 +1,8 @@
-using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using Microsoft.Azure.Storage.Blob;
 
@@ -8,25 +10,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions
 {
     public static class FileExtensions
     {
-        public static IEnumerable<string> GetCsvLines(this SubjectData subjectData)
+        public static DataTable GetCsvLines(this SubjectData subjectData)
         {
             return ReadAllLinesAsync(subjectData.DataBlob).Result;
         }
 
-        public static IEnumerable<string> GetMetaLines(this SubjectData subjectData)
+        public static DataTable GetMetaLines(this SubjectData subjectData)
         {
             return ReadAllLinesAsync(subjectData.MetaBlob).Result;
         }
 
-        private static async Task<IEnumerable<string>> ReadAllLinesAsync(CloudBlob blockBlob)
+        private static async Task<DataTable> ReadAllLinesAsync(CloudBlob blob)
         {
-            var list = new List<string>();
-            using (var sr = new StreamReader(await blockBlob.OpenReadAsync()))
-            {
-                while (sr.Peek() >= 0) list.Add(sr.ReadLine());
-            }
+            return await GetDataTableFromBlob(blob);
+        }
 
-            return list.ToArray();
+        private static async Task<DataTable> GetDataTableFromBlob(CloudBlob blob)
+        {
+            var reader = new StreamReader(await blob.OpenReadAsync());
+            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            using var dr = new CsvDataReader(csv);
+            var dt = new DataTable();
+            dt.Load(dr);
+            return dt;
         }
     }
 }
