@@ -15,5 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
         public CodeNameViewModel RscRegion { get; set; }
         public CodeNameViewModel Sponsor { get; set; }
         public CodeNameViewModel Ward { get; set; }
+        public CodeNameViewModel PlanningArea { get; set; }
     }
 }

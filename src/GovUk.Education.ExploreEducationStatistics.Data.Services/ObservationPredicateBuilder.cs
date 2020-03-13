@@ -121,7 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 predicate = predicate.Or(WardPredicate(query));
             }
-
+            
+            if (query.PlanningArea != null)
+            {
+                predicate = predicate.Or(PlanningAreaPredicate(query));
+            }
             return predicate;
         }
 
@@ -139,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                      query.Region == null &&
                      query.RscRegion == null &&
                      query.Sponsor == null &&
-                     query.Ward == null);
+                     query.Ward == null &&
+                     query.PlanningArea == null);
         }
 
         private static Expression<Func<Observation, bool>> CountryPredicate(SubjectMetaQueryContext query)
@@ -229,6 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return ObservationalUnitPredicate(query, GeographicLevel.Ward,
                 observation => query.Ward.Contains(observation.Location.Ward.Code));
+        }
+        
+        private static Expression<Func<Observation, bool>> PlanningAreaPredicate(SubjectMetaQueryContext query)
+        {
+            return ObservationalUnitPredicate(query, GeographicLevel.PlanningArea,
+                observation => query.PlanningArea.Contains(observation.Location.PlanningArea.Code));
         }
 
         private static Expression<Func<Observation, bool>> ObservationalUnitPredicate(SubjectMetaQueryContext query,

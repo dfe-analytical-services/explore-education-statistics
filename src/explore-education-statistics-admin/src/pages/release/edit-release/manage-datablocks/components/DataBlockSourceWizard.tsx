@@ -1,6 +1,3 @@
-import DataBlockDetailsForm, {
-  DataBlockDetailsFormValues,
-} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
@@ -22,6 +19,9 @@ import {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { createRef, useEffect, useState } from 'react';
+import DataBlockDetailsForm, {
+  DataBlockDetailsFormValues,
+} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 
 interface CreateDataBlockProps {
   releaseId: string;
@@ -53,6 +53,8 @@ const DataBlockSourceWizard = ({
   );
   const [tableHeaders, setTableHeaders] = useState<TableHeadersConfig>();
   const [tableToolState, setTableToolState] = useState<TableToolState>();
+
+  const [captionTitle, setCaptionTitle] = useState<string>();
 
   const [initialValues, setInitialValues] = useState<
     DataBlockDetailsFormValues
@@ -105,6 +107,8 @@ const DataBlockSourceWizard = ({
       source = '',
       customFootnotes = '',
     } = dataBlock;
+
+    setCaptionTitle(title);
 
     setInitialValues({
       title,
@@ -165,6 +169,7 @@ const DataBlockSourceWizard = ({
                     <TimePeriodDataTable
                       ref={dataTableRef}
                       fullTable={table}
+                      captionTitle={captionTitle}
                       tableHeadersConfig={tableHeaders}
                     />
                   </div>
@@ -177,6 +182,7 @@ const DataBlockSourceWizard = ({
                     tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
+                    onTitleChange={setCaptionTitle}
                     onDataBlockSave={data =>
                       onDataBlockSave({
                         ...data,

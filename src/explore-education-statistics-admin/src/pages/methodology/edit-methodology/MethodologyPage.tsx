@@ -5,9 +5,6 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/service';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -22,21 +19,16 @@ export interface MethodologyTabProps {
 const MethodologyPage = ({
   match,
   location,
-  handleApiErrors,
-}: RouteComponentProps<{ methodologyId: string }> & ErrorControlProps) => {
+}: RouteComponentProps<{ methodologyId: string }>) => {
   const { methodologyId } = match.params;
   const [methodology, setMethodology] = useState<MethodologyContent>();
 
   const refreshMethodology = useCallback(async () => {
     setMethodology(undefined);
-    try {
-      const methodologyResponse = await methodologyService.getMethodologyContent(
-        methodologyId,
-      );
-      setMethodology(methodologyResponse);
-    } catch (err) {
-      handleApiErrors(err);
-    }
+    const methodologyResponse = await methodologyService.getMethodologyContent(
+      methodologyId,
+    );
+    setMethodology(methodologyResponse);
   }, [methodologyId]);
 
   useEffect(() => {
@@ -124,14 +116,14 @@ const MethodologyPage = ({
                 exact
                 key={route.path}
                 path={route.path}
-                render={props =>
-                  route.component({
-                    methodology,
-                    setMethodology,
-                    refreshMethodology,
-                    ...props,
-                  })
-                }
+                render={props => (
+                  <route.component
+                    methodology={methodology}
+                    setMethodology={setMethodology}
+                    refreshMethodology={refreshMethodology}
+                    {...props}
+                  />
+                )}
               />
             ))}
           </Switch>
@@ -148,4 +140,4 @@ const MethodologyPage = ({
   );
 };
 
-export default withErrorControl(MethodologyPage);
+export default MethodologyPage;

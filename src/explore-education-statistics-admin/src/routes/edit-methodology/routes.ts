@@ -1,11 +1,12 @@
 import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
 import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
+import { ComponentType } from 'react';
 
 export interface MethodologyRoute {
   path: string;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  component: (props: any) => JSX.Element;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>;
   title: string;
   generateLink: (methodologyId: string) => string;
 }
@@ -13,8 +14,8 @@ export interface MethodologyRoute {
 const createReadonlyRoute = (
   section: string,
   title: string,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  component: (props: any) => JSX.Element,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: ComponentType<any>,
 ): MethodologyRoute => {
   const path = `/methodologies/:methodologyId/${section}`;
   return {
@@ -42,4 +43,10 @@ export const publishStatusRoute = createReadonlyRoute(
   MethodologyStatusPage,
 );
 
-export default [summaryRoute, contentRoute, publishStatusRoute];
+const routes: MethodologyRoute[] = [
+  summaryRoute,
+  contentRoute,
+  publishStatusRoute,
+];
+
+export default routes;
