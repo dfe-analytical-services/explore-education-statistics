@@ -41,10 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Tuple<List<string>, int, int> ValidateAndCountRows(SubjectData subjectData)
         {
             var errors = new List<string>();
-            var metaCols = subjectData.GetMetaLines().Columns;
-            var metaRows = subjectData.GetMetaLines().Rows;
-
-            ValidateMetaHeader(metaCols, errors);
+            var metaTable = subjectData.GetMetaTable();
+           
+            ValidateMetaHeader(metaTable.Columns, errors);
 
             // If the meta header not ok then stop error checks
             if (errors.Count != 0)
@@ -52,20 +51,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return new Tuple<List<string>, int, int>(errors, 0, 0);
             }
 
-            ValidateMetaRows(metaCols, metaRows, errors);
+            ValidateMetaRows(metaTable.Columns, metaTable.Rows, errors);
+
+            var csvTable = subjectData.GetCsvTable();
             
-            var observationsCols = subjectData.GetCsvLines().Columns;
-            var observationRows = subjectData.GetCsvLines().Rows;
-                
-            ValidateObservationHeaders(observationsCols, errors);
-            
+            ValidateObservationHeaders(csvTable.Columns, errors);
+
             if (errors.Count != 0)
             {
                 return new Tuple<List<string>, int, int>(errors, 0, 0);
             }
-            var (totalRows, filteredRows) = ValidateAndCountObservations(observationsCols, observationRows, errors);
 
-            return new Tuple<List<string>, int, int>(errors, totalRows, filteredRows);;
+            var (totalRows, filteredRows) = ValidateAndCountObservations(
+                csvTable.Columns, csvTable.Rows, errors);
+
+            return new Tuple<List<string>, int, int>(errors, totalRows, filteredRows);
+            ;
         }
 
         private static void ValidateMetaHeader(DataColumnCollection header, List<string> errors)
@@ -91,12 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static Tuple<int, int> ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows, List<string> errors)
+        private static Tuple<int, int> ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows,
+            List<string> errors)
         {
             var idx = 0;
             var filteredRows = 0;
-            var totalRows  = 0;
-            //rows.OfType<DataRow>().Select(dr => dr.Field<MyType>(columnName)).ToList();
+            var totalRows = 0;
+
             foreach (DataRow row in rows)
             {
                 if (errors.Count == 100)
@@ -105,7 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     break;
                 }
 
-                if (ValidateObservationRow(row, idx++, cols, errors) && !IsGeographicLevelIgnored(row, cols))
+                var rowValues = CsvUtil.GetRowValues(row);
+                var columnValues = CsvUtil.GetColumnValues(cols);
+
+                if (ValidateObservationRow(row, idx++, cols, errors) &&
+                    !IsGeographicLevelIgnored(rowValues, columnValues))
                 {
                     filteredRows++;
                 }
@@ -115,15 +121,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new Tuple<int, int>(totalRows, filteredRows);
         }
-        
+
         private static void ValidateObservationHeaders(DataColumnCollection cols, List<string> errors)
         {
             foreach (var mandatoryCol in MandatoryObservationColumns)
             {
                 if (!cols.Contains(mandatoryCol))
                 {
-                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " + mandatoryCol);
+                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " +
+                               mandatoryCol);
                 }
+
                 if (errors.Count == 100)
                 {
                     errors.Add("Only first 100 errors are returned");
@@ -143,10 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    var rowValues = row.ItemArray.Select(x => x.ToString()).ToList();
-                    var colValues = cols.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                    
-                    ImporterMetaService.GetMetaRow(rowValues, colValues);
+                    ImporterMetaService.GetMetaRow(CsvUtil.GetColumnValues(cols), row);
                 }
                 catch (Exception e)
                 {
@@ -156,7 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static bool ValidateObservationRow(DataRow row, int rowNumber, DataColumnCollection cols, List<string> errors)
+        private static bool ValidateObservationRow(DataRow row, int rowNumber, DataColumnCollection cols,
+            List<string> errors)
         {
             var valid = false;
 
@@ -169,9 +175,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    var rowValues = row.ItemArray.Select(x => x.ToString()).ToList();
-                    var colValues = cols.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                    
+                    var rowValues = CsvUtil.GetRowValues(row);
+                    var colValues = CsvUtil.GetColumnValues(cols);
+
                     ImporterService.GetGeographicLevel(rowValues, colValues);
                     ImporterService.GetTimeIdentifier(rowValues, colValues);
                     ImporterService.GetYear(rowValues, colValues);
@@ -191,4 +197,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var geographicLevel = ImporterService.GetGeographicLevel(line, headers);
             return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
         }
+    }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -7,13 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
 {
     public interface IImporterService
     {
-        SubjectMeta ImportMeta(List<string> metaLines, Subject subject, StatisticsDbContext context);
+        SubjectMeta ImportMeta(DataTable table, Subject subject, StatisticsDbContext context);
 
-        SubjectMeta GetMeta(List<string> metaLines, Subject subject, StatisticsDbContext context);
+        SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context);
 
-        void ImportObservations(List<string> batch, Subject subject,
+        void ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context);
 
-        void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context);
+        void ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context);
     }
 }

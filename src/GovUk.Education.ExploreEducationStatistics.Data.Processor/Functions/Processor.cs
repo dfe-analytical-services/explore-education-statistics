@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
@@ -157,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             var subjectData = await _fileStorageService.GetSubjectData(message);
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
             
-            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
+            _importerService.ImportMeta(subjectData.GetMetaTable(), subject, dbContext);
 
             if (message.Seeding)
             {

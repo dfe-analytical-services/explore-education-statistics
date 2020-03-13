@@ -10,19 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions
 {
     public static class FileExtensions
     {
-        public static DataTable GetCsvLines(this SubjectData subjectData)
+        public static DataTable GetCsvTable(this SubjectData subjectData)
         {
-            return ReadAllLinesAsync(subjectData.DataBlob).Result;
+            return GetDataTableFromBlob(subjectData.DataBlob).Result;
         }
 
-        public static DataTable GetMetaLines(this SubjectData subjectData)
+        public static DataTable GetMetaTable(this SubjectData subjectData)
         {
-            return ReadAllLinesAsync(subjectData.MetaBlob).Result;
-        }
-
-        private static async Task<DataTable> ReadAllLinesAsync(CloudBlob blob)
-        {
-            return await GetDataTableFromBlob(blob);
+            return GetDataTableFromBlob(subjectData.MetaBlob).Result;
         }
 
         private static async Task<DataTable> GetDataTableFromBlob(CloudBlob blob)
