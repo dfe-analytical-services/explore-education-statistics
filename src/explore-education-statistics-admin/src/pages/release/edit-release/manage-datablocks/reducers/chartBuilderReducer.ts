@@ -5,6 +5,7 @@ import {
   ChartDataSet,
   ChartDefinition,
   ChartDefinitionAxis,
+  ChartDefinitionOptions,
   chartDefinitions,
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
@@ -14,12 +15,7 @@ import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
 
-export interface ChartOptions {
-  stacked?: boolean;
-  legend?: 'none' | 'top' | 'bottom';
-  height: number;
-  width?: number;
-  title?: string;
+export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
   geographicId?: string;
 }
@@ -59,56 +55,92 @@ export type ChartBuilderActions =
       payload: AxisConfiguration;
     };
 
+const defaultOptions: Partial<ChartOptions> = {
+  title: '',
+};
+
+const defaultAxisOptions: Partial<AxisConfiguration> = {
+  min: 0,
+  referenceLines: [],
+  showGrid: true,
+  size: 50,
+  sortAsc: true,
+  sortBy: 'name',
+  tickConfig: 'default',
+  tickSpacing: 1,
+  visible: true,
+  unit: '',
+};
+
 export const chartBuilderReducer: Reducer<
   ChartBuilderState,
   ChartBuilderActions
 > = (draft, action) => {
+  const updateAxis = (
+    next: AxisConfiguration,
+    axisDefinition: ChartDefinitionAxis,
+  ): AxisConfiguration => {
+    const current: Partial<AxisConfiguration> = draft.axes[next.type] ?? {};
+
+    return {
+      ...defaultAxisOptions,
+      ...(axisDefinition.defaults ?? {}),
+      ...current,
+      ...next,
+      ...(axisDefinition.constants ?? {}),
+      type: axisDefinition.type,
+      dataSets:
+        axisDefinition.type === 'major'
+          ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
+          : [],
+    };
+  };
+
   switch (action.type) {
     case 'UPDATE_CHART_DEFINITION': {
       draft.definition = action.payload;
 
       draft.options = {
-        // Set default options
-        ...action.payload.options,
-        title: '',
+        ...defaultOptions,
+        ...(action.payload.options.defaults ?? {}),
         ...draft.options,
+        ...(action.payload.options.constants ?? {}),
       };
 
       draft.axes = mapValues(
         action.payload.axes,
-        (axisDefinition: ChartDefinitionAxis, key: AxisType) => {
-          const previousConfig = draft.axes[key] ?? {};
-
-          return {
-            min: 0,
-            referenceLines: [],
-            showGrid: true,
-            size: 50,
-            sortAsc: true,
-            sortBy: 'name',
-            tickConfig: 'default',
-            tickSpacing: 1,
-            visible: true,
-            unit: '',
-            ...(axisDefinition.defaults ?? {}),
-            ...previousConfig,
-            ...(axisDefinition.constants ?? {}),
-            type: axisDefinition.type,
-            dataSets:
-              axisDefinition.type === 'major'
-                ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                : [],
-          } as AxisConfiguration;
+        (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
+          return updateAxis(
+            draft.axes[type] ?? ({} as AxisConfiguration),
+            axisDefinition,
+          );
         },
       );
 
       break;
     }
-    case 'UPDATE_CHART_AXIS':
-      draft.axes[action.payload.type] = action.payload;
+    case 'UPDATE_CHART_AXIS': {
+      const axisDefinition = draft?.definition?.axes?.[action.payload.type];
+
+      if (!axisDefinition) {
+        throw new Error(
+          `Could not find chart axis definition with type '${action.payload.type}'`,
+        );
+      }
+
+      draft.axes[action.payload.type] = updateAxis(
+        action.payload,
+        axisDefinition,
+      );
       break;
+    }
     case 'UPDATE_CHART_OPTIONS':
-      draft.options = action.payload;
+      draft.options = {
+        ...defaultOptions,
+        ...(draft?.definition?.options.defaults ?? {}),
+        ...action.payload,
+        ...(draft?.definition?.options.constants ?? {}),
+      };
       break;
     case 'ADD_DATA_SET':
       draft.dataSetAndConfiguration.push(action.payload);

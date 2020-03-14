@@ -133,16 +133,21 @@ export interface ChartCapabilities {
   requiresGeoJson: boolean;
 }
 
+export interface ChartDefinitionOptions {
+  stacked?: boolean;
+  legend?: 'none' | 'top' | 'bottom';
+  height: number;
+  width?: number;
+  title?: string;
+}
+
 export interface ChartDefinition {
   type: ChartType;
   name: string;
   capabilities: ChartCapabilities;
   options: {
-    stacked?: boolean;
-    legend?: 'none' | 'top' | 'bottom';
-    height: number;
-    width?: number;
-    title?: string;
+    defaults?: ChartDefinitionOptions;
+    constants?: ChartDefinitionOptions;
   };
   data: {
     type: string;

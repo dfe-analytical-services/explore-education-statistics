@@ -57,8 +57,10 @@ const definition: ChartDefinition = {
   type: 'infographic',
   name: 'Infographic',
   options: {
-    height: 600,
-    legend: 'none',
+    defaults: {
+      height: 600,
+      legend: 'none',
+    },
   },
   capabilities: {
     dataSymbols: false,

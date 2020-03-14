@@ -187,8 +187,10 @@ const definition: ChartDefinition = {
     requiresGeoJson: false,
   },
   options: {
-    height: 300,
-    legend: 'top',
+    defaults: {
+      height: 300,
+      legend: 'top',
+    },
   },
   data: [
     {
