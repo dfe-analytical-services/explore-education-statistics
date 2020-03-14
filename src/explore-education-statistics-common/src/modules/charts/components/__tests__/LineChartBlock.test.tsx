@@ -1,4 +1,4 @@
-import testBlockData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { testChartPropsWithData1 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import LineChartBlock, {
   LineChartProps,
@@ -10,7 +10,7 @@ import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props: LineChartProps = testBlockData.chartProps1 as LineChartProps;
+const props: LineChartProps = testChartPropsWithData1 as LineChartProps;
 const { axes } = props;
 
 describe('LineChartBlock', () => {

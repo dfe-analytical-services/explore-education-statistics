@@ -1,4 +1,4 @@
-import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { testChartPropsWithData1 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import HorizontalBarBlock, {
   HorizontalBarProps,
@@ -10,10 +10,7 @@ import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props: HorizontalBarProps = {
-  ...(testData.chartProps1 as HorizontalBarProps),
-  width: 900,
-};
+const props: HorizontalBarProps = testChartPropsWithData1 as HorizontalBarProps;
 
 const { axes } = props;
 

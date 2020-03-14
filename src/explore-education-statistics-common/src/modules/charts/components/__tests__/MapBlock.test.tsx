@@ -1,11 +1,12 @@
-import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { testChartPropsWithMultipleData } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { testMapBlockPropsWithSmallerDataSets } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
 
-const chartProps: MapBlockProps = testData.AbstractMultipleChartProps as MapBlockProps;
+const chartProps: MapBlockProps = testChartPropsWithMultipleData as MapBlockProps;
 
 describe('MapBlock', () => {
   test('renders', async () => {
@@ -94,14 +95,12 @@ describe('MapBlock', () => {
   });
 
   test('include all indicators from reduced selection', async () => {
-    const largeDataChartProps: MapBlockProps = testData.AbstractLargeDataChartProps_smaller_datasets as MapBlockProps;
-
     const { container } = render(
       <MapBlock
-        {...largeDataChartProps}
+        {...testMapBlockPropsWithSmallerDataSets}
         axes={{
           major: {
-            ...largeDataChartProps.axes.major,
+            ...testMapBlockPropsWithSmallerDataSets.axes.major,
             groupBy: 'locations',
           },
         }}

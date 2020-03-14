@@ -1,4 +1,8 @@
-import testBlockData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import {
+  testChartPropsWithData1,
+  testChartPropsWithMultipleData,
+  testDataBlockResponse,
+} from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import _dataBlockService, {
   DataBlockRequest,
@@ -34,7 +38,7 @@ describe('DataBlock', () => {
   test('renders horizontal chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testBlockData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -46,7 +50,7 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
-            ...testBlockData.chartProps1,
+            ...testChartPropsWithData1,
             type: 'horizontalbar',
           } as Chart,
         ]}
@@ -67,7 +71,7 @@ describe('DataBlock', () => {
   test('renders vertical chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testBlockData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -79,7 +83,7 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
-            ...testBlockData.chartProps1,
+            ...testChartPropsWithData1,
             type: 'verticalbar',
           } as Chart,
         ]}
@@ -100,7 +104,7 @@ describe('DataBlock', () => {
   test('renders table', () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testBlockData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -121,7 +125,7 @@ describe('DataBlock', () => {
   test('renders summary', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testBlockData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -152,7 +156,7 @@ describe('DataBlock', () => {
   test('renders map instead of chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testBlockData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -164,7 +168,7 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
-            ...testBlockData.AbstractMultipleChartProps,
+            ...testChartPropsWithMultipleData,
             type: 'map',
           } as ChartRendererProps,
         ]}

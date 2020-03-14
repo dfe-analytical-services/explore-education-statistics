@@ -1,11 +1,10 @@
-/* eslint-disable prefer-destructuring */
+import { testDataBlockResponse } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+
+import { dataApi } from '@common/services/api';
 import dataBlockService, {
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
-
-import { dataApi } from '@common/services/api';
 
 jest.mock('@common/services/api', () => {
   return {
@@ -17,9 +16,8 @@ jest.mock('@common/services/api', () => {
 
 describe('dataBlockService', () => {
   beforeEach(() => {
-    // @ts-ignore
-    dataApi.post.mockImplementation(() => {
-      return Promise.resolve(testData.response);
+    (dataApi.post as jest.Mock).mockImplementation(() => {
+      return Promise.resolve(testDataBlockResponse);
     });
   });
 

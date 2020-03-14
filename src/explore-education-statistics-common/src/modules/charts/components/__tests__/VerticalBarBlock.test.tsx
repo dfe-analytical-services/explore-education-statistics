@@ -1,4 +1,4 @@
-import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { testChartPropsWithData1 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import VerticalBarBlock, {
   VerticalBarProps,
@@ -11,7 +11,7 @@ import React from 'react';
 jest.mock('recharts/lib/util/LogUtils');
 
 const props = {
-  ...testData.chartProps1,
+  ...testChartPropsWithData1,
   height: 900,
 } as VerticalBarProps;
 
