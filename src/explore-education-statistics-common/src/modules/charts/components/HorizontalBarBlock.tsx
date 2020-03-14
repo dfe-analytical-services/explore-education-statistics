@@ -84,7 +84,7 @@ const HorizontalBarBlock = ({
         <XAxis
           type="number"
           dataKey="value"
-          hide={axes.minor.visible === false}
+          hide={!axes.minor.visible}
           unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
@@ -95,7 +95,7 @@ const HorizontalBarBlock = ({
         <YAxis
           type="category"
           dataKey="name"
-          hide={axes.major.visible === false}
+          hide={!axes.major.visible}
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
