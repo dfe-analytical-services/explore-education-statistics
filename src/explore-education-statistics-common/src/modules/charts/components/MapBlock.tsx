@@ -722,6 +722,7 @@ const definition: ChartDefinition = {
     hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
+    requiresGeoJson: true,
   },
   options: {
     height: 600,
@@ -745,7 +746,6 @@ const definition: ChartDefinition = {
       },
     },
   },
-  requiresGeoJson: true,
 };
 
 MapBlock.definition = definition;

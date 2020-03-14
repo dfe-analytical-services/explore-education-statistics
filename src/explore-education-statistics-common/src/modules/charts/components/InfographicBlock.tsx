@@ -1,4 +1,7 @@
-import { ChartDefinition, ChartProps } from '@common/modules/charts/types/chart';
+import {
+  ChartDefinition,
+  ChartProps,
+} from '@common/modules/charts/types/chart';
 import React, { useEffect, useState } from 'react';
 
 export type GetInfographic = (
@@ -67,10 +70,10 @@ const definition: ChartDefinition = {
     hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
+    requiresGeoJson: false,
   },
   data: [],
   axes: {},
-  requiresGeoJson: false,
 };
 
 InfographicBlock.definition = definition;

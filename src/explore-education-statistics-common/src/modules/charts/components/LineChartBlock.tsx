@@ -184,6 +184,7 @@ const definition: ChartDefinition = {
     hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
+    requiresGeoJson: false,
   },
   options: {
     height: 300,
@@ -212,7 +213,6 @@ const definition: ChartDefinition = {
       type: 'minor',
     },
   },
-  requiresGeoJson: false,
 };
 
 LineChartBlock.definition = definition;

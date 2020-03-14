@@ -20,7 +20,7 @@ const ChartTypeSelector = ({
     <div className={styles.chartContainer}>
       {chartDefinitions.map(definition => (
         <React.Fragment key={definition.type}>
-          {!definition.requiresGeoJson || geoJsonAvailable ? (
+          {!definition.capabilities.requiresGeoJson || geoJsonAvailable ? (
             <button
               type="button"
               className={classnames(styles.chart, {

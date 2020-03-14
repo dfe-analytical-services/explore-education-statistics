@@ -130,6 +130,7 @@ export interface ChartCapabilities {
   fixedAxisGroupBy: boolean;
   hasReferenceLines: boolean;
   hasLegend: boolean;
+  requiresGeoJson: boolean;
 }
 
 export interface ChartDefinition {
@@ -152,7 +153,6 @@ export interface ChartDefinition {
   axes: {
     [key in AxisType]?: ChartDefinitionAxis;
   };
-  requiresGeoJson: boolean;
 }
 
 export interface ChartDefinitionAxis {
