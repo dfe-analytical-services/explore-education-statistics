@@ -738,7 +738,7 @@ const definition: ChartDefinition = {
   axes: {
     major: {
       id: 'geojson',
-      title: 'GeoJSON',
+      title: 'GeoJSON (major axis)',
       type: 'major',
       constants: {
         groupBy: 'locations',

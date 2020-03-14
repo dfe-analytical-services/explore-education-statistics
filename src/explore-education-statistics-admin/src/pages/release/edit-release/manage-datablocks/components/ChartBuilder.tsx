@@ -29,8 +29,8 @@ import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
-  AxesConfiguration,
   AxisConfiguration,
+  AxisType,
   ChartDefinition,
   ChartMetaData,
   ChartProps,
@@ -356,38 +356,40 @@ const ChartBuilder = ({
             />
           </TabsSection>
 
-          {Object.entries(axesConfiguration as Required<AxesConfiguration>).map(
-            ([key, axis]) => {
-              const title = `${definition?.axes[axis.type].title} (${
-                axis.type
-              } axis)`;
+          {Object.entries(
+            definition.axes as Required<ChartDefinition['axes']>,
+          ).map(([key, axis]) => {
+            const axisConfiguration = axesConfiguration[key as AxisType];
 
-              return (
-                <TabsSection
-                  key={key}
-                  id={`${key}-tab`}
-                  title={title}
-                  headingTitle={title}
-                >
-                  <ChartAxisConfiguration
-                    id={key}
-                    configuration={axis}
-                    capabilities={definition.capabilities}
-                    data={data}
-                    meta={metaData}
-                    labels={chartProps?.labels}
-                    dataSets={
-                      key === 'major'
-                        ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                        : []
-                    }
-                    onChange={actions.updateChartAxis}
-                    onSubmit={handleChartSave}
-                  />
-                </TabsSection>
-              );
-            },
-          )}
+            if (!axisConfiguration) {
+              return null;
+            }
+
+            return (
+              <TabsSection
+                key={key}
+                id={`${key}-tab`}
+                title={axis.title}
+                headingTitle={axis.title}
+              >
+                <ChartAxisConfiguration
+                  id={key}
+                  configuration={axisConfiguration}
+                  capabilities={definition.capabilities}
+                  data={data}
+                  meta={metaData}
+                  labels={chartProps?.labels}
+                  dataSets={
+                    key === 'major'
+                      ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
+                      : []
+                  }
+                  onChange={actions.updateChartAxis}
+                  onSubmit={handleChartSave}
+                />
+              </TabsSection>
+            );
+          })}
         </Tabs>
       )}
     </div>

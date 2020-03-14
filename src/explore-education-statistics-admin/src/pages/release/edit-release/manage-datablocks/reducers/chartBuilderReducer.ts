@@ -5,6 +5,7 @@ import {
   AxisConfiguration,
   AxisType,
   ChartDefinition,
+  ChartDefinitionAxis,
   chartDefinitions,
 } from '@common/modules/charts/types/chart';
 import { generateKeyFromDataSet } from '@common/modules/charts/util/chartUtils';
@@ -58,30 +59,33 @@ export const chartBuilderReducer: Reducer<
         ...draft.options,
       };
 
-      draft.axes = mapValues(action.payload.axes, (axisDefinition, key) => {
-        const previousConfig = draft.axes[key as AxisType] ?? {};
+      draft.axes = mapValues(
+        action.payload.axes,
+        (axisDefinition: ChartDefinitionAxis, key: AxisType) => {
+          const previousConfig = draft.axes[key] ?? {};
 
-        return {
-          min: 0,
-          referenceLines: [],
-          showGrid: true,
-          size: 50,
-          sortAsc: true,
-          sortBy: 'name',
-          tickConfig: 'default',
-          tickSpacing: 1,
-          visible: true,
-          unit: '',
-          ...(axisDefinition.defaults ?? {}),
-          ...previousConfig,
-          ...(axisDefinition.constants ?? {}),
-          type: axisDefinition.type,
-          dataSets:
-            axisDefinition.type === 'major'
-              ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
-              : [],
-        } as AxisConfiguration;
-      });
+          return {
+            min: 0,
+            referenceLines: [],
+            showGrid: true,
+            size: 50,
+            sortAsc: true,
+            sortBy: 'name',
+            tickConfig: 'default',
+            tickSpacing: 1,
+            visible: true,
+            unit: '',
+            ...(axisDefinition.defaults ?? {}),
+            ...previousConfig,
+            ...(axisDefinition.constants ?? {}),
+            type: axisDefinition.type,
+            dataSets:
+              axisDefinition.type === 'major'
+                ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
+                : [],
+          } as AxisConfiguration;
+        },
+      );
 
       break;
     }

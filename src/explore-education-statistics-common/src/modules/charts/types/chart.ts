@@ -149,19 +149,22 @@ export interface ChartDefinition {
     entryCount: number | 'multiple';
     targetAxis: string;
   }[];
-  axes: Dictionary<{
-    id: string;
-    title: string;
-    type: AxisType;
-    defaults?: {
-      groupBy?: AxisGroupBy;
-    };
-    constants?: {
-      groupBy?: AxisGroupBy;
-    };
-  }>;
-
+  axes: {
+    [key in AxisType]?: ChartDefinitionAxis;
+  };
   requiresGeoJson: boolean;
+}
+
+export interface ChartDefinitionAxis {
+  id: string;
+  title: string;
+  type: AxisType;
+  defaults?: {
+    groupBy?: AxisGroupBy;
+  };
+  constants?: {
+    groupBy?: AxisGroupBy;
+  };
 }
 
 export const chartDefinitions: ChartDefinition[] = [

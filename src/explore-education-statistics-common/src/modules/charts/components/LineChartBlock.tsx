@@ -200,7 +200,7 @@ const definition: ChartDefinition = {
   axes: {
     major: {
       id: 'xaxis',
-      title: 'X Axis',
+      title: 'X Axis (major axis)',
       type: 'major',
       defaults: {
         groupBy: 'timePeriod',
@@ -208,7 +208,7 @@ const definition: ChartDefinition = {
     },
     minor: {
       id: 'yaxis',
-      title: 'Y Axis',
+      title: 'Y Axis (minor axis)',
       type: 'minor',
     },
   },
