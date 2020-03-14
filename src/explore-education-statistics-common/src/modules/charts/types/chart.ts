@@ -159,12 +159,8 @@ export interface ChartDefinitionAxis {
   id: string;
   title: string;
   type: AxisType;
-  defaults?: {
-    groupBy?: AxisGroupBy;
-  };
-  constants?: {
-    groupBy?: AxisGroupBy;
-  };
+  defaults?: Partial<AxisConfiguration>;
+  constants?: Partial<AxisConfiguration>;
 }
 
 export const chartDefinitions: ChartDefinition[] = [
