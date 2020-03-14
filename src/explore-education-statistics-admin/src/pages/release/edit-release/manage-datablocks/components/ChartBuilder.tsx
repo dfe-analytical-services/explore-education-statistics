@@ -15,15 +15,23 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import { HorizontalBarProps } from '@common/modules/charts/components/HorizontalBarBlock';
+import HorizontalBarBlock, {
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
 import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
-import { LineChartProps } from '@common/modules/charts/components/LineChartBlock';
-import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
-import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
+import LineChartBlock, {
+  LineChartProps,
+} from '@common/modules/charts/components/LineChartBlock';
+import MapBlock, {
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock, {
+  VerticalBarProps,
+} from '@common/modules/charts/components/VerticalBarBlock';
 import {
   AxesConfiguration,
   AxisConfiguration,
-  chartDefinitions,
+  ChartDefinition,
   ChartMetaData,
   ChartProps,
   DataSetConfiguration,
@@ -35,6 +43,13 @@ import {
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo, useState } from 'react';
+
+const chartDefinitions: ChartDefinition[] = [
+  LineChartBlock.definition,
+  VerticalBarBlock.definition,
+  HorizontalBarBlock.definition,
+  MapBlock.definition,
+];
 
 interface Props {
   data: DataBlockResponse;
