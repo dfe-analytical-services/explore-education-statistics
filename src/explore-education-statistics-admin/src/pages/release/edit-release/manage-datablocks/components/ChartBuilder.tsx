@@ -29,7 +29,7 @@ import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
-  AxisConfiguration,
+  AxesConfiguration,
   AxisType,
   ChartDefinition,
   ChartMetaData,
@@ -86,11 +86,11 @@ function getReduceMetaDataForAxis(
 }
 
 function generateAxesMetaData(
-  axes: Dictionary<AxisConfiguration>,
+  axes: AxesConfiguration,
   data: DataBlockResponse,
   metaData: ChartMetaData,
 ) {
-  return Object.values(axes).reduce(
+  return Object.values(axes as Required<AxesConfiguration>).reduce(
     (allValues, axis) => ({
       ...allValues,
       ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
@@ -156,7 +156,7 @@ const ChartBuilder = ({
         return undefined;
       }
 
-      const axes: Dictionary<AxisConfiguration> = {};
+      const axes: AxesConfiguration = {};
 
       if (axesConfiguration.major) {
         axes.major = {
