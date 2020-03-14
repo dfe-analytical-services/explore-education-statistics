@@ -1,11 +1,11 @@
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
+import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import {
   ChartCapabilities,
-  ChartDataSet,
   ChartDefinition,
   ChartMetaData,
   DataSetConfiguration,
@@ -45,11 +45,6 @@ interface Props {
   onDataRemoved?: (data: SelectedData, index: number) => void;
   onDataChanged?: (data: SelectedData[]) => void;
   onSubmit: (data: SelectedData[]) => void;
-}
-
-export interface ChartDataSetAndConfiguration {
-  dataSet: ChartDataSet;
-  configuration: DataSetConfiguration;
 }
 
 const formId = 'chartDataSelectorForm';

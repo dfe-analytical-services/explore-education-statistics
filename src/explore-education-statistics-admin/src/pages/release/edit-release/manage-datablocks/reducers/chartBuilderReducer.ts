@@ -1,18 +1,33 @@
-import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
-import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import {
   AxesConfiguration,
   AxisConfiguration,
   AxisType,
+  ChartDataSet,
   ChartDefinition,
   ChartDefinitionAxis,
   chartDefinitions,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import { generateKeyFromDataSet } from '@common/modules/charts/util/chartUtils';
 import { Chart } from '@common/services/publicationService';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
+
+export interface ChartOptions {
+  stacked?: boolean;
+  legend?: 'none' | 'top' | 'bottom';
+  height: number;
+  width?: number;
+  title?: string;
+  fileId?: string;
+  geographicId?: string;
+}
+
+export interface ChartDataSetAndConfiguration {
+  dataSet: ChartDataSet;
+  configuration: DataSetConfiguration;
+}
 
 export interface ChartBuilderState {
   definition?: ChartDefinition;

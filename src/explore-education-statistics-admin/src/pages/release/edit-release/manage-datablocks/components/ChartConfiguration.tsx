@@ -1,4 +1,5 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import {
@@ -27,16 +28,6 @@ interface Props {
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
-}
-
-export interface ChartOptions {
-  stacked?: boolean;
-  legend?: 'none' | 'top' | 'bottom';
-  height: number;
-  width?: number;
-  title?: string;
-  fileId?: string;
-  geographicId?: string;
 }
 
 const formId = 'chartConfigurationForm';
