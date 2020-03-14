@@ -343,7 +343,7 @@ const ChartBuilder = ({
 
           {Object.entries(axesConfiguration as Required<AxesConfiguration>).map(
             ([key, axis]) => {
-              const title = `${definition?.axes[axis.type]} (${
+              const title = `${definition?.axes[axis.type].title} (${
                 axis.type
               } axis)`;
 
