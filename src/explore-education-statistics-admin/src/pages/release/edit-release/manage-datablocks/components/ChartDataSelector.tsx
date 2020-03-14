@@ -91,7 +91,6 @@ const ChartDataSelector = ({
 
   return (
     <Formik<FormValues>
-      enableReinitialize
       initialValues={{
         filters: mapValues(metaData.filters, () => ''),
         indicator: '',

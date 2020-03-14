@@ -61,7 +61,6 @@ const ChartConfiguration = ({
 
       <Formik<ChartOptions>
         initialValues={chartOptions}
-        enableReinitialize
         onSubmit={onSubmit}
         validationSchema={Yup.object<ChartOptions>({
           height: Yup.number()

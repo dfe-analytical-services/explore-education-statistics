@@ -145,7 +145,6 @@ const ChartAxisConfiguration = ({
   return (
     <Formik<AxisConfiguration>
       initialValues={configuration}
-      enableReinitialize
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
