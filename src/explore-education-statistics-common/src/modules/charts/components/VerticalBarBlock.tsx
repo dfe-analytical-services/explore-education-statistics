@@ -6,7 +6,6 @@ import {
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
@@ -86,7 +85,7 @@ const VerticalBarBlock = ({
           unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
-          width={conditionallyAdd(axes.minor?.size)}
+          width={Number(axes.minor.size)}
         />
 
         <XAxis
@@ -96,6 +95,7 @@ const VerticalBarBlock = ({
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
+          height={Number(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />

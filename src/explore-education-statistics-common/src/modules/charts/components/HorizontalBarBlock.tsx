@@ -6,7 +6,6 @@ import {
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
@@ -88,6 +87,7 @@ const HorizontalBarBlock = ({
           unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
+          height={Number(axes.minor.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -99,7 +99,7 @@ const HorizontalBarBlock = ({
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
-          width={conditionallyAdd(axes.major.size)}
+          width={Number(axes.major.size)}
         />
 
         <Tooltip cursor={false} />
