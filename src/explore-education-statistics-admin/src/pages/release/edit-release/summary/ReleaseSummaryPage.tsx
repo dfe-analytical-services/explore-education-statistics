@@ -106,7 +106,10 @@ const ReleaseSummaryPage = () => {
           {model.canEditRelease && (
             <div className="dfe-align--right">
               <Link
-                to={summaryEditRoute.generateLink(publication.id, releaseId)}
+                to={summaryEditRoute.generateLink({
+                  publicationId: publication.id,
+                  releaseId,
+                })}
               >
                 Edit release summary
               </Link>
