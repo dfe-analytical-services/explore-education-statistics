@@ -1,8 +1,8 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/service';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionsService from '@admin/services/permissions/permissionsService';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -51,9 +51,9 @@ const ReleaseStatusPage = () => {
   useEffect(() => {
     Promise.all([
       service.getReleaseStatus(releaseId),
-      permissionService.canMarkReleaseAsDraft(releaseId),
-      permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
-      permissionService.canApproveRelease(releaseId),
+      permissionsService.canMarkReleaseAsDraft(releaseId),
+      permissionsService.canSubmitReleaseForHigherLevelReview(releaseId),
+      permissionsService.canApproveRelease(releaseId),
     ]).then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
       const statusOptions: RadioOption[] = [
         {

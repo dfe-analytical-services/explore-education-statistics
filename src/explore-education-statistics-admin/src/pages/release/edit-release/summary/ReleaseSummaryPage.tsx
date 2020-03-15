@@ -10,7 +10,7 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionsService';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';

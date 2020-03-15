@@ -1,6 +1,6 @@
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import permissionsService from '@admin/services/permissions/permissionsService';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import {
   Footnote,
@@ -30,7 +30,7 @@ const ReleaseDataPage = () => {
   const getFootnoteData = useCallback(() => {
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
-      permissionService.canUpdateRelease(releaseId),
+      permissionsService.canUpdateRelease(releaseId),
     ]).then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
       setFootnotesData({
         footnoteMeta: meta,

@@ -2,7 +2,7 @@ import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyStatus } from '@admin/services/common/types';
 import service from '@admin/services/methodology/service';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionsService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';

@@ -1,5 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionsService';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, {
   createContext,

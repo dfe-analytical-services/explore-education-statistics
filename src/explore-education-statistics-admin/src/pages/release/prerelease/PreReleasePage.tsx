@@ -5,7 +5,9 @@ import {
   useErrorControl,
 } from '@admin/contexts/ErrorControlContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
-import permissionService from '@admin/services/permissions/service';
+import permissionService, {
+  PreReleaseWindowStatus,
+} from '@admin/services/permissions/permissionsService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { format } from 'date-fns';
