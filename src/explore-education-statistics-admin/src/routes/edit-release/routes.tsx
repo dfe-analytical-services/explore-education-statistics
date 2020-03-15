@@ -10,6 +10,7 @@ import ManageReleaseContext, {
 } from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/permissionService';
 import React, { ComponentType, useContext } from 'react';
+import { generatePath } from 'react-router';
 
 export interface ReleaseRoute {
   path: string;
@@ -31,9 +32,10 @@ const createReadonlyRoute = (
     component,
     title,
     generateLink: (publicationId: string, releaseId: string) =>
-      path
-        .replace(':publicationId', publicationId)
-        .replace(':releaseId', releaseId),
+      generatePath(path, {
+        publicationId,
+        releaseId,
+      }),
   };
 };
 
@@ -49,9 +51,10 @@ const createEditRoute = (
     component,
     title,
     generateLink: (publicationId: string, releaseId: string) =>
-      path
-        .replace(':publicationId', publicationId)
-        .replace(':releaseId', releaseId),
+      generatePath(path, {
+        publicationId,
+        releaseId,
+      }),
   };
 };
 
@@ -112,6 +115,8 @@ export default {
   createReleaseRoute: {
     route: '/publication/:publicationId/create-release',
     generateLink: (publicationId: string) =>
-      `/publication/${publicationId}/create-release`,
+      generatePath(`/publication/:publicationId/create-release`, {
+        publicationId,
+      }),
   },
 };
