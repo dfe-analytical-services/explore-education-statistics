@@ -1,4 +1,5 @@
-import { DependencyList, useCallback, useMemo, useState } from 'react';
+import useMounted from '@common/hooks/useMounted';
+import { DependencyList, useCallback, useMemo, useRef, useState } from 'react';
 
 export interface AsyncState<T> {
   isLoading: boolean;
@@ -25,9 +26,14 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
     isLoading: true,
   },
 ): [AsyncStateReturn<Value>, AsyncCallback<Args>] {
+  const previousCall = useRef(0);
   const [state, setState] = useState<AsyncState<Value>>(initialState);
 
   const run = useCallback(async (...args: Args) => {
+    previousCall.current += 1;
+
+    const currentCall = previousCall.current;
+
     setState({
       isLoading: true,
     });
@@ -35,17 +41,21 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
     try {
       const result = await callback(...args);
 
-      setState({
-        isLoading: false,
-        value: result,
-      });
+      if (currentCall === previousCall.current) {
+        setState({
+          isLoading: false,
+          value: result,
+        });
+      }
 
       return result;
     } catch (error) {
-      setState({
-        isLoading: false,
-        error,
-      });
+      if (currentCall === previousCall.current) {
+        setState({
+          isLoading: false,
+          error,
+        });
+      }
 
       return error;
     }
