@@ -1,10 +1,15 @@
+import Gate from '@common/components/Gate';
 import ReleaseContentPage from '@admin/pages/release/edit-release/content/ReleaseContentPage';
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import { ComponentType } from 'react';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
+import React, { ComponentType, useContext } from 'react';
 
 export interface ReleaseRoute {
   path: string;
@@ -63,7 +68,18 @@ export const dataRoute = createReadonlyRoute(
 export const manageDataBlocksRoute = createReadonlyRoute(
   'manage-datablocks',
   'Manage data blocks',
-  ReleaseManageDataBlocksPage,
+  props => {
+    const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+
+    return (
+      <Gate
+        condition={() => permissionService.canUpdateRelease(releaseId)}
+        fallback={<p>This release is currently not editable.</p>}
+      >
+        <ReleaseManageDataBlocksPage {...props} releaseId={releaseId} />
+      </Gate>
+    );
+  },
 );
 export const contentRoute = createReadonlyRoute(
   'content',

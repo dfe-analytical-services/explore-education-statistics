@@ -2,7 +2,6 @@
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
 import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
@@ -22,14 +21,16 @@ import React, {
   useState,
 } from 'react';
 
+interface Props {
+  releaseId: string;
+}
+
 interface DataBlockData {
   dataBlock: DataBlock;
   dataBlockResponse: DataBlockResponse;
 }
 
-const ReleaseManageDataBlocksPage = () => {
-  const { releaseId } = useManageReleaseContext();
-
+const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
   const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
   const [selectedDataBlock, setSelectedDataBlock] = useState<DataBlock['id']>(
@@ -38,8 +39,6 @@ const ReleaseManageDataBlocksPage = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
 
   const [dataBlockData, setDataBlockData] = useState<DataBlockData>();
 
@@ -52,12 +51,6 @@ const ReleaseManageDataBlocksPage = () => {
   useEffect(() => {
     updateDataBlocks(releaseId);
   }, [releaseId, updateDataBlocks]);
-
-  useEffect(() => {
-    permissionService
-      .canUpdateRelease(releaseId)
-      .then(canUpdateRelease => setCanUpdateRelease(canUpdateRelease));
-  }, [releaseId]);
 
   const dataBlockOptions = useMemo(
     () =>
@@ -191,7 +184,7 @@ const ReleaseManageDataBlocksPage = () => {
     doLoad(releaseId, selectedDataBlock, dataBlocks);
   }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
 
-  return canUpdateRelease ? (
+  return (
     <>
       {dataBlockOptions.length > 0 && (
         <FormSelect
@@ -297,8 +290,6 @@ const ReleaseManageDataBlocksPage = () => {
         </div>
       </div>
     </>
-  ) : (
-    <div>This release is currently not editable.</div>
   );
 };
 
