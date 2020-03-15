@@ -8,14 +8,15 @@ import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/Re
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
 import permissionService from '@admin/services/permissions/permissionService';
 import Gate from '@common/components/Gate';
-import React, { ComponentType } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { OmitStrict } from '@common/types';
+import React from 'react';
+import { generatePath, RouteComponentProps, RouteProps } from 'react-router';
 
 type ReleaseRouteParams = { publicationId: string; releaseId: string };
 
-export interface ReleaseRoute<Params extends ReleaseRouteParams> {
+export interface ReleaseRoute<Params extends ReleaseRouteParams>
+  extends OmitStrict<RouteProps, 'path' | 'location'> {
   path: string;
-  component: ComponentType<RouteComponentProps<Params>>;
   title: string;
   generateLink: (params: Params) => string;
 }
@@ -25,12 +26,12 @@ const createReadonlyRoute = <
 >(
   section: string,
   title: string,
-  component: ComponentType<RouteComponentProps<Params>>,
+  props: OmitStrict<RouteProps, 'path' | 'location'>,
 ): ReleaseRoute<Params> => {
   const path = `/publication/:publicationId/release/:releaseId/${section}`;
   return {
+    ...props,
     path,
-    component,
     title,
     generateLink: params => generatePath(path, params),
   };
@@ -41,58 +42,58 @@ const createEditRoute = <
 >(
   section: string,
   title: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  component: ComponentType<any>,
+  props: OmitStrict<RouteProps, 'path' | 'location'>,
 ): ReleaseRoute<Params> => {
   const path = `/publication/:publicationId/release/:releaseId/${section}/edit`;
   return {
+    ...props,
     path,
-    component,
     title,
     generateLink: params => generatePath(path, params),
   };
 };
 
-export const summaryRoute = createReadonlyRoute(
-  'summary',
-  'Release summary',
-  ReleaseSummaryPage,
-);
-export const dataRoute = createReadonlyRoute(
-  'data',
-  'Manage data',
-  ReleaseDataPage,
-);
+export const summaryRoute = createReadonlyRoute('summary', 'Release summary', {
+  component: ReleaseSummaryPage,
+});
+export const dataRoute = createReadonlyRoute('data', 'Manage data', {
+  component: ReleaseDataPage,
+});
 export const manageDataBlocksRoute = createReadonlyRoute<
   ReleaseManageDataBlocksPageParams
->('datablocks/:dataBlockId?', 'Manage data blocks', props => {
-  const { releaseId } = props.match.params;
+>('datablocks/:dataBlockId?', 'Manage data blocks', {
+  // eslint-disable-next-line react/display-name
+  render: (props: RouteComponentProps<ReleaseManageDataBlocksPageParams>) => {
+    const {
+      match: {
+        params: { releaseId },
+      },
+    } = props;
 
-  return (
-    <Gate
-      condition={() => permissionService.canUpdateRelease(releaseId)}
-      fallback={<p>This release is currently not editable.</p>}
-    >
-      <ReleaseManageDataBlocksPage {...props} />
-    </Gate>
-  );
+    return (
+      <Gate
+        condition={() => permissionService.canUpdateRelease(releaseId)}
+        fallback={<p>This release is currently not editable.</p>}
+      >
+        <ReleaseManageDataBlocksPage {...props} />
+      </Gate>
+    );
+  },
 });
 
-export const contentRoute = createReadonlyRoute(
-  'content',
-  'Manage content',
-  ReleaseContentPage,
-);
+export const contentRoute = createReadonlyRoute('content', 'Manage content', {
+  component: ReleaseContentPage,
+});
 export const publishStatusRoute = createReadonlyRoute(
   'status',
   'Release status',
-  ReleasePublishStatusPage,
+  {
+    component: ReleasePublishStatusPage,
+  },
 );
-export const summaryEditRoute = createEditRoute(
-  'summary',
-  'Release summary',
-  ReleaseSummaryEditPage,
-);
+export const summaryEditRoute = createEditRoute('summary', 'Release summary', {
+  component: ReleaseSummaryEditPage,
+});
 
 export const viewRoutes = [
   summaryRoute,
