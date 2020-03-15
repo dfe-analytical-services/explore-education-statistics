@@ -120,8 +120,8 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
                 <ModalConfirm
                   mounted={deleteFile}
                   title="Confirm deletion of infographic"
-                  onExit={() => toggleDeleteFile(false)}
-                  onCancel={() => toggleDeleteFile(false)}
+                  onExit={toggleDeleteFile.off}
+                  onCancel={toggleDeleteFile.off}
                   onConfirm={async () => {
                     // eslint-disable-next-line no-unused-expressions
                     form.values.fileId &&
@@ -132,7 +132,7 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
                         )
                         .then(setChartFileOptions);
                     onSubmit('');
-                    toggleDeleteFile(false);
+                    toggleDeleteFile.off();
                   }}
                 >
                   <p>
