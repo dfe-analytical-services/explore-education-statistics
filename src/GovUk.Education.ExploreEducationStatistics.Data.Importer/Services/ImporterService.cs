@@ -111,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _logger = logger;
         }
 
-        public SubjectMeta ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
+        public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
         {
-            return _importerMetaService.Import(table.Columns, table.Rows, subject, context);
+            _importerMetaService.Import(table.Columns, table.Rows, subject, context);
         }
         
         public SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context)
@@ -134,8 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
         }
 
-        public void ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject, SubjectMeta subjectMeta, int batchNo,
-            int rowsPerBatch, StatisticsDbContext context)
+        public void ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
+            SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();

@@ -2,12 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -31,6 +36,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
     public class ValidatorService : IValidatorService
     {
+        private readonly ILogger<IValidatorService> _logger;
+
+        public ValidatorService(ILogger<IValidatorService> logger)
+        {
+            _logger = logger;
+        }
+
         private static readonly List<string> MandatoryObservationColumns = new List<string>
         {
             "time_identifier",
@@ -38,115 +50,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "geographic_level"
         };
 
-        public Tuple<List<string>, int, int> ValidateAndCountRows(SubjectData subjectData)
+        public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>> 
+            Validate(DataTable metaTable, DataTable csvTable, ExecutionContext executionContext, ImportMessage message)
         {
-            var errors = new List<string>();
-            var metaTable = subjectData.GetMetaTable();
-           
-            ValidateMetaHeader(metaTable.Columns, errors);
+            _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
 
-            // If the meta header not ok then stop error checks
-            if (errors.Count != 0)
-            {
-                return new Tuple<List<string>, int, int>(errors, 0, 0);
-            }
-
-            ValidateMetaRows(metaTable.Columns, metaTable.Rows, errors);
-
-            var csvTable = subjectData.GetCsvTable();
-            
-            ValidateObservationHeaders(csvTable.Columns, errors);
-
-            if (errors.Count != 0)
-            {
-                return new Tuple<List<string>, int, int>(errors, 0, 0);
-            }
-
-            var (totalRows, filteredRows) = ValidateAndCountObservations(
-                csvTable.Columns, csvTable.Rows, errors);
-
-            return new Tuple<List<string>, int, int>(errors, totalRows, filteredRows);
-            ;
+            return await ValidateMetaHeader(metaTable.Columns)
+                .OnSuccess(() => ValidateMetaRows(metaTable.Columns, metaTable.Rows)
+                    .OnSuccess(() => ValidateObservationHeaders(csvTable.Columns)
+                        .OnSuccess(() =>
+                            ValidateAndCountObservations(csvTable.Columns, csvTable.Rows, executionContext)
+                                .OnSuccess(result =>
+                                {
+                                    _logger.LogInformation($"Validation of Datafile: {message.OrigDataFileName} complete");
+                                    return result;
+                                }))));
         }
 
-        private static void ValidateMetaHeader(DataColumnCollection header, List<string> errors)
+        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateMetaHeader(DataColumnCollection header)
         {
+            var errors = new List<ValidationError>();
             // Check for unexpected column names
+            Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
             {
-                Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
+                if (!header.Contains(col))
                 {
-                    if (!header.Contains(col))
-                    {
-                        errors.Add(ValidationErrorMessages.MetaFileMissingExpectedColumn.GetEnumLabel() + " : " + col);
-                    }
-                });
+                    errors.Add(new ValidationError(ValidationErrorMessages.MetaFileMissingExpectedColumn.GetEnumLabel() + " : " + col));
+                }
+            });
+
+            if (errors.Count > 0)
+            {
+                return errors;
             }
+
+            return true;
         }
 
-        private static void ValidateMetaRows(DataColumnCollection cols, DataRowCollection rows, List<string> errors)
+        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateMetaRows(
+            DataColumnCollection cols, DataRowCollection rows)
         {
+            var errors = new List<ValidationError>();
             var idx = 0;
             foreach (DataRow row in rows)
             {
-                ValidateMetaRow(row, idx++, cols, errors);
-            }
-        }
-
-        private static Tuple<int, int> ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows,
-            List<string> errors)
-        {
-            var idx = 0;
-            var filteredRows = 0;
-            var totalRows = 0;
-
-            foreach (DataRow row in rows)
-            {
-                if (errors.Count == 100)
-                {
-                    errors.Add("Only first 100 errors are returned");
-                    break;
-                }
-
-                var rowValues = CsvUtil.GetRowValues(row);
-                var columnValues = CsvUtil.GetColumnValues(cols);
-
-                if (ValidateObservationRow(row, idx++, cols, errors) &&
-                    !IsGeographicLevelIgnored(rowValues, columnValues))
-                {
-                    filteredRows++;
-                }
-
-                totalRows++;
-            }
-
-            return new Tuple<int, int>(totalRows, filteredRows);
-        }
-
-        private static void ValidateObservationHeaders(DataColumnCollection cols, List<string> errors)
-        {
-            foreach (var mandatoryCol in MandatoryObservationColumns)
-            {
-                if (!cols.Contains(mandatoryCol))
-                {
-                    errors.Add(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " +
-                               mandatoryCol);
-                }
-
-                if (errors.Count == 100)
-                {
-                    errors.Add("Only first 100 errors are returned");
-                    break;
-                }
-            }
-        }
-
-        private static void ValidateMetaRow(DataRow row, int rowNumber, DataColumnCollection cols, List<string> errors)
-        {
-            {
+                idx++;
                 if (row.ItemArray.Count() != cols.Count)
                 {
-                    errors.Add($"error at row {rowNumber + 1}: " +
-                               ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
+                    errors.Add(new ValidationError($"error at row {idx}: " +
+                               ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel()));
                 }
 
                 try
@@ -155,22 +107,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add($"error at row {rowNumber}: " +
-                               ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message);
+                    errors.Add(new ValidationError($"error at row {idx}: " +
+                               ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message));
                 }
             }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            return true;
+        }
+        
+        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateObservationHeaders(DataColumnCollection cols)
+        {
+            var errors = new List<ValidationError>();
+            
+            foreach (var mandatoryCol in MandatoryObservationColumns)
+            {
+                if (!cols.Contains(mandatoryCol))
+                {
+                    errors.Add(new ValidationError(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " +
+                                                         mandatoryCol));
+                }
+
+                if (errors.Count == 100)
+                {
+                    errors.Add(new ValidationError("Only first 100 errors are returned"));
+                    break;
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            return true;
         }
 
-        private static bool ValidateObservationRow(DataRow row, int rowNumber, DataColumnCollection cols,
-            List<string> errors)
+        private static async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
+            ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows, ExecutionContext executionContext)
         {
-            var valid = false;
+            var idx = 0;
+            var filteredRows = 0;
+            var totalRows = 0;
+            var errors = new List<ValidationError>();
 
+            foreach (DataRow row in rows)
             {
+                idx++;
+                if (errors.Count == 100)
+                {
+                    errors.Add(new ValidationError("Only first 100 errors are returned"));
+                    break;
+                }
+
                 if (row.ItemArray.Count() != cols.Count)
                 {
-                    errors.Add($"error at row {rowNumber}: " +
-                               ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel());
+                    errors.Add(new ValidationError($"error at row {idx}: " +
+                               ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel()));
                 }
 
                 try
@@ -181,21 +178,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetGeographicLevel(rowValues, colValues);
                     ImporterService.GetTimeIdentifier(rowValues, colValues);
                     ImporterService.GetYear(rowValues, colValues);
-                    valid = true;
+                    
+                    if (!IsGeographicLevelIgnored(rowValues, colValues))
+                    {
+                        filteredRows++;
+                    }
                 }
                 catch (Exception e)
                 {
-                    errors.Add($"error at row {rowNumber}: {e.Message}");
+                    errors.Add(new ValidationError($"error at row {idx}: {e.Message}"));
                 }
+                
+                totalRows++;
             }
 
-            return valid;
+            if (errors.Count > 0)
+            {
+                return errors;
+            }
+
+            var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
+            var numBatches = FileStorageUtils.GetNumBatches(totalRows, rowsPerBatch);
+            
+            return new ProcessorStatistics(filteredRows, rowsPerBatch, numBatches);
         }
 
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
             var geographicLevel = ImporterService.GetGeographicLevel(line, headers);
             return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
+        }
+        
+        
+        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", true, true)
+                .AddEnvironmentVariables()
+                .Build();
         }
     }
 }

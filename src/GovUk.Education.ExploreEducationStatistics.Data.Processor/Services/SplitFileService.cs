@@ -19,12 +19,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
         private readonly IFileStorageService _fileStorageService;
+        private readonly ILogger<ISplitFileService> _logger;
         
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
@@ -33,9 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             GeographicLevel.School
         };
         
-        public SplitFileService(IFileStorageService fileStorageService)
+        public SplitFileService(IFileStorageService fileStorageService, ILogger<ISplitFileService> logger)
         {
             _fileStorageService = fileStorageService;
+            _logger = logger;
         }
 
         public async Task SplitDataFile(
@@ -45,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             if (subjectData.GetCsvTable().Rows.Count > message.RowsPerBatch)
             {
+                _logger.LogInformation($"Splitting Datafile: {message.DataFileName}");
                 await SplitFiles(message, subjectData, collector);
+                _logger.LogInformation($"Split of Datafile: {message.DataFileName} complete");
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
@@ -84,6 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
 
                 WriteDataTableToStream(table, writer);
+                writer.Flush();
 
                 await _fileStorageService.UploadDataFileAsync(
                     message.Release.Id,
@@ -142,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             throw new InvalidGeographicLevelException(value);
         }
         
-        private void WriteDataTableToStream(DataTable dataTable, TextWriter tw )
+        private static void WriteDataTableToStream(DataTable dataTable, TextWriter tw)
         {
             var csvWriter = new CsvWriter(tw, new CsvConfiguration(CultureInfo.InvariantCulture));
             foreach (DataColumn column in dataTable.Columns)

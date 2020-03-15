@@ -45,9 +45,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (!observationCount.Equals(message.TotalRows))
                 {
-                    await FailImport(releaseId, message.OrigDataFileName, 
-                        new List<string> {$"Number of observations inserted ({observationCount}) " +
-                                          $"does not equal that expected ({message.TotalRows}) : Please delete & retry"});
+                    await FailImport(releaseId, message.OrigDataFileName,
+                        new List<ValidationError>
+                        {
+                            new ValidationError(
+                                $"Number of observations inserted ({observationCount}) " +
+                                $"does not equal that expected ({message.TotalRows}) : Please delete & retry"
+                            )
+                        }.AsEnumerable());
+
                 }
                 else
                 {
@@ -88,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return import.Status;
         }
 
-        public async Task FailImport(string releaseId, string origDataFileName, List<string> errors)
+        public async Task FailImport(string releaseId, string origDataFileName, IEnumerable<ValidationError> errors)
         {
             var import = await GetImport(releaseId, origDataFileName);
             if (import.Status != IStatus.COMPLETE)

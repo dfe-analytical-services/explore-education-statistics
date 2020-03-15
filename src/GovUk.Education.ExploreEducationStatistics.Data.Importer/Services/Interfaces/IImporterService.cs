@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
 {
     public interface IImporterService
     {
-        SubjectMeta ImportMeta(DataTable table, Subject subject, StatisticsDbContext context);
+        void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context);
 
         SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context);
 
