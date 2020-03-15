@@ -173,310 +173,279 @@ const ChartAxisConfiguration = ({
 
           <FormGroup>
             {configuration.type === 'major' && !capabilities.fixedAxisGroupBy && (
-              <>
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-groupBy`}
-                  label="Group data by"
-                  name="groupBy"
-                  options={[
-                    {
-                      label: 'Time periods',
-                      value: 'timePeriod' as AxisGroupBy,
-                    },
-                    {
-                      label: 'Locations',
-                      value: 'locations' as AxisGroupBy,
-                    },
-                    {
-                      label: 'Indicators',
-                      value: 'indicators' as AxisGroupBy,
-                    },
-                    {
-                      label: 'Filters',
-                      value: 'filters' as AxisGroupBy,
-                    },
-                  ]}
-                />
-
-                <hr />
-              </>
+              <FormFieldSelect<AxisConfiguration>
+                id={`${id}-groupBy`}
+                label="Group data by"
+                name="groupBy"
+                options={[
+                  {
+                    label: 'Time periods',
+                    value: 'timePeriod' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Locations',
+                    value: 'locations' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Indicators',
+                    value: 'indicators' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Filters',
+                    value: 'filters' as AxisGroupBy,
+                  },
+                ]}
+              />
             )}
 
             {capabilities.hasAxes && (
-              <>
-                <FormFieldCheckbox<AxisConfiguration>
-                  id={`${id}-visible`}
-                  name="visible"
-                  label="Show axis labels?"
-                  conditional={
-                    <FormFieldTextInput<AxisConfiguration>
-                      id={`${id}-unit`}
-                      label="Override displayed unit"
-                      name="unit"
-                      hint="Leave blank to set default from metadata"
-                      width={10}
-                    />
-                  }
-                />
-                <hr />
-
-                <FormFieldTextInput<AxisConfiguration>
-                  id={`${id}-size`}
-                  name="size"
-                  type="number"
-                  min="0"
-                  max="100"
-                  label="Size of axis (px)"
-                  width={3}
-                />
-                <hr />
-              </>
+              <FormFieldTextInput<AxisConfiguration>
+                id={`${id}-size`}
+                name="size"
+                type="number"
+                min="0"
+                max="100"
+                label="Size of axis (px)"
+                width={3}
+              />
             )}
 
             {capabilities.gridLines && (
-              <>
-                <FormFieldCheckbox<AxisConfiguration>
-                  id={`${id}-showGrid`}
-                  name="showGrid"
-                  label="Show grid lines"
-                />
-
-                <hr />
-              </>
-            )}
-
-            {configuration.type === 'minor' && (
-              <>
-                <FormFieldset
-                  id={`${id}-minorAxisRange`}
-                  legend="Axis range"
-                  legendSize="m"
-                  hint="Leaving these values blank will set them to 'auto'"
-                >
-                  <div className={styles.axisRange}>
-                    <FormGroup className={styles.formGroup}>
-                      <FormFieldTextInput<AxisConfiguration>
-                        id={`${id}-minorMin`}
-                        name="min"
-                        type="number"
-                        width={10}
-                        label="Minimum value"
-                      />
-                    </FormGroup>
-                    <FormGroup className={styles.formGroup}>
-                      <FormFieldTextInput<AxisConfiguration>
-                        id={`${id}-minorMax`}
-                        name="max"
-                        type="number"
-                        width={10}
-                        label="Maximum value"
-                      />
-                    </FormGroup>
-                  </div>
-                </FormFieldset>
-                <hr />
-              </>
+              <FormFieldCheckbox<AxisConfiguration>
+                id={`${id}-showGrid`}
+                name="showGrid"
+                label="Show grid lines"
+              />
             )}
 
             {capabilities.hasAxes && (
-              <>
-                <FormFieldRadioGroup<AxisConfiguration>
-                  id={`${id}-tickConfig`}
-                  name="tickConfig"
-                  legend="Tick display type"
-                  legendSize="m"
-                  order={[]}
-                  options={[
-                    {
-                      value: 'default',
-                      label: 'Automatic',
-                    },
-                    {
-                      label: 'Start and end only',
-                      value: 'startEnd',
-                    },
-                    {
-                      label: 'Custom',
-                      value: 'custom',
-                      conditional: (
-                        <FormFieldTextInput<AxisConfiguration>
-                          id={`${id}-tickSpacing`}
-                          name="tickSpacing"
-                          type="number"
-                          width={10}
-                          label="Every nth value"
-                        />
-                      ),
-                    },
-                  ]}
+              <FormFieldCheckbox<AxisConfiguration>
+                id={`${id}-visible`}
+                name="visible"
+                label="Show axis labels?"
+                conditional={
+                  <FormFieldTextInput<AxisConfiguration>
+                    id={`${id}-unit`}
+                    label="Override displayed unit"
+                    name="unit"
+                    hint="Leave blank to set default from metadata"
+                    width={10}
+                  />
+                }
+              />
+            )}
+          </FormGroup>
+
+          {configuration.type === 'minor' && (
+            <FormFieldset
+              id={`${id}-minorAxisRange`}
+              legend="Axis range"
+              legendSize="m"
+              hint="Leaving these values blank will set them to 'auto'"
+            >
+              <div className={styles.axisRange}>
+                <FormFieldTextInput<AxisConfiguration>
+                  id={`${id}-minorMin`}
+                  name="min"
+                  type="number"
+                  width={10}
+                  label="Minimum value"
+                  formGroupClass="govuk-!-margin-right-2"
                 />
-                <hr />
-              </>
-            )}
+                <FormFieldTextInput<AxisConfiguration>
+                  id={`${id}-minorMax`}
+                  name="max"
+                  type="number"
+                  width={10}
+                  label="Maximum value"
+                />
+              </div>
+            </FormFieldset>
+          )}
 
-            {configuration.type === 'major' && (
-              <>
-                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                  <FormGroup>
-                    <FormFieldSelect<AxisConfiguration>
-                      id={`${id}-sortBy`}
-                      name="sortBy"
-                      label="Sort data by"
-                      order={[]}
-                      options={sortOptions}
+          {capabilities.hasAxes && (
+            <FormFieldRadioGroup<AxisConfiguration>
+              id={`${id}-tickConfig`}
+              name="tickConfig"
+              legend="Tick display type"
+              legendSize="m"
+              order={[]}
+              options={[
+                {
+                  value: 'default',
+                  label: 'Automatic',
+                },
+                {
+                  label: 'Start and end only',
+                  value: 'startEnd',
+                },
+                {
+                  label: 'Custom',
+                  value: 'custom',
+                  conditional: (
+                    <FormFieldTextInput<AxisConfiguration>
+                      id={`${id}-tickSpacing`}
+                      name="tickSpacing"
+                      type="number"
+                      width={10}
+                      label="Every nth value"
                     />
-                  </FormGroup>
-                  <FormGroup>
-                    <FormFieldCheckbox<AxisConfiguration>
-                      id={`${id}-sortAsc`}
-                      name="sortAsc"
-                      label="Sort Ascending"
-                    />
-                  </FormGroup>
-                </FormFieldset>
+                  ),
+                },
+              ]}
+            />
+          )}
 
-                <hr />
+          {configuration.type === 'major' && (
+            <>
+              <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-sortBy`}
+                  name="sortBy"
+                  label="Sort data by"
+                  order={[]}
+                  options={sortOptions}
+                />
+                <FormFieldCheckbox<AxisConfiguration>
+                  id={`${id}-sortAsc`}
+                  name="sortAsc"
+                  label="Sort Ascending"
+                />
+              </FormFieldset>
 
-                <FormFieldset
-                  id={`${id}-majorAxisRange`}
-                  legend="Limiting data"
-                  legendSize="m"
-                >
-                  <FormGroup>
-                    <FormFieldSelect<AxisConfiguration>
-                      id={`${id}-majorMin`}
-                      label="Minimum"
-                      name="min"
-                      options={limitOptions}
-                      order={[]}
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <FormFieldSelect<AxisConfiguration>
-                      id={`${id}-majorMax`}
-                      label="Maximum"
-                      name="max"
-                      options={limitOptions}
-                      order={[]}
-                    />
-                  </FormGroup>
-                </FormFieldset>
+              <FormFieldset
+                id={`${id}-majorAxisRange`}
+                legend="Limiting data"
+                legendSize="m"
+              >
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-majorMin`}
+                  label="Minimum"
+                  name="min"
+                  options={limitOptions}
+                  order={[]}
+                />
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-majorMax`}
+                  label="Maximum"
+                  name="max"
+                  options={limitOptions}
+                  order={[]}
+                />
+              </FormFieldset>
+            </>
+          )}
 
-                <hr />
-              </>
-            )}
+          {capabilities.hasReferenceLines && (
+            <table className="govuk-table">
+              <caption className="govuk-heading-m">Reference lines</caption>
+              <thead>
+                <tr>
+                  <th>Position</th>
+                  <th>Label</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {form.values.referenceLines &&
+                  form.values.referenceLines.map((refLine, idx) => (
+                    <tr key={`${refLine.label}_${refLine.position}`}>
+                      <td>{refLine.position}</td>
+                      <td>{refLine.label}</td>
+                      <td>
+                        <button
+                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                          type="button"
+                          onClick={() => {
+                            const newReferenceLines = [
+                              ...(form.values.referenceLines || []),
+                            ];
+                            newReferenceLines.splice(idx, 1);
 
-            {capabilities.hasReferenceLines && (
-              <table className="govuk-table">
-                <caption className="govuk-heading-m">Reference lines</caption>
-                <thead>
-                  <tr>
-                    <th>Position</th>
-                    <th>Label</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {form.values.referenceLines &&
-                    form.values.referenceLines.map((refLine, idx) => (
-                      <tr key={`${refLine.label}_${refLine.position}`}>
-                        <td>{refLine.position}</td>
-                        <td>{refLine.label}</td>
-                        <td>
-                          <button
-                            className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                            type="button"
-                            onClick={() => {
-                              const newReferenceLines = [
-                                ...(form.values.referenceLines || []),
-                              ];
-                              newReferenceLines.splice(idx, 1);
-
-                              form.setFieldValue(
-                                'referenceLines',
-                                newReferenceLines,
-                              );
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  <tr>
-                    <td>
-                      {form.values.type === 'minor' && (
-                        <FormTextInput
-                          name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                          id={`${id}-referenceLines-position`}
-                          label=""
-                          type="text"
-                          defaultValue={`${referenceLine.position}`}
-                          onChange={e => {
-                            setReferenceLine({
-                              ...referenceLine,
-                              position: e.target.value,
-                            });
+                            form.setFieldValue(
+                              'referenceLines',
+                              newReferenceLines,
+                            );
                           }}
-                        />
-                      )}
-                      {form.values.type === 'major' && (
-                        <FormSelect
-                          name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                          id={`${id}-referenceLines-position`}
-                          label=""
-                          value={referenceLine.position}
-                          order={[]}
-                          onChange={e => {
-                            setReferenceLine({
-                              ...referenceLine,
-                              position: e.target.value,
-                            });
-                          }}
-                          options={referenceOptions}
-                        />
-                      )}
-                    </td>
-                    <td>
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                <tr>
+                  <td>
+                    {form.values.type === 'minor' && (
                       <FormTextInput
-                        name={`referenceLines[${form.values.referenceLines?.length}].label`}
-                        id={`${id}-referenceLines-label`}
+                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                        id={`${id}-referenceLines-position`}
                         label=""
                         type="text"
-                        defaultValue={referenceLine.label}
+                        defaultValue={`${referenceLine.position}`}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
-                            label: e.target.value,
+                            position: e.target.value,
                           });
                         }}
                       />
-                    </td>
-                    <td>
-                      <button
-                        disabled={
-                          referenceLine.position === '' ||
-                          referenceLine.label === ''
-                        }
-                        className="govuk-button govuk-!-margin-bottom-0"
-                        type="button"
-                        onClick={() => {
-                          form.setFieldValue('referenceLines', [
-                            ...(form.values.referenceLines || []),
-                            referenceLine,
-                          ]);
-
-                          setReferenceLine({ label: '', position: '' });
+                    )}
+                    {form.values.type === 'major' && (
+                      <FormSelect
+                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                        id={`${id}-referenceLines-position`}
+                        label=""
+                        value={referenceLine.position}
+                        order={[]}
+                        onChange={e => {
+                          setReferenceLine({
+                            ...referenceLine,
+                            position: e.target.value,
+                          });
                         }}
-                      >
-                        Add
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            )}
-          </FormGroup>
+                        options={referenceOptions}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <FormTextInput
+                      name={`referenceLines[${form.values.referenceLines?.length}].label`}
+                      id={`${id}-referenceLines-label`}
+                      label=""
+                      type="text"
+                      defaultValue={referenceLine.label}
+                      onChange={e => {
+                        setReferenceLine({
+                          ...referenceLine,
+                          label: e.target.value,
+                        });
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      disabled={
+                        referenceLine.position === '' ||
+                        referenceLine.label === ''
+                      }
+                      className="govuk-button govuk-!-margin-bottom-0"
+                      type="button"
+                      onClick={() => {
+                        form.setFieldValue('referenceLines', [
+                          ...(form.values.referenceLines || []),
+                          referenceLine,
+                        ]);
+
+                        setReferenceLine({ label: '', position: '' });
+                      }}
+                    >
+                      Add
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
 
           <Button type="submit">Save chart options</Button>
         </Form>
