@@ -1,3 +1,7 @@
+import DataBlockDetailsForm, {
+  DataBlockDetailsFormValues,
+} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
@@ -29,9 +33,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import DataBlockDetailsForm, {
-  DataBlockDetailsFormValues,
-} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
 
 interface CreateDataBlockProps {
   releaseId: string;
@@ -46,11 +47,12 @@ const DataBlockSourceWizard = ({
   releaseId,
   dataBlock,
   dataBlockResponse,
-  loading = false,
   onDataBlockSave,
   onTableToolLoaded,
 }: CreateDataBlockProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
+
+  const [isLoading, setLoading] = useState(true);
 
   const [query, setQuery] = useState<TableDataQuery | undefined>(
     dataBlock?.dataBlockRequest,
@@ -66,9 +68,13 @@ const DataBlockSourceWizard = ({
   );
 
   useEffect(() => {
-    if (dataBlock && dataBlockResponse) {
+    const initialize = async () => {
+      if (!dataBlock || !dataBlockResponse) {
+        return;
+      }
+
       if (dataBlock.dataBlockRequest) {
-        initialiseFromQuery(dataBlock.dataBlockRequest).then(state => {
+        await initialiseFromQuery(dataBlock.dataBlockRequest).then(state => {
           setTableToolState(state);
 
           if (onTableToolLoaded) {
@@ -92,7 +98,14 @@ const DataBlockSourceWizard = ({
       } else {
         setTableHeaders(getDefaultTableHeaderConfig(dataTable.subjectMeta));
       }
-    }
+    };
+
+    setLoading(true);
+    setTableToolState(undefined);
+
+    initialize().then(() => {
+      setLoading(false);
+    });
   }, [dataBlock, dataBlockResponse, onTableToolLoaded]);
 
   const initialValues: DataBlockDetailsFormValues = useMemo(() => {
@@ -147,7 +160,7 @@ const DataBlockSourceWizard = ({
     [dataBlock, onDataBlockSave, query, tableHeaders],
   );
 
-  return !loading ? (
+  return !isLoading ? (
     <TableToolWizard
       releaseId={releaseId}
       themeMeta={[]}
