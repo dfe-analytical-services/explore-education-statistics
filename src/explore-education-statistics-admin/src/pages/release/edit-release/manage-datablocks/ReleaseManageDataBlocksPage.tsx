@@ -168,6 +168,8 @@ const ReleaseManageDataBlocksPage = ({
     [dataBlocks, setDataBlocks, releaseId, history, publicationId],
   );
 
+  const handleTableToolLoaded = useCallback(() => setLoading(false), []);
+
   return (
     <>
       {dataBlockOptions.length > 0 && (
@@ -266,7 +268,7 @@ const ReleaseManageDataBlocksPage = ({
                   releaseId={releaseId}
                   loading={isLoading}
                   onDataBlockSave={onDataBlockSave}
-                  onTableToolLoaded={() => setLoading(false)}
+                  onTableToolLoaded={handleTableToolLoaded}
                 />
               </div>
             </TabsSection>
