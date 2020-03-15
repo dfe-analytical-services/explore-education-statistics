@@ -8,7 +8,10 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import {
+  TableDataQuery,
+  TimeIdentifier,
+} from '@common/modules/table-tool/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig, {
@@ -17,8 +20,15 @@ import getDefaultTableHeaderConfig, {
 import {
   DataBlock,
   DataBlockResponse,
+  GeographicLevel,
 } from '@common/services/dataBlockService';
-import React, { createRef, useEffect, useState } from 'react';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
@@ -28,10 +38,7 @@ interface CreateDataBlockProps {
   dataBlock?: DataBlock;
   dataBlockResponse?: DataBlockResponse;
   loading?: boolean;
-  onDataBlockSave: (
-    dataBlock: DataBlock,
-    newDataBlockResponse?: TableToolState,
-  ) => Promise<DataBlock>;
+  onDataBlockSave: (dataBlock: DataBlock) => void;
   onTableToolLoaded?: () => void;
 }
 
@@ -54,11 +61,9 @@ const DataBlockSourceWizard = ({
   const [tableHeaders, setTableHeaders] = useState<TableHeadersConfig>();
   const [tableToolState, setTableToolState] = useState<TableToolState>();
 
-  const [captionTitle, setCaptionTitle] = useState<string>();
-
-  const [initialValues, setInitialValues] = useState<
-    DataBlockDetailsFormValues
-  >();
+  const [captionTitle, setCaptionTitle] = useState<string>(
+    dataBlock?.heading ?? '',
+  );
 
   useEffect(() => {
     if (dataBlock && dataBlockResponse) {
@@ -90,26 +95,57 @@ const DataBlockSourceWizard = ({
     }
   }, [dataBlock, dataBlockResponse, onTableToolLoaded]);
 
-  useEffect(() => {
+  const initialValues: DataBlockDetailsFormValues = useMemo(() => {
     if (!dataBlock) {
-      setInitialValues({
-        title: table ? generateTableTitle(table.subjectMeta) : '',
+      return {
+        heading: table ? generateTableTitle(table.subjectMeta) : '',
         name: '',
         source: '',
-      });
-      return;
+      };
     }
 
-    const { heading: title = '', name = '', source = '' } = dataBlock;
+    const { heading = '', name = '', source = '' } = dataBlock;
 
-    setCaptionTitle(title);
-
-    setInitialValues({
-      title,
+    return {
+      heading,
       name,
       source,
-    });
+    };
   }, [dataBlock, table]);
+
+  const handleSubmit = useCallback(
+    (values: DataBlockDetailsFormValues) => {
+      if (!query || !tableHeaders) {
+        return;
+      }
+
+      const savedDataBlock: DataBlock = {
+        ...values,
+        id: dataBlock ? dataBlock.id : undefined,
+        dataBlockRequest: {
+          ...query,
+          geographicLevel: query.geographicLevel as GeographicLevel,
+          timePeriod: query.timePeriod && {
+            ...query.timePeriod,
+            startCode: query.timePeriod.startCode as TimeIdentifier,
+            endCode: query.timePeriod.endCode as TimeIdentifier,
+          },
+        },
+        tables: [],
+      };
+
+      onDataBlockSave({
+        ...savedDataBlock,
+        tables: [
+          {
+            tableHeaders,
+            indicators: [],
+          },
+        ],
+      });
+    },
+    [dataBlock, onDataBlockSave, query, tableHeaders],
+  );
 
   return !loading ? (
     <TableToolWizard
@@ -171,22 +207,8 @@ const DataBlockSourceWizard = ({
 
                   <DataBlockDetailsForm
                     initialValues={initialValues}
-                    query={query}
-                    tableHeaders={tableHeaders}
-                    initialDataBlock={dataBlock}
-                    releaseId={releaseId}
                     onTitleChange={setCaptionTitle}
-                    onDataBlockSave={data =>
-                      onDataBlockSave({
-                        ...data,
-                        tables: [
-                          {
-                            tableHeaders,
-                            indicators: [],
-                          },
-                        ],
-                      })
-                    }
+                    onSubmit={handleSubmit}
                   />
                 </>
               )}
