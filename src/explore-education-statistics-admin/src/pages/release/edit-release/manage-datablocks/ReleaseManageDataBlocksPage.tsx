@@ -125,7 +125,7 @@ const ReleaseManageDataBlocksPage = ({
   );
 
   const onDataBlockSave = useMemo(
-    () => async (dataBlock: DataBlock): Promise<DataBlock> => {
+    () => async (dataBlock: DataBlock) => {
       setIsSaving(true);
 
       let newDataBlock: DataBlock;
@@ -148,6 +148,7 @@ const ReleaseManageDataBlocksPage = ({
         }
 
         setDataBlocks(newDataBlocks);
+        setIsSaving(false);
       } else {
         newDataBlock = await dataBlocksService.postDataBlock(
           releaseId,
@@ -163,8 +164,6 @@ const ReleaseManageDataBlocksPage = ({
           }),
         );
       }
-
-      return newDataBlock;
     },
     [dataBlocks, setDataBlocks, releaseId, history, publicationId],
   );

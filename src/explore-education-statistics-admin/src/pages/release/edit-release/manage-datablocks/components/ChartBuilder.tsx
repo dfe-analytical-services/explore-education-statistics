@@ -54,9 +54,7 @@ const chartDefinitions: ChartDefinition[] = [
 interface Props {
   data: DataBlockResponse;
   initialConfiguration?: ChartRendererProps;
-  onChartSave?: (
-    props: ChartRendererProps,
-  ) => Promise<ChartRendererProps | undefined>;
+  onChartSave?: (props: ChartRendererProps) => void;
 
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }

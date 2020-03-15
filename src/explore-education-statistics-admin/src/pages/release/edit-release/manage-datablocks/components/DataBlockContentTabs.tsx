@@ -23,7 +23,7 @@ import React, { useEffect, useRef, useState } from 'react';
 interface Props {
   dataBlock: DataBlock;
   dataBlockResponse: DataBlockResponse;
-  onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
+  onDataBlockSave: (dataBlock: DataBlock) => void;
 }
 
 const DataBlockContentTabs = ({
@@ -85,9 +85,7 @@ const DataBlockContentTabs = ({
       charts: [props],
     };
 
-    return onDataBlockSave(newDataBlock).then(() => {
-      return { ...props };
-    });
+    onDataBlockSave(newDataBlock);
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {
