@@ -1,15 +1,14 @@
 import ReleaseContentPage from '@admin/pages/release/edit-release/content/ReleaseContentPage';
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
-import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
+import ReleaseManageDataBlocksPage, {
+  ReleaseManageDataBlocksPageParams,
+} from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
 import permissionService from '@admin/services/permissions/permissionService';
 import Gate from '@common/components/Gate';
-import React, { ComponentType, useContext } from 'react';
+import React, { ComponentType } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
 type ReleaseRouteParams = { publicationId: string; releaseId: string };
@@ -64,22 +63,21 @@ export const dataRoute = createReadonlyRoute(
   'Manage data',
   ReleaseDataPage,
 );
-export const manageDataBlocksRoute = createReadonlyRoute(
-  'manage-datablocks',
-  'Manage data blocks',
-  props => {
-    const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+export const manageDataBlocksRoute = createReadonlyRoute<
+  ReleaseManageDataBlocksPageParams
+>('datablocks/:dataBlockId?', 'Manage data blocks', props => {
+  const { releaseId } = props.match.params;
 
-    return (
-      <Gate
-        condition={() => permissionService.canUpdateRelease(releaseId)}
-        fallback={<p>This release is currently not editable.</p>}
-      >
-        <ReleaseManageDataBlocksPage {...props} releaseId={releaseId} />
-      </Gate>
-    );
-  },
-);
+  return (
+    <Gate
+      condition={() => permissionService.canUpdateRelease(releaseId)}
+      fallback={<p>This release is currently not editable.</p>}
+    >
+      <ReleaseManageDataBlocksPage {...props} />
+    </Gate>
+  );
+});
+
 export const contentRoute = createReadonlyRoute(
   'content',
   'Manage content',

@@ -1,7 +1,6 @@
-/* eslint-disable no-shadow */
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
 import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import { manageDataBlocksRoute } from '@admin/routes/edit-release/routes';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
@@ -9,48 +8,48 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
-interface Props {
+export interface ReleaseManageDataBlocksPageParams {
+  publicationId: string;
   releaseId: string;
+  dataBlockId?: string;
 }
 
 interface DataBlockData {
   dataBlock: DataBlock;
-  dataBlockResponse: DataBlockResponse;
+  response: DataBlockResponse;
 }
 
-const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
-  const [dataBlocks, setDataBlocks] = useState<DataBlock[]>([]);
+const emptyDataBlocks: DataBlock[] = [];
+
+const ReleaseManageDataBlocksPage = ({
+  match,
+  history,
+}: RouteComponentProps<ReleaseManageDataBlocksPageParams>) => {
+  const { publicationId, releaseId, dataBlockId } = match.params;
+
   const [activeTab, setActiveTab] = useState<string>('');
-  const [selectedDataBlock, setSelectedDataBlock] = useState<DataBlock['id']>(
-    '',
-  );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const [dataBlockData, setDataBlockData] = useState<DataBlockData>();
+  const [isLoading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [deleteDataBlock, setDeleteDataBlock] = useState<DataBlock>();
 
-  const updateDataBlocks = useCallback((rId: string) => {
-    return dataBlocksService.getDataBlocks(rId).then(setDataBlocks);
-  }, []);
-
-  useEffect(() => {
-    updateDataBlocks(releaseId);
-  }, [releaseId, updateDataBlocks]);
+  const {
+    value: dataBlocks = emptyDataBlocks,
+    isLoading: isDataBlocksLoading,
+    retry: fetchDataBlocks,
+    setValue: setDataBlocks,
+  } = useAsyncRetry(() => dataBlocksService.getDataBlocks(releaseId), [
+    releaseId,
+  ]);
 
   const dataBlockOptions = useMemo(
     () =>
@@ -61,128 +60,114 @@ const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
     [dataBlocks],
   );
 
-  const onDeleteDataBlock = (db: DataBlock) => {
-    setDeleteDataBlock(undefined);
-    if (db.id) {
-      dataBlocksService
-        .deleteDataBlock(db.id)
-        .then(() => updateDataBlocks(releaseId))
-        .then(() => setSelectedDataBlock(''));
+  const { value: dataBlockData } = useAsyncRetry<
+    DataBlockData | undefined
+  >(async () => {
+    if (!dataBlockId) {
+      setLoading(false);
+
+      return undefined;
     }
-  };
 
-  const load = useCallback(
-    async (
-      dataBlocks: DataBlock[],
-      releaseId: string,
-      selectedDataBlockId: string,
-    ) => {
-      // Load's the datablock of 'selectedDataBlockId' in datablock form
+    if (isDataBlocksLoading) {
+      return undefined;
+    }
 
-      setIsLoading(true);
+    const dataBlock = dataBlocks.find(({ id }) => dataBlockId === id);
 
-      if (!selectedDataBlockId) return {};
+    if (dataBlock === undefined) {
+      history.push(
+        manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
+      );
 
-      const db = dataBlocks.find(({ id }) => selectedDataBlockId === id);
+      return undefined;
+    }
 
-      if (db === undefined) return {};
+    const request = dataBlock.dataBlockRequest;
 
-      const request = db.dataBlockRequest;
-      if (request === undefined) return {};
+    if (request === undefined) {
+      return undefined;
+    }
 
-      const response = await dataBlockService.getDataBlockForSubject(request);
+    setLoading(true);
 
-      if (response === undefined) return {};
+    const response = await dataBlockService.getDataBlockForSubject(request);
 
-      return {
-        dataBlock: db,
-        request,
-        response: {
-          ...response,
-          releaseId,
-        },
-      };
-    },
-    [],
-  );
+    if (response === undefined) {
+      return undefined;
+    }
 
-  const currentlyLoadingDataBlockId = useRef<string>();
+    return {
+      dataBlock,
+      response: {
+        ...response,
+        releaseId,
+      },
+    };
+  }, [dataBlockId, dataBlocks, isDataBlocksLoading]);
 
-  const unsetIsLoading = useCallback(() => {
-    setIsLoading(false);
-    currentlyLoadingDataBlockId.current = undefined;
-  }, []);
+  const onDeleteDataBlock = useCallback(
+    (dataBlock: DataBlock) => {
+      setDeleteDataBlock(undefined);
 
-  const doLoad = useCallback(
-    (
-      releaseId: string,
-      selectedDataBlockId: string | undefined,
-      dataBlocks: DataBlock[],
-    ) => {
-      if (!selectedDataBlockId) {
-        setDataBlockData(undefined);
-        setIsLoading(false);
-        currentlyLoadingDataBlockId.current = undefined;
-        return;
-      }
-
-      if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
-        currentlyLoadingDataBlockId.current = selectedDataBlockId;
-
-        load(dataBlocks, releaseId, selectedDataBlockId).then(
-          ({ dataBlock, response: dataBlockResponse }) => {
-            if (dataBlock && dataBlockResponse) {
-              if (dataBlock.id === selectedDataBlockId) {
-                setDataBlockData({
-                  dataBlock,
-                  dataBlockResponse,
-                });
-              } else {
-                setDataBlockData(undefined);
-                setIsLoading(false);
-                currentlyLoadingDataBlockId.current = undefined;
-              }
-            }
-          },
-        );
+      if (dataBlock.id) {
+        dataBlocksService
+          .deleteDataBlock(dataBlock.id)
+          .then(fetchDataBlocks)
+          .then(() =>
+            history.push(
+              manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
+            ),
+          );
       }
     },
-    [load],
+    [fetchDataBlocks, history, publicationId, releaseId],
   );
 
   const onDataBlockSave = useMemo(
-    () => async (db: DataBlock): Promise<DataBlock> => {
+    () => async (dataBlock: DataBlock): Promise<DataBlock> => {
       setIsSaving(true);
 
-      let newDataBlock;
-      let newDataBlocksList;
+      let newDataBlock: DataBlock;
+      let newDataBlocks: DataBlock[];
 
-      if (db.id) {
-        newDataBlock = await dataBlocksService.putDataBlock(db.id, db);
-        newDataBlocksList = [
-          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
-          newDataBlock,
-        ];
+      if (dataBlock.id) {
+        newDataBlock = await dataBlocksService.putDataBlock(
+          dataBlock.id,
+          dataBlock,
+        );
+
+        newDataBlocks = [...dataBlocks];
+
+        const currentBlockIndex = newDataBlocks.findIndex(
+          db => db.id === newDataBlock.id,
+        );
+
+        if (currentBlockIndex > -1) {
+          newDataBlocks[currentBlockIndex] = newDataBlock;
+        }
+
+        setDataBlocks(newDataBlocks);
       } else {
-        newDataBlock = await dataBlocksService.postDataBlock(releaseId, db);
-        newDataBlocksList = [...dataBlocks, newDataBlock];
+        newDataBlock = await dataBlocksService.postDataBlock(
+          releaseId,
+          dataBlock,
+        );
+
+        // Redirect as it's just easier to refresh the page state.
+        history.push(
+          manageDataBlocksRoute.generateLink({
+            publicationId,
+            releaseId,
+            dataBlockId: newDataBlock.id,
+          }),
+        );
       }
-      setDataBlocks(newDataBlocksList);
-
-      setSelectedDataBlock(newDataBlock.id || '');
-
-      doLoad(releaseId, selectedDataBlock, newDataBlocksList);
-
-      setIsSaving(false);
 
       return newDataBlock;
     },
-    [dataBlocks, doLoad, releaseId, selectedDataBlock],
+    [dataBlocks, setDataBlocks, releaseId, history, publicationId],
   );
-
-  useEffect(() => {
-    doLoad(releaseId, selectedDataBlock, dataBlocks);
-  }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
 
   return (
     <>
@@ -191,10 +176,9 @@ const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
           id="selectDataBlock"
           name="selectDataBlock"
           label="Select an existing data block to edit or create a new one"
-          onChange={e => {
-            setSelectedDataBlock(e.target.value);
-          }}
+          disabled={isLoading}
           order={[]}
+          value={dataBlockId}
           optGroups={{
             'Create data block': [
               {
@@ -204,7 +188,15 @@ const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
             ],
             'Edit existing': dataBlockOptions,
           }}
-          value={selectedDataBlock}
+          onChange={e => {
+            history.push(
+              manageDataBlocksRoute.generateLink({
+                publicationId,
+                releaseId,
+                dataBlockId: e.target.value ? e.target.value : undefined,
+              }),
+            );
+          }}
         />
       )}
 
@@ -270,11 +262,12 @@ const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
 
               <div style={{ overflow: 'hidden' }}>
                 <DataBlockSourceWizard
-                  {...dataBlockData}
+                  dataBlock={dataBlockData?.dataBlock}
+                  dataBlockResponse={dataBlockData?.response}
                   releaseId={releaseId}
                   loading={isLoading}
                   onDataBlockSave={onDataBlockSave}
-                  onTableToolLoaded={unsetIsLoading}
+                  onTableToolLoaded={() => setLoading(false)}
                 />
               </div>
             </TabsSection>
@@ -282,6 +275,7 @@ const ReleaseManageDataBlocksPage = ({ releaseId }: Props) => {
               <TabsSection title="Configure content">
                 <DataBlockContentTabs
                   {...dataBlockData}
+                  dataBlockResponse={dataBlockData?.response}
                   onDataBlockSave={onDataBlockSave}
                 />
               </TabsSection>
