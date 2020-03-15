@@ -74,7 +74,7 @@ const ProtectedRoute = ({
   return (
     <Route
       {...rest}
-      component={(props: RouteComponentProps) => (
+      render={(props: RouteComponentProps) => (
         <AuthenticationCheckingComponent
           {...props}
           component={component}
