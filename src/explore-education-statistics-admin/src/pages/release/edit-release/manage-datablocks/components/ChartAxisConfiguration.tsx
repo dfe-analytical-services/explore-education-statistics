@@ -149,19 +149,23 @@ const ChartAxisConfiguration = ({
         onSubmit(normalizeValues(values));
       }}
       validationSchema={Yup.object<Partial<AxisConfiguration>>({
-        size: Yup.number().positive('Size of axis must be positive'),
+        size: Yup.number()
+          .required('Enter size of axis')
+          .positive('Size of axis must be positive'),
         sortAsc: Yup.boolean(),
-        tickConfig: Yup.string().oneOf([
-          'default',
-          'startEnd',
-          'custom',
-        ]) as Schema<AxisConfiguration['tickConfig']>,
+        tickConfig: Yup.string().oneOf(
+          ['default', 'startEnd', 'custom'],
+          'Select a valid tick display type',
+        ) as Schema<AxisConfiguration['tickConfig']>,
         tickSpacing: Yup.number().when('tickConfig', {
           is: 'custom',
-          then: Yup.number().positive('Tick spacing must be positive'),
+          then: Yup.number()
+            .required('Enter tick spacing')
+            .positive('Tick spacing must be positive'),
         }),
         max: Yup.number(),
         min: Yup.number(),
+        visible: Yup.boolean(),
       })}
       render={form => (
         <Form id={id}>

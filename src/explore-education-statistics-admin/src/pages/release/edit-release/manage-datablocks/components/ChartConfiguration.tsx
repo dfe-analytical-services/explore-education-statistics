@@ -64,12 +64,12 @@ const ChartConfiguration = ({
         onSubmit={onSubmit}
         validationSchema={Yup.object<ChartOptions>({
           height: Yup.number()
-            .required('Must set a chart height')
+            .required('Enter chart height')
             .positive('Chart height must be positive'),
           width: Yup.number().positive('Chart width must be positive'),
           legend: Yup.string().oneOf(
             ['bottom', 'top', 'none'],
-            'Must set a legend position',
+            'Select a valid legend position',
           ) as Schema<ChartOptions['legend']>,
           stacked: Yup.boolean(),
         })}
