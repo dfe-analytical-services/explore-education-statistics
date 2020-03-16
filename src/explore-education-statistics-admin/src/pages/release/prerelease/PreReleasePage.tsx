@@ -1,13 +1,13 @@
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import {
-  ErrorControlState,
-  useErrorControl,
-} from '@admin/contexts/ErrorControlContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import permissionService from '@admin/services/permissions/service';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import {
+  ErrorControlState,
+  useErrorControl,
+} from '@common/contexts/ErrorControlContext';
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';

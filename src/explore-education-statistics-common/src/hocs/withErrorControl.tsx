@@ -1,7 +1,4 @@
-import {
-  ErrorControlState,
-  useErrorControl,
-} from '@admin/contexts/ErrorControlContext';
+import { ErrorControlState, useErrorControl } from '@common/contexts/ErrorControlContext';
 import React, { ComponentType, ReactElement } from 'react';
 
 /**

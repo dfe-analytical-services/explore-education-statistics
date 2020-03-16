@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
