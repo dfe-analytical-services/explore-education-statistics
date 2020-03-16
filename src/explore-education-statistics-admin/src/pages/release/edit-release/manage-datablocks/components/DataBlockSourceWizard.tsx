@@ -1,7 +1,6 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
