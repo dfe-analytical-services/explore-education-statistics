@@ -1,3 +1,4 @@
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import '@common/modules/charts/components/charts.scss';
 import {
   AxisConfiguration,
@@ -87,7 +88,7 @@ const HorizontalBarBlock = ({
           unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
-          height={Number(axes.minor.size)}
+          height={parseNumber(axes.minor.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -99,7 +100,7 @@ const HorizontalBarBlock = ({
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
-          width={Number(axes.major.size)}
+          width={parseNumber(axes.major.size)}
         />
 
         <Tooltip cursor={false} />

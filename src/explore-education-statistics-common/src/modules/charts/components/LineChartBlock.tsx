@@ -1,3 +1,4 @@
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
@@ -120,7 +121,7 @@ const LineChartBlock = ({
           unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
-          width={Number(axes.minor.size)}
+          width={parseNumber(axes.minor.size)}
         />
 
         <XAxis
@@ -130,7 +131,7 @@ const LineChartBlock = ({
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
-          height={Number(axes.major.size)}
+          height={parseNumber(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
