@@ -221,7 +221,7 @@ export enum ReleaseType {
 }
 
 export interface ContentSection<ContentBlockType> {
-  id?: string;
+  id: string;
   order: number;
   heading: string;
   caption: string;

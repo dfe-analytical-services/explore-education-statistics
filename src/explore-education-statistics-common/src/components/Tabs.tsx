@@ -19,7 +19,7 @@ interface Props {
   openId?: string;
 }
 
-const Tabs = ({ children, id, onToggle, openId }: Props) => {
+const Tabs = ({ children, id, onToggle }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 

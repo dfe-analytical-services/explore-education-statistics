@@ -1,11 +1,11 @@
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import DataBlock, {
   DataBlockProps,
 } from '@common/modules/find-statistics/components/DataBlock';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -20,7 +20,7 @@ const DatablockSelectForm = ({
   hideCancel = false,
   label = 'Select a data block',
 }: Props) => {
-  const { availableDataBlocks } = useContext(EditingContext);
+  const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const getDBPreview = (datablockId: string) => {
@@ -42,7 +42,7 @@ const DatablockSelectForm = ({
   };
 
   return (
-    <>
+    <div className="dfe-align--left">
       <FormSelect
         className="govuk-!-margin-right-1"
         id="id"
@@ -62,16 +62,21 @@ const DatablockSelectForm = ({
           })),
         ]}
       />
+      <Button className="govuk-button--secondary" onClick={onCancel}>
+        Cancel
+      </Button>
       {getDBPreview(selectedDataBlockId)}
       {selectedDataBlockId !== '' && (
-        <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
+        <>
+          <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
+          {!hideCancel && (
+            <Button className="govuk-button--secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+        </>
       )}
-      {!hideCancel && (
-        <Button className="govuk-button--secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-      )}
-    </>
+    </div>
   );
 };
 

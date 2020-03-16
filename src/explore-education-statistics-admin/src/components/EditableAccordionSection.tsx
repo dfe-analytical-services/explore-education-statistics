@@ -1,23 +1,25 @@
 import AccordionSection, {
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
+import Button from '@common/components/Button';
 import { FormTextInput } from '@common/components/form';
 import GoToTopLink from '@common/components/GoToTopLink';
 import ModalConfirm from '@common/components/ModalConfirm';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
-import ButtonText from '@common/components/ButtonText';
 import styles from './EditableAccordionSection.module.scss';
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
+  sectionId: string;
   index?: number;
-  headingButtons?: ReactNode[];
+  headerButtons?: ReactNode;
+  footerButtons?: ReactNode;
   canToggle?: boolean;
   onHeadingChange: (heading: string) => Promise<unknown>;
-  canEditHeading: boolean;
   canRemoveSection: boolean;
   onRemoveSection: () => Promise<unknown>;
+  isReordering: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -27,40 +29,33 @@ const EditableAccordionSection = ({
   contentId,
   goToTop = true,
   heading,
-  headingButtons,
   headingId,
   headingTag = 'h2',
   canToggle = true,
   open = false,
   onToggle,
   onHeadingChange,
-  canEditHeading,
   onRemoveSection,
+  headerButtons,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
   const [isOpen, setIsOpen] = useState(open);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [previousOpen, setPreviousOpen] = useState(open);
-
-  const [currentHeading, setCurrentHeading] = useState(heading);
-
   const [isEditingHeading, setIsEditingHeading] = useState(false);
+
+  const [newHeading, setNewHeading] = useState(heading);
 
   if (open !== previousOpen) {
     setPreviousOpen(open);
     setIsOpen(open);
   }
 
-  const editHeading = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-
-    if (isEditingHeading && onHeadingChange && currentHeading !== heading) {
-      onHeadingChange(currentHeading).then(() => {
-        setIsEditingHeading(false);
-      });
-    } else {
-      setIsEditingHeading(!isEditingHeading);
+  const saveHeading = () => {
+    if (isEditingHeading && onHeadingChange && newHeading !== heading) {
+      onHeadingChange(newHeading);
     }
+    setIsEditingHeading(false);
   };
 
   return (
@@ -98,70 +93,73 @@ const EditableAccordionSection = ({
                 id="heading"
                 name="heading"
                 label="Edit Heading"
-                defaultValue={currentHeading}
-                onChange={e => setCurrentHeading(e.target.value)}
+                defaultValue={newHeading}
+                onChange={e => {
+                  setNewHeading(e.target.value);
+                }}
                 onClick={e => {
                   e.stopPropagation();
                 }}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') saveHeading();
+                  if (e.key === 'Esc') setIsEditingHeading(false);
+                }}
               />
             ) : (
-              currentHeading
+              heading
             )}
           </span>,
-          canEditHeading && (
-            <a
-              role="button"
-              tabIndex={0}
-              onClick={editHeading}
-              onKeyPress={e => {
-                if (e.charCode === 13) editHeading(e);
-              }}
-              className={styles.edit}
-            >
-              ({isEditingHeading ? 'Save' : 'Edit'} section title)
-            </a>
-          ),
-          headingButtons,
           canToggle && <span className="govuk-accordion__icon" />,
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>
         )}
-        {!!onRemoveSection && (
+      </div>
+      <div
+        className="govuk-accordion__section-content"
+        aria-labelledby={headingId}
+        id={contentId}
+      >
+        <div>
+          {onHeadingChange && isEditingHeading ? (
+            <Button onClick={saveHeading}>Save title</Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={() => setIsEditingHeading(!isEditingHeading)}
+              variant="secondary"
+            >
+              Edit title
+            </Button>
+          )}
+          {headerButtons}
+          {!!onRemoveSection && (
+            <Button onClick={() => setShowRemoveModal(true)} variant="warning">
+              Remove section
+              <ModalConfirm
+                title="Are you sure?"
+                mounted={showRemoveModal}
+                onConfirm={onRemoveSection}
+                onExit={() => setShowRemoveModal(false)}
+                onCancel={() => setShowRemoveModal(false)}
+              >
+                <p>
+                  Are you sure you want to remove the following section?
+                  <br />
+                  <strong>"{heading}"</strong>
+                </p>
+              </ModalConfirm>
+            </Button>
+          )}
+        </div>
+
+        {children && (
           <>
-            <ButtonText
-              onClick={() => setShowRemoveModal(true)}
-              className={styles.edit}
-            >
-              (Remove section)
-            </ButtonText>
-            <ModalConfirm
-              title="Are you sure?"
-              mounted={showRemoveModal}
-              onConfirm={onRemoveSection}
-              onCancel={() => setShowRemoveModal(false)}
-              onExit={() => setShowRemoveModal(false)}
-            >
-              <p>
-                Are you sure you want to remove the following section?
-                <br />
-                <strong>"{heading}"</strong>
-              </p>
-            </ModalConfirm>
+            {children}
+            {goToTop && <GoToTopLink />}
           </>
         )}
       </div>
-      {children && (
-        <div
-          className="govuk-accordion__section-content"
-          aria-labelledby={headingId}
-          id={contentId}
-        >
-          {children}
-
-          {goToTop && <GoToTopLink />}
-        </div>
-      )}
     </div>
   );
 };

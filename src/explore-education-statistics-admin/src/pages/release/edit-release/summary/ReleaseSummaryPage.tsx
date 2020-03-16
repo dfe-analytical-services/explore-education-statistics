@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedTimePeriodCoverageLabel,
   getTimePeriodCoverageDateRangeStringLong,
@@ -22,7 +20,7 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
@@ -34,9 +32,7 @@ interface ReleaseSummaryModel {
 const ReleaseSummaryPage = () => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([
