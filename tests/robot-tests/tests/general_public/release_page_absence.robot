@@ -135,7 +135,7 @@ Validate Key Statistics data block -- Data tables tab
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
    user clicks element   css:#headlines-section-3-tab   # Click Chart tab
-   user checks element is visible  css:.recharts-responsive-container
+   user waits until element is visible  css:.recharts-responsive-container
    # TODO: Possible to verify chart?
 
 Validate accordion sections order
