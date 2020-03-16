@@ -39,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                logger.LogError(e, $"StackTrace:\n{e.StackTrace}");
                 await UpdateStage(message, Failed,
                     new ReleaseStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
