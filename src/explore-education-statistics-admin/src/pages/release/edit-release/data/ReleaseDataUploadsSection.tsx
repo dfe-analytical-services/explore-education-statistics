@@ -1,6 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/permissionService';
+import permissionsService from '@admin/services/permissions/permissionsService';
 import editReleaseDataService, {
   DataFile,
   DeleteDataFilePlan,
@@ -93,7 +93,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   useEffect(() => {
     Promise.all([
       editReleaseDataService.getReleaseDataFiles(releaseId),
-      permissionService.canUpdateRelease(releaseId),
+      permissionsService.canUpdateRelease(releaseId),
     ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
       setDataFiles(releaseDataFiles);
       setCanUpdateRelease(canUpdateReleaseResponse);

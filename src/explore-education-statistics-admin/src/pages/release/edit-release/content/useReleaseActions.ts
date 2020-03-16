@@ -1,5 +1,5 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
-import permissionsService from '@admin/services/permissions/service';
+import permissionsService from '@admin/services/permissions/permissionsService';
 import {
   EditableContentBlock,
   ExtendedComment,
