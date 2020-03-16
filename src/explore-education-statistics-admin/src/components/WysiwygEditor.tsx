@@ -43,10 +43,6 @@ export const toolbarConfigs = {
   reduced: ['bold', 'link', '|', 'bulletedList'],
 };
 
-export const accordionHeadingConfig = {
-  heading: {},
-};
-
 const WysiwygEditor = ({
   editable,
   canDelete = false,
