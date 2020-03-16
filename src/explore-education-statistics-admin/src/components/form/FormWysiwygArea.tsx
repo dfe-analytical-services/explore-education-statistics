@@ -6,10 +6,11 @@ import React, {
 } from 'react';
 import EditableMarkdownRenderer, {
   MarkdownRendererProps,
-} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+} from '@admin/components/editable/EditableMarkdownRenderer';
 import ErrorMessage from '@common/components/ErrorMessage';
 
-export interface FormWysiwygAreaProps extends MarkdownRendererProps {
+export interface FormWysiwygAreaProps
+  extends Omit<MarkdownRendererProps, 'onDelete'> {
   error?: ReactNode | string;
   hint?: string;
   id: string;

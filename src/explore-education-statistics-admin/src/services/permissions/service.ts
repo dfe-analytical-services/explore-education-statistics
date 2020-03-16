@@ -1,7 +1,7 @@
 import { GlobalPermissions, User } from '@admin/services/sign-in/types';
 import client from '@admin/services/util/service';
 
-const service = {
+const permissionsService = {
   getGlobalPermissions: (): Promise<GlobalPermissions> => {
     return client.get(`/permissions/access`);
   },
@@ -55,4 +55,4 @@ const service = {
   },
 };
 
-export default service;
+export default permissionsService;

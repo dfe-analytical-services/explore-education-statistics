@@ -1,7 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
@@ -17,7 +15,7 @@ import {
   dateToDayMonthYear,
   dayMonthYearValuesToInputs,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const errorCodeMappings = [
@@ -39,9 +37,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     ReleaseSummaryDetails
   >();
 
-  const { releaseId, publication } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { releaseId, publication } = useManageReleaseContext();
 
   useEffect(() => {
     service.getReleaseSummaryDetails(releaseId).then(release => {
@@ -59,8 +55,9 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     history.push(summaryRoute.generateLink(publication.id, releaseId));
   }, errorCodeMappings);
 
-  const cancelHandler = () =>
+  const cancelHandler = () => {
     history.push(summaryRoute.generateLink(publication.id, releaseId));
+  };
 
   return (
     <>

@@ -1,142 +1,79 @@
 import Accordion from '@admin/components/EditableAccordion';
-import { EditableContentBlock } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
+import {
+  EditableContentBlock,
+  EditableRelease,
+} from '@admin/services/publicationService';
 import { AbstractRelease } from '@common/services/publicationService';
-import { Dictionary } from '@common/types/util';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
-  releaseId: string;
-  publication: AbstractRelease<EditableContentBlock>['publication'];
   accordionId: string;
   sectionName: string;
-  onContentChange?: (content: ContentType[]) => void;
+  release: EditableRelease;
 }
 
 const ReleaseContentAccordion = ({
-  releaseId,
-  publication,
+  release,
   accordionId,
   sectionName,
-  onContentChange,
 }: ReleaseContentAccordionProps) => {
-  const [content, setContent] = useState<ContentType[]>([]);
+  const {
+    addContentSection,
+    removeContentSection,
+    updateContentSectionHeading,
+    updateContentSectionsOrder,
+  } = useReleaseActions();
 
-  const setContentAndTriggerOnContentChange = useCallback(
-    (newContent: ContentType[]) => {
-      setContent(newContent);
-
-      if (onContentChange) {
-        onContentChange(newContent);
-      }
-    },
-    [onContentChange, setContent],
+  const addAccordionSection = useCallback(
+    () =>
+      addContentSection({
+        releaseId: release.id,
+        order: release.content.length,
+      }),
+    [release.id, release.content.length, addContentSection],
   );
 
-  const onReorder = useCallback(
-    async (ids: Dictionary<number>) => {
-      const newContent = await releaseContentService.updateContentSectionsOrder(
-        releaseId,
-        ids,
-      );
-
-      setContentAndTriggerOnContentChange(newContent);
+  const reorderAccordionSections = useCallback(
+    async order => {
+      updateContentSectionsOrder({ releaseId: release.id, order });
     },
-    [releaseId, setContentAndTriggerOnContentChange],
+    [release.id, updateContentSectionsOrder],
   );
-
-  useEffect(
-    () => {
-      releaseContentService
-        .getContentSections(releaseId)
-        .then(setContentAndTriggerOnContentChange);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const onAddSection = useCallback(async () => {
-    const newContent: AbstractRelease<EditableContentBlock>['content'] = [
-      ...content,
-      await releaseContentService.addContentSection(releaseId, content.length),
-    ];
-
-    setContentAndTriggerOnContentChange(newContent);
-  }, [content, releaseId, setContentAndTriggerOnContentChange]);
-
-  const onUpdateHeading = useCallback(
-    async (block: ContentType, index: number, newTitle: string) => {
-      let result;
-      if (block.id) {
-        result = await releaseContentService.updateContentSectionHeading(
-          releaseId,
-          block.id,
-          newTitle,
-        );
-
-        const newContent = [...content];
-        newContent[index].heading = newTitle;
-
-        setContentAndTriggerOnContentChange(newContent);
-      }
-      return result;
-    },
-    [content, releaseId, setContentAndTriggerOnContentChange],
-  );
-
-  const updateContentSection = useCallback(
-    (index: number, contentBlock?: EditableContentBlock[]) => {
-      const newContent = [...content];
-      newContent[index].content = contentBlock;
-
-      setContentAndTriggerOnContentChange(newContent);
-    },
-    [content, setContentAndTriggerOnContentChange],
-  );
-
-  const onRemoveContentSection = useCallback(
-    async (block: ContentType) => {
-      if (block.id) {
-        await releaseContentService.removeContentSection(releaseId, block.id);
-
-        const newContent = content.filter(item => item.id !== block.id);
-
-        setContentAndTriggerOnContentChange(newContent);
-      }
-    },
-    [content, releaseId, setContentAndTriggerOnContentChange],
-  );
-
   return (
-    <>
-      <Accordion
-        id={accordionId}
-        canReorder
-        sectionName={sectionName}
-        onSaveOrder={onReorder}
-        onAddSection={onAddSection}
-      >
-        {content.map((contentItem, index) => (
-          <ReleaseContentAccordionSection
-            id={contentItem.id}
-            key={contentItem.order}
-            contentItem={contentItem}
-            index={index}
-            publication={publication}
-            onHeadingChange={title =>
-              onUpdateHeading(contentItem, index, title)
-            }
-            onContentChange={newContent =>
-              updateContentSection(index, newContent)
-            }
-            onRemoveSection={() => onRemoveContentSection(contentItem)}
-          />
-        ))}
-      </Accordion>
-    </>
+    <Accordion
+      id={accordionId}
+      canReorder
+      sectionName={sectionName}
+      onSaveOrder={reorderAccordionSections}
+      onAddSection={addAccordionSection}
+    >
+      {release.content.map((accordionSection, index) => (
+        <ReleaseContentAccordionSection
+          release={release}
+          id={accordionSection.id}
+          key={accordionSection.id}
+          contentItem={accordionSection}
+          index={index}
+          onHeadingChange={title =>
+            updateContentSectionHeading({
+              releaseId: release.id,
+              sectionId: accordionSection.id,
+              title,
+            })
+          }
+          onRemoveSection={() =>
+            removeContentSection({
+              releaseId: release.id,
+              sectionId: accordionSection.id,
+            })
+          }
+        />
+      ))}
+    </Accordion>
   );
 };
 

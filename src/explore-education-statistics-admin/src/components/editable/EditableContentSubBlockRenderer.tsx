@@ -1,18 +1,13 @@
-import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import EditableHtmlRenderer from '@admin/modules/find-statistics/components/EditableHtmlRenderer';
-import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
+import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
+import EditableMarkdownRenderer, {
+  MarkdownRendererProps,
+} from '@admin/components/editable/EditableMarkdownRenderer';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import React from 'react';
 
-interface Props {
+interface Props extends MarkdownRendererProps {
   block: EditableContentBlock;
-  id: string;
-  index: number;
-  editable?: boolean;
-  releaseId?: string;
-  canDelete?: boolean;
-  onContentChange?: (content: string) => void;
-  onDelete?: () => void;
 }
 
 function EditableContentSubBlockRenderer({
@@ -26,21 +21,20 @@ function EditableContentSubBlockRenderer({
   switch (block.type) {
     case 'MarkDownBlock':
       return (
-        <>
-          <EditableMarkdownRenderer
-            editable={editable}
-            contentId={block.id}
-            source={block.body}
-            canDelete={canDelete}
-            onDelete={onDelete}
-            onContentChange={onContentChange}
-          />
-        </>
+        <EditableMarkdownRenderer
+          editable={editable}
+          contentId={block.id}
+          source={block.body}
+          canDelete={canDelete}
+          onDelete={onDelete}
+          onContentChange={onContentChange}
+        />
       );
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
           <EditableDataBlock
+            editable={editable}
             {...block}
             canDelete={canDelete}
             onDelete={onDelete}
