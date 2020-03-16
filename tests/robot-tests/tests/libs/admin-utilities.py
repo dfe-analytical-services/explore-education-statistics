@@ -29,9 +29,14 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError(f'Cannot find accordion section number "{num}"')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Edit section title)"]').click()
+        elem.click()
     except:
-        raise AssertionError('Cannot click "(Edit section title)" link!')
+        raise AssertionError(f'Cannot open accordion section number "{num}"')
+
+    try:
+        elem.find_element_by_xpath('.//button[.="Edit title"]').click()
+    except:
+        raise AssertionError('Cannot click "Edit title" button!')
 
     try:
         elem.find_element_by_xpath('.//input[@id="heading"]').clear()
@@ -44,9 +49,15 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError('Failed to press keys!?!')
 
     try:
-        elem.find_element_by_xpath('.//a[.="(Save section title)"]').click()
+        elem.find_element_by_xpath('.//button[.="Save title"]').click()
     except:
-        raise AssertionError('Cannot click "(Save section title)" link!')
+        raise AssertionError('Cannot click "Save title" button!')
+
+    try:
+        elem.find_element_by_xpath('.//h2[@class="govuk-accordion__section-heading"]').click()
+    except:
+        raise AssertionError(f'Cannot close accordion section number "{num}"')
+
 
 def user_gets_editable_accordion_section_element(section_title):
     try:
@@ -61,22 +72,22 @@ def user_opens_editable_accordion_section(section_elem):
     except:
         raise AssertionError('Cannot click accordion section element')
 
-def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=30):
+def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30):
     try:
-        elem = section_elem.find_element_by_xpath('.//button[text()="Add content"]')
+        elem = section_elem.find_element_by_xpath('.//button[text()="Add text block"]')
     except Exception as e:
-        raise AssertionError(f'Failed to get "Add content" button element for accordion section element\nException: ', e)
+        raise AssertionError(f'Failed to get "Add text block" button element for accordion section element\nException: ', e)
 
     max_time = time.time() + timeout
     while (not elem.is_enabled()) and (time.time() < max_time):
         time.sleep(0.5)
     if time.time() >= max_time:
-        raise AssertionError(f'Failed to click "Add content" button for accordion section element. It wasn\'t enabled!')
+        raise AssertionError(f'Failed to click "Add text block" button for accordion section element. It wasn\'t enabled!')
 
     try:
         elem.click()
     except Exception as e:
-        raise AssertionError(f'Failed to click "Add content" button for accordion section element\nException: ', e)
+        raise AssertionError(f'Failed to click "Add text block" button for accordion section element\nException: ', e)
 
     max_time = time.time() + timeout
     while time.time() < max_time:
@@ -98,7 +109,7 @@ def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):
 
     assert len(elems) == int(num_blocks), f'Found {len(elems)} content blocks. Should have found {num_blocks}'
 
-def user_adds_content_to_accordion_section_content_block(section_elem, block_num, content):
+def user_adds_content_to_accordion_section_text_block(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(f'(.//span[text()="Edit"])[{block_num}]').click()
     except:
@@ -113,13 +124,13 @@ def user_adds_content_to_accordion_section_content_block(section_elem, block_num
 
     sl.wait_until_page_contains_element(f'//p[text()="{content}"]')
 
-def user_checks_accordion_section_content_block_contains_text(section_elem, block_num, content):
+def user_checks_accordion_section_text_block_contains_text(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(
-            f'.//*[@class="govuk-accordion__section-content"]/div[{block_num}]//*[text()="{content}"]'
+            f'.//*[@class="govuk-accordion__section-content"]/div[contains(@id,"content-section")][{block_num}]//*[text()="{content}"]'
         )
     except:
-        raise AssertionError(f'Failed to text "{content}" in content block number {block_num}')
+        raise AssertionError(f'Failed to find text "{content}" in content block number {block_num}')
 
 def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
     try:
