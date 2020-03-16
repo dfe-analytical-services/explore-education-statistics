@@ -46,7 +46,6 @@ const ReleaseContentAccordion = ({
   return (
     <Accordion
       id={accordionId}
-      canReorder
       sectionName={sectionName}
       onSaveOrder={reorderAccordionSections}
       onAddSection={addAccordionSection}

@@ -3,18 +3,13 @@ import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/service';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import { MethodologyContent } from '@admin/services/methodology/types';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
-
-export interface MethodologyTabProps {
-  refreshMethodology: () => MethodologyContent | undefined;
-  methodology: MethodologyContent;
-  setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>;
-}
+import { MethodologyProvider } from './content/context/MethodologyContext';
 
 const MethodologyPage = ({
   match,
@@ -110,23 +105,25 @@ const MethodologyPage = ({
             </ul>
           </nav>
 
-          <Switch>
-            {methodologyRoutes.map(route => (
-              <Route
-                exact
-                key={route.path}
-                path={route.path}
-                render={props => (
-                  <route.component
-                    methodology={methodology}
-                    setMethodology={setMethodology}
-                    refreshMethodology={refreshMethodology}
-                    {...props}
-                  />
-                )}
-              />
-            ))}
-          </Switch>
+          <MethodologyProvider>
+            <Switch>
+              {methodologyRoutes.map(route => (
+                <Route
+                  exact
+                  key={route.path}
+                  path={route.path}
+                  render={props => (
+                    <route.component
+                      methodology={methodology}
+                      setMethodology={setMethodology}
+                      refreshMethodology={refreshMethodology}
+                      {...props}
+                    />
+                  )}
+                />
+              ))}
+            </Switch>
+          </MethodologyProvider>
 
           <PreviousNextLinks
             previousSection={previousSection}

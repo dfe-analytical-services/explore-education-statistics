@@ -1,5 +1,3 @@
-import Accordion from '@admin/components/EditableAccordion';
-import AccordionSection from '@admin/components/EditableAccordionSection';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { FormFieldset, FormRadioGroup } from '@common/components/form';
 import FormattedDate from '@common/components/FormattedDate';
@@ -7,17 +5,24 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
-import sortBy from 'lodash/sortBy';
-import React, { useState } from 'react';
-
-import { MethodologyTabProps } from '../MethodologyPage';
-import util from './methodologyContentUtil';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
+import MethodologyAccordion from './components/MethodologyAccordion';
+import { useMethodologyState } from './context/MethodologyContext';
+import useMethodologyActions from './context/useMethodologyActions';
 
 const MethodologyContentPage = ({
-  methodology,
-  setMethodology,
-}: MethodologyTabProps) => {
+  match,
+}: RouteComponentProps<{ methodologyId: string }>) => {
+  const { methodologyId } = match.params;
   const [isEditing, setIsEditing] = useState(true);
+
+  const { methodology } = useMethodologyState();
+  const { getMethodologyContent } = useMethodologyActions();
+
+  useEffect(() => {
+    getMethodologyContent(methodologyId);
+  }, [methodologyId]);
 
   if (methodology)
     return (
@@ -114,48 +119,8 @@ const MethodologyContentPage = ({
                   )}
                 </div>
               </div>
-
-              <Accordion
-                id="contents-accordion"
-                canReorder
-                sectionName="Contents"
-                onSaveOrder={util.accordionUpdateSectionsOrder(
-                  methodology,
-                  setMethodology,
-                )}
-                onAddSection={util.accordionAddNewSection(
-                  methodology,
-                  setMethodology,
-                )}
-              >
-                {sortBy(methodology.content, 'order').map((section, index) => (
-                  <AccordionSection
-                    id={section.id}
-                    key={section.id}
-                    heading={section.heading}
-                    index={index}
-                    onHeadingChange={util.accordionSectionUpdateHeading(
-                      methodology,
-                      setMethodology,
-                      section.id as string,
-                    )}
-                    onRemoveSection={util.accordionSectionRemoveSection(
-                      methodology,
-                      setMethodology,
-                      section.id as string,
-                    )}
-                  >
-                    {/* <ContentBlocks
-                      id={`${section.heading}-content`}
-                      sectionId={section.id as string}
-                      content={section.content}
-                      onContentChange={refreshMethodology}
-                      canAddBlocks
-                      textOnly
-                    /> */}
-                  </AccordionSection>
-                ))}
-              </Accordion>
+              <MethodologyAccordion methodology={methodology} />
+              <MethodologyAccordion methodology={methodology} isAnnex />
             </section>
           </div>
         </EditingContext.Provider>

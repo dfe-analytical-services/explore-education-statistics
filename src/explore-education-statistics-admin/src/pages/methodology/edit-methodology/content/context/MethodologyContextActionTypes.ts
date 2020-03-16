@@ -51,6 +51,7 @@ export type AddContentSection = {
   type: 'ADD_CONTENT_SECTION';
   payload: {
     section: ContentSection<EditableContentBlock>;
+    sectionKey: ContentSectionKeys;
   };
 };
 
@@ -58,13 +59,14 @@ export type SetMethodologyContent = {
   type: 'SET_CONTENT';
   payload: {
     content: ContentSection<EditableContentBlock>[];
+    sectionKey: ContentSectionKeys;
   };
 };
 
 export type UpdateContentSection = {
   type: 'UPDATE_CONTENT_SECTION';
   payload: {
-    meta: { sectionId: string };
+    meta: { sectionId: string; sectionKey: ContentSectionKeys };
     section: ContentSection<EditableContentBlock>;
   };
 };

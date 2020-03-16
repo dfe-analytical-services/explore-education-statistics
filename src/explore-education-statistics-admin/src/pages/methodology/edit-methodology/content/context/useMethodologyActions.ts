@@ -1,30 +1,34 @@
+import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionsService from '@admin/services/permissions/service';
-import methodologyService from '@admin/services/methodology/service';
-import {
-  ContentBlockAttachRequest,
-  ContentBlockPostModel,
-} from '@admin/services/methodology/edit-methodology/content/types';
 import { Dictionary } from '@admin/types';
+import { useCallback } from 'react';
+import { ContentBlockPostModel } from 'src/services/release/edit-release/content/types';
 import { useMethodologyDispatch } from './MethodologyContext';
 import { ContentSectionKeys } from './MethodologyContextActionTypes';
 
 export default function useMethodologyActions() {
   const dispatch = useMethodologyDispatch();
+  const annexes = 'annexes';
 
-  async function getMethodologyContent(methodologyId: string) {
-    dispatch({ type: 'CLEAR_STATE' });
-    const { methodology } = await methodologyService.getContent(methodologyId);
-    const canUpdateMethodology = await permissionsService.canUpdateMethodology(
-      methodologyId,
-    );
-    dispatch({
-      type: 'SET_STATE',
-      payload: {
-        methodology,
-        canUpdateMethodology,
-      },
-    });
-  }
+  const getMethodologyContent = useCallback(
+    async (methodologyId: string) => {
+      dispatch({ type: 'CLEAR_STATE' });
+      const methodology = await methodologyService.getMethodologyContent(
+        methodologyId,
+      );
+      const canUpdateMethodology = await permissionsService.canUpdateMethodology(
+        methodologyId,
+      );
+      dispatch({
+        type: 'SET_STATE',
+        payload: {
+          methodology,
+          canUpdateMethodology,
+        },
+      });
+    },
+    [dispatch],
+  );
 
   async function deleteContentSectionBlock(
     methodologyId: string,
@@ -79,23 +83,6 @@ export default function useMethodologyActions() {
     });
   }
 
-  async function attachContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    block: ContentBlockAttachRequest,
-  ) {
-    const newBlock = await methodologyService.attachContentSectionBlock(
-      methodologyId,
-      sectionId,
-      block,
-    );
-    dispatch({
-      type: 'ADD_BLOCK_TO_SECTION',
-      payload: { meta: { sectionId, sectionKey }, block: newBlock },
-    });
-  }
-
   async function updateSectionBlockOrder(
     methodologyId: string,
     sectionId: string,
@@ -116,31 +103,48 @@ export default function useMethodologyActions() {
     });
   }
 
-  async function addContentSection(methodologyId: string, order: number) {
-    const newSection = await methodologyService.addContentSection(
+  async function addContentSection({
+    methodologyId,
+    order,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    order: number;
+    sectionKey: ContentSectionKeys;
+  }) {
+    const newSection = await methodologyService.addContentSection({
       methodologyId,
       order,
-    );
+      isAnnexes: sectionKey === annexes,
+    });
     dispatch({
       type: 'ADD_CONTENT_SECTION',
       payload: {
+        sectionKey,
         section: newSection,
       },
     });
   }
 
-  async function updateContentSectionsOrder(
-    methodologyId: string,
-    order: Dictionary<number>,
-  ) {
-    const content = await methodologyService.updateContentSectionsOrder(
+  async function updateContentSectionsOrder({
+    methodologyId,
+    order,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    order: Dictionary<number>;
+    sectionKey: ContentSectionKeys;
+  }) {
+    const content = await methodologyService.updateContentSectionsOrder({
       methodologyId,
       order,
-    );
+      isAnnexes: sectionKey === annexes,
+    });
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
+        sectionKey,
       },
     });
   }
@@ -148,6 +152,7 @@ export default function useMethodologyActions() {
   async function removeContentSection(
     methodologyId: string,
     sectionId: string,
+    sectionKey: ContentSectionKeys,
   ) {
     const content = await methodologyService.removeContentSection(
       methodologyId,
@@ -157,6 +162,7 @@ export default function useMethodologyActions() {
       type: 'SET_CONTENT',
       payload: {
         content,
+        sectionKey,
       },
     });
   }
@@ -165,16 +171,18 @@ export default function useMethodologyActions() {
     methodologyId: string,
     sectionId: string,
     title: string,
+    sectionKey: ContentSectionKeys,
   ) {
     const section = await methodologyService.updateContentSectionHeading(
       methodologyId,
       sectionId,
       title,
     );
+
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',
       payload: {
-        meta: { sectionId },
+        meta: { sectionId, sectionKey },
         section,
       },
     });
@@ -185,7 +193,6 @@ export default function useMethodologyActions() {
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,
-    attachContentSectionBlock,
     updateSectionBlockOrder,
     addContentSection,
     updateContentSectionsOrder,

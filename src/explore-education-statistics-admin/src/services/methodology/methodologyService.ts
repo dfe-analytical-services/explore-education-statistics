@@ -4,7 +4,11 @@ import {
   MethodologyStatusListItem,
   UpdateMethodologyStatusRequest,
 } from '@admin/services/methodology/types';
-import { ContentSectionViewModel } from '@admin/services/release/edit-release/content/types';
+import {
+  ContentSectionViewModel,
+  ContentBlockPutModel,
+  ContentBlockPostModel,
+} from '@admin/services/release/edit-release/content/types';
 import client from '@admin/services/util/service';
 import { Dictionary } from '@common/types';
 import {
@@ -12,8 +16,9 @@ import {
   IdTitlePair,
   MethodologyStatus,
 } from '../common/types';
+import { EditableContentBlock } from '../publicationService';
 
-const service = {
+const methodologyService = {
   getMethodologies(): Promise<MethodologyStatusListItem[]> {
     return client.get<MethodologyStatusListItem[]>('/bau/methodology');
   },
@@ -28,16 +33,20 @@ const service = {
     return client.get(`methodology/${methodologyId}/content`);
   },
 
-  addContentSection(
-    methodologyId: string,
-    body: { order: number },
+  addContentSection({
+    methodologyId,
+    order,
     isAnnexes = false,
-  ): Promise<ContentSectionViewModel> {
+  }: {
+    methodologyId: string;
+    order: number;
+    isAnnexes?: boolean;
+  }): Promise<ContentSectionViewModel> {
     return client.post(
       `methodology/${methodologyId}/content/sections/add${
         isAnnexes ? '?type=annexes' : ''
       }`,
-      body,
+      { order },
     );
   },
 
@@ -55,16 +64,20 @@ const service = {
     );
   },
 
-  updateContentSectionsOrder(
-    methodologyId: string,
-    ids: Dictionary<number>,
+  updateContentSectionsOrder({
+    methodologyId,
+    order,
     isAnnexes = false,
-  ): Promise<ContentSectionViewModel[]> {
+  }: {
+    methodologyId: string;
+    order: Dictionary<number>;
+    isAnnexes?: boolean;
+  }): Promise<ContentSectionViewModel[]> {
     return client.put(
       `methodology/${methodologyId}/content/sections/order${
         isAnnexes ? '?type=annexes' : ''
       }`,
-      ids,
+      order,
     );
   },
 
@@ -91,6 +104,62 @@ const service = {
   ): Promise<BasicMethodology> {
     return client.put(`/methodology/${methodologyId}/status`, updateRequest);
   },
+
+  addContentSectionBlock(
+    methodologyId: string,
+    sectionId: string,
+    block: ContentBlockPostModel,
+    isAnnexes = false,
+  ): Promise<EditableContentBlock> {
+    return client.post<EditableContentBlock>(
+      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      block,
+    );
+  },
+
+  deleteContentSectionBlock(
+    methodologyId: string,
+    sectionId: string,
+    blockId: string,
+    isAnnexes = false,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.delete(
+      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+    );
+  },
+
+  updateContentSectionBlock(
+    methodologyId: string,
+    sectionId: string,
+    blockId: string,
+    block: ContentBlockPutModel,
+    isAnnexes = false,
+  ): Promise<EditableContentBlock> {
+    return client.put(
+      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      block,
+    );
+  },
+
+  updateContentSectionBlocksOrder(
+    methodologyId: string,
+    sectionId: string,
+    order: Dictionary<number>,
+    isAnnexes = false,
+  ): Promise<EditableContentBlock[]> {
+    return client.put<EditableContentBlock[]>(
+      `methodology/${methodologyId}/content/section/${sectionId}/blocks/order${
+        isAnnexes ? '?type=annexes' : ''
+      }`,
+      order,
+    );
+  },
 };
 
-export default service;
+export default methodologyService;

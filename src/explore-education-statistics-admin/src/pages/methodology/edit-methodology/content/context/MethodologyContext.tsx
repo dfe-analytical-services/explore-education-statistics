@@ -1,5 +1,3 @@
-import { ExtendedComment } from '@admin/services/publicationService';
-import { DataBlock } from '@common/services/dataBlockService';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { MethodologyContent } from 'src/services/methodology/types';
@@ -103,27 +101,27 @@ export const methodologyReducer: Reducer<
       return draft;
     }
     case 'ADD_CONTENT_SECTION': {
-      const { section } = action.payload;
-      if (draft.methodology) draft.methodology.content.push(section);
+      const { section, sectionKey } = action.payload;
+      if (draft.methodology) draft.methodology[sectionKey].push(section);
       return draft;
     }
     case 'SET_CONTENT': {
-      const { content } = action.payload;
+      const { content, sectionKey } = action.payload;
       if (draft.methodology) {
-        draft.methodology.content = content;
+        draft.methodology[sectionKey] = content;
       }
       return draft;
     }
     case 'UPDATE_CONTENT_SECTION': {
       const { section, meta } = action.payload;
-      const { sectionId } = meta;
+      const { sectionId, sectionKey } = meta;
 
       if (draft.methodology) {
-        const sectionIndex = draft.methodology.content.findIndex(
+        const sectionIndex = draft.methodology[sectionKey].findIndex(
           accordionSection => accordionSection.id === sectionId,
         );
         if (sectionIndex !== -1)
-          draft.methodology.content[sectionIndex] = section;
+          draft.methodology[sectionKey][sectionIndex] = section;
       }
       return draft;
     }

@@ -17,7 +17,7 @@ export type EditableContentType = ContentType;
 
 export type ReorderHook = (sectionId?: string) => Promise<void>;
 
-export interface Props extends ContentBlockProps {
+export interface EditableContentBlocksProps extends ContentBlockProps {
   content: ContentType;
   sectionId: string;
   editable?: boolean;
@@ -37,7 +37,7 @@ const EditableContentBlocks = ({
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
-}: Props) => {
+}: EditableContentBlocksProps) => {
   const [contentBlocks, setContentBlocks] = useState<ContentType>();
   const isInitialMount = useRef(true);
 
