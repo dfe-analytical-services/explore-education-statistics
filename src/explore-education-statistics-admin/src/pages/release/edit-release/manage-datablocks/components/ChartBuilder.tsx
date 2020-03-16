@@ -37,6 +37,7 @@ import {
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
+import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import {
   DataBlockRerequest,
   DataBlockResponse,
@@ -96,28 +97,6 @@ function generateAxesMetaData(
     {},
   );
 }
-
-const isChartRenderable = (
-  props: ChartRendererProps | undefined,
-): props is ChartRendererProps => {
-  if (!props) {
-    return false;
-  }
-
-  // Chart definition may be an infographic
-  // and can be rendered without any axes.
-  if (props.type === 'infographic' && props.fileId && props.releaseId) {
-    return true;
-  }
-
-  return Boolean(
-    props.type &&
-      props.labels &&
-      props.axes?.major?.dataSets.length &&
-      props.data &&
-      props.meta,
-  );
-};
 
 const emptyMetadata = {
   timePeriod: {},
