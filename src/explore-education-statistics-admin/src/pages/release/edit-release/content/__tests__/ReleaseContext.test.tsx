@@ -7,7 +7,7 @@ import {
   releaseReducer as originalReleaseReducer,
   ReleaseContextState,
 } from '../ReleaseContext';
-import ReleaseDispatchAction from '../actions';
+import ReleaseDispatchAction from '../ReleaseContextActionTypes';
 
 const basicRelease: EditableRelease = {
   id: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
