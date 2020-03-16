@@ -7,7 +7,7 @@ import {
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import permissionService, {
   PreReleaseWindowStatus,
-} from '@admin/services/permissions/permissionsService';
+} from '@admin/services/permissions/permissionService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { format } from 'date-fns';

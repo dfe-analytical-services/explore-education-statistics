@@ -6,7 +6,7 @@ import ReleaseManageDataBlocksPage, {
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import permissionsService from '@admin/services/permissions/permissionsService';
+import permissionService from '@admin/services/permissions/permissionService';
 import Gate from '@common/components/Gate';
 import { OmitStrict } from '@common/types';
 import React from 'react';
@@ -72,7 +72,7 @@ export const manageDataBlocksRoute = createReadonlyRoute<
 
     return (
       <Gate
-        condition={() => permissionsService.canUpdateRelease(releaseId)}
+        condition={() => permissionService.canUpdateRelease(releaseId)}
         fallback={<p>This release is currently not editable.</p>}
       >
         <ReleaseManageDataBlocksPage {...props} />

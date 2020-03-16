@@ -9,7 +9,7 @@ export interface PreReleaseWindowStatus {
   preReleaseWindowEndTime: Date;
 }
 
-const permissionsService = {
+const permissionService = {
   getGlobalPermissions: (): Promise<GlobalPermissions> => {
     return client.get(`/permissions/access`);
   },
@@ -63,4 +63,4 @@ const permissionsService = {
   },
 };
 
-export default permissionsService;
+export default permissionService;

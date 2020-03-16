@@ -1,5 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/permissionsService';
+import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   AncillaryFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
