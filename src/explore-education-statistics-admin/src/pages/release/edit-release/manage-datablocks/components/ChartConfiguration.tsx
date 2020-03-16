@@ -10,15 +10,18 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
 } from '@common/modules/charts/types/chart';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
+
+type ChartOptionsChangeValue = ChartOptions & { isValid: boolean };
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -26,7 +29,7 @@ interface Props {
   data: DataBlockResponse;
   meta: ChartMetaData;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
-  onChange: (chartOptions: ChartOptions & { isValid: boolean }) => void;
+  onChange: (chartOptions: ChartOptionsChangeValue) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -41,6 +44,23 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
+  const normalizeValues = (values: ChartOptions): ChartOptions => {
+    return {
+      ...values,
+      width: parseNumber(values.width),
+    };
+  };
+
+  const handleChange = useCallback(
+    ({ isValid, ...values }: ChartOptionsChangeValue) => {
+      onChange({
+        ...normalizeValues(values),
+        isValid,
+      });
+    },
+    [onChange],
+  );
+
   return (
     <>
       {selectedChartType.type === 'infographic' && (
@@ -62,7 +82,9 @@ const ChartConfiguration = ({
 
       <Formik<ChartOptions>
         initialValues={chartOptions}
-        onSubmit={onSubmit}
+        onSubmit={values => {
+          onSubmit(normalizeValues(values));
+        }}
         validationSchema={Yup.object<ChartOptions>({
           height: Yup.number()
             .required('Enter chart height')
@@ -81,7 +103,7 @@ const ChartConfiguration = ({
                 ...form.values,
                 isValid: form.isValid,
               }}
-              onChange={onChange}
+              onChange={handleChange}
             />
 
             <FormGroup>

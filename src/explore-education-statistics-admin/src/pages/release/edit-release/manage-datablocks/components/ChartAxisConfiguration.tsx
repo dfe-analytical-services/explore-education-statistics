@@ -14,6 +14,7 @@ import {
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import Yup from '@common/lib/validation/yup';
 import {
   AxisConfiguration,
@@ -33,6 +34,8 @@ import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
 
+type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
+
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
@@ -42,7 +45,7 @@ interface Props {
   labels?: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   dataSets: ChartDataSet[];
-  onChange: (configuration: AxisConfiguration & { isValid: boolean }) => void;
+  onChange: (configuration: AxisConfigurationChangeValue) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
@@ -118,25 +121,17 @@ const ChartAxisConfiguration = ({
   const normalizeValues = (values: AxisConfiguration): AxisConfiguration => {
     // Values of min/max may be treated as strings by Formik
     // due to the way they are encoded in the form input value.
-    let { min, max } = values;
-
-    if (typeof (min as string | number) === 'string') {
-      min = min ? Number(min) : undefined;
-    }
-
-    if (typeof (max as string | number) === 'string') {
-      max = max ? Number(max) : undefined;
-    }
-
     return {
       ...values,
-      min,
-      max,
+      min: parseNumber(values.min),
+      max: parseNumber(values.max),
+      size: parseNumber(values.size),
+      tickSpacing: parseNumber(values.tickSpacing),
     };
   };
 
   const handleFormChange = useCallback(
-    (values: AxisConfiguration & { isValid: boolean }) => {
+    (values: AxisConfigurationChangeValue) => {
       onChange({
         ...normalizeValues(values),
         isValid: values.isValid,
