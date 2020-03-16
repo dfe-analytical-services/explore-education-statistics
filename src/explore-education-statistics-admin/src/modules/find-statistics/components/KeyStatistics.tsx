@@ -1,31 +1,29 @@
+import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
   AbstractRelease,
   Publication,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
-import EditableKeyStatTile from './EditableKeyStatTile';
+import React, { useCallback, useEffect, useState } from 'react';
 import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
 
 export interface KeyStatisticsProps {
   release: AbstractRelease<EditableContentBlock, Publication>;
-  setRelease: (
-    newRelease: AbstractRelease<EditableContentBlock, Publication>,
-  ) => void;
   isEditing?: boolean;
 }
 
-const KeyStatistics = ({
-  release,
-  setRelease,
-  isEditing,
-}: KeyStatisticsProps) => {
-  const { updateAvailableDataBlocks } = useContext(EditingContext);
+const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
+  const { releaseId } = useManageReleaseContext();
+  const {
+    deleteContentSectionBlock,
+    updateContentSectionDataBlock,
+  } = useReleaseActions();
+
   const [keyStats, setKeyStats] = useState<
     AbstractRelease<EditableContentBlock, Publication>['keyStatisticsSection']
   >();
@@ -50,7 +48,7 @@ const KeyStatistics = ({
             Any data blocks with more than one value cannot be selected as a key
             statistic.
           </WarningMessage>
-          <AddKeyStatistics release={release} setRelease={setRelease} />
+          <AddKeyStatistics release={release} />
         </>
       )}
       <div className={styles.keyStatsContainer}>
@@ -64,59 +62,22 @@ const KeyStatistics = ({
                   {...stat}
                   isEditing={isEditing}
                   onRemove={() => {
-                    releaseContentService
-                      .deleteContentSectionBlock(
-                        release.id,
-                        release.keyStatisticsSection.id || '',
-                        stat.id,
-                      )
-                      .then(() => {
-                        setRelease({
-                          ...release,
-                          keyStatisticsSection: {
-                            ...release.keyStatisticsSection,
-                            content:
-                              release.keyStatisticsSection.content &&
-                              release.keyStatisticsSection.content.filter(
-                                contentBlock => contentBlock.id !== stat.id,
-                              ),
-                          },
-                        });
-                        if (updateAvailableDataBlocks) {
-                          updateAvailableDataBlocks();
-                        }
-                      });
+                    deleteContentSectionBlock({
+                      releaseId,
+                      sectionId: release.keyStatisticsSection.id as string,
+                      blockId: stat.id,
+                      sectionKey: 'keyStatisticsSection',
+                    });
                   }}
-                  onSubmit={values => {
-                    return new Promise(resolve =>
-                      releaseContentService
-                        .updateContentSectionDataBlock(
-                          release.id,
-                          release.keyStatisticsSection.id as string,
-                          stat.id,
-                          values,
-                        )
-                        .then(updatedBlock => {
-                          setRelease({
-                            ...release,
-                            keyStatisticsSection: {
-                              ...release.keyStatisticsSection,
-                              content: release.keyStatisticsSection.content
-                                ? release.keyStatisticsSection.content.map(
-                                    contentBlock => {
-                                      if (contentBlock.id === updatedBlock.id) {
-                                        return updatedBlock;
-                                      }
-                                      return contentBlock;
-                                    },
-                                  )
-                                : [],
-                            },
-                          });
-                          resolve();
-                        }),
-                    );
-                  }}
+                  onSubmit={values =>
+                    updateContentSectionDataBlock({
+                      releaseId,
+                      sectionId: release.keyStatisticsSection.id as string,
+                      blockId: stat.id,
+                      sectionKey: 'keyStatisticsSection',
+                      values,
+                    })
+                  }
                 />
               ) : null;
             }
@@ -127,60 +88,42 @@ const KeyStatistics = ({
   );
 };
 
-const AddKeyStatistics = ({ release, setRelease }: KeyStatisticsProps) => {
-  const { updateAvailableDataBlocks } = useContext(EditingContext);
+const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const { attachContentSectionBlock } = useReleaseActions();
 
   const another =
     release.keyStatisticsSection.content &&
     release.keyStatisticsSection.content.length > 0 &&
     ' another ';
+
+  const addKeyStatToSection = useCallback(
+    (datablockId: string) => {
+      attachContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.keyStatisticsSection.id,
+        sectionKey: 'keyStatisticsSection',
+        block: {
+          contentBlockId: datablockId,
+          order:
+            (release.keyStatisticsSection.content &&
+              release.keyStatisticsSection.content.length) ||
+            0,
+        },
+      });
+      setIsFormOpen(false);
+    },
+    [release.id, release.keyStatisticsSection, attachContentSectionBlock],
+  );
+
   return (
     <>
-      {isFormOpen && (
+      {isFormOpen ? (
         <KeyIndicatorSelectForm
-          onSelect={async datablockId => {
-            if (
-              release.keyStatisticsSection &&
-              release.keyStatisticsSection.id
-            ) {
-              await releaseContentService
-                .attachContentSectionBlock(
-                  release.id,
-                  release.keyStatisticsSection &&
-                    release.keyStatisticsSection.id,
-                  {
-                    contentBlockId: datablockId,
-                    order:
-                      (release.keyStatisticsSection.content &&
-                        release.keyStatisticsSection.content.length) ||
-                      0,
-                  },
-                )
-                .then(v => {
-                  if (updateAvailableDataBlocks) {
-                    updateAvailableDataBlocks();
-                  }
-                  return v;
-                });
-
-              const keyStatisticsSection = await releaseContentService.getContentSection(
-                release.id,
-                release.keyStatisticsSection.id,
-              );
-              if (keyStatisticsSection) {
-                setRelease({
-                  ...release,
-                  keyStatisticsSection,
-                });
-                setIsFormOpen(false);
-              }
-            }
-          }}
+          onSelect={addKeyStatToSection}
           onCancel={() => setIsFormOpen(false)}
         />
-      )}
-      {!isFormOpen && (
+      ) : (
         <Button
           onClick={() => {
             setIsFormOpen(true);

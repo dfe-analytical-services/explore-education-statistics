@@ -27,13 +27,13 @@
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"
     },
     "domain": {
-      "value": "explore-education-statistics.service.gov.uk"
+      "value": "s101p02-as-ees-public.azurewebsites.net"
     },
     "contentApiUrl": {
-      "value": "content.explore-education-statistics.service.gov.uk"
+      "value": "s101p02-as-ees-content.azurewebsites.net"
     },
     "dataApiUrl": {
-      "value": "data.explore-education-statistics.service.gov.uk"
+      "value": "s101p02-as-ees-data.azurewebsites.net"
     }
   }
 }
