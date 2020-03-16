@@ -121,17 +121,18 @@ const EditableAccordionSection = ({
         id={contentId}
       >
         <div>
-          {onHeadingChange && isEditingHeading ? (
-            <Button onClick={saveHeading}>Save title</Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={() => setIsEditingHeading(!isEditingHeading)}
-              variant="secondary"
-            >
-              Edit title
-            </Button>
-          )}
+          {onHeadingChange &&
+            (isEditingHeading ? (
+              <Button onClick={saveHeading}>Save title</Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={() => setIsEditingHeading(!isEditingHeading)}
+                variant="secondary"
+              >
+                Edit title
+              </Button>
+            ))}
           {headerButtons}
           {!!onRemoveSection && (
             <Button onClick={() => setShowRemoveModal(true)} variant="warning">

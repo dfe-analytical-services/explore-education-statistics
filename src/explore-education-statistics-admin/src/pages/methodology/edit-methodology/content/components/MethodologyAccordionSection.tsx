@@ -26,13 +26,14 @@ const MethodologyAccordionSection = ({
     deleteContentSectionBlock,
     updateContentSectionBlock,
     updateSectionBlockOrder,
+    updateContentSectionHeading,
+    removeContentSection,
   } = useMethodologyActions();
 
   const addBlockToAccordionSection = useCallback(() => {
     addContentSectionBlock({
       methodologyId,
       sectionId,
-      sectionKey: 'content',
       block: {
         type: 'MarkdownBlock',
         order: sectionContent.length,
@@ -78,6 +79,27 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, updateSectionBlockOrder],
   );
 
+  const onSaveHeading = useCallback(
+    (title: string) =>
+      updateContentSectionHeading({
+        methodologyId,
+        sectionId,
+        title,
+        isAnnex,
+      }),
+    [methodologyId, sectionId, updateContentSectionHeading],
+  );
+
+  const removeSection = useCallback(
+    () =>
+      removeContentSection({
+        methodologyId,
+        sectionId,
+        isAnnex,
+      }),
+    [],
+  );
+
   return (
     <EditableAccordionSection
       heading={heading}
@@ -93,6 +115,8 @@ const MethodologyAccordionSection = ({
         </Button>
       }
       {...content}
+      onHeadingChange={onSaveHeading}
+      onRemoveSection={removeSection}
     >
       <ContentBlocks
         id={`${heading}-content`}

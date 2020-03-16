@@ -87,13 +87,12 @@ export default function useMethodologyActions() {
   async function addContentSectionBlock({
     methodologyId,
     sectionId,
-    sectionKey,
     block,
     isAnnex = false,
   }: {
     methodologyId: string;
     sectionId: string;
-    sectionKey: ContentSectionKeys;
+
     block: ContentBlockPostModel;
     isAnnex?: boolean;
   }) {
@@ -105,7 +104,10 @@ export default function useMethodologyActions() {
     );
     dispatch({
       type: 'ADD_BLOCK_TO_SECTION',
-      payload: { meta: { sectionId, sectionKey }, block: newBlock },
+      payload: {
+        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
+        block: newBlock,
+      },
     });
   }
 
@@ -181,40 +183,51 @@ export default function useMethodologyActions() {
     });
   }
 
-  async function removeContentSection(
-    methodologyId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-  ) {
+  async function removeContentSection({
+    methodologyId,
+    sectionId,
+    isAnnex = false,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    isAnnex?: boolean;
+  }) {
     const content = await methodologyService.removeContentSection(
       methodologyId,
       sectionId,
+      isAnnex,
     );
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
-        sectionKey,
+        sectionKey: isAnnex ? annexes : 'content',
       },
     });
   }
 
-  async function updateContentSectionHeading(
-    methodologyId: string,
-    sectionId: string,
-    title: string,
-    sectionKey: ContentSectionKeys,
-  ) {
+  async function updateContentSectionHeading({
+    methodologyId,
+    sectionId,
+    title,
+    isAnnex,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    title: string;
+    isAnnex?: boolean;
+  }) {
     const section = await methodologyService.updateContentSectionHeading(
       methodologyId,
       sectionId,
       title,
+      isAnnex,
     );
 
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',
       payload: {
-        meta: { sectionId, sectionKey },
+        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
         section,
       },
     });
