@@ -37,8 +37,8 @@ const DataBlockDetailsForm = ({
       ref={formikRef}
       initialValues={initialValues}
       validationSchema={Yup.object<DataBlockDetailsFormValues>({
-        heading: Yup.string().required('Please enter a title'),
-        name: Yup.string().required('Please supply a name'),
+        name: Yup.string().required('Enter a data block name'),
+        heading: Yup.string().required('Enter a table title'),
         source: Yup.string(),
       })}
       onSubmit={handleSubmit}
