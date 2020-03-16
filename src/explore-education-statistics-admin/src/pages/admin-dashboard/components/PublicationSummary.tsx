@@ -61,30 +61,85 @@ const PublicationSummary = ({
                   release={release}
                   actions={
                     <>
+                      {release.amendment ? (
+                        <>
+                          <ButtonLink
+                            to={summaryRoute.generateLink(
+                              publication.id,
+                              release.id,
+                            )}
+                            testId={formatTestId(
+                              `Edit release amendment link for ${
+                                publication.title
+                              }, ${getReleaseSummaryLabel(release)}`,
+                            )}
+                          >
+                            {release.permissions.canUpdateRelease
+                              ? 'Edit this release amendment'
+                              : 'View this release amendment'}
+                          </ButtonLink>
+                          <ButtonLink
+                            to={summaryRoute.generateLink(
+                              publication.id,
+                              // TODO DW - previousReleaseId
+                              release.originalId,
+                            )}
+                            className="govuk-button--secondary govuk-!-margin-left-4"
+                            testId={formatTestId(
+                              `View original release link for ${
+                                publication.title
+                              }, ${getReleaseSummaryLabel(release)}`,
+                            )}
+                          >
+                            View original release
+                          </ButtonLink>
+                        </>
+                      ) : (
+                        <>
+                          <ButtonLink
+                            to={summaryRoute.generateLink(
+                              publication.id,
+                              release.id,
+                            )}
+                            testId={formatTestId(
+                              `Edit release link for ${
+                                publication.title
+                              }, ${getReleaseSummaryLabel(release)}`,
+                            )}
+                          >
+                            {release.permissions.canUpdateRelease
+                              ? 'Edit this release'
+                              : 'View this release'}
+                          </ButtonLink>
+                          {release.permissions.canMakeAmendmentOfRelease && (
+                            <Button
+                              className="govuk-button--secondary govuk-!-margin-left-4"
+                              onClick={() => setAmendReleaseId(release.id)}
+                            >
+                              Amend this release
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </>
+                  }
+                  secondaryActions={
+                    release.amendment && (
                       <ButtonLink
                         to={summaryRoute.generateLink(
                           publication.id,
                           release.id,
                         )}
+                        className="govuk-button--warning"
                         testId={formatTestId(
-                          `Edit release link for ${
+                          `Cancel release amendment link for ${
                             publication.title
                           }, ${getReleaseSummaryLabel(release)}`,
                         )}
                       >
-                        {release.permissions.canUpdateRelease
-                          ? 'Edit this release'
-                          : 'View this release'}
+                        Cancel amendment
                       </ButtonLink>
-                      {release.permissions.canMakeAmendmentOfRelease && (
-                        <Button
-                          className="govuk-button--secondary govuk-!-margin-left-4"
-                          onClick={() => setAmendReleaseId(release.id)}
-                        >
-                          Amend this release
-                        </Button>
-                      )}
-                    </>
+                    )
                   }
                 />
               </li>

@@ -19,10 +19,16 @@ import LazyLoad from 'react-lazyload';
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
+  secondaryActions?: ReactNode;
   children?: ReactNode;
 }
 
-const ReleaseSummary = ({ release, actions, children }: Props) => {
+const ReleaseSummary = ({
+  release,
+  actions,
+  secondaryActions,
+  children,
+}: Props) => {
   return (
     <Details
       className="govuk-!-margin-bottom-0"
@@ -81,8 +87,10 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       {children}
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">{actions}</div>
-        <div className="govuk-grid-column-one-half dfe-align--right" />
+        <div className="govuk-grid-column-two-thirds">{actions}</div>
+        <div className="govuk-grid-column-one-third dfe-align--right">
+          {secondaryActions}
+        </div>
       </div>
     </Details>
   );
