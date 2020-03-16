@@ -12,5 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             RowsPerBatch = rowsPerBatch;
             NumBatches = numBatches;
         }
+
+        public ProcessorStatistics()
+        {
+        }
     }
 }

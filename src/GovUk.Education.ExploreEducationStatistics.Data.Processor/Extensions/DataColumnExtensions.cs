@@ -7,17 +7,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions
     {
         public static DataColumn CopyTo(this DataColumn column, DataTable table)
         {
-            DataColumn newColumn = new DataColumn(column.ColumnName, column.DataType, column.Expression, column.ColumnMapping);
-            newColumn.AllowDBNull = column.AllowDBNull;
-            newColumn.AutoIncrement = column.AutoIncrement;
-            newColumn.AutoIncrementSeed = column.AutoIncrementSeed;
-            newColumn.AutoIncrementStep = column.AutoIncrementStep;
-            newColumn.Caption = column.Caption;
-            newColumn.DateTimeMode = column.DateTimeMode;
-            newColumn.DefaultValue = column.DefaultValue;
-            newColumn.MaxLength = column.MaxLength;
-            newColumn.ReadOnly = column.ReadOnly;
-            newColumn.Unique = column.Unique;
+            var newColumn = new DataColumn(column.ColumnName, column.DataType, column.Expression, column.ColumnMapping)
+            {
+                AllowDBNull = column.AllowDBNull,
+                AutoIncrement = column.AutoIncrement,
+                AutoIncrementSeed = column.AutoIncrementSeed,
+                AutoIncrementStep = column.AutoIncrementStep,
+                Caption = column.Caption,
+                DateTimeMode = column.DateTimeMode,
+                DefaultValue = column.DefaultValue,
+                MaxLength = column.MaxLength,
+                ReadOnly = column.ReadOnly,
+                Unique = column.Unique
+            };
 
             table.Columns.Add(newColumn);
 

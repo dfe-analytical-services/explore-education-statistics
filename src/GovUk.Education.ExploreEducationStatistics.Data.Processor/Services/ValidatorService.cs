@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -31,7 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         DataFileHasInvalidNumberOfColumns,
 
         [EnumLabelValue("Datafile is missing expected column")]
-        DataFileMissingExpectedColumn
+        DataFileMissingExpectedColumn,
+        
+        [EnumLabelValue("Only first 100 errors are shown")]
+        FirstOneHundredErrors
     }
 
     public class ValidatorService : IValidatorService
@@ -56,15 +60,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
 
             return await ValidateMetaHeader(metaTable.Columns)
-                .OnSuccess(() => ValidateMetaRows(metaTable.Columns, metaTable.Rows)
-                    .OnSuccess(() => ValidateObservationHeaders(csvTable.Columns)
-                        .OnSuccess(() =>
-                            ValidateAndCountObservations(csvTable.Columns, csvTable.Rows, executionContext)
-                                .OnSuccess(result =>
-                                {
-                                    _logger.LogInformation($"Validation of Datafile: {message.OrigDataFileName} complete");
-                                    return result;
-                                }))));
+                .OnSuccess(() => ValidateMetaRows(metaTable.Columns, metaTable.Rows))
+                .OnSuccess(() => ValidateObservationHeaders(csvTable.Columns))
+                .OnSuccess(() =>
+                    ValidateAndCountObservations(csvTable.Columns, csvTable.Rows, executionContext)
+                        .OnSuccess(result =>
+                        {
+                            _logger.LogInformation($"Validation of Datafile: {message.OrigDataFileName} complete");
+                            return result;
+                        }));
         }
 
         private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateMetaHeader(DataColumnCollection header)
@@ -75,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (!header.Contains(col))
                 {
-                    errors.Add(new ValidationError(ValidationErrorMessages.MetaFileMissingExpectedColumn.GetEnumLabel() + " : " + col));
+                    errors.Add(new ValidationError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
                 }
             });
 
@@ -97,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 idx++;
                 if (row.ItemArray.Count() != cols.Count)
                 {
-                    errors.Add(new ValidationError($"error at row {idx}: " +
-                               ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel()));
+                    errors.Add(new ValidationError($"error at row {idx}: {MetaFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
                 }
 
                 try
@@ -107,8 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new ValidationError($"error at row {idx}: " +
-                               ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message));
+                    errors.Add(new ValidationError($"error at row {idx}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
                 }
             }
 
@@ -128,13 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (!cols.Contains(mandatoryCol))
                 {
-                    errors.Add(new ValidationError(ValidationErrorMessages.DataFileMissingExpectedColumn.GetEnumLabel() + " : " +
-                                                         mandatoryCol));
+                    errors.Add(new ValidationError($"{DataFileMissingExpectedColumn.GetEnumLabel()} : {mandatoryCol}"));
                 }
 
                 if (errors.Count == 100)
                 {
-                    errors.Add(new ValidationError("Only first 100 errors are returned"));
+                    errors.Add(new ValidationError(FirstOneHundredErrors.GetEnumLabel()));
                     break;
                 }
             }
@@ -160,14 +161,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 idx++;
                 if (errors.Count == 100)
                 {
-                    errors.Add(new ValidationError("Only first 100 errors are returned"));
+                    errors.Add(new ValidationError(FirstOneHundredErrors.GetEnumLabel()));
                     break;
                 }
 
                 if (row.ItemArray.Count() != cols.Count)
                 {
-                    errors.Add(new ValidationError($"error at row {idx}: " +
-                               ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel()));
+                    errors.Add(new ValidationError($"error at row {idx}: {DataFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
                 }
 
                 try
@@ -198,9 +198,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
-            var numBatches = FileStorageUtils.GetNumBatches(totalRows, rowsPerBatch);
-            
-            return new ProcessorStatistics(filteredRows, rowsPerBatch, numBatches);
+
+            return new ProcessorStatistics
+            {
+                FilteredObservationCount = filteredRows,
+                RowsPerBatch = rowsPerBatch,
+                NumBatches = FileStorageUtils.GetNumBatches(totalRows, rowsPerBatch)
+            };
         }
 
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
