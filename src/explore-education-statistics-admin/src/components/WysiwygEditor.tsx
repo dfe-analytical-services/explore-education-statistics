@@ -44,29 +44,7 @@ export const toolbarConfigs = {
 };
 
 export const accordionHeadingConfig = {
-  heading: {
-    options: [
-      { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-      {
-        model: 'heading3',
-        view: 'h3',
-        title: 'Heading 3',
-        class: 'ck-heading_heading3',
-      },
-      {
-        model: 'heading4',
-        view: 'h4',
-        title: 'Heading 4',
-        class: 'ck-heading_heading4',
-      },
-      {
-        model: 'heading5',
-        view: 'h5',
-        title: 'Heading 5',
-        class: 'ck-heading_heading5',
-      },
-    ],
-  },
+  heading: {},
 };
 
 const WysiwygEditor = ({
@@ -173,7 +151,33 @@ const WysiwygEditor = ({
             editor={ClassicEditor}
             config={{
               toolbar: toolbarConfig || toolbarConfigs.full,
-              heading: insideAccordion && accordionHeadingConfig.heading,
+              heading: insideAccordion && {
+                options: [
+                  {
+                    model: 'paragraph',
+                    title: 'Paragraph',
+                    class: 'ck-heading_paragraph',
+                  },
+                  {
+                    model: 'heading3',
+                    view: 'h3',
+                    title: 'Heading 3',
+                    class: 'ck-heading_heading3',
+                  },
+                  {
+                    model: 'heading4',
+                    view: 'h4',
+                    title: 'Heading 4',
+                    class: 'ck-heading_heading4',
+                  },
+                  {
+                    model: 'heading5',
+                    view: 'h5',
+                    title: 'Heading 5',
+                    class: 'ck-heading_heading5',
+                  },
+                ],
+              },
             }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {

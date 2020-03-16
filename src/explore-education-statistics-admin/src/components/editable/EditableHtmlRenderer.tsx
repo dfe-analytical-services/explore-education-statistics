@@ -8,12 +8,14 @@ export type Props = RendererProps & {
   canDelete: boolean;
   onDelete: () => void;
   editable?: boolean;
+  insideAccordion?: boolean;
   onContentChange: (content: string) => void;
 };
 
 const EditableHtmlRenderer = ({
   source = '',
   canDelete,
+  insideAccordion,
   onDelete,
   editable = true,
   onContentChange,
@@ -23,6 +25,7 @@ const EditableHtmlRenderer = ({
       <WysiwygEditor
         content={source}
         editable={editable}
+        insideAccordion={insideAccordion}
         canDelete={canDelete}
         onContentChange={onContentChange}
         onDelete={onDelete}
