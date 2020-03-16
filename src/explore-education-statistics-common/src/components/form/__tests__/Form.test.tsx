@@ -1,6 +1,6 @@
 import Yup from '@common/lib/validation/yup';
 import { fireEvent, render, wait } from '@testing-library/react';
-import { Formik } from 'formik';
+import { Field, Formik } from 'formik';
 import React from 'react';
 import Form from '../Form';
 
@@ -244,6 +244,7 @@ describe('Form', () => {
 
     expect(queryByText('Something went wrong')).not.toBeNull();
 
+    // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
     fireEvent.submit(form, {
@@ -257,10 +258,6 @@ describe('Form', () => {
   });
 
   test('removes submit error when form is reset', async () => {
-    const onSubmit = jest.fn(() => {
-      throw new Error('Something went wrong');
-    });
-
     const { container, queryByText, getByText } = render(
       <Formik
         initialValues={{
@@ -269,7 +266,9 @@ describe('Form', () => {
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={onSubmit}
+        onSubmit={() => {
+          throw new Error('Something went wrong');
+        }}
       >
         {formik => (
           <Form id="test-form" showSubmitError>
@@ -293,11 +292,49 @@ describe('Form', () => {
 
     expect(queryByText('Something went wrong')).not.toBeNull();
 
-    onSubmit.mockImplementation();
-
     fireEvent.click(getByText('Reset form'));
 
     await wait();
+
+    expect(queryByText('Something went wrong')).toBeNull();
+  });
+
+  test('removes submit error when form values are changed', async () => {
+    const { container, queryByText, getByLabelText } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={() => {
+          throw new Error('Something went wrong');
+        }}
+      >
+        <Form id="test-form" showSubmitError>
+          <label htmlFor="firstName">Firstname</label>
+          <Field name="firstName" type="text" id="firstName" />
+        </Form>
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(queryByText('Something went wrong')).not.toBeNull();
+
+    fireEvent.change(getByLabelText('Firstname'), {
+      target: {
+        value: 'Another firstname',
+      },
+    });
 
     expect(queryByText('Something went wrong')).toBeNull();
   });
