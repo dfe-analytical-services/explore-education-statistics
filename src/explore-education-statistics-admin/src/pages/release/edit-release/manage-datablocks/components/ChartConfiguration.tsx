@@ -26,7 +26,7 @@ interface Props {
   data: DataBlockResponse;
   meta: ChartMetaData;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
-  onChange: (chartOptions: ChartOptions) => void;
+  onChange: (chartOptions: ChartOptions & { isValid: boolean }) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -52,6 +52,7 @@ const ChartConfiguration = ({
               onChange({
                 ...chartOptions,
                 fileId,
+                isValid: true,
               });
             }}
           />
@@ -75,7 +76,13 @@ const ChartConfiguration = ({
         })}
         render={form => (
           <Form id={formId}>
-            <Effect value={form.values} onChange={onChange} />
+            <Effect
+              value={{
+                ...form.values,
+                isValid: form.isValid,
+              }}
+              onChange={onChange}
+            />
 
             <FormGroup>
               <FormFieldTextInput<ChartOptions>

@@ -43,7 +43,7 @@ import {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
   LineChartBlock.definition,
@@ -213,15 +213,12 @@ const ChartBuilder = ({
     return createChartRendererProps(chartBuilderState);
   }, [chartBuilderState, createChartRendererProps]);
 
-  const [finalChartProps, setFinalChartProps] = useState<
-    ChartRendererProps | undefined
-  >(chartProps);
-
   const {
     axes: axesConfiguration,
     definition,
     options,
     dataSetAndConfiguration,
+    isValid,
   } = chartBuilderState;
 
   const handleBoundaryLevelChange = useCallback(
@@ -236,31 +233,15 @@ const ChartBuilder = ({
     [onRequiresDataUpdate],
   );
 
-  const saveChart = useCallback(
-    async (nextChartProps: ChartRendererProps) => {
-      if (!isChartRenderable(nextChartProps)) {
-        return;
-      }
-
-      if (onChartSave) {
-        await onChartSave(nextChartProps);
-        setFinalChartProps(nextChartProps);
-      }
-    },
-    [onChartSave],
-  );
-
-  const handleChartDataSubmit = useCallback(async () => {
-    if (finalChartProps) {
-      await saveChart(finalChartProps);
-    }
-  }, [finalChartProps, saveChart]);
-
   const handleChartSave = useCallback(async () => {
-    if (chartProps) {
-      await saveChart(chartProps);
+    if (!isChartRenderable(chartProps) && !isValid) {
+      return;
     }
-  }, [chartProps, saveChart]);
+
+    if (onChartSave) {
+      await onChartSave(chartProps as ChartRendererProps);
+    }
+  }, [chartProps, isValid, onChartSave]);
 
   return (
     <div className={styles.editor}>
@@ -306,6 +287,7 @@ const ChartBuilder = ({
               headingTitle="Add data from the existing dataset to the chart"
             >
               <ChartDataSelector
+                canSaveChart={isValid}
                 metaData={metaData}
                 selectedData={dataSetAndConfiguration}
                 chartType={definition}
@@ -313,7 +295,7 @@ const ChartBuilder = ({
                 onDataAdded={actions.addDataSet}
                 onDataRemoved={actions.removeDataSet}
                 onDataChanged={actions.updateDataSet}
-                onSubmit={handleChartDataSubmit}
+                onSubmit={handleChartSave}
               />
             </TabsSection>
           )}

@@ -30,6 +30,7 @@ export interface ChartBuilderState {
   options: ChartOptions;
   dataSetAndConfiguration: ChartDataSetAndConfiguration[];
   axes: AxesConfiguration;
+  isValid?: boolean;
 }
 
 export type ChartBuilderActions =
@@ -53,6 +54,10 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_CHART_AXIS';
       payload: AxisConfiguration;
+    }
+  | {
+      type: 'UPDATE_VALID';
+      payload: boolean;
     };
 
 const defaultOptions: Partial<ChartOptions> = {
@@ -132,24 +137,48 @@ export const chartBuilderReducer: Reducer<
         action.payload,
         axisDefinition,
       );
+
       break;
     }
-    case 'UPDATE_CHART_OPTIONS':
+    case 'UPDATE_CHART_OPTIONS': {
       draft.options = {
         ...defaultOptions,
         ...(draft?.definition?.options.defaults ?? {}),
         ...action.payload,
         ...(draft?.definition?.options.constants ?? {}),
       };
+
       break;
-    case 'ADD_DATA_SET':
+    }
+    case 'ADD_DATA_SET': {
       draft.dataSetAndConfiguration.push(action.payload);
+
+      if (typeof draft.isValid === 'undefined') {
+        draft.isValid = true;
+      }
+
       break;
-    case 'REMOVE_DATA_SET':
+    }
+    case 'REMOVE_DATA_SET': {
       draft.dataSetAndConfiguration.splice(action.payload, 1);
+
+      if (typeof draft.isValid === 'undefined') {
+        draft.isValid = draft.dataSetAndConfiguration.length > 0;
+      }
+
       break;
-    case 'UPDATE_DATA_SETS':
+    }
+    case 'UPDATE_DATA_SETS': {
       draft.dataSetAndConfiguration = action.payload;
+
+      if (typeof draft.isValid === 'undefined') {
+        draft.isValid = draft.dataSetAndConfiguration.length > 0;
+      }
+
+      break;
+    }
+    case 'UPDATE_VALID':
+      draft.isValid = action.payload;
       break;
     default:
       break;
@@ -242,7 +271,8 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateChartOptions = useCallback(
-    (chartOptions: ChartOptions) => {
+    ({ isValid, ...chartOptions }: ChartOptions & { isValid: boolean }) => {
+      dispatch({ type: 'UPDATE_VALID', payload: isValid });
       dispatch({
         type: 'UPDATE_CHART_OPTIONS',
         payload: chartOptions,
@@ -252,7 +282,11 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateChartAxis = useCallback(
-    (axisConfiguration: AxisConfiguration) => {
+    ({
+      isValid,
+      ...axisConfiguration
+    }: AxisConfiguration & { isValid: boolean }) => {
+      dispatch({ type: 'UPDATE_VALID', payload: isValid });
       dispatch({
         type: 'UPDATE_CHART_AXIS',
         payload: axisConfiguration,

@@ -42,7 +42,7 @@ interface Props {
   labels?: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   dataSets: ChartDataSet[];
-  onChange: (configuration: AxisConfiguration) => void;
+  onChange: (configuration: AxisConfiguration & { isValid: boolean }) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
@@ -136,8 +136,11 @@ const ChartAxisConfiguration = ({
   };
 
   const handleFormChange = useCallback(
-    (values: AxisConfiguration) => {
-      onChange(normalizeValues(values));
+    (values: AxisConfiguration & { isValid: boolean }) => {
+      onChange({
+        ...normalizeValues(values),
+        isValid: values.isValid,
+      });
     },
     [onChange],
   );
@@ -169,7 +172,13 @@ const ChartAxisConfiguration = ({
       })}
       render={form => (
         <Form id={id}>
-          <Effect value={form.values} onChange={handleFormChange} />
+          <Effect
+            value={{
+              ...form.values,
+              isValid: form.isValid,
+            }}
+            onChange={handleFormChange}
+          />
 
           <FormGroup>
             {configuration.type === 'major' && !capabilities.fixedAxisGroupBy && (

@@ -2,6 +2,7 @@ import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-dat
 import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
+import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import {
@@ -37,6 +38,7 @@ export interface SelectedData {
 }
 
 interface Props {
+  canSaveChart?: boolean;
   chartType: ChartDefinition;
   selectedData?: ChartDataSetAndConfiguration[];
   metaData: ChartMetaData;
@@ -50,6 +52,7 @@ interface Props {
 const formId = 'chartDataSelectorForm';
 
 const ChartDataSelector = ({
+  canSaveChart,
   metaData,
   capabilities,
   selectedData = [],
@@ -263,18 +266,19 @@ const ChartDataSelector = ({
                   </div>
                 </React.Fragment>
               ))}
+
+              <hr />
+
+              <Button
+                disabled={!canSaveChart}
+                onClick={() => {
+                  onSubmit(chartData);
+                }}
+              >
+                Save chart options
+              </Button>
             </>
           )}
-
-          <hr />
-
-          <Button
-            onClick={() => {
-              onSubmit(selectedData);
-            }}
-          >
-            Save chart options
-          </Button>
         </>
       )}
     />
