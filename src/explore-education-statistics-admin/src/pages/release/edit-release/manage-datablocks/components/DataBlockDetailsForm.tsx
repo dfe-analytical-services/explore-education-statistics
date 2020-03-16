@@ -1,3 +1,4 @@
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
 import {
   Form,
@@ -6,7 +7,6 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
@@ -30,12 +30,7 @@ const DataBlockDetailsForm = ({
 }: Props) => {
   const formikRef = useRef<Formik<DataBlockDetailsFormValues>>(null);
 
-  const [blockState, handleSubmit] = useAsyncCallback(
-    async (values: DataBlockDetailsFormValues) => {
-      await onSubmit(values);
-    },
-    [onSubmit],
-  );
+  const handleSubmit = useFormSubmit(onSubmit, []);
 
   return (
     <Formik<DataBlockDetailsFormValues>
@@ -80,23 +75,14 @@ const DataBlockDetailsForm = ({
                 percentageWidth="two-thirds"
               />
 
-              <Button type="submit" className="govuk-!-margin-top-6">
+              <Button
+                type="submit"
+                className="govuk-!-margin-top-6"
+                disabled={form.isSubmitting}
+              >
                 Save data block
               </Button>
             </FormGroup>
-
-            {!blockState.isLoading && (
-              <>
-                {blockState.error ? (
-                  <p>
-                    An error occurred saving the data block, please try again
-                    later.
-                  </p>
-                ) : (
-                  <p>The data block has been saved</p>
-                )}
-              </>
-            )}
           </Form>
         );
       }}

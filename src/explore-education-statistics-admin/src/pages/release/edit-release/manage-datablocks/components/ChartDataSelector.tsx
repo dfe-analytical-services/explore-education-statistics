@@ -2,7 +2,6 @@ import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-dat
 import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import {
