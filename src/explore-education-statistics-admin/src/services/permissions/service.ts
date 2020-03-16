@@ -32,6 +32,9 @@ const permissionsService = {
       `/permissions/publication/${publicationId}/release/create`,
     );
   },
+  canUpdateMethodology: (methodologyId: string): Promise<boolean> => {
+    return client.get(`/permissions/methodology/${methodologyId}/update`);
+  },
   canMarkMethodologyAsDraft: (methodologyId: string): Promise<boolean> => {
     return client.get(`/permissions/methodology/${methodologyId}/status/draft`);
   },

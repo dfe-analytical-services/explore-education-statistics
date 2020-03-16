@@ -90,6 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow))
                 .HandleFailuresOr(Ok);
         }
+        
+        [HttpGet("methodology/{methodologyId}/update")]
+        public Task<ActionResult<bool>> CanUpdateMethodology(Guid methodologyId)
+        {
+            return CheckPolicyAgainstEntity<Methodology>(methodologyId, _userService.CheckCanUpdateMethodology);
+        }
 
         [HttpGet("methodology/{methodologyId}/status/draft")]
         public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
