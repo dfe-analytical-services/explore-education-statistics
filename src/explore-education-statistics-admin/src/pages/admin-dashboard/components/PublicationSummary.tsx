@@ -24,6 +24,9 @@ const PublicationSummary = ({
 }: Props & RouteComponentProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
+  const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
+    string
+  >();
   return (
     <>
       <SummaryList>
@@ -125,20 +128,12 @@ const PublicationSummary = ({
                   }
                   secondaryActions={
                     release.amendment && (
-                      <ButtonLink
-                        to={summaryRoute.generateLink(
-                          publication.id,
-                          release.id,
-                        )}
+                      <Button
+                        onClick={() => setCancelAmendmentReleaseId(release.id)}
                         className="govuk-button--warning"
-                        testId={formatTestId(
-                          `Cancel release amendment link for ${
-                            publication.title
-                          }, ${getReleaseSummaryLabel(release)}`,
-                        )}
                       >
                         Cancel amendment
-                      </ButtonLink>
+                      </Button>
                     )
                   }
                 />
@@ -192,6 +187,30 @@ const PublicationSummary = ({
           <p>
             Please note, any changes made to this live release must be approved
             before updates can be published.
+          </p>
+        </ModalConfirm>
+      )}
+
+      {cancelAmendmentReleaseId && (
+        <ModalConfirm
+          title="Confirm you want to cancel this amended release"
+          onConfirm={
+            async () => {}
+            // service
+            //   .createReleaseAmendment(amendReleaseId)
+            //   .then(amendment =>
+            //     history.push(
+            //       summaryRoute.generateLink(publication.id, amendment.id),
+            //     ),
+            //   )
+          }
+          onExit={() => setCancelAmendmentReleaseId(undefined)}
+          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+          mounted
+        >
+          <p>
+            By cancelling the amendments you will lose any changes made, and the
+            original release will remain unchanged.
           </p>
         </ModalConfirm>
       )}
