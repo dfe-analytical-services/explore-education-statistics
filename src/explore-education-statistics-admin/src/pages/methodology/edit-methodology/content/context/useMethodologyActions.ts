@@ -30,52 +30,78 @@ export default function useMethodologyActions() {
     [dispatch],
   );
 
-  async function deleteContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    blockId: string,
-    sectionKey: ContentSectionKeys,
-  ) {
+  async function deleteContentSectionBlock({
+    methodologyId,
+    sectionId,
+    blockId,
+    isAnnex = false,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    blockId: string;
+    isAnnex?: boolean;
+  }) {
     await methodologyService.deleteContentSectionBlock(
       methodologyId,
       sectionId,
       blockId,
+      isAnnex,
     );
     dispatch({
       type: 'REMOVE_BLOCK_FROM_SECTION',
-      payload: { meta: { sectionId, blockId, sectionKey } },
+      payload: {
+        meta: { sectionId, blockId, sectionKey: isAnnex ? annexes : 'content' },
+      },
     });
   }
 
-  async function updateContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    blockId: string,
-    sectionKey: ContentSectionKeys,
-    bodyContent: string,
-  ) {
+  async function updateContentSectionBlock({
+    methodologyId,
+    sectionId,
+    blockId,
+    bodyContent,
+    isAnnex = false,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    blockId: string;
+    bodyContent: string;
+    isAnnex?: boolean;
+  }) {
     const updateBlock = await methodologyService.updateContentSectionBlock(
       methodologyId,
       sectionId,
       blockId,
       { body: bodyContent },
+      isAnnex,
     );
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
-      payload: { meta: { sectionId, blockId, sectionKey }, block: updateBlock },
+      payload: {
+        meta: { sectionId, blockId, sectionKey: isAnnex ? annexes : 'content' },
+        block: updateBlock,
+      },
     });
   }
 
-  async function addContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    block: ContentBlockPostModel,
-  ) {
+  async function addContentSectionBlock({
+    methodologyId,
+    sectionId,
+    sectionKey,
+    block,
+    isAnnex = false,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    sectionKey: ContentSectionKeys;
+    block: ContentBlockPostModel;
+    isAnnex?: boolean;
+  }) {
     const newBlock = await methodologyService.addContentSectionBlock(
       methodologyId,
       sectionId,
       block,
+      isAnnex,
     );
     dispatch({
       type: 'ADD_BLOCK_TO_SECTION',
@@ -83,21 +109,27 @@ export default function useMethodologyActions() {
     });
   }
 
-  async function updateSectionBlockOrder(
-    methodologyId: string,
-    sectionId: string,
-    sectionKey: ContentSectionKeys,
-    order: Dictionary<number>,
-  ) {
+  async function updateSectionBlockOrder({
+    methodologyId,
+    sectionId,
+    order,
+    isAnnex = false,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    order: Dictionary<number>;
+    isAnnex?: boolean;
+  }) {
     const sectionContent = await methodologyService.updateContentSectionBlocksOrder(
       methodologyId,
       sectionId,
       order,
+      isAnnex,
     );
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
-        meta: { sectionId, sectionKey },
+        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
         sectionContent,
       },
     });

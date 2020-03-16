@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
 
-interface MethodologyAccordionProps {
+export interface MethodologyAccordionProps {
   isAnnex?: boolean;
   methodology: MethodologyContent;
 }
@@ -50,6 +50,7 @@ const MethodologyAccordion = ({
       {(isAnnex ? methodology.annexes : methodology.content).map(
         accordionSection => (
           <MethodologyAccordionSection
+            methodologyId={methodology.id}
             key={accordionSection.id}
             content={accordionSection}
             isAnnex={isAnnex}
