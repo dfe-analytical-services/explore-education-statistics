@@ -51,6 +51,7 @@ export interface AdminDashboardRelease {
   originalId: string;
   permissions: {
     canUpdateRelease: boolean;
+    canDeleteRelease: boolean;
     canMakeAmendmentOfRelease: boolean;
   };
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -73,7 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
-        // POST api/publication/{publicationId}/releases
         [HttpPost("publications/{publicationId}/releases")]
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
             Guid publicationId)
@@ -84,6 +82,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .CreateReleaseAsync(release)
                 .HandleFailuresOr(Ok);
         }
+
+        [HttpDelete("release/{releaseId}")]
+        public async Task<ActionResult<ReleaseViewModel>> DeleteReleaseAsync(Guid releaseId)
+        {
+            return await _releaseService
+                .DeleteReleaseAsync(releaseId)
+                .HandleFailuresOr(_ => NoContent());
+        }
         
         [HttpPost("release/{releaseId}/amendment")]
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
@@ -93,7 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
         
-        // GET api/release/{releaseId}/data
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -105,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // GET api/release/{releaseId}/ancillary
         [HttpGet("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -117,7 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // GET api/release/{releaseId}/chart
         [HttpGet("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -129,7 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // POST api/release/{releaseId}/ancillary
         [HttpPost("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -144,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // POST api/release/{releaseId}/chart
         [HttpPost("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -159,7 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // POST api/release/{releaseId}/data
         [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -211,7 +211,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // GET api/publications/{publicationId}/releases/template
         [HttpGet("publications/{publicationId}/releases/template")]
         public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateReleaseAsync(
             [Required] Guid publicationId)
@@ -221,7 +220,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(releaseId => new OkObjectResult(releaseId));
         }
         
-        // GET api/releases/draft
         [HttpGet("releases/draft")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
@@ -230,7 +228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
         
-        // GET api/releases/scheduled
         [HttpGet("releases/scheduled")]
         public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
@@ -261,7 +258,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // DELETE api/release/{releaseId}/ancillary/{fileName}
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
             Guid releaseId, string fileName)
@@ -271,7 +267,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        // DELETE api/release/{releaseId}/chart/{fileName}
         [HttpDelete("release/{releaseId}/chart/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
             Guid releaseId, string fileName)

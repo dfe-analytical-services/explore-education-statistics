@@ -35,6 +35,7 @@ const ReleaseSummary = ({
       summary={getReleaseSummaryLabel(release)}
       tag={[
         getReleaseStatusLabel(release.status),
+        release.amendment && 'Amendment',
         // eslint-disable-next-line react/jsx-key
         release.status !== 'Draft' && release.status !== 'HigherLevelReview' && (
           <LazyLoad

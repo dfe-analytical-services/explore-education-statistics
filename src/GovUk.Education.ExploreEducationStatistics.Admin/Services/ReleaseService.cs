@@ -115,6 +115,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, bool>> DeleteReleaseAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => { return true; });
+        }
+
+
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper

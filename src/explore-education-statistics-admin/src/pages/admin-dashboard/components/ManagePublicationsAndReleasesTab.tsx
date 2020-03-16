@@ -240,7 +240,7 @@ const ManagePublicationsAndReleasesTab = ({
                     heading={publication.title}
                     headingTag="h3"
                   >
-                    <PublicationSummary publication={publication} />
+                    <PublicationSummary initialPublication={publication} />
                   </AccordionSection>
                 ))}
               </Accordion>

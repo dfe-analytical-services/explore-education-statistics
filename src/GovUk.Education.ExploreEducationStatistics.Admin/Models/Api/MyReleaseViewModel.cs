@@ -55,6 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         {
             public bool CanUpdateRelease { get; set; }
             
+            public bool CanDeleteRelease { get; set; }
+            
             public bool CanMakeAmendmentOfRelease { get; set; }
         }
 
