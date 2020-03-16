@@ -55,12 +55,11 @@ interface Props {
 export interface DataBlockDetailsFormValues {
   title: string;
   source: string;
-  customFootnotes: string;
   name: string;
 }
 
 const DataBlockDetailsForm = ({
-  initialValues = { title: '', name: '', source: '', customFootnotes: '' },
+  initialValues = { title: '', name: '', source: '' },
   query,
   tableHeaders,
   releaseId,
@@ -97,7 +96,6 @@ const DataBlockDetailsForm = ({
       },
 
       heading: values.title,
-      customFootnotes: values.customFootnotes,
       name: values.name,
 
       source: values.source,
@@ -117,7 +115,6 @@ const DataBlockDetailsForm = ({
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),
-    customFootnotes: Yup.string(),
   };
 
   return (
@@ -160,13 +157,6 @@ const DataBlockDetailsForm = ({
                 name="source"
                 label="Source"
                 percentageWidth="two-thirds"
-              />
-
-              <FormFieldTextArea<DataBlockDetailsFormValues>
-                id="data-block-footnotes"
-                name="customFootnotes"
-                label="Footnotes"
-                additionalClass="govuk-!-width-two-thirds"
               />
 
               <Button type="submit" className="govuk-!-margin-top-6">

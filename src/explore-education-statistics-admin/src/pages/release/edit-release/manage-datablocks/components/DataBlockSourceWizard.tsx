@@ -96,17 +96,11 @@ const DataBlockSourceWizard = ({
         title: table ? generateTableTitle(table.subjectMeta) : '',
         name: '',
         source: '',
-        customFootnotes: '',
       });
       return;
     }
 
-    const {
-      heading: title = '',
-      name = '',
-      source = '',
-      customFootnotes = '',
-    } = dataBlock;
+    const { heading: title = '', name = '', source = '' } = dataBlock;
 
     setCaptionTitle(title);
 
@@ -114,7 +108,6 @@ const DataBlockSourceWizard = ({
       title,
       name,
       source,
-      customFootnotes,
     });
   }, [dataBlock, table]);
 

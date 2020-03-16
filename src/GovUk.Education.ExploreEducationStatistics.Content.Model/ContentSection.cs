@@ -129,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public string Heading { get; set; }
         
-        public string CustomFootnotes { get; set; }
-        
         public string Name { get; set; }
         
         public string Source { get; set; }

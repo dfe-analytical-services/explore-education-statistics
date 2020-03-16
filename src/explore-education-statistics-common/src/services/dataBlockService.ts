@@ -134,7 +134,6 @@ export interface DataBlock {
   type?: 'DataBlock';
 
   heading?: string;
-  customFootnotes?: string;
   name?: string;
   source?: string;
 
