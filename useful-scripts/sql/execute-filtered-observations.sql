@@ -14,6 +14,8 @@ begin
 
 	declare @localAuthorityDistrictList IdListVarcharType
 
+	declare @localAuthorityOldCodeList IdListVarcharType
+
 	declare @localEnterprisePartnershipsList IdListVarcharType
 
 	declare @mayoralCombinedAuthoritiesList IdListVarcharType
@@ -36,7 +38,6 @@ begin
 	declare @planningAreasList IdListVarcharType
 
 	declare @filterItemList IdListGuidType
-	insert @filterItemList values (83), (86)
 
 	declare @result int
 	exec
@@ -48,6 +49,7 @@ begin
 			@institutionsList,
 			@localAuthorityList,
 			@localAuthorityDistrictList,
+		    @localAuthorityOldCodeList,
 			@localEnterprisePartnershipsList,
 			@mayoralCombinedAuthoritiesList,
 			@multiAcademyTrustList,
