@@ -26,7 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             GeographicLevel.Institution,
             GeographicLevel.Provider,
-            GeographicLevel.School
+            GeographicLevel.School,
+            GeographicLevel.PlanningArea
         };
         
         public SplitFileService(IFileStorageService fileStorageService)
