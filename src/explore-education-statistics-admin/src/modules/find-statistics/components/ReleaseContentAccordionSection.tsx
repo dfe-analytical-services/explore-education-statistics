@@ -133,6 +133,7 @@ const ReleaseContentAccordionSection = ({
         onBlockDelete={removeBlockFromAccordionSection}
         content={sectionContent}
         allowComments
+        insideAccordion
       />
 
       {!isReordering && canAddBlocks && (
