@@ -307,6 +307,34 @@ describe('chartBuilderReducer', () => {
         },
       ]);
     });
+
+    test('does not add `axes.dataSets` for minor axis', () => {
+      const initialStateWithDataSets: ChartBuilderState = {
+        ...initialState,
+        dataSetAndConfiguration: [
+          {
+            configuration: {
+              value: '1',
+              label: 'Data set 1',
+            },
+            dataSet: {
+              filters: ['filter-1', 'filter-2'],
+              indicator: 'indicator-1',
+            },
+          },
+        ],
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
+        type: 'UPDATE_CHART_DEFINITION',
+        payload: testChartDefinition,
+      } as ChartBuilderActions);
+
+      // Need to spread as there's a weird Jest bug
+      // when comparing read-only objects
+      // See: https://github.com/facebook/jest/issues/9531
+      expect(nextState.axes.minor?.dataSets).toEqual<ChartDataSet[]>([]);
+    });
   });
 
   describe('UPDATE_CHART_AXIS', () => {
@@ -396,7 +424,66 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('cannot update `dataSets` property', () => {
+    test('updates `axes.dataSets` property with `dataSetsAndConfiguration` state', () => {
+      const initialStateWithDataSets: ChartBuilderState = {
+        ...initialState,
+        dataSetAndConfiguration: [
+          {
+            configuration: {
+              value: '1',
+              label: 'Data set 1',
+            },
+            dataSet: {
+              filters: ['filter-1', 'filter-2'],
+              indicator: 'indicator-1',
+            },
+          },
+        ],
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
+        type: 'UPDATE_CHART_AXIS',
+        payload: {
+          type: 'major',
+        },
+      } as ChartBuilderActions);
+
+      expect(nextState.axes.major?.dataSets).toEqual([
+        {
+          filters: ['filter-1', 'filter-2'],
+          indicator: 'indicator-1',
+        },
+      ]);
+    });
+
+    test('does not update `axes.dataSets` for minor axis', () => {
+      const initialStateWithDataSets: ChartBuilderState = {
+        ...initialState,
+        dataSetAndConfiguration: [
+          {
+            configuration: {
+              value: '1',
+              label: 'Data set 1',
+            },
+            dataSet: {
+              filters: ['filter-1', 'filter-2'],
+              indicator: 'indicator-1',
+            },
+          },
+        ],
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
+        type: 'UPDATE_CHART_AXIS',
+        payload: {
+          type: 'minor',
+        },
+      } as ChartBuilderActions);
+
+      expect(nextState.axes.minor?.dataSets).toEqual([]);
+    });
+
+    test('cannot update `axes.dataSets` property directly', () => {
       const nextState = produce(chartBuilderReducer)(initialState, {
         type: 'UPDATE_CHART_AXIS',
         payload: {

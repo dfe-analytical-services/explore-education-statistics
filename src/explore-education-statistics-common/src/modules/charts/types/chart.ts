@@ -1,8 +1,8 @@
-import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
-import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
-import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
-import MapBlock from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
+import { horizontalBarBlockDefinition } from '@common/modules/charts/components/HorizontalBarBlock';
+import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
+import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
+import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
+import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
 import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tableBuilderService';
 import {
   BoundaryLevel,
@@ -169,9 +169,9 @@ export interface ChartDefinitionAxis {
 }
 
 export const chartDefinitions: ChartDefinition[] = [
-  LineChartBlock.definition,
-  VerticalBarBlock.definition,
-  HorizontalBarBlock.definition,
-  MapBlock.definition,
-  InfographicBlock.definition,
+  lineChartBlockDefinition,
+  verticalBarBlockDefinition,
+  horizontalBarBlockDefinition,
+  mapBlockDefinition,
+  infographicBlockDefinition,
 ];

@@ -2,7 +2,7 @@ import {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 export type GetInfographic = (
   releaseId: string,
@@ -53,7 +53,7 @@ const InfographicBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const infographicBlockDefinition: ChartDefinition = {
   type: 'infographic',
   name: 'Infographic',
   options: {
@@ -78,6 +78,4 @@ const definition: ChartDefinition = {
   axes: {},
 };
 
-InfographicBlock.definition = definition;
-
-export default InfographicBlock;
+export default memo(InfographicBlock);

@@ -1,3 +1,4 @@
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import {
   AxesConfiguration,
   AxisConfiguration,
@@ -31,6 +32,7 @@ export interface ChartBuilderState {
   dataSetAndConfiguration: ChartDataSetAndConfiguration[];
   axes: AxesConfiguration;
   isValid?: boolean;
+  chartProps?: ChartRendererProps;
 }
 
 export type ChartBuilderActions =
@@ -94,10 +96,6 @@ export const chartBuilderReducer: Reducer<
       ...next,
       ...(axisDefinition.constants ?? {}),
       type: axisDefinition.type,
-      dataSets:
-        axisDefinition.type === 'major'
-          ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
-          : [],
     };
   };
 
@@ -183,6 +181,14 @@ export const chartBuilderReducer: Reducer<
     default:
       break;
   }
+
+  Object.values(draft.axes as Required<AxesConfiguration>).forEach(axis => {
+    // eslint-disable-next-line no-param-reassign
+    axis.dataSets =
+      axis.type === 'major'
+        ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
+        : [];
+  });
 };
 
 export function useChartBuilderReducer(initialConfiguration?: Chart) {

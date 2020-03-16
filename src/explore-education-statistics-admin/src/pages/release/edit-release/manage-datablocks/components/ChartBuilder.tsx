@@ -3,10 +3,7 @@ import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablo
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
-import {
-  ChartBuilderState,
-  useChartBuilderReducer,
-} from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
+import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -15,17 +12,21 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import HorizontalBarBlock, {
+import {
+  horizontalBarBlockDefinition,
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
-import LineChartBlock, {
+import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
+import {
+  lineChartBlockDefinition,
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import MapBlock, {
+import {
+  mapBlockDefinition,
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock, {
+import {
+  verticalBarBlockDefinition,
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
@@ -46,10 +47,10 @@ import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
-  LineChartBlock.definition,
-  VerticalBarBlock.definition,
-  HorizontalBarBlock.definition,
-  MapBlock.definition,
+  lineChartBlockDefinition,
+  verticalBarBlockDefinition,
+  horizontalBarBlockDefinition,
+  mapBlockDefinition,
 ];
 
 interface Props {
@@ -120,106 +121,75 @@ const ChartBuilder = ({
     initialConfiguration,
   );
 
-  const createChartRendererProps = useCallback(
-    (currentState: ChartBuilderState): ChartRendererProps | undefined => {
-      const {
-        axes: axesConfiguration,
-        definition,
-        options,
-        dataSetAndConfiguration,
-      } = currentState;
-
-      if (!definition) {
-        return undefined;
-      }
-
-      const axes: AxesConfiguration = {};
-
-      if (axesConfiguration.major) {
-        axes.major = {
-          ...axesConfiguration.major,
-          dataSets: dataSetAndConfiguration.map(dsc => dsc.dataSet),
-        };
-      }
-
-      if (axesConfiguration.minor) {
-        axes.minor = {
-          ...axesConfiguration.minor,
-          dataSets: [],
-        };
-      }
-
-      const labels: Dictionary<DataSetConfiguration> = {
-        ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-          (acc, { configuration }) => {
-            acc[configuration.value] = configuration;
-
-            return acc;
-          },
-          {},
-        ),
-        ...generateAxesMetaData(axes, data, metaData),
-      };
-
-      const baseProps: ChartProps = {
-        ...options,
-        data,
-        axes: {},
-        meta: metaData,
-        labels,
-      };
-
-      switch (definition.type) {
-        case 'infographic':
-          return {
-            ...baseProps,
-            labels: {},
-            type: 'infographic',
-            releaseId: data.releaseId,
-            getInfographic: editReleaseDataService.downloadChartFile,
-          };
-        case 'line':
-          return {
-            ...baseProps,
-            type: 'line',
-            axes: axes as LineChartProps['axes'],
-          };
-        case 'horizontalbar':
-          return {
-            ...baseProps,
-            type: 'horizontalbar',
-            axes: axes as HorizontalBarProps['axes'],
-          };
-        case 'verticalbar':
-          return {
-            ...baseProps,
-            type: 'verticalbar',
-            axes: axes as VerticalBarProps['axes'],
-          };
-        case 'map':
-          return {
-            ...baseProps,
-            type: 'map',
-            axes: axes as MapBlockProps['axes'],
-          };
-        default:
-          return undefined;
-      }
-    },
-    [data, metaData],
-  );
-
-  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
-    return createChartRendererProps(chartBuilderState);
-  }, [chartBuilderState, createChartRendererProps]);
-
   const {
-    axes: axesConfiguration,
+    axes,
     definition,
     options,
     dataSetAndConfiguration,
     isValid,
   } = chartBuilderState;
+
+  const labels: Dictionary<DataSetConfiguration> = useMemo(
+    () => ({
+      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
+        (acc, { configuration }) => {
+          acc[configuration.value] = configuration;
+
+          return acc;
+        },
+        {},
+      ),
+      ...generateAxesMetaData(axes, data, metaData),
+    }),
+    [axes, data, dataSetAndConfiguration, metaData],
+  );
+
+  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
+    if (!definition) {
+      return undefined;
+    }
+
+    const baseProps: ChartProps = {
+      ...options,
+      data,
+      axes,
+      meta: metaData,
+      labels,
+    };
+
+    switch (definition.type) {
+      case 'infographic':
+        return {
+          ...baseProps,
+          labels: {},
+          type: 'infographic',
+          releaseId: data.releaseId,
+          getInfographic: editReleaseDataService.downloadChartFile,
+        };
+      case 'line':
+        return {
+          ...(baseProps as LineChartProps),
+          type: 'line',
+        };
+      case 'horizontalbar':
+        return {
+          ...(baseProps as HorizontalBarProps),
+          type: 'horizontalbar',
+        };
+      case 'verticalbar':
+        return {
+          ...(baseProps as VerticalBarProps),
+          type: 'verticalbar',
+        };
+      case 'map':
+        return {
+          ...(baseProps as MapBlockProps),
+          type: 'map',
+        };
+      default:
+        return undefined;
+    }
+  }, [axes, data, definition, labels, metaData, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -254,7 +224,7 @@ const ChartBuilder = ({
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
         <ButtonText
           onClick={() => {
-            actions.updateChartDefinition(InfographicBlock.definition);
+            actions.updateChartDefinition(infographicBlockDefinition);
           }}
         >
           Choose an infographic as alternative
@@ -268,7 +238,7 @@ const ChartBuilder = ({
               <ChartRenderer {...chartProps} />
             ) : (
               <div className={styles.previewPlaceholder}>
-                {Object.keys(axesConfiguration).length > 0 ? (
+                {Object.keys(axes).length > 0 ? (
                   <p>Add data to view a preview of the chart</p>
                 ) : (
                   <p>Configure the {definition.name} to view a preview</p>
@@ -318,7 +288,7 @@ const ChartBuilder = ({
           {Object.entries(
             definition.axes as Required<ChartDefinition['axes']>,
           ).map(([key, axis]) => {
-            const axisConfiguration = axesConfiguration[key as AxisType];
+            const axisConfiguration = axes[key as AxisType];
 
             if (!axisConfiguration) {
               return null;
@@ -338,11 +308,7 @@ const ChartBuilder = ({
                   data={data}
                   meta={metaData}
                   labels={chartProps?.labels}
-                  dataSets={
-                    key === 'major'
-                      ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                      : []
-                  }
+                  dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}
                   onSubmit={handleChartSave}
                 />

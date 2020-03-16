@@ -30,6 +30,7 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React, {
   createRef,
+  memo,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -709,7 +710,7 @@ const MapBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const mapBlockDefinition: ChartDefinition = {
   type: 'map',
   name: 'Geographic',
   capabilities: {
@@ -750,6 +751,4 @@ const definition: ChartDefinition = {
   },
 };
 
-MapBlock.definition = definition;
-
-export default MapBlock;
+export default memo(MapBlock);

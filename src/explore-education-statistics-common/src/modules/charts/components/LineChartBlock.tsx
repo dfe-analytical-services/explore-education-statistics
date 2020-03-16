@@ -16,7 +16,7 @@ import {
 } from '@common/modules/charts/util/chartUtils';
 import { Dictionary } from '@common/types';
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -171,7 +171,7 @@ const LineChartBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
   capabilities: {
@@ -217,6 +217,4 @@ const definition: ChartDefinition = {
   },
 };
 
-LineChartBlock.definition = definition;
-
-export default LineChartBlock;
+export default memo(LineChartBlock);

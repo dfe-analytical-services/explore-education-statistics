@@ -12,7 +12,7 @@ import {
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Bar,
   BarChart,
@@ -134,7 +134,7 @@ const VerticalBarBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const verticalBarBlockDefinition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
   capabilities: {
@@ -180,6 +180,4 @@ const definition: ChartDefinition = {
   },
 };
 
-VerticalBarBlock.definition = definition;
-
-export default VerticalBarBlock;
+export default memo(VerticalBarBlock);

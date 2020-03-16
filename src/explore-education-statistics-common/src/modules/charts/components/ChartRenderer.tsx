@@ -41,8 +41,8 @@ export type ChartRendererProps =
       type: 'infographic';
     } & InfographicChartProps);
 
-function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title } = props;
+function ChartRenderer({ title, ...props }: ChartRendererProps) {
+  const { data, meta } = props;
 
   const [legendProps, setLegendProps] = useState<LegendProps>();
 
