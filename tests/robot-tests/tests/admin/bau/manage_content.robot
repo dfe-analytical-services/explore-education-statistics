@@ -80,14 +80,17 @@ Add key statistics summary content to release
 
 Add accordion sections to release
     [Tags]  HappyPath
+    user waits until element is enabled  xpath://button[text()="Add new section"]
     user clicks element   xpath://button[text()="Add new section"]
     user waits until page contains element  xpath://span[text()="New section"]
     user changes accordion section title  1   Test section one
 
+    user waits until element is enabled  xpath://button[text()="Add new section"]
     user clicks element   xpath://button[text()="Add new section"]
     user waits until page contains element  xpath://span[text()="New section"]
     user changes accordion section title  2   Test section two
 
+    user waits until element is enabled  xpath://button[text()="Add new section"]
     user clicks element   xpath://button[text()="Add new section"]
     user waits until page contains element  xpath://span[text()="New section"]
     user changes accordion section title  3   Test section three

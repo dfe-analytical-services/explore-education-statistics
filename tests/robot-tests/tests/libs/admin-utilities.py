@@ -58,6 +58,11 @@ def user_changes_accordion_section_title(num, new_title):
     except:
         raise AssertionError(f'Cannot close accordion section number "{num}"')
 
+    try:
+        elem.find_element_by_xpath(f'.//span[text()="{new_title}"]')
+    except:
+        raise AssertionError(f'Couldn\'t find accordion section with text "{new_title}". So it didn\'t get changed?!')
+
 
 def user_gets_editable_accordion_section_element(section_title):
     try:
