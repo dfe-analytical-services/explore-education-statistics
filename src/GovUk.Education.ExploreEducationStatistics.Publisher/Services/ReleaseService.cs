@@ -90,31 +90,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task SetPublishedDateAsync(Guid id)
         {
+            var publishedDate = DateTime.UtcNow;
+            
             var contentRelease = await _contentDbContext.Releases
                 .SingleOrDefaultAsync(r => r.Id == id);
 
+            var statisticsRelease = await _statisticsDbContext.Release
+                .SingleOrDefaultAsync(r => r.Id == id);
+            
             if (contentRelease == null)
             {
                 throw new ArgumentException("Content Release does not exist", nameof(id));
             }
             
-            var statisticsRelease = await _statisticsDbContext.Release
-                .SingleOrDefaultAsync(r => r.Id == id);
-            
-            if (statisticsRelease == null)
-            {
-                throw new ArgumentException("Statistics Release does not exist", nameof(id));
-            }
-
-            var publishedDate = DateTime.UtcNow;
-            
-            contentRelease.Published = publishedDate;
-            statisticsRelease.Published = publishedDate;
-            
             _contentDbContext.Releases.Update(contentRelease);
-            _statisticsDbContext.Release.Update(statisticsRelease);
-
-            await Task.WhenAll(_contentDbContext.SaveChangesAsync(), _statisticsDbContext.SaveChangesAsync());
+            contentRelease.Published = publishedDate;
+            await _contentDbContext.SaveChangesAsync();
+            
+            // The Release in the statistics database can be absent if no Subjects were created
+            if (statisticsRelease != null)
+            {
+                _statisticsDbContext.Release.Update(statisticsRelease);
+                statisticsRelease.Published = publishedDate;
+                await _statisticsDbContext.SaveChangesAsync();
+            }
         }
 
         private DateTime GetNextScheduledPublishingTime()
