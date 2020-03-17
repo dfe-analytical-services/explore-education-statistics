@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4635611b-ef09-472f-b78f-0e0c44e75b73",
+		"_postman_id": "36369c32-48fb-420c-bfc2-17e9b5e110ab",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5908,66 +5908,6 @@
 								"pupil-absence-in-schools-in-england",
 								"2016-17",
 								"absence_by_term.csv"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Debug",
-			"item": [
-				{
-					"name": "Debug",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "90830933-d7da-4502-b316-ed7887c913cf",
-								"exec": [
-									"var respJson = pm.response.json();",
-									"",
-									"pm.test(\"Filter count is above the expected count\", function () {",
-									"    pm.expect(respJson.filterCount).to.be.above(19);",
-									"});",
-									"",
-									"pm.test(\"Indicator count is above the expected count\", function () {",
-									"    pm.expect(respJson.indicatorCount).to.be.above(201);",
-									"});",
-									"",
-									"pm.test(\"Location count is above the expected count\", function () {",
-									"    pm.expect(respJson.locationCount).to.be.above(656);",
-									"});",
-									"",
-									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    pm.expect(respJson.observationCount).to.be.above(252830);",
-									"});",
-									"",
-									"pm.test(\"Release count is above the expected count\", function () {",
-									"    pm.expect(respJson.releaseCount).to.be.above(2);",
-									"});",
-									"",
-									"pm.test(\"Subject count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().subjectCount).to.be.above(13);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{data_api_url}}/debug/report",
-							"host": [
-								"{{data_api_url}}"
-							],
-							"path": [
-								"debug",
-								"report"
 							]
 						}
 					},
