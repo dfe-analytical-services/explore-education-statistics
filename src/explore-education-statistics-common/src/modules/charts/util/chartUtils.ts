@@ -1,3 +1,4 @@
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -385,13 +386,6 @@ export function populateDefaultChartProps(
   };
 }
 
-export const conditionallyAdd = (size?: string | number, add?: number) => {
-  if (size) {
-    return +size + (add === undefined ? 0 : add);
-  }
-  return add;
-};
-
 const calculateMinMaxReduce = (
   { min, max }: { min: number; max: number },
   next: string,
@@ -419,25 +413,6 @@ export function calculateDataRange(chartData: ChartData[]) {
     max: -Infinity,
   });
 }
-
-const parseNumberOrDefault = (
-  number: string | number | undefined,
-  defaultValue: number,
-): number => {
-  let parsed = defaultValue;
-
-  if (typeof number === 'string') {
-    parsed = Number.parseFloat(number);
-  } else if (typeof number === 'number') {
-    parsed = number;
-  }
-
-  if (Number.isNaN(parsed)) {
-    return defaultValue;
-  }
-
-  return parsed;
-};
 
 export function getNiceMaxValue(maxValue: number) {
   if (maxValue === 0) {
@@ -553,8 +528,8 @@ export function generateMinorAxis(
 ) {
   const { min, max } = calculateDataRange(chartData);
 
-  const axisMin = parseNumberOrDefault(axis.min, min);
-  const axisMax = parseNumberOrDefault(axis.max, getNiceMaxValue(max));
+  const axisMin = parseNumber(axis.min) ?? min;
+  const axisMax = parseNumber(axis.max) ?? getNiceMaxValue(max);
 
   const domain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
 
@@ -573,8 +548,8 @@ export function generateMajorAxis(
 ) {
   const majorAxisCategories = chartData.map(({ name }) => name);
 
-  const min = parseNumberOrDefault(axis.min, 0);
-  const max = parseNumberOrDefault(axis.max, majorAxisCategories.length - 1);
+  const min = parseNumber(axis.min) ?? 0;
+  const max = parseNumber(axis.max) ?? majorAxisCategories.length - 1;
 
   const domain: [AxisDomain, AxisDomain] = [min, max];
 
