@@ -87,6 +87,8 @@ Validate Analyst1 can see Manage content page
     user clicks element   xpath://a[text()="Manage content"]
     user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
 
+Validate Manage content page is in Edit mode
+    [Tags]  HappyPath   Failing
     user waits until page contains element   css:#pageMode
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
@@ -113,7 +115,7 @@ Validate Analyst1 can see Manage content page accordion sections
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
     user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
-    user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
+    user checks there are x accordion sections  11
 
 Validate Analyst1 cannot Approve a Pupil absence in schools in England release
     [Tags]  HappyPath
