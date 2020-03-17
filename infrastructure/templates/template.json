@@ -566,6 +566,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -645,6 +646,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -779,6 +781,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -847,6 +850,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -1991,6 +1995,7 @@
         "cors": {
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
+            "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"
