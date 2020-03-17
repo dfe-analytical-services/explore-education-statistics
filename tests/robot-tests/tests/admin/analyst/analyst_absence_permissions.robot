@@ -9,6 +9,9 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
     [Tags]  HappyPath
+    user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
+    user waits until page contains accordion section  Pupil absence in schools in England     60
+
     user checks list contains label   css:#selectTheme   Pupils and schools
     user checks list contains x elements   css:#selectTopic   2
     user checks list contains label   css:#selectTopic   Exclusions
@@ -29,11 +32,11 @@ Validate Analyst1 can see correct scheduled releases
     user clicks element   css:#scheduled-releases-tab
     user checks element contains  css:#scheduled-releases   There are currently no scheduled releases
 
-Validate Analyst1 cannot create a publication for Pupils and schools theme
+Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
-    user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
-    user waits until page contains accordion section  Pupil absence in schools in England     60
-
+    user clicks element   css:#my-publications-tab
+    user waits until page contains element   css:#selectTheme
+    user waits until page contains element   xpath://h3[text()="Pupil absence"]
     user checks page does not contain element   xpath://a[text()="Create new publication"]
 
 Validate Analyst1 cannot create a release for Pupil absence topic
