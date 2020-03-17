@@ -119,7 +119,7 @@ const ReleaseContentAccordionSection = ({
           className={`govuk-button ${!isReordering &&
             'govuk-button--secondary'}`}
         >
-          {isReordering ? 'Save order' : 'Reorder'}
+          {isReordering ? 'Save section order' : 'Reorder this section'}
         </Button>
       }
       {...restOfProps}
