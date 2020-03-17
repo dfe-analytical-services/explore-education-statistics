@@ -16,7 +16,7 @@ import React, { ReactNode } from 'react';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import LazyLoad from 'react-lazyload';
 
-interface Props {
+export interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
   secondaryActions?: ReactNode;

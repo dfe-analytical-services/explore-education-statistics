@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseRepository
     {
-        Task<List<ReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
+        Task<List<MyReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses);
 
-        Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUserAsync(Guid userId,
+        Task<List<MyReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUserAsync(Guid userId,
             params ReleaseStatus[] releaseStatuses);
     }
 }

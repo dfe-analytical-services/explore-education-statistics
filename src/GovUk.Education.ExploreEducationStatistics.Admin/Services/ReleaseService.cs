@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
         
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses)
         {
             return await _userService

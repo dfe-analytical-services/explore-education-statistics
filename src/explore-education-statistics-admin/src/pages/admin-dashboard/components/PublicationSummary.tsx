@@ -1,21 +1,19 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import {
   AdminDashboardPublication,
   AdminDashboardRelease,
 } from '@admin/services/dashboard/types';
 import service from '@admin/services/release/create-release/service';
-import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { formatTestId } from '@common/util/test-utils';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
+import CancelAmendmentModal from './CancelAmendmentModal';
 
 export interface Props {
   initialPublication: AdminDashboardPublication;
@@ -77,88 +75,10 @@ const PublicationSummary = ({
                   .filter(noAmendmentInProgressFilter)
                   .map(release => (
                     <li key={release.id}>
-                      <ReleaseSummary
+                      <NonScheduledReleaseSummary
+                        onClickAmendRelease={setAmendReleaseId}
+                        onClickCancelAmendment={setCancelAmendmentReleaseId}
                         release={release}
-                        actions={
-                          <>
-                            {release.amendment ? (
-                              <>
-                                <ButtonLink
-                                  to={summaryRoute.generateLink(
-                                    publication.id,
-                                    release.id,
-                                  )}
-                                  testId={formatTestId(
-                                    `Edit release amendment link for ${
-                                      publication.title
-                                    }, ${getReleaseSummaryLabel(release)}`,
-                                  )}
-                                >
-                                  {release.permissions.canUpdateRelease
-                                    ? 'Edit this release amendment'
-                                    : 'View this release amendment'}
-                                </ButtonLink>
-                                <ButtonLink
-                                  to={summaryRoute.generateLink(
-                                    publication.id,
-                                    // TODO DW - previousReleaseId
-                                    release.originalId,
-                                  )}
-                                  className="govuk-button--secondary govuk-!-margin-left-4"
-                                  testId={formatTestId(
-                                    `View original release link for ${
-                                      publication.title
-                                    }, ${getReleaseSummaryLabel(release)}`,
-                                  )}
-                                >
-                                  View original release
-                                </ButtonLink>
-                              </>
-                            ) : (
-                              <>
-                                <ButtonLink
-                                  to={summaryRoute.generateLink(
-                                    publication.id,
-                                    release.id,
-                                  )}
-                                  testId={formatTestId(
-                                    `Edit release link for ${
-                                      publication.title
-                                    }, ${getReleaseSummaryLabel(release)}`,
-                                  )}
-                                >
-                                  {release.permissions.canUpdateRelease
-                                    ? 'Edit this release'
-                                    : 'View this release'}
-                                </ButtonLink>
-                                {release.permissions
-                                  .canMakeAmendmentOfRelease && (
-                                  <Button
-                                    className="govuk-button--secondary govuk-!-margin-left-4"
-                                    onClick={() =>
-                                      setAmendReleaseId(release.id)
-                                    }
-                                  >
-                                    Amend this release
-                                  </Button>
-                                )}
-                              </>
-                            )}
-                          </>
-                        }
-                        secondaryActions={
-                          release.permissions.canDeleteRelease &&
-                          release.amendment && (
-                            <Button
-                              onClick={() =>
-                                setCancelAmendmentReleaseId(release.id)
-                              }
-                              className="govuk-button--warning"
-                            >
-                              Cancel amendment
-                            </Button>
-                          )
-                        }
                       />
                     </li>
                   ))}
@@ -217,8 +137,7 @@ const PublicationSummary = ({
           )}
 
           {cancelAmendmentReleaseId && (
-            <ModalConfirm
-              title="Confirm you want to cancel this amended release"
+            <CancelAmendmentModal
               onConfirm={async () =>
                 service.deleteRelease(cancelAmendmentReleaseId).then(() => {
                   setPublication({
@@ -230,15 +149,8 @@ const PublicationSummary = ({
                   setCancelAmendmentReleaseId(undefined);
                 })
               }
-              onExit={() => setCancelAmendmentReleaseId(undefined)}
               onCancel={() => setCancelAmendmentReleaseId(undefined)}
-              mounted
-            >
-              <p>
-                By cancelling the amendments you will lose any changes made, and
-                the original release will remain unchanged.
-              </p>
-            </ModalConfirm>
+            />
           )}
         </>
       )}

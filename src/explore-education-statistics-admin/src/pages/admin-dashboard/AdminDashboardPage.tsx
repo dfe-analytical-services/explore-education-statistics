@@ -2,12 +2,17 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
+import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftReleasesTab';
+import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
+import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import { PrereleaseContactDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import service from '@admin/services/release/create-release/service';
 import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -24,6 +29,9 @@ interface Model {
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
   const [model, setModel] = useState<Model>();
+  const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
+    string
+  >();
   useEffect(() => {
     Promise.all([
       dashboardService.getDraftReleases(),
@@ -124,20 +132,7 @@ const AdminDashboardPage = () => {
               id="draft-releases"
               title={`View draft releases (${model.draftReleases.length})`}
             >
-              <ReleasesTab
-                releases={model.draftReleases}
-                noReleasesMessage="There are currently no draft releases"
-                actions={release => (
-                  <ButtonLink
-                    to={summaryRoute.generateLink(
-                      release.publicationId,
-                      release.id,
-                    )}
-                  >
-                    View and edit release
-                  </ButtonLink>
-                )}
-              />
+              <DraftReleasesTab initialReleases={model.draftReleases} />
             </TabsSection>
             <TabsSection
               lazy
@@ -147,19 +142,25 @@ const AdminDashboardPage = () => {
               <ReleasesTab
                 releases={model.scheduledReleases}
                 noReleasesMessage="There are currently no scheduled releases"
-                actions={release => (
-                  <ButtonLink
-                    to={summaryRoute.generateLink(
-                      release.publicationId,
-                      release.id,
-                    )}
+                releaseSummaryRenderer={release => (
+                  <ReleaseSummary
+                    key={release.id}
+                    release={release}
+                    actions={
+                      <ButtonLink
+                        to={summaryRoute.generateLink(
+                          release.publicationId,
+                          release.id,
+                        )}
+                      >
+                        Preview release
+                      </ButtonLink>
+                    }
                   >
-                    Preview release
-                  </ButtonLink>
+                    <PrereleaseAccessManagement release={release} />
+                  </ReleaseSummary>
                 )}
-              >
-                {release => <PrereleaseAccessManagement release={release} />}
-              </ReleasesTab>
+              />
             </TabsSection>
           </Tabs>
         </Page>
