@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     case YearFormatOption.Default:
                         return year;
                     case YearFormatOption.AcademicOrFiscal:
-                        return $"{Parse(year)}/{(Parse(year) % 100) + 1}"; // Only want the last two digits
+                        return $"{Parse(year)}/{(Parse(year) + 1) % 100:D2}"; // Only want the last two digits
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
