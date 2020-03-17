@@ -214,9 +214,10 @@ const ReleaseManageDataBlocksPage = () => {
             }}
             value={selectedDataBlock}
           />
-          <hr />
         </>
       )}
+
+      <hr />
 
       <div style={{ position: 'relative' }}>
         {(isLoading || isSaving) && (
