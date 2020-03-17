@@ -1,10 +1,10 @@
 import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
 import dashboardService from '@admin/services/dashboard/service';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import React, { useContext, useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import PageNotFoundPage from '../errors/PageNotFoundPage';

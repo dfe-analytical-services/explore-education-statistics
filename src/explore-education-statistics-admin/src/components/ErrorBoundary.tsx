@@ -1,8 +1,8 @@
-import { ErrorControlContextProvider } from '@admin/contexts/ErrorControlContext';
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { clients } from '@admin/services/util/configureAxios';
+import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import { AxiosError } from 'axios';
 import * as H from 'history';
 import React from 'react';
