@@ -194,28 +194,29 @@ const ReleaseManageDataBlocksPage = () => {
   return canUpdateRelease ? (
     <>
       {dataBlockOptions.length > 0 && (
-        <FormSelect
-          id="selectDataBlock"
-          name="selectDataBlock"
-          label="Select an existing data block to edit or create a new one"
-          onChange={e => {
-            setSelectedDataBlock(e.target.value);
-          }}
-          order={[]}
-          optGroups={{
-            'Create data block': [
-              {
-                label: 'Create new data block',
-                value: '',
-              },
-            ],
-            'Edit existing': dataBlockOptions,
-          }}
-          value={selectedDataBlock}
-        />
+        <>
+          <FormSelect
+            id="selectDataBlock"
+            name="selectDataBlock"
+            label="Select an existing data block to edit or create a new one"
+            onChange={e => {
+              setSelectedDataBlock(e.target.value);
+            }}
+            order={[]}
+            optGroups={{
+              'Create data block': [
+                {
+                  label: 'Create new data block',
+                  value: '',
+                },
+              ],
+              'Edit existing': dataBlockOptions,
+            }}
+            value={selectedDataBlock}
+          />
+          <hr />
+        </>
       )}
-
-      <hr />
 
       <div style={{ position: 'relative' }}>
         {(isLoading || isSaving) && (
