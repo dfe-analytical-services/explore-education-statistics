@@ -146,8 +146,5 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
-  },
-  "dependencies": {
-    "use-immer": "^0.3.5"
   }
 }
