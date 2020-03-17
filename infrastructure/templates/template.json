@@ -399,6 +399,10 @@
     "storageAccountPrefix": {
       "type": "string",
       "defaultValue": "storage"
+    },
+    "detailedErrors": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -1026,7 +1030,7 @@
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
-        "ASPNETCORE_DETAILEDERRORS": "true",
+        "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
         "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
