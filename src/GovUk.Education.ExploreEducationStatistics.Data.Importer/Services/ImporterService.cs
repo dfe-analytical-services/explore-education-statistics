@@ -96,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             GeographicLevel.Institution,
             GeographicLevel.Provider,
-            GeographicLevel.School
+            GeographicLevel.School,
+            GeographicLevel.PlanningArea
         };
         
         public ImporterService(
