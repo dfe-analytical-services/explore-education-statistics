@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import FiltersForm, {
