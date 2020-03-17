@@ -96,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             GeographicLevel.Institution,
             GeographicLevel.Provider,
-            GeographicLevel.School
+            GeographicLevel.School,
+            GeographicLevel.PlanningArea
         };
         
         public ImporterService(
@@ -111,40 +112,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _logger = logger;
         }
 
-        public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
+        public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
         {
-            return _importerMetaService.Import(metaLines, subject, context);
+            _importerMetaService.Import(table.Columns, table.Rows, subject, context);
         }
         
-        public SubjectMeta GetMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
+        public SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context)
         {
-            return _importerMetaService.Get(metaLines, subject, context);
+            return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context)
+        public void ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
-            
-            var headers = lines.First().Split(',').ToList();
-            lines.RemoveAt(0);
-            lines.ToList().ForEach(line =>
+
+            var headers = CsvUtil.GetColumnValues(cols);
+            foreach (DataRow row in rows)
             {
-                CreateFiltersAndLocationsFromCsv(context, line, headers, subjectMeta.Filters);
-            });
+                CreateFiltersAndLocationsFromCsv(context, CsvUtil.GetRowValues(row), headers, subjectMeta.Filters);
+            }
         }
 
-        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo,
-            int rowsPerBatch, StatisticsDbContext context)
+        public void ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
+            SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
             
-            var headers = lines.First().Split(',').ToList();
-            lines.RemoveAt(0);
-            
-            var observations = GetObservations(context, lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
+            var observations = GetObservations(
+                context,
+                rows,
+                CsvUtil.GetColumnValues(cols),
+                subject,
+                subjectMeta,
+                batchNo,
+                rowsPerBatch).ToList();
 
             InsertObservations(context, observations);
         }
@@ -193,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private IEnumerable<Observation> GetObservations(
             StatisticsDbContext context,
-            IEnumerable<string> lines,
+            DataRowCollection rows,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta,
@@ -201,22 +205,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             int rowsPerBatch
             )
         {
-            return lines.Select((line, i) =>
+            var observations = new List<Observation>();
+            var i = 0;
+            
+            foreach (DataRow row in rows)
             {
-                var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
-                return ObservationFromCsv(context, line, headers, subject, subjectMeta, csvRowNum);
-            }).Where(o => !IgnoredGeographicLevels.Contains(o.GeographicLevel));
+                var o = ObservationFromCsv(
+                    context,
+                    CsvUtil.GetRowValues(row).ToArray(),
+                    headers,
+                    subject,
+                    subjectMeta,
+                    ((batchNo - 1) * rowsPerBatch) + i++ + 2);
+                
+                if (!IgnoredGeographicLevels.Contains(o.GeographicLevel))
+                {
+                    observations.Add(o);  
+                }
+            }
+
+            return observations;
         }
         
         private Observation ObservationFromCsv(
             StatisticsDbContext context,
-            string raw,
+            string[] line,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta,
             int csvRowNum)
         {
-            var line = raw.Split(',');
             var observationId = Guid.NewGuid();
 
             return new Observation
@@ -235,13 +253,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         private void CreateFiltersAndLocationsFromCsv(
             StatisticsDbContext context,
-            string raw,
+            List<string> row,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
-            var line = raw.Split(',');
-            CreateFilterItems(context, line, headers, filtersMeta);
-            GetLocationId(line, headers, context);
+            CreateFilterItems(context, row, headers, filtersMeta);
+            GetLocationId(row, headers, context);
         }
 
         private void CreateFilterItems(
