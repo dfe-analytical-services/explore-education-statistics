@@ -1,15 +1,17 @@
 /**
  * Parse a {@param value} to a number or
- * return the {@param defaultValue}. If the value
- * is an empty string, we don't convert this to 0.
+ * return undefined. If the value is an
+ * empty string, we don't convert this to 0.
  *
- * This is useful for converting NaNs to
- * some other value or undefined.
+ * This is useful for converting NaNs to undefined
+ * so that we can chain it with null coalescing
+ * for a default value e.g.
+ *
+ * ```typescript
+ * parseNumber(someNumber) ?? 100
+ * ```
  */
-export default function parseNumber(
-  value: unknown,
-  defaultValue?: number,
-): number | undefined {
+export default function parseNumber(value: unknown): number | undefined {
   let parsed: unknown;
 
   if (typeof value === 'string' && value !== '') {
@@ -20,11 +22,11 @@ export default function parseNumber(
 
   if (typeof parsed === 'number') {
     if (Number.isNaN(parsed)) {
-      return defaultValue;
+      return undefined;
     }
 
     return parsed;
   }
 
-  return defaultValue;
+  return undefined;
 }
