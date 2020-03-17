@@ -220,9 +220,19 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
         dataSetAndConfiguration = initialConfiguration.axes.major.dataSets
           .map(dataSet => {
             const key = generateKeyFromDataSet(dataSet);
-            const configuration =
-              initialConfiguration.labels && initialConfiguration.labels[key];
-            return { dataSet, configuration };
+            const configuration = initialConfiguration.labels[key];
+
+            return {
+              dataSet,
+              // Set the value to the key as it doesn't
+              // always exist (e.g. for seed data)
+              configuration: configuration
+                ? {
+                    ...configuration,
+                    value: configuration.value ?? key,
+                  }
+                : undefined,
+            };
           })
           .filter(
             dsc => typeof dsc.configuration !== 'undefined',
