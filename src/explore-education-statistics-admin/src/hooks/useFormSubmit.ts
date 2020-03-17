@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 export type UseFormSubmit<FormValues> = (
   values: FormValues,
   formikActions: FormikActions<FormValues>,
-) => Promise<void>;
+) => Promise<void> | void;
 
 const isServerValidationError = (error: AxiosError) => {
   if (!error.isAxiosError || !error.response?.data) {

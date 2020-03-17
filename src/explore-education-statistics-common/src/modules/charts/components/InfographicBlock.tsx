@@ -1,21 +1,21 @@
 import {
-  AbstractChartProps,
   ChartDefinition,
+  ChartProps,
 } from '@common/modules/charts/types/chart';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 export type GetInfographic = (
   releaseId: string,
   fileName: string,
 ) => Promise<Blob>;
 
-export interface InfographicChartProps extends AbstractChartProps {
+export interface InfographicChartProps extends ChartProps {
   releaseId?: string;
   fileId?: string;
   getInfographic?: GetInfographic;
 }
 
-const Infographic = ({
+const InfographicBlock = ({
   releaseId,
   fileId,
   getInfographic,
@@ -53,12 +53,15 @@ const Infographic = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const infographicBlockDefinition: ChartDefinition = {
   type: 'infographic',
   name: 'Infographic',
-
-  height: 600,
-
+  options: {
+    defaults: {
+      height: 600,
+      legend: 'none',
+    },
+  },
   capabilities: {
     dataSymbols: false,
     stackable: false,
@@ -69,15 +72,10 @@ const definition: ChartDefinition = {
     hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
+    requiresGeoJson: false,
   },
-
   data: [],
-
-  axes: [],
-
-  requiresGeoJson: false,
+  axes: {},
 };
 
-Infographic.definition = definition;
-
-export default Infographic;
+export default memo(InfographicBlock);

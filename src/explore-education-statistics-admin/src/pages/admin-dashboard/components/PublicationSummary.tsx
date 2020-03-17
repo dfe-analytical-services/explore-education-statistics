@@ -53,7 +53,10 @@ const PublicationSummary = ({ publication }: Props) => {
                   release={release}
                   actions={
                     <ButtonLink
-                      to={summaryRoute.generateLink(publication.id, release.id)}
+                      to={summaryRoute.generateLink({
+                        publicationId: publication.id,
+                        releaseId: release.id,
+                      })}
                       testId={formatTestId(
                         `Edit release link for ${
                           publication.title

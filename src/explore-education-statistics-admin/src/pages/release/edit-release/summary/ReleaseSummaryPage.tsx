@@ -10,7 +10,7 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
@@ -106,7 +106,10 @@ const ReleaseSummaryPage = () => {
           {model.canEditRelease && (
             <div className="dfe-align--right">
               <Link
-                to={summaryEditRoute.generateLink(publication.id, releaseId)}
+                to={summaryEditRoute.generateLink({
+                  publicationId: publication.id,
+                  releaseId,
+                })}
               >
                 Edit release summary
               </Link>

@@ -27,7 +27,7 @@ import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
-import { RouteProps } from 'react-router';
+import { generatePath, RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
   protectedAction?: (user: User) => boolean;
@@ -36,7 +36,11 @@ interface ProtectedRouteProps extends RouteProps {
 export const generateAdminDashboardThemeTopicLink: (
   themeId: string,
   topicId: string,
-) => string = (themeId, topicId) => `/dashboard/${themeId}/${topicId}`;
+) => string = (themeId, topicId) =>
+  generatePath('/dashboard/:themeId/:topicId', {
+    themeId,
+    topicId,
+  });
 
 const appRouteList: Dictionary<ProtectedRouteProps> = {
   home: {

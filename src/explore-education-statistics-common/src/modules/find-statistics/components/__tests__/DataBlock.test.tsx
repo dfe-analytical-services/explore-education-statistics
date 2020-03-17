@@ -1,10 +1,16 @@
-import testData from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import {
+  testChartPropsWithData1,
+  testChartPropsWithMultipleData,
+  testDataBlockResponse,
+} from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import _dataBlockService, {
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import React from 'react';
+import { Chart } from '@common/services/publicationService';
 import { render, wait } from '@testing-library/react';
+import React from 'react';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
@@ -32,7 +38,7 @@ describe('DataBlock', () => {
   test('renders horizontal chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -44,48 +50,9 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
+            ...testChartPropsWithData1,
             type: 'horizontalbar',
-            stacked: true,
-            labels: {
-              '23_1_2': {
-                name: '23_1_2',
-                label: 'Label 23_1_2',
-                value: '23_1_2',
-                unit: '%',
-              },
-              '26_1_2': {
-                name: '26_1_2',
-                label: 'Label 26_1_2',
-                value: '26_1_2',
-                unit: '%',
-              },
-              '28_1_2': {
-                name: '28_1_2',
-                label: 'Label 28_1_2',
-                value: '28_1_2',
-                unit: '%',
-              },
-            },
-            axes: {
-              major: {
-                name: 'major',
-                type: 'major',
-                groupBy: 'timePeriod',
-                dataSets: [
-                  { indicator: '23', filters: ['1', '2'] },
-                  { indicator: '26', filters: ['1', '2'] },
-                  { indicator: '28', filters: ['1', '2'] },
-                ],
-              },
-              minor: {
-                name: 'minor',
-                type: 'minor',
-                dataSets: [],
-              },
-            },
-            width: 800,
-            height: 600,
-          },
+          } as Chart,
         ]}
       />,
     );
@@ -104,7 +71,7 @@ describe('DataBlock', () => {
   test('renders vertical chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -116,48 +83,9 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
+            ...testChartPropsWithData1,
             type: 'verticalbar',
-            labels: {
-              '23_1_2': {
-                name: '23_1_2',
-                label: 'Label 23_1_2',
-                value: '23_1_2',
-                unit: '%',
-              },
-              '26_1_2': {
-                name: '26_1_2',
-                label: 'Label 26_1_2',
-                value: '26_1_2',
-                unit: '%',
-              },
-              '28_1_2': {
-                name: '28_1_2',
-                label: 'Label 28_1_2',
-                value: '28_1_2',
-                unit: '%',
-              },
-            },
-
-            axes: {
-              major: {
-                name: 'major',
-                type: 'major',
-                groupBy: 'timePeriod',
-                dataSets: [
-                  { indicator: '23', filters: ['1', '2'] },
-                  { indicator: '26', filters: ['1', '2'] },
-                  { indicator: '28', filters: ['1', '2'] },
-                ],
-              },
-              minor: {
-                name: 'minor',
-                type: 'minor',
-                dataSets: [],
-              },
-            },
-            width: 800,
-            height: 600,
-          },
+          } as Chart,
         ]}
       />,
     );
@@ -176,7 +104,7 @@ describe('DataBlock', () => {
   test('renders table', () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -197,7 +125,7 @@ describe('DataBlock', () => {
   test('renders summary', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -228,7 +156,7 @@ describe('DataBlock', () => {
   test('renders map instead of chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
+        return Promise.resolve(testDataBlockResponse);
       },
     );
 
@@ -240,51 +168,9 @@ describe('DataBlock', () => {
         showTables={false}
         charts={[
           {
+            ...testChartPropsWithMultipleData,
             type: 'map',
-            labels: {
-              '23_1_2_____': {
-                name: '23_1_2_____',
-                label: 'Label 23_1_2',
-                value: '23_1_2',
-                unit: '%',
-                colour: '#ff0000',
-              },
-              '26_1_2_____': {
-                name: '26_1_2_____',
-                label: 'Label 26_1_2',
-                value: '26_1_2',
-                unit: '%',
-                colour: '#00ff00',
-              },
-              '28_1_2_____': {
-                name: '28_1_2_____',
-                label: 'Label 28_1_2',
-                value: '28_1_2',
-                unit: '%',
-                colour: '#0000ff',
-              },
-            },
-
-            axes: {
-              major: {
-                name: 'major',
-                type: 'major',
-                groupBy: 'locations',
-                dataSets: [
-                  { indicator: '23', filters: ['1', '2'] },
-                  { indicator: '26', filters: ['1', '2'] },
-                  { indicator: '28', filters: ['1', '2'] },
-                ],
-              },
-              minor: {
-                name: 'minor',
-                type: 'minor',
-                dataSets: [],
-              },
-            },
-            width: 800,
-            height: 600,
-          },
+          } as ChartRendererProps,
         ]}
       />,
     );

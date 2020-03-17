@@ -1,6 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   DataFile,
   DeleteDataFilePlan,

@@ -17,13 +17,13 @@ import dataBlockService, {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart, ChartType } from '@common/services/publicationService';
+import { Chart } from '@common/services/publicationService';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
   dataBlock: DataBlock;
   dataBlockResponse: DataBlockResponse;
-  onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
+  onDataBlockSave: (dataBlock: DataBlock) => void;
 }
 
 const DataBlockContentTabs = ({
@@ -80,28 +80,12 @@ const DataBlockContentTabs = ({
   }, [dataBlock.tables, chartBuilderData]);
 
   const onChartSave = (props: ChartRendererProps) => {
-    // copy and strip out redundant data from the properties
-    const chart: Chart = {
-      type: props.type as ChartType,
-      axes: props.axes,
-      fileId: props.fileId,
-      geographicId: props.geographicId,
-      height: props.height,
-      labels: props.labels,
-      legend: props.legend,
-      stacked: props.stacked,
-      title: props.title,
-      width: props.width,
-    };
-
     const newDataBlock: DataBlock = {
       ...dataBlock,
-      charts: [chart],
+      charts: [props],
     };
 
-    return onDataBlockSave(newDataBlock).then(() => {
-      return { ...props };
-    });
+    onDataBlockSave(newDataBlock);
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {

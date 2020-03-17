@@ -1,7 +1,15 @@
 import { GlobalPermissions, User } from '@admin/services/sign-in/types';
 import client from '@admin/services/util/service';
 
-const permissionsService = {
+export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
+
+export interface PreReleaseWindowStatus {
+  preReleaseAccess: PreReleaseAccess;
+  preReleaseWindowStartTime: Date;
+  preReleaseWindowEndTime: Date;
+}
+
+const permissionService = {
   getGlobalPermissions: (): Promise<GlobalPermissions> => {
     return client.get(`/permissions/access`);
   },
@@ -55,4 +63,4 @@ const permissionsService = {
   },
 };
 
-export default permissionsService;
+export default permissionService;

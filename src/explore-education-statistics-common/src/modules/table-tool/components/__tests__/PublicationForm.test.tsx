@@ -1,4 +1,5 @@
 import PublicationForm from '@common/modules/table-tool/components/PublicationForm';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 
@@ -155,19 +156,24 @@ describe('PublicationForm', () => {
     },
   ];
 
+  const wizardProps: InjectedWizardProps = {
+    shouldScroll: true,
+    stepNumber: 1,
+    currentStep: 1,
+    setCurrentStep: () => undefined,
+    isActive: true,
+    goToNextStep: () => undefined,
+    goToPreviousStep: () => undefined,
+  };
+
   test('renders publication options filtered by title when using search field', () => {
     jest.useFakeTimers();
 
     const { container, getByLabelText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -192,14 +198,9 @@ describe('PublicationForm', () => {
 
     const { container, getByLabelText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -224,14 +225,9 @@ describe('PublicationForm', () => {
 
     const { getByLabelText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -249,14 +245,9 @@ describe('PublicationForm', () => {
   test('renders empty message when there are no publication options', () => {
     const { container, queryByText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={[]}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -269,14 +260,9 @@ describe('PublicationForm', () => {
 
     const { container, queryByText, getByLabelText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -300,14 +286,9 @@ describe('PublicationForm', () => {
 
     const { container, queryByText, getByLabelText, queryByLabelText } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 
@@ -334,14 +315,9 @@ describe('PublicationForm', () => {
   test('renders dropdown for selected publication option as open', () => {
     const { container, getByLabelText, getByTestId } = render(
       <PublicationForm
+        {...wizardProps}
         onSubmit={() => undefined}
         options={testOptions}
-        stepNumber={1}
-        currentStep={1}
-        setCurrentStep={() => undefined}
-        isActive
-        goToNextStep={() => undefined}
-        goToPreviousStep={() => undefined}
       />,
     );
 

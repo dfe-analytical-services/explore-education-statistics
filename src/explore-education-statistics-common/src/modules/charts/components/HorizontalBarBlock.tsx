@@ -1,18 +1,19 @@
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import '@common/modules/charts/components/charts.scss';
 import {
+  AxisConfiguration,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Bar,
   BarChart,
@@ -25,7 +26,12 @@ import {
   YAxis,
 } from 'recharts';
 
-export type HorizontalBarProps = StackedBarProps;
+export interface HorizontalBarProps extends StackedBarProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const HorizontalBarBlock = ({
   data,
@@ -78,10 +84,11 @@ const HorizontalBarBlock = ({
         <XAxis
           type="number"
           dataKey="value"
-          hide={axes.minor?.visible === false}
-          unit={axes.minor?.unit}
+          hide={!axes.minor.visible}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
+          height={parseNumber(axes.minor.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -89,11 +96,11 @@ const HorizontalBarBlock = ({
         <YAxis
           type="category"
           dataKey="name"
-          hide={axes.major.visible === false}
+          hide={!axes.major.visible}
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
-          width={conditionallyAdd(axes.major.size)}
+          width={parseNumber(axes.major.size)}
         />
 
         <Tooltip cursor={false} />
@@ -118,7 +125,7 @@ const HorizontalBarBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             x={referenceLine.position}
@@ -130,10 +137,9 @@ const HorizontalBarBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const horizontalBarBlockDefinition: ChartDefinition = {
   type: 'horizontalbar',
   name: 'Horizontal bar',
-
   capabilities: {
     dataSymbols: false,
     stackable: true,
@@ -144,8 +150,14 @@ const definition: ChartDefinition = {
     hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
+    requiresGeoJson: false,
   },
-
+  options: {
+    defaults: {
+      height: 300,
+      legend: 'top',
+    },
+  },
   data: [
     {
       type: 'bar',
@@ -154,24 +166,21 @@ const definition: ChartDefinition = {
       targetAxis: 'yaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'major',
-      title: 'Y Axis',
+      title: 'Y Axis (major axis)',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
-    {
+    minor: {
       id: 'minor',
-      title: 'X Axis',
+      title: 'X Axis (minor axis)',
       type: 'minor',
     },
-  ],
-
-  requiresGeoJson: false,
+  },
 };
 
-HorizontalBarBlock.definition = definition;
-
-export default HorizontalBarBlock;
+export default memo(HorizontalBarBlock);
