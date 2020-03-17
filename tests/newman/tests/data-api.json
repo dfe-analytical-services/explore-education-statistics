@@ -37,7 +37,7 @@
 											"});",
 											"",
 											"pm.test(\"Expect correct number of themes\", function () {",
-											"    pm.expect(respJson.length).to.be.above(1);",
+											"    pm.expect(respJson.length).to.be.above(0);",
 											"});",
 											"",
 											"pm.test(\"Pupils and school theme should contain more than 2 topics\", function () {",
@@ -46,23 +46,6 @@
 											"            pm.expect(respJson[i].topics.length).to.be.above(2);",
 											"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
 											"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
-											"        }",
-											"    }",
-											"});",
-											"        ",
-											"pm.test(\"Children, early years and social care should contain correct data\", function () {",
-											"    for(var i = 0; i < pm.response.json().length; i++) {",
-											"        if(respJson[i].title === \"Children, early years and social care\") {",
-											"            pm.expect(respJson[i].topics.length).to.be.above(0);",
-											"            const topic = respJson[i].topics.find(topic => topic.title === \"Early years foundation stage profile\");",
-											"            pm.expect(topic.id).to.not.be.undefined;",
-											"            pm.expect(topic.slug).to.not.be.undefined;",
-											"            ",
-											"            pm.expect(topic.publications.length).to.equal(1);",
-											"            pm.expect(topic.publications[0].title).to.equal(\"Early years foundation stage profile results\");",
-											"            pm.expect(topic.publications[0].id).to.not.be.undefined;",
-											"            pm.expect(topic.publications[0].slug).to.not.be.undefined;",
-											"        ",
 											"        }",
 											"    }",
 											"});"
@@ -587,64 +570,6 @@
 												"meta",
 												"subject",
 												"666cd878-87bb-4f77-9a3f-f5c75078e112"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Early learning goal underlying data 2013-2018",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.OverallRating\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EarlyLearningGoal\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject/8e3d1bc0-2beb-4dc6-9db7-3d27d0608042",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject",
-												"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042"
 											]
 										}
 									},
@@ -1567,201 +1492,6 @@
 												"meta",
 												"subject",
 												"28feb263-4bf9-4dd7-9440-48e2685f6954"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						},
-						{
-							"name": "Early years foundation stage profile results",
-							"item": [
-								{
-									"name": "Subject Meta - Early learning goal underlying data 2013-2018",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.OverallRating\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EarlyLearningGoal\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"});",
-													"",
-													"pm.test(\"Should have correct number of indicators\", function () {",
-													"   pm.expect(pm.response.json().indicators.OverallRating.options.length).to.equal(3);",
-													"   pm.expect(pm.response.json().indicators.EarlyLearningGoal.options.length).to.equal(2);",
-													"   pm.expect(pm.response.json().indicators.GoodLevelOfDevelopment.options.length).to.equal(2);",
-													"   pm.expect(pm.response.json().indicators.AreaOfLearning.options.length).to.equal(2);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject/8e3d1bc0-2beb-4dc6-9db7-3d27d0608042",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject",
-												"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Subject Meta - Areas of learning underlying data 2013-2018",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AreaOfLearning\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"});",
-													"",
-													"pm.test(\"Should have correct number of indicators\", function () {",
-													"   pm.expect(pm.response.json().indicators.AreaOfLearning.options.length).to.equal(5);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject/55759ccd-da8f-4a27-9f4a-ca669f4218e0",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject",
-												"55759ccd-da8f-4a27-9f4a-ca669f4218e0"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Subject Meta - EYFSP ELG underlying data 2013-2018",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.EarlyLearningGoal\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EarlyLearningGoal\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"indicators.OverallRating\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"indicators.AreaOfLearning\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"});",
-													"",
-													"pm.test(\"Should have correct number of indicators\", function () {",
-													"   pm.expect(pm.response.json().indicators.EarlyLearningGoal.options.length).to.equal(9);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject/01ebdcfc-979a-4fe7-8d39-e5f8a6546e95",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject",
-												"01ebdcfc-979a-4fe7-8d39-e5f8a6546e95"
 											]
 										}
 									},
@@ -5558,140 +5288,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Early years foundation stage results",
-					"item": [
-						{
-							"name": "Early learning goal underlying data 2013-2018",
-							"item": [
-								{
-									"name": "Data - Early learning goal 2013-18 - LA - Lambeth, Sefton, Luton - Male, Female",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Should have correct filters metaData\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(1);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Should have correct indicators metaData\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(2);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.\" + pm.globals.get(\"INDI_TotalPointScoreBasedOnAssessmentRating\")));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.\" + pm.globals.get(\"INDI_AveragePointScore\")));",
-													"});",
-													"",
-													"pm.test(\"Should have correct locations metaData\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000022\")); // LA - Lambeth",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E08000014\")); //      Sefton",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000032\")); //      Luton",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(24); ",
-													"});",
-													"",
-													"pm.test(\"All results have filter Characteristic Gender:Female or Gender:Male\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderMale\")) {",
-													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
-													"        }",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"8e3d1bc0-2beb-4dc6-9db7-3d27d0608042\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{INDI_TotalPointScoreBasedOnAssessmentRating}}\",\n        \"{{INDI_AveragePointScore}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
-										"type": "text/javascript",
-										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"beeaa217-3233-48df-bc1d-11f066a26efe\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"2cf47ea3-1891-4bba-9381-81a0305a7581\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"edcc7822-d88e-490d-8446-baca8b6ccca4\");",
-											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"7d250efe-afad-4117-8ccf-debf689c4efc\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"37faaef4-5b5e-473e-9585-8580c1df967a\");"
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "a50021c8-3c9a-46f9-bce7-d5f222d0253e",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Secondary and primary schools applications and offers",
 					"item": [
 						{
@@ -6334,28 +5930,27 @@
 									"var respJson = pm.response.json();",
 									"",
 									"pm.test(\"Filter count is above the expected count\", function () {",
-									"    pm.expect(respJson.filterCount).to.be.above(31);",
+									"    pm.expect(respJson.filterCount).to.be.above(19);",
 									"});",
 									"",
 									"pm.test(\"Indicator count is above the expected count\", function () {",
-									"    pm.expect(respJson.indicatorCount).to.be.above(224);",
+									"    pm.expect(respJson.indicatorCount).to.be.above(201);",
 									"});",
 									"",
 									"pm.test(\"Location count is above the expected count\", function () {",
-									"    pm.expect(respJson.locationCount).to.be.above(528);",
+									"    pm.expect(respJson.locationCount).to.be.above(656);",
 									"});",
 									"",
 									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    // KS2_2016_test_UD is excluded, so 1101149 - 35700",
-									"    pm.expect(respJson.observationCount).to.be.above(408598);",
+									"    pm.expect(respJson.observationCount).to.be.above(252830);",
 									"});",
 									"",
 									"pm.test(\"Release count is above the expected count\", function () {",
-									"    pm.expect(respJson.releaseCount).to.be.above(3);",
+									"    pm.expect(respJson.releaseCount).to.be.above(2);",
 									"});",
 									"",
 									"pm.test(\"Subject count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().subjectCount).to.be.above(16);",
+									"    pm.expect(pm.response.json().subjectCount).to.be.above(13);",
 									"});"
 								],
 								"type": "text/javascript"
