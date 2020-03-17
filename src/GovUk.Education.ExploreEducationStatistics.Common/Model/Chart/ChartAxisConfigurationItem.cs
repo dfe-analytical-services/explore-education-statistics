@@ -32,12 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public int? Min;
         public int? Max;
-        public int Size;
+        public int? Size;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TickConfig TickConfig;
 
-        public int TickSpacing;
+        public int? TickSpacing;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
