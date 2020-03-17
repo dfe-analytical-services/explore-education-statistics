@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             public CanDeleteAllReleaseAmendmentsAuthorizationHandler() 
                 : base(ctx => 
                     ctx.Entity.Amendment 
+                    && ctx.Entity.Status != ReleaseStatus.Approved
                     && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.DeleteAllReleaseAmendments)) {}
         }
 
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             public HasEditorRoleOnReleaseAmendmentAuthorizationHandler(ContentDbContext context) 
                 : base(context, ctx => 
                     ctx.Release.Amendment 
+                    && ctx.Release.Status != ReleaseStatus.Approved
                     && ContainsEditorRole(ctx.Roles))
             {}
         }

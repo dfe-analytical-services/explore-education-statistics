@@ -36,8 +36,7 @@ const ReleaseSummary = ({
       tag={[
         getReleaseStatusLabel(release.status),
         release.amendment && 'Amendment',
-        // eslint-disable-next-line react/jsx-key
-        release.status !== 'Draft' && release.status !== 'HigherLevelReview' && (
+        release.status === 'Approved' && (
           <LazyLoad
             scroll={false}
             placeholder={
@@ -63,9 +62,11 @@ const ReleaseSummary = ({
             </FormattedDate>
           )}
         </SummaryListItem>
-        <SummaryListItem term="Release process status">
-          <ReleaseServiceStatus releaseId={release.id} />
-        </SummaryListItem>
+        {release.status === 'Approved' && (
+          <SummaryListItem term="Release process status">
+            <ReleaseServiceStatus releaseId={release.id} />
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Lead statistician">
           {release.contact && (
             <span>

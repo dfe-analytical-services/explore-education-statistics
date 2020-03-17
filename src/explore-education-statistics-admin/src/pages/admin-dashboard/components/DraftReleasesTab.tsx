@@ -3,52 +3,41 @@ import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import service from '@admin/services/release/create-release/service';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
-  initialReleases: AdminDashboardRelease[];
+  releases: AdminDashboardRelease[];
+  onChangeRelease: () => void;
 }
 
-const DraftReleasesTab = ({ initialReleases }: Props) => {
-  const [releases, setReleases] = useState<AdminDashboardRelease[]>();
+const DraftReleasesTab = ({ releases, onChangeRelease }: Props) => {
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
     string
   >();
 
-  useEffect(() => {
-    setReleases(initialReleases);
-  }, [initialReleases, setReleases]);
-
   return (
     <>
-      {releases && (
-        <>
-          <ReleasesTab
-            releases={releases}
-            noReleasesMessage="There are currently no draft releases"
-            releaseSummaryRenderer={release => (
-              <NonScheduledReleaseSummary
-                key={release.id}
-                onClickCancelAmendment={setCancelAmendmentReleaseId}
-                release={release}
-              />
-            )}
+      <ReleasesTab
+        releases={releases}
+        noReleasesMessage="There are currently no draft releases"
+        releaseSummaryRenderer={release => (
+          <NonScheduledReleaseSummary
+            key={release.id}
+            onClickCancelAmendment={setCancelAmendmentReleaseId}
+            release={release}
           />
+        )}
+      />
 
-          {cancelAmendmentReleaseId && (
-            <CancelAmendmentModal
-              onConfirm={async () =>
-                service.deleteRelease(cancelAmendmentReleaseId).then(() => {
-                  setReleases(
-                    releases.filter(r => r.id !== cancelAmendmentReleaseId),
-                  );
-                  setCancelAmendmentReleaseId(undefined);
-                })
-              }
-              onCancel={() => setCancelAmendmentReleaseId(undefined)}
-            />
-          )}
-        </>
+      {cancelAmendmentReleaseId && (
+        <CancelAmendmentModal
+          onConfirm={async () => {
+            await service.deleteRelease(cancelAmendmentReleaseId);
+            setCancelAmendmentReleaseId(undefined);
+            onChangeRelease();
+          }}
+          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+        />
       )}
     </>
   );

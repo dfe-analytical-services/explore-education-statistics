@@ -28,5 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public User CreatedBy { get; set; }
 
         public Guid CreatedById { get; set; }
+        
+        public bool SoftDeleted { get; set; }
     }
 }

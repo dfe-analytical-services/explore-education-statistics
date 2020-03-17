@@ -71,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; }
+        
+        public bool SoftDeleted { get; set; }
 
         [NotMapped]
         [JsonProperty("Content")]

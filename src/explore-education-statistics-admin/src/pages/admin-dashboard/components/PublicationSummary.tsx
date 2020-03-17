@@ -10,25 +10,21 @@ import service from '@admin/services/release/create-release/service';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 import CancelAmendmentModal from './CancelAmendmentModal';
+import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
-  initialPublication: AdminDashboardPublication;
+  publication: AdminDashboardPublication;
+  onChangePublication: () => void;
 }
 
 const PublicationSummary = ({
-  initialPublication,
+  publication,
+  onChangePublication,
   history,
 }: Props & RouteComponentProps) => {
-  const [publication, setPublication] = useState<AdminDashboardPublication>();
-
-  useEffect(() => {
-    setPublication(initialPublication);
-  }, [initialPublication, setPublication]);
-
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
@@ -40,119 +36,107 @@ const PublicationSummary = ({
 
   return (
     <>
-      {publication && (
-        <>
-          <SummaryList>
-            <SummaryListItem term="Methodology" smallKey>
-              {publication.methodology && (
-                <Link to={`/methodologies/${publication.methodology.id}`}>
-                  {publication.methodology.title}
-                </Link>
-              )}
-              {publication.externalMethodology &&
-                publication.externalMethodology.url && (
-                  <>
-                    {publication.externalMethodology.title} (
-                    <a
-                      href={publication.externalMethodology.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {publication.externalMethodology.url}
-                    </a>
-                    )
-                  </>
-                )}
-              {!publication.methodology &&
-                (!publication.externalMethodology ||
-                  !publication.externalMethodology.url) && (
-                  <>No methodology assigned</>
-                )}
-            </SummaryListItem>
-            <SummaryListItem term="Releases" smallKey>
-              <ul className="govuk-list dfe-admin">
-                {publication.releases
-                  .filter(noAmendmentInProgressFilter)
-                  .map(release => (
-                    <li key={release.id}>
-                      <NonScheduledReleaseSummary
-                        onClickAmendRelease={setAmendReleaseId}
-                        onClickCancelAmendment={setCancelAmendmentReleaseId}
-                        release={release}
-                      />
-                    </li>
-                  ))}
-                {publication.releases.length < 1 && <>No releases created</>}
-              </ul>
-            </SummaryListItem>
-          </SummaryList>
-          <SummaryList>
-            <SummaryListItem term="" smallKey>
-              {publication.permissions.canCreateReleases && (
-                <ButtonLink
-                  to={releaseRoutes.createReleaseRoute.generateLink(
-                    publication.id,
-                  )}
-                  className="govuk-!-margin-right-6"
-                  testId={`Create new release link for ${publication.title}`}
+      <SummaryList>
+        <SummaryListItem term="Methodology" smallKey>
+          {publication.methodology && (
+            <Link to={`/methodologies/${publication.methodology.id}`}>
+              {publication.methodology.title}
+            </Link>
+          )}
+          {publication.externalMethodology &&
+            publication.externalMethodology.url && (
+              <>
+                {publication.externalMethodology.title} (
+                <a
+                  href={publication.externalMethodology.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Create new release
-                </ButtonLink>
-              )}
-              <ButtonLink
-                to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
-                className="govuk-button--secondary"
-              >
-                {!publication.methodology &&
-                (!publication.externalMethodology ||
-                  !publication.externalMethodology.url)
-                  ? 'Add'
-                  : 'Edit'}{' '}
-                methodology
-              </ButtonLink>
-            </SummaryListItem>
-          </SummaryList>
-
-          {amendReleaseId && (
-            <ModalConfirm
-              title="Confirm you want to amend this live release"
-              onConfirm={async () =>
-                service
-                  .createReleaseAmendment(amendReleaseId)
-                  .then(amendment =>
-                    history.push(
-                      summaryRoute.generateLink(publication.id, amendment.id),
-                    ),
-                  )
-              }
-              onExit={() => setAmendReleaseId(undefined)}
-              onCancel={() => setAmendReleaseId(undefined)}
-              mounted
+                  {publication.externalMethodology.url}
+                </a>
+                )
+              </>
+            )}
+          {!publication.methodology &&
+            (!publication.externalMethodology ||
+              !publication.externalMethodology.url) && (
+              <>No methodology assigned</>
+            )}
+        </SummaryListItem>
+        <SummaryListItem term="Releases" smallKey>
+          <ul className="govuk-list dfe-admin">
+            {publication.releases
+              .filter(noAmendmentInProgressFilter)
+              .map(release => (
+                <li key={release.id}>
+                  <NonScheduledReleaseSummary
+                    onClickAmendRelease={setAmendReleaseId}
+                    onClickCancelAmendment={setCancelAmendmentReleaseId}
+                    release={release}
+                  />
+                </li>
+              ))}
+            {publication.releases.length < 1 && <>No releases created</>}
+          </ul>
+        </SummaryListItem>
+      </SummaryList>
+      <SummaryList>
+        <SummaryListItem term="" smallKey>
+          {publication.permissions.canCreateReleases && (
+            <ButtonLink
+              to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
+              className="govuk-!-margin-right-6"
+              testId={`Create new release link for ${publication.title}`}
             >
-              <p>
-                Please note, any changes made to this live release must be
-                approved before updates can be published.
-              </p>
-            </ModalConfirm>
+              Create new release
+            </ButtonLink>
           )}
+          <ButtonLink
+            to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
+            className="govuk-button--secondary"
+          >
+            {!publication.methodology &&
+            (!publication.externalMethodology ||
+              !publication.externalMethodology.url)
+              ? 'Add'
+              : 'Edit'}{' '}
+            methodology
+          </ButtonLink>
+        </SummaryListItem>
+      </SummaryList>
 
-          {cancelAmendmentReleaseId && (
-            <CancelAmendmentModal
-              onConfirm={async () =>
-                service.deleteRelease(cancelAmendmentReleaseId).then(() => {
-                  setPublication({
-                    ...publication,
-                    releases: publication.releases.filter(
-                      r => r.id !== cancelAmendmentReleaseId,
-                    ),
-                  });
-                  setCancelAmendmentReleaseId(undefined);
-                })
-              }
-              onCancel={() => setCancelAmendmentReleaseId(undefined)}
-            />
-          )}
-        </>
+      {amendReleaseId && (
+        <ModalConfirm
+          title="Confirm you want to amend this live release"
+          onConfirm={async () =>
+            service
+              .createReleaseAmendment(amendReleaseId)
+              .then(amendment =>
+                history.push(
+                  summaryRoute.generateLink(publication.id, amendment.id),
+                ),
+              )
+          }
+          onExit={() => setAmendReleaseId(undefined)}
+          onCancel={() => setAmendReleaseId(undefined)}
+          mounted
+        >
+          <p>
+            Please note, any changes made to this live release must be approved
+            before updates can be published.
+          </p>
+        </ModalConfirm>
+      )}
+
+      {cancelAmendmentReleaseId && (
+        <CancelAmendmentModal
+          onConfirm={async () => {
+            await service.deleteRelease(cancelAmendmentReleaseId);
+            setCancelAmendmentReleaseId(undefined);
+            onChangePublication();
+          }}
+          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+        />
       )}
     </>
   );

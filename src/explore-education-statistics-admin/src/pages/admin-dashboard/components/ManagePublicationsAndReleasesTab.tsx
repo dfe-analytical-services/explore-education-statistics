@@ -6,6 +6,7 @@ import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import {
   AdminDashboardPublication,
+  AdminDashboardRelease,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
 import permissionService from '@admin/services/permissions/service';
@@ -45,12 +46,20 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
+interface Props {
+  onChangePublication: () => void;
+  nonLiveReleases: AdminDashboardRelease[];
+}
+
 const ManagePublicationsAndReleasesTab = ({
   match,
-}: RouteComponentProps<{
-  themeId?: string;
-  topicId?: string;
-}>) => {
+  onChangePublication,
+  nonLiveReleases,
+}: Props &
+  RouteComponentProps<{
+    themeId?: string;
+    topicId?: string;
+  }>) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -166,7 +175,7 @@ const ManagePublicationsAndReleasesTab = ({
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedThemeAndTopic]);
+  }, [selectedThemeAndTopic, nonLiveReleases]);
 
   return (
     <>
@@ -240,7 +249,10 @@ const ManagePublicationsAndReleasesTab = ({
                     heading={publication.title}
                     headingTag="h3"
                   >
-                    <PublicationSummary initialPublication={publication} />
+                    <PublicationSummary
+                      publication={publication}
+                      onChangePublication={onChangePublication}
+                    />
                   </AccordionSection>
                 ))}
               </Accordion>

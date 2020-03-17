@@ -119,7 +119,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => { return true; });
+                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(async release =>
+                {
+                    var roles = await _context
+                        .UserReleaseRoles
+                        .Where(r => r.ReleaseId == releaseId)
+                        .ToListAsync();
+
+                    var invites = await _context
+                        .UserReleaseInvites
+                        .Where(r => r.ReleaseId == releaseId)
+                        .ToListAsync();
+                    
+                    release.SoftDeleted = true;
+                    roles.ForEach(r => r.SoftDeleted = true);
+                    invites.ForEach(r => r.SoftDeleted = true);
+
+                    _context.Update(release);
+                    _context.UpdateRange(roles);
+                    _context.UpdateRange(invites);
+
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                });
         }
 
 
