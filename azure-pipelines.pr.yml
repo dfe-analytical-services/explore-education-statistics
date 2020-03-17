@@ -246,9 +246,10 @@ jobs:
         displayName: 'Publish frontend test results'
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: '**/junit.xml'
+          testResultsFiles: 'explore-education-statistics-*/junit-*.xml'
           searchFolder: './src'
-          testRunTitle: 'Frontend Jest tests'
+          testRunTitle: 'PR Jest tests'
+          mergeTestResults: true
   - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-16.04'

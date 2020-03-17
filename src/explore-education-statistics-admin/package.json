@@ -191,6 +191,11 @@
       "<rootDir>/node_modules/jest-watch-typeahead/testname.js"
     ]
   },
+  "jest-junit": {
+    "ancestorSeparator": " › ",
+    "suiteName": "Admin Jest tests",
+    "outputName": "junit-admin.xml"
+  },
   "browserslist": [
     "ie>=11",
     "safari>=12",
