@@ -395,6 +395,10 @@
     },
     "devopsSPN": {
       "type": "string"
+    }, 
+    "storageAccountPrefix": {
+      "type": "string",
+      "defaultValue": "storage"
     }
   },
   "variables": {
@@ -411,7 +415,7 @@
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
-    "coreStorageAccountName": "[concat(parameters('subscription'), 'storageeescore')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
@@ -421,7 +425,7 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsStorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
+    "notificationsStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eesnotify')]",
     "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
