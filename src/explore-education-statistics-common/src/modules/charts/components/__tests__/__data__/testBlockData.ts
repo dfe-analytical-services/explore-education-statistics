@@ -339,12 +339,6 @@ const multipleData: DataBlockData = {
   ],
 };
 
-const labels = {
-  '28': 'Authorised absence rate',
-  '26': 'Overall absence rate',
-  '23': 'Unauthorised absence rate',
-};
-
 const metaData: DataBlockMetadata = {
   geoJsonAvailable: true,
   publicationName: 'test',

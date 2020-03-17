@@ -1,4 +1,3 @@
-import useMounted from '@common/hooks/useMounted';
 import { DependencyList, useCallback, useMemo, useRef, useState } from 'react';
 
 export interface AsyncState<T> {
