@@ -12,19 +12,24 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
   // Hide injected props from public API
   const injectedWizardProps = restProps as InjectedWizardProps;
 
-  const { stepNumber, currentStep, isActive } = injectedWizardProps;
+  const {
+    stepNumber,
+    currentStep,
+    shouldScroll,
+    isActive,
+  } = injectedWizardProps;
 
   const ref = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    if (isActive && ref.current) {
+    if (isActive && shouldScroll && ref.current) {
       ref.current.scrollIntoView({
         block: 'start',
         behavior: 'smooth',
       });
       ref.current.focus();
     }
-  }, [isActive]);
+  }, [currentStep, isActive, shouldScroll]);
 
   return (
     <li

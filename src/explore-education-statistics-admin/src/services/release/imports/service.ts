@@ -1,5 +1,5 @@
 import client from '@admin/services/util/service';
-import { ImportStatus } from './types';
+import { ErrorObj, ImportStatus } from './types';
 
 interface StringifiedImportStatus extends Omit<ImportStatus, 'errors'> {
   errors?: string;
@@ -14,7 +14,9 @@ const service = {
       .then(importStatus => {
         return {
           ...importStatus,
-          errors: JSON.parse(importStatus.errors || '[]'),
+          errors: JSON.parse(importStatus.errors || '[]').map(
+            ({ Message }: ErrorObj) => Message,
+          ),
         };
       });
   },

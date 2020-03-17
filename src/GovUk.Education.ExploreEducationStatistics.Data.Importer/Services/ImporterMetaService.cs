@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
@@ -25,10 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
         }
 
-        public SubjectMeta Import(IEnumerable<string> lines, Subject subject, StatisticsDbContext context)
+        public SubjectMeta Import(DataColumnCollection cols, DataRowCollection rows, Subject subject, StatisticsDbContext context)
         {
-            var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(lines, headers);
+            var metaRows = GetMetaRows(CsvUtil.GetColumnValues(cols), rows);
             var filters = ImportFilters(metaRows, subject, context).ToList();
             var indicators = ImportIndicators(metaRows, subject, context).ToList();
             
@@ -39,10 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
         }
 
-        public SubjectMeta Get(IEnumerable<string> lines, Subject subject, StatisticsDbContext context)
+        public SubjectMeta Get(DataColumnCollection cols, DataRowCollection rows, Subject subject, StatisticsDbContext context)
         {
-            var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(lines, headers);
+            var metaRows = GetMetaRows(CsvUtil.GetColumnValues(cols), rows);
             var filters = GetFilters(metaRows, subject, context).ToList();
             var indicators = GetIndicators(metaRows, subject, context).ToList();
             
@@ -53,24 +52,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
         }
 
-        private static List<string> GetHeaders(IEnumerable<string> lines)
-        {
-            return lines.First().Split(',').ToList();
-        }
-
         private static IEnumerable<MetaRow> GetMetaRows(
-            IEnumerable<string> lines,
-            List<string> headers)
+            List<string> cols,
+            DataRowCollection rows)
         {
-            return lines
-                .Skip(1)
-                .Select((line, index) => GetMetaRow(line, headers));
+            List<MetaRow> metaRows = new List<MetaRow>();
+            foreach (DataRow row in rows)
+            {
+                metaRows.Add(GetMetaRow(cols, row));
+            }
+
+            return metaRows;
         }
 
-        public static MetaRow GetMetaRow(string line, List<string> headers)
+        public static MetaRow GetMetaRow(List<string> cols, DataRow row)
         {
-            return CsvUtil.BuildType(line.Split(','), 
-                headers, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow
+            return CsvUtil.BuildType(CsvUtil.GetRowValues(row), 
+                cols, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow
             {
                 ColumnName = values[0],
                 ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),

@@ -4,7 +4,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import { GetInfographic } from '@common/modules/charts/components/Infographic';
+import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
@@ -20,7 +20,7 @@ import {
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, { Component, ReactNode, MouseEvent } from 'react';
+import React, { Component, MouseEvent, ReactNode } from 'react';
 
 export interface DataBlockProps {
   id: string;
@@ -202,23 +202,18 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 {charts.map((chart, idx) => {
                   const key = `${id}_chart_${idx}`;
 
-                  return (
-                    <React.Fragment key={key}>
-                      {chart.data &&
-                      chart.meta &&
-                      chart.data.result.length > 0 ? (
-                        <ChartRenderer
-                          {...chart}
-                          releaseId={releaseId}
-                          getInfographic={getInfographic}
-                        />
-                      ) : (
-                        <div>
-                          Unable to render chart, invalid data configured
-                        </div>
-                      )}
-                    </React.Fragment>
-                  );
+                  if (chart.type === 'infographic') {
+                    return (
+                      <ChartRenderer
+                        {...chart}
+                        key={key}
+                        releaseId={releaseId}
+                        getInfographic={getInfographic}
+                      />
+                    );
+                  }
+
+                  return <ChartRenderer {...chart} key={key} />;
                 })}
 
                 {additionalTabContent}

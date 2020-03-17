@@ -1,6 +1,6 @@
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import {
   Footnote,

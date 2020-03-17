@@ -52,12 +52,15 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     );
 
     await service.updateReleaseSummaryDetails(updatedReleaseDetails);
-    history.push(summaryRoute.generateLink(publication.id, releaseId));
+    history.push(
+      summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
+    );
   }, errorCodeMappings);
 
-  const cancelHandler = () => {
-    history.push(summaryRoute.generateLink(publication.id, releaseId));
-  };
+  const cancelHandler = () =>
+    history.push(
+      summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
+    );
 
   return (
     <>

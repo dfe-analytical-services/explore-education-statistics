@@ -2,6 +2,7 @@ import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/co
 import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 import { ComponentType } from 'react';
+import { generatePath } from 'react-router';
 
 export interface MethodologyRoute {
   path: string;
@@ -23,7 +24,7 @@ const createReadonlyRoute = (
     component,
     title,
     generateLink: (methodologyId: string) =>
-      path.replace(':methodologyId', methodologyId),
+      generatePath(path, { methodologyId }),
   };
 };
 
