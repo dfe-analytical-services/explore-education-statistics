@@ -2,21 +2,25 @@ import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ContentSection } from '@common/services/publicationService';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import useMethodologyActions from '../context/useMethodologyActions';
 
 interface MethodologyAccordionSectionProps {
   content: ContentSection<EditableContentBlock>;
   isAnnex?: boolean;
   methodologyId: string;
+  index: number;
 }
 
 const MethodologyAccordionSection = ({
   isAnnex = false,
   content,
   methodologyId,
+  ...restOfProps
 }: MethodologyAccordionSectionProps) => {
+  const { isEditing } = useContext(EditingContext);
   const { caption, heading, id: sectionId } = content;
   const { content: sectionContent = [] } = content;
   const [isReordering, setIsReordering] = useState(false);
@@ -117,6 +121,7 @@ const MethodologyAccordionSection = ({
       {...content}
       onHeadingChange={onSaveHeading}
       onRemoveSection={removeSection}
+      {...restOfProps}
     >
       <ContentBlocks
         id={`${heading}-content`}
@@ -127,7 +132,7 @@ const MethodologyAccordionSection = ({
         onBlockDelete={removeBlockFromAccordionSection}
         content={sectionContent}
       />
-      {!isReordering && (
+      {isEditing && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block

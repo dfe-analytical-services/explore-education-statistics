@@ -6,7 +6,8 @@ import { ContentType } from '@admin/modules/find-statistics/components/ReleaseCo
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import React, { useCallback, useState } from 'react';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React, { useCallback, useContext, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
@@ -29,6 +30,7 @@ const ReleaseContentAccordionSection = ({
   canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
+  const { isEditing } = useContext(EditingContext);
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
@@ -135,7 +137,7 @@ const ReleaseContentAccordionSection = ({
         allowComments
       />
 
-      {!isReordering && canAddBlocks && (
+      {isEditing && !isReordering && canAddBlocks && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block

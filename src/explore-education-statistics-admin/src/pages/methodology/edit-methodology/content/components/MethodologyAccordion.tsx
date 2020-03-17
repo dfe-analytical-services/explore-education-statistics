@@ -1,6 +1,7 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import React, { useCallback } from 'react';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React, { useCallback, useContext } from 'react';
 import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
 
@@ -13,6 +14,7 @@ const MethodologyAccordion = ({
   isAnnex = false,
   methodology,
 }: MethodologyAccordionProps) => {
+  const { isEditing } = useContext(EditingContext);
   const {
     addContentSection,
     updateContentSectionsOrder,
@@ -40,6 +42,7 @@ const MethodologyAccordion = ({
     [methodology.id, updateContentSectionsOrder],
   );
 
+  if (isAnnex && !isEditing && methodology.annexes.length < 1) return null;
   return (
     <EditableAccordion
       id={`methodology-accordion-${sectionKey}`}
@@ -48,12 +51,13 @@ const MethodologyAccordion = ({
       onSaveOrder={reorderAccordionSections}
     >
       {(isAnnex ? methodology.annexes : methodology.content).map(
-        accordionSection => (
+        (accordionSection, index) => (
           <MethodologyAccordionSection
             methodologyId={methodology.id}
             key={accordionSection.id}
             content={accordionSection}
             isAnnex={isAnnex}
+            index={index}
           />
         ),
       )}

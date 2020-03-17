@@ -120,6 +120,9 @@ const MethodologyContentPage = ({
                 </div>
               </div>
               <MethodologyAccordion methodology={methodology} />
+              {!isEditing && methodology.annexes.length ? (
+                <h2>Annexes</h2>
+              ) : null}
               <MethodologyAccordion methodology={methodology} isAnnex />
             </section>
           </div>
